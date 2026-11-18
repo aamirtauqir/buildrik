@@ -199,10 +199,11 @@ describe("useEditorShortcuts", () => {
     expect(ev.defaultPrevented).toBe(false);
   });
 
-  it("Cmd+J opens the AI tab (composer ui:switch-tab)", () => {
+  // re-baseline: ⌘J no longer opens AI (no AI entry points, owner 2026-10-17).
+  it("Cmd+J opens nothing", () => {
     mount();
     dispatchKey({ key: "j", metaKey: true });
-    expect(composer.emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "ai" });
+    expect(composer.emit).not.toHaveBeenCalledWith("ui:switch-tab", { tab: "ai" });
   });
 
   it("Escape closes the shortcuts modal", () => {

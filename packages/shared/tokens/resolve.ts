@@ -28,6 +28,18 @@ export function lightAliasOf(token: DesignToken): string | undefined {
   return "alias" in token.modes.light ? token.modes.light.alias : undefined;
 }
 
+/** Points a semantic token's light mode at another token (2L9 B6-B02 "Alias of
+ *  …"). Its dark mode is left as it is. Refused (tokens unchanged) for a
+ *  primitive, an unknown target, or a target whose chain leads back to `id`.
+ *  "Literal value · no alias" is the reverse: `setTokenLiteral` with the
+ *  value the alias resolves to now. */
+export function setTokenAlias(tokens: readonly DesignToken[], id: string, targetId: string): DesignToken[] {
+  const t = tokens.find((x) => x.id === id);
+  if (!t || t.layer === "primitive" || targetId === id || !tokens.some((x) => x.id === targetId)) return [...tokens];
+  const next = tokens.map((x) => (x.id === id ? { ...x, modes: { ...x.modes, light: { alias: targetId } } } : x));
+  return resolveTokenLiteral(next, id, "light") === null ? [...tokens] : next;
+}
+
 /** Writes a literal for a token in a mode.
  *
  *  A primitive takes the literal itself (light only — it has no dark mode, so a

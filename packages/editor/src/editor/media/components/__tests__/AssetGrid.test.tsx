@@ -424,7 +424,7 @@ describe("AssetGrid — badges + footer", () => {
       counts: { all: 5, img: 5, vid: 0, ico: 0, fnt: 0 },
     });
     mount(state, { smartFolder: "unused" });
-    expect(screen.getByTestId("mgr-count")).toHaveTextContent("1 file · Unused");
+    expect(screen.getByTestId("mgr-count")).toHaveTextContent("1 file · No known placements");
   });
 });
 

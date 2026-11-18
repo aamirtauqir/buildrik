@@ -48,9 +48,10 @@ describe("getContextMenuActions — structure (board 4428:43928)", () => {
     expect(actions.find((a) => a.id === "style-group")!.label).toBe("Style");
   });
 
-  it("Improve with AI leads when the shell passes an AI door", () => {
-    const actions = getContextMenuActions({ ...makeCtx(), openAI: () => {} });
-    expect(actions[0].id).toBe("improve-with-ai");
+  // re-baseline: canvas menu — "Improve with AI" removed (no AI entry points, owner 2026-10-17).
+  it("never offers Improve with AI", () => {
+    const actions = getContextMenuActions(makeCtx());
+    expect(actions.map((a) => a.label)).not.toContain("Improve with AI");
   });
 
   it("keeps every older row, under Structure", () => {

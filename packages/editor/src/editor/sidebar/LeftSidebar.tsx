@@ -16,15 +16,18 @@ import type { GroupedTabId, GroupedTabConfig } from "../rail/tabsConfig";
 import { getTabConfig, getFigmaRailGroups, RAIL_FIGMA_IDS, VIEWER_TABS } from "../rail/tabsConfig";
 import type { BlockData } from "@/shared/types";
 import type { PageSettingsOpenRequest } from "./tabs/pages/types";
-import { Button, HintTooltip, useToast } from "@/editor/chrome-ui";
+import { Button, HintTooltip, Menu, MenuGroup, MenuItem, Popover } from "@/editor/chrome-ui";
+import { useEditLocks } from "@/editor/shared/useEditLocks";
 import { InspectorErrorBoundary } from "../inspector/components/InspectorErrorBoundary";
 import { PanelSkeleton, SidebarErrorFallback } from "./SidebarFallbacks";
+import { PanelChunkBoundary } from "@/editor/shell/PanelChunkBoundary";
 import { TabRouter } from "./TabRouter";
 import { useRailTab } from "./tabs/media/data/assetPick";
 import { useSidebarKeyboard } from "./useSidebarKeyboard";
 import {
   Plus,
   LayoutGrid,
+  Database,
   Image,
   Layers,
   File,
@@ -46,6 +49,7 @@ import type { LucideIcon } from "lucide-react";
 const ICON_MAP: Record<string, LucideIcon> = {
   Plus,
   LayoutGrid,
+  Database,
   Image,
   Layers,
   File,
@@ -249,6 +253,62 @@ function FigmaRail({
 }
 
 // ============================================
+// Rail Help menu (design-2l9 263:255084)
+// ============================================
+
+function RailHelpMenu({ composer, showTour }: { composer: Composer | null; showTour: boolean }) {
+  const [open, setOpen] = React.useState(false);
+  const close = () => setOpen(false);
+  return (
+    <Popover
+      open={open}
+      onClose={() => setOpen(false)}
+      placement="right-end"
+      /* Portalled: the rail clips its overflow and the open drawer sits over
+         it, so an anchored panel opened UNDER the drawer (measured: x 17,
+         covered by the Pages panel). 2L9 263:255084 draws it beside the rail. */
+      portal
+      label="Help"
+      trigger={
+        <Button
+          color="light"
+          className="ls-btn ls-btn--labeled"
+          onClick={() => setOpen((v) => !v)}
+          aria-label="Help"
+          aria-haspopup="menu"
+          aria-expanded={open}
+          data-testid="rail-help"
+        >
+          <HelpCircle size={20} />
+          <span className="ls-btn__label">Help</span>
+        </Button>
+      }
+    >
+      <Menu label="Help" data-testid="rail-help-menu" className="tw:w-60">
+        {/* 2L9 263:255084 heads the menu "Help" in sentence case, muted — not
+            the shared MenuLabel's small caps. */}
+        <div className="tw:px-2 tw:pt-1 tw:pb-0.5 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]" data-testid="rail-help-title">
+          Help
+        </div>
+        <MenuItem kbd="?" className="tw:min-h-10" data-testid="rail-help-shortcuts" onClick={() => { close(); composer?.emit(EVENTS.UI_TOGGLE_CHEAT_SHEET, {}); }}>
+          Keyboard shortcuts
+        </MenuItem>
+        {showTour && (
+          <MenuItem className="tw:min-h-10" data-testid="rail-help-getting-started" onClick={() => { close(); composer?.emit(EVENTS.UI_ONBOARDING_REPLAY, {}); }}>
+            Getting started
+          </MenuItem>
+        )}
+        <MenuGroup>
+          <MenuItem data-testid="rail-help-legend" onClick={() => { close(); composer?.emit(EVENTS.UI_TOGGLE_KEYBOARD_LEGEND, {}); }}>
+            Keyboard legend
+          </MenuItem>
+        </MenuGroup>
+      </Menu>
+    </Popover>
+  );
+}
+
+// ============================================
 // LeftSidebar Component
 // ============================================
 
@@ -276,10 +336,11 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
 }) => {
   const navRef = React.useRef<HTMLElement>(null);
   const railTab = useRailTab(activeTab);
+  const editLocks = useEditLocks(composer);
   const panelContentRef = React.useRef<HTMLDivElement>(null);
   const [errorKey, setErrorKey] = React.useState(0);
 
-  // Expand state (board 16:6 header action): 280 ↔ 700 drawer width.
+  // Expand state (board 16:6 header action): 280 ↔ 720 drawer width.
   // Collapsed by default — the boards draw the 280 drawer (redrawn 2026-09-02). Controlled or
   // internal fallback, same shape the pin state had.
   const [internalExpanded, setInternalExpanded] = React.useState(false);
@@ -344,7 +405,6 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   );
 
   // Global keyboard shortcuts (A, T, Z, etc.)
-  const openAssistant = React.useCallback(() => composer?.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" }), [composer]);
   /* FB-4: "R" is Review's letter in GROUPED_TABS_CONFIG — closed the same
      way as its ⌘K row and its panel render when the server flag is off. */
   const disabledTabs = React.useMemo<ReadonlySet<GroupedTabId>>(
@@ -359,55 +419,17 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
     (tab: GroupedTabId) => composer?.emit(EVENTS.UI_SWITCH_TAB, { tab }),
     [composer],
   );
-  useSidebarKeyboard(openTab, openAssistant, disabledTabs);
-
-  const { addToast } = useToast();
-
-  // Component creation handler
-  const handleCreateComponent = React.useCallback(() => {
-    if (!composer) return;
-    /*
-      The guard used to ask `composer.elements` for a `getComponents` method.
-      No such method exists anywhere — the components API lives on
-      `composer.components` (`ComponentManager.isAvailable()` at :483), which is
-      what every other caller checks, ComponentsTab included at its own :118.
-
-      So the guard was always false and this handler always returned on its
-      second line. It is what the Components panel's empty state calls from BOTH
-      of its actions — the inline "Create component" link and the footer
-      "+ Create component" button — so the only two things that panel offers a
-      new user did nothing at all. Measured live: zero dialogs, no toast, no
-      console error. Silence is what a wrong-manager typeof check buys.
-    */
-    if (!composer.components?.isAvailable?.()) return;
-    const selectedIds = composer.selection.getSelectedIds();
-    const elementId = selectedIds[0];
-    /* And with NOTHING selected it returned silently on the next line, which is
-       the state the empty state is FOR: both of its actions sit under copy that
-       says "Select an element on the canvas and save it as a component", and a
-       new user who clicks them first got no dialog, no toast, nothing. Say what
-       is missing instead of saying nothing. Measured live 2026-08-22: three
-       clicks (the header +, the inline link, the footer button), zero change of
-       any kind. */
-    if (!elementId) {
-      addToast({
-        description: "Select an element on the canvas first — a component is made from something.",
-        tone: "info",
-        duration: 4000,
-      });
-      return;
-    }
-    composer.emit(EVENTS.COMPONENT_CREATE_REQUESTED, { elementId });
-  }, [composer, addToast]);
+  useSidebarKeyboard(openTab, disabledTabs);
 
   // Panel header info
   const tabConfig = getTabConfig(activeTab);
   const panelTitle = tabConfig?.label ?? "Panel";
 
-  // Header expand (board 16:6) widens a drawer to 700. `null` means "no flow
-  // width" — the default comes from `--bk-size-drawer` in LeftSidebar.css, so
-  // the generated token is the single source.
-  const panelWidthOverride = isExpanded ? 700 : null;
+  // Expand widens the drawer to 720 and floats it over the canvas (design-2l9
+  // 63:21262, Pages Listings; REQUESTS A-19). `null` means "no flow width" —
+  // the default comes from `--bk-size-drawer` in LeftSidebar.css, so the
+  // generated token is the single source.
+  const panelWidthOverride = isExpanded ? 720 : null;
 
   const commonTabProps = {
     /* A closed drawer keeps its tab mounted (width 0); a tab that acts on
@@ -419,7 +441,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   };
 
   return (
-    <div className="ls-root">
+    <div className="ls-root tw:has-[.ls-panel--wide]:overflow-visible!">
       {/* Rail */}
       <nav
         ref={navRef}
@@ -445,25 +467,26 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
 
         <div className="ls-spacer" />
 
-        {/* Every v3 shell board ends the rail with "? Help" (C5 G1-089). It
-            opens the Keyboard legend card (4418:126882), whose "All shortcuts
-            ›" is the door to the one sheet (B7) — not a tab; the drawer stays. */}
-        <HintTooltip content="Keyboard shortcuts · ?" placement="right">
-          <Button
-            color="light"
-            className="ls-btn ls-btn--labeled"
-            onClick={() => composer?.emit(EVENTS.UI_TOGGLE_KEYBOARD_LEGEND, {})}
-            aria-label="Help — keyboard shortcuts"
-            data-testid="rail-help"
-          >
-            <HelpCircle size={20} />
-            <span className="ls-btn__label">Help</span>
-          </Button>
-        </HintTooltip>
+        {/* design-2l9 boards 263:255084 / 263:255509: the rail's seventh
+            item, "Help", opens a two-row menu — Keyboard shortcuts (the one
+            sheet, ?) and Getting started (the tour; not in view mode or for
+            a viewer). The Keyboard legend card it used to open stays below
+            them (code-ahead, OD-3: nothing loses its door). */}
+        <RailHelpMenu composer={composer} showTour={!viewerChrome && !editLocks.includes("view")} />
       </nav>
       {/* Panel */}
       <div
-        className={`ls-panel${!drawerOpen ? " ls-panel--closed" : ""}`}
+        /* design-2l9 63:21262: the widened drawer floats over the canvas. It
+           keeps the narrow drawer's place in the layout (the negative margin
+           hands the rest back) and spills right with the overlay shadow;
+           `ls-panel--wide` is what un-clips .ls-root and the sidebar slot. */
+        className={`ls-panel${
+          !drawerOpen
+            ? " ls-panel--closed"
+            : isExpanded
+              ? " ls-panel--wide tw:mr-[calc(var(--bk-size-drawer)-var(--drawer-w))] tw:[box-shadow:var(--bk-shadow-overlay)]"
+              : ""
+        }`}
         style={
           panelWidthOverride !== null
             ? ({ "--drawer-w": `${panelWidthOverride}px` } as React.CSSProperties)
@@ -495,6 +518,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                 must remount so the tab re-reads its initial screen. */}
             <div key={`${activeTab}:${activeSubTab ?? ""}`} className="ls-panel-animate">
               {hostedInColumn ? null : (
+              <PanelChunkBoundary>
               <React.Suspense fallback={<PanelSkeleton />}>
                 <TabRouter
                   activeTab={activeTab}
@@ -506,7 +530,6 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                   onElementSelect={onElementSelect}
                   canvasHoveredId={canvasHoveredId}
                   onSwitchToTemplates={() => onTabChange("templates")}
-                  onCreateComponent={handleCreateComponent}
                   projectId={projectId}
                   onOpenLibrary={onOpenLibrary}
                   onOpenImageEditor={onOpenImageEditor}
@@ -515,6 +538,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                   reviewsEnabled={reviewsEnabled}
                 />
               </React.Suspense>
+              </PanelChunkBoundary>
               )}
             </div>
           </InspectorErrorBoundary>

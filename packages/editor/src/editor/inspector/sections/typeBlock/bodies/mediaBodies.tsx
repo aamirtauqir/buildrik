@@ -3,8 +3,8 @@
  * analogy (no board, OQ-3) native Video and SVG / Icon.
  *
  *   Image  source row · Alt text + "Add alt text…" hint while empty ·
- *          Fit Cover / Contain / Fill (object-fit — the only writer since
- *          Size lost it) · Loading
+ *          Loading. Its Fit (object-fit) is a style, so it is Style › Size's
+ *          (2L9 board 36:2: "Image fit and dimensions are in Style").
  *   Audio  source row (Choose audio) · Show controls · Loop · Autoplay
  *   Video  source row · Poster image · Autoplay · Muted · Loop · Show
  *          controls · Plays inline, with board 9's warning while autoplay
@@ -13,8 +13,7 @@
  *          size, stroke
  *
  * Attribute rows write through `writeAttribute` (lock gate, one transaction
- * for the whole selection); Fit writes a style through the Inspector's style
- * path (`onChange`), so it follows breakpoint and state like every style.
+ * for the whole selection).
  *
  * @license BSD-3-Clause
  */
@@ -25,22 +24,24 @@ import type { IconConfig } from "@/shared/types/media";
 import type { TypeBlockBodyProps } from "@/editor/inspector/config/typeBlocks";
 import type { TypeBlockId } from "@/shared/constants/elementCapabilities";
 import { writableElements } from "@/engine/commands/commandOperations";
-import { ButtonGroup, InputRow, SelectRow } from "@/editor/inspector/shared/controls";
+import { InputRow, SelectRow } from "@/editor/inspector/shared/controls";
 import { SourceRow } from "../SourceRow";
 import { getCurrentIconConfig, handleIconSelectAction, handleVideoPosterChange, runTxn, writeAttribute } from "../attributeWriter";
 import { PropertyRows, type PropertyConfig } from "../PropertyField";
 import { Note, Warning, useElementVersion } from "./bodyRows";
 import { CheckRow } from "@/editor/inspector/shared/controls/CheckRow";
-
-const FIT_OPTIONS = [
-  { value: "cover", label: "Cover" },
-  { value: "contain", label: "Contain" },
-  { value: "fill", label: "Fill" },
-];
+import { GROUP_TITLE, WIDE_BUTTON } from "@/editor/inspector/shared/controls/controlClasses";
+import { ELEMENT_ACTIONS } from "@/editor/shared/elementActions";
 
 const LOADING_OPTIONS = [
   { value: "lazy", label: "Lazy" },
   { value: "eager", label: "Eager" },
+];
+
+const DECODING_OPTIONS = [
+  { value: "auto", label: "Auto" },
+  { value: "async", label: "Async" },
+  { value: "sync", label: "Sync" },
 ];
 
 /** A boolean attribute is on when present (HTML writes it empty) and not "false". */
@@ -62,16 +63,42 @@ function Source(p: TypeBlockBodyProps) {
   return <SourceRow composer={p.composer} element={p.element} targetIds={p.targetIds} onOpenMediaLibrary={p.onOpenMediaLibrary} />;
 }
 
+/* 2L9 36:2: Image source (the file card, Replace image, Alt text,
+   Decorative image), then a "Loading" group — Loading, Decoding, and where
+   fit and size live. Decorative is an explicit choice — an empty alt AND
+   role="presentation" — so a legacy alt="" still asks for alt text. The
+   generic writer drops an empty value, so it writes directly; Alt text
+   steps aside while it is on. */
 const Image: React.FC<TypeBlockBodyProps> = (p) => {
   const { read, write } = useAttrs(p);
-  const alt = read("alt") ?? "";
+  const alt = read("alt");
+  const decorative = read("role") === "presentation";
+  const setDecorative = (on: boolean) => {
+    const composer = p.composer;
+    if (!composer) return;
+    const targets = writableElements(composer, p.targetIds.map((id) => composer.elements.getElement(id)));
+    if (targets.length === 0) return;
+    runTxn(composer, "element-prop-change", () => {
+      for (const el of targets) {
+        if (on) {
+          el.setAttribute("alt", "");
+          el.setAttribute("role", "presentation");
+        } else {
+          el.removeAttribute("role");
+        }
+      }
+    });
+  };
   return (
     <>
       <Source {...p} />
-      <InputRow label="Alt text" value={alt} placeholder="Describe this image" onChange={(v) => write("alt", v)} />
-      {!alt.trim() && <Note testId="inspector-alt-hint">Add alt text so everyone can understand this image.</Note>}
-      <ButtonGroup label="Fit" property="object-fit" value={p.styles["object-fit"] ?? ""} options={FIT_OPTIONS} onChange={(v) => p.onChange("object-fit", v)} />
-      <SelectRow label="Loading" value={read("loading") ?? ""} options={LOADING_OPTIONS} onChange={(v) => write("loading", v)} />
+      {!decorative && <InputRow label="Alt text" value={alt ?? ""} placeholder="Describe this image" onChange={(v) => write("alt", v)} />}
+      <CheckRow label="Decorative image" checked={decorative} onChange={setDecorative} />
+      {!decorative && !(alt ?? "").trim() && <Note testId="inspector-alt-hint">Add alt text so everyone can understand this image.</Note>}
+      <div className={GROUP_TITLE}>Loading</div>
+      <SelectRow label="Loading" value={read("loading") ?? "eager"} options={LOADING_OPTIONS} onChange={(v) => write("loading", v)} />
+      <SelectRow label="Decoding" value={read("decoding") ?? "auto"} options={DECODING_OPTIONS} onChange={(v) => write("decoding", v)} />
+      <Note>Image fit and dimensions are in Style.</Note>
     </>
   );
 };
@@ -128,12 +155,66 @@ const ICON_ROWS: readonly PropertyConfig[] = [
     type: "select",
     options: ["1", "1.5", "2", "2.5", "3"].map((v) => ({ value: v, label: v })),
   },
+  /* B69/03: what a screen reader says for the icon (empty = decorative). */
+  { id: "aria-label", label: "Accessible name", type: "text", placeholder: "Decorative" },
 ];
 
-/** SVG: its source row. Icon: the icon picker door and its size / stroke. */
+/* 2L9 B69/03 (249:72047): an SVG's own attributes live with its source —
+   ViewBox, Role and Labelled by (moved from Semantics' native attributes). */
+const SVG_ROWS: readonly PropertyConfig[] = [
+  { id: "viewBox", label: "ViewBox", type: "text", placeholder: "0 0 24 24" },
+  {
+    id: "role",
+    label: "Role",
+    type: "select",
+    options: [
+      { value: "img", label: "img" },
+      { value: "presentation", label: "presentation" },
+    ],
+  },
+  { id: "aria-labelledby", label: "Labelled by", type: "text", placeholder: "An element id" },
+];
+
+/** SVG: its source and attributes. Icon: the icon picker door and its size / stroke. */
 const Svg: React.FC<TypeBlockBodyProps> = (p) => {
   const { composer, element, onOpenIconPicker } = p;
-  if (element.type !== "icon") return <Source {...p} />;
+  if (element.type !== "icon") {
+    /* B69/03: Representation (inline markup or a file), and the drawn shapes
+       live in Layers — "Inspect in Layers" is the registry's Show in Layers.
+       Replacing the file is the source row's door (S34 reviews the loss). */
+    const el = composer?.elements.getElement(element.id);
+    const inline = !!el && el.getTagName().toLowerCase() === "svg";
+    const shapes = inline ? (el?.getChildren().length ?? 0) : 0;
+    return (
+      <>
+        <Source {...p} />
+        <div className="bdi-row-ctrl" data-testid="inspector-svg-representation">
+          <span className="bdi-lb">Representation</span>
+          <div className="bdi-row-content">
+            <span className="tw:flex tw:h-6 tw:w-full tw:items-center tw:rounded-[4px] tw:bg-[var(--bk-bg-subtle)] tw:px-2 tw:text-[12px] tw:text-[var(--bk-ink)]">
+              {inline ? "Inline SVG" : "SVG file"}
+            </span>
+          </div>
+        </div>
+        <PropertyRows composer={composer} element={element} targetIds={p.targetIds} rows={SVG_ROWS} />
+        {shapes > 0 && composer && el ? (
+          <div className="tw:flex tw:flex-col tw:gap-2 tw:py-1">
+            <Note>{`Native shapes · ${shapes}`}</Note>
+            <Button
+              type="button"
+              size="xs"
+              color="light"
+              className={WIDE_BUTTON}
+              onClick={() => ELEMENT_ACTIONS["show-in-layers"].run({ composer, element: el, isRoot: false })}
+              data-testid="inspector-svg-inspect-shapes"
+            >
+              Inspect in Layers
+            </Button>
+          </div>
+        ) : null}
+      </>
+    );
+  }
   const choose = (icon: IconConfig) => {
     if (!composer) return;
     /* P-1: the lock gate — a locked icon keeps its glyph. */

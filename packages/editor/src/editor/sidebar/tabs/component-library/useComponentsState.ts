@@ -30,8 +30,6 @@ interface UseComponentsStateParams {
   selectedComponentId?: string | null;
   onComponentSelect?: (component: ComponentDefinition | null) => void;
   onClose?: () => void;
-  onExpandToggle?: () => void;
-  onHelpClick?: () => void;
 }
 
 export function useComponentsState({
@@ -39,11 +37,10 @@ export function useComponentsState({
   selectedComponentId,
   onComponentSelect,
   onClose,
-  onExpandToggle,
-  onHelpClick,
 }: UseComponentsStateParams) {
   // v3 FC-10: the load + subscribe shape lives once, in useComponentList.
-  const { components, isLoaded, error, setError, library } = useComponentList(composer);
+  const { components, isLoaded, error, setError, library, libraryLoadFailed, retryLibraryLoad } =
+    useComponentList(composer);
 
   // Use controlled selectedId if provided, otherwise internal state
   const [internalSelectedId, setInternalSelectedId] = React.useState<string | null>(null);
@@ -166,6 +163,7 @@ export function useComponentsState({
      master's "‹ Back to instance" gives back. A master reached from the list
      has none. */
   const [returnInstanceId, setReturnInstanceId] = React.useState<string | null>(null);
+  const [returnFrom, setReturnFrom] = React.useState<"layers" | null>(null);
 
   // "Edit master ›" from an instance (openMasterRequest.ts): a request made
   // before this panel mounted is taken here; a mounted panel hears the event.
@@ -178,6 +176,7 @@ export function useComponentsState({
         setDetailComponent(c);
         setSelectedId(c.id);
         setReturnInstanceId(request?.instanceId ?? null);
+        setReturnFrom(request?.from ?? null);
       }
     };
     open(takePendingMaster(composer));
@@ -190,6 +189,7 @@ export function useComponentsState({
   const handleBackFromDetail = React.useCallback(() => {
     setDetailComponent(null);
     setReturnInstanceId(null);
+    setReturnFrom(null);
   }, []);
 
   const returnInstance = returnInstanceId ? composer?.elements.getElement(returnInstanceId) : undefined;
@@ -215,12 +215,7 @@ export function useComponentsState({
   // Derived state
   const canCreateComponent = canvasSelection.length > 0;
   const isAtComponentLimit = components.length >= MAX_COMPONENTS;
-  const isStandaloneMode = onClose !== undefined || onExpandToggle !== undefined;
 
-  // No fallback: PanelHeader hides the help affordance when the handler is
-  // undefined, which is what we want. The old fallback opened docs.aquibra.com —
-  // a domain from a project this was forked from, which does not resolve.
-  const handleHelpClickFn = onHelpClick;
 
   return {
     // Components
@@ -228,6 +223,8 @@ export function useComponentsState({
     // v3 FC-10: ComponentsTab reads its "which masters are library-linked"
     // list from here instead of fetching it a second time in the same tree.
     library,
+    libraryLoadFailed,
+    retryLibraryLoad,
     // Selection
     selectedId,
     setSelectedId,
@@ -245,6 +242,7 @@ export function useComponentsState({
     handleViewDetail,
     handleBackFromDetail,
     backToInstance,
+    returnFrom,
     handleDetailInsert,
     handleDetailDelete,
     // Dialog state (replaces native dialogs)
@@ -261,8 +259,6 @@ export function useComponentsState({
     isAtComponentLimit,
     maxComponents: MAX_COMPONENTS,
     // Standalone
-    isStandaloneMode,
-    handleHelpClick: handleHelpClickFn,
   };
 
 }

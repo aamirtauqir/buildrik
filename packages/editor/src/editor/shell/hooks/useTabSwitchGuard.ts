@@ -29,6 +29,7 @@
  */
 import * as React from "react";
 import { shellDirty, type DirtyDomain } from "../shellDirtyRegistry";
+import { cmsWorkspace } from "@/editor/cms/cmsWorkspaceStore";
 
 export interface TabSwitchGuardDialogProps {
   open: boolean;
@@ -50,6 +51,15 @@ export interface TabSwitchSinks {
   onDiscardFailed: (domains: DirtyDomain[]) => void;
   isLeftPanelOpen: boolean;
   setIsLeftPanelOpen: (open: boolean) => void;
+}
+
+/* design-2l9 122:43815: Pages opens OVER an open CMS record — the workspace
+   and its draft stay up beside the drawer (StudioPanels' cmsOverPages), so
+   the switch unmounts nothing and asks nothing. Marks the visit as over Pages. */
+function openPagesOverRecord(from: string, to: string): boolean {
+  if (from !== "content" || to !== "pages" || cmsWorkspace.get().recordId === null) return false;
+  cmsWorkspace.setOverPages(true);
+  return true;
 }
 
 /* What a drawer close unmounts: the CMS workspace (StudioPanels'
@@ -106,6 +116,11 @@ export function useTabSwitchGuard({
   const guardedSetLeftPanelTab = React.useCallback(
     (tab: string, onSwitched?: () => void) => {
       if (!isTabAllowed(tab)) return setLeftPanelTab(tab);
+      if (openPagesOverRecord(leftPanelTab, tab)) {
+        setLeftPanelTab(tab);
+        onSwitched?.();
+        return;
+      }
       guard(tab !== leftPanelTab, () => {
         setLeftPanelTab(tab);
         onSwitched?.();
@@ -117,6 +132,11 @@ export function useTabSwitchGuard({
   const guardedOpenLeftPanelToTab = React.useCallback(
     (primaryTab: string, subTab?: string, onSwitched?: () => void) => {
       if (!isTabAllowed(primaryTab)) return openLeftPanelToTab(primaryTab, subTab);
+      if (openPagesOverRecord(leftPanelTab, primaryTab)) {
+        openLeftPanelToTab(primaryTab, subTab);
+        onSwitched?.();
+        return;
+      }
       const sameView = primaryTab === leftPanelTab && subTab === leftPanelSubTabs[primaryTab];
       guard(!sameView, () => {
         openLeftPanelToTab(primaryTab, subTab);

@@ -12,31 +12,24 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Braces, Database, GitBranch, Table2 } from "lucide-react";
 import {
   ConfirmDialog,
   Button,
-  EmptyState,
-  EmptyStateActions,
-  EmptyStateDesc,
+  Modal,
   IconButton,
   Popover,
   Menu,
   MenuItem,
-  ListRow,
   Row,
-  SectionHeader,
-  ROW_ICON_CLASS,
-  ROW_LABEL_CLASS,
   Select,
   TextInput,
 } from "@/editor/chrome-ui";
-import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
-import type { ConditionExpression, ConditionOperator, DataSource } from "@/shared/types/data";
+import type { DataSource } from "@/shared/types/data";
 import type { SiteVariable } from "@/shared/types/project";
-import { conditionSummary, isValidVariableKey } from "./contentPanelUtils";
+import { isValidVariableKey } from "./contentPanelUtils";
 import type { ConditionRow } from "./useContentPanel";
 import { ConnectSourceDialog, RenameDialog, ResyncJsonDialog } from "./DataRowDialogs";
+import { placeholderCount, type VariableUse } from "./variableUsage";
 
 /** The panel column. Exported because ContentTab wraps these views in it. */
 export const CONTENT_BODY = "tw:flex tw:flex-col tw:h-full tw:min-h-0";
@@ -53,7 +46,9 @@ export const CONTENT_BODY = "tw:flex tw:flex-col tw:h-full tw:min-h-0";
  *  this constant, so the shared primitive keeps whatever its own boards say. */
 export const SECTION_H = "tw:h-[var(--bk-size-row)] tw:leading-4";
 
-const SCROLL = "tw:flex-1 tw:min-h-0 tw:overflow-y-auto";
+/** The scrolling body under a view's header. */
+export const SCROLL = "tw:flex-1 tw:min-h-0 tw:overflow-y-auto";
+
 /** A text button that reads as a link: breadcrumbs and every "+ New …".
  *
  *  `border-0` is the one that matters, and it is NOT interchangeable with
@@ -105,11 +100,16 @@ const STATUS_PILL_IDLE = "tw:bg-[var(--bk-gray-200)] tw:border-[var(--bk-gray-40
    source's status, 151:71 a variable's value, 151:96 a condition's summary —
    all four boards draw it 11/16, and the line-height was left to the face. */
 const SUB = "tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
-const INLINE_FORM = "tw:flex tw:flex-col tw:gap-2 tw:p-3 tw:border-b tw:border-[var(--bk-gray-200)]";
-const FORM_ROW = "tw:flex tw:gap-2 tw:items-center";
-const SPACER = "tw:flex-1";
 /** Two stacked lines inside a row (name over type, key over value). */
 const ROW_STACK = "tw:flex tw:flex-col tw:gap-0.5 tw:min-w-0 tw:flex-1";
+/** The page's row reads across: key · value · placeholders (B5-V01). */
+/* 2L9 260:235689: the key over its value in the first column, the
+   placeholder count beside them, the ⋯ at the end; 72px rows. */
+const PAGE_ROW = "tw:grid tw:min-w-0 tw:flex-1 tw:grid-cols-[minmax(0,1.9fr)_minmax(0,1fr)] tw:items-center tw:gap-x-4 tw:gap-y-1";
+const DIALOG_LABEL = "tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]";
+const DIALOG_HINT = "tw:m-0 tw:text-[12px] tw:leading-[18px]";
+const PAGE_VALUE = "tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
+const PAGE_COUNT = "tw:col-start-2 tw:row-span-2 tw:row-start-1 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]";
 /** …and its FIRST line: 13/20 wherever a board draws one (151:10 a field name,
  *  151:54 a source name, 151:95 a condition's element). `Row` supplies the 13
  *  and nothing supplied the 20. */
@@ -126,149 +126,6 @@ function Crumb({ label, onClick }: { label: string; onClick: () => void }) {
     <Button className={`${LINK_BTN} tw:mx-4 tw:my-0.5 tw:self-start tw:justify-start`} onClick={onClick} aria-label={`Back to ${label}`} data-testid="content-crumb">
       ‹ {label}
     </Button>
-  );
-}
-
-/* ── Root (148:2) + empty (149:7) ────────────────────────────────────────── */
-
-export function RootView({
-  collections,
-  recordCounts,
-  sourcesCount,
-  variablesCount,
-  conditionsCount,
-  selectedCollectionId,
-  onOpenCollection,
-  onCreateCollection,
-  onOpenSources,
-  onOpenVariables,
-  onOpenConditions,
-}: {
-  collections: CMSCollection[];
-  recordCounts: Record<string, number>;
-  sourcesCount: number;
-  variablesCount: number;
-  conditionsCount: number;
-  selectedCollectionId?: string | null;
-  onOpenCollection: (id: string) => void;
-  onCreateCollection?: () => void;
-  onOpenSources: () => void;
-  onOpenVariables: () => void;
-  onOpenConditions: () => void;
-}) {
-  if (collections.length === 0 && sourcesCount === 0 && variablesCount === 0 && conditionsCount === 0) {
-    return (
-      /*
-        Board 149:7 draws this block composed, not with the default slots:
-        the copy is 13/20 over 272, and the call to action is ACCENT TEXT.
-        EmptyState's shared body class is 12px and its `action` slot takes a
-        filled Button, so the defaults gave a 12px line under a solid blue
-        CTA. The Button doc on the same page is explicit — primary is the ONE
-        filled accent button per screen — and an empty panel inviting you in
-        is not where that one gets spent. Media's empty state (145:406) draws
-        its two calls to action the same way.
-      */
-      <EmptyState
-        /* 149:46 — a 160-tall block at the TOP of the panel, not a column that
-           fills it. `flex-1` centred the two lines in whatever height the
-           drawer had (~768 live), which put the invitation halfway down an
-           otherwise blank panel and ~300px below where the board draws it. */
-        className="tw:h-40"
-        data-testid="content-empty"
-      >
-        <EmptyStateDesc className="tw:max-w-[272px] tw:text-[13px] tw:leading-5" data-testid="content-empty-desc">
-          {/* One source literal, deliberately: gate:copy greps src/ for the exact
-              string from the design doc, so wrapping it across two JSX lines
-              reads to that gate as the line having been deleted. */}
-          Collections turn a spreadsheet into pages — one page per row, updated when the data changes.
-        </EmptyStateDesc>
-        {/* A-17/A09-8: the zero state offered only Create a collection — the
-            Sources/Variables/Conditions doors this tab also owns had no way
-            in until the user first created a collection. All three routes
-            are wired regardless of collection count. */}
-        <EmptyStateActions>
-          {onCreateCollection ? (
-            <Button
-              color="light"
-              size="xs"
-              variant="link" className="tw:min-h-6 tw:font-normal"
-              data-testid="content-empty-cta"
-              onClick={onCreateCollection}
-            >
-              Create a collection
-            </Button>
-          ) : null}
-          <Button
-            color="light"
-            size="xs"
-            variant="link" className="tw:min-h-6 tw:font-normal"
-            data-testid="content-empty-sources"
-            onClick={onOpenSources}
-          >
-            Open Sources
-          </Button>
-          <Button
-            color="light"
-            size="xs"
-            variant="link" className="tw:min-h-6 tw:font-normal"
-            data-testid="content-empty-variables"
-            onClick={onOpenVariables}
-          >
-            Open Variables
-          </Button>
-          <Button
-            color="light"
-            size="xs"
-            variant="link" className="tw:min-h-6 tw:font-normal"
-            data-testid="content-empty-conditions"
-            onClick={onOpenConditions}
-          >
-            Open Conditions
-          </Button>
-        </EmptyStateActions>
-      </EmptyState>
-    );
-  }
-  return (
-    <div className={SCROLL}>
-      {/* Board 148:2 — the group header is 32-tall with a tint wash, not the
-          shared List section's plain 28. The arbitrary bracket sorts after
-          the named `h-7` scale utility in the compiled sheet and so wins
-          regardless of class order (same trick as AssetDetailOverlay's alt
-          input) rather than trusting an equal-specificity `h-8` to win. */}
-      <SectionHeader tint className={SECTION_H} count={collections.length} data-testid="content-section-collections">Collections</SectionHeader>
-      {collections.map((c) => (
-        <ListRow
-          key={c.id}
-          icon={<Table2 size={16} />}
-          label={c.name}
-          count={recordCounts[c.id] ?? "—"}
-          chevron
-          selected={c.id === selectedCollectionId}
-          aria-current={c.id === selectedCollectionId ? "true" : undefined}
-          data-testid={`content-collection-${c.id}`}
-          onClick={() => onOpenCollection(c.id)}
-        />
-      ))}
-      {/* Board 148:20 — a bare row, not a button: "+" sits in the icon column
-          (12/400 ink-muted) and "New collection" is the 13/400 accent-text
-          label, flush with every List row above it. The old small inset
-          Button (mx-4, its own 48h before this fix) never matched that. */}
-      {onCreateCollection && (
-        <Row interactive onClick={onCreateCollection} data-testid="content-new-collection" aria-label="New collection">
-          <span className={`${ROW_ICON_CLASS} tw:text-[length:var(--bk-text-12)] tw:leading-[18px]`} aria-hidden="true" data-testid="content-new-collection-plus">
-            +
-          </span>
-          <span className={`${ROW_LABEL_CLASS} tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-accent-text)]`} data-testid="content-new-collection-label">
-            New collection
-          </span>
-        </Row>
-      )}
-      <SectionHeader tint className={SECTION_H} data-testid="content-section-data">Data</SectionHeader>
-      <ListRow icon={<Database size={16} />} label="Sources" count={sourcesCount} chevron data-testid="content-open-sources" onClick={onOpenSources} />
-      <ListRow icon={<Braces size={16} />} label="Variables" count={variablesCount} chevron data-testid="content-open-variables" onClick={onOpenVariables} />
-      <ListRow icon={<GitBranch size={16} />} label="Conditions" count={conditionsCount} chevron data-testid="content-open-conditions" onClick={onOpenConditions} />
-    </div>
   );
 }
 
@@ -462,11 +319,24 @@ export function VariablesView({
   variables,
   onBack,
   onChange,
+  usages = new Map(),
+  onOpenUse,
+  page = false,
+  addSignal = 0,
 }: {
   variables: SiteVariable[];
+  /** B5-V01 (260:235689): the CMS workspace's full page — no crumb, the add
+   *  door is the page header's, rows read across (key · value · uses · ⋯). */
+  page?: boolean;
+  /** Bumped by the page header's "+ New variable". */
+  addSignal?: number;
   onBack: () => void;
   onChange: (vars: SiteVariable[]) => void;
+  /** Where each key is typed as {{site.<key>}} (260:238267). */
+  usages?: Map<string, VariableUse[]>;
+  onOpenUse?: (elementId: string) => void;
 }) {
+  const [showing, setShowing] = React.useState<string | null>(null);
   const [adding, setAdding] = React.useState(false);
   const [key, setKey] = React.useState("");
   const [value, setValue] = React.useState("");
@@ -475,30 +345,74 @@ export function VariablesView({
   const [menuFor, setMenuFor] = React.useState<string | null>(null);
   const [renaming, setRenaming] = React.useState<string | null>(null);
   const [deleting, setDeleting] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    if (addSignal > 0) setAdding(true);
+  }, [addSignal]);
   const keyError = key.trim() !== "" && !isValidVariableKey(key.trim());
   const dupError = variables.some((v) => v.key === key.trim());
+  const closeAdd = () => {
+    setAdding(false);
+    setKey("");
+    setValue("");
+  };
+  const usesOf = (k: string) => usages.get(k) ?? [];
+  const placeholdersOf = (k: string) => {
+    const n = usesOf(k).length;
+    return n === 0 ? null : `${placeholderCount(n)} still use${n === 1 ? "s" : ""} {{site.${k}}}`;
+  };
+
+  if (showing !== null) {
+    /* 260:238267 — one key's placeholders, each opening its element. */
+    const list = usesOf(showing);
+    return (
+      <div className={CONTENT_BODY} data-testid="content-var-usages">
+        <Crumb label="Site variables" onClick={() => setShowing(null)} />
+        <div className={SCROLL}>
+          <p className="tw:m-0 tw:px-4 tw:py-2 tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]">
+            {showing} · {placeholderCount(list.length)}
+          </p>
+          {list.map((u, i) => (
+            <Row
+              key={`${u.elementId}-${i}`}
+              interactive={Boolean(onOpenUse)}
+              onClick={onOpenUse ? () => onOpenUse(u.elementId) : undefined}
+              data-testid={`content-var-use-${i}`}
+            >
+              <span className="tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">{u.label}</span>
+            </Row>
+          ))}
+          <p className={INLINE_HINT}>
+            Renaming or deleting the key does not rewrite these placeholders. Update each usage to keep published text correct.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={CONTENT_BODY}>
-      <Crumb label="Variables" onClick={onBack} />
-      <div className={SCROLL}>
-        {/* Every other screen in this panel says what an empty list means —
-            "No data source connected", "No records yet". Variables said
-            nothing at all, so an empty Variables screen was one blue link on
-            white with no clue what a variable is for. */}
+      {page ? null : <Crumb label="Site variables" onClick={onBack} />}
+      <div className={page ? `${SCROLL} tw:max-w-[880px] tw:px-2` : SCROLL}>
+        {/* RL02 (424:337452) — the intro says what a variable is for, list or
+            no list. Variables are saved with the project and the export
+            writes their value wherever {{site.<key>}} appears in text
+            (G3-075); the canvas keeps the braces as typed — say so. */}
+        <div className={`tw:flex tw:flex-col tw:px-4 tw:py-3 ${page ? "tw:gap-3 tw:pt-5" : "tw:gap-1"}`} data-testid="content-vars-intro">
+          <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]">Use one value across your site</p>
+          <p className={page ? "tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]" : `${SUB} tw:m-0`}>
+            Type <span className={page ? undefined : MONO}>{"{{site.key}}"}</span> in text. Published pages show the value; the canvas keeps the
+            placeholder. Changes are saved with your site.
+          </p>
+        </div>
         {variables.length === 0 && !adding && (
-          /* Variables are saved with the project and the export writes their
-             value wherever {{site.<key>}} appears in text (G3-075). The canvas
-             still shows the braces as typed — say so. */
-          <div className={`${SUB} tw:p-3`}>
-            No variables yet. Write a value once, then type{" "}
-            <span className={MONO}>{"{{site.name}}"}</span> in any text: the
-            published page shows the value; the canvas shows the braces.
+          /* 260:235928 */
+          <div className={`${SUB} tw:px-4 tw:pb-3`} data-testid="content-vars-empty">
+            No variables yet. Add a key and value to start.
           </div>
         )}
         {variables.map((v) => (
-          <Row key={v.key} size="stack" data-variable-row data-testid={`content-var-${v.key}`}>
-            <span className={ROW_STACK}>
+          <Row key={v.key} size="stack" data-variable-row data-testid={`content-var-${v.key}`} className={page ? "tw:min-h-[72px]" : undefined}>
+            <span className={page ? PAGE_ROW : ROW_STACK}>
               <span className={VAR_KEY} data-testid={`content-var-key-${v.key}`}>{`{{site.${v.key}}}`}</span>
               {editKey === v.key ? (
                 <TextInput
@@ -516,8 +430,15 @@ export function VariablesView({
                   }}
                 />
               ) : (
-                <span className={SUB} data-testid={`content-var-value-${v.key}`}>{v.value || "—"}</span>
+                <span
+                  className={page ? (v.value ? PAGE_VALUE : `${PAGE_VALUE} tw:text-[var(--bk-ink-muted)]`) : SUB}
+                  data-testid={`content-var-value-${v.key}`}
+                >
+                  {v.value || "Empty value"}
+                </span>
               )}
+              {/* 260:235689 — how many text placeholders read this key. */}
+              <span className={page ? PAGE_COUNT : SUB} data-testid={`content-var-count-${v.key}`}>{placeholderCount(usesOf(v.key).length)}</span>
             </span>
             <span className={ROW_ACTIONS}>
               {editKey === v.key ? (
@@ -555,10 +476,14 @@ export function VariablesView({
                       Edit value
                     </MenuItem>
                     <MenuItem data-testid={`content-var-rename-${v.key}`} onClick={() => { setMenuFor(null); setRenaming(v.key); }}>
-                      Rename
+                      Rename key…
                     </MenuItem>
-                    <MenuItem danger data-testid={`content-var-delete-${v.key}`} onClick={() => { setMenuFor(null); setDeleting(v.key); }}>
-                      Delete…
+                    <MenuItem data-testid={`content-var-usages-${v.key}`} onClick={() => { setMenuFor(null); setShowing(v.key); }}>
+                      Show usages
+                    </MenuItem>
+                    {/* 260:237728: plain text, as the board draws it. */}
+                    <MenuItem data-testid={`content-var-delete-${v.key}`} onClick={() => { setMenuFor(null); setDeleting(v.key); }}>
+                      Delete variable…
                     </MenuItem>
                   </Menu>
                 </Popover>
@@ -567,43 +492,45 @@ export function VariablesView({
           </Row>
         ))}
         {adding ? (
-          <div className={INLINE_FORM}>
-            <TextInput
-              placeholder="key (e.g. phone)"
-              value={key}
-              onChange={(e) => setKey(e.target.value)}
-              aria-label="Variable key"
-              autoFocus
-            />
-            {(keyError || dupError) && (
-              <div className={ERROR_TEXT} role="alert">
-                {dupError ? "A variable with this key already exists." : "Keys are letters/digits/dashes, starting with a letter."}
-              </div>
-            )}
-            <TextInput
-              placeholder="value"
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              aria-label="Variable value"
-            />
-            <div className={FORM_ROW}>
-              <span className={SPACER} />
-              <Button color="light" size="xs" className={GHOST} onClick={() => setAdding(false)}>Cancel</Button>
-              <Button
-                size="xs"
-                disabled={!key.trim() || keyError || dupError}
-                onClick={() => {
-                  onChange([...variables, { key: key.trim(), value }]);
-                  setAdding(false);
-                  setKey("");
-                  setValue("");
-                }}
-              >
-                Add
-              </Button>
+          /* 2L9 B5-V03 260:236147 — "Add site variable" is a dialog. */
+          <Modal
+            open
+            onClose={closeAdd}
+            title="Add site variable"
+            kind="form"
+            testId="content-var-add"
+            footer={
+              <>
+                <Button variant="secondary" onClick={closeAdd}>
+                  Cancel
+                </Button>
+                <Button
+                  disabled={!key.trim() || keyError || dupError}
+                  onClick={() => {
+                    onChange([...variables, { key: key.trim(), value }]);
+                    closeAdd();
+                  }}
+                >
+                  Add variable
+                </Button>
+              </>
+            }
+          >
+            <div className="tw:flex tw:flex-col tw:gap-1.5 tw:[&_input]:border-transparent tw:[&_input]:bg-[var(--bk-bg-subtle)]">
+              <p className="tw:m-0 tw:mb-2 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
+                Save a value once for text across your site. Publishing is separate.
+              </p>
+              <label className={DIALOG_LABEL} htmlFor="content-var-add-key">Key</label>
+              <TextInput id="content-var-add-key" sizing="sm" value={key} onChange={(e) => setKey(e.target.value)} aria-label="Variable key" autoFocus />
+              <p className={`${DIALOG_HINT} ${keyError || dupError ? "tw:text-[var(--bk-error-text)]" : "tw:text-[var(--bk-ink-muted)]"}`} role={keyError || dupError ? "alert" : undefined}>
+                {dupError ? "A variable with this key already exists." : "Start with a letter. Use letters, digits, underscores or dashes."}
+              </p>
+              <label className={`${DIALOG_LABEL} tw:mt-2`} htmlFor="content-var-add-value">Value</label>
+              <TextInput id="content-var-add-value" sizing="sm" value={value} onChange={(e) => setValue(e.target.value)} aria-label="Variable value" />
+              <p className={`${DIALOG_HINT} tw:text-[var(--bk-ink-muted)]`}>An empty value is allowed.</p>
             </div>
-          </div>
-        ) : (
+          </Modal>
+        ) : page ? null : (
           <Button className={`${LINK_BTN} tw:mx-4 tw:my-0.5`} data-testid="content-add-variable" onClick={() => setAdding(true)}>
             + New variable
           </Button>
@@ -614,8 +541,11 @@ export function VariablesView({
         key={renaming}
         open
         onClose={() => setRenaming(null)}
-        title="Rename variable"
-        label="Key"
+        title={`Rename ${renaming}?`}
+        description={placeholdersOf(renaming) ? `${placeholdersOf(renaming)}. They will not automatically change to the new key.` : undefined}
+        aside={usesOf(renaming).length ? { label: "Show usages", onClick: () => { setShowing(renaming); setRenaming(null); } } : undefined}
+        saveLabel="Rename key"
+        label="New key"
         initial={renaming}
         validate={(next) =>
           !isValidVariableKey(next)
@@ -628,152 +558,88 @@ export function VariablesView({
         testId="content-var-rename"
       />
       ) : null}
-      <ConfirmDialog
+      {/* 260:238886 — the delete names the placeholders it leaves behind. */}
+      <Modal
         open={deleting != null}
         onClose={() => setDeleting(null)}
-        onConfirm={() => {
-          onChange(variables.filter((x) => x.key !== deleting));
-          setDeleting(null);
-        }}
-        title={`Delete {{site.${deleting ?? ""}}}?`}
-        message="The variable and its value are removed."
-        confirmLabel="Delete variable"
-        tone="destructive"
-      />
+        title={`Delete ${deleting ?? ""}?`}
+        testId="content-var-delete"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setDeleting(null)}>
+              Cancel
+            </Button>
+            {deleting && usesOf(deleting).length ? (
+              <Button variant="ghost" data-testid="content-var-delete-usages" onClick={() => { setShowing(deleting); setDeleting(null); }}>
+                Show usages
+              </Button>
+            ) : null}
+            <Button
+              variant="danger"
+              data-testid="content-var-delete-confirm"
+              onClick={() => {
+                onChange(variables.filter((x) => x.key !== deleting));
+                setDeleting(null);
+              }}
+            >
+              Delete variable
+            </Button>
+          </>
+        }
+      >
+        <p className="tw:m-0" data-testid="content-var-delete-body">
+          The variable and its value will be removed.
+          {deleting && placeholdersOf(deleting) ? ` ${placeholdersOf(deleting)}; review those usages before publishing.` : ""}
+        </p>
+      </Modal>
     </div>
   );
 }
 
-/* ── Conditions (151:87) ─────────────────────────────────────────────────── */
+/* ── Conditions (176:21830 D39) ──────────────────────────────────────────── */
 
-const OPERATORS: ConditionOperator[] = ["==", "!=", ">", "<", ">=", "<=", "contains", "exists", "empty"];
-
+/** The site's element conditions as a read-only index: where each one is and
+ *  whether it is active; Locate selects the element, whose Inspector
+ *  (Content › Conditions) is where a condition is edited. */
 export function ConditionsView({
   conditions,
-  onBack,
-  onRemove,
-  onSelectElement,
-  onStartPick,
-  pickedElementId,
-  onCreate,
-  onCancelPick,
+  onLocate,
 }: {
   conditions: ConditionRow[];
-  onBack: () => void;
-  onRemove: (elementId: string) => void;
-  onSelectElement: (elementId: string) => void;
-  onStartPick: () => void;
-  pickedElementId: string | null;
-  onCreate: (expr: ConditionExpression) => void;
-  onCancelPick: () => void;
+  onLocate: (row: ConditionRow) => void;
 }) {
-  const [left, setLeft] = React.useState("");
-  const [operator, setOperator] = React.useState<ConditionOperator>("==");
-  const [right, setRight] = React.useState("");
-  const needsRight = !["exists", "not_exists", "empty", "not_empty"].includes(operator);
-  const [menuFor, setMenuFor] = React.useState<string | null>(null);
-
+  /* 176:21830 measured: the column is 1020 wide from 24 in; title 14/20 then
+     the sentence 16 under it; rows on an 80 pitch, Locate as a link. */
   return (
-    <div className={CONTENT_BODY}>
-      <Crumb label="Conditions" onClick={onBack} />
-      <div className={SCROLL}>
-        {conditions.map((c) => (
-          <Row key={`${c.elementId}`} size="tall" data-condition-row data-testid={`content-cond-${c.elementId}`}>
-            <span className={ROW_STACK}>
-              <span className={`${ROW_TITLE} tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap`} data-testid={`content-cond-label-${c.elementId}`}>{c.label}</span>
-              <span className={SUB} data-testid={`content-cond-summary-${c.elementId}`}>{conditionSummary(c.binding)}</span>
-            </span>
-            <span className={ROW_ACTIONS}>
-              {/* Board 151:87 draws `⋯`. */}
-              <Popover
-                open={menuFor === c.elementId}
-                onClose={() => setMenuFor(null)}
-                placement="bottom-end"
-                label={`Actions for ${c.label}`}
-                trigger={
-                  <IconButton
-                    label={`Actions for ${c.label}`}
-                    onClick={() => setMenuFor((p) => (p === c.elementId ? null : c.elementId))}
-                  >
-                    ⋯
-                  </IconButton>
-                }
-              >
-                <Menu>
-                  <MenuItem onClick={() => { setMenuFor(null); onSelectElement(c.elementId); }}>
-                    Select element
-                  </MenuItem>
-                  <MenuItem onClick={() => { setMenuFor(null); onRemove(c.elementId); }}>
-                    Remove condition
-                  </MenuItem>
-                </Menu>
-              </Popover>
-            </span>
-          </Row>
-        ))}
-        {conditions.length === 0 && !pickedElementId && (
-          <div className={`${SUB} tw:p-3`}>
-            No conditions yet. A condition shows or hides an element based on data —
-            &ldquo;+ New condition&rdquo; starts by picking the element on the canvas it
-            controls.
-          </div>
-        )}
-        {pickedElementId ? (
-          <div className={INLINE_FORM} data-testid="condition-form">
-            <div className={SUB}>Show the picked element when…</div>
-            <TextInput
-              placeholder="site.hours or menu.available"
-              value={left}
-              onChange={(e) => setLeft(e.target.value)}
-              aria-label="Condition path"
-              autoFocus
-            />
-            <div className={FORM_ROW}>
-              <Select
-                value={operator}
-                onChange={(e) => setOperator(e.target.value as ConditionOperator)}
-                aria-label="Operator"
-              >
-                {OPERATORS.map((o) => (
-                  <option key={o} value={o}>{o}</option>
-                ))}
-              </Select>
-              {needsRight && (
-                <div className={SPACER}>
-                  <TextInput
-                    placeholder="value"
-                    value={right}
-                    onChange={(e) => setRight(e.target.value)}
-                    aria-label="Condition value"
-                  />
-                </div>
-              )}
-            </div>
-            <div className={FORM_ROW}>
-              <span className={SPACER} />
-              <Button color="light" size="xs" className={GHOST} onClick={onCancelPick}>Cancel</Button>
-              <Button
-                size="xs"
-                disabled={!left.trim() || (needsRight && !right.trim())}
-                onClick={() =>
-                  onCreate({
-                    operator,
-                    left: left.trim(),
-                    ...(needsRight ? { right: right.trim() } : {}),
-                  })
-                }
-              >
-                Add condition
+    <div className={`${SCROLL} tw:h-full`}>
+      <div className="tw:max-w-[1068px] tw:px-6 tw:pt-[34px]">
+        <p className="tw:m-0 tw:text-[14px] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)]">Conditions across this site</p>
+        <p className="tw:m-0 tw:mt-4 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
+          Edit conditions on their selected element in the Inspector.
+        </p>
+        <div className="tw:mt-[30px]">
+          {conditions.map((c) => (
+            <div key={c.elementId} className="tw:flex tw:h-20 tw:items-start tw:gap-4" data-condition-row data-testid={`content-cond-${c.elementId}`}>
+              <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
+                <span className="tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]" data-testid={`content-cond-label-${c.elementId}`}>
+                  {c.label}
+                </span>
+                <span className="tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid={`content-cond-summary-${c.elementId}`}>
+                  {c.state === "active" ? `Active · ${c.summary}` : "Not active — review legacy rule"}
+                </span>
+              </div>
+              <Button className={`${LINK_BTN} tw:mt-0.5`} data-testid={`content-cond-locate-${c.elementId}`} onClick={() => onLocate(c)}>
+                Locate
               </Button>
             </div>
-          </div>
-        ) : (
-          <Button className={`${LINK_BTN} tw:mx-4 tw:my-0.5`} data-testid="content-add-condition" onClick={onStartPick}>
-            + New condition
-          </Button>
-        )}
+          ))}
+          {conditions.length === 0 && (
+            <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="content-cond-empty">
+              No conditions yet. Select an element and add one in the Inspector under Content › Conditions.
+            </p>
+          )}
+        </div>
       </div>
-
     </div>
   );
 }

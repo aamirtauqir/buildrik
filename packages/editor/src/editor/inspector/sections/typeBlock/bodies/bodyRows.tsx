@@ -15,7 +15,7 @@ import type { Composer } from "@/engine";
 
 export function Note({ children, testId }: { children: React.ReactNode; testId?: string }) {
   return (
-    <p className="tw:m-0 tw:py-2 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid={testId}>
+    <p className="tw:m-0 tw:py-2 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid={testId}>
       {children}
     </p>
   );

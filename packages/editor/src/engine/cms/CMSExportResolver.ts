@@ -8,6 +8,7 @@ import { CURRENT_ITEM_ATTR, followsContextRecord, RepeaterRenderer, richtextKeys
 import type { Composer } from "../Composer";
 import { URL_ATTRIBUTES } from "@buildrik/shared/schemas/element-markup";
 import { cmsRecordToken } from "@buildrik/shared/schemas/cms";
+import { applyPageConditions, stripConditionState, templateCollectionFor } from "./conditionRender";
 
 export type CMSExportMode = "static" | "template" | "none";
 export type TemplateSyntax = "handlebars" | "liquid";
@@ -20,6 +21,11 @@ export interface CMSExportOptions {
    *  record on this page" is written as the publish worker's {fieldSlug}
    *  token, which it fills once per record. */
   pageFile?: string;
+  /** B-30: page of a split Collection list, its hrefs, and (out) each split
+   *  list's page count — see RepeaterRenderer's CollectionListExpandOptions. */
+  listPage?: number;
+  pageHref?: (k: number) => string;
+  pageCounts?: Map<string, number>;
 }
 
 /**
@@ -82,7 +88,7 @@ export class CMSExportResolver {
     }
 
     if (options.mode === "static") {
-      return this.resolveStatic(html, options.pageFile);
+      return this.resolveStatic(html, options);
     }
 
     if (options.mode === "template") {
@@ -95,7 +101,7 @@ export class CMSExportResolver {
   /**
    * Resolve with actual CMS content values (static mode)
    */
-  private async resolveStatic(html: string, pageFile?: string): Promise<string> {
+  private async resolveStatic(html: string, { pageFile, listPage, pageHref, pageCounts }: CMSExportOptions): Promise<string> {
     /* Optional all the way down. Now that resolution is the DEFAULT rather than
        an opt-in flag, every export runs through here — including composers
        built without a CMS manager at all, where `composer.cms.bindings` threw
@@ -109,7 +115,8 @@ export class CMSExportResolver {
     /* Collection lists first (G3-079): their per-record copies are what the
        field bindings below then resolve over. A page without one is left
        untouched by this step. */
-    await new RepeaterRenderer(this.composer).expandCollectionLists(doc);
+    const perRecordOnServer = Boolean(templateCollectionFor(this.composer, pageFile));
+    await new RepeaterRenderer(this.composer).expandCollectionLists(doc, { pageFile, perRecordOnServer, listPage, pageHref, pageCounts });
     const elements = doc.querySelectorAll("[data-buildrick-id]");
     const promises: Promise<void>[] = [];
 
@@ -141,6 +148,16 @@ export class CMSExportResolver {
     });
 
     await Promise.all(promises);
+
+    /* B-11: the page's own conditions — on a template page the server
+       evaluates them per generated page (data-bk-if); elsewhere (a preview)
+       against the preview record. List copies already decided theirs. */
+    await applyPageConditions(doc, this.composer, {
+      canvas: false,
+      pageFile,
+      perRecordOnServer,
+    });
+    stripConditionState(doc);
 
     clearItemPlaceholders(doc);
 

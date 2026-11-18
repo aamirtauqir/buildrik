@@ -13,7 +13,7 @@
  *     thing left that means "no publish path is wired" (flag off);
  *   · a running publish can be cancelled (`publishJob.cancel` →
  *     `sites.cancelPublish`), and a cancelled job has its own outcome block;
- *   · Unpublish asks for the word (typed UNPUBLISH) from both doors.
+ *   · Unpublish asks for the live domain, typed, from both doors (B8-PB18).
  *
  * Read-only view of the ONE canonical publish state machine (`usePublishJob`,
  * the same instance the topbar drives). No second state machine, no second
@@ -31,17 +31,17 @@ import type { Composer } from "@/engine";
 import type { UsePublishJobResult } from "@/editor/shell/hooks/usePublishJob";
 import type { NextMove } from "@/editor/shell/lifecycle";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
-import { fetchPrePublishChecks, unpublishSite } from "@/services/PublishService";
+import { unpublishSite } from "@/services/PublishService";
 import { EVENTS } from "@/shared/constants";
-import { relativeShort, usePublishSnapshot } from "./usePublishSnapshot";
+import { domainOf, relativeShort, usePublishSnapshot } from "./usePublishSnapshot";
 import { CHECK_DOOR, PrePublishChecks } from "./PrePublishChecks";
+import { usePrePublishChecks } from "./usePrePublishChecks";
 import { ApprovalCheckRow, PublishGateBanner } from "./PublishGateBanner";
 import { UnpublishConfirmModal } from "./UnpublishConfirmModal";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
-import {
-  VERCEL_CHECK_LABEL,
-  type PrePublishChecksResult,
-} from "@buildrik/shared/schemas/publish";
+import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
+import { roleAtLeast } from "@/services/RoleService";
+import { VERCEL_CHECK_LABEL } from "@buildrik/shared/schemas/publish";
 
 // ============================================
 // Types
@@ -336,6 +336,9 @@ export const PublishTab: React.FC<PublishTabProps> = ({
      produced the payload ran synchronously before the job existed and is not
      a thing that can be cancelled, so the copy never claims it. */
   const [cancelling, setCancelling] = React.useState(false);
+  /* The server cancels for an ADMIN only; a role KNOWN to be lower gets no
+     Cancel (unknown leaves it to the server). */
+  const canCancel = roleAtLeast(useEditorRole(), "ADMIN") !== false;
   const cancelRun = async () => {
     if (!publishJob || cancelling) return;
     setCancelling(true);
@@ -350,43 +353,10 @@ export const PublishTab: React.FC<PublishTabProps> = ({
   }, [isPublishing]);
 
   // Readiness comes from the server (`runPrePublishChecks`), never from a local
-  // approximation. See fetchPrePublishChecks for why: the old local set was a
-  // different seven checks with no severity and no Vercel check, so the panel
-  // could read all-green while the server hard-refused the publish.
-  const [checkState, setCheckState] = React.useState<"loading" | "ready" | "error">("loading");
-  const [checks, setChecks] = React.useState<PrePublishChecksResult | null>(null);
-
-  const loadChecks = React.useCallback(async () => {
-    if (!siteId) {
-      setCheckState("ready");
-      setChecks(null);
-      return;
-    }
-    setCheckState("loading");
-    try {
-      const result = await fetchPrePublishChecks(siteId);
-      /* 7051:78232 / 7051:78633 draw the server's Favicon row too (with
-         Fix ›), so every server row renders — the list is the server's. */
-      setChecks(result);
-      setCheckState("ready");
-    } catch {
-      // DF5: never fall back to a fake-passing checklist — show Retry.
-      setChecks(null);
-      setCheckState("error");
-    }
-  }, [siteId]);
-
-  React.useEffect(() => {
-    void loadChecks();
-  }, [loadChecks]);
-
-  // Re-read after a publish settles: publishing can change what the checks
-  // report (a first deploy resolves the Vercel row), and a stale checklist is
-  // the exact failure this panel is being fixed for.
-  const uiState = publishJob?.uiState;
-  React.useEffect(() => {
-    if (uiState === "published" || uiState === "failed") void loadChecks();
-  }, [uiState, loadChecks]);
+  // approximation: the old local set was a different seven checks with no
+  // severity and no Vercel check, so the panel could read all-green while the
+  // server hard-refused the publish. 7051:78232 / 7051:78633 draw every row.
+  const { checkState, checks, reload: loadChecks } = usePrePublishChecks(siteId, publishJob?.uiState);
 
   const blocking = React.useMemo(
     () => (checks?.checks ?? []).filter((c) => c.status === "fail"),
@@ -506,8 +476,9 @@ export const PublishTab: React.FC<PublishTabProps> = ({
      Otherwise it opens the door `nextMove.gate` names — the errors confirm,
      the changes-requested gate, the stale acknowledgement, or the facts
      confirm — through the same `requestPublish` the topbar uses. */
-  /* `waiting` and `unchecked` print their own reason in the gate banner. */
-  const gateSpeaks = nextMove?.gate === "waiting" || nextMove?.gate === "unchecked";
+  /* `waiting`, `unchecked` and `open-errors` (OD-1: blocking issues block)
+     print their own reason in the gate banner. */
+  const gateSpeaks = nextMove?.gate === "waiting" || nextMove?.gate === "unchecked" || nextMove?.gate === "open-errors";
   const gateShut = nextMove === null || gateSpeaks || nextMove.blockedReason !== null;
   /* Never publishable in an unknown state (re-walk 2026-09-24: the CTA stayed
      clickable through a 60 s "Checking readiness…"). A disabled primary always
@@ -749,7 +720,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
                 sentence prints under the bar and the run keeps going. */}
             {/* 4418:97570 sets Cancel at the bar's right end. */}
             <div className="tw:mt-1 tw:flex tw:items-center tw:justify-end tw:gap-4">
-              <Button
+              {canCancel && <Button
                 color="light"
                 size="xs"
                 onClick={() => void cancelRun()}
@@ -759,7 +730,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
                 data-testid="publish-cancel"
               >
                 {cancelling ? "Cancelling…" : "Cancel"}
-              </Button>
+              </Button>}
               {error ? (
                 <span className={`${META} tw:text-[var(--bk-error-text)]`} role="alert" data-testid="publish-cancel-error">
                   {error}
@@ -1097,6 +1068,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
       <UnpublishConfirmModal
         open={confirmUnpublish}
         siteName={siteName}
+        domain={domainOf(publishedUrl)}
         busy={unpublishing}
         onConfirm={() => void runUnpublish()}
         onClose={() => setConfirmUnpublish(false)}

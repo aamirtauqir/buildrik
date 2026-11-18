@@ -55,23 +55,6 @@ const mount = () =>
     <AITab composer={makeComposer()} isExpanded={false} onExpandToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />,
   );
 
-describe("AITab — CREATE opens Add › Generate a block (board 4418:104313)", () => {
-  /* CREATE sits on the page-scope idle panel (4418:104313); an element scope
-     shows its scope note instead (4418:104454). */
-  it("the idle panel's CREATE row asks Add for its Generate screen", () => {
-    const composer = { ...(makeComposer() as object), selection: { getAllSelected: () => [], select: vi.fn() } } as unknown as {
-      emit: ReturnType<typeof vi.fn>;
-    };
-    render(
-      <AITab composer={composer as never} isExpanded={false} onExpandToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />,
-    );
-    expect(screen.queryByText(/Draft a new section from a brief/)).toBeNull();
-    fireEvent.click(screen.getByTestId("ai-create-block"));
-    expect(composer.emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "add" });
-    expect(composer.emit).toHaveBeenCalledWith("ui:insert-open-generate", {});
-  });
-});
-
 /* The way back out. `reset()` is the only thing that returns the runner to
    idle, and nothing called it — so a finished run left the plan's last frame
    on screen with no way to ask anything else, which is the dead end the

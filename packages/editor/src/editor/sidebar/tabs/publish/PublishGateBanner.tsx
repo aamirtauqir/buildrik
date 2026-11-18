@@ -87,7 +87,10 @@ export const ApprovalCheckRow: React.FC<PublishGateProps> = ({ nextMove, compose
 export const PublishGateBanner: React.FC<PublishGateProps> = ({ nextMove, composer }) => {
   if (!speaks(nextMove)) return null;
   const blocks =
-    nextMove.gate === "waiting" || nextMove.gate === "changes-requested" || nextMove.gate === "unchecked";
+    nextMove.gate === "waiting" ||
+    nextMove.gate === "changes-requested" ||
+    nextMove.gate === "unchecked" ||
+    nextMove.gate === "open-errors";
   return (
     <div
       className="tw:flex tw:min-w-0 tw:flex-col tw:items-start tw:gap-0.5"

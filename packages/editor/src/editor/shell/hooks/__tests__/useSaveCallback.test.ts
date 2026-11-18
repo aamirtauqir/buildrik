@@ -9,6 +9,11 @@ import { renderHook, act } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { TRPCClientError } from "@trpc/client";
 import { useSaveCallback, type UseSaveCallbackOptions } from "../useSaveCallback";
+import { BANNER_ID, clearGlobalBanner, useGlobalBanners } from "@/editor/shell/globalBanners";
+
+/* F-12 / F-14: connection and role conditions go to the global banner slot. */
+const banners = () => renderHook(() => useGlobalBanners()).result.current;
+const banner = (id: string) => banners().find((b) => b.id === id);
 
 /* The siteId branch calls the SERVICE's saveProject, not the composer's, so
    the two have to be controllable apart. getSiteIdFromUrl stays real — the
@@ -46,6 +51,7 @@ describe("useSaveCallback", () => {
 
   beforeEach(() => {
     opts = makeOpts();
+    Object.values(BANNER_ID).forEach(clearGlobalBanner);
   });
 
   afterEach(() => {
@@ -166,16 +172,23 @@ describe("useSaveCallback", () => {
         outcome = await result.current();
       });
       expect(outcome).toBe("error");
-      // Online (jsdom's default) — the server was unreachable, not the user.
-      expect(opts.addToast).toHaveBeenCalledWith(
-        expect.objectContaining({
-          tone: "warning",
-          title: "Couldn't reach the server — not saved",
-        }),
-      );
-      expect(opts.addToast).not.toHaveBeenCalledWith(
-        expect.objectContaining({ title: expect.stringContaining("on this device") }),
-      );
+      /* Online (jsdom's default) — the server was unreachable, not the user.
+         F-12 / board 225:8126: that is the slot's "Can't reach" banner with
+         Retry now, not a toast the next toast replaces. */
+      expect(opts.addToast).not.toHaveBeenCalled();
+      expect(banner(BANNER_ID.connection)).toMatchObject({
+        tone: "warning",
+        message: "Can’t reach Buildrick. Your edits are kept and will save when it responds.",
+        actions: [expect.objectContaining({ label: "Retry now" })],
+      });
+      /* Retry now re-sends; a save that lands takes the banner down. */
+      const retryNow = banner(BANNER_ID.connection)!.actions![0].onClick;
+      await act(async () => {
+        retryNow();
+        await flushMicrotasks();
+      });
+      expect(svc.saveProject).toHaveBeenCalledTimes(2);
+      expect(banner(BANNER_ID.connection)).toBeUndefined();
     } finally {
       Object.defineProperty(window, "location", { value: original, writable: true });
     }
@@ -209,22 +222,21 @@ describe("useSaveCallback", () => {
       await act(async () => {
         await result.current();
       });
-      expect(opts.addToast).toHaveBeenCalledWith(
-        expect.objectContaining({ tone: "warning", title: "Offline — not saved" }),
-      );
+      /* F-12: offline is the slot's own banner (B7-G11, raised from the
+         browser's online state) — the save adds no toast and no second one. */
+      expect(opts.addToast).not.toHaveBeenCalled();
+      expect(banner(BANNER_ID.connection)).toBeUndefined();
     } finally {
       delete (navigator as unknown as Record<string, unknown>).onLine;
       Object.defineProperty(window, "location", { value: original, writable: true });
     }
   });
 
-  it.each([
-    ["storage quota exceeded", "Storage full"],
-    ["permission denied", "Permission denied"],
-    ["request timeout", "Request timed out"],
-    ["something weird", "Could not save project"],
-  ])("maps error '%s' to friendly hint '%s'", async (raw, hint) => {
-    opts.saveProject.mockRejectedValueOnce(new Error(raw));
+  /* Owner 2026-10-26 (one error surface): a failed ⌘S is the save status —
+     the slot's bar and the bottom bar's "Couldn't save — Retry" read it
+     (copy per reason: saveFailedBanner.test.ts). No toast. */
+  it("a failed save is the status error with the raw message, and raises no toast", async () => {
+    opts.saveProject.mockRejectedValueOnce(new Error("request timeout"));
     const { result } = renderHook(() =>
       useSaveCallback({
         composer: opts.composer,
@@ -233,16 +245,16 @@ describe("useSaveCallback", () => {
         setIsDirty: opts.setIsDirty,
       }),
     );
+    let outcome: string | undefined;
     await act(async () => {
-      result.current();
+      outcome = await result.current();
       await flushMicrotasks();
     });
-    expect(opts.addToast).toHaveBeenCalledWith(
-      expect.objectContaining({
-        tone: "error",
-        description: expect.stringContaining(hint),
-      }),
-    );
+    expect(outcome).toBe("error");
+    const last = opts.setSaveState.mock.calls.at(-1)![0] as unknown;
+    const next = typeof last === "function" ? (last as (s: object) => object)({}) : last;
+    expect(next).toMatchObject({ status: "error", error: "request timeout" });
+    expect(opts.addToast).not.toHaveBeenCalledWith(expect.objectContaining({ tone: "error" }));
   });
 
   it("falls back to 'Unknown error' when err.message is missing", async () => {
@@ -270,40 +282,6 @@ describe("useSaveCallback", () => {
       status: "saving",
     });
     expect(errorState).toMatchObject({ status: "saving" });
-  });
-
-  it("Retry toast action re-invokes save", async () => {
-    opts.saveProject.mockRejectedValueOnce(new Error("boom"));
-    const { result } = renderHook(() =>
-      useSaveCallback({
-        composer: opts.composer,
-        addToast: opts.addToast,
-        setSaveState: opts.setSaveState,
-        setIsDirty: opts.setIsDirty,
-      }),
-    );
-    await act(async () => {
-      result.current();
-      await flushMicrotasks();
-    });
-
-    expect(opts.saveProject).toHaveBeenCalledTimes(1);
-
-    // Pull the action.onClick from the error toast call
-    const errorToast = opts.addToast.mock.calls.find(
-      (c) => (c[0] as { tone?: string }).tone === "error",
-    );
-    expect(errorToast).toBeDefined();
-    const action = (errorToast![0] as { action?: { onClick: () => void } }).action;
-    expect(action?.onClick).toBeTypeOf("function");
-
-    // Retry — succeeds this time
-    opts.saveProject.mockResolvedValueOnce(undefined);
-    await act(async () => {
-      action!.onClick();
-      await flushMicrotasks();
-    });
-    expect(opts.saveProject).toHaveBeenCalledTimes(2);
   });
 });
 
@@ -476,8 +454,13 @@ describe("useSaveCallback — an expired session is not a retryable save failure
       });
       expect(localStorage.getItem("bk-unsaved-v1-site_trpc403")).not.toBeNull();
       expect(invalidateMyRole).toHaveBeenCalled();
-      const toast = opts.addToast.mock.calls.at(-1)?.[0] as { title: string };
-      expect(toast.title).toBe("You don't have access to save this site");
+      /* F-14 / board 227:7411: the role change is the slot's banner, with
+         the board's two actions. */
+      expect(opts.addToast).not.toHaveBeenCalled();
+      expect(banner(BANNER_ID.roleChanged)).toMatchObject({
+        message: "Your role changed to Viewer — editing is off. Changes that weren’t saved are kept in this browser.",
+        actions: [expect.objectContaining({ label: "Download them" }), expect.objectContaining({ label: "Ask an admin" })],
+      });
       localStorage.removeItem("bk-unsaved-v1-site_trpc403");
     } finally {
       Object.defineProperty(window, "location", { value: original, writable: true });
@@ -504,12 +487,8 @@ describe("useSaveCallback — an expired session is not a retryable save failure
         await flushMicrotasks();
       });
       expect(onAuthExpired).not.toHaveBeenCalled();
-      const toast = opts.addToast.mock.calls.at(-1)?.[0] as {
-        title: string;
-        action?: { label: string };
-      };
-      expect(toast.title).toBe("You don't have access to save this site");
-      expect(toast.action).toBeUndefined();
+      expect(opts.addToast).not.toHaveBeenCalled();
+      expect(banner(BANNER_ID.roleChanged)?.actions?.map((a) => a.label)).toEqual(["Download them", "Ask an admin"]);
     },
   );
 
@@ -563,13 +542,16 @@ describe("useSaveCallback — an expired session is not a retryable save failure
       await flushMicrotasks();
     });
     expect(invalidateMyRole.mock.calls.length).toBe(roleInvalidationsBefore);
-    const toast = opts.addToast.mock.calls.at(-1)?.[0] as { title: string; description: string };
-    expect(toast.title).toBe("Save failed");
-    expect(toast.description).toMatch(/another site/i);
-    expect(toast.description).toMatch(/reload/i);
+    /* The words are the slot bar's (saveFailedBanner: "…another site… Reload
+       the site…"), read from the status; no toast. */
+    const last = opts.setSaveState.mock.calls.at(-1)![0] as unknown;
+    const next = (typeof last === "function" ? (last as (s: object) => object)({}) : last) as { status: string; error: string };
+    expect(next.status).toBe("error");
+    expect(next.error).toMatch(/belongs to another site/);
+    expect(opts.addToast).not.toHaveBeenCalled();
   });
 
-  it("a plain failure still gets Retry", async () => {
+  it("a plain failure is the error status (its Retry is the status's and the slot's), no toast", async () => {
     const opts = makeOpts();
     opts.saveProject.mockRejectedValueOnce(new Error("boom"));
     const { result } = renderHook(() =>
@@ -584,12 +566,10 @@ describe("useSaveCallback — an expired session is not a retryable save failure
       await result.current();
       await flushMicrotasks();
     });
-    const toast = opts.addToast.mock.calls.at(-1)?.[0] as {
-      title: string;
-      action?: { label: string };
-    };
-    expect(toast.title).toBe("Save failed");
-    expect(toast.action?.label).toBe("Retry");
+    const last = opts.setSaveState.mock.calls.at(-1)![0] as unknown;
+    const next = typeof last === "function" ? (last as (s: object) => object)({}) : last;
+    expect(next).toMatchObject({ status: "error", error: "boom" });
+    expect(opts.addToast).not.toHaveBeenCalled();
   });
 });
 

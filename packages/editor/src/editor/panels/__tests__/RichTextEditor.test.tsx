@@ -1,189 +1,132 @@
 /**
- * RichTextEditor tests — toolbar command dispatch.
+ * RichTextEditor — the inline text toolbar (design-2l9 TX02 / TX05 / TX10).
  *
- * RichTextEditor is a pure toolbar: every control funnels into the
- * `onCommand(command, value?)` prop. The canvas consumer binds that to
- * document.execCommand — jsdom has no execCommand, so a stub is installed
- * up front (defensive; the component itself never touches it).
- *
- * Coverage:
- *   - Format buttons (bold/italic/underline/strikeThrough)
- *   - List / align / indent groups
- *   - Heading + font-size selects (formatBlock / fontSize)
- *   - Active-state reflection (accent background on active button)
- *   - Link popover: apply, empty-guard, unlink
- *   - Color popovers: foreColor / hiliteColor
- *   - Clear formatting (removeFormat)
+ * Re-baseline 2026-10-30: the 18-control bar became the board's compact row
+ * "Heading ▾ · B · I · U · Lists · Align · Color · Link · … · Done", with
+ * every old tool kept (rare ones behind "…"). Every control still funnels
+ * into `onCommand(command, value?)`; Done sends `commitEdit`.
  *
  * @license BSD-3-Clause
  */
 
 import { describe, it, expect, vi, beforeAll, afterEach } from "vitest";
-import { render, screen, fireEvent, cleanup, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import * as React from "react";
 import { RichTextEditor } from "../RichTextEditor";
 
 beforeAll(() => {
-  // jsdom ships no document.execCommand. RichTextEditor's consumer wires
-  // onCommand → document.execCommand; stub it so nothing explodes if any
-  // code path (now or later) reaches for it.
   document.execCommand = vi.fn().mockReturnValue(true);
 });
-
-afterEach(() => {
-  cleanup();
-});
+afterEach(cleanup);
 
 function renderEditor(props: Partial<React.ComponentProps<typeof RichTextEditor>> = {}) {
   const onCommand = vi.fn();
-  render(
-    <RichTextEditor onCommand={onCommand} {...props} />
-  );
+  render(<RichTextEditor onCommand={onCommand} {...props} />);
   return onCommand;
 }
 
-describe("RichTextEditor — format buttons", () => {
-  it("dispatches bold/italic/underline/strikeThrough on click", () => {
-    const onCommand = renderEditor();
-    const cases: Array<[string, string]> = [
-      ["B", "bold"],
-      ["I", "italic"],
-      ["U", "underline"],
-      ["S", "strikeThrough"],
-    ];
-    for (const [icon, command] of cases) {
-      fireEvent.click(screen.getByText(icon));
-      expect(onCommand).toHaveBeenLastCalledWith(command);
+const click = (id: string) => fireEvent.click(screen.getByTestId(id));
+
+describe("RichTextEditor — the compact row (423:97218)", () => {
+  it("reads Heading ▾ · B · I · U · Lists · Align · Color · Link · … · Done", () => {
+    renderEditor({ blockTag: "h1" });
+    const row = screen.getAllByRole("button").map((b) => b.textContent?.trim());
+    expect(row).toEqual(["Heading ▾", "B", "I", "U", "Lists", "Align", "Color", "Link", "…", "Done"]);
+  });
+
+  it("names the block from the edited tag", () => {
+    renderEditor({ blockTag: "p" });
+    expect(screen.getByTestId("rte-block")).toHaveTextContent("Paragraph ▾");
+  });
+
+  it("B / I / U dispatch their commands, and show their active state", () => {
+    const onCommand = renderEditor({ activeStyles: { bold: true } });
+    for (const c of ["bold", "italic", "underline"]) {
+      click(`rte-${c}`);
+      expect(onCommand).toHaveBeenLastCalledWith(c);
     }
-    expect(onCommand).toHaveBeenCalledTimes(4);
+    expect(screen.getByTestId("rte-bold")).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByTestId("rte-italic")).toHaveAttribute("aria-pressed", "false");
   });
 
-  it("dispatches list commands", () => {
+  it("Done commits the edit", () => {
     const onCommand = renderEditor();
-    fireEvent.click(screen.getByText("•"));
-    expect(onCommand).toHaveBeenLastCalledWith("insertUnorderedList");
-    fireEvent.click(screen.getByText("1."));
-    expect(onCommand).toHaveBeenLastCalledWith("insertOrderedList");
-  });
-
-  /* This used to PIN the ambiguity: Align Center and Justify both drew "⬌",
-     so the test reached them by DOM order and the user could only tell them
-     apart by hovering for a tooltip. Both halves are fixed — Justify has its
-     own glyph, and every toolbar button carries its label as an accessible
-     name, so the buttons are reachable by name instead of by position. */
-  it("dispatches align commands, each button reachable by its own name", () => {
-    const onCommand = renderEditor();
-    for (const [name, command] of [
-      ["Align Left", "justifyLeft"],
-      ["Align Center", "justifyCenter"],
-      ["Align Right", "justifyRight"],
-      ["Justify", "justifyFull"],
-    ] as const) {
-      fireEvent.click(screen.getByRole("button", { name }));
-      expect(onCommand).toHaveBeenLastCalledWith(command);
-    }
-  });
-
-  it("draws Align Center and Justify with different glyphs", () => {
-    renderEditor();
-    const glyph = (name: string) =>
-      screen.getByRole("button", { name }).textContent?.trim();
-    expect(glyph("Align Center")).not.toBe(glyph("Justify"));
-  });
-
-  it("names every format button for a screen reader", () => {
-    renderEditor();
-    for (const name of ["Bold", "Italic", "Underline", "Bullet List", "Clear formatting", "Insert link"]) {
-      expect(screen.getByRole("button", { name }), name).toBeTruthy();
-    }
-  });
-
-  it("dispatches indent/outdent", () => {
-    const onCommand = renderEditor();
-    fireEvent.click(screen.getByText("⇤"));
-    expect(onCommand).toHaveBeenLastCalledWith("outdent");
-    fireEvent.click(screen.getByText("⇥"));
-    expect(onCommand).toHaveBeenLastCalledWith("indent");
-  });
-
-  it("dispatches removeFormat from the clear-formatting button", () => {
-    const onCommand = renderEditor();
-    fireEvent.click(screen.getByText("✕"));
-    expect(onCommand).toHaveBeenCalledWith("removeFormat");
+    click("rte-done");
+    expect(onCommand).toHaveBeenCalledWith("commitEdit");
   });
 });
 
-describe("RichTextEditor — selects", () => {
-  it("heading select dispatches formatBlock with the chosen tag", () => {
+describe("RichTextEditor — menus keep every tool (TX05)", () => {
+  it("the block menu sets the tag", () => {
     const onCommand = renderEditor();
-    const [headingSelect] = screen.getAllByRole("combobox");
-    fireEvent.change(headingSelect, { target: { value: "h2" } });
+    click("rte-block");
+    click("rte-block-h2");
     expect(onCommand).toHaveBeenCalledWith("formatBlock", "h2");
   });
 
-  it("font-size select dispatches fontSize with the execCommand size index", () => {
+  it("Lists and Align", () => {
     const onCommand = renderEditor();
-    const selects = screen.getAllByRole("combobox");
-    fireEvent.change(selects[1], { target: { value: "5" } });
-    expect(onCommand).toHaveBeenCalledWith("fontSize", "5");
-  });
-});
-
-describe("RichTextEditor — active-state reflection", () => {
-  it("active format button gets the accent background, inactive stays transparent", () => {
-    renderEditor({ activeStyles: { bold: true } });
-    const boldBtn = screen.getByText("B");
-    const italicBtn = screen.getByText("I");
-    expect(boldBtn.getAttribute("style")).toContain("var(--bk-accent)");
-    expect(italicBtn.getAttribute("style")).not.toContain("var(--bk-accent)");
-  });
-});
-
-describe("RichTextEditor — link popover", () => {
-  it("Apply dispatches createLink with the typed URL and closes the popover", async () => {
-    const onCommand = renderEditor();
-    fireEvent.click(screen.getByTitle("Insert Link"));
-    const input = await screen.findByPlaceholderText("https://...");
-    fireEvent.change(input, { target: { value: "https://example.com" } });
-    fireEvent.click(screen.getByText("Apply"));
-    expect(onCommand).toHaveBeenCalledWith("createLink", "https://example.com");
-    await waitFor(() => {
-      expect(screen.queryByPlaceholderText("https://...")).toBeNull();
-    });
+    click("rte-lists");
+    click("rte-insertOrderedList");
+    expect(onCommand).toHaveBeenLastCalledWith("insertOrderedList");
+    click("rte-align");
+    click("rte-justifyFull");
+    expect(onCommand).toHaveBeenLastCalledWith("justifyFull");
   });
 
-  it("Apply with an empty URL is a no-op (popover stays open)", async () => {
-    const onCommand = renderEditor();
-    fireEvent.click(screen.getByTitle("Insert Link"));
-    await screen.findByPlaceholderText("https://...");
-    fireEvent.click(screen.getByText("Apply"));
-    expect(onCommand).not.toHaveBeenCalled();
-    expect(screen.getByPlaceholderText("https://...")).toBeTruthy();
+  it("… ends with Close menu (423:98182)", () => {
+    renderEditor();
+    click("rte-more");
+    click("rte-more-close");
+    expect(screen.queryByTestId("rte-more-close")).toBeNull();
   });
 
-  it("Remove dispatches unlink", async () => {
+  it("… holds Strikethrough, Indent, Outdent, Text highlight, Clear formatting and Text size", () => {
     const onCommand = renderEditor();
-    fireEvent.click(screen.getByTitle("Insert Link"));
-    const remove = await screen.findByText("Remove");
-    fireEvent.click(remove);
-    expect(onCommand).toHaveBeenCalledWith("unlink");
+    for (const c of ["strikeThrough", "indent", "outdent", "removeFormat"]) {
+      click("rte-more");
+      click(`rte-${c}`);
+      expect(onCommand).toHaveBeenLastCalledWith(c);
+    }
+    click("rte-more");
+    fireEvent.change(screen.getByTestId("rte-fontSize"), { target: { value: "5" } });
+    expect(onCommand).toHaveBeenLastCalledWith("fontSize", "5");
   });
-});
 
-describe("RichTextEditor — color popovers", () => {
-  it("text color picker dispatches foreColor", async () => {
+  it("Text highlight opens its colour field in place and sends hiliteColor", async () => {
     const onCommand = renderEditor();
-    fireEvent.click(screen.getByLabelText("Change text color"));
-    const picker = await screen.findByLabelText("Text Color");
+    click("rte-more");
+    click("rte-highlight");
+    const [picker] = await screen.findAllByLabelText("Text highlight");
+    fireEvent.change(picker, { target: { value: "#00ff00" } });
+    expect(onCommand).toHaveBeenCalledWith("hiliteColor", "#00ff00");
+  });
+
+  it("Color sends foreColor", async () => {
+    const onCommand = renderEditor();
+    click("rte-color");
+    const [picker] = await screen.findAllByLabelText("Text color");
     fireEvent.change(picker, { target: { value: "#ff0000" } });
     expect(onCommand).toHaveBeenCalledWith("foreColor", "#ff0000");
   });
 
-  it("highlight color picker dispatches hiliteColor", async () => {
+  it("Link opens 'Link selected text', applies a typed address, refuses an empty one (TX06)", () => {
     const onCommand = renderEditor();
-    fireEvent.click(screen.getByLabelText("Change background highlight color"));
-    const picker = await screen.findByLabelText("Highlight Color");
-    fireEvent.change(picker, { target: { value: "#00ff00" } });
-    expect(onCommand).toHaveBeenCalledWith("hiliteColor", "#00ff00");
+    click("rte-link");
+    expect(screen.getByText("Link selected text")).toBeTruthy();
+    expect(screen.getByTestId("rte-link-body").textContent).toBe(
+      "Link “the selected text”. Page, selected element and inline text draft stay intact.",
+    );
+    expect(screen.getByTestId("rte-link-apply")).toBeDisabled();
+    fireEvent.change(screen.getByTestId("rte-link-url"), { target: { value: "https://example.com" } });
+    click("rte-link-apply");
+    expect(onCommand).toHaveBeenCalledWith("createLink", "https://example.com");
+  });
+
+  it("on linked text the dialog offers Remove link", () => {
+    const onCommand = renderEditor({ activeStyles: { link: true } });
+    click("rte-link");
+    click("rte-unlink");
+    expect(onCommand).toHaveBeenCalledWith("unlink");
   });
 });

@@ -30,7 +30,7 @@ interface OptionProps {
   checked: boolean;
   onChange: (v: boolean) => void;
   title: React.ReactNode;
-  hint: string;
+  hint?: string;
 }
 
 function Option({ checked, onChange, title, hint }: OptionProps) {
@@ -44,7 +44,7 @@ function Option({ checked, onChange, title, hint }: OptionProps) {
       />
       <span>
         <span className={OPTION_TITLE}>{title}</span>
-        <span className={OPTION_HINT}>{hint}</span>
+        {hint ? <span className={OPTION_HINT}>{hint}</span> : null}
       </span>
     </label>
   );
@@ -82,13 +82,17 @@ export const ReplaceModal: React.FC<ReplaceModalProps> = ({
     open
     onClose={onCancel}
     dismissOnScrimClick
-    title={`Replace this page with ‘${template.name}’?`}
+    /* 2L9 223:44891 — "Replace Home with SaaS landing?", the CTA names the
+       page again. */
+    title={`Replace ${currentPageName || "this page"} with ${template.name}?`}
+    /* 223:44891 — a 720 dialog. */
+    width="xl"
     footer={
       <>
         <Button color="light" onClick={onCancel}>
           Cancel
         </Button>
-        <Button onClick={onApply}>Replace page</Button>
+        <Button onClick={onApply}>Replace {currentPageName || "page"}</Button>
       </>
     }
   >
@@ -103,22 +107,19 @@ export const ReplaceModal: React.FC<ReplaceModalProps> = ({
         the sentence true means rewriting the ten built-in templates onto
         tokens — a change to what they look like, which is a founder call. */}
     <div className="tw:mb-3">
-      Everything on {currentPageName || "this page"} will be replaced by the template
       {currentPageCount > 0
-        ? ` (${currentPageCount} element${currentPageCount === 1 ? "" : "s"})`
-        : ""}
-      .{" "}
+        ? `${currentPageName || "This page"}’s ${currentPageCount} element${currentPageCount === 1 ? " is" : "s are"} removed and replaced. `
+        : `Everything on ${currentPageName || "this page"} is replaced. `}
       {/* L2-026: a template saved from a page carries {{token…}} placeholders
           that apply resolves to this site's brand; a built-in one does not. */}
       {template.html?.includes("{{token.")
-        ? "The template takes this site’s brand colours and type."
-        : "The template brings its own colours and type — your brand tokens are not applied to it."}
+        ? `${template.name} uses this site’s Brand colors and fonts — your Brand is not changed.`
+        : `${template.name} has its own colors and fonts — your Brand is not changed.`}
     </div>
     <Option
       checked={backupCurrentPage}
       onChange={onBackupChange}
-      title="Save the current page as a backup version first"
-      hint="Keeps your work as a version in History › Saves."
+      title="Save a backup first (History › Saves)"
     />
   </Modal>
 );
@@ -135,6 +136,8 @@ export interface CreatePageConfirmModalProps {
   templateName: string;
   /** The name the new page will get — the board states it before you agree. */
   newPageName: string;
+  /** The New-page choice carried here: the page also joins site navigation. */
+  addToNavigation?: boolean;
   onCancel: () => void;
   onConfirm: () => void;
 }
@@ -142,17 +145,21 @@ export interface CreatePageConfirmModalProps {
 export const CreatePageConfirmModal: React.FC<CreatePageConfirmModalProps> = ({
   templateName,
   newPageName,
+  addToNavigation = false,
   onCancel,
   onConfirm,
 }) => (
-  /* Boards 1169:4725 / 4418:54243 — the question names the template, the
-     answer names the page and says nothing else changes. */
+  /* design-2l9 106:29182: "Create Services from SaaS Landing?", what is
+     made and what is left alone, and where you land — the apply switches to
+     the page it makes (TemplatesTab.runApply). Actions on the left. */
   <Modal
     open
     onClose={onCancel}
     dismissOnScrimClick
     testId="tpl-create-confirm"
-    title={`Create a page from ‘${templateName}’?`}
+    width="lg"
+    footerAlign="start"
+    title={`Create ${newPageName} from ${templateName}?`}
     footer={
       <>
         <Button color="light" onClick={onCancel}>
@@ -163,53 +170,9 @@ export const CreatePageConfirmModal: React.FC<CreatePageConfirmModalProps> = ({
     }
   >
     <p className="tw:m-0">
-      A new page named ‘{newPageName}’ will be added. Your current pages stay unchanged.
+      {`A new page will be created${addToNavigation ? " and added to site navigation" : ""}. Your other pages and Brand settings will stay unchanged.`}
     </p>
-  </Modal>
-);
-
-// ============================================================================
-// Create Page Success Modal (uMJFZ)
-// ============================================================================
-
-export interface CreatePageSuccessModalProps {
-  /** The page that now exists, and that the editor is already showing. */
-  pageName: string;
-  onClose: () => void;
-  onOpenPageSettings: () => void;
-}
-
-export const CreatePageSuccessModal: React.FC<CreatePageSuccessModalProps> = ({
-  pageName,
-  onClose,
-  onOpenPageSettings,
-}) => (
-  /* Board 1169:4725: "Page created" with a green tick, "‘Menu 2’ is ready —
-     you're on it now", and the two things left to do. "Go to page" was the
-     old copy from when the apply did NOT switch pages. */
-  <Modal
-    open
-    onClose={onClose}
-    dismissOnScrimClick
-    testId="tpl-create-success"
-    title="Page created"
-    footer={
-      <>
-        <Button color="light" onClick={onOpenPageSettings}>
-          Open page settings
-        </Button>
-        <Button onClick={onClose}>Done</Button>
-      </>
-    }
-  >
-    <p className="tw:m-0 tw:flex tw:items-center tw:gap-2">
-      {/* success-TEXT, not success: board 1169:4736 colours this line
-          --color/success-text `var(--bk-green-600)`, and the raw `var(--bk-green-500)` measured 3.39:1 on
-          the modal's white ground — under the 4.5 floor the conformance run
-          enforces. The board's own token is the accessible one. */}
-      <span className="tw:text-[var(--bk-success-text)]" aria-hidden="true">✓</span>
-      ‘{pageName}’ is ready — you&rsquo;re on it now.
-    </p>
+    <p className="tw:m-0 tw:mt-3 tw:text-[12px] tw:text-[var(--bk-ink-muted)]">{`After creation, ${newPageName} opens in the Editor.`}</p>
   </Modal>
 );
 
@@ -236,7 +199,7 @@ export const CreatePageErrorModal: React.FC<CreatePageErrorModalProps> = ({
     onClose={onCancel}
     dismissOnScrimClick
     testId="tpl-create-error"
-    title="Couldn't create the page"
+    title="Couldn’t create the page"
     footer={
       <>
         <Button color="light" onClick={onCancel}>
@@ -246,9 +209,13 @@ export const CreatePageErrorModal: React.FC<CreatePageErrorModalProps> = ({
       </>
     }
   >
-    <p className="tw:m-0">
-      {reason ?? "The template failed to load."} Your pages are unchanged.
-    </p>
+    {/* 2L9 222:47163 — the reassurance first; what broke, when known, under it. */}
+    <p className="tw:m-0">Nothing was changed. No empty page was left behind.</p>
+    {reason ? (
+      <p className="tw:m-0 tw:mt-1 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]" data-testid="tpl-create-error-reason">
+        {reason}
+      </p>
+    ) : null}
   </Modal>
 );
 
@@ -272,7 +239,7 @@ export const BackupFailedModal: React.FC<BackupFailedModalProps> = ({
   <Modal
     open
     onClose={onCancel}
-    title={`${pageName} backup could not be saved`}
+    title={`Couldn’t save a backup of ${pageName}`}
     width="sm"
     testId="tpl-backup-failed"
     footer={
@@ -288,7 +255,7 @@ export const BackupFailedModal: React.FC<BackupFailedModalProps> = ({
     }
   >
     <p className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-[var(--bk-leading-18)] tw:text-[var(--bk-ink-soft)]">
-      {pageName} has not been replaced. Retry creating the backup, or go back and pick another layout.
+      {pageName} has not been changed. You can try the backup again, or replace without one — then only Undo can bring {pageName} back.
     </p>
   </Modal>
 );

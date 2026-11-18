@@ -45,10 +45,9 @@ describe("AltTextService.generateAltTextRemote", () => {
     expect(mocks.generateAltTextMutate).toHaveBeenCalledWith({ assetId: "asset-cuid-123" });
   });
 
-  it("Regenerate sends force: true; the default call never does", async () => {
+  // re-baseline: alt text — the explicit Regenerate is gone, so nothing sends force.
+  it("never sends force", async () => {
     mocks.generateAltTextMutate.mockResolvedValue({ altText: "New", skipped: false });
-    await generateAltTextRemote("a1", { force: true });
-    expect(mocks.generateAltTextMutate).toHaveBeenLastCalledWith({ assetId: "a1", force: true });
     await generateAltTextRemote("a1");
     expect(mocks.generateAltTextMutate).toHaveBeenLastCalledWith({ assetId: "a1" });
   });

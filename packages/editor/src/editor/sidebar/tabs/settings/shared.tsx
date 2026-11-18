@@ -59,23 +59,17 @@ export const SET_EYEBROW =
 export const SET_CARD =
   "tw:rounded-[var(--bk-radius-card)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)]";
 
-/** The amber strip under the header — `Restoring a site version leaves this
- *  configuration unchanged.` — on Domains, Localization, Redirects, Headers:
- *  --bk-warning-text on the warning tint inside a yellow-100 hairline
- *  (--bk-warning as text there is 3.41:1, under WCAG AA). */
-export const SET_RESTORE_STRIP =
-  // --bk-warning-text kept, not --bk-warning: plain --bk-warning on the tint
-  // is 3.41:1, under WCAG AA (see comment above) — the incoming v3 sizing
-  // (min-h-13/py-2/leading-18) is layout-only and doesn't touch that.
-  "tw:min-h-13 tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-yellow-100)] tw:bg-[var(--bk-warning-tint)] " +
-  "tw:px-3 tw:py-2 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-warning-text)]";
+/** The line under the header — `Restoring a site version leaves this
+ *  configuration unchanged.` (Security headers): 2L9 B8-SH01 draws it as a
+ *  plain muted line over the cards, not a tinted strip. */
+export const SET_RESTORE_STRIP = "tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 
 /** Label-left rows at the 180 label column (4418:127966 / 4418:128657) (the SEO screen's Indexing card
  *  set the shape; `Enable Google Analytics` wrapped at 144). `col-span-full`
  *  keeps each on its own line in the Section's grid. */
-export const SET_ROW = "tw:col-span-full tw:flex tw:items-center tw:gap-4";
+export const SET_ROW = "tw:col-span-full tw:flex tw:items-center tw:gap-3";
 export const SET_ROW_LABEL =
-  "tw:w-45 tw:shrink-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]";
+  "tw:w-48 tw:shrink-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Tables and status pills — one shape for every Settings table (Locales,
@@ -138,12 +132,14 @@ export const Section: React.FC<SectionProps> = ({ title, desc, anchor, children 
   const cardId = stem ? `set-card-${stem}` : undefined;
   const cardTitleId = `set-card-title-${stem}`;
   return (
-    <section className={`${SET_CARD} tw:flex tw:flex-col tw:gap-5 tw:p-6`} data-testid={cardId}>
+    /* 2L9 B8-SH01 (245:47988): a 720 card, 16 in, the 14/600 title 8 above
+       its first field, fields 8 apart. */
+    <section className={`${SET_CARD} tw:flex tw:w-full tw:max-w-180 tw:flex-col tw:gap-2 tw:p-4`} data-testid={cardId}>
       {title || desc ? (
         <div className="tw:flex tw:flex-col tw:gap-1">
           {title ? (
             <h3
-              className="tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:leading-6 tw:text-[var(--bk-ink)]"
+              className="tw:m-0 tw:text-[length:var(--bk-text-14)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]"
               data-testid={cardTitleId}
             >
               {title}
@@ -156,7 +152,7 @@ export const Section: React.FC<SectionProps> = ({ title, desc, anchor, children 
       ) : null}
       {/* 3397:32011 — fields sit two to a row; anything that is not a Field
           (a table, a code well, a button row) takes the whole row. */}
-      <div className="tw:grid tw:grid-cols-2 tw:gap-6 tw:[&>*:not([data-set-field])]:col-span-full">
+      <div className="tw:grid tw:grid-cols-2 tw:gap-x-4 tw:gap-y-2 tw:[&>*:not([data-set-field])]:col-span-full">
         {children}
       </div>
     </section>
@@ -238,7 +234,7 @@ export const Field: React.FC<FieldProps> = ({ label, hint, htmlFor, anchor, span
       data-testid={`set-field-${stem}`}
     >
       <label
-        className="tw:flex tw:flex-wrap tw:items-baseline tw:gap-1 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink)]"
+        className="tw:flex tw:flex-wrap tw:items-baseline tw:gap-1 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]"
         htmlFor={htmlFor}
         data-testid={`set-field-label-${stem}`}
       >
@@ -267,6 +263,8 @@ type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, "className">
 const SETTINGS_INPUT_THEME: NonNullable<CustomFlowbiteTheme["textInput"]> = {
   field: {
     input: {
+      /* 2L9 (owner 2026-10-26, board density): settings fields are 28 tall. */
+      sizes: { md: "tw:h-7 tw:py-0 tw:text-[13px]" },
       colors: {
         gray:
           "tw:bg-[var(--bk-gray-50)] tw:rounded-md! tw:border-[var(--bk-border-medium)] tw:focus:border-primary-700 tw:focus:ring-primary-700 " +
@@ -294,7 +292,7 @@ const SETTINGS_SELECT_THEME: NonNullable<CustomFlowbiteTheme["select"]> = {
   field: {
     select: {
       sizes: {
-        md: "tw:h-8 tw:py-0 tw:pl-3 tw:text-[length:var(--bk-text-13)]",
+        md: "tw:h-7 tw:py-0 tw:pl-3 tw:text-[length:var(--bk-text-13)]",
       },
       withAddon: {
         off: "tw:rounded-[var(--bk-radius-md)]",
@@ -381,41 +379,59 @@ export const Screen: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface LoadCardProps {
-  /** Card eyebrow, e.g. `SITE IDENTITY`. */
+  /** The screen's name — "Analytics" reads "Loading Analytics…" / "Couldn’t load Analytics". */
   title: string;
-  /** What the card would hold, e.g. `Site name, favicon, language and social profiles.` */
-  line: string;
   state: "loading" | "error";
-  /** The failure line, e.g. `Couldn't load your site settings. Check your connection, then try again.` */
+  /** The failure's sentence under the heading. */
   errorLine: string;
   /** `Try again` — re-runs the screen's load. */
   onRetry?: () => void;
 }
 
-export const LoadCard: React.FC<LoadCardProps> = ({ title, line, state, errorLine, onRetry }) => (
+/** 2L9 B8-AN13/14, SH12/13 (252:47222…252:47989): "Loading <screen>…" over
+ *  placeholder cards, or "Couldn’t load <screen>", what happened, and Try
+ *  again. */
+/* The board's bars sit a step darker than the card they are on. */
+const PLACEHOLDER_BAR = "tw:rounded tw:bg-[var(--bk-gray-200)] tw:animate-pulse tw:motion-reduce:animate-none";
+
+export const LoadCard: React.FC<LoadCardProps> = ({ title, state, errorLine, onRetry }) => (
+  /* 252:47733 / 252:47989: no card of its own — the heading on the pane, then
+     three placeholder cards while loading; on failure the sentence and a
+     filled Try again under it. */
   <section
-    className={`${SET_CARD} tw:flex tw:items-center tw:justify-between tw:gap-6 tw:p-4`}
+    className="tw:flex tw:w-full tw:max-w-180 tw:flex-col tw:gap-2"
     role={state === "error" ? "alert" : "status"}
     aria-busy={state === "loading"}
     data-testid="set-load-card"
     data-state={state}
   >
-    <div className="tw:flex tw:min-w-0 tw:flex-col tw:gap-1.5">
-      <div className={SET_EYEBROW} data-testid="set-load-title">
-        {title}
-      </div>
-      <div className="tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-soft)]" data-testid="set-load-line">
-        {line}
-      </div>
-      <div className="tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="set-load-state">
-        {state === "loading" ? "Loading…" : errorLine}
-      </div>
+    <div
+      className="tw:text-[length:var(--bk-text-13)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]"
+      data-testid="set-load-title"
+    >
+      {state === "loading" ? `Loading ${title}…` : `Couldn’t load ${title}`}
     </div>
-    {state === "error" ? (
-      <Button type="button" size="xs" className={SET_BTN} onClick={onRetry} data-testid="set-load-retry">
-        Try again
-      </Button>
-    ) : null}
+    {state === "loading" ? (
+      <div className="tw:mt-2 tw:flex tw:flex-col tw:gap-2" aria-hidden="true">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="tw:flex tw:h-[94px] tw:flex-col tw:justify-center tw:gap-3 tw:rounded-[var(--bk-radius-md)] tw:bg-[var(--bk-bg-subtle)] tw:px-4">
+            <div className={`${PLACEHOLDER_BAR} tw:h-2.5 tw:w-[30%]`} />
+            <div className={`${PLACEHOLDER_BAR} tw:h-2 tw:w-[78%]`} />
+          </div>
+        ))}
+      </div>
+    ) : (
+      <>
+        <div className="tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="set-load-state">
+          {errorLine}
+        </div>
+        <div className="tw:mt-2">
+          <Button type="button" size="xs" className={`${SET_BTN} tw:px-6`} onClick={onRetry} data-testid="set-load-retry">
+            Try again
+          </Button>
+        </div>
+      </>
+    )}
   </section>
 );
 
@@ -438,14 +454,15 @@ export const SaveErrorBanner: React.FC<{ message: string }> = ({ message }) => (
 // member's role. The shell renders it above the disabled screen.
 // ─────────────────────────────────────────────────────────────────────────────
 
-/* 8134:212323: the accent tint, 16 in, 12 down, a 4 radius, 13/20 ink. */
-export const ReadOnlyBanner: React.FC<{ who: string; screen: string; message?: string }> = ({ who, screen, message }) => (
+/* 2L9 B8-S19 (238:15344): one grey line the cards' width, 13/20 ink — not
+   the accent-tinted block of 8134:212323. */
+export const ReadOnlyBanner: React.FC<{ message: string }> = ({ message }) => (
   <div
     role="status"
-    className="tw:shrink-0 tw:rounded-[var(--bk-radius-sm)] tw:bg-[var(--bk-accent-tint)] tw:px-4 tw:py-3 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]"
+    className="tw:w-full tw:max-w-180 tw:shrink-0 tw:rounded-[var(--bk-radius-sm)] tw:bg-[var(--bk-bg-subtle)] tw:px-3 tw:py-1 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]"
     data-testid="set-readonly"
   >
-    {message ?? `Only ${who} can change ${screen}`}
+    {message}
   </div>
 );
 

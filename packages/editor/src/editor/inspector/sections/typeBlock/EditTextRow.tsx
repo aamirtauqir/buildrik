@@ -14,6 +14,13 @@ import { Button } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine/Composer";
 import { EVENTS } from "@/shared/constants/events";
 import { useInspectorField } from "@/editor/inspector/shared/controls/InspectorFieldContext";
+import { WIDE_BUTTON } from "@/editor/inspector/shared/controls/controlClasses";
+import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
+import { SelectedTextLink } from "./SelectedTextLink";
+import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
+import { lockOwner } from "@/engine/commands/commandOperations";
+
+const NOTE = "tw:m-0 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 
 interface EditTextRowProps {
   composer: Composer | null | undefined;
@@ -23,15 +30,35 @@ interface EditTextRowProps {
 export function EditTextRow({ composer, elementId }: EditTextRowProps) {
   /* Read-only (locked, save conflict — DD-18): the door stays visible and
      focusable, and the click is refused here — never `disabled`. */
-  const { readOnly } = useInspectorField();
-  if (!composer) return null;
+  const { readOnly, readOnlyReason } = useInspectorField();
+  /* A bound text comes from its record (D01 / B5-D04 draw no edit door):
+     what the canvas would edit is the record's value. */
+  const bound = composer?.cms?.bindings?.getBindings?.(elementId)?.some((b) => b.property === "content");
+  if (!composer || bound) return null;
+  /* 2L9 TX09 (423:99859): the lock — the element's own, or an ancestor's
+     (lockOwner; a lock covers everything inside it) — says why the door is
+     shut and where it opens; the canvas refuses Enter / double-click on it
+     too (useCanvasInlineEdit). */
+  const locked = readOnlyReason === "locked";
+  const el = locked ? composer.elements?.getElement?.(elementId) : null;
+  const name = el ? (getLayerName(el) ?? elementTypeLabel(el.getType())) : "This element";
+  const holder = el ? lockOwner(el) : null;
+  const holderName = holder && holder !== el ? (getLayerName(holder) ?? elementTypeLabel(holder.getType())) : null;
   return (
-    <div className="tw:flex tw:h-6 tw:items-center tw:justify-end" data-testid="inspector-text-content">
+    <div className="tw:flex tw:flex-col tw:gap-1 tw:py-1" data-testid="inspector-text-content">
+      {locked ? (
+        <p className={NOTE} data-testid="inspector-text-locked">
+          {holderName
+            ? `Locked by ${holderName}. Unlock ${holderName} in Layers to edit this text or its semantic tag.`
+            : `${name} is locked. Unlock it in Layers to edit its text or semantic tag.`}
+        </p>
+      ) : null}
+      {/* 2L9 161:8480: a full-width bordered button under the "Text" row. */}
       <Button
         type="button"
         size="xs"
         color="light"
-        className="tw:h-6 tw:w-40 tw:justify-center tw:border-0 tw:bg-transparent tw:px-2 tw:text-[12px] tw:font-normal tw:text-[var(--bk-accent-text)] tw:hover:bg-[var(--bk-accent-tint)]"
+        className={WIDE_BUTTON}
         aria-disabled={readOnly || undefined}
         onClick={() => {
           if (!readOnly) composer.emit(EVENTS.UI_INLINE_EDIT_REQUEST, { elementId });
@@ -40,6 +67,12 @@ export function EditTextRow({ composer, elementId }: EditTextRowProps) {
       >
         Edit text on canvas
       </Button>
+      <SelectedTextLink elementId={elementId} />
+      {locked ? (
+        <p className={NOTE} data-testid="inspector-text-locked-hint">
+          Locked — unlock {holderName ?? name} before editing. Enter and double-click do not start an edit.
+        </p>
+      ) : null}
     </div>
   );
 }

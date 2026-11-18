@@ -18,10 +18,21 @@
  * @license BSD-3-Clause
  */
 
-import { flatCatalog } from "./catalog";
+import { CATALOG, flatCatalog } from "./catalog";
+import type { FlatElEntry } from "./types";
 import { getBlockDefinitions, componentBlockDefinitions, type BlockDefinition } from "@/blocks/blockRegistry";
 
-export type InsertGroupId = "favourites" | "recent" | "elements" | "blocks" | "components" | "mine";
+export type InsertGroupId = "favourites" | "recent" | "elements" | "blocks" | "components" | "mine" | `cat-${string}`;
+
+/** The Add panel's three tabs (board 7:18981: Elements · Blocks · Components). */
+export type AddTabId = "elements" | "blocks" | "components";
+
+/** Which tab a group lives under — a door that asks for a group opens its tab. */
+export function addTabOf(group: InsertGroupId): AddTabId {
+  if (group === "blocks") return "blocks";
+  if (group === "components" || group === "mine") return "components";
+  return "elements";
+}
 
 export interface InsertGroup {
   id: InsertGroupId;
@@ -61,6 +72,23 @@ export function buildInsertGroups(
     { id: "blocks", label: "BLOCKS", count: blockRows.length, kind: "inline" },
     /* Board 4428:140817 names them by where they come from. */
     { id: "components", label: "BUILT-IN COMPONENTS", count: componentRows.length, kind: "inline" },
-    { id: "mine", label: "SAVED COMPONENTS", count: mineCount, kind: "inline" },
+    /* 215:43556 (B6-K01): "Saved components · This site". */
+    { id: "mine", label: "Saved components · This site", count: mineCount, kind: "inline" },
   ];
+}
+
+/** Board 7:18981 names the first category "Basic elements"; the rest keep
+ *  their catalog names. */
+const CATEGORY_LABEL: Partial<Record<string, string>> = { basic: "Basic elements" };
+
+/** The Elements tab: the catalog's categories, in catalog order, each with
+ *  the rows the site offers (an emptied category is dropped). No count —
+ *  board 7:18981 heads each category with its name alone. */
+export function elementCategoryGroups(elements: readonly FlatElEntry[]): Array<InsertGroup & { elements: FlatElEntry[] }> {
+  return CATALOG.flatMap((cat) => {
+    const rows = elements.filter((el) => el.catId === cat.id);
+    return rows.length
+      ? [{ id: `cat-${cat.id}` as const, label: CATEGORY_LABEL[cat.id] ?? cat.name, count: null, kind: "inline" as const, elements: rows }]
+      : [];
+  });
 }

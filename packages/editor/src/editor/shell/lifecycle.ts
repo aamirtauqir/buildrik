@@ -40,8 +40,9 @@
  *                      opened) — the door is SHUT: disabled + `gateReason`
  *   changes-requested  the client replied with changes — the door opens the
  *                      changes-requested gate modal (B1-09), never a publish
- *   open-errors        the site has blocking issues — the door opens the
- *                      "Publish with N open errors?" confirm (B1-11) first
+ *   open-errors        the site has blocking issues — the door is SHUT
+ *                      (OD-1, design 2L9): disabled, "Fix N blocking
+ *                      issue(s) to publish"
  *   stale-approval     approved, then edited — the door opens the stale-
  *                      approval acknowledgement (B1-10)
  *   confirm            the plain path — the door opens the four-facts confirm
@@ -54,11 +55,10 @@
  *                      (the CTA carries its own `blockedReason`), or a server
  *                      refusal this module does not recognise
  *
- * The plan lists `open-errors` first. Here every BLOCK outranks it, because
- * the errors confirm ends in "Publish anyway", and an invitation on a door
- * the server will refuse is the defect this module was written to remove
- * (`lifecycle.test.ts`: "a real block outranks the error re-label — one
- * refusal, not two"). Among the doors that can open, the plan's order holds.
+ * Every outside BLOCK outranks `open-errors`: the user cannot fix a flag,
+ * a role or the network from the checks list, so that reason speaks first
+ * (`lifecycle.test.ts`: "a real block outranks the blocking-issues line —
+ * one refusal, not two").
  *
  * The server's post-click refusal (`publishJob.blockedReason`) maps onto the
  * SAME enum through `gateFromBlockReason`, so a refusal the pre-click
@@ -109,7 +109,7 @@ export interface LifecycleInput {
    *  review can still be sent with publishing switched off. */
   publishEnabled: boolean;
   offline: boolean;
-  /** Blocking issues on the site. Does not block publish — it re-labels it. */
+  /** Blocking issues on the site. Any at all blocks publish (OD-1). */
   errorCount: number;
   /** C-3: a save was refused because this tab is behind the server. Its
    *  pages are a behind-copy, so publishing them would overwrite newer work. */
@@ -185,10 +185,11 @@ export function gateFromBlockReason(reason: string | null | undefined): PublishG
   }
 }
 
-/** The errors confirm's own line — a count, because that dialog is the one
- *  place the shell asks the user to weigh a number. */
-function openErrorsLine(n: number): string {
-  return `${n} open error${n === 1 ? "" : "s"} will go live exactly as ${n === 1 ? "it is" : "they are"}.`;
+/** OD-1 (design 2L9, boards B8-PB01 `233:2` / Publish v2 `499:2656`): a
+ *  failing BLOCKING check shuts the door. The tray prints this under its one
+ *  CTA, word for word the board's ("Fix 1 blocking issue to publish"). */
+function blockingIssuesLine(n: number): string {
+  return `Fix ${n} blocking issue${n === 1 ? "" : "s"} to publish`;
 }
 
 /** What the review round says about the publish door, before the blocks and
@@ -215,7 +216,7 @@ function resolveGate(
   if (review.gate === "waiting") return { gate: "waiting", gateReason: review.reason ?? blockedReason };
   if (review.gate === "unchecked") return { gate: "unchecked", gateReason: review.reason };
   if (blockedReason) return { gate: "none", gateReason: null };
-  if (i.errorCount > 0) return { gate: "open-errors", gateReason: openErrorsLine(i.errorCount) };
+  if (i.errorCount > 0) return { gate: "open-errors", gateReason: blockingIssuesLine(i.errorCount) };
   if (review.gate === "stale-approval") return { gate: "stale-approval", gateReason: review.reason };
   return { gate: "confirm", gateReason: null };
 }
@@ -233,10 +234,19 @@ function whoever(i: LifecycleInput): { subject: string; object: string; possessi
 /** Why publish is refused here, or null. Ordered: a workspace that cannot
  *  publish at all outranks a role that cannot, which outranks a dropped
  *  connection. */
+/** The refusals from outside the site (B8-PB19 233:10270, PB20, PB21): the
+ *  publish tray draws less for them — the switched-off workspace only its
+ *  status card, a viewer or a lost connection no checks and no destination. */
+export const PUBLISH_REFUSAL = {
+  off: "Publishing isn’t switched on for this workspace yet",
+  viewer: "Publishing needs Editor access",
+  offline: "Needs a connection",
+} as const;
+
 function publishBlocker(i: LifecycleInput): string | null {
-  if (!i.publishEnabled) return "Publishing isn't switched on for this workspace yet";
-  if (i.isViewer) return "Viewers can't publish — ask an editor";
-  if (i.offline) return "Can't publish while offline";
+  if (!i.publishEnabled) return PUBLISH_REFUSAL.off;
+  if (i.isViewer) return PUBLISH_REFUSAL.viewer;
+  if (i.offline) return PUBLISH_REFUSAL.offline;
   if (i.saveConflict) return "Resolve the sync conflict before publishing";
   if (i.saveFailed) return "Save your changes before publishing — the last save failed";
   return null;
@@ -252,17 +262,17 @@ function publishMove(
   /* Resolve the refusal BEFORE the label. Reading only the review reason here
      put "Publish anyway" on a button whose tooltip said "Can't publish while
      offline" — an invitation and a refusal in the same control. */
-  const blockedReason = reason ?? publishBlocker(i);
-  const label = i.isPublished && i.hasUnpublishedChanges === true ? "Publish changes" : "Publish";
+  const outsideBlock = reason ?? publishBlocker(i);
   return {
     kind: "publish",
-    /* errorCount does not block — it re-labels, so pressing it is a stated
-       choice rather than a surprise. Same rule the Topbar's "anyway" state
-       has always used. Never on a button nobody can press. */
-    label: i.errorCount > 0 && !blockedReason ? `${label} anyway` : label,
-    blockedReason,
+    label: i.isPublished && i.hasUnpublishedChanges === true ? "Publish changes" : "Publish",
+    /* OD-1: blocking issues BLOCK. They used to re-label the CTA "Publish
+       anyway"; the 2L9 boards disable it and say what to fix instead. A block
+       from outside (flag · role · network · review) still speaks first — it
+       is the one the user cannot fix from the checks list. */
+    blockedReason: outsideBlock ?? (i.errorCount > 0 ? blockingIssuesLine(i.errorCount) : null),
     hint,
-    ...resolveGate(i, blockedReason, review),
+    ...resolveGate(i, outsideBlock, review),
   };
 }
 

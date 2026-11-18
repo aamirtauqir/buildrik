@@ -1,5 +1,6 @@
 /**
- * useElementLocked — is this element locked, kept current by the engine's
+ * useElementLocked — is this element locked (its own lock or an ancestor's —
+ * lockOwner), kept current by the engine's
  * own ELEMENT_UPDATED (a lock from Layers, the canvas menu or the ⋯ lands
  * here without a selection change). Read-only: it never writes.
  *
@@ -8,10 +9,11 @@
 import * as React from "react";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
+import { lockOwner } from "@/engine/commands/commandOperations";
 
 export function useElementLocked(composer: Composer | null | undefined, elementId: string | null | undefined): boolean {
   const read = React.useCallback(
-    () => Boolean(elementId && composer?.elements.getElement(elementId)?.isLocked?.()),
+    () => Boolean(elementId && lockOwner(composer?.elements.getElement(elementId))),
     [composer, elementId],
   );
   const [locked, setLocked] = React.useState(read);

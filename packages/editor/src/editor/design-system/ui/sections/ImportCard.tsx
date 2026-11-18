@@ -1,26 +1,31 @@
 /**
- * ImportCard (S5) — drop-zone UI + conflict resolution per prototype s05.
+ * ImportCard — Brand › Import / export › Import, Figma 2L9 B6-B15/B16/B17/B49.
  *
- * Flow:
- *   1. Idle  → drop zone (drag-and-drop / click-to-browse) + secondary
- *      "or paste JSON" expander.
- *   2. Parsed → RECENT detail block (Detected / Valid / Errors / Conflicts).
- *      When conflicts > 0 the Resolve section surfaces 3 strategy buttons.
- *   3. Action row → "Apply N valid only" (cobalt) + Cancel.
+ *   idle     "Import tokens" · Choose JSON file (or drop it, or paste JSON) ·
+ *            "Review compatible values and changes before applying." · the
+ *            mode: Update matching ("Matching values update. Tokens absent
+ *            from the file are kept.") or Add new only (code-ahead)
+ *   dry run  "{n} detected · {v} valid · {u} unsupported", Added / Modified /
+ *            Skipped / Unsupported, "Preview only · Nothing has been applied",
+ *            Cancel · Apply {v} valid
+ *   offline  "Apply with local recovery only?" — no server restore point; the
+ *            one Undo still reverts it (B6-B17)
+ *   applied  the same rows as a result, "Applied {n} of {d}, as shown in the
+ *            preview." + the receipt with Undo (B6-B49)
  *
- * Apply writes the tokens through useImportTokens — one write over the
- * site's tokens (modify existing ids, add new ones), one ⌘Z, live at once.
- *
- * Conflict resolution is local to this component — strategy state filters
- * the parsed token set before calling useImportTokens:
- *   - replace          → all incoming tokens (existing-id rows update in place)
- *   - merge-keep-mine  → only NEW ids (skip existing-id rows)
+ * Apply takes a "Before import" restore point first (online), then writes the
+ * tokens through useImportTokens — one write, one ⌘Z, live at once.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { useToast, Button, Textarea, TextInput } from "@/editor/chrome-ui";
+import { useToast, Button, Modal, Textarea, TextInput } from "@/editor/chrome-ui";
+import type { Composer } from "@/engine/Composer";
+import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
+import { takeRestorePoint } from "@/editor/design-system/state/useBrandRestorePoints";
+import { useGuardedApply } from "@/editor/design-system/state/useGuardedApply";
+import { useOnline } from "@/editor/design-system/state/useOnline";
 import { parseImportJSON, diffTokens, type DiffResult } from "@/editor/design-system/utils/importUtils";
 import { useImportTokens } from "@/editor/design-system/state/useImportTokens";
 import {
@@ -28,7 +33,7 @@ import {
   useRadiusRegistry, useShadowRegistry, useMotionRegistry,
   useBorderRegistry, useOpacityRegistry, useZindexRegistry,
   useBreakpointRegistry, useGridRegistry, useSizingRegistry,
-  useIconRegistry, useImageryRegistry,
+  useIconRegistry, useImageryRegistry, useProjectTokenStore,
 } from "@/editor/design-system/state/TokenRegistryContext";
 import type { DesignToken } from "@/editor/design-system/types";
 /* Was `"replace" | "keep-mine" | "keep-theirs"`. `handleApply` filtered on
@@ -49,14 +54,10 @@ interface ParsedState {
   errors: string[];
 }
 
-/* Board 153:120 gives IMPORT the same plain section header + full-bleed
-   treatment as EXPORT — no card, no second inset. */
-const CARD = "tw:flex tw:flex-col";
-/* Board 220:839 · 28-tall caps header, matching EXPORT. */
-const TITLE =
-  "tw:flex tw:h-7 tw:items-center tw:gap-2 tw:-mx-4 tw:px-4 tw:bg-[var(--bk-bg-subtle)] " +
-  "tw:text-[11px] tw:leading-4 tw:font-semibold tw:tracking-[0.06em] " +
-  "tw:text-[var(--bk-ink-soft)]";
+const CARD = "tw:flex tw:flex-col tw:gap-3";
+const TITLE = "tw:m-0 tw:text-[length:var(--bk-text-14)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]";
+const NOTE = "tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
+const NOTE_STRONG = "tw:m-0 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:text-[var(--bk-ink)]";
 /* base/active supply their own border-colour and background together — never
    two competing utilities for the same property (Row precedent). */
 /* Board 153:152 · a 56-tall dashed band with ONE centred line, not the 128
@@ -75,10 +76,6 @@ const DETAIL_BLOCK =
 const DETAIL_ROW = "tw:flex tw:items-baseline tw:justify-between tw:gap-2 tw:text-xs";
 const DETAIL_KEY = "tw:text-[var(--bk-ink-muted)]";
 const DETAIL_VALUE = "tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:text-right tw:text-[var(--bk-ink)]";
-const RECENT_LABEL =
-  "tw:mt-3 tw:[font-family:var(--bk-font-mono)] tw:text-[length:var(--bk-text-11)] tw:uppercase tw:tracking-[0.06em] tw:text-[var(--bk-ink-muted)]";
-const CONFLICT_BOX =
-  "tw:mt-3 tw:p-3 tw:bg-[var(--bk-warning-tint)] tw:border tw:border-yellow-200 tw:rounded-md tw:flex tw:flex-col tw:gap-2";
 const ERROR_BOX =
   "tw:mt-2 tw:p-2 tw:rounded-md tw:bg-[var(--bk-error-tint)] tw:border tw:border-red-200 tw:text-[var(--bk-ink)] tw:text-xs";
 const PASTE_AREA =
@@ -111,7 +108,14 @@ function detectFormat(raw: string, fileName: string | null): string {
   return "Unknown format";
 }
 
-export const ImportCard: React.FC = () => {
+export interface ImportCardProps {
+  /** For the "Before import" restore point; without one, no point is taken. */
+  composer?: Composer | null;
+}
+
+type Result = { name: string; mode: ConflictStrategy; added: number; modified: number; skipped: number; detected: number; restorePoint: boolean };
+
+export const ImportCard: React.FC<ImportCardProps> = ({ composer = null }) => {
   const [parsed, setParsed] = React.useState<ParsedState | null>(null);
   const [showPaste, setShowPaste] = React.useState(false);
   const [pasteBuffer, setPasteBuffer] = React.useState("");
@@ -119,8 +123,14 @@ export const ImportCard: React.FC = () => {
   const [isDragOver, setIsDragOver] = React.useState(false);
   const [parseErrors, setParseErrors] = React.useState<string[]>([]);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [offlineAsk, setOfflineAsk] = React.useState(false);
+  const [failed, setFailed] = React.useState(false);
+  const [result, setResult] = React.useState<Result | null>(null);
+  const online = useOnline();
+  const guard = useGuardedApply();
 
   const apply = useImportTokens();
+  const { undo } = useProjectTokenStore();
   const { addToast } = useToast();
 
   // Snapshot of the union of current tokens — drives the diff calc. Reading
@@ -201,35 +211,59 @@ export const ImportCard: React.FC = () => {
     setPasteBuffer("");
   };
 
-  const handleApply = () => {
-    if (!parsed) return;
-    // Strategy filters the staged token set: `replace` sends everything,
-    // `keep-mine` skips tokens whose id is already in any registry.
-    const toApply: DesignToken[] =
-      strategy === "keep-mine"
-        ? parsed.tokens.filter((t) => parsed.diff.added.some((a) => a.id === t.id))
-        : parsed.tokens;
-
-    if (toApply.length === 0) {
-      addToast({ description: "Nothing to apply", tone: "info" });
-      return;
-    }
-
-    const stats = apply(toApply);
-    if (stats.refused) {
-      addToast({ title: "Import failed", description: "Nothing was imported — the brand can't be changed right now.", tone: "error" });
-      return;
-    }
-    addToast({
-      /* `ImportStats.skipped` has always carried the ids; the toast reported
-         only its length, so "2 skipped" named nothing the user could act on. */
-      description:
-        `Imported · ${stats.modified} modified · ${stats.added} added` +
-        (stats.skipped.length ? ` · skipped ${stats.skipped.join(", ")}` : ""),
-      tone: "success",
+  /* Online: a "Before import" restore point first (no point → nothing is
+     applied). Offline: only after "Apply locally" (B6-B17). */
+  const handleApply = (local = false) =>
+    guard.run(async () => {
+      if (!parsed) return false;
+      // Update matching sends everything; Add new only skips existing ids.
+      const toApply: DesignToken[] =
+        strategy === "keep-mine"
+          ? parsed.tokens.filter((t) => parsed.diff.added.some((a) => a.id === t.id))
+          : parsed.tokens;
+      if (toApply.length === 0) {
+        addToast({ description: "Nothing to apply", tone: "info" });
+        return false;
+      }
+      if (!online && !local) {
+        setOfflineAsk(true);
+        return false;
+      }
+      setOfflineAsk(false);
+      setFailed(false);
+      const siteId = getSiteIdFromUrl();
+      const restorePoint = !local && Boolean(composer && siteId);
+      if (restorePoint && !(await takeRestorePoint(composer!, siteId!, "import"))) {
+        setFailed(true);
+        return false;
+      }
+      const stats = apply(toApply);
+      if (stats.refused) {
+        addToast({ title: "Import failed", description: "Nothing was imported — the brand can't be changed right now.", tone: "error" });
+        return false;
+      }
+      /* B6-B49's receipt; its Undo is the one undo (composer.history). The
+         skipped ids stay named — "2 skipped" alone named nothing to act on. */
+      const imported = stats.modified + stats.added;
+      addToast({
+        description:
+          `Imported ${imported} token${imported === 1 ? "" : "s"}. One Undo reverts the import.` +
+          (stats.skipped.length ? ` Skipped ${stats.skipped.join(", ")}.` : ""),
+        tone: "success",
+        action: { label: "Undo", onClick: () => { undo(); } },
+      });
+      setResult({
+        name: parsed.fileName ?? "Pasted JSON",
+        mode: strategy,
+        added: stats.added,
+        modified: stats.modified,
+        skipped: stats.skipped.length + (strategy === "keep-mine" ? parsed.diff.modified.length : 0),
+        detected: parsed.tokens.length + parsed.errors.length,
+        restorePoint,
+      });
+      handleCancel();
+      return true;
     });
-    handleCancel();
-  };
 
   const conflictCount = parsed?.diff.modified.length ?? 0;
   const validCount = parsed ? parsed.diff.added.length + parsed.diff.modified.length : 0;
@@ -237,16 +271,58 @@ export const ImportCard: React.FC = () => {
     ? (parsed?.diff.added.length ?? 0)
     : validCount;
 
+  const modeLabel = (m: ConflictStrategy) => (m === "replace" ? "Update matching" : "Add new only");
+  const kindsOf = (tokens: readonly DesignToken[]) => {
+    const n = tokens.length;
+    return `${n} token${n === 1 ? "" : "s"}`;
+  };
+  const rows = (r: { added: string; modified: string; skipped: string; unsupported: string }) => (
+    <dl className={DETAIL_BLOCK} data-testid="import-detail-block">
+      {(
+        [
+          ["Added", r.added],
+          ["Modified", r.modified],
+          ["Skipped", r.skipped],
+          ["Unsupported", r.unsupported],
+        ] as const
+      ).map(([k, v]) => (
+        <div key={k} className={DETAIL_ROW}>
+          <dt className={DETAIL_KEY}>{k}</dt>
+          <dd className={`${DETAIL_VALUE} tw:m-0`}>{v}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+
+  const unsupported = parsed?.errors.length ?? 0;
+  const skipped = strategy === "keep-mine" ? conflictCount : 0;
+
   return (
-    <div className={CARD}>
-      <div className={TITLE} data-testid="brand-import-head">IMPORT</div>
+    <div className={CARD} data-testid="brand-import">
+      <p className={TITLE} data-testid="brand-import-head">Import tokens</p>
+
+      {result && !parsed && (
+        <div className="tw:flex tw:flex-col tw:gap-2" data-testid="import-result">
+          <p className={NOTE_STRONG}>Imported {result.name} · {modeLabel(result.mode)}</p>
+          {rows({
+            added: `${result.added} token${result.added === 1 ? "" : "s"}`,
+            modified: `${result.modified} matching token${result.modified === 1 ? "" : "s"}`,
+            skipped: String(result.skipped),
+            unsupported: "0",
+          })}
+          <p className={NOTE}>
+            Applied {result.added + result.modified} of {result.detected}, as shown in the preview.
+            {result.restorePoint ? " Restore point “Before import” was saved first." : ""}
+          </p>
+        </div>
+      )}
 
       {!parsed && (
         <>
           <div
             role="button"
             tabIndex={0}
-            aria-label="Drop tokens.json, or click to browse"
+            aria-label="Choose JSON file, or drop it here"
             data-testid="import-drop-zone"
             className={`${DROP_BASE} ${isDragOver ? DROP_ACTIVE : DROP_IDLE}`}
             onClick={() => fileInputRef.current?.click()}
@@ -260,10 +336,7 @@ export const ImportCard: React.FC = () => {
             onDragLeave={() => setIsDragOver(false)}
             onDrop={handleDrop}
           >
-            {/* 4418:168885: "Drop tokens.json — JSON only". It is true: a .ts
-                Tailwind config only ever surfaced as a parse error, so the
-                picker no longer offers one. */}
-            Drop tokens.json — JSON only
+            Choose JSON file
             <TextInput
               ref={fileInputRef}
               type="file"
@@ -277,6 +350,8 @@ export const ImportCard: React.FC = () => {
               aria-label="Upload JSON file"
             />
           </div>
+          <p className={NOTE}>Review compatible values and changes before applying.</p>
+
 
           <Button
             type="button"
@@ -284,7 +359,7 @@ export const ImportCard: React.FC = () => {
             size="xs"
             onClick={() => setShowPaste((v) => !v)}
             aria-expanded={showPaste}
-            className={`${GHOST} tw:mt-2 tw:p-0 tw:text-[11px] tw:underline`}
+            className={`${GHOST} tw:self-start tw:p-0 tw:text-[11px] tw:underline`}
           >
             or paste JSON
           </Button>
@@ -292,9 +367,7 @@ export const ImportCard: React.FC = () => {
           {showPaste && (
             <div>
               <label>
-                <span className="tw:sr-only">
-                  Paste JSON
-                </span>
+                <span className="tw:sr-only">Paste JSON</span>
                 <Textarea
                   aria-label="Paste JSON"
                   value={pasteBuffer}
@@ -324,89 +397,81 @@ export const ImportCard: React.FC = () => {
         </>
       )}
 
+      {/* The mode is chosen before or after the file (B6-B15 / B6-B16). */}
+      <div className="tw:flex tw:flex-col tw:gap-1" role="radiogroup" aria-label="Import mode">
+        {(["replace", "keep-mine"] as const).map((m) => (
+          <Button
+            key={m}
+            type="button"
+            size="xs"
+            role="radio"
+            aria-checked={strategy === m}
+            color={strategy === m ? undefined : "light"}
+            className="tw:self-start"
+            onClick={() => setStrategy(m)}
+            data-testid={`import-mode-${m}`}
+          >
+            {modeLabel(m)}
+          </Button>
+        ))}
+        <p className={NOTE}>
+          {strategy === "replace"
+            ? "Matching values update. Tokens absent from the file are kept."
+            : "Only tokens new to this site are added. Matching values are left as they are."}
+        </p>
+      </div>
       {parsed && (
         <>
-          <div className={RECENT_LABEL}>RECENT</div>
-          <div className={DETAIL_BLOCK} data-testid="import-detail-block">
-            <div className={DETAIL_ROW}>
-              <span className={DETAIL_KEY}>Detected</span>
-              <span className={DETAIL_VALUE}>{parsed.detected}</span>
-            </div>
-            <div className={DETAIL_ROW}>
-              <span className={DETAIL_KEY}>Valid tokens</span>
-              <span className={`${DETAIL_VALUE} tw:text-[var(--bk-ink-muted)]`}>
-                {parsed.tokens.length}
-              </span>
-            </div>
-            <div className={DETAIL_ROW}>
-              <span className={DETAIL_KEY}>Errors</span>
-              {/* This carried a ternary whose branches were the same colour. */}
-              <span className={`${DETAIL_VALUE} tw:text-[var(--bk-ink-muted)]`}>
-                {parsed.errors.length === 0
-                  ? "0"
-                  : `${parsed.errors.length} (${parsed.errors[0]})`}
-              </span>
-            </div>
-            <div className={DETAIL_ROW}>
-              <span className={DETAIL_KEY}>Conflicts</span>
-              <span className={`${DETAIL_VALUE} tw:text-[var(--bk-ink-muted)]`}>
-                {conflictCount === 0
-                  ? "0"
-                  : `${conflictCount} ID collisions`}
-              </span>
-            </div>
-          </div>
-
-          {conflictCount > 0 && (
-            <div className={CONFLICT_BOX} data-testid="import-resolve-box">
-              <div className="tw:text-xs tw:font-medium tw:text-[var(--bk-ink)]">
-                Resolve conflicts
-              </div>
-              <div className="tw:text-[11px] tw:text-[var(--bk-ink-muted)]">
-                {conflictCount} tokens already exist with the same ID. Choose how to handle them:
-              </div>
-              <div className="tw:flex tw:gap-1.5 tw:flex-wrap">
-                <Button
-                  type="button"
-                  size="xs"
-                  color={strategy === "replace" ? undefined : "light"}
-                  aria-pressed={strategy === "replace"}
-                  onClick={() => setStrategy("replace")}
-                >
-                  Replace
-                </Button>
-                <Button
-                  type="button"
-                  size="xs"
-                  color={strategy === "keep-mine" ? undefined : "light"}
-                  aria-pressed={strategy === "keep-mine"}
-                  onClick={() => setStrategy("keep-mine")}
-                >
-                  Merge · keep mine
-                </Button>
-              </div>
-            </div>
+          <p className={NOTE_STRONG} data-testid="import-file">
+            {parsed.fileName ?? "Pasted JSON"} · {modeLabel(strategy)}
+          </p>
+          <p className={NOTE} data-testid="import-summary" title={parsed.detected}>
+            {parsed.tokens.length + unsupported} detected · {applyCount} valid · {unsupported} unsupported
+          </p>
+          {rows({
+            added: kindsOf(parsed.diff.added),
+            modified: `${conflictCount} matching token${conflictCount === 1 ? "" : "s"}`,
+            skipped: String(skipped),
+            unsupported: unsupported === 0 ? "0" : parsed.errors.join(", "),
+          })}
+          <p className={`${NOTE} tw:bg-[var(--bk-accent-tint)] tw:p-2`} role="status">
+            Preview only · Nothing has been applied
+          </p>
+          {failed && (
+            <p className={ERROR_BOX} role="alert" data-testid="import-restore-failed">
+              We couldn't save a restore point — nothing was changed.
+            </p>
           )}
-
-          <div className="tw:mt-3 tw:flex tw:gap-2 tw:items-center">
-            <Button
-              type="button"
-              onClick={handleApply}
-              className="tw:flex-1"
-              disabled={applyCount === 0}
-            >
-              Apply {applyCount} valid only
-            </Button>
-            <Button
-              type="button"
-              color="light"
-              onClick={handleCancel}
-            >
+          <div className="tw:mt-1 tw:flex tw:items-center tw:gap-2">
+            <Button type="button" color="light" onClick={handleCancel}>
               Cancel
+            </Button>
+            <Button type="button" onClick={() => void handleApply()} disabled={applyCount === 0 || guard.busy} data-testid="import-apply">
+              {failed ? "Retry" : `Apply ${applyCount} valid`}
             </Button>
           </div>
         </>
       )}
+
+      <Modal
+        open={offlineAsk}
+        onClose={() => setOfflineAsk(false)}
+        title="Apply with local recovery only?"
+        testId="import-offline-dialog"
+        footer={
+          <>
+            <Button type="button" color="light" size="xs" onClick={() => setOfflineAsk(false)}>
+              Cancel
+            </Button>
+            <Button type="button" size="xs" onClick={() => void handleApply(true)} data-testid="import-apply-local">
+              Apply locally
+            </Button>
+          </>
+        }
+      >
+        <p className={NOTE}>You’re offline. A server restore point can’t be created.</p>
+        <p className={NOTE}>Undo is available on this device. Cancel keeps your Brand unchanged.</p>
+      </Modal>
     </div>
   );
 };

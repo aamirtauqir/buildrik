@@ -10,8 +10,8 @@
  *    card offers `Unarchive site` (`sites.unarchive`, at once).
  *  - **Transfer site** — TransferSiteDialog → `sites.transfer` (the creator
  *    or the workspace OWNER, Q-B5); the toast says who owns it now.
- *  - **Delete site** — DeleteSiteModal (M17) → `sites.delete`; the line names
- *    the live address it unpublishes. The editor then leaves for the
+ *  - **Delete site** — DeleteSiteModal (2L9 B8-S17) → `sites.delete`, armed
+ *    by typing the site's name. The editor then leaves for the
  *    dashboard's Recently deleted, where the site can be restored for 30 days.
  *
  * Every action applies at once (`immediate`). Below OWNER (`readOnly`) the
@@ -75,30 +75,30 @@ const refusal = (e: unknown, fallback: string) => (e instanceof Error && e.messa
 /** Where a deleted site can be brought back from (the dashboard's Sites list). */
 export const RECENTLY_DELETED_PATH = "/dashboard/projects?status=deleted";
 
-/* 8137:216600: a card per action — 24 in, the title 16/600, then a row of the
-   line (13 muted) and its text button, 24 apart. */
-const CARD = `${SET_CARD} tw:flex tw:flex-col tw:gap-4 tw:p-6`;
-const TITLE =
-  "tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:leading-6 tw:tracking-[-0.16px] tw:text-[var(--bk-ink)]";
+/* 2L9 B8-S16 238:14472: one "Danger zone" card, a ruled row per action —
+   the action's name (240), what it does (284, muted), and a text link at the
+   right (accent; Delete in error ink). */
+const CARD = `${SET_CARD} tw:flex tw:w-full tw:max-w-180 tw:flex-col tw:gap-2.5 tw:p-4`;
+const TITLE = "tw:m-0 tw:text-[length:var(--bk-text-14)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]";
+const ROW = "tw:flex tw:min-h-12 tw:items-center tw:gap-3 tw:border-b tw:border-[var(--bk-border)] tw:py-2";
+const LABEL = "tw:w-60 tw:shrink-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]";
 const LINE = "tw:m-0 tw:min-w-0 tw:flex-1 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
 const ACTION =
-  `${SET_BTN} tw:shrink-0 tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)] ` +
-  "tw:disabled:bg-transparent tw:disabled:text-[var(--bk-gray-400)]";
+  "tw:h-8 tw:w-35 tw:shrink-0 tw:justify-start tw:px-0 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:no-underline tw:hover:underline " +
+  "tw:disabled:text-[var(--bk-gray-400)]";
 const ACTION_DANGER = `${ACTION} tw:text-[var(--bk-error-text)]`;
 
-const ActionCard: React.FC<{
+const ActionRow: React.FC<{
   title: string;
   line: string;
   testId: string;
   children: React.ReactNode;
 }> = ({ title, line, testId, children }) => (
-  <section className={CARD} data-testid={testId}>
-    <h3 className={TITLE}>{title}</h3>
-    <div className="tw:flex tw:items-center tw:gap-6">
-      <p className={LINE}>{line}</p>
-      {children}
-    </div>
-  </section>
+  <div className={ROW} data-testid={testId}>
+    <span className={LABEL}>{title}</span>
+    <p className={LINE}>{line}</p>
+    {children}
+  </div>
 );
 
 export const DangerZoneScreen: React.FC<ScreenProps> = ({
@@ -220,9 +220,12 @@ export const DangerZoneScreen: React.FC<ScreenProps> = ({
   if (!projectId) {
     return (
       <Screen>
-        <ActionCard title="Danger zone" line="Open a real site to archive, transfer or delete it." testId="set-danger-demo">
-          {null}
-        </ActionCard>
+        <section className={CARD}>
+          <h3 className={TITLE}>Danger zone</h3>
+          <ActionRow title="Danger zone" line="Open a real site to archive, transfer or delete it." testId="set-danger-demo">
+            {null}
+          </ActionRow>
+        </section>
       </Screen>
     );
   }
@@ -232,7 +235,6 @@ export const DangerZoneScreen: React.FC<ScreenProps> = ({
       <Screen>
         <LoadCard
           title="Danger zone"
-          line="Archive, transfer or delete this site."
           state={load.state}
           errorLine="Couldn't load this site. Check your connection, then try again."
           onRetry={load.retry}
@@ -255,15 +257,17 @@ export const DangerZoneScreen: React.FC<ScreenProps> = ({
 
   return (
     <Screen>
-      {notice ? <ReadOnlyBanner who="the workspace owner" screen="Danger zone" message={notice} /> : null}
+      {notice ? <ReadOnlyBanner message={notice} /> : null}
       {banner ? <SaveErrorBanner message={banner} /> : null}
 
-      <ActionCard
+      <section className={CARD} aria-label="Danger zone">
+      <h3 className={TITLE}>Danger zone</h3>
+      <ActionRow
         title="Archive site"
         line={
           site.archived
-            ? "This site is archived: it is hidden from the Sites list. The live site stays up."
-            : "Hide this site from the Sites list. The live site stays up."
+            ? "Archived — hidden from your dashboard. The live site stays up."
+            : "Hides it from your dashboard. You can unarchive any time."
         }
         testId="set-danger-archive"
       >
@@ -271,20 +275,20 @@ export const DangerZoneScreen: React.FC<ScreenProps> = ({
           <Button
             type="button"
             size="xs"
-            variant="ghost"
+            variant="link"
             className={ACTION}
             id="danger-archive"
             disabled={busy || ownerActionsOff}
             onClick={() => void unarchive()}
             data-testid="set-danger-unarchive-btn"
           >
-            Unarchive site
+            Unarchive
           </Button>
         ) : (
           <Button
             type="button"
             size="xs"
-            variant="ghost"
+            variant="link"
             className={ACTION}
             id="danger-archive"
             disabled={ownerActionsOff}
@@ -294,52 +298,53 @@ export const DangerZoneScreen: React.FC<ScreenProps> = ({
             }}
             data-testid="set-danger-archive-btn"
           >
-            Archive site
+            Archive
           </Button>
         )}
-      </ActionCard>
+      </ActionRow>
 
-      <ActionCard
+      <ActionRow
         title="Transfer site"
-        line="Transfer this site to another workspace member. The workspace owner or site creator can do this."
+        line="Move it to another member of this workspace."
         testId="set-danger-transfer"
       >
         <Button
           type="button"
           size="xs"
-          variant="ghost"
+          variant="link"
           className={ACTION}
           id="danger-transfer"
           disabled={transferOff}
           onClick={() => void openTransfer()}
           data-testid="set-danger-transfer-btn"
         >
-          Transfer site
+          Transfer…
         </Button>
-      </ActionCard>
+      </ActionRow>
 
-      <ActionCard
+      <ActionRow
         title="Delete site"
         line={
           site.liveAddress
-            ? `Unpublish ${site.liveAddress} now. You can restore it from Recently deleted for 30 days.`
-            : "Delete this site. You can restore it from Recently deleted for 30 days."
+            ? `Unpublishes ${site.liveAddress}. You can restore it for 30 days from Recently deleted.`
+            : "You can restore it for 30 days from Recently deleted."
         }
         testId="set-danger-delete"
       >
         <Button
           type="button"
           size="xs"
-          variant="ghost"
+          variant="link"
           className={ACTION_DANGER}
           id="danger-delete"
           disabled={ownerActionsOff}
           onClick={() => setDialog("delete")}
           data-testid="set-danger-delete-btn"
         >
-          Delete site
+          Delete site…
         </Button>
-      </ActionCard>
+      </ActionRow>
+      </section>
 
       <ArchiveSiteDialog
         open={dialog === "archive"}
@@ -359,7 +364,6 @@ export const DangerZoneScreen: React.FC<ScreenProps> = ({
       <DeleteSiteModal
         open={dialog === "delete"}
         siteName={siteName}
-        liveAddress={site.liveAddress}
         onClose={() => setDialog(null)}
         onDelete={remove}
       />

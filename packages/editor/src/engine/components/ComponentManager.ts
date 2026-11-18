@@ -23,7 +23,7 @@ import type {
 import { deepClone } from "@/shared/utils/helpers";
 import { sanitizeElementTreeContent } from "@/shared/utils/html/sanitization";
 import type { Composer } from "../Composer";
-import { ComponentInstanceUtils, usableOverrides } from "./ComponentInstance";
+import { ComponentInstanceUtils, applyOverridesToTree, usableOverrides } from "./ComponentInstance";
 import {
   type InstanceMaps,
   instantiateComponent,
@@ -43,6 +43,15 @@ export interface UpdateMasterOutcome {
   updated: boolean;
   instancesSynced: number;
   overridesDropped: number;
+}
+
+/** What `updateComponentMaster` WOULD do from a source — the review before
+ *  the update (2L9 B6-K15). `lost` lists, per instance, the overrides whose
+ *  target the new master does not have. */
+export interface MasterUpdatePreview {
+  instances: number;
+  overridesKept: number;
+  lost: Array<{ elementId: string; count: number }>;
 }
 
 /**
@@ -222,6 +231,7 @@ export class ComponentManager {
       pageId?: string | null;
     }
   ): Promise<ComponentDefinition | null> {
+    if (this.composer.writeLocked) return null;
     const element = this.composer.elements.getElement(elementId);
     if (!element) return null;
 
@@ -261,6 +271,7 @@ export class ComponentManager {
    * are recorded and nothing on the canvas moves.
    */
   adoptInstances(componentId: string, elementIds: readonly string[]): number {
+    if (this.composer.writeLocked) return 0;
     const component = this.components.get(componentId);
     if (!component) return 0;
     let adopted = 0;
@@ -303,6 +314,7 @@ export class ComponentManager {
    * as is. Page scope never travels with it: a library master is site-wide.
    */
   async adoptLibraryComponent(definition: ComponentDefinition): Promise<ComponentDefinition> {
+    if (this.composer.writeLocked) throw new Error("EDIT_LOCKED");
     const existing = this.components.get(definition.id);
     if (existing) return existing;
     if (!hasUsableMaster(definition)) {
@@ -328,6 +340,7 @@ export class ComponentManager {
     id: string,
     updates: Partial<Pick<ComponentDefinition, "name" | "description" | "category" | "tags" | "thumbnail">>
   ): Promise<boolean> {
+    if (this.composer.writeLocked) return false;
     const component = this.components.get(id);
     if (!component) return false;
 
@@ -366,6 +379,7 @@ export class ComponentManager {
     id: string,
     elementId: string,
   ): Promise<UpdateMasterOutcome> {
+    if (this.composer.writeLocked) return FAILED_UPDATE;
     const component = this.components.get(id);
     if (!component) return FAILED_UPDATE;
 
@@ -383,8 +397,31 @@ export class ComponentManager {
     return this.applyMaster(component, promoted);
   }
 
+  /**
+   * The update `updateComponentMaster(id, elementId)` would make, measured on
+   * copies: the same promoted tree and the same override application sync
+   * uses, so the review and the update cannot disagree. Writes nothing.
+   */
+  previewMasterUpdate(id: string, elementId: string): MasterUpdatePreview | null {
+    const component = this.components.get(id);
+    const tree = component ? this.composer.elements.getElement(elementId)?.toJSON() : null;
+    if (!component || !tree) return null;
+    const promoted = deepClone(tree);
+    this.instanceUtils.clearInstanceMarkers(promoted);
+    let overridesKept = 0;
+    const lost: MasterUpdatePreview["lost"] = [];
+    const live = getInstancesOfComponent(this.maps, id).filter((i) => !i.isDetached);
+    for (const instance of live) {
+      const { applied, dropped } = applyOverridesToTree(deepClone(promoted), instance.overrides);
+      overridesKept += applied;
+      if (dropped > 0) lost.push({ elementId: instance.elementId, count: dropped });
+    }
+    return { instances: live.length, overridesKept, lost };
+  }
+
   /** Undo of an update: put a snapshot's master back and fan it out again. */
   async revertComponentMaster(id: string, masterTree: ComponentDefinition["masterTree"]): Promise<UpdateMasterOutcome> {
+    if (this.composer.writeLocked) return FAILED_UPDATE;
     const component = this.components.get(id);
     if (!component) return FAILED_UPDATE;
     return this.applyMaster(component, deepClone(masterTree));
@@ -438,6 +475,7 @@ export class ComponentManager {
 
   /** Define the variant axes (e.g. Size: [S,M,L], State: [Default,Hover]). */
   async setVariantProperties(componentId: string, properties: VariantProperty[]): Promise<boolean> {
+    if (this.composer.writeLocked) return false;
     const component = this.components.get(componentId);
     if (!component) return false;
     component.variantProperties = properties;
@@ -447,6 +485,7 @@ export class ComponentManager {
 
   /** Add a variant (a property-value combination + its overrides) to a master. */
   async addVariant(componentId: string, variant: ComponentVariant): Promise<boolean> {
+    if (this.composer.writeLocked) return false;
     const component = this.components.get(componentId);
     if (!component) return false;
     const variants = component.variants ?? [];
@@ -462,6 +501,7 @@ export class ComponentManager {
     variantId: string,
     patch: Partial<Omit<ComponentVariant, "id">>,
   ): Promise<boolean> {
+    if (this.composer.writeLocked) return false;
     const component = this.components.get(componentId);
     if (!component?.variants) return false;
     const idx = component.variants.findIndex((v) => v.id === variantId);
@@ -473,6 +513,7 @@ export class ComponentManager {
 
   /** Remove a variant. Returns false if the master or variant is absent. */
   async removeVariant(componentId: string, variantId: string): Promise<boolean> {
+    if (this.composer.writeLocked) return false;
     const component = this.components.get(componentId);
     if (!component?.variants) return false;
     const next = component.variants.filter((v) => v.id !== variantId);
@@ -483,6 +524,7 @@ export class ComponentManager {
   }
 
   async duplicateComponent(id: string): Promise<ComponentDefinition | null> {
+    if (this.composer.writeLocked) return null;
     const original = this.components.get(id);
     if (!original) return null;
 
@@ -525,24 +567,40 @@ export class ComponentManager {
   }
 
   /**
-   * Undo of a delete: re-register the snapshot's master and relink every
-   * instance whose element is still on the site. Returns how many relinked.
+   * Relink instance records (from `snapshotComponent`) whose element and
+   * master are still on the site, overrides and all. The Undo of Detach all
+   * (2L9 217:41451) and the second half of a delete's Undo. Returns how many
+   * relinked.
    */
-  async restoreDeletedComponent(snapshot: ComponentSnapshot): Promise<number> {
-    const component = deepClone(snapshot.component);
-    await saveComponent(component, this.projectId);
-    this.components.set(component.id, component);
-
+  relinkInstances(records: readonly ComponentInstance[]): number {
+    if (this.composer.writeLocked) return 0;
     let relinked = 0;
-    for (const record of snapshot.instances) {
+    for (const record of records) {
       const element = this.composer.elements.getElement(record.elementId);
-      if (!element) continue;
+      if (!element || !this.components.has(record.componentId)) continue;
       const instance: ComponentInstance = { ...deepClone(record), isDetached: false };
       this.instances.set(record.elementId, instance);
       element.setData("componentInstance", instance);
       relinked++;
     }
-    if (relinked > 0) this.composer.markDirty();
+    if (relinked > 0) {
+      this.composer.markDirty();
+      this.composer.emit(EVENTS.COMPONENT_LIST_UPDATED, { components: this.getAllComponents() });
+    }
+    return relinked;
+  }
+
+  /**
+   * Undo of a delete: re-register the snapshot's master and relink every
+   * instance whose element is still on the site. Returns how many relinked.
+   */
+  async restoreDeletedComponent(snapshot: ComponentSnapshot): Promise<number> {
+    if (this.composer.writeLocked) return 0;
+    const component = deepClone(snapshot.component);
+    await saveComponent(component, this.projectId);
+    this.components.set(component.id, component);
+
+    const relinked = this.relinkInstances(snapshot.instances);
     /* The server mirror re-upserts on COMPONENT_CREATED; without it the undone
        delete stayed deleted on the server and came back after a reload
        (audit L2-010). */
@@ -552,6 +610,7 @@ export class ComponentManager {
   }
 
   async deleteComponent(id: string): Promise<boolean> {
+    if (this.composer.writeLocked) return false;
     const component = this.components.get(id);
     if (!component) return false;
 
@@ -577,6 +636,7 @@ export class ComponentManager {
     parentId: string,
     _index?: number
   ): Promise<string | null> {
+    if (this.composer.writeLocked) return null;
     return instantiateComponent(this.composer, this.maps, componentId, parentId, _index);
   }
 
@@ -615,25 +675,33 @@ export class ComponentManager {
   }
 
   async detachInstance(elementId: string): Promise<boolean> {
+    if (this.composer.writeLocked) return false;
     return detachInstance(this.composer, this.maps, elementId);
   }
 
   /** Board 160:2 — throw away this instance's own edits and take the master. */
   async resetInstance(elementId: string): Promise<boolean> {
+    if (this.composer.writeLocked) return false;
     return (await resetInstance(this.composer, this.maps, elementId)).synced;
   }
 
   /** Board 26 — the override dot's reset: one property back to the master. */
   resetInstanceOverride(elementId: string, type: OverrideType, property: string): boolean {
+    if (this.composer.writeLocked) return false;
     return resetInstanceOverride(this.composer, this.maps, elementId, type, property);
   }
 
   /** Dropped overrides are a whole-component concern — see updateComponentMaster. */
   async syncInstance(elementId: string): Promise<boolean> {
-    return (await syncInstance(this.composer, this.maps, elementId)).synced;
+    /* Taking the master's newer version is derived, not an edit: it runs while
+       viewing, never before load. syncInstance's writes are all synchronous,
+       so they land inside the bypass. */
+    const outcome = await this.composer.runDerivedSync(() => syncInstance(this.composer, this.maps, elementId));
+    return outcome?.synced ?? false;
   }
 
   async updateInstanceVariant(elementId: string, variantId: string): Promise<boolean> {
+    if (this.composer.writeLocked) return false;
     return updateInstanceVariant(this.composer, this.maps, elementId, variantId);
   }
 

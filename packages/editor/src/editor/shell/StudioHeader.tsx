@@ -33,7 +33,9 @@ import { useCollaboration } from "../canvas/hooks/useCollaboration";
 import { toPresenceUsers } from "../collaboration/PresenceIndicators";
 import { duplicateSite, getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import type { ReviewStatus } from "@/services/ReviewService";
-import { useRefetchOnFocus } from "@/shared/hooks";
+import { useHistoryState, useRefetchOnFocus } from "@/shared/hooks";
+import { useEditLocks } from "@/editor/shared/useEditLocks";
+import { formatChord } from "@/editor/canvas/controls/keyboardSheetRows";
 import { formatRelativeTime } from "@/shared/utils/relativeTime";
 import { EVENTS } from "@/shared/constants";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
@@ -48,8 +50,14 @@ import { totalPendingMirrors } from "@/services/syncRetryQueue";
 import { SiteMenu } from "./SiteMenu";
 import { PermissionsHost } from "./PermissionsHost";
 import { TimeTravelHost } from "./TimeTravelHost";
-import { SaveFailedBanner } from "./SaveFailedBanner";
+import { BANNER_ID, clearGlobalBanner, saveFailedBanner, showGlobalBanner } from "./globalBanners";
+import { SaveFailedStrip } from "./SaveFailedStrip";
+import { isAuthSaveError } from "./hooks/useSaveCallback";
+import { publishTray, usePublishTrayOpen } from "./publishTrayStore";
+import { runLabel } from "./PublishTrayRun";
+import type { PublishStep } from "@/services/PublishService";
 import { shellDirty, useShellDirty } from "./shellDirtyRegistry";
+import { saveStatusStore } from "./saveStatusStore";
 import "./header.css";
 
 /** Selected element minimal info */
@@ -100,9 +108,11 @@ export interface StudioHeaderProps {
   onOpenIssues?: () => void;
   /** Open Keyboard Shortcuts panel (site menu · `?`) */
   onOpenShortcuts?: () => void;
-  /** The site crumb's door — the Pages panel (C5 G1-004). */
+  /** @deprecated Not read: board 497:99433 draws the site name as plain
+   *  text, so the crumb doors are gone. AquibraStudio still passes it
+   *  (REQUESTS L3-1). */
   onOpenPages?: () => void;
-  /** The page crumb — back to the base shell, drawer closed (4418:123573). */
+  /** @deprecated As `onOpenPages` (REQUESTS L3-1). */
   onCloseDrawer?: () => void;
   /** History · Activity (B6) — the site menu's "Activity log" stays in the editor. */
   onOpenActivity?: () => void;
@@ -120,12 +130,18 @@ export interface StudioHeaderProps {
   /** Export HTML as zip download */
   onExportHTML?: () => void;
 
-  /** The publish door. AquibraStudio's `requestPublish` — it routes on
-   *  `nextMove.gate` and opens the right dialog (errors confirm · stale
-   *  acknowledgement · facts confirm); this bar never publishes on its own. */
+  /** The publish door. AquibraStudio still passes it; since design-2l9
+   *  Task 1.7 the topbar's Publish is the publish tray's toggle, and the
+   *  tray (StudioPanels) calls the door from its one CTA. Not read here. */
   onVercelPublish?: () => void;
   /** True while a publish job is in flight */
   publishLoading?: boolean;
+  /** The running job's steps (`publishJob.steps`) — the toggle reads
+   *  "Publishing 2/3…" while it runs (board B8-PB07 `233:3648`). */
+  publishSteps?: PublishStep[] | null;
+  /** The last publish failed (`publishJob.uiState === "failed" && !pollLost`)
+   *  — the toggle turns red, "Publish failed" (board B8-PB10 `233:5303`). */
+  publishFailed?: boolean;
   /** Live URL after successful publish */
   publishedUrl?: string | null;
   /** T5 (D10): 2s outcome flash — drives "✓ Published" and the announcement
@@ -144,7 +160,15 @@ export interface StudioHeaderProps {
 }
 
 /**
- * The topbar's one review chip — board B3-01 `7569:190283` (C2, owner
+ * The topbar's review control — design 2L9 board `497:99433` (Task 1.2):
+ * "Request review" with no round; "In review · {n} open" while a round is
+ * out and the open count is known; "In review" when it is not (the status
+ * endpoint carries no count of its own — `openCommentCount` comes from
+ * `useLifecycle`, and is never invented). An approved round keeps its own
+ * label. The control is the entry point only: its click opens the existing
+ * Review flow, which owns the sending/sent/failed states.
+ *
+ * History of this chip — board B3-01 `7569:190283` (C2, owner
  * decision D3): the status VERB plus the one number that matters, in five
  * states: Not sent · Waiting · Sara · Changes requested · 2 · Approved ·
  * Approved · edited since. The sentence (who, when, opened-but-no-reply)
@@ -167,18 +191,19 @@ function reviewChip(
 ): Omit<ReviewPill, "onClick"> | null {
   if (!status.reviewsEnabled) return null;
   const who = status.reviewerName;
+  const inReview = openCount ? `In review · ${openCount} open` : "In review";
   switch (status.state) {
     case "none":
       return status.editsRequireApproval
-        ? { label: "Not sent", tone: "info", title: "Not sent for review yet" }
-        : { label: "Review", tone: "neutral", title: "Open Review" };
+        ? { label: "Request review", tone: "info", title: "Not sent for review yet" }
+        : { label: "Request review", tone: "neutral", title: "Open Review" };
     case "pending":
-      return { label: who ? `Waiting · ${who}` : "Waiting", tone: "info", title: `Sent to ${who ?? "your client"} — waiting on approval` };
+      return { label: inReview, tone: "info", title: `Sent to ${who ?? "your client"} — waiting on approval` };
     case "opened-not-acted":
-      return { label: who ? `Waiting · ${who}` : "Waiting", tone: "info", title: `${who ?? "Your client"} opened the review — no reply yet` };
+      return { label: inReview, tone: "info", title: `${who ?? "Your client"} opened the review — no reply yet` };
     case "changes-requested":
       return {
-        label: openCount ? `Changes requested · ${openCount}` : "Changes requested",
+        label: inReview,
         tone: "warning",
         title: `${who ?? "Your client"} asked for changes${openCount ? ` — ${openCount} open` : ""}`,
       };
@@ -187,6 +212,15 @@ function reviewChip(
     case "approved-edited-since":
       return { label: "Approved · edited since", tone: "warning", title: `${who ?? "Your client"} approved an earlier version — edited since` };
   }
+}
+
+/* The History group's tooltip chords, spelled by the keyboard sheet's own
+   formatter and tightened the way the palette and Activity view print them
+   ("⌘Z", "⇧⌘Z"; "Ctrl+Z", "Ctrl+Shift+Z" elsewhere). */
+function historyChords(): { undoChord: string; redoChord: string } {
+  const isMac = typeof navigator !== "undefined" && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+  const tight = (chord: string) => formatChord(chord, isMac).replace(/([⌘⇧⌥⌃])\+/g, "$1");
+  return { undoChord: tight("ctrl+z"), redoChord: tight(isMac ? "shift+ctrl+z" : "ctrl+shift+z") };
 }
 
 /**
@@ -239,14 +273,13 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   onOpenIssues,
   onOpenShortcuts,
   onOpenActivity,
-  onOpenPages,
-  onCloseDrawer,
   onOpenReview,
   onOpenConflict,
   onSave,
   onExportHTML,
-  onVercelPublish,
   publishLoading,
+  publishSteps = null,
+  publishFailed = false,
   publishedUrl,
   publishOutcome = null,
   reviewStatus,
@@ -371,13 +404,6 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
 
   useRefetchOnFocus(refreshUnread);
 
-  // Keeps "Saved · 2m ago" honest without a render on every tick.
-  const [, setTick] = React.useState(0);
-  React.useEffect(() => {
-    if (!lastSavedAt && !lastSaved) return;
-    const id = window.setInterval(() => setTick((t) => t + 1), 30_000);
-    return () => window.clearInterval(id);
-  }, [lastSavedAt, lastSaved]);
 
   // Redesign P5: the live site name, read from the composer rather than a
   // "My project" placeholder. F7: PROJECT_METADATA_CHANGED fires from every
@@ -508,23 +534,61 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
     }
   }, [exitDialog, onSave]);
 
-  /* ── Save failed (4418:124938 / 125678) — the red card on the canvas. ── */
+  /* ── Save failed (C05 10:2199) — one strip over the canvas column ───────
+     Owner 2026-10-26: a failed save showed a strip, a toast, a Reconnecting…
+     bar and a red topbar label at once. Now it is one stored condition
+     (`saveFailedBanner`: the same id as can't-reach / reconnecting, so the
+     latest of the three is the one surface) drawn as the board's strip
+     (`SaveFailedStrip`), plus the bottom bar's "Couldn't save — Retry". A
+     signed-out save says nothing here: the session-expired
+     dialog and its banner own that condition (B7-G03/G04). */
   const [leaveAfterSave, setLeaveAfterSave] = React.useState<(() => void) | null>(null);
-  const [saveBannerDismissed, setSaveBannerDismissed] = React.useState(false);
-  const [retrying, setRetrying] = React.useState(false);
-  React.useEffect(() => {
-    if (saveStatus !== "error") setSaveBannerDismissed(false);
-  }, [saveStatus]);
   const retrySave = React.useCallback(async () => {
-    setRetrying(true);
     const outcome = await onSave();
-    setRetrying(false);
     if (outcome === "saved" && leaveAfterSave) {
       const nav = leaveAfterSave;
       setLeaveAfterSave(null);
       navigateBypassingUnloadGuard(nav);
     }
   }, [onSave, leaveAfterSave]);
+  const retrySaveRef = React.useRef(retrySave);
+  retrySaveRef.current = retrySave;
+  const authRefused = saveStatus === "error" && Boolean(saveError && isAuthSaveError(saveError));
+  const saveFailedShown = (saveStatus === "error" && !authRefused) || leaveAfterSave !== null;
+  const saveFailedWhere = [siteName, crumbCtx ?? pageName].filter(Boolean).join(" · ");
+  const brandLocked = saveFailedShown ? (composer?.designSystem.readOnly ?? false) : false;
+  const raisedSaveFailed = React.useRef(false);
+  React.useEffect(() => {
+    if (saveFailedShown) {
+      raisedSaveFailed.current = true;
+      showGlobalBanner(
+        saveFailedBanner({
+          where: saveFailedWhere,
+          error: saveError,
+          leaving: leaveAfterSave !== null,
+          brandLocked,
+          retry: () => void retrySaveRef.current(),
+          keepEditing: () => {
+            setLeaveAfterSave(null);
+            clearGlobalBanner(BANNER_ID.connection);
+          },
+        }),
+      );
+      return;
+    }
+    /* A retry in flight ("saving") keeps whatever the save hooks put in the
+       slot (Reconnecting…); a landed save clears it. */
+    if (raisedSaveFailed.current && saveStatus !== "saving") {
+      raisedSaveFailed.current = false;
+      clearGlobalBanner(BANNER_ID.connection);
+    }
+  }, [saveFailedShown, saveFailedWhere, saveError, leaveAfterSave, brandLocked, saveStatus]);
+  React.useEffect(
+    () => () => {
+      if (raisedSaveFailed.current) clearGlobalBanner(BANNER_ID.connection);
+    },
+    [],
+  );
 
   const leaveAnyway = React.useCallback(() => {
     if (!exitDialog) return;
@@ -628,7 +692,13 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   /* SaveStatus has carried a "conflict" state — label, amber pill, dot — that
      this derivation could not produce, so board 66:640's condition showed the
      chip as Saved. */
-  const save: SaveState = offline
+  /* The site never arrived (Task 1.6): the engine holds `not-loaded`, so
+     nothing can be saved and nothing can be published (board B7-G02). */
+  const editLocks = useEditLocks(composer);
+  const notLoaded = editLocks.includes("not-loaded");
+  const save: SaveState = notLoaded
+    ? "not-loaded"
+    : offline
     ? "offline"
     : saveStatus === "saving"
       ? "saving"
@@ -640,25 +710,38 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             ? "unsaved"
             : "saved";
 
-  /* ── B2 (decision #23) · the save pill's click, by state ─────────────────
-     The pill used to save for `unsaved`/`error` and do nothing otherwise.
-     Board G1-005's dot opens History; the owner kept ⌘S as the save. So:
-       saved · saving · unsaved → History (the timeline the pill summarises)
-       error                    → retry the save (the one state where a
-                                  click IS the fix)
-       conflict                 → the recovery dialog (B1-01), re-opened
-       offline                  → nothing to click; the reason is a tooltip
-     `onSave` stays the save — ⌘S and the exit guard call it directly. */
-  const savePillClick: (() => void) | undefined =
-    save === "error"
-      ? () => void onSave()
-      : save === "conflict"
-        ? onOpenConflict
-        : save === "offline"
-          ? undefined
-          : onOpenHistory;
-  const savePillHint =
-    save === "offline" ? "Offline — changes aren't reaching the server. Reconnect to keep saving." : undefined;
+  /* ── The save status (2L9 Shell/BottomBar 497:99485) ──────────────────────
+     It left the topbar for the bottom bar: "✓ Saved just now" + "Details".
+     Its click is kept only where the state itself is the fix:
+       error    → retry the save (board C05: "Couldn't save — Retry")
+       conflict → the recovery dialog (B1-01), re-opened
+       offline  → nothing to click; the reason is a tooltip
+     "Details" opens History, which the saved pill's click used to do.
+     `onSave` stays the save — ⌘S and the exit guard call it directly.
+     The callbacks go through refs: AquibraStudio passes fresh arrows every
+     render, and the store would otherwise wake the bottom bar each time. */
+  const saveCallbacks = React.useRef({ onSave, onOpenConflict, onOpenHistory });
+  saveCallbacks.current = { onSave, onOpenConflict, onOpenHistory };
+  const retrySaveClick = React.useCallback(() => void saveCallbacks.current.onSave(), []);
+  const openConflictClick = React.useCallback(() => saveCallbacks.current.onOpenConflict?.(), []);
+  const openHistoryClick = React.useCallback(() => saveCallbacks.current.onOpenHistory?.(), []);
+  const savedAtTs = lastSavedAt ?? lastSaved?.getTime();
+  const hasConflictDoor = Boolean(onOpenConflict);
+  const hasHistoryDoor = Boolean(onOpenHistory);
+  React.useEffect(() => {
+    if (viewMode.readOnlyView) {
+      saveStatusStore.set(null);
+      return;
+    }
+    saveStatusStore.set({
+      state: save,
+      savedAt: savedAtTs,
+      onClick: save === "error" ? retrySaveClick : save === "conflict" && hasConflictDoor ? openConflictClick : undefined,
+      hint: save === "offline" ? "Offline — changes aren't reaching the server. Reconnect to keep saving." : undefined,
+      onDetails: hasHistoryDoor ? openHistoryClick : undefined,
+    });
+  }, [save, savedAtTs, viewMode.readOnlyView, hasConflictDoor, hasHistoryDoor, retrySaveClick, openConflictClick, openHistoryClick]);
+  React.useEffect(() => () => saveStatusStore.set(null), []);
 
   const errorCount = issues.filter((i) => i.type === "error").length;
   const warnCount = issues.filter((i) => i.type === "warning").length;
@@ -678,12 +761,26 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
      a review-blocked site rendering the ENABLED branch. `"anyway"` is gone:
      the derivation owns the error re-label, and it refuses to put an
      invitation on a button nobody can press. */
+  /* design-2l9 Task 1.7: a publish move is the tray's TOGGLE, and stays
+     pressable whatever blocks the publish — the tray holds the one CTA and
+     its reason, so the bar never shows a second, disabled Publish. Only the
+     review verbs (Send for review · Open feedback) keep the old shape: they
+     open the Review panel, and a blocked one says why on the button. */
+  const trayOpen = usePublishTrayOpen();
+  const isTrayToggle = !nextMove || nextMove.kind === "publish";
   const publish: PublishState =
-    publishOutcome === "published"
+    publishOutcome === "published" && !trayOpen
       ? "published"
-      : nextMove?.blockedReason
+      : publishFailed && isTrayToggle
+        ? "failed"
+      : !isTrayToggle && nextMove?.blockedReason
         ? "disabled"
         : "ready";
+  /* The tray reads the site's issues from here: they reach the shell only
+     through this component's props. */
+  React.useEffect(() => {
+    publishTray.setIssues(issues);
+  }, [issues]);
 
   // ── T5/F24 · the ONE announcement pipe (eng D5 — centralized) ────────────
   // SaveStatus is presentation-only; these two visually-hidden regions speak
@@ -723,13 +820,16 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
      `nextMove.gate`: the "Publish with N open errors?" confirm used to be this
      bar's private dialog, so the Publish panel's identical verb skipped it
      (B4 — one confirm door, both entrances). */
-  const handleCtaClick = React.useCallback(() => {
-    if (nextMove && nextMove.kind !== "publish") {
-      onOpenReview?.();
-      return;
-    }
-    onVercelPublish?.();
-  }, [nextMove, onOpenReview, onVercelPublish]);
+  const handleCtaClick = React.useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      if (nextMove && nextMove.kind !== "publish") {
+        onOpenReview?.();
+        return;
+      }
+      publishTray.toggle(e.currentTarget);
+    },
+    [nextMove, onOpenReview],
+  );
 
   // Plan §2/eng D12: the CONTAINER composes the tool cluster per role/view —
   // the bar renders exactly what it receives. View mode is itself a preview,
@@ -769,6 +869,24 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   // F3: every review state opens the same door — the Review panel. `null`
   // (reviews disabled for this site) means no door at all — see reviewChip.
   const reviewChipResult = reviewChip(reviewStatus, openCommentCount);
+  /* The editor's ONE undo (design-2l9 Task 1.2, board 497:99433). State comes
+     from the composer's own history events through useHistoryState — never
+     from AquibraStudio — so it re-reads on a composer swap, a project load
+     (importProject emits only project:loaded) and a version restore. */
+  const { canUndo, canRedo, undo, redo } = useHistoryState(composer);
+  /* The engine refuses undo/redo under any edit lock (time travel, a missing
+     site); offering them enabled would make a silent no-op. */
+  const historyLocked = editLocks.length > 0;
+  const history =
+    viewMode.readOnlyView || !composer
+      ? null
+      : {
+          canUndo: canUndo && !historyLocked,
+          canRedo: canRedo && !historyLocked,
+          onUndo: undo,
+          onRedo: redo,
+          ...historyChords(),
+        };
   const review: ReviewPill | null = reviewChipResult ? { ...reviewChipResult, onClick: onOpenReview } : null;
 
   return (
@@ -782,22 +900,18 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       <div className="bk-sr-only" aria-live="assertive" data-testid="bk-announce-assertive">
         {alertMsg}
       </div>
+      <SaveFailedStrip />
       <Topbar
         siteName={siteName}
-        pageName={crumbCtx ?? pageName}
-        onOpenPages={viewMode.readOnlyView ? undefined : onOpenPages}
-        onPageCrumb={viewMode.readOnlyView ? undefined : onCloseDrawer}
+        /* Board 497:99433: a labelled "Site settings" in the bar. A view has
+           no settings to change. */
+        onOpenSiteSettings={viewMode.readOnlyView ? undefined : onOpenProjectSettings}
         /* In view mode the leftmost control leaves the MODE. It used to
            leave the product — the loudest button on a preview took you to the
            dashboard, while returning to the editor was buried in ⋯. */
         onExit={viewMode.readOnlyView && canLeaveView ? toggleReadOnlyView : exitToDashboard}
-        exitLabel={viewMode.readOnlyView && canLeaveView ? "‹ Back to editing" : "‹ Exit"}
-        save={viewMode.readOnlyView ? undefined : save}
-        savedAt={lastSavedAt ?? lastSaved?.getTime()}
-        /* The pill is a button wherever a click has a destination (B2). A
-           view does not offer one — nothing in it can become unsaved. */
-        onSaveClick={viewMode.readOnlyView ? undefined : savePillClick}
-        saveHint={viewMode.readOnlyView ? undefined : savePillHint}
+        exitLabel={viewMode.readOnlyView && canLeaveView ? "‹ Back to editing" : "Exit"}
+        history={history}
         review={review}
         tools={tools}
         presence={
@@ -828,16 +942,26 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         onOpenNotifications={() => setNotifOpen((v) => !v)}
         /* Publishing is the owner's act. It stayed visible in view mode
            because nothing here ever read readOnlyView for it. */
-        /* `nextMove === null` means the site has no next act — live, with
-           nothing waiting. The CTA is withheld there rather than showing a
-           Publish that would do nothing; the live chip below carries the
-           status that used to be implied by the button's presence. */
-        publish={isViewer ? "disabled" : viewMode.readOnlyView || !nextMove ? "hidden" : publish}
+        /* `nextMove === null` — live with nothing waiting — still shows
+           Publish: it opens the tray, which says "Up to date" (board PLAY
+           F4.22 `308:25079`) beside the live site and its links. */
+        publish={isViewer ? "disabled" : viewMode.readOnlyView || notLoaded ? "hidden" : publish}
         publishBusy={publishLoading}
-        /* A viewer's reason is the lifecycle's own ("Viewers can't publish —
-           ask an editor"); in view mode it rides the disabled CTA. */
+        publishExpanded={!isViewer && !viewMode.readOnlyView && isTrayToggle ? trayOpen : undefined}
+        publishControls="publish-tray"
+        /* A viewer's reason is the lifecycle's own ("Publishing needs Editor
+           access"); in view mode it rides the disabled CTA. */
         publishBlockedReason={nextMove?.blockedReason ?? undefined}
-        ctaLabel={isViewer ? nextMove?.label ?? "Publish" : nextMove?.label}
+        /* Board 497:99433 says "Publish" on the tray toggle; "Publish
+           changes" stays the tray's own CTA and the toggle's title. The
+           review verbs keep their words (they open Review, not the tray). */
+        ctaLabel={
+          isViewer
+            ? nextMove?.label ?? "Publish"
+            : isTrayToggle
+              ? publishLoading ? runLabel(publishSteps) : undefined
+              : nextMove?.label
+        }
         ctaHint={nextMove?.hint}
         onPublish={handleCtaClick}
         /* SendForReview used to render ONLY in view mode, from when
@@ -912,23 +1036,8 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
           initialQuery={cmdQuery}
           /* FB-4: Review has no client gate today — hide its ⌘K row when the
              agency review layer is off (same flag the topbar pill already
-             reads for its own "Not sent" vs plain "Review" wording). */
+             reads for its own "Request review" wording). */
           reviewsEnabled={reviewStatus.reviewsEnabled}
-        />
-      ) : null}
-
-      {(saveStatus === "error" && !saveBannerDismissed) || leaveAfterSave ? (
-        <SaveFailedBanner
-          where={[siteName, crumbCtx ?? pageName].filter(Boolean).join(" · ")}
-          leaving={leaveAfterSave !== null}
-          busy={retrying}
-          refusal={saveError?.startsWith("TOKENS_INVALID:") ? saveError.slice("TOKENS_INVALID:".length).trim() : undefined}
-          brandLocked={composer?.designSystem.readOnly ?? false}
-          onRetry={() => void retrySave()}
-          onKeepEditing={() => {
-            setLeaveAfterSave(null);
-            setSaveBannerDismissed(true);
-          }}
         />
       ) : null}
 

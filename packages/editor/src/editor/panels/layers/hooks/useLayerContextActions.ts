@@ -17,6 +17,8 @@ import type { LayerAction } from "../types";
 import type { UseLayersStateReturn } from "./useLayersState";
 import { useToast } from "@/editor/chrome-ui";
 import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
+import { requestOpenMaster } from "@/editor/sidebar/tabs/component-library/openMasterRequest";
+import { detachInstanceWithUndo } from "@/editor/sidebar/tabs/component-library/instantiate";
 
 export interface LayerContextActionOptions {
   /** Delete asked for N ≥ 2 elements — open the confirm (board 6887:78291). */
@@ -119,6 +121,18 @@ export function useLayerContextActions(
             description: `Wrapped ${multi ? `${ids.length} elements` : name.charAt(0).toUpperCase() + name.slice(1)} in a group`,
             action: composer ? { label: "Undo", onClick: composer.history.captureUndo() } : undefined,
           });
+          break;
+        }
+        /* 2L9 B6-K22: the same doors as the Inspector's component row. */
+        case "goToMain": {
+          const inst = composer?.components?.getInstanceByElementId(nodeId);
+          if (composer && inst) requestOpenMaster(composer, inst.componentId, nodeId, "layers");
+          break;
+        }
+        case "detachInstance": {
+          const inst = composer?.components?.getInstanceByElementId(nodeId);
+          const master = inst ? composer?.components?.getComponent(inst.componentId) : null;
+          if (composer && inst) void detachInstanceWithUndo(composer, nodeId, master?.name ?? "Instance").then(({ toast }) => addToast(toast));
           break;
         }
         case "moveToPage":

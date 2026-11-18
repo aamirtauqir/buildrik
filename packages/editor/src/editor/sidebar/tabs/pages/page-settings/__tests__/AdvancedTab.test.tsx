@@ -27,6 +27,7 @@ function makeSettings(over: Partial<UsePageSettingsReturn> = {}): UsePageSetting
     slugError: null,
     seoScore: 100,
     seoChecks: { titleSet: true, slugClean: true, indexingOn: true, descSet: true },
+    seoBreakdown: [],
     ogTitle: "",
     setOgTitle: vi.fn(),
     ogDesc: "",
@@ -58,26 +59,23 @@ beforeEach(() => vi.clearAllMocks());
 // ── Visibility ───────────────────────────────────────────────────────────────
 
 describe("AdvancedTab visibility", () => {
-  it("marks the current visibility radio as checked", () => {
+  /* design-2l9 board 63:17061: visibility is a select. Re-baseline. */
+  it("shows the current visibility in its select", () => {
     render(<AdvancedTab s={makeSettings({ visibility: "hidden" })} />);
-    const radios = screen.getAllByRole("radio");
-    const hidden = radios.find((r) => r.textContent === "Hidden")!;
-    const live = radios.find((r) => r.textContent === "Live")!;
-    expect(hidden.getAttribute("aria-checked")).toBe("true");
-    expect(live.getAttribute("aria-checked")).toBe("false");
+    expect((screen.getByTestId("adv-input-visibility") as HTMLSelectElement).value).toBe("hidden");
   });
 
   it("offers Live and Hidden only — no Password (decision #21)", () => {
     render(<AdvancedTab s={makeSettings()} />);
-    expect(screen.getAllByRole("radio").map((r) => r.textContent)).toEqual(["Live", "Hidden"]);
-    expect(screen.queryByLabelText("Page access password")).toBeNull();
+    const options = Array.from((screen.getByTestId("adv-input-visibility") as HTMLSelectElement).options).map((o) => o.textContent);
+    expect(options).toEqual(["Live", "Hidden"]);
     expect(screen.queryByText(/password/i)).toBeNull();
   });
 
-  it("calls setVisibility with the clicked value", () => {
+  it("calls setVisibility with the chosen value", () => {
     const s = makeSettings({ visibility: "live" });
     render(<AdvancedTab s={s} />);
-    fireEvent.click(screen.getAllByRole("radio").find((r) => r.textContent === "Hidden")!);
+    fireEvent.change(screen.getByTestId("adv-input-visibility"), { target: { value: "hidden" } });
     expect(s.setVisibility).toHaveBeenCalledWith("hidden");
   });
 
@@ -89,38 +87,33 @@ describe("AdvancedTab visibility", () => {
     expect(screen.queryByText(/reachable via direct URL/)).toBeNull();
   });
 
-  it("shows the publicly-accessible helper text for live only", () => {
+  /* design-2l9 board 63:17061. Re-baseline: Advanced tab copy. */
+  it("names Publish visibility and says what Live means", () => {
     render(<AdvancedTab s={makeSettings({ visibility: "live" })} />);
-    expect(screen.getByText("Page is publicly accessible.")).toBeTruthy();
+    expect(screen.getByText("Publish visibility")).toBeTruthy();
+    expect(screen.getByText("Live means this page is included on the next publish.")).toBeTruthy();
   });
 });
 
 // ── Indexing ─────────────────────────────────────────────────────────────────
 
 describe("AdvancedTab indexing switches", () => {
-  it("reflects allowIndex / allowFollow as switch checked state", () => {
-    // flowbite's ToggleSwitch is a <button role="switch" aria-checked>, not
-    // an <input> — the checked state lives in aria-checked now.
-    render(<AdvancedTab s={makeSettings({ allowIndex: true, allowFollow: false })} />);
-    expect(
-      screen.getByRole("switch", { name: "Allow indexing" }).getAttribute("aria-checked")
-    ).toBe("true");
-    expect(
-      screen.getByRole("switch", { name: "Follow links" }).getAttribute("aria-checked")
-    ).toBe("false");
-  });
-
-  it("toggles allowIndex to the opposite of its current value", () => {
-    const s = makeSettings({ allowIndex: true });
+  /* design-2l9 board 63:17061: indexing is switched in SEO; Advanced reads
+     it out and links there — one control, one home. */
+  it("reads indexing out and sends Change in SEO to the SEO tab", () => {
+    const s = makeSettings({ allowIndex: true, allowFollow: false });
     render(<AdvancedTab s={s} />);
-    fireEvent.click(screen.getByRole("switch", { name: "Allow indexing" }));
-    expect(s.setAllowIndex).toHaveBeenCalledWith(false);
+    expect(screen.getByTestId("adv-indexing")).toHaveTextContent("Search indexing: Indexed");
+    expect(screen.queryByRole("switch", { name: "Allow indexing" })).toBeNull();
+    fireEvent.click(screen.getByTestId("adv-indexing-change"));
+    expect(s.setActiveTab).toHaveBeenCalledWith("seo");
+    expect((screen.getByTestId("adv-input-follow") as HTMLSelectElement).value).toBe("nofollow");
   });
 
-  it("toggles allowFollow to the opposite of its current value", () => {
+  it("Follow links is a select (63:17061)", () => {
     const s = makeSettings({ allowFollow: false });
     render(<AdvancedTab s={s} />);
-    fireEvent.click(screen.getByRole("switch", { name: "Follow links" }));
+    fireEvent.change(screen.getByTestId("adv-input-follow"), { target: { value: "follow" } });
     expect(s.setAllowFollow).toHaveBeenCalledWith(true);
   });
 });

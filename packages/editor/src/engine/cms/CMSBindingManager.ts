@@ -29,6 +29,9 @@ import { BINDABLE_TYPES } from "@/shared/constants/elementCapabilities";
 import type { Composer } from "../Composer";
 import { BaseBindingManager, type BindingWithData } from "../data/BaseBindingManager";
 import type { CollectionManager } from "./CollectionManager";
+import { lockOwner } from "../commands/commandOperations";
+import { pageFileNames } from "../export/pageFiles";
+import type { CmsCondition, CmsListSortKey } from "@buildrik/shared/schemas/cmsConditions";
 
 /**
  * CMS element binding configuration
@@ -69,6 +72,28 @@ export interface CMSCollectionBinding {
    *  repeater, default) or its children (the Collection list element,
    *  G3-079 — the list stays one container, its children are the template). */
   repeat?: "self" | "children";
+  /** C-14 (engine-list-query.md): which records, in which order. */
+  filter?: CmsCondition;
+  sort?: CmsListSortKey[];
+  skip?: number;
+  /** B-27: leave out the template page's own record. */
+  excludeCurrent?: boolean;
+  /** B-30 (engine-list-query.md §Pages): "Split into pages" of Show records
+   *  each, written as `<page>/page/N` on publish; absent = first Show only. */
+  pages?: "split";
+  /** B-30 §When empty: "Hide list"; absent = the editable No items block. */
+  whenEmpty?: "hide";
+}
+
+/** A Collection list's query, as the Inspector edits it. */
+export interface CMSListQuery {
+  filter?: CmsCondition;
+  sort?: CmsListSortKey[];
+  skip?: number;
+  limit?: number;
+  excludeCurrent?: boolean;
+  pages?: "split";
+  whenEmpty?: "hide";
 }
 
 /** The part of an element a binding copy walks. */
@@ -104,6 +129,14 @@ const TEXT_LIKE_FIELDS = new Set<CMSFieldType>(["text", "textarea", "richtext", 
 export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
   private cmsManager: CollectionManager;
   private collectionBindings: Map<string, CMSCollectionBinding> = new Map();
+  /* design-2l9 173:12022: which record the CANVAS previews for "this page's
+     record", per collection, and whether drafts may be previewed. A view
+     preference — never in the project, the history, or what publishes; with
+     no choice the canvas previews the first published record, as before. */
+  private previewChoice: Map<string, string> = new Map();
+  private draftsOnCanvas = false;
+  /** B-11: element id → its visibility condition (engine-conditions.md). */
+  private conditions: Map<string, CmsCondition> = new Map();
 
   constructor(composer: Composer, cmsManager: CollectionManager) {
     super(composer);
@@ -140,11 +173,12 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
   private forgetBoundElement(elementId: string): void {
     this.forgetElement(elementId);
     if (this.collectionBindings.delete(elementId)) this.composer.emit(EVENTS.CMS_COLLECTION_UNBOUND, { elementId });
+    if (this.conditions.delete(elementId)) this.composer.emit(EVENTS.CMS_CONDITION_CHANGED, { elementId });
   }
 
   /** Bindings whose element no longer exists anywhere (a deleted page). */
   private pruneMissing(): void {
-    const ids = new Set([...Object.keys(this.export()), ...this.collectionBindings.keys()]);
+    const ids = new Set([...Object.keys(this.export()), ...this.collectionBindings.keys(), ...this.conditions.keys()]);
     for (const id of ids) if (!this.composer.elements.getElement(id)) this.forgetBoundElement(id);
   }
 
@@ -160,6 +194,11 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
     if (list) {
       this.collectionBindings.set(toId, { ...list, elementId: toId });
       this.composer.emit(EVENTS.CMS_COLLECTION_BOUND, { elementId: toId, collectionId: list.collectionId });
+    }
+    const condition = this.conditions.get(fromId);
+    if (condition) {
+      this.conditions.set(toId, structuredClone(condition));
+      this.composer.emit(EVENTS.CMS_CONDITION_CHANGED, { elementId: toId });
     }
     const a = from.getChildren();
     const b = to.getChildren();
@@ -178,12 +217,12 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
     fallback?: string,
     /** Makes the bind one undo step (the inspector passes it; loads don't). */
     historyLabel?: string
-  ): void {
+  ): Promise<void> {
     /* BD-11: only element types that show content bind (BINDABLE_TYPES —
        the Inspector's own gate), from any door. A container bound to a field
        had its children replaced by the value. */
     const type = this.composer.elements.getElement(elementId)?.getType?.();
-    if (type !== undefined && !BINDABLE_TYPES.has(type)) return;
+    if (type !== undefined && !BINDABLE_TYPES.has(type)) return Promise.resolve();
     const collectionName = this.cmsManager.getCollection(collectionId)?.name;
     const binding: CMSElementBinding = {
       binding: {
@@ -199,13 +238,64 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
       fallback,
     };
 
-    this.bind(elementId, binding, historyLabel);
+    return this.bind(elementId, binding, historyLabel);
+  }
+
+  // ============================================
+  // Canvas preview record (view preference)
+  // ============================================
+
+  /** The collection whose template page is `pageId` (Dynamic pages links a
+   *  collection to a page by its published file name), or null. */
+  templateCollectionOf(pageId: string): string | null {
+    const file = pageFileNames(this.composer.elements.getAllPages()).get(pageId);
+    if (!file) return null;
+    return this.cmsManager.getAllCollections().find((c) => c.pageTemplatePath === file)?.id ?? null;
+  }
+
+  /** The records the canvas may preview, in store order: the published ones,
+   *  plus drafts while "Show drafts" is on. */
+  async previewCandidates(collectionId: string): Promise<CMSContentItem[]> {
+    const items = await this.cmsManager.getContentItems(collectionId);
+    return items.filter((i) => i.status === "published" || (this.draftsOnCanvas && i.status === "draft"));
+  }
+
+  /** The record the canvas previews: the chosen one while it is still a
+   *  candidate, else the first candidate. */
+  async getPreviewRecord(collectionId: string): Promise<CMSContentItem | null> {
+    const candidates = await this.previewCandidates(collectionId);
+    const chosen = this.previewChoice.get(collectionId);
+    return candidates.find((i) => i.id === chosen) ?? candidates[0] ?? null;
+  }
+
+  getPreviewChoice(collectionId: string): string | null {
+    return this.previewChoice.get(collectionId) ?? null;
+  }
+
+  /** Preview another record on the canvas (null: back to the first). */
+  setPreviewRecord(collectionId: string, itemId: string | null): void {
+    if ((this.previewChoice.get(collectionId) ?? null) === itemId) return;
+    if (itemId) this.previewChoice.set(collectionId, itemId);
+    else this.previewChoice.delete(collectionId);
+    this.composer.emit(EVENTS.CMS_PREVIEW_RECORD_CHANGED, { collectionId });
+  }
+
+  getShowDrafts(): boolean {
+    return this.draftsOnCanvas;
+  }
+
+  setShowDrafts(on: boolean): void {
+    if (this.draftsOnCanvas === on) return;
+    this.draftsOnCanvas = on;
+    this.composer.emit(EVENTS.CMS_PREVIEW_RECORD_CHANGED, { collectionId: null });
   }
 
   /**
-   * Resolve a CMS binding to its actual value
+   * Resolve a CMS binding to its actual value. `preview`: for the canvas
+   * preview, a binding to "this page's record" follows the preview choice;
+   * the value written into the element (and so what is stored) never does.
    */
-  async resolveBinding(binding: CMSElementBinding): Promise<string> {
+  async resolveBinding(binding: CMSElementBinding, opts: { preview?: boolean } = {}): Promise<string> {
     try {
       const { collectionId, itemId, fieldSlug, fallback } = binding;
 
@@ -214,7 +304,9 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
          template's {fieldSlug} token (CMSExportResolver); everywhere else —
          the canvas, a plain page — it previews the first published record. */
       if (!itemId || itemId === "context") {
-        const first = (await this.cmsManager.queryContent({ collectionId, status: "published", filter: {} })).items[0];
+        const first = opts.preview
+          ? await this.getPreviewRecord(collectionId)
+          : (await this.cmsManager.queryContent({ collectionId, status: "published", filter: {} })).items[0];
         return cmsTextOf(first?.data[fieldSlug]) || fallback || "";
       }
 
@@ -294,8 +386,12 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
       else element.setTrait(property, value);
     };
     const history = this.composer.history;
-    if (history?.runWithoutTracking) history.runWithoutTracking(write);
-    else write();
+    /* A refresh, not an edit: it still runs while the site is only being
+       viewed (runDerivedSync), never before it has loaded. */
+    this.composer.runDerivedSync(() => {
+      if (history?.runWithoutTracking) history.runWithoutTracking(write);
+      else write();
+    });
   }
 
   /**
@@ -329,6 +425,7 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
     collectionId: string,
     options: Partial<Omit<CMSCollectionBinding, "elementId" | "collectionId">> = {}
   ): void {
+    if (this.composer.writeLocked) return;
     this.collectionBindings.set(elementId, {
       elementId,
       collectionId,
@@ -351,6 +448,7 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
    * records instead of blanks. Placeholders the author already aimed stay.
    */
   bindCollectionList(elementId: string, collectionId: string, options: { limit?: number } = {}): void {
+    if (this.composer.writeLocked) return;
     this.bindCollection(elementId, collectionId, { repeat: "children", limit: options.limit });
     const collection = this.cmsManager.getCollection(collectionId);
     const list = this.composer.elements.getElement(elementId);
@@ -380,6 +478,7 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
    * Unbind a collection from an element
    */
   unbindCollection(elementId: string): void {
+    if (this.composer.writeLocked) return;
     if (this.collectionBindings.has(elementId)) {
       this.collectionBindings.delete(elementId);
       this.composer.markDirty();
@@ -442,11 +541,92 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
     }
   }
 
+  // ============================================
+  // Conditions (B-11) and list queries (C-14)
+  // ============================================
+
+  /** One recorded history step around a binding-map write (as bind()). */
+  private recordStep(label: string | undefined, write: () => void): void {
+    if (label) this.composer.history?.flushPending?.();
+    write();
+    this.composer.markDirty?.();
+    if (label) this.composer.history?.record?.(label);
+    else this.composer.history?.noteUnrecordedAction?.("changing a condition");
+  }
+
+  /** The element's visibility condition, if it has one. */
+  getCondition(elementId: string): CmsCondition | null {
+    return this.conditions.get(elementId) ?? null;
+  }
+
+  hasConditions(): boolean {
+    return this.conditions.size > 0;
+  }
+
+  /**
+   * Set (or, with null, remove) an element's visibility condition — one
+   * history step when `historyLabel` is given. Refused while writes are
+   * locked or the element is locked (P-1).
+   */
+  setCondition(elementId: string, condition: CmsCondition | null, historyLabel?: string): boolean {
+    if (this.composer.writeLocked) return false;
+    if (lockOwner(this.composer.elements.getElement(elementId))) {
+      this.composer.emit(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
+      return false;
+    }
+    const safe = condition ? filterCmsBindings({ conditions: { [elementId]: condition } })?.conditions?.[elementId] : null;
+    if (condition && !safe) return false;
+    this.recordStep(historyLabel, () => {
+      if (safe) this.conditions.set(elementId, safe);
+      else this.conditions.delete(elementId);
+    });
+    this.composer.emit(EVENTS.CMS_CONDITION_CHANGED, { elementId });
+    return true;
+  }
+
+  exportConditions(): Record<string, CmsCondition> {
+    return Object.fromEntries(this.conditions);
+  }
+
+  /** Replace every condition (a load, an undo); the save filter runs here too. */
+  importConditions(data: Record<string, CmsCondition> | undefined): void {
+    this.conditions.clear();
+    const safe = filterCmsBindings({ conditions: data ?? {} })?.conditions ?? {};
+    for (const [id, c] of Object.entries(safe)) this.conditions.set(id, c);
+  }
+
+  /**
+   * A Collection list's query (filter, sort, skip, Show) — one history step.
+   * Keys given as undefined are cleared; keys not given are kept.
+   */
+  setListQuery(listId: string, query: CMSListQuery, historyLabel?: string): boolean {
+    if (this.composer.writeLocked) return false;
+    const binding = this.collectionBindings.get(listId);
+    if (!binding) return false;
+    if (lockOwner(this.composer.elements.getElement(listId))) {
+      this.composer.emit(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
+      return false;
+    }
+    const next: CMSCollectionBinding = { ...binding };
+    for (const key of ["filter", "sort", "skip", "limit", "excludeCurrent", "pages", "whenEmpty"] as const) {
+      if (!(key in query)) continue;
+      const v = query[key];
+      if (v === undefined || v === false || (Array.isArray(v) && v.length === 0)) delete next[key];
+      else (next as unknown as Record<string, unknown>)[key] = v;
+    }
+    const safe = filterCmsBindings({ collection: { [listId]: next } })?.collection?.[listId];
+    if (!safe) return false;
+    this.recordStep(historyLabel, () => this.collectionBindings.set(listId, safe as CMSCollectionBinding));
+    this.composer.emit(EVENTS.CMS_LIST_QUERY_CHANGED, { elementId: listId });
+    return true;
+  }
+
   /**
    * Clean up on destroy
    */
   override destroy(): void {
     this.collectionBindings.clear();
+    this.conditions.clear();
     super.destroy();
   }
 }

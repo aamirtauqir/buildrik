@@ -20,7 +20,7 @@ import { EditorShell, Footer, Rail, RailItem, RightPanel, Topbar, Drawer } from 
 function shell(extra: Partial<React.ComponentProps<typeof EditorShell>> = {}) {
   return render(
     <EditorShell
-      topbar={<Topbar siteName="Bella Cucina" save="saved" />}
+      topbar={<Topbar siteName="Bella Cucina" />}
       rail={
         <Rail>
           <RailItem icon="+" label="Insert" active />

@@ -172,19 +172,40 @@ describe("saveProjectFromEditor — editor save path (positional args)", () => {
     );
   });
 
-  it("deletes pages removed from project data", async () => {
+  it("guards the trash with the save's base stamp (restore race, A-21)", async () => {
+    vi.mocked(prisma.site.findUnique).mockResolvedValue({ id: "site-1", name: "Test Site" } as never);
+    const { txPage, txSite, txFormBlock } = makeTx();
+    txPage.findMany.mockResolvedValueOnce([{ id: "page-1" }, { id: "page-2" }]).mockResolvedValueOnce([]);
+    vi.mocked(prisma.$transaction).mockImplementation(((fn: (tx: unknown) => unknown) => fn({ page: txPage, site: txSite, formBlock: txFormBlock })) as never);
+
+    await saveProjectFromEditor("site-1", {
+      version: "1.0",
+      pages: [{ id: "page-1", name: "Home", slug: "home", isHome: true, root: { type: "div", children: [] } }],
+      styles: [],
+      assets: [],
+    }, "2026-10-31T10:00:00.000Z", "user-1");
+
+    const base = new Date("2026-10-31T10:00:00.000Z");
+    expect(txPage.findMany.mock.calls[1][0].where).toEqual({
+      id: { in: ["page-2"] },
+      siteId: "site-1",
+      deletedAt: null,
+      OR: [{ restoredAt: null }, { restoredAt: { lte: base } }],
+    });
+    expect(txPage.update).not.toHaveBeenCalled(); // page-2 was restored after the base
+  });
+
+  it("moves pages removed from project data to the trash (A-21)", async () => {
     vi.mocked(prisma.site.findUnique).mockResolvedValue({
       id: "site-1",
       name: "Test Site",
     } as any);
 
     const { txPage, txSite, txFormBlock } = makeTx();
-    txPage.findMany.mockResolvedValue([
-      { id: "page-1" },
-      { id: "page-2" },
-      { id: "page-3" },
-    ]);
-    txPage.deleteMany.mockResolvedValue({ count: 2 });
+    // 1st read: the site's live pages; 2nd: the ones to trash, with slugs.
+    txPage.findMany
+      .mockResolvedValueOnce([{ id: "page-1" }, { id: "page-2" }, { id: "page-3" }])
+      .mockResolvedValueOnce([{ id: "page-2", slug: "about" }, { id: "page-3", slug: "work" }]);
 
     vi.mocked(prisma.$transaction).mockImplementation((fn: any) =>
       fn({ page: txPage, site: txSite, formBlock: txFormBlock })
@@ -203,15 +224,25 @@ describe("saveProjectFromEditor — editor save path (positional args)", () => {
       ],
       styles: [],
       assets: [],
-    });
+    }, undefined, "user-1");
 
     expect(result.success).toBe(true);
-    expect(txFormBlock.deleteMany).toHaveBeenCalledWith({
-      where: { pageId: { in: ["page-2", "page-3"] } },
+    // Live pages only, so a trashed page is not trashed again on every save.
+    expect(txPage.findMany.mock.calls[0][0]).toEqual({ where: { siteId: "site-1", deletedAt: null }, select: { id: true } });
+    // No base stamp sent → no restore-race guard on the read.
+    expect(txPage.findMany.mock.calls[1][0].where).toEqual({ id: { in: ["page-2", "page-3"] }, siteId: "site-1", deletedAt: null });
+    expect(txPage.deleteMany).not.toHaveBeenCalled();
+    expect(txFormBlock.deleteMany).not.toHaveBeenCalled();
+    expect(txPage.update).toHaveBeenCalledWith({
+      where: { id: "page-2" },
+      data: { deletedAt: expect.any(Date), deletedById: "user-1", trashedSlug: "about", slug: "about~deleted~page-2" },
     });
-    expect(txPage.deleteMany).toHaveBeenCalledWith({
-      where: { id: { in: ["page-2", "page-3"] } },
+    expect(txPage.update).toHaveBeenCalledWith({
+      where: { id: "page-3" },
+      data: { deletedAt: expect.any(Date), deletedById: "user-1", trashedSlug: "work", slug: "work~deleted~page-3" },
     });
+    // The page the editor sends is live: a trashed one coming back leaves the trash.
+    expect(txPage.upsert.mock.calls[0][0].update).toMatchObject({ deletedAt: null, deletedById: null, trashedSlug: null });
     expect(txPage.upsert).toHaveBeenCalledTimes(1);
     expect(txSite.updateMany).toHaveBeenCalledWith(
       expect.objectContaining({

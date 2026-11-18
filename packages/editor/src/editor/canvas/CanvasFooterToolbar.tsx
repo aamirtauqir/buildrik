@@ -1,39 +1,34 @@
 /**
- * CanvasFooterToolbar - the canvas status bar's edit + view controls.
+ * CanvasFooterToolbar — the canvas status bar (design-2l9 boards 7:18654,
+ * 145:64586): "Hero / Text · 1440 px · 52% · View".
  *
- * CONTROLS:
- * - Undo / Redo (moved off the topbar)
- * - ONE "View ▾" menu holding the six overlay toggles — board 5930:44801
- *   (Canvas · View menu): Snap guides · Spacing · Grid · Rulers · Badges ·
- *   X-Ray as check rows, each with its chord (G2-037: "one contextual
- *   selector", not a word bar). The chords themselves stay bound below.
- * - Its last two rows, Breakpoint ▸ (5930:44781, with Custom width… →
- *   5930:44824) and Zoom ▸ (7048:78112), plus the bar's own "100% ▾"
- *   (7048:78046, board 5936:44788).
- * - The selection readout at the right end.
+ * - Left: where the selection is, two levels — "{Parent} / {Element}", the
+ *   page alone with nothing selected (useSelectionReadout). The type and
+ *   W × H the bar used to print ride in its tooltip.
+ * - "{width} px" opens Page width (145:71013): presets + a custom width. It
+ *   replaces View ▸ Breakpoint ▸ / Custom width….
+ * - "{zoom}%" opens the zoom rows (fit, selection, presets).
+ * - "View" opens Canvas view (145:64586): Grid · {n} px › (the Grid and
+ *   snapping panel, 145:65011, opened in the View popover's place), Rulers,
+ *   Snap guides — then, under a rule,
+ *   the code's Spacing · Badges · X-Ray toggles (kept, code-ahead). "Show
+ *   outlines" is the shell's preference (A-12); "Focus mode" waits on its
+ *   meaning (`open:focus-mode-meaning`).
  *
- * The Inspector toggle that sat at the end of the word bar has no home on the
- * board; it is a ⌘K row now (`toggle-inspector`, registry owned by the
- * commands lane) plus the ✕ in the inspector's own header, both of which emit
- * EVENTS.UI_TOGGLE_INSPECTOR for the shell to act on.
- *
- * Layout:
- * ┌────────────────────────────────────────────────────────────────┐
- * │  [↶] [↷]  [View ▾]  [100% ▾]            Section · Hero · 680 × 250 │
- * └────────────────────────────────────────────────────────────────┘
+ * Undo / Redo left this bar for the topbar's History group (Task 1.2).
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { Redo, Undo } from "lucide-react";
-import { Button, isModalOpen, Menu, MenuGroup, MenuItem, MenuLabel, Popover, TextInput, Tooltip, type Breakpoint } from "@/editor/chrome-ui";
-import { BREAKPOINTS } from "@/shared/constants/breakpoints";
+import { setShowHiddenElements, useShowHiddenElements } from "./hiddenElementsPref";
+import { BreakpointSwitcher, Button, isModalOpen, Menu, MenuGroup, MenuItem, Popover, type Breakpoint } from "@/editor/chrome-ui";
+import { ChevronDown } from "lucide-react";
 import { stepZoom } from "@/shared/constants/canvas";
-import { CustomWidthModal } from "./controls/CustomWidthModal";
-// Undo/redo/device switching moved OFF the topbar and onto this canvas toolbar
-// (Figma contract §2: viewport + edit controls belong to the canvas, the topbar
-// stays minimal). Device values are the chrome-ui Breakpoint union.
+import { GridSnapPanel } from "./controls/GridSnapPanel";
+import { RulersGuidesPanel, type CanvasGuideActions } from "./controls/RulersGuidesPanel";
+import { PageWidthPanel } from "./controls/PageWidthPanel";
+// Device values are the chrome-ui Breakpoint union.
 export type FooterDevice = Breakpoint;
 
 // ============================================
@@ -47,6 +42,8 @@ export interface CanvasOverlayState {
   rulers: boolean;
   badges: boolean;
   xray: boolean;
+  /** Element outlines without X-Ray's wireframe (board 145:64586). */
+  outlines: boolean;
 }
 
 export interface CanvasFooterToolbarProps {
@@ -62,103 +59,80 @@ export interface CanvasFooterToolbarProps {
   onFitToScreen?: () => void;
   /** Board 817:4723 — fit the SELECTED element, not the page. */
   onZoomToSelection?: () => void;
+  /** The site's ruler guides — View › Rulers and guides… (153:79518). */
+  guides?: CanvasGuideActions;
 
   // ── Edit + viewport controls (moved off the topbar) ──────────────────────
   /** Current device/breakpoint. When provided, the device switcher renders. */
   device?: FooterDevice;
   /** Change the active device/breakpoint. */
   onDeviceChange?: (device: FooterDevice) => void;
-  /** Whether an undo step is available. When onUndo is provided, undo renders. */
-  canUndo?: boolean;
-  /** Whether a redo step is available. */
-  canRedo?: boolean;
-  /** Perform undo. */
-  onUndo?: () => void;
-  /** Perform redo. */
-  onRedo?: () => void;
   /** Preview width set by "Custom width…", or null for the device's own. */
   customWidth?: number | null;
-  /** Apply a custom preview width (board 5930:44824). */
+  /** Apply a custom preview width (board 145:71013). */
   onCustomWidth?: (width: number) => void;
-  /** Right-end readout: "{Type} · {name} · W × H" (board 5936:44788). */
+  /** The width the page renders at now, in px — the bar's "{width} px". */
+  pageWidth?: number;
+  /** Left readout: "{Parent} / {Element}" (board 7:18654). */
   readout?: string;
+  /** Its tooltip: "{Type} · {name} · W × H". */
+  readoutTitle?: string;
   /** Grid spacing in px (the project's grid-size setting). */
   gridSize?: number;
   /** Set the grid spacing — View ▸ Grid ▸ Size (owner 2026-09-24). */
   onGridSizeChange?: (size: number) => void;
 }
 
-// ============================================
-// Icons — lucide (DQ-017: the undo/redo glyphs were lucide's own paths,
-// hand-copied into inline SVGs at an off-scale 15px)
-// ============================================
-
-/* The six overlay glyphs that used to sit in this block are gone with the
-   icon-only toggles — board 199:205 labels them in words. Recover from git
-   history if a future surface needs them. */
-
-/** Square icon control in the bar — undo/redo/help all share this box. The
- *  board draws a disabled ↶ ↷ as a muted glyph with no fill, so the Button's
- *  disabled fill is cleared. */
-const EDIT_BTN =
-  "tw:inline-flex tw:items-center tw:justify-center tw:size-7 tw:p-0 tw:rounded " +
-  "tw:border tw:border-transparent tw:bg-transparent tw:disabled:bg-transparent tw:text-[var(--bk-ink-soft)] " +
-  "tw:hover:bg-[var(--bk-gray-100)] tw:hover:text-[var(--bk-ink)]";
-
 /**
- * The docked bar — one 44-tall row: ↶ ↷ · View ▾ · 100% ▾ on the left, the
- * selection readout ("Section · Hero · 680 × 250") at the right end.
- * Breakpoints live in View ▸ Breakpoint; shortcuts in Help. `min-w-0` + a
- * truncating readout keep it inside the canvas column when the column is
- * narrow.
+ * The docked bar — one 44-tall row, the readout on the left and the three
+ * controls on the right. `min-w-0` + a truncating readout keep it inside the
+ * canvas column when the column is narrow.
  *
- * OWNER OVERRIDE 2026-10-03 (boards 5936:44788 / 4428:44164 drew a floating
- * card inset 16 from the canvas edges, rounded, with a drag shadow): the bar
- * is docked flush to the canvas column's bottom edge at full width — no
- * radius, no shadow, no side border. The hairline on top and the fill come
- * from its container (`footerToolbarContainerStyles`), which spans the column.
+ * OWNER OVERRIDE 2026-10-03: docked flush to the canvas column's bottom edge
+ * at full width — no radius, no shadow, no side border. The hairline on top
+ * and the fill come from its container (`footerToolbarContainerStyles`).
  */
 const BAR =
-  "tw:flex tw:items-center tw:justify-start tw:gap-1 tw:h-[var(--bk-size-header)] tw:px-3 " +
+  "tw:grid tw:grid-cols-[minmax(0,1.44fr)_auto_minmax(0,1fr)] tw:items-center tw:gap-2 tw:h-[41px] tw:pl-1 " +
   "tw:bg-white tw:whitespace-nowrap tw:w-full tw:max-w-full tw:min-w-0";
-const GROUP = "tw:flex tw:items-center tw:gap-1";
+/* Board 7:18654: path left, the device toggles in BAR's middle column, the
+   controls right — BAR's 1.44 : 1 grid puts the toggles where the board does. */
+const SIDE = "tw:flex tw:min-w-0 tw:items-center";
 
-// ============================================
-// View menu rows — board 5930:44801, in its order, with its chords
-// ============================================
-
-const VIEW_ROWS: readonly { key: keyof CanvasOverlayState; label: string; kbd: string }[] = [
+/* Board 145:64586's own rows, in its order. */
+const VIEW_ROWS: readonly { key: keyof CanvasOverlayState; label: string; kbd?: string }[] = [
+  /* 145:64586 "Rulers and guides…": the rulers are where guides are placed
+     (click a ruler). No "…" — it toggles; the board's guide-detail dialog
+     (S11) does not exist. */
+  { key: "rulers", label: "Rulers and guides", kbd: "⌘R" },
   { key: "guides", label: "Snap guides", kbd: "⌘;" },
+  { key: "outlines", label: "Show outlines" },
+];
+/* The code's other overlays — not on the board, kept under a rule. */
+const MORE_VIEW_ROWS: readonly { key: keyof CanvasOverlayState; label: string; kbd: string }[] = [
   { key: "spacing", label: "Spacing", kbd: "⌘⇧;" },
-  { key: "grid", label: "Grid", kbd: "⌘'" },
-  { key: "rulers", label: "Rulers", kbd: "⌘R" },
   { key: "badges", label: "Badges", kbd: "⌘B" },
   { key: "xray", label: "X-Ray", kbd: "⌘⇧X" },
 ];
 
-/** Board 5930:44781 — the Breakpoint list (+ Custom width…, G2-014). */
-/* Boards 5930:44801 / 5930:44781 / 7048:78046: the footer's menus are 224
-   wide with 30px rows (a descendant rule, so it outranks the item's h-8). */
+/* The bar's popovers open downward, 5 under the bar's bottom edge (145:65011:
+   the panel's top at 103 under a bar ending at 98) — 8 more than Popover's
+   own 4 from the trigger. */
+const POPOVER_UNDER_BAR = "tw:mt-2";
 const FOOTER_MENU = "tw:min-w-[224px] tw:[&_[role^=menuitem]]:h-[30px]";
-/* The View menu's Breakpoint / Zoom rows open lists: tinted, medium. */
-const SUBMENU_ROW = "tw:!bg-[var(--bk-gray-100)] tw:font-medium";
-
-const BREAKPOINT_ROWS: { id: Breakpoint; label: string; width?: string }[] = [
-  { id: "desktop", label: "Desktop" },
-  { id: "tablet", label: "Tablet", width: "768px" },
-  { id: "mobile", label: "Mobile", width: "375px" },
-];
-const DEVICE_LABEL: Partial<Record<string, string>> = { wide: "Wide", desktop: "Desktop", tablet: "Tablet", mobile: "Mobile" };
-/** View ▸ Grid ▸ Size presets (owner 2026-09-24; custom 1–100 beside them). */
-const GRID_SIZES: readonly number[] = [4, 8, 16];
-/** Board 7048:78112's presets. */
 const VIEW_ZOOM_LEVELS = [50, 75, 100, 150, 200];
 
-/* The trigger is plain text on the bar, as the board draws it, overlays on or
-   off. The " · N" count is the one hint that something is drawn over the
-   canvas (designer-notes: View trigger count). */
-const VIEW_TRIGGER =
-  "tw:inline-flex tw:items-center tw:gap-1 tw:h-7 tw:px-2.5 tw:py-1 tw:rounded tw:border tw:border-transparent tw:text-[11px] tw:whitespace-nowrap tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:font-medium tw:hover:bg-[var(--bk-gray-100)]";
+/* The triggers are plain text on the bar, as the board draws them. */
+const BAR_TRIGGER =
+  "tw:inline-flex tw:items-center tw:gap-1 tw:h-7 tw:px-2.5 tw:py-1 tw:rounded tw:border tw:border-transparent tw:text-[12px] tw:whitespace-nowrap tw:bg-transparent tw:text-[var(--bk-ink)] tw:font-medium tw:tabular-nums tw:hover:bg-[var(--bk-gray-100)]";
+/* Board 7:18654: bare device glyphs 24 square, 12 apart, the chosen one on a
+   blue tint (not the well and solid fill the switcher draws elsewhere). */
+const BAR_DEVICES =
+  "tw:!gap-3 tw:!border-0 tw:!bg-transparent tw:!p-0 tw:[&_button]:!size-6 " +
+  "tw:[&_[aria-pressed=true]]:!bg-[var(--bk-accent-tint)] tw:[&_[aria-pressed=true]]:!text-[var(--bk-accent-text)]";
+/* Board 7:18654: the width is a gray mono chip, the zoom an outlined select. */
+const WIDTH_CHIP = `${BAR_TRIGGER} tw:!bg-[var(--bk-gray-100)] tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:font-normal`;
+const ZOOM_SELECT = `${BAR_TRIGGER} tw:!border-[var(--bk-border)] tw:w-[82px] tw:justify-between tw:rounded-md tw:font-normal`;
 
 // ============================================
 // Main Component
@@ -171,15 +145,14 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
   onZoomChange,
   onFitToScreen,
   onZoomToSelection,
+  guides,
   device,
   onDeviceChange,
-  canUndo,
-  canRedo,
-  onUndo,
-  onRedo,
   customWidth,
   onCustomWidth,
+  pageWidth,
   readout,
+  readoutTitle,
   gridSize,
   onGridSizeChange,
 }) => {
@@ -250,292 +223,249 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [overlays, onOverlayChange, onZoomChange, onFitToScreen, onZoomToSelection, zoom]);
 
-  const showEditGroup = Boolean(onUndo || onRedo);
-  const [viewOpen, setViewOpenState] = React.useState(false);
-  /* Board 5930:44801's last two rows open their own lists in place —
-     5930:44781 (Breakpoint) and 7048:78112 (Zoom). */
-  const [viewPane, setViewPane] = React.useState<"main" | "breakpoint" | "zoom" | "grid">("main");
-  const [customGrid, setCustomGrid] = React.useState("");
-  const setViewOpen = (next: boolean | ((v: boolean) => boolean)) => {
-    setViewOpenState(next);
-    setViewPane("main");
-  };
-  const activeOverlays = VIEW_ROWS.filter((row) => overlays[row.key]).length;
+  const [viewOpen, setViewOpen] = React.useState(false);
+  const showHidden = useShowHiddenElements();
+  const [gridOpen, setGridOpen] = React.useState(false);
+  const [guidesOpen, setGuidesOpen] = React.useState(false);
   const [zoomOpen, setZoomOpen] = React.useState(false);
-  const [customOpen, setCustomOpen] = React.useState(false);
-  /* Zoom rows — shared by View ▸ Zoom and the bar's "100% ▾" (7048:78046). */
-  const zoomRows = (close: () => void) => (
-    <>
-      {onFitToScreen && (
-        <MenuItem
-          radio
-          tick="box"
-          selected={false}
-          data-testid="canvas-zoom-fit"
-          onClick={() => {
-            onFitToScreen();
-            close();
-          }}
-        >
-          Fit to screen
-        </MenuItem>
-      )}
-      {VIEW_ZOOM_LEVELS.map((z) => (
-        <MenuItem
-          key={z}
-          radio
-          tick="box"
-          selected={Math.round(zoom) === z}
-          data-testid={`canvas-zoom-${z}`}
-          onClick={() => {
-            onZoomChange(z);
-            close();
-          }}
-        >
-          {`${z}%`}
-        </MenuItem>
-      ))}
-    </>
+  const [widthOpen, setWidthOpen] = React.useState(false);
+
+  const overlayRow = (row: { key: keyof CanvasOverlayState; label: string; kbd?: string }) => (
+    <MenuItem
+      key={row.key}
+      selected={overlays[row.key]}
+      kbd={row.kbd}
+      data-testid={`canvas-view-${row.key}`}
+      onClick={() => {
+        onOverlayChange(row.key, !overlays[row.key]);
+        setViewOpen(false);
+      }}
+    >
+      {row.label}
+    </MenuItem>
   );
 
   return (
-    <div className={BAR}>
-      {/* Edit + viewport group — undo/redo + device switcher (moved off topbar) */}
-      {showEditGroup && (
-        <>
-          <div className={GROUP}>
-            {onUndo && (
-              <Tooltip content="Undo · ⌘Z" placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
-                <Button
-                  type="button"
-                  color="light"
-                  className={EDIT_BTN}
-                  onClick={onUndo}
-                  disabled={canUndo === false}
-                  aria-label="Undo"
-                >
-                  <Undo size={16} aria-hidden="true" />
-                </Button>
-              </Tooltip>
-            )}
-            {onRedo && (
-              <Tooltip content="Redo · ⌘⇧Z" placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
-                <Button
-                  type="button"
-                  color="light"
-                  className={EDIT_BTN}
-                  onClick={onRedo}
-                  disabled={canRedo === false}
-                  aria-label="Redo"
-                >
-                  <Redo size={16} aria-hidden="true" />
-                </Button>
-              </Tooltip>
-            )}
-          </div>
-        </>
-      )}
-      {/* View menu — board 5930:44801. Opens upward: the bar sits at the
-          bottom of the canvas. A row click toggles its overlay and closes
-          (the board's SV + CLOSE). */}
-      <div className={GROUP}>
-        <Popover
-          open={viewOpen}
-          onClose={() => setViewOpen(false)}
-          placement="top"
-          label="View"
-          trigger={
-            <Button
-              type="button"
-              color="light"
-              className={VIEW_TRIGGER}
-              aria-haspopup="menu"
-              aria-expanded={viewOpen}
-              aria-label="View"
-              data-testid="canvas-view-menu-trigger"
-              onClick={() => setViewOpen((v) => !v)}
-            >
-              View{activeOverlays > 0 ? ` · ${activeOverlays}` : ""} ▾
-            </Button>
-          }
+    <div className={BAR} data-testid="canvas-bar">
+      {/* The left readout — where the selection is. */}
+      <div className={SIDE}>
+        <span
+          className="tw:min-w-0 tw:truncate tw:pr-2 tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink-muted)]"
+          title={readoutTitle ?? readout}
+          data-testid="canvas-bar-readout"
         >
-          {/* Board 5930:44801 draws the View menu 224 wide, rows 30. */}
-          <Menu label="View" data-testid="canvas-view-menu" className={FOOTER_MENU}>
-            {viewPane === "main" && (
-              <>
-                {VIEW_ROWS.map((row) => {
-                  /* Owner 2026-09-24: the grid-size setting lives here now —
-                     Grid opens its own list (Show grid · Size) instead of
-                     toggling straight away. */
-                  const opensGrid = row.key === "grid" && onGridSizeChange;
-                  return (
-                    <MenuItem
-                      key={row.key}
-                      selected={overlays[row.key]}
-                      kbd={opensGrid ? `${gridSize ?? 8} px ▸` : row.kbd}
-                      data-testid={`canvas-view-${row.key}`}
-                      onClick={() => {
-                        if (opensGrid) {
-                          setCustomGrid("");
-                          setViewPane("grid");
-                          return;
-                        }
-                        onOverlayChange(row.key, !overlays[row.key]);
-                        setViewOpen(false);
-                      }}
-                    >
-                      {row.label}
-                    </MenuItem>
-                  );
-                })}
-                <MenuGroup>
-                  {device && onDeviceChange && (
-                    <MenuItem
-                      className={SUBMENU_ROW}
-                      data-testid="canvas-view-breakpoint"
-                      kbd={`${customWidth ? `${customWidth}px` : (DEVICE_LABEL[device] ?? device)} ▸`}
-                      onClick={() => setViewPane("breakpoint")}
-                    >
-                      Breakpoint
-                    </MenuItem>
-                  )}
-                  <MenuItem className={SUBMENU_ROW} data-testid="canvas-view-zoom" kbd={`${Math.round(zoom)}% ▸`} onClick={() => setViewPane("zoom")}>
-                    Zoom
-                  </MenuItem>
-                </MenuGroup>
-              </>
-            )}
-            {viewPane === "breakpoint" && device && onDeviceChange && (
-              <>
-                {BREAKPOINT_ROWS.map((row) => (
-                  <MenuItem
-                    key={row.id}
-                    radio
-                    tick="trailing"
-                    selected={device === row.id && !customWidth}
-                    kbd={row.width}
-                    data-testid={`canvas-breakpoint-${row.id}`}
-                    onClick={() => {
-                      onDeviceChange(row.id);
-                      setViewOpen(false);
-                    }}
-                  >
-                    {row.label}
-                  </MenuItem>
-                ))}
-                {onCustomWidth && (
-                  <MenuGroup>
-                    <MenuItem
-                      data-testid="canvas-breakpoint-custom"
-                      onClick={() => {
-                        setViewOpen(false);
-                        setCustomOpen(true);
-                      }}
-                    >
-                      Custom width…
-                    </MenuItem>
-                  </MenuGroup>
-                )}
-              </>
-            )}
-            {viewPane === "zoom" && zoomRows(() => setViewOpen(false))}
-            {viewPane === "grid" && onGridSizeChange && (
-              <>
-                <MenuItem
-                  selected={overlays.grid}
-                  kbd="⌘'"
-                  data-testid="canvas-grid-show"
-                  onClick={() => {
-                    onOverlayChange("grid", !overlays.grid);
-                    setViewOpen(false);
-                  }}
-                >
-                  Show grid
-                </MenuItem>
-                <MenuGroup>
-                  <MenuLabel>Size</MenuLabel>
-                  {GRID_SIZES.map((size) => (
-                    <MenuItem
-                      key={size}
-                      radio
-                      selected={gridSize === size}
-                      data-testid={`canvas-grid-size-${size}`}
-                      onClick={() => {
-                        onGridSizeChange(size);
-                        setViewOpen(false);
-                      }}
-                    >
-                      {`${size}px`}
-                    </MenuItem>
-                  ))}
-                  <div className="tw:flex tw:items-center tw:gap-2 tw:px-2 tw:py-1">
-                    <span className="tw:text-[13px] tw:text-[var(--bk-ink)]">Custom</span>
-                    <TextInput
-                      sizing="sm"
-                      inputMode="numeric"
-                      aria-label="Custom grid size in px"
-                      placeholder={gridSize && !GRID_SIZES.includes(gridSize) ? String(gridSize) : "px"}
-                      value={customGrid}
-                      data-testid="canvas-grid-size-custom"
-                      onChange={(e) => setCustomGrid(e.target.value.replace(/[^0-9]/g, ""))}
-                      onKeyDown={(e) => {
-                        e.stopPropagation();
-                        const n = Number.parseInt(customGrid, 10);
-                        if (e.key === "Enter" && n >= 1 && n <= 100) {
-                          onGridSizeChange(n);
-                          setViewOpen(false);
-                        }
-                      }}
-                    />
-                  </div>
-                </MenuGroup>
-              </>
-            )}
-          </Menu>
-        </Popover>
-        {/* "100% ▾" — board 5936:44788's bar; opens 7048:78046. */}
+          {readout}
+        </span>
+      </div>
+      {device && onDeviceChange ? (
+        <BreakpointSwitcher
+          value={device}
+          onChange={onDeviceChange}
+          data-testid="canvas-bar-breakpoints"
+          className={BAR_DEVICES}
+        />
+      ) : (
+        <span />
+      )}
+      <div className={`${SIDE} tw:justify-end tw:gap-1`}>
+        {/* "{width} px" — board 145:71013's Page width. */}
+        {device && onDeviceChange && onCustomWidth && pageWidth ? (
+          <Popover
+            open={widthOpen}
+            onClose={() => setWidthOpen(false)}
+            placement="bottom"
+            className={POPOVER_UNDER_BAR}
+            label="Page width"
+            trigger={
+              <Button
+                type="button"
+                color="light"
+                className={WIDTH_CHIP}
+                aria-haspopup="dialog"
+                aria-expanded={widthOpen}
+                aria-label={`Page width ${pageWidth} px`}
+                data-testid="canvas-width-trigger"
+                onClick={() => setWidthOpen((v) => !v)}
+              >
+                {`${pageWidth} px`}
+              </Button>
+            }
+          >
+            <PageWidthPanel
+              width={pageWidth}
+              device={device}
+              custom={Boolean(customWidth)}
+              onDeviceChange={onDeviceChange}
+              onCustomWidth={onCustomWidth}
+              onDone={() => setWidthOpen(false)}
+            />
+          </Popover>
+        ) : null}
         <Popover
           open={zoomOpen}
           onClose={() => setZoomOpen(false)}
-          placement="top"
+          placement="bottom"
+          className={POPOVER_UNDER_BAR}
           label="Zoom"
           trigger={
             <Button
               type="button"
               color="light"
-              className={`${VIEW_TRIGGER} tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:font-medium tw:hover:bg-[var(--bk-gray-100)]`}
+              className={ZOOM_SELECT}
               aria-haspopup="menu"
               aria-expanded={zoomOpen}
               aria-label={`Zoom ${Math.round(zoom)}%`}
               data-testid="canvas-zoom-trigger"
               onClick={() => setZoomOpen((v) => !v)}
             >
-              {Math.round(zoom)}% ▾
+              {Math.round(zoom)}%
+              <ChevronDown size={14} aria-hidden="true" />
             </Button>
           }
         >
           <Menu label="Zoom" data-testid="canvas-zoom-menu" className={FOOTER_MENU}>
-            {zoomRows(() => setZoomOpen(false))}
+            {onFitToScreen && (
+              <MenuItem
+                radio
+                tick="box"
+                selected={false}
+                kbd="⌘1"
+                data-testid="canvas-zoom-fit"
+                onClick={() => {
+                  onFitToScreen();
+                  setZoomOpen(false);
+                }}
+              >
+                Fit to screen
+              </MenuItem>
+            )}
+            {VIEW_ZOOM_LEVELS.map((z) => (
+              <MenuItem
+                key={z}
+                radio
+                tick="box"
+                selected={Math.round(zoom) === z}
+                data-testid={`canvas-zoom-${z}`}
+                onClick={() => {
+                  onZoomChange(z);
+                  setZoomOpen(false);
+                }}
+              >
+                {`${z}%`}
+              </MenuItem>
+            ))}
           </Menu>
         </Popover>
-      </div>
-      {onCustomWidth && (
-        <CustomWidthModal
-          open={customOpen}
-          initialWidth={customWidth ?? BREAKPOINTS.desktop.minWidth}
-          onClose={() => setCustomOpen(false)}
-          onApply={onCustomWidth}
-        />
-      )}
-      {readout && (
-        <span
-          className="tw:ml-auto tw:min-w-0 tw:truncate tw:pl-2 tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink-muted)]"
-          title={readout}
-          data-testid="canvas-bar-readout"
+        {/* "View" — board 145:64586's Canvas view. Opens downward: the bar
+            sits at the top of the canvas column (7:18654). */}
+        <Popover
+          open={viewOpen || gridOpen || guidesOpen}
+          onClose={() => {
+            setViewOpen(false);
+            setGridOpen(false);
+            setGuidesOpen(false);
+          }}
+          placement="bottom-end"
+          /* The Grid panel is its own framed surface (145:65011, 360 wide):
+             no popover padding around it. */
+          className={gridOpen || guidesOpen ? `${POPOVER_UNDER_BAR} tw:p-0!` : POPOVER_UNDER_BAR}
+          label="Canvas view"
+          trigger={
+            <Button
+              type="button"
+              color="light"
+              className={BAR_TRIGGER}
+              aria-haspopup="menu"
+              aria-expanded={viewOpen}
+              aria-label="View"
+              data-testid="canvas-view-menu-trigger"
+              onClick={() => setViewOpen((v) => !v)}
+            >
+              View
+            </Button>
+          }
         >
-          {readout}
-        </span>
-      )}
+          {/* Board 145:65011: Grid opens its panel in the View popover's
+              place, under the same control, with Close in its head. */}
+          {gridOpen && onGridSizeChange ? (
+            <GridSnapPanel
+              gridOn={overlays.grid}
+              gridSize={gridSize ?? 8}
+              onClose={() => setGridOpen(false)}
+              onApply={({ gridOn, gridSize: size }) => {
+                if (size !== gridSize) onGridSizeChange(size);
+                if (gridOn !== overlays.grid) onOverlayChange("grid", gridOn);
+              }}
+            />
+          ) : guidesOpen && guides ? (
+            <RulersGuidesPanel
+              rulersOn={overlays.rulers}
+              onRulersChange={(on) => onOverlayChange("rulers", on)}
+              guides={guides}
+              onClose={() => setGuidesOpen(false)}
+            />
+          ) : (
+          <Menu label="Canvas view" data-testid="canvas-view-menu" className={FOOTER_MENU}>
+            {/* 145:64586: titled like Grid and snapping — "Canvas view" and a
+                text Close, not a small-caps label. */}
+            <div className="tw:flex tw:items-center tw:pl-2">
+              <span className="tw:text-[13px] tw:font-semibold tw:text-[var(--bk-ink)]">Canvas view</span>
+              <Button
+                color="light"
+                size="xs"
+                data-testid="canvas-view-close"
+                className="tw:ml-auto tw:h-7 tw:border-transparent tw:bg-transparent tw:px-2 tw:text-[13px] tw:font-normal tw:text-[var(--bk-ink)] tw:focus:ring-0"
+                onClick={() => setViewOpen(false)}
+              >
+                Close
+              </Button>
+            </div>
+            <MenuItem
+              selected={overlays.grid}
+              kbd={onGridSizeChange ? "›" : "⌘'"}
+              data-testid="canvas-view-grid"
+              onClick={() => {
+                setViewOpen(false);
+                if (onGridSizeChange) setGridOpen(true);
+                else onOverlayChange("grid", !overlays.grid);
+              }}
+            >
+              {`Grid · ${gridSize ?? 8} px`}
+            </MenuItem>
+            {/* 153:79518: with the site's guides to hand, the rulers row opens
+                Rulers and guides; without, it stays the toggle. */}
+            {guides ? (
+              <MenuItem
+                selected={overlays.rulers}
+                kbd="›"
+                data-testid="canvas-view-rulers"
+                onClick={() => {
+                  setViewOpen(false);
+                  setGuidesOpen(true);
+                }}
+              >
+                Rulers and guides…
+              </MenuItem>
+            ) : (
+              overlayRow(VIEW_ROWS[0])
+            )}
+            {VIEW_ROWS.slice(1).map(overlayRow)}
+            {/* 176:19089: conditional elements hidden on this record — ghosts, or nothing. */}
+            <MenuItem
+              selected={showHidden}
+              data-testid="canvas-view-hidden"
+              onClick={() => {
+                setShowHiddenElements(!showHidden);
+                setViewOpen(false);
+              }}
+            >
+              Show hidden elements
+            </MenuItem>
+            <MenuGroup>{MORE_VIEW_ROWS.map(overlayRow)}</MenuGroup>
+          </Menu>
+          )}
+        </Popover>
+      </div>
     </div>
   );
 };

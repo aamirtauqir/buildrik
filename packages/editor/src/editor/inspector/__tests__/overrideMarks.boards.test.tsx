@@ -37,32 +37,56 @@ describe("override marks — boards 27 / 28", () => {
     const { c, id, view } = mount("button");
     c.styles.setRule(`[data-buildrick-id="${id}"]`, { "background-color": "red" }, { pseudo: ":hover" });
     render(view());
-    fireEvent.click(screen.getByTestId("inspector-state-chip"));
-    fireEvent.click(screen.getByTestId("inspector-state-opt-hover"));
+    /* A button opens on Content, whose context line has no state Select
+       (B-10: content writes ignore state) — the state is picked on Style. */
+    expect(screen.getByRole("tab", { name: "Content" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.queryByRole("combobox", { name: "Editing" })).toBeNull();
+    fireEvent.click(screen.getByRole("tab", { name: "Style" }));
+    fireEvent.change(screen.getByRole("combobox", { name: "Editing" }), { target: { value: "hover" } });
     await act(async () => {});
     expect(screen.getByTestId("inspector-state-overrides").textContent).toContain("1 :hover override");
+    /* 2L9 161:8940: Background arrives shut, "1 set"; opening it shows the note. */
+    expect(screen.getByTestId("inspector-summary-fill")).toHaveTextContent("1 set");
+    fireEvent.click(screen.getByRole("button", { name: "Background section, collapsed" }));
     const fill = document.getElementById("inspector-section-fill")!;
     expect(within(fill).getByTestId("inspector-section-note").textContent).toBe("Overridden on :hover");
     /* The Colour row itself carries the dot (board 27 "Colour ●"). */
     expect(within(fill).getByTestId("inspector-override-dot-pseudo")).toBeTruthy();
+    /* 2L9 S13: Reset reviews the exact Hover properties before it removes. */
     act(() => fireEvent.click(screen.getByTestId("inspector-state-reset")));
+    const review = screen.getByTestId("inspector-override-review");
+    expect(review).toHaveTextContent("Hover overrides");
+    expect(review).toHaveTextContent("1 set");
+    expect(screen.getAllByTestId("inspector-override-entry").map((e) => e.textContent)).toEqual(["Background colorred"]);
+    expect(screen.getByTestId("inspector-override-consequence")).toHaveTextContent(
+      "Removing this 1 Hover property reveals each property’s Default-state value. Other states stay unchanged.",
+    );
+    act(() => fireEvent.click(screen.getByTestId("inspector-override-remove")));
     expect(screen.queryByTestId("inspector-state-overrides")).toBeNull();
     expect(screen.queryByTestId("inspector-section-note")).toBeNull();
   });
 
-  it("28: Tablet · 1 override, 'Size' header dot + note; Revert clears them", () => {
+  it("28 / IC05: Tablet · 1 override; Size lists it — 'Size · 1 override', Width, Falls back to Desktop; Revert clears it", () => {
     const { c, id, view } = mount("heading", "tablet");
     c.styles.setBreakpointStyle(id, "tablet", { width: "480px" });
     render(view());
-    expect(screen.getByTestId("inspector-bp-chip").textContent).toContain("Tablet · 1 override");
+    /* A heading opens on Content (2L9 page 04); the override lines are Style's. */
+    fireEvent.click(screen.getByRole("tab", { name: "Style" }));
+    expect(screen.getByTestId("inspector-breakpoint-prefix").textContent).toBe("Tablet ·");
+    expect(screen.getByTestId("inspector-bp-line").textContent).toContain("Tablet · 1 override");
     const size = document.getElementById("inspector-section-size")!;
-    expect(within(size).getByRole("img", { name: "Overridden on Tablet" })).toBeTruthy();
-    expect(within(size).getByTestId("inspector-section-note").textContent).toBe("Overridden on Tablet");
+    expect(within(size).getByTestId("inspector-section-title-note").textContent).toBe(" · 1 override");
+    expect(within(size).getByTestId("inspector-bp-override")).toHaveTextContent("Width480 px");
+    expect(within(size).getByRole("button", { name: "Remove Tablet override" })).toBeTruthy();
     act(() => fireEvent.click(screen.getByTestId("inspector-bp-revert")));
-    expect(screen.queryByTestId("inspector-section-note")).toBeNull();
+    /* 2L9 S15: the exact property and what Desktop shows under it. */
+    expect(screen.getByTestId("inspector-override-review")).toHaveTextContent("Tablet overrides");
+    expect(screen.getByTestId("inspector-override-consequence")).toHaveTextContent("Removing Tablet overrides reveals Desktop");
+    act(() => fireEvent.click(screen.getByTestId("inspector-override-remove")));
+    expect(screen.queryByTestId("inspector-bp-override")).toBeNull();
   });
 
-  it("26: an instance's padding edit puts a master dot on that SpacingBox side and the note on Spacing", async () => {
+  it("26: an instance's padding edit puts a master dot on that Padding row and the note on Spacing", async () => {
     const c = createTestComposer();
     const root = c.elements.createPage("Home").root.id;
     const banner = c.elements.createElement("container" as never, {} as never);
@@ -78,8 +102,11 @@ describe("override marks — boards 27 / 28", () => {
       </ToastProvider>
     );
     await act(async () => {});
+    /* Spacing arrives shut (2L9 161:8940); open it to reach the box. */
+    if (screen.queryByRole("tab", { name: "Style", selected: false })) fireEvent.click(screen.getByRole("tab", { name: "Style" }));
+    fireEvent.click(screen.getByRole("button", { name: "Spacing section, collapsed" }));
     const spacing = document.getElementById("inspector-section-spacing")!;
-    const side = within(spacing).getByTestId("inspector-spacing-padding-top");
+    const side = within(spacing).getByTestId("inspector-row-padding-top");
     expect(within(side).getByRole("button", { name: "Overrides master" })).toBeTruthy();
     expect(within(spacing).getByTestId("inspector-section-note").textContent).toBe("Padding overrides master");
   });

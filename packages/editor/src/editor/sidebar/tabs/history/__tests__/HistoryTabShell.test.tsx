@@ -168,11 +168,13 @@ describe("HistoryTab shell", () => {
 
   /* 4418:73791 ends the Session tab with the same "+ Save a version" footer
      Saves carries — it was only on Saves. */
-  it("Session carries the + Save a version footer", () => {
+  /* 2L9 H01 (230:12999): Session has no footer; "+ Save a version" is on
+     Saves (H04), one tab away. */
+  it("Session draws no footer; + Save a version stays on Saves (VersionHistoryPanel's own list)", () => {
     renderTab();
-    expect(screen.getByTestId("saves-save-version")).toHaveTextContent("+ Save a version");
-    fireEvent.click(screen.getByTestId("saves-save-version"));
-    expect(screen.getByRole("dialog")).toHaveTextContent("Save a version");
+    expect(screen.queryByTestId("saves-save-version")).toBeNull();
+    expect(screen.queryByTestId("history-prune-note")).toBeNull();
+    expect(screen.getByRole("tab", { name: /Saves/ })).toBeEnabled();
   });
 
   it("draws no search field until ⋯ › Search asks for one (board 4418:73791)", () => {
@@ -356,11 +358,11 @@ describe("HistoryTab — the Saves chrome waits for the list", () => {
 });
 
 describe("HistoryTab — opened by an Activity row, with the way back", () => {
-  it("draws ‹ Activity, which reopens the Activity panel", () => {
+  it("draws ‹ Back to Activity, which reopens the Activity panel", () => {
     const emit = vi.fn();
     renderTab({ initialView: "published", fromActivity: true, composer: { emit, on: () => {}, off: () => {} } as never });
     expect(screen.getByTestId("history-view-tab-published").getAttribute("aria-selected")).toBe("true");
-    fireEvent.click(screen.getByRole("button", { name: "‹ Activity" }));
+    fireEvent.click(screen.getByRole("button", { name: "‹ Back to Activity" }));
     expect(emit).toHaveBeenCalledWith(EVENTS.UI_PANEL_OPEN, { panel: "activity" });
   });
 

@@ -1,8 +1,8 @@
 /**
  * Type-block bodies — form fields (boards 14, 15).
  *
- *   Input (+ textarea, select, upload) — Input type, Name, Placeholder,
- *     Default, Required, Disabled (board 14); the others by analogy.
+ *   Input (+ textarea, select, upload) — the "Field" block (./fieldBody,
+ *     2L9 F02).
  *   Choice (checkbox, radio, switch) — Edit text on canvas, Name, Checked by
  *     default, Required (board 15). The element is the <label>; every setting
  *     is written on the <input> it wraps — the one a submitted form reads —
@@ -21,74 +21,11 @@ import type { Composer } from "@/engine";
 import type { Element } from "@/engine/elements/Element";
 import { writableElements } from "@/engine/commands/commandOperations";
 import { InputRow } from "@/editor/inspector/shared/controls";
-import { handleGenericAttributeChange, runTxn, writeAttribute } from "../attributeWriter";
+import { handleGenericAttributeChange, runTxn } from "../attributeWriter";
 import { isAttrOn, useElementRead } from "../blockRows";
 import { CheckRow } from "@/editor/inspector/shared/controls/CheckRow";
 import { EditTextRow } from "../EditTextRow";
-import { PropertyRows, type PropertyConfig } from "../PropertyField";
-
-const INPUT_TYPES = [
-  ["text", "Text"],
-  ["email", "Email"],
-  ["password", "Password"],
-  ["number", "Number"],
-  ["tel", "Phone"],
-  ["url", "URL"],
-  ["date", "Date"],
-  ["time", "Time"],
-  ["datetime-local", "Date & Time"],
-  ["search", "Search"],
-  ["file", "File"],
-  ["hidden", "Hidden"],
-  ["range", "Range"],
-  ["color", "Color"],
-].map(([value, label]) => ({ value, label }));
-
-const NAME: PropertyConfig = { id: "name", label: "Name", type: "text", placeholder: "field_name" };
-const PLACEHOLDER: PropertyConfig = { id: "placeholder", label: "Placeholder", type: "text", placeholder: "Enter text…" };
-const DEFAULT: PropertyConfig = { id: "value", label: "Default", type: "text", placeholder: "" };
-
-/** The text / select rows per field type; the boolean rows follow them. */
-const ROWS: Record<string, readonly PropertyConfig[]> = {
-  input: [{ id: "type", label: "Input type", type: "select", options: INPUT_TYPES }, NAME, PLACEHOLDER, DEFAULT],
-  textarea: [NAME, PLACEHOLDER, DEFAULT, { id: "rows", label: "Rows", type: "text", placeholder: "4" }],
-  select: [NAME, { id: "options", label: "Options (one per line)", type: "textarea", placeholder: "Option 1\nOption 2" }],
-  upload: [NAME],
-};
-
-const FLAGS: Record<string, readonly [string, string][]> = {
-  input: [["required", "Required"], ["disabled", "Disabled"]],
-  textarea: [["required", "Required"], ["disabled", "Disabled"]],
-  select: [["required", "Required"], ["disabled", "Disabled"], ["multiple", "Multiple"]],
-  upload: [["required", "Required"], ["disabled", "Disabled"]],
-};
-
-function FlagRow({ name, label, ...props }: TypeBlockBodyProps & { name: string; label: string }) {
-  const [on, reread] = useElementRead(props, (el) => isAttrOn(el.getAttribute?.(name)), false);
-  return (
-    <CheckRow
-      label={label}
-      checked={on}
-      onChange={(checked) => {
-        if (!props.composer) return;
-        writeAttribute(props.composer, props.targetIds, name, checked ? "true" : "");
-        reread();
-      }}
-    />
-  );
-}
-
-const InputBody: React.FC<TypeBlockBodyProps> = (props) => {
-  const type = ROWS[props.element.type] ? props.element.type : "input";
-  return (
-    <>
-      <PropertyRows composer={props.composer} element={props.element} targetIds={props.targetIds} rows={ROWS[type]} />
-      {FLAGS[type].map(([name, label]) => (
-        <FlagRow key={name} {...props} name={name} label={label} />
-      ))}
-    </>
-  );
-};
+import { FieldBody } from "./fieldBody";
 
 // ============================================================================
 // CHOICE — checkbox, radio, switch
@@ -121,11 +58,12 @@ const ChoiceBody: React.FC<TypeBlockBodyProps> = (props) => {
       return {
         textId: innerText(el)?.getId?.() ?? element.id,
         name: input?.getAttribute?.("name") ?? "",
+        value: input?.getAttribute?.("value") ?? "",
         checked: isAttrOn(input?.getAttribute?.("checked")),
         required: isAttrOn(input?.getAttribute?.("required")),
       };
     },
-    { textId: element.id, name: "", checked: false, required: false },
+    { textId: element.id, name: "", value: "", checked: false, required: false },
   );
   const write = (name: string, value: string) => {
     if (!composer) return;
@@ -136,6 +74,8 @@ const ChoiceBody: React.FC<TypeBlockBodyProps> = (props) => {
     <>
       <EditTextRow composer={composer} elementId={attrs.textId} />
       <InputRow label="Name" value={attrs.name} onChange={(v) => write("name", v)} placeholder="field_name" />
+      {/* B69/06: what the form submits when it is checked ("on" when unset). */}
+      <InputRow label="Submission value" value={attrs.value} onChange={(v) => write("value", v)} placeholder="on" />
       <CheckRow label="Checked by default" checked={attrs.checked} onChange={(on) => write("checked", on ? "true" : "")} />
       <CheckRow label="Required" checked={attrs.required} onChange={(on) => write("required", on ? "true" : "")} />
     </>
@@ -143,6 +83,7 @@ const ChoiceBody: React.FC<TypeBlockBodyProps> = (props) => {
 };
 
 export const FORM_BODIES: Partial<Record<TypeBlockId, React.FC<TypeBlockBodyProps>>> = {
-  input: InputBody,
+  /* 2L9 F02: a field's block is "Field" (./fieldBody). */
+  input: FieldBody,
   choice: ChoiceBody,
 };

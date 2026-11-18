@@ -5,7 +5,9 @@
  */
 
 import * as React from "react";
+import { ChevronDown, Database } from "lucide-react";
 import { getEditorViewMode } from "@shared/utils/editorViewMode";
+import { useEditLocks } from "@/editor/shared/useEditLocks";
 import type { Composer } from "@/engine";
 import type { LayerItem, DragState, LayerDisplayPrefs } from "./types";
 import { getDisplayName } from "./data/layerUtils";
@@ -48,6 +50,8 @@ export interface LayerTreeItemProps {
   /** Selection mode (LayersTab's Select): the row shows its checkbox and a
    *  click or Enter/Space toggles it. Off (default): no checkbox. */
   selecting?: boolean;
+  /** An ancestor is locked — 147:77668 draws the lock on every row under it. */
+  lockedAncestor?: boolean;
 }
 
 export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
@@ -83,6 +87,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
     getVisibleLayerIds,
     displayPrefs,
     selecting = false,
+    lockedAncestor = false,
   } = props;
   const isSelected = selectedIds.has(layer.id);
   const isExpanded = expandedIds.has(layer.id);
@@ -92,6 +97,8 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
   const dropPosition = isDropTarget ? dragState.position : null;
   const isHidden = hiddenIds.has(layer.id);
   const isLocked = lockedIds.has(layer.id);
+  /* Its own lock or one over it: a lock covers everything inside it. */
+  const underLock = isLocked || lockedAncestor;
   const isEditing = editingId === layer.id;
   const isCanvasHovered = canvasHoveredId === layer.id;
   const LayerGlyph = getElementIcon(layer.type);
@@ -106,8 +113,11 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
      2026-09-24). The page root itself is not a row. */
   /* View mode (a VIEWER, board 4418:126059): Layers is for inspection —
      select and expand only; no drag, rename, context menu, eye or lock. */
-  const readOnly = getEditorViewMode().readOnlyView;
-  const canDrag = !!(composer && !isLocked && !readOnly);
+  /* View mode by URL, or any engine edit lock — a row that drags or renames
+     into a refused write offers what cannot happen. */
+  const editLocked = useEditLocks(composer).length > 0;
+  const readOnly = getEditorViewMode().readOnlyView || editLocked;
+  const canDrag = !!(composer && !underLock && !readOnly);
 
   // Board 1082:4739 (Layers · component-instance): ONE diamond badge sits
   // between the label and the eye on component-linked rows. Only the
@@ -129,16 +139,22 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
      list when "Show dimmed layers" is off — its children go with it, since a
      dimmed parent dims them on the canvas too. */
   if (isHidden && !displayPrefs.showDimmed) return null;
+  /* design-2l9 173:9757 / 189:22915: a bound row always carries its glyph;
+     "Highlight CMS-bound" (147:76329, off by default) adds the row tint. */
   const isCmsBound =
-    displayPrefs.highlightCmsBound &&
-    !!composer &&
+    !!composer?.cms &&
     (composer.cms.bindings.getBindings(layer.id).length > 0 || composer.cms.bindings.hasCollectionBinding(layer.id));
 
   /* v3 board 4418:81300's indent ladder: 16px chevron boxes at 16 / 32 / 48
      from the drawer edge — base 16, step 16. The first 16 is the selection
      checkbox's gutter (see LayerTreeItem.indent.test.tsx). */
   const rowStyle: React.CSSProperties = {
-    paddingLeft: `${16 + layer.depth * 16}px`,
+    /* design-2l9 147:75914 / 152:78614 (measured 2026-10-27): under the page
+       row, depth 0's chevron is CENTRED at 28 — a 16 box from 20 — then 16 a
+       level. */
+    paddingLeft: `${20 + layer.depth * 16}px`,
+    /* A search result carries its path on a second line (147:77189). */
+    ...(layer.searchPath ? { height: "auto", flexWrap: "wrap" } : {}),
   };
 
   const rowClassNames = [
@@ -146,7 +162,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
     isSelected ? "bdc-sel" : "",
     isCanvasHovered ? "bdc-canvas-hover" : "",
     isHidden ? "bdc-hidden" : "",
-    isCmsBound ? "bdc-cms-bound" : "",
+    isCmsBound && displayPrefs.highlightCmsBound ? "bdc-cms-bound" : "",
     isEditing ? "bdc-editing" : "",
     isDragging ? "is-dragging" : "",
     hasChildren ? "" : "bdc-leaf",
@@ -171,7 +187,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
       onSelect(layer.id, selecting ? { meta: true } : {});
     } else if (e.key === "F2") {
       e.preventDefault();
-      if (!isLocked && !readOnly) {
+      if (!underLock && !readOnly) {
         onStartEditing(layer.id, displayName, e as unknown as React.MouseEvent);
       }
     } else if (e.key === "ArrowRight" && hasChildren && !isExpanded) {
@@ -213,9 +229,9 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
         draggable={canDrag}
         aria-selected={isSelected}
         aria-expanded={hasChildren ? isExpanded : undefined}
-        aria-label={`${displayName}, ${layer.type} element${isHidden ? ", dimmed in editor" : ""}${isLocked ? ", locked" : ""}`}
+        aria-label={`${displayName}, ${layer.type} element${isHidden ? ", dimmed in editor" : ""}${underLock ? ", locked" : ""}`}
         aria-level={layer.depth + 1}
-        title={`${displayName}${isHidden ? " (Hidden)" : ""}${isLocked ? " (Locked)" : ""}`}
+        title={`${displayName}${isHidden ? " (Hidden)" : ""}${underLock ? " (Locked)" : ""}`}
         style={rowStyle}
         data-testid={`layer-row-${layer.id}`}
         data-drop={dropPosition ?? undefined}
@@ -239,7 +255,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
           onContextMenu(e, layer.id);
         }}
         onDoubleClick={(e) => {
-          if (!isLocked && !readOnly) onStartEditing(layer.id, displayName, e);
+          if (!underLock && !readOnly) onStartEditing(layer.id, displayName, e);
         }}
         onKeyDown={handleKeyDown}
       >
@@ -272,7 +288,8 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
             if (hasChildren) onToggleExpand(layer.id);
           }}
         >
-          {"\u25BE"}
+          {/* design-2l9 147:75914: a 16px chevron (the closed row turns it). */}
+          <ChevronDown size={16} aria-hidden="true" />
         </Button>
 
         {/* Was a 12px solid ink-muted square (board 244:1580, the same call as
@@ -329,11 +346,6 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
             {displayPrefs.showHtmlBadges && (
               <span className="bdc-lr-tag" aria-hidden>{layer.tagName}</span>
             )}
-            {isCmsBound && (
-              <span className="bdc-lr-tag" title="Bound to CMS" role="img" aria-label="Bound to CMS" data-testid={`layer-cms-badge-${layer.id}`}>
-                CMS
-              </span>
-            )}
             {layer.breakpointOverrides?.mobile?.hidden && (
               <span className="bdc-lr-bp" title="Hidden on mobile" role="img" aria-label="Hidden on mobile">M</span>
             )}
@@ -389,7 +401,17 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
 
         {/* "Show lock badges" off hides the control on rows that are not
             locked; a locked row keeps it, or it could never be unlocked. */}
-        {!readOnly && (displayPrefs.showLockBadges || isLocked) && (
+        {/* 147:77668: under a locked ancestor the row shows the lock too — a
+            mark, not a control (unlock the ancestor that holds it). */}
+        {!readOnly && !isLocked && lockedAncestor && (
+          <span className="bdc-lr-lock bdc-on tw:cursor-default!" data-testid={`layer-lock-inherited-${layer.id}`} title="Locked by a parent layer" role="img" aria-label="Locked by a parent layer">
+            <svg viewBox="0 0 24 24">
+              <rect x="5" y="11" width="14" height="10" rx="2" />
+              <path d="M8 11V7a4 4 0 018 0v4" />
+            </svg>
+          </span>
+        )}
+        {!readOnly && !(lockedAncestor && !isLocked) && (displayPrefs.showLockBadges || isLocked) && (
         <Button
           type="button"
           className={`bdc-lr-lock tw:focus:ring-0${isLocked ? " bdc-on" : ""}`}
@@ -413,9 +435,31 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
           </svg>
         </Button>
         )}
+        {/* design-2l9 173:9757 / 189:22915: the bound glyph closes the row. */}
+        {isCmsBound && (
+          <span
+            className="tw:inline-flex tw:flex-none tw:items-center tw:text-[var(--bk-ink-muted)]"
+            title="Bound to CMS"
+            role="img"
+            aria-label="Bound to CMS"
+            data-testid={`layer-cms-badge-${layer.id}`}
+          >
+            <Database size={14} aria-hidden="true" />
+          </span>
+        )}
+        {/* design-2l9 147:77189: a search result names where it sits on its
+            own line under the row ("Services › Card 1"), 12 in. */}
+        {layer.searchPath && (
+          <span
+            className="tw:-ml-2 tw:basis-full tw:truncate tw:pb-1 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+            data-testid={`layer-search-path-${layer.id}`}
+          >
+            {layer.searchPath}
+          </span>
+        )}
       </div>
       {isExpanded && hasChildren && layer.children.map((child) => (
-        <LayerTreeItem key={child.id} {...props} layer={child} />
+        <LayerTreeItem key={child.id} {...props} layer={child} lockedAncestor={lockedAncestor || isLocked} />
       ))}
     </>
   );

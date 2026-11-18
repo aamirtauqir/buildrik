@@ -1,22 +1,25 @@
 /**
- * StartersSection — Brand › Starters, board 7316:85139 (C1 (ii)).
+ * StartersSection — Brand › Starters, Figma 2L9 B6-B07…B11.
  *
- * The row is the control: a click APPLIES the starter — one write to the
- * site's tokens, one ⌘Z (Brand Part 1a Task 10; it used to stage a draft).
- * The drawer's warning callout, thumbnails and "Starter applied" pill are not
- * on the board.
+ * A row opens a PREVIEW (no write); Apply takes a "starter" restore point,
+ * then writes once (one ⌘Z); no restore point → nothing applied, Retry.
  */
-import { render, fireEvent } from "@testing-library/react";
+import { render, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import * as React from "react";
-import { StartersSection } from "../StartersSection";
+import { StartersSection, starterColourChanges } from "../StartersSection";
 import { TokenRegistryProvider, useColorRegistry } from "@/editor/design-system/state/TokenRegistryContext";
 import { DSModeProvider } from "@/editor/design-system/state/DSModeContext";
 import { ToastProvider } from "@/editor/chrome-ui";
 import { STARTER_DS_REGISTRY } from "@/editor/design-system/starters";
+import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 import { validateTokens } from "@buildrik/shared/schemas/design-tokens";
 import { makeFakeComposer } from "@/editor/design-system/ui/__tests__/brandWorkspaceHarness";
+
+const take = vi.fn(async (..._a: unknown[]) => true);
+vi.mock("@/editor/design-system/state/useBrandRestorePoints", () => ({ takeRestorePoint: (...a: unknown[]) => take(...a) }));
+vi.mock("@/services/BuildrikSyncProvider", () => ({ getSiteIdFromUrl: () => "s1" }));
 
 /** Reads the live colour registry from inside the provider. */
 const seen: { registry?: ReturnType<typeof useColorRegistry> } = {};
@@ -25,7 +28,19 @@ const Probe: React.FC = () => {
   return null;
 };
 
-let composer = makeFakeComposer();
+/** The fake composer plus the Brand preview slot the preview writes to. */
+function makeComposer(...args: Parameters<typeof makeFakeComposer>) {
+  const c = makeFakeComposer(...args);
+  const ds = c.designSystem as unknown as { preview: unknown; setPreview: (p: unknown) => void };
+  ds.preview = null;
+  ds.setPreview = (p: unknown) => {
+    ds.preview = p;
+    c.emit("brand:preview-changed");
+  };
+  return c;
+}
+
+let composer = makeComposer();
 const wrap = (ui: React.ReactNode) => (
   <ToastProvider>
     <DSModeProvider initialMode="pro">
@@ -36,81 +51,99 @@ const wrap = (ui: React.ReactNode) => (
     </DSModeProvider>
   </ToastProvider>
 );
+const preview = () => (composer.designSystem as unknown as { preview: { tokens: unknown[] } | null }).preview;
 
 beforeEach(() => {
   localStorage.clear();
-  composer = makeFakeComposer();
+  take.mockReset();
+  take.mockResolvedValue(true);
+  composer = makeComposer();
 });
 
-describe("StartersSection", () => {
-  it("offers every starter in the registry as a row in one radiogroup card", () => {
-    const { getByRole } = render(wrap(<StartersSection projectId="p1" />));
-    const group = getByRole("radiogroup", { name: /starter design systems/i });
-    expect(group.querySelectorAll('[role="radio"]').length).toBe(STARTER_DS_REGISTRY.length);
-  });
-
-  it("each row names the starter over '<fonts> · <colour>' (7316:85139); the description is its title", () => {
-    const { getByTestId } = render(wrap(<StartersSection projectId="p1" />));
+describe("StartersSection — list (B6-B07)", () => {
+  it("says what the page is for and lists every starter as a › row", () => {
+    const { getByTestId, getByText } = render(wrap(<StartersSection composer={composer} projectId="p1" />));
+    expect(getByText("Choose a starting point")).toBeTruthy();
+    expect(getByText("Preview a palette before applying it to your site.")).toBeTruthy();
+    const list = getByTestId("starter-list");
+    expect(list.querySelectorAll('[data-testid^="starter-row-"]').length).toBe(STARTER_DS_REGISTRY.length);
     const first = STARTER_DS_REGISTRY[0];
-    const row = getByTestId(`starter-row-${first.id}`);
-    expect(row.textContent).toContain(first.name);
-    expect(getByTestId(`starter-line-${first.id}`).textContent).toMatch(/^[A-Z][\w ]+( \+ [\w ]+)? · #[0-9A-F]{6} on #[0-9A-F]{6}$/);
-    expect(row.getAttribute("title")).toBe(first.description);
+    expect(getByTestId(`starter-row-${first.id}`).getAttribute("title")).toBe(first.description);
   });
 
-  it("applies the starter in ONE write — a valid v6 set, live at once", () => {
-    const { container } = render(wrap(<StartersSection projectId="p1" />));
-    fireEvent.click(container.querySelectorAll<HTMLElement>('[role="radio"]')[0]);
+  it("ends with From logo or URL only when the caller passes the door (dsAi)", () => {
+    const open = vi.fn();
+    const off = render(wrap(<StartersSection composer={composer} projectId="p1" />));
+    expect(off.queryByTestId("starter-row-from-source")).toBeNull();
+    off.unmount();
+    const on = render(wrap(<StartersSection composer={composer} projectId="p1" onOpenFromSource={open} />));
+    const row = on.getByTestId("starter-row-from-source");
+    expect(on.getByTestId("starter-list").lastElementChild?.contains(row)).toBe(true);
+    expect(row.textContent).toContain("From logo or URL");
+    fireEvent.click(row);
+    expect(open).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("StartersSection — preview, restore point, apply (B6-B08…B11)", () => {
+  it("a row previews the starter without writing; Cancel drops the preview", () => {
+    const starter = STARTER_DS_REGISTRY[1];
+    const { getByTestId, getByText } = render(wrap(<StartersSection composer={composer} projectId="p1" />));
+    fireEvent.click(getByTestId(`starter-row-${starter.id}`));
+    expect(getByTestId("starter-preview-name").textContent).toBe(starter.name);
+    expect(getByText("Preview only · Your Brand is unchanged")).toBeTruthy();
+    expect(getByTestId("starter-preview-impact").textContent).toMatch(/colors? will change\. Typography and spacing stay as they are\.$/);
+    expect(composer.designSystem.setTokens).not.toHaveBeenCalled();
+    expect(preview()).not.toBeNull();
+    fireEvent.click(getByTestId("starter-cancel"));
+    expect(preview()).toBeNull();
+    expect(getByTestId("starter-list")).toBeTruthy();
+  });
+
+  it("Apply takes a starter restore point, then writes ONE valid set with the starter's values", async () => {
+    const starter = STARTER_DS_REGISTRY[1];
+    const onApplied = vi.fn();
+    const { getByTestId } = render(wrap(<StartersSection composer={composer} projectId="p1" onApplied={onApplied} />));
+    fireEvent.click(getByTestId(`starter-row-${starter.id}`));
+    fireEvent.click(getByTestId("starter-apply"));
+    await waitFor(() => expect(onApplied).toHaveBeenCalledWith(starter.name));
+    expect(take).toHaveBeenCalledWith(composer, "s1", "starter");
     expect(composer.designSystem.setTokens).toHaveBeenCalledTimes(1);
     const [written] = composer.designSystem.setTokens.mock.calls[0];
     expect(validateTokens(written).ok).toBe(true);
-  });
-
-  it("moves the live tokens to the starter's values, dark included, keeping the palette", () => {
-    const { container } = render(wrap(<StartersSection projectId="p1" />));
-    const starter = STARTER_DS_REGISTRY[1];
-    const before = seen.registry?.tokens.length ?? 0;
-    fireEvent.click(container.querySelectorAll<HTMLElement>('[role="radio"]')[1]);
     const tokens = seen.registry?.tokens ?? [];
     expect(resolveTokenLiteral(tokens, "color-primary", "light")).toBe(resolveTokenLiteral(starter.tokens, "color-primary", "light"));
-    expect(resolveTokenLiteral(tokens, "color-primary", "dark")).toBe(resolveTokenLiteral(starter.tokens, "color-primary", "dark"));
     // The palette primitives survive: a starter is values, not a replacement list.
     expect(tokens.some((t) => t.id === "color-brand-500")).toBe(true);
-    expect(tokens.length).toBeGreaterThanOrEqual(before);
+    expect(preview()).toBeNull();
   });
 
-  it("writes nothing while the tokens are read-only", () => {
-    composer = makeFakeComposer([], { readOnly: true });
-    const { container } = render(wrap(<StartersSection projectId="p1" />));
-    fireEvent.click(container.querySelectorAll<HTMLElement>('[role="radio"]')[0]);
+  it("no restore point → nothing applied, the reason, and Retry", async () => {
+    take.mockResolvedValueOnce(false);
+    const starter = STARTER_DS_REGISTRY[0];
+    const { getByTestId } = render(wrap(<StartersSection composer={composer} projectId="p1" />));
+    fireEvent.click(getByTestId(`starter-row-${starter.id}`));
+    fireEvent.click(getByTestId("starter-apply"));
+    expect((await waitFor(() => getByTestId("starter-failed"))).textContent).toBe(
+      "Couldn’t create a restore point. Nothing was applied. Retry or cancel the preview.",
+    );
+    expect(composer.designSystem.setTokens).not.toHaveBeenCalled();
+    expect(getByTestId("starter-apply").textContent).toBe("Retry");
+    fireEvent.click(getByTestId("starter-apply"));
+    await waitFor(() => expect(composer.designSystem.setTokens).toHaveBeenCalledTimes(1));
+  });
+
+  it("writes nothing while the tokens are read-only", async () => {
+    composer = makeComposer([], { readOnly: true });
+    const { getByTestId } = render(wrap(<StartersSection composer={composer} projectId="p1" />));
+    fireEvent.click(getByTestId(`starter-row-${STARTER_DS_REGISTRY[0].id}`));
+    fireEvent.click(getByTestId("starter-apply"));
+    await waitFor(() => getByTestId("starter-failed"));
     expect(composer.settings.designTokens).toEqual([]);
   });
 
-  it("marks the chosen row checked, and Enter chooses too", () => {
-    const { container } = render(wrap(<StartersSection projectId="p1" />));
-    const rows = container.querySelectorAll<HTMLElement>('[role="radio"]');
-    fireEvent.keyDown(rows[1], { key: "Enter" });
-    expect(rows[1].getAttribute("aria-checked")).toBe("true");
-    expect(rows[0].getAttribute("aria-checked")).toBe("false");
-  });
-
-  it("draws none of the drawer's furniture: no warning note, no Apply button, no pill", () => {
-    const { container, queryByRole, queryByText } = render(wrap(<StartersSection projectId="p1" />));
-    expect(queryByRole("note")).toBeNull();
-    expect(container.querySelector("[data-apply-starter]")).toBeNull();
-    fireEvent.click(container.querySelectorAll<HTMLElement>('[role="radio"]')[0]);
-    expect(queryByText("Starter applied")).toBeNull();
-  });
-});
-
-describe("StartersSection — Brand from logo or website (BRP1-M11, behind dsAi)", () => {
-  it("shows the door only when the caller passes one, and opens it", () => {
-    const open = vi.fn();
-    const off = render(wrap(<StartersSection projectId="p1" />));
-    expect(off.queryByTestId("starter-row-from-source")).toBeNull();
-    off.unmount();
-    const on = render(wrap(<StartersSection projectId="p1" onOpenFromSource={open} />));
-    fireEvent.click(on.getByTestId("starter-row-from-source"));
-    expect(open).toHaveBeenCalledTimes(1);
+  it("counts the colour tokens a starter changes", () => {
+    const starter = STARTER_DS_REGISTRY[1];
+    expect(starterColourChanges(starter, DEFAULT_TOKENS)).toBeGreaterThan(0);
   });
 });

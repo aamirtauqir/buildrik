@@ -68,11 +68,13 @@ export class InteractionManager {
 
   /** Get all interactions for an element */
   getInteractions(elementId: string): Interaction[] {
-    const element = this.composer.elements.getElement(elementId);
-    if (!element) return [];
-
-    const data = element.getData();
-    return (data.data?.interactions as Interaction[]) || [];
+    /* The element's own store (`data.data.interactions`) — the one the
+       Inspector edits and the export publishes. Writes go through the
+       element's setter too: `getData()` is a shallow copy, so writing
+       `data.data = {}` on it was lost for an element with no data yet, and an
+       interaction added here never reached the panel or the published page.
+       The setter also emits ELEMENT_UPDATED, which the panel re-reads on. */
+    return (this.composer.elements.getElement(elementId)?.getInteractions() as Interaction[] | undefined) ?? [];
   }
 
   /** Get a specific interaction by ID */
@@ -88,6 +90,7 @@ export class InteractionManager {
     animation?: Partial<InteractionAnimationConfig>,
     name?: string
   ): Interaction | null {
+    if (this.composer.writeLocked) return null;
     const element = this.composer.elements.getElement(elementId);
     if (!element) return null;
 
@@ -99,7 +102,7 @@ export class InteractionManager {
       name,
     };
 
-    this.setInteractions(element, [...this.getInteractions(elementId), interaction]);
+    element.setInteractions([...this.getInteractions(elementId), interaction]);
 
     const eventData: InteractionEventData = { elementId, interaction };
     this.composer.emit(EVENTS.INTERACTION_ADDED, eventData);
@@ -113,6 +116,7 @@ export class InteractionManager {
     interactionId: string,
     updates: Partial<Omit<Interaction, "id">>
   ): Interaction | null {
+    if (this.composer.writeLocked) return null;
     const element = this.composer.elements.getElement(elementId);
     if (!element) return null;
 
@@ -124,7 +128,7 @@ export class InteractionManager {
     const updated: Interaction = { ...previous, ...updates };
     interactions[index] = updated;
 
-    this.setInteractions(element, interactions);
+    element.setInteractions(interactions);
 
     const eventData: InteractionUpdateEventData = {
       elementId,
@@ -138,6 +142,7 @@ export class InteractionManager {
 
   /** Remove an interaction from an element */
   removeInteraction(elementId: string, interactionId: string): boolean {
+    if (this.composer.writeLocked) return false;
     const element = this.composer.elements.getElement(elementId);
     if (!element) return false;
 
@@ -146,7 +151,7 @@ export class InteractionManager {
     if (!interaction) return false;
 
     const filtered = interactions.filter((i) => i.id !== interactionId);
-    this.setInteractions(element, filtered);
+    element.setInteractions(filtered);
 
     const eventData: InteractionEventData = { elementId, interaction };
     this.composer.emit(EVENTS.INTERACTION_REMOVED, eventData);
@@ -156,13 +161,14 @@ export class InteractionManager {
 
   /** Clear all interactions from an element */
   clearInteractions(elementId: string): void {
+    if (this.composer.writeLocked) return;
     const element = this.composer.elements.getElement(elementId);
     if (!element) return;
 
     const interactions = this.getInteractions(elementId);
     if (interactions.length === 0) return;
 
-    this.setInteractions(element, []);
+    element.setInteractions([]);
     this.composer.emit(EVENTS.INTERACTIONS_CLEARED, { elementId });
   }
 
@@ -172,6 +178,7 @@ export class InteractionManager {
 
   /** Toggle interaction enabled state */
   toggleInteraction(elementId: string, interactionId: string): boolean {
+    if (this.composer.writeLocked) return false;
     const interaction = this.getInteraction(elementId, interactionId);
     if (!interaction) return false;
 
@@ -192,6 +199,7 @@ export class InteractionManager {
 
   /** Duplicate an interaction */
   duplicateInteraction(elementId: string, interactionId: string): Interaction | null {
+    if (this.composer.writeLocked) return null;
     const interaction = this.getInteraction(elementId, interactionId);
     if (!interaction) return null;
 
@@ -233,6 +241,7 @@ export class InteractionManager {
 
   /** Move interaction to new position */
   reorderInteraction(elementId: string, interactionId: string, newIndex: number): boolean {
+    if (this.composer.writeLocked) return false;
     const element = this.composer.elements.getElement(elementId);
     if (!element) return false;
 
@@ -244,7 +253,7 @@ export class InteractionManager {
     const clampedIndex = Math.max(0, Math.min(newIndex, interactions.length));
     interactions.splice(clampedIndex, 0, interaction);
 
-    this.setInteractions(element, interactions);
+    element.setInteractions(interactions);
     this.composer.emit(EVENTS.INTERACTIONS_REORDERED, { elementId, interactions });
 
     return true;
@@ -255,14 +264,6 @@ export class InteractionManager {
   // ===========================================================================
 
   /** Set interactions array on element (internal) */
-  private setInteractions(element: Element, interactions: Interaction[]): void {
-    const data = element.getData();
-    if (!data.data) {
-      data.data = {};
-    }
-    data.data.interactions = interactions;
-    this.composer.markDirty();
-  }
 
   /** Generate unique interaction ID */
   private generateId(): string {

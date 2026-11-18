@@ -6,8 +6,10 @@
  *
  * The site is frozen at send: every page is rendered with the same export
  * engine publish uses, so the client reviews the version that was sent, not
- * whatever the draft has drifted to since. A render failure does not block the
- * send — the link works with or without a preview.
+ * whatever the draft has drifted to since. A render failure stops before
+ * anything is sent and the designer chooses: try again, or send without a
+ * preview (Play F5.04, 2L9 `307:16107`). It used to send without one, unasked,
+ * and the client opened a review with no pages.
  *
  * @license BSD-3-Clause
  */
@@ -16,9 +18,8 @@ import * as React from "react";
 import { FormField, Modal, Button, Textarea, TextInput, Tooltip } from "@/editor/chrome-ui";
 import { ReviewSentModal, type ReviewSendState } from "./modals/ReviewSentModal";
 import type { Composer } from "@/engine";
-import { EVENTS } from "@/shared/constants/events";
-import { submitForReview, type ReviewStatus } from "@/services/ReviewService";
-import { exportPublishPages } from "./exportPublishPages";
+import type { ReviewStatus } from "@/services/ReviewService";
+import { ReviewPreviewError, sendReviewRound } from "./reviewSend";
 import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 
 export interface SendForReviewProps {
@@ -47,6 +48,8 @@ export interface SendForReviewProps {
    *  invite a client to a round that has none, where "Send for review" would
    *  read as a second send beside the re-send button. */
   idleLabel?: string;
+  /** The round this send creates, named while it is prepared and sent. */
+  roundNumber?: number | null;
 }
 
 type SendState = "idle" | "sending" | "sent" | "again" | "error";
@@ -69,6 +72,7 @@ export const SendForReview: React.FC<SendForReviewProps> = ({
   onSent,
   reviewStatus,
   idleLabel,
+  roundNumber,
 }) => {
   const [state, setState] = React.useState<SendState>("idle");
   /** The round landed but its invite mail did not. */
@@ -80,6 +84,8 @@ export const SendForReview: React.FC<SendForReviewProps> = ({
      created was reachable only by the email failing. */
   const [outcomeModal, setOutcomeModal] = React.useState<ReviewSendState | null>(null);
   const [linkCopied, setLinkCopied] = React.useState(false);
+  /** Whether the send in flight carries the frozen preview. */
+  const [withPreview, setWithPreview] = React.useState(true);
   const [open, setOpen] = React.useState(false);
   const [email, setEmail] = React.useState("");
   const [summary, setSummary] = React.useState("");
@@ -97,46 +103,51 @@ export const SendForReview: React.FC<SendForReviewProps> = ({
     return () => window.clearTimeout(id);
   }, [state, reviewStatus?.at]);
 
-  const send = React.useCallback(async () => {
+  const send = React.useCallback(async (preview = true) => {
     atBeforeSendRef.current = reviewStatus?.at ? String(reviewStatus.at) : null;
     setState("sending");
-    setOutcomeModal("sending");
+    setOutcomeModal(preview && composer ? "preparing" : "sending");
+    const invited = email.trim() || undefined;
     try {
-      let snapshotPages;
-      if (composer) {
-        try {
-          snapshotPages = await exportPublishPages(composer);
-        } catch (e) {
-          console.warn("[review] snapshot render failed; sending without preview", e);
-        }
-      }
-      const outcome = await submitForReview(
-        note.trim() || undefined,
-        summary.trim() || undefined,
-        email.trim() || undefined,
-        snapshotPages,
+      const outcome = await sendReviewRound(
+        composer,
+        { note: note.trim() || undefined, summary: summary.trim() || undefined, email: invited },
+        {
+          preview,
+          onSubmitting: (included) => {
+            setWithPreview(included);
+            setOutcomeModal("sending");
+          },
+        },
       );
       /* The round is created either way — a mail failure must never fail the
          submit. But "Sent for review ✓" over an invite that never left the
          server is the same lie the 2026-08-25 pass spent a day removing, and
          it is the failure most likely to hit a real pilot invite: an unset
          SMTP_HOST throws straight into the server's catch. */
-      const mailFailed = outcome?.inviteEmailSent === false;
+      const mailFailed = outcome.inviteEmailSent === false;
       setInviteFailed(mailFailed);
-      setReviewUrl(outcome?.reviewUrl ?? null);
+      setReviewUrl(outcome.reviewUrl ?? null);
       setState("sent");
       /* The popover's job is done either way; the outcome modal carries the
          link now, so success no longer disappears without showing it. */
       setOpen(false);
       setOutcomeModal(mailFailed ? "email-failed" : "sent");
-      // The onboarding checklist's send-review / connect-client wires.
-      composer?.emit(EVENTS.REVIEW_SENT, { invitedEmail: email.trim() || null });
-      onSent?.({ inviteEmailSent: outcome?.inviteEmailSent ?? null });
-    } catch {
+      onSent?.({ inviteEmailSent: outcome.inviteEmailSent ?? null });
+    } catch (err) {
+      if (err instanceof ReviewPreviewError) {
+        /* Nothing has gone out: back to idle, the form and its fields as they were. */
+        setState("idle");
+        setOutcomeModal("preview-failed");
+        return;
+      }
       setState("error");
       setOutcomeModal(null);
     }
   }, [composer, note, summary, email, onSent, reviewStatus?.at]);
+
+  const sendWithPreview = () => void send(true);
+  const sendWithoutPreview = () => void send(false);
 
   return (
     <>
@@ -145,7 +156,11 @@ export const SendForReview: React.FC<SendForReviewProps> = ({
       reviewUrl={reviewUrl}
       invitedEmail={email.trim() || null}
       onClose={() => setOutcomeModal(null)}
-      onResend={() => { setOutcomeModal(null); void send(); }}
+      onResend={() => { setOutcomeModal(null); sendWithPreview(); }}
+      roundNumber={roundNumber}
+      withPreview={withPreview}
+      onRetryPreview={sendWithPreview}
+      onSendWithoutPreview={sendWithoutPreview}
     />
     {disabledReason ? (
       /*
@@ -202,7 +217,7 @@ export const SendForReview: React.FC<SendForReviewProps> = ({
           >
             Cancel
           </Button>
-          <Button size="xs" disabled={state === "sending"} onClick={() => void send()} aria-busy={state === "sending" || undefined}>
+          <Button size="xs" disabled={state === "sending"} onClick={sendWithPreview} aria-busy={state === "sending" || undefined}>
             Send
           </Button>
         </>

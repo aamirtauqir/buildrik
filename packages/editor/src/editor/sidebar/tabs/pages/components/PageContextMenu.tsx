@@ -6,13 +6,31 @@
  * - "Delete page" is DISABLED (not hidden) when: page is homepage OR only page
  * - Keyboard: Escape closes here; <Menu> owns ↑↓/Home/End roving and, unlike
  *   the hand-rolled version this replaced, SKIPS the disabled Delete item
+ * - design-2l9 board 131:41791 (owner: it wins over 63:13820): the page's
+ *   name as a title, rules between make · organise · settings · delete,
+ *   "Page settings", Delete page red, then "Close menu". No chord hints (F2,
+ *   ⌘D, ⌫ still work on the row) except Move up ⌥↑ / Move down ⌥↓, as the
+ *   order boards draw them (owner A-17).
+ * - design-2l9 boards 63:13820 / 131:41791 / 137:55343: Save as template… ·
+ *   Move to folder… · Move up ⌥↑ / Move down ⌥↓ join the menu in the board's
+ *   order; a move that cannot happen is disabled and says why (137:56060,
+ *   137:56781, 127:39528).
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 import type { PageItem } from "../types";
-import { Menu, MenuItem, MenuSeparator, POPOVER_BASE_CLASS, Portal } from "@/editor/chrome-ui";
+import { Menu, MenuItem, POPOVER_BASE_CLASS, Portal } from "@/editor/chrome-ui";
+
+/* 131:41791 draws its rows 36 tall (the menu's own MenuItem is 32; a joined
+   class list does not merge, so the height is forced). */
+const ROW = "tw:h-9!";
+/* …and its rules 5 tall (MenuSeparator's 9 made the menu 30 too tall). */
+const RULE = "tw:my-0.5 tw:h-px tw:bg-[var(--bk-gray-200)]";
+
+/* A disabled row shows no tooltip, so its reason is a line in the menu. */
+const MENU_NOTE = "tw:m-0 tw:px-2 tw:pt-1 tw:pb-1.5 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 
 interface Props {
   pageId: string;
@@ -33,6 +51,14 @@ interface Props {
    *  to the ⠿ handle. */
   folderName?: string;
   onRemoveFromFolder: (id: string) => void;
+  /** Board 63:13820 "Save as template…" — the page, as a reusable template. */
+  onSaveAsTemplate: (id: string) => void;
+  /** Board 131:41791 "Move to folder…" — opens the one-page Move dialog. */
+  onMoveToFolder: (id: string) => void;
+  /** Board 137:55343 — one place up or down among the top-level pages. */
+  onMove: (id: string, direction: -1 | 1) => void;
+  /** Where the page sits among the top-level pages (folder members: null). */
+  rootPosition: { index: number; count: number } | null;
 }
 
 export const PageContextMenu: React.FC<Props> = ({
@@ -50,6 +76,10 @@ export const PageContextMenu: React.FC<Props> = ({
   onSettings,
   folderName,
   onRemoveFromFolder,
+  onSaveAsTemplate,
+  onMoveToFolder,
+  onMove,
+  rootPosition,
 }) => {
   const page = pages.find((p) => p.id === pageId);
   const menuRef = React.useRef<HTMLDivElement>(null);
@@ -63,6 +93,21 @@ export const PageContextMenu: React.FC<Props> = ({
       ? "A site needs at least 1 page. Add another page first."
       : undefined;
 
+  const name = page?.name ?? "This page";
+  const isFirst = rootPosition !== null && rootPosition.index === 0;
+  const isLast = rootPosition !== null && rootPosition.index === rootPosition.count - 1;
+  /* One line under the pair, as boards 137:56060 / 137:56781 / 127:39528 draw it. */
+  const moveReason =
+    rootPosition === null
+      ? "Pages in a folder can’t be reordered."
+      : rootPosition.count === 1
+        ? `${name} is the only top-level page.`
+        : isFirst
+          ? `${name} is the first top-level page.`
+          : isLast
+            ? `${name} is the last top-level page.`
+            : null;
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Escape") {
       e.preventDefault();
@@ -72,8 +117,8 @@ export const PageContextMenu: React.FC<Props> = ({
 
   const style: React.CSSProperties = {
     position: "fixed",
-    top: Math.min(y, window.innerHeight - 260),
-    left: Math.min(x, window.innerWidth - 232),
+    top: Math.min(y, window.innerHeight - 420),
+    left: Math.min(x, window.innerWidth - 288),
     zIndex: 9999,
   };
 
@@ -95,50 +140,90 @@ export const PageContextMenu: React.FC<Props> = ({
        computed from the click, not from an anchor. */
     <div
       ref={menuRef}
-      /* 6883:69130 — the menu is 224 wide. */
-      className={`bd-pg-menu ${POPOVER_BASE_CLASS} tw:!fixed tw:w-56`}
+      /* design-2l9 63:13820 / 131:41791 — the menu is 280 wide (224 wrapped
+         "Replace layout with template…" onto two lines). */
+      className={`bd-pg-menu ${POPOVER_BASE_CLASS} tw:!fixed tw:w-70`}
       style={style}
       data-testid="pages-context-menu"
     >
       <Menu label={`Options for ${page?.name ?? "page"}`} onKeyDown={handleKeyDown}>
-        {/* Board 1171:4753 labels — sentence case, ellipsis on the two that
-            open something. Its 2026-09 revision ALSO draws the chord beside
-            the three items that have one (2838:12148/12149/12150), which is
-            what the row's own F2 / ⌘D / ⌫ already do; this comment used to
-            say the board drew none. MenuItem has carried a `kbd` slot the
-            whole time. ⌘, opens Page settings from the row but the board
-            leaves that item bare, so it stays bare. */}
-        <MenuItem kbd="F2" data-testid="pages-menu-rename" onClick={() => act(() => onRename(pageId))}>
+        {/* design-2l9 131:41791 (owner: the dedicated board wins over
+            63:13820's context drawing): the page's name heads the menu, rules
+            split it into make · organise · settings · delete, Delete page is
+            red, and "Close menu" ends it. */}
+        <div className="tw:px-2 tw:pt-1 tw:text-[12px] tw:leading-4 tw:font-semibold tw:text-[var(--bk-ink)]" data-testid="pages-menu-title">
+          {/* 127:39528 / 134:44345 — a folder member's menu names its folder. */}
+          {folderName ? `${page?.name ?? "Page"} · In ${folderName}` : (page?.name ?? "Page")}
+        </div>
+        <MenuItem className={ROW} data-testid="pages-menu-rename" onClick={() => act(() => onRename(pageId))}>
           Rename…
         </MenuItem>
-        <MenuItem kbd="⌘D" data-testid="pages-menu-duplicate" onClick={() => act(() => onDuplicate(pageId))}>
+        <MenuItem className={ROW} data-testid="pages-menu-duplicate" onClick={() => act(() => onDuplicate(pageId))}>
           Duplicate
         </MenuItem>
         {!isHome && (
-          <MenuItem data-testid="pages-menu-homepage" onClick={() => act(() => onSetHomepage(pageId))}>
+          <MenuItem className={ROW} data-testid="pages-menu-homepage" onClick={() => act(() => onSetHomepage(pageId))}>
             Set as homepage
           </MenuItem>
         )}
-        <MenuItem data-testid="pages-menu-replace-layout" onClick={() => act(() => onReplaceLayout(pageId))}>
+        <MenuItem className={ROW} data-testid="pages-menu-replace-layout" onClick={() => act(() => onReplaceLayout(pageId))}>
           Replace layout with template…
         </MenuItem>
-        <MenuItem data-testid="pages-menu-copy-link" onClick={() => act(() => onCopyLink(pageId))}>
-          Copy link
+        <MenuItem className={ROW} data-testid="pages-menu-save-template" onClick={() => act(() => onSaveAsTemplate(pageId))}>
+          Save as template…
         </MenuItem>
-        <MenuItem data-testid="pages-menu-settings" onClick={() => act(() => onSettings(pageId))}>
-          Page settings…
+        <div role="separator" className={RULE} />
+        <MenuItem className={ROW} data-testid="pages-menu-move-folder" onClick={() => act(() => onMoveToFolder(pageId))}>
+          Move to folder…
         </MenuItem>
+        {/* Owner decision A-17 (boards 137:55343 / 137:56060 / 137:56781):
+            the order commands live here, with their chords, and a boundary's
+            reason sits under the move it blocks. */}
+        <MenuItem className={ROW}
+          kbd="⌥↑"
+          disabled={rootPosition === null || isFirst}
+          data-testid="pages-menu-move-up"
+          onClick={() => act(() => onMove(pageId, -1))}
+        >
+          Move up
+        </MenuItem>
+        {moveReason && rootPosition !== null && isFirst && (
+          <p className={MENU_NOTE} data-testid="pages-menu-move-reason">
+            {moveReason}
+          </p>
+        )}
+        <MenuItem className={ROW}
+          kbd="⌥↓"
+          disabled={rootPosition === null || isLast}
+          data-testid="pages-menu-move-down"
+          onClick={() => act(() => onMove(pageId, 1))}
+        >
+          Move down
+        </MenuItem>
+        {/* A folder member's reason covers both moves, so it follows the pair
+            and "Remove from <folder>" comes after it (127:39528 / 134:44345). */}
+        {moveReason && (rootPosition === null || !isFirst) && (
+          <p className={MENU_NOTE} data-testid="pages-menu-move-reason">
+            {moveReason}
+          </p>
+        )}
         {folderName && (
-          <MenuItem data-testid="pages-menu-remove-folder" onClick={() => act(() => onRemoveFromFolder(pageId))}>
+          <MenuItem className={ROW} data-testid="pages-menu-remove-folder" onClick={() => act(() => onRemoveFromFolder(pageId))}>
             Remove from {folderName}
           </MenuItem>
         )}
-        <MenuSeparator />
-        <MenuItem
+        <MenuItem className={ROW} data-testid="pages-menu-copy-link" onClick={() => act(() => onCopyLink(pageId))}>
+          Copy link
+        </MenuItem>
+        <div role="separator" className={RULE} />
+        <MenuItem className={ROW} data-testid="pages-menu-settings" onClick={() => act(() => onSettings(pageId))}>
+          Page settings
+        </MenuItem>
+        <div role="separator" className={RULE} />
+        <MenuItem className={ROW}
           danger
           disabled={deleteDisabled}
           title={deleteTooltip}
-          kbd="⌫"
           data-testid="pages-menu-delete"
           onClick={() => act(() => onDelete(pageId))}
         >
@@ -147,13 +232,13 @@ export const PageContextMenu: React.FC<Props> = ({
         {/* 6883:69130 — why Delete is off, said in the menu (a disabled row
             shows no tooltip). */}
         {deleteDisabled && (
-          <p
-            className="tw:m-0 tw:px-2 tw:pt-1 tw:pb-1.5 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
-            data-testid="pages-menu-delete-reason"
-          >
+          <p className={MENU_NOTE} data-testid="pages-menu-delete-reason">
             {isHome ? "Homepage can’t be deleted" : "A site needs at least one page"}
           </p>
         )}
+        <MenuItem className={ROW} data-testid="pages-menu-close" onClick={onClose}>
+          Close menu
+        </MenuItem>
       </Menu>
     </div>
   );

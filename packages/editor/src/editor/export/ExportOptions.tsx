@@ -2,14 +2,8 @@
  * Export Options Panel
  * Configuration UI for export settings
  *
- * The format picker is a real radiogroup — picking one of several exclusive
- * options is a radio group, not a row of buttons that happen to look
- * selected — but the VISUAL is board 1172:4825's compact pill row, not
- * chrome-ui's FormatRow. FormatRow is the title+description CARD (min-h-16,
- * Figma 249:6): right for a surface with room for a description, and this
- * modal's 1172:4825 draws none — a single line of 11px pills, all five
- * formats in one row. FormatRow here cost 40+ extra pixels of row height per
- * format for a description line the board never draws.
+ * 2L9 B8-EX01 / EX03: the Format row (three real radios) and the Options
+ * tab's label / value rows.
  *
  * @license BSD-3-Clause
  */
@@ -17,16 +11,13 @@
 import * as React from "react";
 import type { CMSExportMode, TemplateSyntax } from "@/engine/cms/CMSExportResolver";
 import type { ExportConfig, CSSExportStyle, ExportFormat } from "@/shared/types/export";
-import { Button, Checkbox, Label, Radio, TextInput } from "@/editor/chrome-ui";
+import { BK_SELECT_BARE_VALUE_THEME, Label, Radio, Select, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // FORMAT CONFIG
 // ============================================================================
 
 /** Formats that are fully implemented and available in demo */
 const AVAILABLE_FORMATS: ExportFormat[] = ["html", "zip", "react"];
-
-/** Formats that exist in the type but require future implementation */
-const COMING_SOON_FORMATS: ExportFormat[] = ["vue", "nextjs"];
 
 const FORMAT_LABELS: Record<ExportFormat, string> = {
   html: "HTML",
@@ -37,17 +28,8 @@ const FORMAT_LABELS: Record<ExportFormat, string> = {
   nextjs: "Next.js",
 };
 
-/** One field label style, not five copies of the same inline object. */
-const FIELD_LABEL = "tw:block tw:mb-1.5";
-/** The segmented single-choice strip (CSS style, CMS mode, template syntax). */
-const SEGMENTED = "tw:flex tw:gap-2";
-
-/** Selected reads as the primary action, unselected as a quiet one — flowbite's
- *  own colour system, so the states cannot drift from every other Button. */
-const segmentColor = (selected: boolean) => (selected ? undefined : ("light" as const));
-
 // ============================================================================
-// FORMAT GRID — board 1172:4825's single-row pill selector
+// FORMAT ROW — 2L9 B8-EX01's labelled radios
 // ============================================================================
 
 export interface FormatGridProps {
@@ -55,89 +37,32 @@ export interface FormatGridProps {
   onFormatChange: (format: ExportFormat) => void;
 }
 
-/* fmt/HTML (selected), fmt/ZIP, fmt/React, fmt/Vue (dimmed + Soon),
-   fmt/Next.js (dimmed + Soon) — one row, gap 8, px-10/py-7, rounded-6,
-   11px medium. The Radio stays real (arrow keys, `role="radio"`, checked
-   state) but is visually hidden — the board's pill carries no dot, the
-   tinted fill + accent border/text ARE the checked state. */
-const PILL_BASE =
-  "tw:flex tw:items-center tw:gap-1.5 tw:rounded-md tw:border tw:px-2.5 tw:py-[7px] " +
-  "tw:text-[11px] tw:font-medium tw:cursor-pointer tw:[transition:var(--bk-transition-fast)] " +
-  "tw:aria-disabled:opacity-55 tw:aria-disabled:pointer-events-none tw:aria-disabled:select-none";
-const PILL_SELECTED = "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)]";
-const PILL_IDLE = "tw:border-[var(--bk-border)] tw:bg-white tw:text-[var(--bk-ink)] tw:hover:bg-[var(--bk-bg-subtle)]";
-/* The scale has no 8px step and the ratchet locks that population at zero,
-   so the "soon" tag sits on the floor the scale does define. Micro chrome
-   furniture snapped onto --bk-text-11 in the same 2026-08-29 pass. */
-const SOON_TAG =
-  "tw:rounded tw:bg-[var(--bk-bg-subtle)] tw:px-1 tw:py-px tw:text-[length:var(--bk-text-11)] " +
-  "tw:font-medium tw:text-[var(--bk-ink-muted)]";
+/* 2L9 B8-EX01 236:4951: "Format  ○ HTML  ● ZIP  ○ React" — a label, then
+   real radios with their dots, the checked one in the accent. Vue and
+   Next.js are not offered (the board draws three formats). */
+const OPTION = "tw:flex tw:cursor-pointer tw:items-center tw:gap-2 tw:text-[length:var(--bk-text-13)] tw:leading-5";
 
 export const FormatGrid: React.FC<FormatGridProps> = ({ selectedFormat, onFormatChange }) => (
-  <div
-    role="radiogroup"
-    aria-label="Export format"
-    className="tw:flex tw:flex-wrap tw:gap-2"
-    data-testid="export-format-grid"
-  >
-    {AVAILABLE_FORMATS.map((fmt) => {
-      const checked = selectedFormat === fmt;
-      return (
-        <label
-          key={fmt}
-          className={[PILL_BASE, checked ? PILL_SELECTED : PILL_IDLE].join(" ")}
-          data-testid={`export-fmt-${fmt}`}
-        >
-          <Radio
-            className="tw:sr-only"
-            color="blue"
-            name="export-format"
-            value={fmt}
-            checked={checked}
-            onChange={() => onFormatChange(fmt)}
-          />
-          {FORMAT_LABELS[fmt]}
-        </label>
-      );
-    })}
-
-    {/* Unimplemented stubs: same row, no radio, not reachable — a disabled
-        radio would still answer to getByRole("radio") and still take an
-        arrow-key stop in the group (FormatRow precedent). */}
-    {COMING_SOON_FORMATS.map((fmt) => (
-      <label
-        key={fmt}
-        className={[PILL_BASE, PILL_IDLE].join(" ")}
-        aria-disabled="true"
-        data-testid={`export-fmt-${fmt}`}
-      >
-        {FORMAT_LABELS[fmt]}
-        <span className={SOON_TAG}>Soon</span>
-      </label>
-    ))}
+  <div className="tw:flex tw:items-center tw:gap-8" data-testid="export-format-grid">
+    <span className="tw:w-12 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]" id="export-format-label">
+      Format
+    </span>
+    <div role="radiogroup" aria-labelledby="export-format-label" className="tw:flex tw:items-center tw:gap-12">
+      {AVAILABLE_FORMATS.map((fmt) => {
+        const checked = selectedFormat === fmt;
+        return (
+          <label
+            key={fmt}
+            className={`${OPTION} ${checked ? "tw:text-[var(--bk-accent)]" : "tw:text-[var(--bk-ink)]"}`}
+            data-testid={`export-fmt-${fmt}`}
+          >
+            <Radio color="blue" name="export-format" value={fmt} checked={checked} onChange={() => onFormatChange(fmt)} />
+            {FORMAT_LABELS[fmt]}
+          </label>
+        );
+      })}
+    </div>
   </div>
-);
-
-// ============================================================================
-// TOGGLE OPTION
-// ============================================================================
-
-interface ToggleOptionProps {
-  label: string;
-  checked: boolean;
-  onChange: (checked: boolean) => void;
-}
-
-const ToggleOption: React.FC<ToggleOptionProps> = ({ label, checked, onChange }) => (
-  <label className="tw:flex tw:items-center tw:gap-2 tw:cursor-pointer tw:text-[13px]">
-    <Checkbox
-      color="blue"
-      className="tw:bg-white tw:cursor-pointer"
-      checked={checked}
-      onChange={(e) => onChange(e.target.checked)}
-    />
-    {label}
-  </label>
 );
 
 // ============================================================================
@@ -157,119 +82,126 @@ export interface OptionsPanelProps {
   hasCMSBindings?: boolean;
 }
 
+/* 2L9 B8-EX03 236:6085: label / value rows, 44 tall, ruled — every option
+   the export has stays, each as one borderless select (the value reads as
+   text with its chevron, as drawn). */
+const ROW = "tw:grid tw:min-h-11 tw:grid-cols-[200px_1fr] tw:items-center tw:border-b tw:border-[var(--bk-border)]";
+const ROW_LABEL = "tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]";
+const VALUE = "tw:max-w-60";
+
+const OptionRow: React.FC<{ id: string; label: string; children: React.ReactNode }> = ({ id, label, children }) => (
+  <div className={ROW} data-testid={`export-opt-${id}`}>
+    <Label htmlFor={`export-opt-${id}-value`} className={ROW_LABEL}>
+      {label}
+    </Label>
+    <div className={VALUE}>{children}</div>
+  </div>
+);
+
+const CSS_STYLE_LABEL: Record<CSSExportStyle, string> = {
+  external: "One stylesheet",
+  embedded: "In the page",
+  inline: "Inline styles",
+};
+/* Meta and viewport are two flags; the board's one row offers each mix. */
+type MetaMix = "both" | "meta" | "viewport" | "none";
+const metaMix = (c: ExportConfig): MetaMix =>
+  c.includeMeta && c.includeViewport ? "both" : c.includeMeta ? "meta" : c.includeViewport ? "viewport" : "none";
+
 export const OptionsPanel: React.FC<OptionsPanelProps> = ({
   config,
   onChange,
   cmsSettings = { mode: "none", syntax: "handlebars" },
   onCMSChange,
   hasCMSBindings = false,
-}) => {
-  return (
-    <div className="tw:flex tw:flex-col tw:gap-4">
-      {/* Page Title */}
-      <div>
-        <Label htmlFor="export-page-title" className={FIELD_LABEL}>Page Title</Label>
-        {/* No style prop: the TextInput wrapper already applies
-            BK_TEXT_INPUT_THEME. The override this replaced painted the field
-            --bk-gray-900 — a near-black background left over from the dark
-            theme, on a light-theme surface. */}
-        <TextInput
-          id="export-page-title"
-          type="text"
-          value={config.pageTitle || ""}
-          onChange={(e) => onChange({ pageTitle: e.target.value })}
-        />
-      </div>
-      {/* CSS Style */}
-      <div>
-        <Label className={FIELD_LABEL}>CSS Style</Label>
-        <div className={SEGMENTED}>
-          {(["embedded", "external", "inline"] as CSSExportStyle[]).map((style) => (
-            <Button
-              key={style}
-              size="xs"
-              color={segmentColor(config.cssStyle === style)}
-              aria-pressed={config.cssStyle === style}
-              className="tw:flex-1 tw:capitalize"
-              onClick={() => onChange({ cssStyle: style })}
+}) => (
+  <div className="tw:flex tw:flex-col" data-testid="export-options">
+    <OptionRow id="title" label="Page title">
+      <TextInput
+        id="export-opt-title-value"
+        type="text"
+        sizing="sm"
+        value={config.pageTitle || ""}
+        onChange={(e) => onChange({ pageTitle: e.target.value })}
+      />
+    </OptionRow>
+    <OptionRow id="css" label="CSS">
+      <Select
+        id="export-opt-css-value" theme={BK_SELECT_BARE_VALUE_THEME}
+        sizing="sm"
+        value={config.cssStyle}
+        onChange={(e) => onChange({ cssStyle: e.target.value as CSSExportStyle })}
+      >
+        {(["external", "embedded", "inline"] as CSSExportStyle[]).map((style) => (
+          <option key={style} value={style}>
+            {CSS_STYLE_LABEL[style]}
+          </option>
+        ))}
+      </Select>
+    </OptionRow>
+    <OptionRow id="minify" label="Minify">
+      <Select id="export-opt-minify-value" theme={BK_SELECT_BARE_VALUE_THEME} sizing="sm" value={config.minify ? "on" : "off"} onChange={(e) => onChange({ minify: e.target.value === "on" })}>
+        <option value="on">On</option>
+        <option value="off">Off</option>
+      </Select>
+    </OptionRow>
+    <OptionRow id="reset" label="CSS reset">
+      <Select
+        id="export-opt-reset-value" theme={BK_SELECT_BARE_VALUE_THEME}
+        sizing="sm"
+        value={config.includeResetCSS ? "include" : "leave-out"}
+        onChange={(e) => onChange({ includeResetCSS: e.target.value === "include" })}
+      >
+        <option value="include">Include</option>
+        <option value="leave-out">Leave out</option>
+      </Select>
+    </OptionRow>
+    <OptionRow id="meta" label="Meta and viewport">
+      <Select
+        id="export-opt-meta-value" theme={BK_SELECT_BARE_VALUE_THEME}
+        sizing="sm"
+        value={metaMix(config)}
+        onChange={(e) => {
+          const mix = e.target.value as MetaMix;
+          onChange({ includeMeta: mix === "both" || mix === "meta", includeViewport: mix === "both" || mix === "viewport" });
+        }}
+      >
+        <option value="both">Include</option>
+        <option value="meta">Meta tags only</option>
+        <option value="viewport">Viewport only</option>
+        <option value="none">Leave out</option>
+      </Select>
+    </OptionRow>
+    {hasCMSBindings && onCMSChange ? (
+      <>
+        <OptionRow id="cms" label="CMS content">
+          <Select
+            id="export-opt-cms-value" theme={BK_SELECT_BARE_VALUE_THEME}
+            sizing="sm"
+            value={cmsSettings.mode}
+            onChange={(e) => onCMSChange({ mode: e.target.value as CMSExportMode })}
+          >
+            <option value="static">Published records only</option>
+            <option value="template">As template tags</option>
+            <option value="none">Leave bindings unresolved</option>
+          </Select>
+        </OptionRow>
+        {cmsSettings.mode === "template" ? (
+          <OptionRow id="syntax" label="Template syntax">
+            <Select
+              id="export-opt-syntax-value" theme={BK_SELECT_BARE_VALUE_THEME}
+              sizing="sm"
+              value={cmsSettings.syntax}
+              onChange={(e) => onCMSChange({ syntax: e.target.value as TemplateSyntax })}
             >
-              {style}
-            </Button>
-          ))}
-        </div>
-      </div>
-      {/* Toggle Options */}
-      <div className="tw:flex tw:flex-col tw:gap-2">
-        <ToggleOption
-          label="Minify output"
-          checked={config.minify}
-          onChange={(minify) => onChange({ minify })}
-        />
-        <ToggleOption
-          label="Include reset CSS"
-          checked={config.includeResetCSS}
-          onChange={(includeResetCSS) => onChange({ includeResetCSS })}
-        />
-        <ToggleOption
-          label="Include meta tags"
-          checked={config.includeMeta}
-          onChange={(includeMeta) => onChange({ includeMeta })}
-        />
-        <ToggleOption
-          label="Include viewport meta"
-          checked={config.includeViewport}
-          onChange={(includeViewport) => onChange({ includeViewport })}
-        />
-      </div>
-      {/* CMS Export Options - only show if project has CMS bindings */}
-      {hasCMSBindings && onCMSChange && (
-        <div className="tw:border-t tw:border-[var(--bk-gray-200)] tw:pt-4">
-          <Label className={`${FIELD_LABEL} tw:font-semibold`}>CMS Content</Label>
-          <div className={`${SEGMENTED} tw:mb-3`}>
-            {(["none", "static", "template"] as CMSExportMode[]).map((mode) => (
-              <Button
-                key={mode}
-                size="xs"
-                color={segmentColor(cmsSettings.mode === mode)}
-                aria-pressed={cmsSettings.mode === mode}
-                className="tw:flex-1"
-                onClick={() => onCMSChange({ mode })}
-              >
-                {mode === "none" ? "None" : mode === "static" ? "Embed Data" : "Template"}
-              </Button>
-            ))}
-          </div>
-
-          {cmsSettings.mode === "template" && (
-            <div>
-              <Label className={`${FIELD_LABEL} tw:text-[var(--bk-ink-muted)]`}>Template Syntax</Label>
-              <div className={SEGMENTED}>
-                {(["handlebars", "liquid"] as TemplateSyntax[]).map((syntax) => (
-                  <Button
-                    key={syntax}
-                    size="xs"
-                    color={segmentColor(cmsSettings.syntax === syntax)}
-                    aria-pressed={cmsSettings.syntax === syntax}
-                    className="tw:flex-1 tw:capitalize"
-                    onClick={() => onCMSChange({ syntax })}
-                  >
-                    {syntax}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="tw:text-xs tw:text-[var(--bk-ink-muted)] tw:mt-2">
-            {cmsSettings.mode === "none" && "CMS bindings will not be resolved in export."}
-            {cmsSettings.mode === "static" && "CMS data will be embedded directly in HTML."}
-            {cmsSettings.mode === "template" &&
-              `Output will use ${cmsSettings.syntax === "handlebars" ? "{{variable}}" : "{{ variable }}"} syntax.`}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
+              <option value="handlebars">Handlebars {"{{variable}}"}</option>
+              <option value="liquid">Liquid {"{{ variable }}"}</option>
+            </Select>
+          </OptionRow>
+        ) : null}
+      </>
+    ) : null}
+  </div>
+);
 
 export default OptionsPanel;

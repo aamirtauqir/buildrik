@@ -22,6 +22,7 @@ import { EVENTS } from "@/shared/constants/events";
 import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 import { BINDABLE_TYPES } from "@/shared/constants/elementCapabilities";
 import { findStylePeers } from "@/engine/commands/stylePeers";
+import { lockOwner } from "@/engine/commands/commandOperations";
 import { requestReplaceWithBlock } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 
 /** Toast notification function signature */
@@ -36,7 +37,6 @@ export interface ElementActionContext {
   composer: Composer;
   element: Element;
   isRoot: boolean;
-  openAI?: () => void;
   /** Toast function for undo notifications */
   addToast?: AddToastFn;
 }
@@ -51,9 +51,9 @@ export type ElementActionId =
   | "lock"
   | "unlock"
   | "delete"
-  | "improve-with-ai"
   | "bind-to-cms"
   | "add-interaction"
+  | "show-in-layers"
   | "replace-with-block";
 
 export interface ElementAction {
@@ -189,15 +189,6 @@ export const ELEMENT_ACTIONS: Record<ElementActionId, ElementAction> = {
   },
 
   // ── Canvas-only doors (board 4428:43928) ─────────────────────────────
-  "improve-with-ai": {
-    id: "improve-with-ai",
-    label: "Improve with AI",
-    icon: "sparkles",
-    /* The Inspector's ✦ chip is its AI door; the canvas row shows only when
-       the shell mounted an AI handler. */
-    isVisible: ({ openAI }) => Boolean(openAI),
-    run: ({ openAI }) => openAI?.(),
-  },
   "bind-to-cms": {
     id: "bind-to-cms",
     label: "Bind to CMS field…",
@@ -222,6 +213,17 @@ export const ELEMENT_ACTIONS: Record<ElementActionId, ElementAction> = {
       composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "interactions" });
     },
   },
+  /* 2L9 S08: the element in the Layers tree, selected. */
+  "show-in-layers": {
+    id: "show-in-layers",
+    label: "Show in Layers",
+    icon: "layers",
+    isVisible: notRoot,
+    run: ({ composer, element }) => {
+      composer.selection.select(element as never);
+      composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "layers" });
+    },
+  },
   "replace-with-block": {
     id: "replace-with-block",
     label: "Replace with block…",
@@ -229,7 +231,7 @@ export const ELEMENT_ACTIONS: Record<ElementActionId, ElementAction> = {
     /* Blocks are sections; offering to replace a heading with a hero is noise. */
     isVisible: ({ element, isRoot }) => !isRoot && SECTION_TYPES.has(element.getType?.() ?? ""),
     /* Replacing deletes the element: a lock refuses it (audit 2026-10-08 P1-3). */
-    isEnabled: ({ element }) => (element.isLocked?.() ? "Unlock it to replace it" : true),
+    isEnabled: ({ element }) => (lockOwner(element) ? "Unlock it to replace it" : true),
     run: ({ composer, element }) => {
       composer.selection.select(element as never);
       composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "add" });
@@ -238,21 +240,30 @@ export const ELEMENT_ACTIONS: Record<ElementActionId, ElementAction> = {
   },
 };
 
-/** The Inspector's ⋯ menu, board 30 — nothing else ("---" is a rule).
- *  Lock and Unlock share a slot: only the one that applies is visible. */
-export const INSPECTOR_MENU: readonly (ElementActionId | "---")[] = [
+/** The Inspector's ⋯ menu (2L9 S08 `255:85835`): one registry, four
+ *  headed groups ("#Name" is a group heading, drawn only above a visible
+ *  row). Lock and Unlock share a slot: only the one that applies shows. */
+export const INSPECTOR_MENU: readonly (ElementActionId | `#${string}`)[] = [
+  "#Clipboard",
   "duplicate",
   "copy-style",
   "paste-style",
-  "apply-style-to-page",
-  "reset-style",
-  "---",
+  "#Structure",
   "save-as-component",
+  "bind-to-cms",
+  "show-in-layers",
+  "#State",
   "lock",
   "unlock",
-  "---",
+  "add-interaction",
+  "apply-style-to-page",
+  "reset-style",
+  "#Delete",
   "delete",
 ];
+
+/** A group heading entry of `INSPECTOR_MENU`, not an action. */
+export const isMenuGroup = (entry: ElementActionId | `#${string}`): entry is `#${string}` => entry.startsWith("#");
 
 export function actionLabel(action: ElementAction, ctx: ElementActionContext): string {
   return typeof action.label === "function" ? action.label(ctx) : action.label;

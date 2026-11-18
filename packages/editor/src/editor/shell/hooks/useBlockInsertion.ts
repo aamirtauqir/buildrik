@@ -10,18 +10,14 @@
 import * as React from "react";
 import { getBlockDefinitions, insertBlock } from "@/blocks/blockRegistry";
 import type { Composer } from "@/engine";
-import type { BlockData, ElementType } from "@/shared/types";
+import type { BlockData } from "@/shared/types";
 import { useToast } from "@/editor/chrome-ui";
 import { animateDropSuccess } from "@/shared/utils/dragDrop/animations";
-import {
-  canNestElement,
-  ELEMENT_CATEGORIES,
-  ElementCategory,
-  getSuggestedParents,
-} from "@/shared/utils/nesting";
+import { getSuggestedParents } from "@/shared/utils/nesting";
 import { writableElements } from "@/engine/commands/commandOperations";
-import { takeReplaceTarget } from "@/editor/sidebar/tabs/build/insertGroupRequest";
-import { elementLocation, getElementNameFromType } from "@/editor/canvas/utils/elementInfo";
+import { showInsertReceipt, takeReplaceTarget } from "@/editor/sidebar/tabs/build/insertGroupRequest";
+import { resolveInsertTarget } from "@/editor/sidebar/tabs/build/insertTarget";
+import { getElementNameFromType } from "@/editor/canvas/utils/elementInfo";
 
 export interface UseBlockInsertionResult {
   handleBlockClick: (block: BlockData) => void;
@@ -73,17 +69,6 @@ export function useBlockInsertion(composer: Composer | null): UseBlockInsertionR
           return;
         }
 
-        // Smart placement: walk up from the selected element looking for the
-        // nearest ancestor that can accept this block. Insert into selected if
-        // it is itself a valid container; otherwise insert as sibling at the
-        // ancestor's child list, after whichever descendant is on the
-        // selected element's path. If no ancestor accepts the block, fall
-        // back to the page root. This prevents silent-fail cascades where
-        // one-level lookups give up after a single rejection.
-        const selectedIds = composer.selection.getSelectedIds();
-        let parentId = root.getId();
-        let insertIndex: number | undefined = root.getChildCount();
-
         // "Replace with block…": the block goes where the marked element is.
         const replaceId = takeReplaceTarget(composer);
         const replaced = replaceId ? composer.elements.getElement(replaceId) : undefined;
@@ -93,64 +78,17 @@ export function useBlockInsertion(composer: Composer | null): UseBlockInsertionR
            (audit 2026-10-08 P1-3). */
         if (replaced && writableElements(composer, [replaced]).length === 0) return;
 
-        if (replaced && replacedParent) {
-          parentId = replacedParent.getId();
-          insertIndex = replacedParent.getChildIndex(replaced);
-        } else if (selectedIds.length === 1) {
-          const selectedEl = composer.elements.getElement(selectedIds[0]);
-          if (selectedEl) {
-            let candidate: ReturnType<typeof composer.elements.getElement> = selectedEl;
-            let childOnPath = selectedEl;
-            let isSelected = true;
+        /* Otherwise the Add panel's placement rule — the same resolver its
+           "Insert into Hero · At end" strip reads (board 7:18981), so the strip
+           and the insert cannot disagree. */
+        const target =
+          replaced && replacedParent
+            ? { parentId: replacedParent.getId(), index: replacedParent.getChildIndex(replaced), parentName: "" }
+            : resolveInsertTarget(composer, def.elementType) ??
+              { parentId: root.getId(), index: root.getChildCount(), parentName: page.name };
+        const { parentId } = target;
 
-            while (candidate) {
-              const candidateType = candidate.getType() as ElementType;
-              /* A selected text element (heading, paragraph, text, label) is
-                 never the target: the rules let it hold blocks, so Add → Divider
-                 produced <h2>Heading<hr></h2> (audit L1-001). The block goes
-                 after it instead. */
-              const textLeaf =
-                isSelected && (ELEMENT_CATEGORIES[candidateType] ?? []).includes(ElementCategory.TEXT);
-              const canContain = !textLeaf && canNestElement(def.elementType, candidateType);
-              /* L1-037: a Section's lone inner container is its content slot
-                 (the "Drop a block here" box) — the block goes in there, not
-                 beside it. */
-              const sectionKids = isSelected && candidateType === "section" ? candidate.getChildren() : [];
-              const slot = sectionKids.length === 1 && sectionKids[0].getType() === "container" ? sectionKids[0] : null;
-              if (slot && canNestElement(def.elementType, "container")) {
-                parentId = slot.getId();
-                insertIndex = slot.getChildCount?.() ?? 0;
-                break;
-              }
-              if (canContain) {
-                if (isSelected) {
-                  // Selected itself accepts the block: insert inside at end.
-                  parentId = candidate.getId();
-                  insertIndex = candidate.getChildCount?.() ?? 0;
-                } else {
-                  // Inserting as sibling of whichever descendant of candidate
-                  // sits on the selection path.
-                  const siblingIdx = candidate
-                    .getChildren()
-                    .findIndex((c) => c.getId() === childOnPath.getId());
-                  parentId = candidate.getId();
-                  insertIndex = siblingIdx >= 0 ? siblingIdx + 1 : candidate.getChildCount?.();
-                }
-                break;
-              }
-              // Walk up. getParent() returns Element | null; normalize to
-              // undefined so the loop guard (while candidate) exits cleanly.
-              childOnPath = candidate;
-              candidate = candidate.getParent() ?? undefined;
-              isSelected = false;
-            }
-            // candidate === null means nothing up to (and including) root
-            // accepts this block. The initial root-fallback parentId/insertIndex
-            // values are already set above, so the insert still tries.
-          }
-        }
-
-        const insertedId = insertBlock(composer, def, parentId, insertIndex);
+        const insertedId = insertBlock(composer, def, parentId, target.index);
         if (insertedId && replaced) composer.elements.removeElement(replaced.getId());
         if (insertedId) {
           const el = composer.elements.getElement(insertedId);
@@ -189,22 +127,24 @@ export function useBlockInsertion(composer: Composer | null): UseBlockInsertionR
             }, 100);
           }
 
-          /* Decision #16 / board 4428:145642 — "Hero added" with Undo. The
-             toast store keeps one transient, so ten fast inserts show one
-             toast whose Undo is the last insert. */
-          /* Boards 4418:166733 / 4418:169389 name where an element landed
-             ("Heading added to Home › Hero › Content"); a section on the page
-             itself is just "Hero added" (4428:145642). */
-          const onPage = el?.getParent()?.getParent() == null;
-          addToast({
-            description: replaced
-              ? `${getElementNameFromType(replaced.getType())} replaced with ${block.label}`
-              : onPage
-                ? `${block.label} added`
-                : `${block.label} added to ${elementLocation(composer, insertedId)}`,
-            tone: "success",
-            action: { label: "Undo", onClick: composer.history.captureUndo() },
-          });
+          /* A-11 / boards 7:19448, 302:4542, 10:3787: the receipt names where
+             the block landed ("Text added to Hero"; the page at its root) and
+             that the selection moved while focus stayed in the panel. 7:19448
+             draws it IN the Add panel, under the list — so an open Add panel
+             takes it there; any other insert path keeps the toast (the toast
+             store keeps one transient, so ten fast inserts show one receipt
+             whose Undo is the last insert). */
+          const undo = { label: "Undo", onClick: composer.history.captureUndo() };
+          const receipt = { title: `${block.label} added to ${target.parentName}`, detail: "Selected on canvas · Focus stays here" };
+          if (replaced) {
+            addToast({
+              description: `${getElementNameFromType(replaced.getType())} replaced with ${block.label}`,
+              tone: "success",
+              action: undo,
+            });
+          } else if (!showInsertReceipt(composer, receipt)) {
+            addToast({ title: receipt.title, description: receipt.detail, tone: "success", action: undo });
+          }
         } else {
           // Build contextual nesting error message
           const parentEl = composer.elements.getElement(parentId);

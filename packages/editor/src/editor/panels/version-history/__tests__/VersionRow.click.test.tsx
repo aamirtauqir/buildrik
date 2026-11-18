@@ -16,13 +16,11 @@ function renderRow() {
   const props = {
     onRestore: vi.fn(),
     onDeleteRequest: vi.fn(),
-    onDeleteConfirm: vi.fn(),
-    onDeleteCancel: vi.fn(),
     onCompare: vi.fn(),
     onDetails: vi.fn(),
     onRename: vi.fn(),
   };
-  render(<VersionRow version={version} isRestoring={false} isDeleteConfirm={false} changeCount={7} {...props} />);
+  render(<VersionRow version={version} isRestoring={false} changeCount={7} {...props} />);
   return props;
 }
 

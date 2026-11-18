@@ -23,9 +23,13 @@ function renderList(counts: Array<[string, TokenUsageCount]>, extra: Partial<Rea
 }
 
 describe("ColorTokenList — usage column (BRP1-M5)", () => {
-  it("heads the column USAGE", () => {
-    const { getByRole } = renderList([]);
-    expect(getByRole("table").textContent).toContain("Usage");
+  it("says when other tokens reach it through aliases (B6-B01)", () => {
+    const alias = v6Token({ id: "color-link", name: "Link", value: "#1A56DB", category: "colors", type: "color", kind: "color", group: "brand" });
+    const linked = { ...alias, modes: { light: { alias: "color-primary" } } } as unknown as DesignToken;
+    const { getByTestId } = render(
+      <ColorTokenList tokens={tokens} allTokens={[...tokens, linked]} onAddToken={vi.fn()} usageCounts={new Map([["color-primary", 3]])} />,
+    );
+    expect(getByTestId("brand-token-used-color-primary").textContent).toBe("Used by 3 places · through aliases");
   });
 
   it("prints 'Used by N' and a click on it asks for the highlight of that token", () => {
@@ -33,7 +37,7 @@ describe("ColorTokenList — usage column (BRP1-M5)", () => {
     const onSelectToken = vi.fn();
     const { getByTestId } = renderList([["color-primary", 14], ["color-border", 0]], { onShowUsage, onSelectToken });
     const cell = getByTestId("brand-token-used-color-primary");
-    expect(cell.textContent).toBe("Used by 14");
+    expect(cell.textContent).toBe("Used by 14 places");
     fireEvent.click(cell.querySelector("button")!);
     expect(onShowUsage).toHaveBeenCalledWith("color-primary");
     expect(onSelectToken).not.toHaveBeenCalled();
@@ -43,16 +47,16 @@ describe("ColorTokenList — usage column (BRP1-M5)", () => {
     const onShowUsage = vi.fn();
     const { getByTestId } = renderList([["color-primary", 14], ["color-border", 0]], { onShowUsage });
     const cell = getByTestId("brand-token-used-color-border");
-    expect(cell.textContent).toBe("Used by 0");
+    expect(cell.textContent).toBe("Used by 0 places");
     expect(cell.querySelector("button")).toBeNull();
   });
 
   it("prints the unknown state with no number, and the warning notice under the table", () => {
     const { getByTestId } = renderList([["color-primary", "unknown"], ["color-border", "unknown"]]);
-    expect(getByTestId("brand-token-used-color-primary").textContent).toBe("Can't count right now");
+    expect(getByTestId("brand-token-used-color-primary").textContent).toBe("Can’t count right now");
     expect(getByTestId("brand-token-used-color-primary").textContent).not.toMatch(/\d/);
     expect(getByTestId("brand-usage-unknown-notice").textContent).toBe(
-      "Can't count right now. Some site content couldn't be checked. Try again before deleting a token.",
+      "We can’t count where colors are used right now. Editing still works; deleting is blocked until the count is back.",
     );
   });
 

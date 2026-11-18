@@ -10,8 +10,11 @@ Figma variables  ──export──▶  figma-tokens.json  ──generate.mjs─
 
 ## Change a colour
 
-1. Change the variable in Figma (file `g4GzQFqzNYz5sosz1QtZXC`, collection
-   `Primitives` for palette/semantic, `Package` for the accent family).
+1. Change the variable in Figma (file `2L9OTGzBrL6kYmU18yA1c7`, collections
+   `Buildrick / Primitives` (mode `Value`), `Buildrick / Chrome` (mode `Light`)
+   for semantic colours, `Buildrick / Geometry` (mode `Value`) for spacing,
+   radius and sizes). `figma-tokens.json` was last exported from
+   `g4GzQFqzNYz5sosz1QtZXC` (`Primitives` + `Package`); see the 2L9 diff below.
 2. Re-export (below).
 3. `npm run tokens:generate`
 4. Commit the regenerated files. Every consumer updates — there is nothing else to edit.
@@ -41,9 +44,30 @@ for (const c of cols) {
 return out;
 ```
 
+2L9 has no `Editor` mode, so the script falls back to each collection's first
+mode (`Light` for Chrome, `Value` for the others).
+
 Only the values change between exports. The structure of `figma-tokens.json`
 (which groups exist, what they are called) is a deliberate design decision and
 is edited by hand.
+
+## 2L9 diff (2026-10-22, design-2l9 Task 1.1)
+
+Export of `2L9OTGzBrL6kYmU18yA1c7` diffed against `figma-tokens.json`:
+
+- **Colours:** all 25 `Buildrick / Chrome` values equal their `semantic`
+  counterparts (`color/canvas-guide` #F05252 equals `palette.red/500`).
+- **Spacing and radius:** equal (`spacing/*`, `radius/sm|md|lg|xl|full`).
+- **Sizes used by the Phase-1 shell:** equal — `size/topbar` 56,
+  `size/bottom` 32 = `size.footer`, `size/inspector` 300,
+  `size/toolbar` 44 = `size.header`, `size/control` 32 = `size.control-sm`,
+  `size/row-dense` 28.
+- **Deltas left for owner review (not Phase-1 surfaces):** `size/rail` 56 vs
+  `size.rail` 60; `size/drawer` 284 vs `size.drawer` 280. Keys only in 2L9:
+  `size/task` 360, `size/property-label` 88, `size/unit-control` 40,
+  `size/property-control-height` 28.
+
+No token value was changed by this diff.
 
 ## One flat tier
 

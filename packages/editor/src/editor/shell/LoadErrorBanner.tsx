@@ -1,128 +1,254 @@
 /**
- * LoadErrorBanner (S1.5) — a persistent surface when the site fails to load
- * from the dashboard. The old behaviour was a toast that vanished in seconds,
- * leaving the user on a local-only fallback with no idea their real site
- * didn't load. This banner stays until they act.
+ * LoadErrorBanner (S1.5, Task 1.6) — the one primary signal that the site did
+ * not load. Everything else (the save status, the inspector's view-only line,
+ * the canvas's neutral empty state) is a quiet echo of it, and the engine's
+ * `not-loaded` lock keeps every write refused until a load lands.
  *
- *   auth     → the session expired; Sign in (→ dashboard) or Retry.
- *   network  → the dashboard didn't answer; Retry.
- *   missing  → the server says this site does not exist (deleted, a stale
- *              link, or someone else's site). "You're seeing local changes for
- *              now" is the wrong story here: there is no "for now", nothing can
- *              ever save, and Retry cannot succeed — so it is not offered.
- *              Verified live against a deleted site, where the editor showed a
- *              blank "Page 1" and invited the user to start building.
- *              The copy does NOT offer a trash: `deleteSite` soft-deletes for a
- *              purge cron, no route restores it, no screen lists it, and the
- *              delete dialog itself says "This action cannot be undone".
+ * Copy is the board's, per cause (07-recovery.md, page 3:8):
+ *   network   → B7-G02 225:2821
+ *   auth      → B7-G04 225:3888
+ *   missing   → B7-G22 227:9531. The server keeps a deleted site restorable
+ *               (`sites.restore`, Recently deleted for 30 days), so the old
+ *               "there is no trash to restore from" text was wrong.
+ *   forbidden → B7-G18 227:7411 (the closest board; warning tone)
+ *   offline   → no board words a load-time offline; the plan's fallback.
  *
- * Retry is a full reload (re-runs the load fresh) — honest and side-effect-free.
+ * Retry re-runs the load in place when the load path has published a retry
+ * (`siteLoadStatus`): 1 s, 2 s, 4 s apart, at most three times, after which
+ * the only honest actions are a page reload and the dashboard. With no
+ * published retry it falls back to `onRetry` (a page reload).
  *
- * Board 297:2139 (`state-banner`, 297:2243) is the visual contract: the ERROR
- * tint, not the warning one — a site that did not load is a failure, and the
- * amber pill in the topbar already means "unsaved". One type size (14 medium)
- * in `--bk-error-text` across the whole line, 20/12 insets, radius 8, and a
- * plain bordered Retry rather than a filled accent button, because the accent
- * fill is reserved for the one CTA per screen (Button 9:102's own note).
+ * Wave 3 (owner: the board wins on visuals): B7-G02 `225:2821` draws the
+ * full-bleed 40 px bar — ✕ glyph, the line, "Download local copy" and the
+ * filled Retry — and nothing else, so "Copy details" and the trailing ✕
+ * dismiss are gone (the request id still reaches the Sentry report). A
+ * retry's attempt count rides the same line. For an expired session the
+ * board's one action is Sign in; Retry stays beside it, unfilled, because
+ * nothing else re-runs the load after signing in elsewhere
+ * (`code:auth-retry-after-sign-in`).
+ *
+ * L-F (2026-10-26): the bar is the lead entry of the one global banner slot
+ * (`GlobalBannerSlot`, board G31), so the other conditions wait behind its
+ * "{n} more ⌄" instead of stacking. `LoadErrorBanner` is that composition,
+ * mounted where AquibraStudio already mounts it. The download the board pairs
+ * with each cause (G02 Download local copy, G22 Download changes, G18
+ * Download them) saves the work there is (`workSnapshot`); with none, no
+ * button. G18's "Ask an admin" opens the Permissions dialog — there is no
+ * access-request API (`authority: code:no-access-request-api`).
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 import { Button } from "@/editor/chrome-ui";
-export type LoadErrorKind = "auth" | "network" | "missing" | "forbidden" | null;
+import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
+import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
+import { useSiteLoadStatus, type SiteLoadErrorKind } from "./siteLoadStatus";
+import {
+  BANNER_ACTION as ACTION,
+  BANNER_ACTION_SECONDARY as ACTION_SECONDARY,
+  BANNER_BAR as BAR,
+  BANNER_TONE,
+  GlobalBannerSlot,
+  ToneGlyph,
+} from "./GlobalBannerSlot";
+import { BANNER_ID } from "./globalBanners";
+import { currentWork, downloadProject } from "./workSnapshot";
+import { PermissionsModal } from "./modals/PermissionsModal";
+
+export type LoadErrorKind = SiteLoadErrorKind | null;
 
 export interface LoadErrorBannerProps {
   kind: LoadErrorKind;
+  /** Fallback Retry when the load path published none: a page reload. */
   onRetry: () => void;
   onSignIn: () => void;
   onDismiss?: () => void;
 }
 
-/* `leading-[normal]`, not `leading-normal`: the second is Tailwind's 1.5,
-   which computes to 21px, and board 297:2244 says the keyword. */
-const BAR =
-  "tw:flex tw:items-center tw:gap-3 tw:px-5 tw:py-3 tw:rounded-lg " +
-  "tw:bg-[var(--bk-error-tint)] tw:text-sm tw:font-medium tw:leading-[normal] " +
-  "tw:text-[var(--bk-error-text)] tw:[font-family:var(--bk-font-ui)]";
+const COPY: Record<SiteLoadErrorKind, string> = {
+  network: "Couldn’t load this site. You can look around; editing waits until it loads.",
+  offline: "You’re offline. Your saved work is safe.",
+  auth: "Session expired — changes aren’t saving. They’re kept in this tab.",
+  missing:
+    "This site was deleted. Your unsaved changes are kept in this browser. A site owner can restore it from Recently deleted for 30 days.",
+  forbidden: "Your role changed to Viewer — editing is off. Changes that weren’t saved are kept in this browser.",
+};
 
-/** Board 297:2246 — white surface, `--bk-border-medium` hairline, error label
- *  at 13 on radius 6 with 12/6 insets. flowbite's `size="xs"` supplies h-8 and
- *  text-xs and the base supplies rounded-lg, and each of those only yields to
- *  a SAME-property utility — `h-auto` for the height, not `min-h`. */
-const ACTION =
-  "tw:h-auto tw:px-3 tw:py-1.5 tw:rounded-md tw:text-[13px] tw:leading-[normal] " +
-  "tw:text-[var(--bk-error-text)]";
+const LABEL: Record<SiteLoadErrorKind, string> = {
+  network: "Load failed",
+  offline: "Offline",
+  auth: "Session expired",
+  missing: "Site deleted",
+  forbidden: "No access",
+};
 
-const QUIET =
-  "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
+/** A retry can succeed for these; a deleted or refused site cannot. */
+const RETRYABLE: ReadonlySet<SiteLoadErrorKind> = new Set(["network", "offline", "auth"]);
 
-export const LoadErrorBanner: React.FC<LoadErrorBannerProps> = ({ kind, onRetry, onSignIn, onDismiss }) => {
-  /* Board 294:1992's "Reconnecting…" state, on the control rather than as the
-     board's full-screen takeover. Retry is a whole-page reload and said
-     nothing while it ran, so the banner read as a dead button. The takeover
-     itself is refused on purpose: the shipped load error is a banner over the
-     LIVE shell because the local changes underneath are still editable
-     (11-flows.md:34, walked 2026-08-24), and a full-screen reconnect hides the
-     work it is protecting — then offers a Cancel back to the shell it hid. */
-  const [reconnecting, setReconnecting] = React.useState(false);
+const RETRY_BACKOFF_MS: readonly number[] = [1000, 2000, 4000];
+const MAX_RETRIES = RETRY_BACKOFF_MS.length;
 
-  if (!kind) return null;
+/** The board's download label per cause; causes it pairs with none get none. */
+const DOWNLOAD_LABEL: Partial<Record<SiteLoadErrorKind, string>> = {
+  network: "Download local copy",
+  missing: "Download changes",
+  forbidden: "Download them",
+};
 
-  const isAuth = kind === "auth";
-  const isMissing = kind === "missing";
-  /* A role refusal is not a blip and not a session problem. Retry can never
-     succeed and Sign in changes nothing — the same distinction useSaveCallback
-     already draws for the save path (:237-246, "Different truths, different
-     surfaces"). It shares `missing`'s shape: no Retry, dashboard instead. */
-  const isForbidden = kind === "forbidden";
-  const noRetry = isMissing || isForbidden;
-  const label = isAuth
-    ? "Session expired"
-    : isMissing
-      ? "Site not found"
-      : isForbidden
-        ? "You don't have access to this site"
-        : "Load failed";
+const LoadErrorBar: React.FC<LoadErrorBannerProps & { kind: SiteLoadErrorKind; more: React.ReactNode }> = ({
+  kind,
+  onRetry,
+  onSignIn,
+  onDismiss,
+  more,
+}) => {
+  const { retry } = useSiteLoadStatus();
+  const [permissionsOpen, setPermissionsOpen] = React.useState(false);
+  /* Board 294:1992's "Reconnecting…" state, on the control. The ref, not the
+     state, is what refuses a second click: two clicks in one frame both read
+     the old state. */
+  const [busy, setBusy] = React.useState(false);
+  const busyRef = React.useRef(false);
+  const [failedRetries, setFailedRetries] = React.useState(0);
+  const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mountedRef = React.useRef(true);
+  React.useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
+
+  const exhausted = failedRetries >= MAX_RETRIES;
+  const canRetry = RETRYABLE.has(kind) && !exhausted;
+  const showLeaveActions = !RETRYABLE.has(kind) || exhausted;
+
+  const runRetry = () => {
+    if (busyRef.current) return;
+    busyRef.current = true;
+    setBusy(true);
+    if (!retry) {
+      onRetry();
+      return;
+    }
+    timerRef.current = setTimeout(() => {
+      timerRef.current = null;
+      void retry().then((loaded) => {
+        if (!mountedRef.current) return;
+        busyRef.current = false;
+        setBusy(false);
+        if (loaded) {
+          setFailedRetries(0);
+          onDismiss?.();
+        } else {
+          setFailedRetries((n) => n + 1);
+        }
+      });
+    }, RETRY_BACKOFF_MS[Math.min(failedRetries, MAX_RETRIES - 1)]);
+  };
+
+  const reload = () => window.location.reload();
+  const downloadLabel = DOWNLOAD_LABEL[kind];
+  const work = downloadLabel ? currentWork(getSiteIdFromUrl()) : null;
+  const toDashboard = () => window.location.assign(`${DASHBOARD_URL}/dashboard`);
+
+  const tone = kind === "forbidden" ? "warning" : "error";
+  const attempts =
+    failedRetries > 0
+      ? exhausted
+        ? ` Tried ${MAX_RETRIES} times — it still didn’t load.`
+        : ` Retry ${failedRetries} of ${MAX_RETRIES} didn’t load.`
+      : "";
+
   return (
-    <div className={BAR} role="alert" aria-label={label} data-testid="load-error-banner">
-      <div className="tw:flex-1" data-testid="load-error-message">
-        {/* Board 297:2244 opens the line with a warning glyph. Decorative — the
-            banner's role and its `aria-label` already say "alert" and name the
-            failure, and a screen reader repeating "warning sign" adds nothing. */}
-        <span aria-hidden="true">⚠&nbsp;&nbsp;</span>
-        {isAuth
-          ? "Session expired. Sign in to load this site — anything done here is not saved until it loads."
-          : isMissing
-            ? "This site isn't there anymore. It was deleted, or it isn't yours to open. Deleting is permanent — there is no trash to restore from — so nothing you do here can be saved."
-            : isForbidden
-              ? "Your role changed, or the site isn't yours to open. Ask the owner — signing in again won't change it, and nothing you do here can be saved."
-              : "Couldn't load this site. Retry — anything done here is not saved until it loads."}
-      </div>
-      <div className="tw:flex tw:items-center tw:gap-2">
-        {onDismiss && <Button color="light" size="xs" onClick={onDismiss} className={QUIET}>Dismiss</Button>}
-        {isAuth && <Button color="light" size="xs" onClick={onSignIn} className={ACTION}>Sign in</Button>}
-        {noRetry ? (
-          <Button color="light" size="xs" onClick={onSignIn} className={ACTION}>Go to dashboard</Button>
-        ) : (
+    <div
+      className={`${BAR} ${BANNER_TONE[tone]}`}
+      role="alert"
+      aria-label={LABEL[kind]}
+      data-testid="load-error-banner"
+      data-kind={kind}
+    >
+      <ToneGlyph tone={tone} />
+      <span className="tw:min-w-0 tw:flex-1 tw:truncate" data-testid="load-error-message" title={COPY[kind] + attempts}>
+        {COPY[kind]}
+        {attempts ? <span data-testid="load-error-attempts">{attempts}</span> : null}
+      </span>
+      <div className="tw:flex tw:flex-none tw:items-center tw:gap-2.5">
+        {work && downloadLabel ? (
           <Button
             color="light"
             size="xs"
-            disabled={reconnecting}
-            aria-busy={reconnecting}
-            /* Button 9:102: a disabled control names the reason. Here the
-               reason is the label. */
-            title={reconnecting ? "Reaching the server — this usually takes a moment." : undefined}
-            onClick={() => { setReconnecting(true); onRetry(); }}
-            className={ACTION}
+            onClick={() => downloadProject(work, "local-copy")}
+            className={ACTION_SECONDARY}
+            data-testid="load-error-download"
+          >
+            {downloadLabel}
+          </Button>
+        ) : null}
+        {kind === "forbidden" ? (
+          <Button
+            color="light"
+            size="xs"
+            onClick={() => setPermissionsOpen(true)}
+            className={ACTION_SECONDARY}
+            data-testid="load-error-ask-admin"
+          >
+            Ask an admin
+          </Button>
+        ) : null}
+        {failedRetries > 0 ? (
+          <Button color="light" size="xs" onClick={reload} className={ACTION_SECONDARY} data-testid="load-error-reload">
+            Reload page
+          </Button>
+        ) : null}
+        {showLeaveActions ? (
+          <Button color="light" size="xs" onClick={toDashboard} className={ACTION_SECONDARY} data-testid="load-error-dashboard">
+            {kind === "missing" ? "Go to dashboard ↗" : "Back to dashboard"}
+          </Button>
+        ) : null}
+        {canRetry ? (
+          <Button
+            color={kind === "auth" ? "light" : undefined}
+            size="xs"
+            disabled={busy}
+            aria-busy={busy}
+            /* Button 9:102: a disabled control names the reason. */
+            title={busy ? "Reaching the server — this usually takes a moment." : undefined}
+            onClick={runRetry}
+            className={kind === "auth" ? ACTION_SECONDARY : ACTION}
             data-testid="load-error-retry"
           >
-            {reconnecting ? "Reconnecting…" : "Retry"}
+            {busy ? "Reconnecting…" : "Retry"}
           </Button>
-        )}
+        ) : null}
+        {kind === "auth" ? (
+          <Button size="xs" onClick={onSignIn} className={ACTION}>
+            Sign in ↗
+          </Button>
+        ) : null}
+        {more}
       </div>
+      {kind === "forbidden" ? (
+        <PermissionsModal open={permissionsOpen} role="VIEWER" onClose={() => setPermissionsOpen(false)} />
+      ) : null}
     </div>
   );
 };
+
+/** The global banner slot, led by the load failure when there is one. */
+export const LoadErrorBanner: React.FC<LoadErrorBannerProps> = ({ kind, ...props }) => (
+  <GlobalBannerSlot
+    lead={
+      kind
+        ? {
+            id: kind === "offline" ? BANNER_ID.offline : `load-${kind}`,
+            render: (more) => <LoadErrorBar kind={kind} {...props} more={more} />,
+          }
+        : null
+    }
+  />
+);
 
 export default LoadErrorBanner;

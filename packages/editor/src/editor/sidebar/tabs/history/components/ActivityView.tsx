@@ -5,6 +5,15 @@
  *   4418:73791: "label · author" left, the time in mono right (a restore)
  *   diff-preview with diff-item rows (operation icon + property + change-type badge)
  *
+ * 2L9 B7-H01 `230:12999` / H02 `230:13557` (L-F W2): two lines per row — the
+ * step, then "time · you" — and "Restore to here" on the row the pointer or
+ * j/k is on (it was the timestamp, a control that did not look like one). The
+ * confirm names the step. The board's "verb · target · place" needs the target
+ * and page on each history entry, which the engine does not record
+ * (`authority: code:history-entry-no-target`); the board's "You can still undo
+ * the restore" is not said — `restoreEntry` truncates the stack for good
+ * (`code:restore-truncates`, also why H03's "Restored to …" row is absent).
+ *
  * @license BSD-3-Clause
  */
 
@@ -18,18 +27,36 @@ import { collapseIdenticalChanges, type CollapsedChange } from "../helpers";
 import type { ActivityViewProps } from "../types";
 import type { HistoryDisplayEntry } from "@/engine/historyTypes";
 import { formatChord } from "@/editor/canvas/controls/keyboardSheetRows";
+import {
+  getHistorySessionMarkers,
+  subscribeHistorySessionMarkers,
+  type HistorySessionMarker,
+} from "@/shared/utils/historySessionMarkers";
 
 /** "⌘Z" on a Mac, "Ctrl+Z" elsewhere — the spelling the palette uses. */
 const undoChord = () =>
   formatChord("Ctrl+Z", typeof navigator !== "undefined" && /Mac|iPod|iPhone|iPad/.test(navigator.platform)).replace(/([⌘⇧⌥⌃])\+/g, "$1");
 const MAX_VISIBLE_CHANGES = 5;
 
-// Row sizing constants (see spec §2.5). 44 is board 163:48's change row; the
-// rows are contiguous there, so the virtual slot IS the row and `.entry-row`
-// carries no vertical margin.
-const ROW_H_COLLAPSED = 44;
+// Row sizing constants. 50 is 2L9 H01's step pitch (8 + 18 + 16 + 8); the rows
+// are contiguous, so the virtual slot IS the row and `.entry-row` carries no
+// vertical margin. The row the pointer or j/k is on grows by its Restore
+// button (28 + 8 gap).
+const ROW_H_COLLAPSED = 50;
+const ROW_H_RESTORE = 36;
 const ROW_H_CHANGE = 24;
 const ROW_H_SHOW_ALL_BTN = 32;
+/* 2L9 H01: "— Opened Home —" sits 30 above its first step; the keys hint
+   follows the list rather than pinning to the panel's foot. */
+const ROW_H_MARKER = 30;
+const KEYS_HINT_H = 32;
+
+/** A Session list slot: a step, or one of the session markers between them. */
+type SessionItem =
+  | { kind: "entry"; entry: HistoryDisplayEntry; entryIndex: number }
+  | { kind: "marker"; key: string; text: string };
+
+const NO_MARKERS: readonly HistorySessionMarker[] = [];
 
 const OP_ICON: Record<string, string> = {
   add: "+",
@@ -43,23 +70,17 @@ const CANVAS_ID = "editor-canvas";
 const CROSSFADE_MS = 300;
 
 
+const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
+
 function formatTime(ts: number): string {
   return new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
 
 // Inline style objects hoisted so RowRenderer stays compact + stable identity.
-const STYLE_TIME_BTN: React.CSSProperties = {
-  background: "transparent",
-  border: "none",
-  padding: 0,
-  margin: 0,
-  font: "inherit",
-  color: "inherit",
-  cursor: "pointer",
-  display: "inline-flex",
-  alignItems: "center",
-};
+/* "Restore to here" sits under the time line of the hovered or j/k row
+   (2L9 H01). */
+const RESTORE_BTN = "tw:mt-2 tw:h-7 tw:min-h-0 tw:px-4 tw:text-[13px] tw:font-normal";
 
 const STYLE_DIFF_COUNT: React.CSSProperties = {
   marginLeft: 6,
@@ -124,6 +145,51 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
      the row index. */
   const allEntries = filteredHistory;
 
+  /* 2L9 H01: a page open heads the steps made on it ("— Opened Home —"), and
+     a clear closes the list ("— Undo history cleared 09:58 —"). Both come
+     from the session log (historySessionMarkers), never inferred. A search
+     shows matching steps only. */
+  const markers = React.useSyncExternalStore(
+    React.useCallback(
+      (cb: () => void) => (composer ? subscribeHistorySessionMarkers(composer, cb) : () => undefined),
+      [composer]
+    ),
+    () => (composer ? getHistorySessionMarkers(composer) : NO_MARKERS)
+  );
+  const items = React.useMemo<SessionItem[]>(() => {
+    const steps: SessionItem[] = allEntries.map((entry, entryIndex) => ({ kind: "entry", entry, entryIndex }));
+    if (searchQuery.trim() || allEntries.length === 0) return steps;
+    const pages = markers.filter((m): m is Extract<HistorySessionMarker, { kind: "page" }> => m.kind === "page");
+    const header = (i: number): SessionItem => ({
+      kind: "marker",
+      key: `page-${i}`,
+      text: `Opened ${composer?.elements?.getPage?.(pages[i].pageId)?.name ?? pages[i].pageName}`,
+    });
+    const groupOf = (ts: number) => {
+      for (let i = pages.length - 1; i >= 0; i--) if (pages[i].at <= ts) return i;
+      return -1;
+    };
+    const out: SessionItem[] = [];
+    let group: number | null = null;
+    for (const step of steps) {
+      if (step.kind !== "entry") continue;
+      const g = groupOf(step.entry.timestamp);
+      if (g !== group && g >= 0) out.push(header(g));
+      group = g;
+      out.push(step);
+    }
+    /* The page open now, with no step on it yet, still heads the list. */
+    if (pages.length && groupOf(allEntries[0].timestamp) !== pages.length - 1) out.unshift(header(pages.length - 1));
+    const cleared = markers.find((m) => m.kind === "cleared");
+    if (cleared) out.push({ kind: "marker", key: "cleared", text: `Undo history cleared ${formatTime(cleared.at)}` });
+    return out;
+  }, [allEntries, markers, searchQuery, composer]);
+  const itemIndexOfEntry = React.useMemo(() => {
+    const map = new Map<number, number>();
+    items.forEach((item, i) => item.kind === "entry" && map.set(item.entryIndex, i));
+    return map;
+  }, [items]);
+
   // Per-entry collapsed change groups. Memoized so expand toggles don't recompute.
   const collapsedByEntry = React.useMemo(() => {
     const map = new Map<string, CollapsedChange[]>();
@@ -152,10 +218,13 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
   // F1 — Row sizing based on kind + expansion state + show-all state.
   const getItemSize = React.useCallback(
     (index: number): number => {
-      const entry = allEntries[index];
+      const item = items[index];
+      if (item?.kind === "marker") return ROW_H_MARKER;
+      const entry = item?.entry;
       if (!entry) return ROW_H_COLLAPSED;
+      const base = ROW_H_COLLAPSED + (item.entryIndex === focusedIndex ? ROW_H_RESTORE : 0);
       if (expandedGroupId !== entry.id || entry.changes.length === 0) {
-        return ROW_H_COLLAPSED;
+        return base;
       }
       const collapsed = collapsedByEntry.get(entry.id) ?? [];
       const showAll = showAllIds.has(entry.id);
@@ -165,19 +234,19 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
       const hasMore = collapsed.length > MAX_VISIBLE_CHANGES;
       const diffPad = 10;
       return (
-        ROW_H_COLLAPSED +
+        base +
         diffPad +
         visibleCount * ROW_H_CHANGE +
         (hasMore ? ROW_H_SHOW_ALL_BTN : 0)
       );
     },
-    [allEntries, expandedGroupId, showAllIds, collapsedByEntry]
+    [items, expandedGroupId, showAllIds, collapsedByEntry, focusedIndex]
   );
 
   // Reset virtual-list size caches whenever any row's size might have changed.
   React.useEffect(() => {
     listRef.current?.resetAfterIndex(0, true);
-  }, [allEntries, expandedGroupId, showAllIds, collapsedByEntry]);
+  }, [items, expandedGroupId, showAllIds, collapsedByEntry, focusedIndex]);
 
   /* F1 — Measure the scroll host, via a CALLBACK ref rather than a mount-time
      effect. The effect ran once, on mount, when this component was still
@@ -262,8 +331,8 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
   // Scroll focused entry into view via react-window's scrollToItem.
   React.useEffect(() => {
     if (!listRef.current || focusedIndex < 0) return;
-    listRef.current.scrollToItem(focusedIndex, "smart");
-  }, [focusedIndex, allEntries]);
+    listRef.current.scrollToItem(itemIndexOfEntry.get(focusedIndex) ?? focusedIndex, "smart");
+  }, [focusedIndex, itemIndexOfEntry]);
 
   // F4 — Timestamp click = smooth restore with opacity crossfade.
   const cancelPendingRestore = React.useCallback(() => {
@@ -349,31 +418,26 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
     const { discarded } = pendingRestore;
     const losses: string[] = [];
     if (discarded > 0) {
-      losses.push(`${discarded} later change${discarded === 1 ? "" : "s"}`);
+      losses.push(`the ${discarded} later step${discarded === 1 ? "" : "s"}`);
     }
     if (canRedo) losses.push("everything you can currently redo");
     const unsaved = losses.length > 0 && composer?.isDirty() === true;
+    const plural = losses.length > 1 || discarded > 1;
 
     return (
       <ConfirmDialog
         open
         tone="destructive"
-        title={`Restore to ${pendingRestore.time}?`}
+        title={`Restore to “${pendingRestore.label}”?`}
         message={
           <>
-            This rewinds the project to <strong>{pendingRestore.label}</strong> at{" "}
-            {pendingRestore.time}.{" "}
             {losses.length > 0
-              ? `It permanently discards ${losses.join(" and ")}.`
-              : "Nothing later is discarded."}
+              ? `${capitalize(losses.join(" and "))} ${plural ? "are" : "is"} removed from this session. This can’t be undone.`
+              : "Nothing later is removed."}
             {unsaved ? " Some of that work has not been saved yet." : ""}
           </>
         }
-        confirmLabel={
-          discarded > 0
-            ? `Restore, discard ${discarded} change${discarded === 1 ? "" : "s"}`
-            : `Restore to ${pendingRestore.time}`
-        }
+        confirmLabel="Restore to here"
         onClose={() => setPendingRestoreId(null)}
         onConfirm={() => {
           setPendingRestoreId(null);
@@ -394,9 +458,21 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
   // F1 — Row renderer handed to VariableSizeList.
   const RowRenderer = React.useCallback(
     ({ index, style }: { index: number; style: React.CSSProperties }) => {
-      const entry = allEntries[index];
-      if (!entry) return null;
-      const globalIndex = index;
+      const item = items[index];
+      if (!item) return null;
+      if (item.kind === "marker") {
+        return (
+          <div
+            style={style}
+            className="tw:flex tw:items-center tw:justify-center tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+            role="listitem"
+            data-testid={`history-marker-${item.key}`}
+          >
+            — {item.text} —
+          </div>
+        );
+      }
+      const { entry, entryIndex: globalIndex } = item;
       const isExpanded = expandedGroupId === entry.id;
       const hasChanges = entry.changes.length > 0;
       const isFocused = focusedIndex === globalIndex;
@@ -411,11 +487,11 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
          every entry with the signed-in user — so a stamped entry is always the
          viewer's own. `userId` is an account id (a cuid), never a name: it was
          drawn as its first letter in a chip, i.e. a meaningless "C". Board
-         4418:73791's "label · author" reads "· You" here. */
-      const author = entry.userId?.trim() ? "You" : null;
+         2L9 H01's meta line reads "10:42 · you". */
+      const author = entry.userId?.trim() ? "you" : null;
 
       const rowClass = [
-        "entry-row",
+        "entry-row tw:group",
         isFocused && "focused",
         isExpanded && "expanded",
       ]
@@ -438,45 +514,49 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
             aria-label={entryAriaLabel}
             onClick={() => hasChanges && toggleExpand(entry.id)}
             onMouseEnter={() => setFocusedIndex(globalIndex)}
+            onFocus={() => setFocusedIndex(globalIndex)}
           >
             <div className="entry-row-main">
               <div className="entry-label" data-testid={`history-change-label-${globalIndex}`}>
-                {author ? `${entry.label} · ${author}` : entry.label}
+                {entry.label}
               </div>
-              {readOnly ? (
-                <Tooltip content="Viewers can't restore — ask an editor" placement="top" arrow={false}>
-                  <Button
-                    type="button"
-                    className="entry-time-btn tw:h-4 tw:min-h-0"
-                    aria-disabled="true"
-                    onClick={(e) => e.stopPropagation()}
-                    aria-label={`Restore the project to ${timeLabel}`}
-                    style={STYLE_TIME_BTN}
-                  >
-                    <span className="entry-time" data-testid={`history-change-time-${globalIndex}`}>
-                      {timeLabel}
-                    </span>
-                  </Button>
-                </Tooltip>
-              ) : (
-              <Button
-                type="button"
-                /* flowbite's Button is 40 tall and a plain class cannot
-                   reach it — only a same-property `tw:` utility survives
-                   twMerge (CLAUDE.md §Chrome). */
-                className="entry-time-btn tw:h-4 tw:min-h-0"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  requestRestore(entry.id);
-                }}
-                aria-label={`Restore the project to ${timeLabel}`}
-                title={`Restore the project to ${timeLabel} — discards every later change`}
-                style={STYLE_TIME_BTN}
-              >
+              <div className="entry-meta tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
                 <span className="entry-time" data-testid={`history-change-time-${globalIndex}`}>
                   {timeLabel}
                 </span>
-              </Button>
+                {author ? ` · ${author}` : null}
+              </div>
+              {!isFocused ? null : readOnly ? (
+                <Tooltip content="Viewers can't restore — ask an editor" placement="top" arrow={false}>
+                  <Button
+                    type="button"
+                    color="light"
+                    size="xs"
+                    className={`entry-restore-btn ${RESTORE_BTN}`}
+                    aria-disabled="true"
+                    onClick={(e) => e.stopPropagation()}
+                    data-testid={`history-change-restore-${globalIndex}`}
+                  >
+                    Restore to here
+                  </Button>
+                </Tooltip>
+              ) : (
+                <Button
+                  type="button"
+                  color="light"
+                  size="xs"
+                  /* flowbite's Button is 40 tall; only a same-property
+                     `tw:` utility survives twMerge (CLAUDE.md §Chrome). */
+                  className={`entry-restore-btn ${RESTORE_BTN}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    requestRestore(entry.id);
+                  }}
+                  title="Restore to here — removes every later step"
+                  data-testid={`history-change-restore-${globalIndex}`}
+                >
+                  Restore to here
+                </Button>
               )}
             </div>
 
@@ -531,7 +611,7 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
       );
     },
     [
-      allEntries,
+      items,
       expandedGroupId,
       focusedIndex,
       showAllIds,
@@ -608,25 +688,41 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
 
   return (
     <div className="activity-view">
-      <div
-        ref={attachScrollHost}
-        className="virtual-list"
-        role="list"
-        style={STYLE_VIRTUAL_HOST}
-      >
+      <div ref={attachScrollHost} className="virtual-list" style={STYLE_VIRTUAL_HOST}>
         {measuredHeight > 0 && (
-          <VariableSizeList
-            ref={listRef}
-            height={measuredHeight}
-            width="100%"
-            itemCount={allEntries.length}
-            itemSize={getItemSize}
-            overscanCount={5}
-            itemKey={(index: number) => allEntries[index]?.id ?? index}
-          >
-            {RowRenderer}
-          </VariableSizeList>
+          <div role="list">
+            <VariableSizeList
+              ref={listRef}
+              /* As tall as its rows, so the keys hint follows the last one
+                 (2L9 H01); the list scrolls once the rows outgrow the panel. */
+              height={Math.max(
+                0,
+                Math.min(
+                  measuredHeight - KEYS_HINT_H,
+                  items.reduce((sum, _item, i) => sum + getItemSize(i), 0)
+                )
+              )}
+              width="100%"
+              itemCount={items.length}
+              itemSize={getItemSize}
+              overscanCount={5}
+              itemKey={(index: number) => {
+                const item = items[index];
+                return item?.kind === "entry" ? item.entry.id : (item?.key ?? index);
+              }}
+            >
+              {RowRenderer}
+            </VariableSizeList>
+          </div>
         )}
+        {/* The board's last clause is "Esc closes History"; here Esc
+            collapses the open step (code:esc-collapses-row). */}
+        <p
+          className="tw:m-0 tw:px-3 tw:py-2 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+          data-testid="history-keys-hint"
+        >
+          j / k to move · Enter to expand · Esc to collapse
+        </p>
       </div>
       {renderRestoreConfirm()}
     </div>

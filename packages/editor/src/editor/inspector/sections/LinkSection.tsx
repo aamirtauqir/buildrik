@@ -21,6 +21,14 @@ import { CommitRow, NoteRow } from "./behaviourRows";
 import { CheckRow } from "../shared/controls/CheckRow";
 import { isEmail, isPhoneNumber } from "@/shared/utils/helpers/validation";
 import { writeElement } from "@/engine/commands/commandOperations";
+import { Button } from "@/editor/chrome-ui";
+import { CreateCollectionPageDialog } from "@/editor/cms/CreateCollectionPageDialog";
+import { useLinkRowCollectionPage } from "@/editor/cms/useLinkRowCollectionPage";
+import { WIDE_BUTTON } from "../shared/controls/controlClasses";
+import { RECORD_PAGE_HREF as RECORD_HREF, useCmsBinding } from "./binding/useCmsBinding";
+import { useInspectorField } from "../shared/controls/InspectorFieldContext";
+import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
+import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 
 export interface LinkSectionProps {
   selectedElement: {
@@ -39,7 +47,9 @@ export interface LinkSectionProps {
 /** "example.com", "www.example.co.uk/menu" — a host with a TLD, no scheme. */
 const BARE_DOMAIN = /^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}(:\d+)?([/?#]\S*)?$/i;
 
-type LinkType = "none" | "page" | "url" | "email" | "phone" | "anchor";
+type LinkType = "none" | "record" | "page" | "url" | "email" | "phone" | "anchor";
+
+
 
 const ErrorText: React.FC<{ message: string }> = ({ message }) => (
   <p role="alert" className="tw:m-0 tw:pb-1 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-error-text)]">
@@ -81,6 +91,23 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
   const [anchorError, setAnchorError] = React.useState(false);
 
   const isLinkable = LINKABLE_TYPES.has(selectedElement.type);
+  const { listCollection } = useCmsBinding(composer, selectedElement.id);
+  const recordPages = Boolean(listCollection?.pageSlugPattern);
+  /* B5-D88…D97: the collection page is made from here; the user stays on the Card. */
+  const pageMake = useLinkRowCollectionPage(composer, listCollection ?? null, selectedElement.id);
+  const [pageDialog, setPageDialog] = React.useState(false);
+  /* D90 (193:26952): the page is made but nothing links to it yet — the
+     select empties ("Choose link…") so choosing This record's page is a real
+     change that writes the link (D92). Left on "record", re-choosing it fired
+     no change and the Card could never be linked. */
+  const madeNotLinked = !!listCollection && pageMake.phase === "ready" && linkType !== "record";
+  React.useEffect(() => {
+    if (pageMake.phase !== "ready") return;
+    const href = composer?.elements.getElement(selectedElement.id)?.getAttribute?.("href");
+    if (href !== RECORD_HREF) setLinkType("none");
+  }, [pageMake.phase, composer, selectedElement.id]);
+  const { announce } = useInspectorField();
+  const linkName = (el: Element | null | undefined) => (el ? getLayerName(el) ?? elementTypeLabel(el.getType()) : "Element");
   /* Rel is read off the element on render; an undo / redo re-renders it. */
   const [, refresh] = React.useReducer((n: number) => n + 1, 0);
   React.useEffect(() => {
@@ -129,6 +156,8 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
     // Determine link type from href
     if (!href) {
       setLinkType("none");
+    } else if (href === RECORD_HREF) {
+      setLinkType("record");
     } else if (href.startsWith("#page:")) {
       setLinkType("page");
       setSelectedPageId(href.replace("#page:", ""));
@@ -188,7 +217,8 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
     const el = selectedElement?.id ? composer?.elements.getElement(selectedElement.id) : null;
     if (!composer || !el) return;
     const href =
-      type === "page" && selectedPageId ? `#page:${selectedPageId}`
+      type === "record" && recordPages ? RECORD_HREF
+      : type === "page" && selectedPageId ? `#page:${selectedPageId}`
       : type === "url" && /^https?:\/\//.test(externalUrl) ? externalUrl
       : type === "email" && isEmail(emailAddress) ? `mailto:${emailAddress}`
       : type === "phone" && isPhoneNumber(phoneNumber) ? `tel:${phoneNumber}`
@@ -203,6 +233,8 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
     });
     /* The UI follows the write: a locked element keeps its displayed type. */
     if (!ran) return;
+    /* B5-D92: "Card linked to its record page · Undo". */
+    if (href === RECORD_HREF) announce(`${linkName(el)} linked to its record page`);
     setLinkType(type as LinkType);
     if (noTab) setTarget("_self");
   };
@@ -269,7 +301,10 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
   if (!isLinkable) return null;
 
   const rel = composer?.elements.getElement(selectedElement.id)?.getAttribute?.("rel") || "";
-  const opensInTab = linkType === "page" || linkType === "url" || linkType === "anchor";
+  const opensInTab = madeNotLinked || linkType === "record" || linkType === "page" || linkType === "url" || linkType === "anchor";
+  /* The make's button + note: before the page exists, while it is made or its
+     link retried, and (D90) once made until the Card links to it. */
+  const showMake = madeNotLinked || (linkType === "record" && !!listCollection && (!recordPages || (pageMake.phase !== "idle" && pageMake.phase !== "ready")));
   const pageOptions = pages.map((page) => ({ value: page.id, label: page.name }));
 
   return (
@@ -280,9 +315,23 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
         label="Link to"
         value={linkType === "none" ? "" : linkType}
         onChange={(v) => handleLinkTypeChange(v || "none")}
-        options={LINK_TYPE_OPTIONS}
-        placeholder="None"
+        options={listCollection ? [{ value: "record", label: "This record\u2019s page" }, ...LINK_TYPE_OPTIONS] : LINK_TYPE_OPTIONS}
+        placeholder={madeNotLinked ? "Choose link…" : "None"}
       />
+
+      {madeNotLinked || (linkType === "record" && listCollection) ? (
+        madeNotLinked ? (
+          <NoteRow testId="link-record-note">{`${pageMake.pageName} is ready. Choose This record’s page to link each card.`}</NoteRow>
+        ) : pageMake.phase === "unlinked" || pageMake.phase === "saving" ? (
+          <NoteRow testId="link-record-note">{`Page created, link not saved. Retry keeps the existing ${pageMake.pageName} page.`}</NoteRow>
+        ) : recordPages ? (
+          <NoteRow testId="link-record-note">
+            Each {listCollection.name} {linkName(composer?.elements.getElement(selectedElement.id)).toLowerCase()} opens its own generated page.
+          </NoteRow>
+        ) : (
+          <NoteRow testId="link-record-note">{listCollection.name} has no page per record.</NoteRow>
+        )
+      ) : null}
 
       {linkType === "page" && (
         <SelectRow label="Page" value={selectedPageId} onChange={handlePageSelect} options={pageOptions} placeholder="Choose a page…" />
@@ -324,11 +373,53 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
             onChange={(on) => updateTarget(on ? "_blank" : "_self")}
             testId="link-new-tab"
           />
-          <CommitRow label="Rel" value={rel} onCommit={updateRel} placeholder="nofollow" testId="link-rel" />
+          {linkType === "record" || madeNotLinked ? null : <CommitRow label="Rel" value={rel} onCommit={updateRel} placeholder="nofollow" testId="link-rel" />}
         </>
       )}
 
-      <NoteRow testId="link-hint">Changing Link to clears the old destination</NoteRow>
+      {showMake && listCollection ? (
+        <div className="tw:flex tw:flex-col tw:gap-1 tw:pt-2">
+          {pageMake.phase === "ready" ? null : (
+            <Button
+              variant="primary"
+              size="xs"
+              className={`${WIDE_BUTTON} tw:text-white!`}
+              disabled={pageMake.phase === "creating" || pageMake.phase === "saving"}
+              data-testid="link-create-collection-page"
+              onClick={() => (pageMake.phase === "unlinked" ? void pageMake.retry() : setPageDialog(true))}
+            >
+              {pageMake.phase === "creating"
+                ? "Creating page…"
+                : pageMake.phase === "saving"
+                  ? "Saving link…"
+                  : pageMake.phase === "unlinked"
+                    ? "Retry link save"
+                    : "Create collection page"}
+            </Button>
+          )}
+          <NoteRow testId="link-create-note">
+            {pageMake.phase === "ready"
+              ? "Page ready. Choose This record page to link the Card."
+              : pageMake.phase === "unlinked"
+                ? "Page created. Retry saving its collection link."
+                : pageMake.phase === "saving"
+                  ? "Saving the collection link. Your Card stays selected."
+                  : "You’ll return to this card after creating the page."}
+          </NoteRow>
+          <CreateCollectionPageDialog
+            key={String(pageDialog)}
+            open={pageDialog}
+            collection={listCollection}
+            onCancel={() => setPageDialog(false)}
+            onCreate={(choice) => {
+              setPageDialog(false);
+              void pageMake.create(choice);
+            }}
+          />
+        </div>
+      ) : null}
+
+      {linkType === "record" || madeNotLinked ? null : <NoteRow testId="link-hint">Changing Link to clears the old destination</NoteRow>}
     </Section>
   );
 };

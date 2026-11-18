@@ -89,6 +89,9 @@ export function PanelHeaderActions({
 
 export interface PanelHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
+  /** A muted second line under the title — 2L9 B8-R01's "Fieldwork Studio ·
+   *  Round 2". Outside the heading, so the heading's name stays the title. */
+  subtitle?: string;
   actions?: React.ReactNode;
   /** Expanded = 700-wide drawer (board 16:6 expand action); announced via aria-pressed. */
   isExpanded?: boolean;
@@ -124,15 +127,19 @@ const SIZE_CLASS: Record<"drawer" | "panel" | "column", string> = {
      a 20 line — "Panel header" in 4418:100087, 4418:123573, 4418:126059,
      4418:140587… (10 boards agree). The 11px ink-soft label above was page
      1:3's, now archived. */
+  /* design-2l9 drawers (63:6393 Pages, 147:75914 Layers, 7:18981 Add —
+     measured 2026-10-27): the title sits 12 in, and nothing rules the head
+     off from the search under it. The 44 height already puts the search
+     field where the boards do (top 52 vs 50). REQUESTS A-19. */
   drawer:
-    "tw:h-11 tw:text-[length:var(--bk-text-14)] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]",
+    "tw:h-11 tw:pl-3 tw:text-[length:var(--bk-text-14)] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]",
   panel:
-    "tw:h-12 tw:text-[length:var(--bk-text-14)] tw:font-medium tw:leading-[21px] tw:text-[var(--bk-ink)]",
+    "tw:h-12 tw:pl-4 tw:border-b tw:border-[var(--bk-gray-100)] tw:text-[length:var(--bk-text-14)] tw:font-medium tw:leading-[21px] tw:text-[var(--bk-ink)]",
   column:
-    "tw:h-11 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:text-[var(--bk-ink)]",
+    "tw:h-11 tw:pl-4 tw:border-b tw:border-[var(--bk-gray-100)] tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:text-[var(--bk-ink)]",
 };
 
-export function PanelHeader({ title, actions, isExpanded, onExpandToggle, onHelpClick, onClose, closeLabel, size: sizeProp, className, ...rest }: PanelHeaderProps) {
+export function PanelHeader({ title, subtitle, actions, isExpanded, onExpandToggle, onHelpClick, onClose, closeLabel, size: sizeProp, className, ...rest }: PanelHeaderProps) {
   const hosted = React.useContext(PanelHeaderSize);
   const size = sizeProp ?? hosted;
   return (
@@ -150,7 +157,7 @@ export function PanelHeader({ title, actions, isExpanded, onExpandToggle, onHelp
         // screen on page `1:3` overrules it (founder decision D2: the screens
         // win). The tracking survives the case change deliberately: the screen
         // keeps 0.88px on Title Case text.
-        "tw:flex tw:items-center tw:gap-2 tw:py-0 tw:pl-4 tw:pr-3 tw:bg-[var(--bk-bg-panel)] tw:border-b tw:border-[var(--bk-gray-100)] " +
+        "tw:flex tw:items-center tw:gap-2 tw:py-0 tw:pr-3 tw:bg-[var(--bk-bg-panel)] " +
           "tw:[font-family:var(--bk-font-ui)] tw:flex-none",
         SIZE_CLASS[size],
         className,
@@ -166,9 +173,23 @@ export function PanelHeader({ title, actions, isExpanded, onExpandToggle, onHelp
           beside it, the heading's accessible name became "SEOSearch & social
           preview", and any action label in here would have joined it. Caught by
           SettingsTab's pending-nav test, which asserted the heading read "SEO". */}
-      <span className="tw:flex-1" role="heading" aria-level={2} data-testid="panel-header-title">
-        {title}
-      </span>
+      {subtitle ? (
+        <span className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
+          <span role="heading" aria-level={2} data-testid="panel-header-title">
+            {title}
+          </span>
+          <span
+            className="tw:truncate tw:text-[12px] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+            data-testid="panel-header-subtitle"
+          >
+            {subtitle}
+          </span>
+        </span>
+      ) : (
+        <span className="tw:flex-1" role="heading" aria-level={2} data-testid="panel-header-title">
+          {title}
+        </span>
+      )}
       <PanelHeaderActions
         label={title}
         closeLabel={closeLabel}

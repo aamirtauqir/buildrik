@@ -11,7 +11,7 @@
 
 import * as React from "react";
 import {
-  Upload, Search, AlertCircle, X, ChevronDown,
+  Search, AlertCircle, X, ChevronDown,
 } from "lucide-react";
 import type { Composer } from "@/engine/Composer";
 import { useMediaState } from "../sidebar/tabs/media/hooks/useMediaState";
@@ -36,17 +36,16 @@ import { ApplyVersionModal } from "./components/ApplyVersionModal";
 import { UrlImportError, fetchUrlAsFile } from "./fetchUrlAsFile";
 import type { ImageEditorOptions } from "../shell/hooks/useStudioModals";
 import { LIBRARY_KINDS, MEDIA_EVENTS, STORAGE_QUOTA_BYTES, getAssetTypeFromMime } from "@/shared/constants/media";
-import { useToast, Button, IconButton, Menu, MenuItem, Popover, TextInput, Tooltip } from "@/editor/chrome-ui";
+import { useToast, Button, IconButton, Menu, MenuItem, Popover, TextInput } from "@/editor/chrome-ui";
 import { useMediaWriteAccess } from "@/editor/sidebar/tabs/media/hooks/useMediaWriteAccess";
 import type { LibraryItem, VersionEntry } from "../sidebar/tabs/media/data/mediaTypes";
 import { displayNameFor } from "../sidebar/tabs/media/data/mediaUtils";
 import type { EditsSnapshot, IconConfig, MediaAsset } from "@/shared/types/media";
 import { FolderTree, type SmartFolder } from "./components/FolderTree";
 import { AssetDetailsPanel } from "./components/AssetDetailsPanel";
-import { AssetGrid } from "./components/AssetGrid";
+import { AssetGrid, assetScopeLabel } from "./components/AssetGrid";
 import { formatBytes } from "@shared/utils/helpers/number";
 import { formatQuotaSize } from "@/editor/sidebar/tabs/media/components/StorageQuotaBar";
-import { regenerateAltText } from "@/services/AltTextService";
 import { createAssetVersion } from "@/services/MediaVersionService";
 import "./LibraryManager.css";
 
@@ -110,12 +109,6 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
      lives in the grid, folder rail, details and menu components. */
   const mediaWrite = useMediaWriteAccess();
   const [uploadMenuOpen, setUploadMenuOpen] = React.useState(false);
-  const viewOnlyTip = (control: React.ReactElement) =>
-    mediaWrite.canWrite ? control : (
-      <Tooltip content={mediaWrite.reason("upload")} placement="bottom">
-        {control}
-      </Tooltip>
-    );
   const { addToast } = useToast();
   const [stockModalOpen, setStockModalOpen] = React.useState(false);
   const [selectedAssetId, setSelectedAssetId] = React.useState<string | null>(null);
@@ -717,7 +710,8 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
     return Array.from(tagSet).sort();
   }, [state.allLibraryItems]);
 
-  const storageUsedPct = Math.min(100, (state.storage.used / state.storage.total) * 100);
+  /* "‹ Back to Editor · Home" names the page the editor keeps open. */
+  const activePageName = composer.elements?.getActivePage?.()?.name ?? null;
 
   const fileDragProps = {
     onDragEnter: (e: React.DragEvent) => {
@@ -746,109 +740,10 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
 
   return (
     <div className="mgr" data-testid="mgr-root" {...fileDragProps}>
-      {/* ═══ TOP BAR ═══ */}
-      {/* Clone 3695:45155 — the top bar is title · search · actions. The MANAGE
-          tag and the folder breadcrumb the V1 board drew are gone; the scope
-          now reads in the grid's count line ("24 files · All assets") and the
-          rail highlights the folder, so the crumb said it a third time. */}
-      <div className="mgr-top" data-testid="mgr-top">
-        <h2 className="mgr-title">Asset library</h2>
-
-        {/* Board 4418:58292 "mgr-top": title · a full-width search · the dark
-            Upload split button (▾ holds Import from URL and Add from stock) ·
-            ‹ Back to canvas. */}
-        <div className="mgr-search">
-          <Search size={16} />
-          {/* Clone 3721:43697 — while a tag is the filter the field leads
-              with its token, `Tag: menu · Clear filter ×`, where the
-              placeholder was; typing after it searches within the tag. */}
-          {state.tagFilter && (
-            <span className={SEARCH_TAG_TOKEN} data-testid="mgr-search-tag-token">
-              Tag: {state.tagFilter} · Clear filter
-              <IconButton
-                size="sm"
-                label="Clear the tag filter"
-                className={SEARCH_TAG_CLEAR}
-                data-testid="mgr-search-tag-clear"
-                onClick={() => state.setTagFilter(null)}
-              >
-                <X size={12} />
-              </IconButton>
-            </span>
-          )}
-          <TextInput
-            ref={searchRef}
-            type="text"
-            placeholder={state.tagFilter ? "" : "Search all assets…"}
-            aria-label={state.tagFilter ? `Search within tag ${state.tagFilter}` : "Search all assets"}
-            data-testid="mgr-search-input"
-            value={state.librarySearch}
-            onChange={(e) => state.setLibraryQuery(e.target.value)}
-          />
-        </div>
-
-        <div className="mgr-right">
-          <div className={`mgr-upload-split${mediaWrite.canWrite ? "" : " mgr-upload-split--view-only"}`}>
-            {viewOnlyTip(
-              <Button
-                className="mgr-btn-primary"
-                data-testid="mgr-btn-upload"
-                aria-disabled={mediaWrite.canWrite ? undefined : "true"}
-                onClick={() => mediaWrite.canWrite && handleUploadClick()}
-              >
-                <Upload size={16} />
-                Upload
-              </Button>,
-            )}
-            <span className="mgr-upload-divider" aria-hidden="true" />
-            <Popover
-              open={uploadMenuOpen}
-              onClose={() => setUploadMenuOpen(false)}
-              placement="bottom-end"
-              label="More ways to add"
-              trigger={
-                <Button
-                  className="mgr-btn-primary mgr-upload-caret"
-                  data-testid="mgr-btn-upload-menu"
-                  aria-label="More ways to add"
-                  aria-haspopup="menu"
-                  aria-expanded={uploadMenuOpen}
-                  onClick={() => setUploadMenuOpen((v) => !v)}
-                >
-                  <ChevronDown size={16} />
-                </Button>
-              }
-            >
-              <Menu label="More ways to add">
-                <MenuItem
-                  data-testid="mgr-btn-import"
-                  aria-disabled={mediaWrite.canWrite ? undefined : "true"}
-                  onClick={() => {
-                    setUploadMenuOpen(false);
-                    if (!mediaWrite.canWrite) return;
-                    setImportDraft("");
-                    setImportUrlOpen(true);
-                  }}
-                >
-                  Import from URL…
-                </MenuItem>
-                <MenuItem
-                  data-testid="mgr-btn-stock"
-                  onClick={() => {
-                    setUploadMenuOpen(false);
-                    setStockModalOpen(true);
-                  }}
-                >
-                  Add from stock…
-                </MenuItem>
-              </Menu>
-            </Popover>
-          </div>
-          <Button className="mgr-close" data-testid="mgr-btn-close" onClick={onClose}>
-            ‹ Back to canvas
-          </Button>
-        </div>
-      </div>
+      {/* 2L9 B6-A01 (199:37199): no full-width top bar. The rail heads itself
+          "Assets"; the grid column opens with "‹ Back to Editor · {page}" and
+          the scope as its title, then the search and the blue "Upload ▾"
+          (Upload files · From URL · Stock photos & videos). */}
       {/* ═══ BODY ═══ */}
       <div className="mgr-body" data-testid="mgr-body">
         {/* ─── LEFT: Folder tree ─── */}
@@ -860,6 +755,11 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
             the current scope, and the tree renders children under their
             parent, so a folder made inside "Products" had no row at all
             until now: the tree never received it. */}
+        <div className="mgr-navcol" data-testid="mgr-navcol">
+        <div className="mgr-navhead">
+          <h2 className="mgr-title">Assets</h2>
+          <p className="mgr-navsub">Your uploads for this site</p>
+        </div>
         <FolderTree
           folders={state.allFolders}
           currentFolderId={state.currentFolderId}
@@ -893,12 +793,108 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
           onMoveAssetToFolder={handleDropOnFolder}
           assetDragActive={assetDrag !== null}
         />
+        </div>
 
         {/* ─── MIDDLE: Asset grid ─── */}
         {/* D5 Stage 3 (audit-remediation 2026-05-08): MIDDLE panel +
             viewMode + sortMenuOpen + bulkMovePickerOpen all live in
             ./components/AssetGrid.tsx now. Virtualization deferred —
             see comment in AssetGrid.tsx for the full reasoning. */}
+        <div className="mgr-center" data-testid="mgr-top">
+        <div className="mgr-pagehead">
+          <Button variant="link" className="mgr-close" data-testid="mgr-btn-close" onClick={onClose}>
+            ‹ Back to Editor{activePageName ? ` · ${activePageName}` : ""}
+          </Button>
+          <h3 className="mgr-scope" data-testid="mgr-scope-title">
+            {assetScopeLabel(smartFolder, state.currentFolderId, state.allFolders)}
+          </h3>
+        </div>
+        <div className="mgr-toolrow">
+        <div className="mgr-search">
+          <Search size={16} />
+          {/* Clone 3721:43697 — while a tag is the filter the field leads
+              with its token, `Tag: menu · Clear filter ×`; typing after it
+              searches within the tag. */}
+          {state.tagFilter && (
+            <span className={SEARCH_TAG_TOKEN} data-testid="mgr-search-tag-token">
+              Tag: {state.tagFilter} · Clear filter
+              <IconButton
+                size="sm"
+                label="Clear the tag filter"
+                className={SEARCH_TAG_CLEAR}
+                data-testid="mgr-search-tag-clear"
+                onClick={() => state.setTagFilter(null)}
+              >
+                <X size={12} />
+              </IconButton>
+            </span>
+          )}
+          <TextInput
+            ref={searchRef}
+            type="text"
+            placeholder={state.tagFilter ? "" : "Search assets…"}
+            aria-label={state.tagFilter ? `Search within tag ${state.tagFilter}` : "Search assets"}
+            data-testid="mgr-search-input"
+            value={state.librarySearch}
+            onChange={(e) => state.setLibraryQuery(e.target.value)}
+          />
+        </div>
+        <Popover
+          open={uploadMenuOpen}
+          onClose={() => setUploadMenuOpen(false)}
+          placement="bottom-end"
+          label="Upload"
+          trigger={
+            <Button
+              className={`mgr-upload${mediaWrite.canWrite ? "" : " mgr-upload--view-only"}`}
+              data-testid="mgr-btn-upload"
+              aria-haspopup="menu"
+              aria-expanded={uploadMenuOpen}
+              onClick={() => setUploadMenuOpen((v) => !v)}
+            >
+              Upload <ChevronDown size={14} aria-hidden="true" />
+            </Button>
+          }
+        >
+          <Menu label="Upload">
+            {/* B6-A04: the menu holds every way in. A viewer's write rows stay
+                listed, inert, with the reason — the stock browser still opens. */}
+            <MenuItem
+              data-testid="mgr-btn-upload-files"
+              aria-disabled={mediaWrite.canWrite ? undefined : "true"}
+              title={mediaWrite.reason("upload")}
+              onClick={() => {
+                setUploadMenuOpen(false);
+                if (mediaWrite.canWrite) handleUploadClick();
+              }}
+            >
+              Upload files
+            </MenuItem>
+            <MenuItem
+              data-testid="mgr-btn-import"
+              aria-disabled={mediaWrite.canWrite ? undefined : "true"}
+              title={mediaWrite.reason("upload")}
+              onClick={() => {
+                setUploadMenuOpen(false);
+                if (!mediaWrite.canWrite) return;
+                setImportDraft("");
+                setImportUrlOpen(true);
+              }}
+            >
+              From URL
+            </MenuItem>
+            <MenuItem
+              data-testid="mgr-btn-stock"
+              onClick={() => {
+                setUploadMenuOpen(false);
+                setStockModalOpen(true);
+              }}
+            >
+              Stock photos &amp; videos
+            </MenuItem>
+          </Menu>
+        </Popover>
+        </div>
         <AssetGrid
           isDragOver={isDragOver}
           onDownload={handleDownload}
@@ -918,6 +914,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
           onAssetDragEnd={() => setAssetDrag(null)}
           addToast={addToast}
         />
+        </div>
         {/* ─── RIGHT: Details rail ─── */}
         {/* D5 Stage 2 (audit-remediation 2026-05-08): RIGHT panel +
             detailTab + replaceAllPickerOpen all live in
@@ -984,8 +981,6 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
               generatedMetadata: undefined,
             });
           }}
-          // Regenerate is an explicit ask to REPLACE the current text.
-          onRegenerateAltText={(key) => regenerateAltText(composer.media, key, key)}
         />
       </div>
       {/* ═══ STATUS BAR ═══ */}
@@ -1000,27 +995,21 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
               : `Drop ${assetDrag.keys.length} files on a folder to move them · release outside to cancel`}
           </span>
         )}
-        <span><strong className="tw:text-[var(--bk-ink-soft)]">{state.counts.all}</strong> assets</span>
-        <span className="mgr-status-dot" />
-        <span>{formatQuotaSize(state.storage.used)} / {formatQuotaSize(state.storage.total)}</span>
-        <div className="mgr-status-right">
-          <div className="mgr-quota-bar" data-testid="mgr-quota-bar">
-            <div className="mgr-quota-fill" data-testid="mgr-quota-fill" style={{ width: `${storageUsedPct}%` }} />
-          </div>
-          {/* This was a hardcoded string. It is the library's only persistent
-              signal for whether assets reached the server, and it said "This
-              device only" unconditionally — so in production, where the blob
-              token is required and assets DO sync, it told every user the
-              opposite of the truth. `localOnly` is a real per-asset flag,
-              persisted to IndexedDB, and `MediaManager` already rebuilds its
-              retry queue by scanning for it. */}
-          {localOnlyCount > 0 && (
+        {/* B6-A01: "248 MB of 1 GB used", then whether everything reached the
+            server — `localOnly` is the real per-asset flag. */}
+        <span data-testid="mgr-quota">
+          {formatQuotaSize(state.storage.used)} of {formatQuotaSize(state.storage.total)} used
+        </span>
+        <span className="mgr-status-center" data-testid="mgr-sync-state">
+          {localOnlyCount > 0 ? (
             <span className="mgr-sync-pill" data-testid="mgr-sync-pill">
               <AlertCircle size={12} />
               {localOnlyCount} not on the server
             </span>
+          ) : (
+            "All assets saved"
           )}
-        </div>
+        </span>
       </div>
       {/* Hidden file input */}
       <TextInput

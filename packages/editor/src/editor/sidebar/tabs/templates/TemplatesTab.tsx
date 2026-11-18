@@ -16,9 +16,10 @@ import { getEditorPlanTier } from "@/services/BuildrikSyncProvider";
 import { X } from "lucide-react";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
+import { usePageCapacity } from "@/editor/sidebar/tabs/pages/usePageCapacity";
 import { type TemplateItem, SITE_TEMPLATES, PAGE_TEMPLATES, DEFAULT_TEMPLATE_VERSION, getMyTemplates } from "./templatesData";
 import { clearAppliedId, recordTemplateApplied, saveAppliedId } from "./templatesStorage";
-import { ReplaceModal, CreatePageConfirmModal, CreatePageSuccessModal, CreatePageErrorModal, BackupFailedModal } from "./TemplatesTabModals";
+import { ReplaceModal, CreatePageConfirmModal, CreatePageErrorModal, BackupFailedModal } from "./TemplatesTabModals";
 import { TemplatePreview } from "./TemplatePreview";
 import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
 import { roleAtLeast } from "@/services/RoleService";
@@ -31,6 +32,8 @@ import { resolveTokens } from "./utils/resolveTemplateTokens";
 import { snapshotFromComputedStyle } from "./utils/tokenSnapshot";
 import { DEFAULT_TOKENS } from "@/editor/design-system/constants";
 import { ApplyProgressOverlay, type ApplyStep } from "./ApplyProgressOverlay";
+import { RecentlyDeletedTemplates } from "./components/RecentlyDeletedTemplates";
+import { templateTrash } from "@/services/TemplateTrashService";
 import "./TemplatesTab.css";
 
 /** The sidebar lists the built-in page templates (board 4418:54134). */
@@ -70,11 +73,16 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   const newPageName = request?.newPageName;
   const addToNavigation = request?.addToNavigation;
   const replaceMode = Boolean(request?.replace);
+  /* 104:28892's "6 of 10 pages on Free": the same capacity New page reads —
+     the server's page limit and the site's real page count; nothing shown
+     while it is unknown or unlimited. */
+  const { capacity } = usePageCapacity(Boolean(newPageName) && !replaceMode);
+  const pageCount = composer?.elements.getAllPages?.().length ?? 0;
+  const capacityText =
+    capacity.state === "known" && capacity.limit !== -1 ? `${pageCount} of ${capacity.limit} pages on ${capacity.plan}` : null;
   const { addToast } = useToast();
-  const [createResult, setCreateResult] = React.useState<"success" | "error" | null>(null);
+  const [createResult, setCreateResult] = React.useState<"error" | null>(null);
   /** G2-100: the page whose backup could not be written — the Backup failed dialog is open. */
-  /** The page the create flow just made — the Page created modal names it. */
-  const [createdPageName, setCreatedPageName] = React.useState<string | null>(null);
   const [backupFailedPage, setBackupFailedPage] = React.useState<string | null>(null);
 
 
@@ -134,6 +142,8 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   /* "⟳ Reload catalogue" re-reads the saved templates (the built-ins are a
      static module). */
   const [reloadKey, setReloadKey] = React.useState(0);
+  /* B6-T24: "Recently deleted" replaces the main column until ‹ Back. */
+  const [trashOpen, setTrashOpen] = React.useState(false);
   const catalogue = React.useMemo<TemplateItem[]>(
     () => [...PAGE_TEMPLATES, ...getMyTemplates()],
     // eslint-disable-next-line react-hooks/exhaustive-deps -- reloadKey is the trigger
@@ -162,6 +172,24 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   }
 
   // ── Handlers ──
+  /* B6-T16: a saved template goes to Recently deleted (30 days), with Undo. */
+  async function deleteSaved(t: TemplateItem) {
+    const r = await templateTrash.remove(t.id);
+    setReloadKey((k) => k + 1);
+    if (!r.ok) {
+      addToast({ description: `Couldn’t delete ${t.name}. It is still saved; try again.`, tone: "warning" });
+      return;
+    }
+    addToast({
+      description: `${t.name} moved to Recently deleted`,
+      tone: "info",
+      action: {
+        label: "Undo",
+        onClick: () => void templateTrash.restore(t.id).then(() => setReloadKey((k) => k + 1)),
+      },
+    });
+  }
+
   /** Did the replace in flight take a backup? Read by the success toast. */
   const backupTakenRef = React.useRef(false);
   function handleApplyToCurrent(id: string) {
@@ -215,7 +243,10 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
     setCreateConfirmId(id);
   }
 
+  /* 106:37032: the progress card says which page is being created. */
+  const [creatingName, setCreatingName] = React.useState<string | null>(null);
   function handleAddAsNewPage(id: string) {
+    setCreatingName(newPageName ?? findTemplate(id)?.name ?? null);
     addAsNewPageRef.current = true;
     pendingId.current = id;
     startApply();
@@ -291,6 +322,9 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
       return;
     }
 
+    /* 222:47163 promises "No empty page was left behind": a page made for
+       this apply is taken back out if the import then fails. */
+    let madePage: { id: string; name: string; previousId: string | null } | null = null;
     try {
       // 1 — tokens
       setApplyStepIndex(0);
@@ -315,7 +349,9 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
            page replaced the page they were on, and left the new one empty.
            Walked live — Page 1 held "SaaS Landing", "Add as new page" with
            Portfolio, and Page 1 came back as Portfolio. */
+        const previousId = composer.elements.getActivePage()?.id ?? null;
         const created = composer.elements.createPage(newPageName ?? t.name);
+        madePage = { id: created.id, name: created.name, previousId };
         if (addToNavigation) composer.elements.addPageToNavigation(created.id);
         composer.elements.setActivePage?.(created.id);
       }
@@ -330,6 +366,15 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
       await paint();
       await paint();
     } catch (err) {
+      if (madePage) {
+        const { id, previousId } = madePage;
+        /* The nav links "Add to navigation" gave it point at nothing now. */
+        for (const el of composer.elements.getAllElements()) {
+          if (el.getAttribute("href") === `#page:${id}`) composer.elements.removeElement(el.getId());
+        }
+        composer.elements.deletePage(id);
+        if (previousId) composer.elements.setActivePage?.(previousId);
+      }
       const msg = err instanceof Error ? err.message : "Failed to apply";
       setCanRetry(true);
       setApplyError(msg);
@@ -352,12 +397,10 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
 
     // P2 fix (codex A6): success modal now fires AFTER actual page creation +
     // HTML import, not on confirm-click. Renders only in newPage flow.
-    if (wasNewPageMode) {
-      /* Named now: pendingId is cleared just below, and the modal read the
-         template name from it on the next render — "‘Template’ is ready". */
-      setCreatedPageName(composer?.elements.getActivePage()?.name ?? t.name);
-      setCreateResult("success");
-    }
+    /* design-2l9 106:37579: a created page lands in the editor with a
+       receipt — "Services created from SaaS Landing · Page settings" — not a
+       dialog over the Templates view. Named now: the active page IS it. */
+    const createdName = wasNewPageMode ? madePage?.name ?? newPageName ?? t.name : null;
 
     pendingId.current = null;
     addAsNewPageRef.current = false;
@@ -372,7 +415,22 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
          auto-version went (#25). The board's second action, View backup,
          needs a two-action toast chrome-ui does not have. */
       const replacedName = composer?.elements.getActivePage()?.name;
-      if (!wasNewPageMode && replacedName) {
+      if (createdName) {
+        addToast({
+          description: `${createdName} created from ${t.name}`,
+          tone: "success",
+          action: {
+            label: "Page settings",
+            onClick: () => {
+              /* Page settings is local state inside PagesTab, so the ask
+                 goes through the composer (UI_PAGES_OPEN_SETTINGS). */
+              const active = composer?.elements.getActivePage?.();
+              onSwitchTab?.("pages");
+              if (active) composer?.emit(EVENTS.UI_PAGES_OPEN_SETTINGS, { pageId: active.id });
+            },
+          },
+        });
+      } else if (!wasNewPageMode && replacedName) {
         addToast({
           tone: "success",
           title: `${replacedName} replaced`,
@@ -396,10 +454,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           version: t.version ?? DEFAULT_TEMPLATE_VERSION,
         });
       }
-      /* A new page ends on "Page created" (1169:4725), whose Done / Open page
-         settings leave the view. Leaving here too unmounted the view — and
-         that dialog with it — before it was ever seen (walked live). */
-      if (!wasNewPageMode) onTemplateUsed?.();
+      onTemplateUsed?.();
     });
     setApplyStepIndex(APPLY_STEPS.length);
     await paint();
@@ -411,6 +466,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   React.useEffect(() => {
     if (!showProgress) {
       applyRunningRef.current = false;
+      setCreatingName(null);
       return;
     }
     if (applyRunningRef.current) return;
@@ -445,6 +501,12 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   const pageLabel = activePageInfo?.name ?? "this page";
   /* Replace mode's Cancel (4428:149355 → Build · Manage pages). */
   const backToPages = () => onSwitchTab?.("pages");
+  /* 104:28892: back to the New page dialog with what it had — the catalogue
+     closes and the dialog reopens on From template. */
+  const backToNewPage = () => {
+    onClose?.();
+    composer?.emit(EVENTS.UI_NEW_PAGE_REQUESTED, { name: newPageName, addToNavigation });
+  };
 
   return (
     <div className="tpl-ws" data-testid="tpl-workspace">
@@ -456,9 +518,9 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           color="light"
           className="tpl-ws-back"
           data-testid="tpl-ws-back"
-          onClick={previewTemplate ? () => sel.setPreviewId(null) : replaceMode ? backToPages : onClose}
+          onClick={previewTemplate ? () => sel.setPreviewId(null) : replaceMode ? backToPages : newPageName ? backToNewPage : onClose}
         >
-          {previewTemplate ? "‹ Back to templates" : replaceMode ? "‹ Back to Pages" : "‹ Back to canvas"}
+          {previewTemplate ? "‹ Back to templates" : replaceMode ? "‹ Back to Pages" : newPageName ? "‹ Back to New page" : "‹ Back to canvas"}
         </Button>
         <div className="tpl-ws-title">Templates</div>
         {siteName && <div className="tpl-ws-site">{siteName}</div>}
@@ -491,9 +553,27 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
         <Button variant="link" className="tpl-ws-reload" data-testid="tpl-ws-reload" onClick={() => setReloadKey((k) => k + 1)}>
           ⟳&nbsp;&nbsp;Reload catalogue
         </Button>
+        <Button
+          variant="link"
+          className="tpl-ws-reload"
+          data-testid="tpl-ws-trash"
+          onClick={() => {
+            sel.setPreviewId(null);
+            setTrashOpen(true);
+          }}
+        >
+          Recently deleted
+        </Button>
       </aside>
       <div className="tpl-shell tpl-ws-main">
-      {previewTemplate ? (
+      {trashOpen ? (
+        <RecentlyDeletedTemplates
+          onBack={() => setTrashOpen(false)}
+          onRestored={() => setReloadKey((k) => k + 1)}
+          /* Permanent delete is ADMIN, the same bar as applying a template. */
+          canPurge={canApplyTemplate}
+        />
+      ) : previewTemplate ? (
         /* Board 4418:53202 — the preview lives in the view, not in a modal. */
         <TemplatePreview
           template={previewTemplate}
@@ -502,6 +582,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           onReplacePage={(t) => handleApplyToCurrent(t.id)}
           onBack={() => sel.setPreviewId(null)}
           dialogOpen={Boolean(createConfirmId) || sel.showReplace}
+          creating={Boolean(newPageName) && !replaceMode}
           usedOn={(usageMap.get(previewTemplate.id) ?? []).map((u) => ({ id: u.pageId, name: u.pageName }))}
           onOpenPage={(pageId) => {
             composer?.elements.setActivePage?.(pageId);
@@ -518,6 +599,23 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
             {replaceMode ? `Pick a layout for ${pageLabel}.` : `Preview a template, then create a page or replace ${pageLabel}.`}{" "}
             Templates saved from a page keep the styles captured with them.
           </p>
+          {newPageName && !replaceMode && (
+            /* design-2l9 104:28892: the page this visit is creating, from the
+               New page dialog, with Change back to it. */
+            <div className="tw:mb-3 tw:flex tw:items-center tw:gap-3 tw:rounded-md tw:bg-[var(--bk-accent-tint)] tw:px-3 tw:py-2.5" data-testid="tpl-creating-banner" role="status">
+              <span className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
+                <span className="tw:text-[13px] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)]">{`Creating “${newPageName}”`}</span>
+                <span className="tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+                  {[addToNavigation === false ? "Not added to site navigation" : "Add to site navigation", capacityText]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </span>
+              </span>
+              <Button variant="link" data-testid="tpl-creating-change" onClick={backToNewPage}>
+                Change
+              </Button>
+            </div>
+          )}
           {replaceMode && (
             /* 4428:149355: what this visit is for, with its way out. */
             <div className="tpl-replace-banner" data-testid="tpl-replace-banner" role="status">
@@ -537,6 +635,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
                 onClick={(id) => sel.setPreviewId(id)}
                 useLabel={replaceMode ? `Use for ${pageLabel}` : undefined}
                 onUse={replaceMode ? handleApplyToCurrent : undefined}
+                onDelete={tpl.category === "my-templates" ? () => void deleteSaved(tpl) : undefined}
               />
             ))}
           </div>
@@ -599,6 +698,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           <CreatePageConfirmModal
             templateName={t.name}
             newPageName={newPageName ?? t.name}
+            addToNavigation={Boolean(newPageName) && addToNavigation !== false}
             onCancel={() => setCreateConfirmId(null)}
             onConfirm={() => {
               setCreateConfirmId(null);
@@ -607,23 +707,6 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           />
         );
       })()}
-      {createResult === "success" && (
-        <CreatePageSuccessModal
-          pageName={createdPageName ?? tName}
-          onClose={() => { setCreateResult(null); onTemplateUsed?.(); }}
-          onOpenPageSettings={() => {
-            setCreateResult(null);
-            onSwitchTab?.("pages");
-            /* Page settings is local state inside PagesTab, so the ask goes
-               through the composer (UI_PAGES_OPEN_SETTINGS). Without this the
-               button opened the Pages list and left the user to find the
-               page they had just made. */
-            const active = composer?.elements.getActivePage?.();
-            if (active) composer?.emit(EVENTS.UI_PAGES_OPEN_SETTINGS, { pageId: active.id });
-            onTemplateUsed?.();
-          }}
-        />
-      )}
       {createResult === "error" && (
         <CreatePageErrorModal
           reason={applyError ?? undefined}
@@ -634,6 +717,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
       {showProgress && (
         <ApplyProgressOverlay
           templateName={tName}
+          creating={creatingName ?? undefined}
           steps={applySteps}
           onCancel={
             applyCancellable

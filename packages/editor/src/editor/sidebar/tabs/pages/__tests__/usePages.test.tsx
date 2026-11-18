@@ -239,12 +239,13 @@ describe("usePages commitRename", () => {
   });
 
   /* v3 4418:94200: a Keep-URL rename reports the kept URL, with Undo. */
-  it("reports “Renamed to X · URL /slug kept” with Undo on a Keep-URL rename", () => {
+  /* design-2l9 board 63:23182. Re-baseline: rename receipt. */
+  it("reports “X renamed · URL kept” with Undo on a Keep-URL rename", () => {
     const composer = createMockComposer({ pages: [pg("p1", "Home", { isHome: true }), pg("p2", "Menu")] });
     const { result } = setup(composer);
     act(() => result.current.commitRename("p2", "Our menu"));
     const toast = lastToast();
-    expect(toast?.description).toMatch(/^Renamed to Our menu · URL \/.+ kept$/);
+    expect(toast?.description).toBe("Our menu renamed · URL kept");
     expect(toast?.action?.label).toBe("Undo");
   });
 
@@ -359,6 +360,22 @@ describe("usePages duplicatePage", () => {
       description: "Couldn't duplicate — source page not found.",
       tone: "warning",
     });
+  });
+});
+
+/* design-2l9 board 139:50620: a bulk duplicate reports once. */
+describe("usePages duplicatePages", () => {
+  it("duplicates each and says so once — originals kept", () => {
+    const composer = createMockComposer({ pages: [pg("p1", "Home"), pg("p2", "About"), pg("p3", "Work")] });
+    const { result } = setup(composer);
+    addToastMock.mockClear();
+    act(() => result.current.duplicatePages(["p1", "p2", "p3"]));
+    expect(composer.elements.duplicatePage).toHaveBeenCalledTimes(3);
+    expect(addToastMock).toHaveBeenCalledTimes(1);
+    expect(lastToast()?.description).toBe("3 pages duplicated · Originals kept");
+    /* One transaction, and the receipt's Undo (139:50620). */
+    expect(composer.beginTransaction).toHaveBeenCalledWith("Duplicate pages");
+    expect(lastToast()?.action?.label).toBe("Undo");
   });
 });
 

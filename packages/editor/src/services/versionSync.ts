@@ -16,7 +16,7 @@
  */
 import { getBuildrikClient } from "./api-client";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
-import { getSiteIdFromUrl } from "./BuildrikSyncProvider";
+import { getSiteIdFromUrl, loadProject } from "./BuildrikSyncProvider";
 import { loadVersions, saveVersion } from "../engine/storage/VersionHistoryStorage";
 import type { NamedVersion } from "../shared/types/versions";
 import {
@@ -70,6 +70,40 @@ export async function mirrorVersionCreate(version: NamedVersion, isAuto: boolean
     // eslint-disable-next-line no-console
     (e) => console.warn("[version-sync] create mirror failed (kept locally)", e)
   );
+}
+
+/**
+ * Keep the server's newer copy as a Saves version named "Before overwrite"
+ * before this tab overwrites it (2L9 B7-G16 `225:10249`). Reads the server's
+ * current project and writes it through the existing `siteVersions.create`
+ * — no new endpoint. NOT queued like `mirrorVersionCreate`: the overwrite
+ * must wait for this to land, and a failure must stop it (B7-G17), so it
+ * throws. The local cache gets the same version so History › Saves lists it
+ * without a reload.
+ */
+export async function keepBeforeOverwrite(siteId: string): Promise<NamedVersion> {
+  const snapshot = await loadProject(siteId);
+  const version: NamedVersion = {
+    id: `before-overwrite-${Date.now().toString(36)}`,
+    name: "Before overwrite",
+    snapshot,
+    createdAt: Date.now(),
+    isAutoCheckpoint: false,
+    projectId: siteId,
+  };
+  await client().siteVersions.create.mutate({
+    siteId,
+    versionId: version.id,
+    name: version.name,
+    isAuto: false,
+    payload: version as unknown as Record<string, unknown>,
+  });
+  try {
+    await saveVersion(version);
+  } catch {
+    /* The server holds it; the cache catches up on the next hydrate. */
+  }
+  return version;
 }
 
 /** The persisted server stamp (`syncRetryQueue` C-4) for a cached version.

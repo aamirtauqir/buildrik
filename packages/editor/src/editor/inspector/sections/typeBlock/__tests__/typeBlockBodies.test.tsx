@@ -85,22 +85,26 @@ describe("layout", () => {
 });
 
 describe("Attributes", () => {
-  it("ID, title, tab index and the type's §17.H rows; a link has no Title", () => {
+  it("title, tab index and the type's §17.H rows; a form field also has its ID and Disabled here (no Semantics on a field); a link has no Title", () => {
     const el = makeMockElement({ id: "e1", type: "input" });
     const composer = makeMockComposer({ element: el });
     const { unmount } = render(
       <AttributesSection element={{ id: "e1", type: "input" }} targetIds={["e1"]} composer={composer as never} isOpen onToggle={() => {}} />
     );
-    for (const label of ["ID", "Title", "Tab index", "Read only", "Autocomplete"]) expect(screen.getByText(label)).toBeInTheDocument();
+    for (const label of ["ID", "Disabled", "Title", "Tab index", "Read only", "Autocomplete"]) expect(screen.getByText(label)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^Advanced attributes section/ })).toBeInTheDocument();
     unmount();
     render(<AttributesSection element={{ id: "e1", type: "link" }} targetIds={["e1"]} composer={composer as never} isOpen onToggle={() => {}} />);
     expect(screen.queryByText("Title")).toBeNull();
+    expect(screen.queryByText("ID")).toBeNull();
   });
 
-  it("summarises as the board does: id, then how many attributes", () => {
+  it("summarises as the 2L9 boards do: '{n} set', '0 set' included; the id, title and tab index (Semantics, A11) are not counted", () => {
     const el = makeMockElement({ id: "e1", type: "heading", attrs: { id: "hero-title", title: "Hi" } });
-    const composer = makeMockComposer({ element: el });
-    expect(attributesSummary(composer as never, { id: "e1", type: "heading" })).toBe("id: hero-title · 1 attribute");
-    expect(attributesSummary(makeMockComposer({ element: makeMockElement({ id: "e1" }) }) as never, { id: "e1", type: "heading" })).toBeNull();
+    expect(attributesSummary(makeMockComposer({ element: el }) as never, { id: "e1", type: "heading" })).toBe("0 set");
+    /* A form field draws no Semantics: its Title stays in Advanced attributes. */
+    const field = makeMockElement({ id: "e1", type: "input", attrs: { title: "Hi" } });
+    expect(attributesSummary(makeMockComposer({ element: field }) as never, { id: "e1", type: "input" })).toBe("1 set");
+    expect(attributesSummary(makeMockComposer({ element: makeMockElement({ id: "e1" }) }) as never, { id: "e1", type: "heading" })).toBe("0 set");
   });
 });

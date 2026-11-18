@@ -57,8 +57,7 @@ describe("PublishConfirmModal — it does not promise a target it has not checke
   it("says what is actually wrong instead of 'your connected Vercel project'", async () => {
     fetchPrePublishChecks.mockResolvedValue(blocked);
     mount();
-    await waitFor(() => expect(screen.getByText("No Vercel connection")).toBeInTheDocument());
-    expect(screen.queryByText("your connected Vercel project")).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText(NOT_CONNECTED)).toBeInTheDocument());
     // The sentence is the band's job — once, with room for it.
     expect(screen.getAllByText(NOT_CONNECTED)).toHaveLength(1);
   });
@@ -67,8 +66,8 @@ describe("PublishConfirmModal — it does not promise a target it has not checke
     fetchPrePublishChecks.mockResolvedValue(blocked);
     const onConfirm = vi.fn();
     mount(onConfirm);
-    await waitFor(() => expect(screen.getByText("Publish now")).toBeDisabled());
-    fireEvent.click(screen.getByText("Publish now"));
+    await waitFor(() => expect(screen.getByText("Publish")).toBeDisabled());
+    fireEvent.click(screen.getByText("Publish"));
     expect(onConfirm).not.toHaveBeenCalled();
   });
 
@@ -76,8 +75,7 @@ describe("PublishConfirmModal — it does not promise a target it has not checke
     fetchPrePublishChecks.mockResolvedValue(green);
     const onConfirm = vi.fn();
     mount(onConfirm);
-    await waitFor(() => expect(screen.getByText("your connected Vercel project")).toBeInTheDocument());
-    expect(screen.getByText("Publish now")).not.toBeDisabled();
+    await waitFor(() => expect(screen.getByText("Publish")).not.toBeDisabled());
   });
 
   it("tells the fast path about warnings the wizard would have shown", async () => {
@@ -95,9 +93,12 @@ describe("PublishConfirmModal — it does not promise a target it has not checke
       ],
     });
     mount();
-    await waitFor(() => expect(screen.getByText(/2 warnings — none block/)).toBeInTheDocument());
-    // Warnings never disable the button — that is what "none block" means.
-    expect(screen.getByText("Publish now")).not.toBeDisabled();
+    /* B8-PB04: advice does not block, but it is acknowledged — "2 Tips ·
+       I’ve seen these" — before the publish goes. */
+    await waitFor(() => expect(screen.getByText("2 advisory checks")).toBeInTheDocument());
+    expect(screen.getByText("Publish")).toBeDisabled();
+    fireEvent.click(screen.getByTestId("publish-fact-tips-seen"));
+    expect(screen.getByText("Publish")).not.toBeDisabled();
   });
 
   it("lets the blocker speak alone when it also has warnings", async () => {
@@ -110,7 +111,7 @@ describe("PublishConfirmModal — it does not promise a target it has not checke
     });
     mount();
     await waitFor(() => expect(screen.getByText(NOT_CONNECTED)).toBeInTheDocument());
-    expect(screen.queryByText(/warning.*none block/)).not.toBeInTheDocument();
+    expect(screen.getByText("Publish")).toBeDisabled();
   });
 
   /* DQ-001: a failed checks call used to collapse into "no failing checks"
@@ -121,23 +122,23 @@ describe("PublishConfirmModal — it does not promise a target it has not checke
     const onConfirm = vi.fn();
     mount(onConfirm);
     await waitFor(() => expect(screen.getByText(/Couldn't run the pre-publish checks/)).toBeInTheDocument());
-    expect(screen.getByText("Publish now")).toBeDisabled();
+    expect(screen.getByText("Publish")).toBeDisabled();
     expect(screen.queryByText("your connected Vercel project")).not.toBeInTheDocument();
-    fireEvent.click(screen.getByText("Publish now"));
+    fireEvent.click(screen.getByText("Publish"));
     expect(onConfirm).not.toHaveBeenCalled();
   });
 
   it("re-runs the checks on the next open instead of remembering the failure", async () => {
     fetchPrePublishChecks.mockRejectedValueOnce(new Error("offline")).mockResolvedValue(green);
     const view = mount();
-    await waitFor(() => expect(screen.getByText("Publish now")).toBeDisabled());
+    await waitFor(() => expect(screen.getByText("Publish")).toBeDisabled());
     view.rerender(
       <PublishConfirmModal isOpen={false} composer={null} isPublished={false} publishedUrl={null} siteId="site-1" onConfirm={vi.fn()} onClose={vi.fn()} />,
     );
     view.rerender(
       <PublishConfirmModal isOpen composer={null} isPublished={false} publishedUrl={null} siteId="site-1" onConfirm={vi.fn()} onClose={vi.fn()} />,
     );
-    await waitFor(() => expect(screen.getByText("Publish now")).not.toBeDisabled());
+    await waitFor(() => expect(screen.getByText("Publish")).not.toBeDisabled());
   });
 
   /* v3 FC-8: this door used to read only the FIRST failing check
@@ -156,6 +157,6 @@ describe("PublishConfirmModal — it does not promise a target it has not checke
     mount();
     await waitFor(() => expect(screen.getByText(NOT_CONNECTED)).toBeInTheDocument());
     expect(screen.getByText(NO_PAGES)).toBeInTheDocument();
-    expect(screen.getByText("Publish now")).toBeDisabled();
+    expect(screen.getByText("Publish")).toBeDisabled();
   });
 });

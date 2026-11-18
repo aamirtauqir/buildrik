@@ -1,11 +1,13 @@
 /**
- * Analytics — Clone 3397:32295 (`Visitors / Analytics`): Google Analytics
- * (enable · Measurement ID · Connection status · Last received data), Google
- * Tag Manager, Meta Pixel, then Microsoft Clarity below the fold. No Consent
- * card (G3-108, 4418:127827): its switch recorded a flag nothing reads — no
- * banner, no export effect — so it is hidden until wired; the stored value is
+ * Analytics — 2L9 B8-AN01…AN06 (245:45159…245:46449): one card per provider
+ * (Google Analytics, Google Tag Manager, Meta Pixel, Microsoft Clarity), each
+ * a single row — the id's label, the id, the switch labelled "Enabled".
+ * Google Analytics adds the tracker's status in words ("Not verified" /
+ * "Waiting for data" / "Receiving data") with Verify, the last received line,
+ * and "Buildrick tracker status; this does not confirm Google Analytics
+ * delivery." No Consent card (G3-108, 4418:127827): its switch recorded a
+ * flag nothing reads, so it is hidden until wired; the stored value is
  * written back unchanged on the flush.
- * Label-left rows at 32, as SEO's Indexing card draws them.
  *
  * Two sources. The ids and toggles are the composer's `projectSettings.
  * analytics`, edited here and flushed once on Save (the shell persists them).
@@ -14,20 +16,21 @@
  * §5; GA's Data API is OAuth, `blocked:external` — read on open (3953:49515
  * loading, 3953:49670 load-error) and again on Verify, which checks the id's
  * shape, stamps `verifiedAt` into the draft (flushed on the next Save — no
- * mutation of its own, phase2-backend §1) and opens Connection verified
- * (4256:26844). A malformed id shows its provider's sentence under the field
+ * mutation of its own, phase2-backend §1); the status row says what it
+ * found (B8-AN02 "Checking status…", AN03, AN04) — no dialog, the board draws
+ * none. A malformed id shows its provider's sentence under the field
  * and holds Save (3397:34148); a refused save shows the banner (3951:26455).
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { Badge, Button, ToggleSwitch } from "@/editor/chrome-ui";
+import { useOnlineStatus } from "@/shared/hooks/useOnlineStatus";
+import { Button, ToggleSwitch } from "@/editor/chrome-ui";
 import { getBuildrikClient } from "@/services/api-client";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { devError } from "@/shared/utils/devLogger";
 import { Input, LoadCard, SCREEN_FIELD_ERROR, SET_BTN, SaveErrorBanner, Screen, Section } from "../shared";
-import { ConnectionVerifiedDialog, eventsPhrase } from "../components/ConnectionVerifiedDialog";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
 import { useServerLoad } from "../hooks/useServerLoad";
 import type { ScreenProps } from "../types";
@@ -81,54 +84,71 @@ export function connectionPill(status: AnalyticsStatus | null, verifiedAt: strin
   return verifiedAt ? "NO DATA YET" : "NOT VERIFIED";
 }
 
+/** `1,284 events`. */
+function eventsPhrase(n: number): string {
+  return `${n.toLocaleString("en-GB")} ${n === 1 ? "event" : "events"}`;
+}
+
 /** The Last received data line: `2 Jul 2025, 19:38 · 1,284 events in the last 24 hours` or `No events yet`. */
 export function lastReceivedLine(status: AnalyticsStatus | null): string {
   if (!status?.lastEventAt) return "No events yet";
-  return `${formatDayTime(status.lastEventAt)} · ${eventsPhrase(status.events24h)} in the last 24 hours`;
+  const at = new Date(status.lastEventAt);
+  const today = new Date();
+  const when =
+    at.toDateString() === today.toDateString() ? `today at ${two(at.getHours())}:${two(at.getMinutes())}` : formatDayTime(at);
+  return `Last received ${when} · ${eventsPhrase(status.events24h)} in the last 24 hours`;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Row — the label-left row (3397:32295): a 144 label column against a 32
-// control, the shape SEO's Indexing card set. `stem` is the label's slug —
-// the `set-field-*` anchors the S7 probes already target, and the Search
-// landing (`set-field-<fieldId>`) for the rows that have no control of their
-// own. Inputs get a real <label>; the switches are labelled by the span's id.
+// ProviderRow — 2L9 B8-AN01 245:45159: one row per provider — the id's label
+// in a 192 column, the id (368), and the provider's switch with its state
+// word ("Enabled", 104) at the right. `stem` keeps the search
+// landing (`set-field-<stem>`); the switch keeps its `enable-…` id.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const ROW_LABEL =
-  "tw:w-48 tw:shrink-0 tw:py-1.5 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]";
+const ROW_LABEL = "tw:w-48 tw:shrink-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]";
+const INPUT_CELL = "tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:gap-1";
+const SWITCH_CELL = "tw:flex tw:w-26 tw:shrink-0 tw:items-center tw:gap-2 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]";
+const NOTE = "tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 
-const Row: React.FC<{ stem: string; label: string; htmlFor?: string; children: React.ReactNode }> = ({
-  stem,
-  label,
-  htmlFor,
-  children,
-}) => (
-  <div className="tw:col-span-full tw:flex tw:min-h-8 tw:items-start tw:gap-4" data-testid={`set-field-${stem}`}>
-    {htmlFor ? (
-      <label htmlFor={htmlFor} className={ROW_LABEL} data-testid={`set-field-label-${stem}`}>
-        {label}
-      </label>
-    ) : (
-      <span id={`${stem}-label`} className={ROW_LABEL} data-testid={`set-field-label-${stem}`}>
-        {label}
-      </span>
-    )}
-    {children}
+interface ProviderRowProps {
+  stem: string;
+  label: string;
+  inputId: string;
+  switchId: string;
+  provider: string;
+  enabled: boolean;
+  onEnabled(next: boolean): void;
+  switchTestId: string;
+  children: React.ReactNode;
+}
+
+const ProviderRow: React.FC<ProviderRowProps> = ({ stem, label, inputId, switchId, provider, enabled, onEnabled, switchTestId, children }) => (
+  <div className="tw:col-span-full tw:flex tw:min-h-8 tw:items-start tw:gap-3" data-testid={`set-field-${stem}`}>
+    <label htmlFor={inputId} className={`${ROW_LABEL} tw:py-1.5`} data-testid={`set-field-label-${stem}`}>
+      {label}
+    </label>
+    <div className={INPUT_CELL}>{children}</div>
+    <div className={`${SWITCH_CELL} tw:min-h-8`}>
+      <ToggleSwitch
+        id={switchId}
+        checked={enabled}
+        onChange={onEnabled}
+        aria-label={`Enable ${provider}`}
+        sizing="md"
+        data-testid={switchTestId}
+      />
+      {/* B8-AN01: the switch's label reads "Enabled" on or off — the switch shows the state. */}
+      <span aria-hidden>Enabled</span>
+    </div>
   </div>
 );
 
-const SWITCH_CELL = "tw:flex tw:min-h-8 tw:items-center";
-const INPUT_CELL = "tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:gap-1";
-/* The frame draws the Last received data line a shade lighter than a value — it is a reading, not an input. */
-const LINE_CELL = "tw:flex tw:min-h-8 tw:items-center tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]";
-
-const PILL =
-  "tw:rounded-[var(--bk-radius-sm)] tw:border tw:px-2 tw:py-0 tw:text-[length:var(--bk-text-11)] tw:font-medium tw:uppercase tw:leading-4 tw:tracking-[0.04em]";
-const PILL_TONE: Record<ConnectionPill, string> = {
-  "RECEIVING DATA": "tw:border-[var(--bk-success)] tw:bg-[var(--bk-success-tint)] tw:text-[var(--bk-success-text)]",
-  "NO DATA YET": "tw:border-[var(--bk-border-medium)] tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-soft)]",
-  "NOT VERIFIED": "tw:border-[var(--bk-border-medium)] tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-soft)]",
+/** B8-AN01/03/04: the tracker's status in words, not a pill. */
+const STATUS_WORDS: Record<ConnectionPill, string> = {
+  "RECEIVING DATA": "Receiving data",
+  "NO DATA YET": "Waiting for data",
+  "NOT VERIFIED": "Not verified",
 };
 
 export const AnalyticsScreen: React.FC<ScreenProps> = ({
@@ -141,6 +161,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
   registerRetryLoad,
   saveError,
   registerFieldErrors,
+  registerFooterMessage,
   fieldErrors,
 }) => {
   const { value: stored } = useSettingsScreen(
@@ -172,8 +193,8 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
   const cookieConsent = stored.cookieConsent;
   const [status, setStatus] = React.useState<AnalyticsStatus | null>(null);
   const [verifying, setVerifying] = React.useState(false);
-  /** The Connection verified dialog's subject, while it is open. */
-  const [verified, setVerified] = React.useState<{ id: string; events24h: number } | null>(null);
+  /* B8-AN06: a status re-read that fails says so in place; the values stay. */
+  const [verifyFailed, setVerifyFailed] = React.useState(false);
   const gaInputRef = React.useRef<HTMLInputElement>(null);
 
   /* Dirty is a difference from what is stored, so a field typed back to its
@@ -223,6 +244,8 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
     { onLoadStateChange, registerRetryLoad }
   );
 
+  /* B8-AN07: offline, the tracker's status cannot be read. */
+  const online = useOnlineStatus();
   const gaError = validateProviderId("googleAnalytics", gaId);
   const gtmError = validateProviderId("googleTagManager", gtmId);
   const pixelError = validateProviderId("facebookPixel", pixelId);
@@ -237,25 +260,25 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
   const pixelShown = shown(pixelError, "facebookPixel.pixelId");
   const clarityShown = shown(clarityError, "microsoftClarity.projectId");
 
-  /* Verify (4256:26844): the id's shape, then the tracker's status read
+  /* Verify: the id's shape, then the tracker's status read
      again, then `verifiedAt` into the draft — the next Save carries it. A
      malformed or empty id just lands the cursor on the field (its sentence is
-     already under it); a failed re-read is the load-error card, not a dialog
-     that claims a check it could not make. */
+     already under it); a failed re-read says "Couldn't check status" in the
+     status row (B8-AN06), not a dialog that claims a check it could not make. */
   const verify = async () => {
     if (gaId === "" || gaError) {
       gaInputRef.current?.focus();
       return;
     }
     setVerifying(true);
+    setVerifyFailed(false);
     try {
       const next = projectId ? await getBuildrikClient(DASHBOARD_URL).siteDetail.analyticsStatus.query({ siteId: projectId }) : status;
       setStatus(next);
       setGaVerifiedAt(new Date().toISOString());
-      setVerified({ id: gaId, events24h: next?.events24h ?? 0 });
     } catch (error: unknown) {
       devError("settings", `analytics status re-read failed for site ${projectId}`, error);
-      load.retry();
+      setVerifyFailed(true);
     } finally {
       setVerifying(false);
     }
@@ -284,6 +307,13 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
     registerFieldErrors(Object.keys(errors).length > 0 ? errors : null);
   }, [registerFieldErrors, gaError, gtmError, pixelError, clarityError]);
   React.useEffect(() => () => registerFieldErrors?.(null), [registerFieldErrors]);
+  /* B8-AN05: while an id is malformed the footer names it instead of "Unsaved changes". */
+  const fixWhat = gaError ? "measurement ID" : gtmError ? "container ID" : pixelError ? "pixel ID" : clarityError ? "project ID" : null;
+  React.useEffect(() => {
+    if (!registerFooterMessage) return;
+    registerFooterMessage(fixWhat ? `Fix the ${fixWhat} before saving` : null);
+    return () => registerFooterMessage(null);
+  }, [registerFooterMessage, fixWhat]);
 
   // On Save the shell calls this and saves what it returns (ScreenProps.registerFlushHandler). The
   // other providers' `verifiedAt` ride through from the stored config.
@@ -319,9 +349,8 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
       <Screen>
         <LoadCard
           title="Analytics"
-          line="GA4, GTM, Meta Pixel and Clarity keys."
           state={load.state}
-          errorLine="Couldn't load your analytics settings. Check your connection, then try again."
+          errorLine="The settings service did not respond. Your existing configuration has not changed."
           onRetry={load.retry}
         />
       </Screen>
@@ -335,197 +364,181 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
       {saveError ? <SaveErrorBanner message={saveError} /> : null}
 
       <Section title="Google Analytics">
-        <Row stem="enable-google-analytics" label="Enable Google Analytics">
-          <div className={SWITCH_CELL}>
-            <ToggleSwitch
-              id="enable-google-analytics"
-              checked={gaEnabled}
-              onChange={(next) => {
-                setGaEnabled(next);
-              }}
-              aria-labelledby="enable-google-analytics-label"
-              sizing="md"
-              data-testid="set-an-ga-enable"
-            />
-          </div>
-        </Row>
-        <Row stem="google-analytics-id" label="Google Analytics ID" htmlFor="google-analytics-id">
-          <div className={INPUT_CELL}>
-            <Input
-              ref={gaInputRef}
-              id="google-analytics-id"
-              type="text"
-              value={gaId}
-              onChange={(e) => {
-                setGaId(e.target.value.toUpperCase());
-                // A different id is a different connection: its verification goes with it.
-                setGaVerifiedAt(undefined);
-              }}
-              placeholder="G-XXXXXXXXXX"
-              aria-describedby={gaShown ? "ga-error" : undefined}
-              aria-invalid={gaShown !== null}
-              data-testid="set-an-ga-id"
-            />
-            {gaShown && (
-              <div id="ga-error" role="alert" className={SCREEN_FIELD_ERROR} data-testid="set-an-ga-error">
-                {gaShown}
-              </div>
-            )}
-          </div>
-        </Row>
-        <Row stem="connection-status" label="Connection status">
-          <div className="tw:flex tw:min-h-8 tw:min-w-0 tw:flex-1 tw:items-center tw:gap-3">
-            <Badge className={`${PILL} ${PILL_TONE[pill]}`} data-testid="set-an-ga-status">
-              {pill}
-            </Badge>
-            {gaVerifiedAt ? (
-              <span
-                className="tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
-                data-testid="set-an-ga-verified"
-              >
-                Measurement ID verified on {formatDay(gaVerifiedAt)}
-              </span>
-            ) : null}
-            <Button
-              type="button"
-              variant="secondary"
-              size="xs"
-              className={`${SET_BTN} tw:ml-auto`}
-              disabled={verifying}
-              onClick={verify}
-              data-testid="set-an-ga-verify"
+        <ProviderRow
+          stem="google-analytics-id"
+          label="Measurement ID"
+          inputId="google-analytics-id"
+          switchId="enable-google-analytics"
+          provider="Google Analytics"
+          enabled={gaEnabled}
+          onEnabled={setGaEnabled}
+          switchTestId="set-an-ga-enable"
+        >
+          <Input
+            ref={gaInputRef}
+            id="google-analytics-id"
+            type="text"
+            value={gaId}
+            onChange={(e) => {
+              setGaId(e.target.value.toUpperCase());
+              // A different id is a different connection: its verification goes with it.
+              setGaVerifiedAt(undefined);
+            }}
+            placeholder="G-XXXXXXXXXX"
+            aria-describedby={gaShown ? "ga-error" : undefined}
+            aria-invalid={gaShown !== null}
+            data-testid="set-an-ga-id"
+          />
+          {gaShown && (
+            <div id="ga-error" role="alert" className={SCREEN_FIELD_ERROR} data-testid="set-an-ga-error">
+              {gaShown}
+            </div>
+          )}
+        </ProviderRow>
+        {/* B8-AN01…AN06: the status word with Verify at the right, the tracker
+            note, then one detail line under it (AN03/AN04) or a failed check's
+            sentence in error ink (AN06). */}
+        <div className="tw:col-span-full tw:flex tw:min-h-8 tw:items-center tw:gap-3" data-testid="set-field-connection-status">
+          <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col" data-testid="set-field-last-received-data">
+            <span
+              className={`tw:text-[length:var(--bk-text-13)] tw:leading-5 ${
+                verifyFailed || !online
+                  ? "tw:text-[var(--bk-ink-muted)]"
+                  : !verifying && pill === "RECEIVING DATA"
+                    ? "tw:text-[var(--bk-success-text)]"
+                    : "tw:text-[var(--bk-ink)]"
+              }`}
+              role="status"
+              data-testid="set-an-ga-status"
             >
-              {verifying ? "Checking…" : "Check data is arriving"}
-            </Button>
+              {!online ? "Status unavailable offline" : verifying ? "Checking status…" : verifyFailed ? "Couldn’t check status" : STATUS_WORDS[pill]}
+            </span>
           </div>
-        </Row>
-        <Row stem="last-received-data" label="Last received data">
-          <div className={LINE_CELL} data-testid="set-an-ga-last">
+          <Button
+            type="button"
+            variant="secondary"
+            size="xs"
+            className={`${SET_BTN} tw:w-37 tw:shrink-0`}
+            disabled={verifying || !online}
+            onClick={verify}
+            data-testid="set-an-ga-verify"
+          >
+            {verifying ? "Checking…" : "Verify"}
+          </Button>
+        </div>
+        <p className={`${NOTE} tw:col-span-full`} data-testid="set-an-ga-disclaimer">
+          Buildrick tracker status; this does not confirm Google Analytics delivery.
+        </p>
+        {!online ? null : verifyFailed ? (
+          <p className="tw:col-span-full tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-error)]" role="alert" data-testid="set-an-ga-verify-error">
+            The status service did not respond. Try Verify again.
+          </p>
+        ) : verifying ? null : pill === "RECEIVING DATA" ? (
+          <p className={`${NOTE} tw:col-span-full`} data-testid="set-an-ga-last">
             {lastReceivedLine(status)}
-          </div>
-        </Row>
+          </p>
+        ) : pill === "NO DATA YET" ? (
+          <p className={`${NOTE} tw:col-span-full`} data-testid="set-an-ga-verified">
+            {gaVerifiedAt !== stored.gaVerifiedAt
+              ? "No events received yet. Verification is an unsaved setting."
+              : `No events received yet · verified on ${formatDay(gaVerifiedAt!)}`}
+          </p>
+        ) : null}
       </Section>
 
       <Section title="Google Tag Manager">
-        <Row stem="enable-google-tag-manager" label="Enable Google Tag Manager">
-          <div className={SWITCH_CELL}>
-            <ToggleSwitch
-              id="enable-google-tag-manager"
-              checked={gtmEnabled}
-              onChange={(next) => {
-                setGtmEnabled(next);
-              }}
-              aria-labelledby="enable-google-tag-manager-label"
-              sizing="md"
-              data-testid="set-an-gtm-enable"
-            />
-          </div>
-        </Row>
-        <Row stem="gtm-container-id" label="GTM Container ID" htmlFor="gtm-container-id">
-          <div className={INPUT_CELL}>
-            <Input
-              id="gtm-container-id"
-              type="text"
-              value={gtmId}
-              onChange={(e) => {
-                setGtmId(e.target.value.toUpperCase().trim());
-              }}
-              placeholder="GTM-XXXXXXX"
-              aria-describedby={gtmShown ? "gtm-error" : undefined}
-              aria-invalid={gtmShown !== null}
-              data-testid="set-an-gtm-id"
-            />
-            {gtmShown && (
-              <div id="gtm-error" role="alert" className={SCREEN_FIELD_ERROR} data-testid="set-an-gtm-error">
-                {gtmShown}
-              </div>
-            )}
-          </div>
-        </Row>
+        <ProviderRow
+          stem="gtm-container-id"
+          label="Container ID"
+          inputId="gtm-container-id"
+          switchId="enable-google-tag-manager"
+          provider="Google Tag Manager"
+          enabled={gtmEnabled}
+          onEnabled={setGtmEnabled}
+          switchTestId="set-an-gtm-enable"
+        >
+          <Input
+            id="gtm-container-id"
+            type="text"
+            value={gtmId}
+            onChange={(e) => {
+              setGtmId(e.target.value.toUpperCase().trim());
+            }}
+            placeholder="GTM-XXXXXXX"
+            aria-describedby={gtmShown ? "gtm-error" : undefined}
+            aria-invalid={gtmShown !== null}
+            data-testid="set-an-gtm-id"
+          />
+          {gtmShown && (
+            <div id="gtm-error" role="alert" className={SCREEN_FIELD_ERROR} data-testid="set-an-gtm-error">
+              {gtmShown}
+            </div>
+          )}
+        </ProviderRow>
       </Section>
 
       <Section title="Meta Pixel">
-        <Row stem="enable-meta-pixel" label="Enable Meta Pixel">
-          <div className={SWITCH_CELL}>
-            <ToggleSwitch
-              id="enable-meta-pixel"
-              checked={pixelEnabled}
-              onChange={(next) => {
-                setPixelEnabled(next);
-              }}
-              aria-labelledby="enable-meta-pixel-label"
-              sizing="md"
-              data-testid="set-an-pixel-enable"
-            />
-          </div>
-        </Row>
-        <Row stem="pixel-id" label="Pixel ID" htmlFor="pixel-id">
-          <div className={INPUT_CELL}>
-            <Input
-              id="pixel-id"
-              type="text"
-              value={pixelId}
-              onChange={(e) => {
-                setPixelId(e.target.value.replace(/\D/g, ""));
-              }}
-              placeholder="1234567890123456"
-              aria-describedby={pixelShown ? "pixel-error" : undefined}
-              aria-invalid={pixelShown !== null}
-              data-testid="set-an-pixel-id"
-            />
-            {pixelShown && (
-              <div id="pixel-error" role="alert" className={SCREEN_FIELD_ERROR} data-testid="set-an-pixel-error">
-                {pixelShown}
-              </div>
-            )}
-          </div>
-        </Row>
+        <ProviderRow
+          stem="pixel-id"
+          label="Pixel ID"
+          inputId="pixel-id"
+          switchId="enable-meta-pixel"
+          provider="Meta Pixel"
+          enabled={pixelEnabled}
+          onEnabled={setPixelEnabled}
+          switchTestId="set-an-pixel-enable"
+        >
+          <Input
+            id="pixel-id"
+            type="text"
+            value={pixelId}
+            onChange={(e) => {
+              setPixelId(e.target.value.replace(/\D/g, ""));
+            }}
+            placeholder="1234567890123456"
+            aria-describedby={pixelShown ? "pixel-error" : undefined}
+            aria-invalid={pixelShown !== null}
+            data-testid="set-an-pixel-id"
+          />
+          {pixelShown && (
+            <div id="pixel-error" role="alert" className={SCREEN_FIELD_ERROR} data-testid="set-an-pixel-error">
+              {pixelShown}
+            </div>
+          )}
+        </ProviderRow>
       </Section>
 
       <Section title="Microsoft Clarity">
-        <Row stem="enable-microsoft-clarity" label="Enable Microsoft Clarity">
-          <div className={SWITCH_CELL}>
-            <ToggleSwitch
-              id="enable-microsoft-clarity"
-              checked={clarityEnabled}
-              onChange={(next) => {
-                setClarityEnabled(next);
-              }}
-              aria-labelledby="enable-microsoft-clarity-label"
-              sizing="md"
-              data-testid="set-an-clarity-enable"
-            />
-          </div>
-        </Row>
-        <Row stem="clarity-project-id" label="Clarity Project ID" htmlFor="clarity-project-id">
-          <div className={INPUT_CELL}>
-            <Input
-              id="clarity-project-id"
-              type="text"
-              value={clarityId}
-              onChange={(e) => {
-                setClarityId(e.target.value.trim());
-              }}
-              placeholder="abcdefghij"
-              aria-describedby={clarityShown ? "clarity-error" : undefined}
-              aria-invalid={clarityShown !== null}
-              data-testid="set-an-clarity-id"
-            />
-            {clarityShown && (
-              <div id="clarity-error" role="alert" className={SCREEN_FIELD_ERROR} data-testid="set-an-clarity-error">
-                {clarityShown}
-              </div>
-            )}
-          </div>
-        </Row>
+        <ProviderRow
+          stem="clarity-project-id"
+          label="Project ID"
+          inputId="clarity-project-id"
+          switchId="enable-microsoft-clarity"
+          provider="Microsoft Clarity"
+          enabled={clarityEnabled}
+          onEnabled={setClarityEnabled}
+          switchTestId="set-an-clarity-enable"
+        >
+          <Input
+            id="clarity-project-id"
+            type="text"
+            value={clarityId}
+            onChange={(e) => {
+              setClarityId(e.target.value.trim());
+            }}
+            placeholder="abcdefghij"
+            aria-describedby={clarityShown ? "clarity-error" : undefined}
+            aria-invalid={clarityShown !== null}
+            data-testid="set-an-clarity-id"
+          />
+          {clarityShown && (
+            <div id="clarity-error" role="alert" className={SCREEN_FIELD_ERROR} data-testid="set-an-clarity-error">
+              {clarityShown}
+            </div>
+          )}
+        </ProviderRow>
       </Section>
 
-      <ConnectionVerifiedDialog
-        open={verified !== null}
-        id={verified?.id ?? ""}
-        events24h={verified?.events24h ?? 0}
-        onBack={() => setVerified(null)}
-      />
     </Screen>
   );
 };

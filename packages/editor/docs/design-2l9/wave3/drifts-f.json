@@ -1,0 +1,65 @@
+[
+ {
+  "nodeId": "10:2199",
+  "name": "C05 · Save failed / edits retained",
+  "family": "recovery",
+  "shot": "shots/10-2199.png",
+  "note": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Strip 'Couldn't save s0-qa site · Home. Your changes are kept.' + Retry + Keep editing, plus a 'Save failed' toast and a 'Reconnecting…' bar at once. Board: one strip. | prior: L-F W1: built, not compared. SaveFailedBanner is one strip: line + Retry. context=\"publish\" draws the board's \"Save before publishing. Your changes are kept.\"; without a context \"Couldn't save {where}. Your changes are kept.\" Exit and brand-refusal variants kept (code:tokens-invalid). StudioHeader p"
+ },
+ {
+  "nodeId": "10:3787",
+  "name": "C09 · Narrow insertion / Inspector stays closed",
+  "family": "recovery",
+  "shot": "shots/10-3787.png",
+  "note": "Compared live 2026-10-26 (delivery-recovery): DRIFT — At 1280x720 selection opens the Inspector floating over the canvas; board keeps it closed behind an 'Inspector' button. Insert strip OK; add receipt not built. | prior: L-A S1 built the 'Insert into Hero · At end' strip; receipt waits on REQUESTS #11; 1280 collapsed-Inspector mode is shell (lead). Not compared."
+ },
+ {
+  "nodeId": "225:2821",
+  "name": "B7-G02 · Site didn’t load / banner and read-only canvas",
+  "family": "recovery",
+  "shot": "shots/225-2821.png",
+  "note": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Copy + Download local copy/Retry match; banner sits above the topbar (y=0–54, board under it), adds Copy details and ×; canvas empty, not the read-only site. | prior: L-F S2: Download local copy added (workSnapshot; REQUESTS #15 registers the live project, else the kept unsaved copy). Leads the global slot. Placement under topbar REQUESTS #11. Built, not compared."
+ },
+ {
+  "nodeId": "225:3353",
+  "name": "B7-G03 · Session expired / unsaved changes kept",
+  "family": "recovery",
+  "shot": "shots/225-3353.png",
+  "note": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Title, body ('Your 1 change is kept in this tab and in this browser') and buttons match; the save-failed strip renders above the scrim, undimmed. | prior: L-F S5: built, not compared. 480 dialog (size confirm), \"Sign in again to save\" + board body with the history count since the last save; \"and in this browser\" only when a kept copy exists (code truth). Keep editing · Try saving again · Sign in ↗ (primary). The labels list folded into the count (code"
+ },
+ {
+  "nodeId": "225:3888",
+  "name": "B7-G04 · Session expired banner / edits keep queueing",
+  "family": "recovery",
+  "shot": "shots/225-3888.png",
+  "note": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Copy and Sign in ↗ match, but the banner spans the window above the topbar (y=0–56) and the 'Couldn't save… Retry · Keep editing' strip shows too. | prior: L-F S5: built, not compared. Keep editing (and Escape) leaves the G04 banner in the global slot with Sign in ↗; the next landed save (lastSavedAt) clears it."
+ },
+ {
+  "nodeId": "225:4941",
+  "name": "B7-G06 · Different account signed in / nothing sent",
+  "family": "recovery",
+  "shot": "shots/225-4941.png",
+  "note": "Compared live 2026-10-26 (delivery-recovery): unreachable live — Not built (REQUESTS F-22); no code path detects a different signed-in account. | prior: L-F W10: not built. Detecting a different account needs the save path (lead) and ideally a server expectedUserId — REQUESTS F-22. Today such a save goes through as the other account."
+ },
+ {
+  "nodeId": "225:5474",
+  "name": "B7-G07 · Unsaved work found / server older, restore allowed",
+  "family": "recovery",
+  "shot": "shots/225-5474.png",
+  "note": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Kept work after a failed save + reload shows the old toast 'Some work never reached the server… Restore my edits', not the board's banner with Discard… · Restore. | prior: L-F S3: built, not compared. RecoveryBanner is the one surface: board copy (time as \"today 10:12\"), Discard… · Restore my edits. Dashboard kept copy arrives via keptWorkOffer (REQUESTS #16 retires the toast); local draft sentinel uses the same words."
+ },
+ {
+  "nodeId": "225:6003",
+  "name": "B7-G08 · Unsaved work found / server newer, no restore",
+  "family": "recovery",
+  "shot": "shots/225-6003.png",
+  "note": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Kept copy older than the server: the same toast still offers 'Restore my edits'; board says someone saved after and offers Download my copy only. | prior: L-F S3: built, not compared. Server newer → board line (author not in the contract: code:no-author) + Download my copy; Compare not offered until CompareHost has a kept-copy source (REQUESTS #16c)."
+ },
+ {
+  "nodeId": "225:6532",
+  "name": "B7-G09 · Unsaved work found / server time unknown",
+  "family": "recovery",
+  "shot": "shots/225-6532.png",
+  "note": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Server version check blocked: the same 'Restore my edits' toast; board says it can't be restored safely and offers Download my copy. | prior: L-F S3: built, not compared. Server unknown → board line + Download my copy; Compare as G08 (REQUESTS #16c)."
+ }
+]

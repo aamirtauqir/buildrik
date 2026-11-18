@@ -21,6 +21,7 @@ import { hasLiveDeployment, unpublishSite } from "@/server/services/publish.serv
 import { slugifyProjectName } from "@/lib/vercel";
 import { BRAND_FORMAT_CONFLICT, TOKENS_SCHEMA_VERSION } from "@buildrik/shared/schemas/design-tokens";
 import { checkTokenPayload, TokenSaveError, type TokenCheck } from "@/server/services/brand-tokens";
+import { trashPages } from "@/server/services/page-trash.service";
 
 function slugify(name: string): string {
   return name
@@ -391,7 +392,13 @@ export function redactSitePassword<T extends { publishedPassword: string | null 
 export async function getSite(siteId: string) {
   const site = await prisma.site.findFirst({
     where: { id: siteId, deletedAt: null },
-    include: { folder: true, sourceTemplate: { select: { id: true, name: true } } },
+    include: {
+      folder: true,
+      sourceTemplate: { select: { id: true, name: true } },
+      /* The editor's "This workspace will be deleted on …" banner (2L9
+         B7-G20/G21): publishing is already refused while it is set. */
+      workspace: { select: { deletionScheduledAt: true } },
+    },
   });
   return site ? redactSitePassword(site) : null;
 }
@@ -476,10 +483,13 @@ export async function duplicateSite(
   const slug = await generateUniqueSlug(copyName);
 
   const originalPages = await prisma.page.findMany({
-    where: { siteId },
+    where: { siteId, deletedAt: null },
     orderBy: { position: "asc" },
   });
-  const originalForms = await prisma.formBlock.findMany({ where: { siteId } });
+  // Form blocks of trashed pages stay behind with them.
+  const originalForms = await prisma.formBlock.findMany({
+    where: { siteId, OR: [{ pageId: null }, { pageId: { in: originalPages.map((p) => p.id) } }] },
+  });
 
   /* X-A1: legacy pages can share element ids ("root" everywhere), which the
      editor loads as one tree. The copy is written with the editor's own
@@ -757,6 +767,7 @@ export async function saveProjectFromEditor(
     cmsBindings?: CmsBindingsInput;
   },
   expectedLastEditedAt?: string,
+  userId?: string,
 ) {
   // 2026-05-23: array-level cast — Zod's passthrough output type
   // (`objectOutputType<{...},...,"passthrough">`) for the `meta` field
@@ -786,7 +797,7 @@ export async function saveProjectFromEditor(
     settings: projectData.settings,
     dsSchemaVersion: projectData.dsSchemaVersion,
     cmsBindings: projectData.cmsBindings,
-  }, expectedLastEditedAt);
+  }, expectedLastEditedAt, userId);
 }
 
 export async function bulkAction(
@@ -982,11 +993,11 @@ async function assertPageLimit(siteId: string, workspaceId: string, incoming: nu
   const workspace = await prisma.workspace.findUnique({ where: { id: workspaceId }, select: { plan: true } });
   const limit = PLAN_LIMITS[(workspace?.plan ?? "FREE") as PlanName].pagesPerSite as number;
   if (limit === -1 || incoming <= limit) return;
-  const stored = await prisma.page.count({ where: { siteId } });
+  const stored = await prisma.page.count({ where: { siteId, deletedAt: null } });
   if (incoming > stored) throw new Error(`PAGE_LIMIT:${limit}`);
 }
 
-export async function saveProjectData(input: SaveProjectDataInput, expectedLastEditedAt?: string) {
+export async function saveProjectData(input: SaveProjectDataInput, expectedLastEditedAt?: string, userId?: string) {
   const site = await prisma.site.findUnique({
     where: { id: input.siteId },
     select: {
@@ -1121,7 +1132,7 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
 
     if (isFullSnapshot) {
       const existingPages = await tx.page.findMany({
-        where: { siteId: input.siteId },
+        where: { siteId: input.siteId, deletedAt: null },
         select: { id: true },
       });
       /* `[].every(...)` is true, so a save carrying no pages read as a complete
@@ -1136,14 +1147,15 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
       }
       const incomingPageIds = new Set(input.pages.map((p: { id: string }) => p.id));
       const pagesToDelete = existingPages.filter((p) => !incomingPageIds.has(p.id));
-      if (pagesToDelete.length > 0) {
-        await tx.formBlock.deleteMany({
-          where: { pageId: { in: pagesToDelete.map((p) => p.id) } },
-        });
-        await tx.page.deleteMany({
-          where: { id: { in: pagesToDelete.map((p) => p.id) } },
-        });
-      }
+      /* A-21: a page the editor no longer has goes to the trash (kept 30
+         days, restorable from "Recently deleted"), not out of the database. */
+      await trashPages(
+        tx,
+        input.siteId,
+        pagesToDelete.map((p) => p.id),
+        userId ?? null,
+        expectedLastEditedAt ? new Date(expectedLastEditedAt) : undefined,
+      );
     }
 
     // Upsert each incoming page.
@@ -1171,6 +1183,11 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
 
       const updateData: Prisma.PageUpdateInput = {
         blocks: page.blocks as Prisma.InputJsonValue,
+        /* A page the editor sends is live: a trashed one coming back (⌘Z of
+           the delete, then a save) leaves the trash with its slug below. */
+        deletedAt: null,
+        deletedById: null,
+        trashedSlug: null,
       };
       if (page.name !== undefined) updateData.name = page.name;
       if (slug !== undefined) updateData.slug = slug;
@@ -1257,6 +1274,7 @@ export async function getProjectData(siteId: string) {
       projectCmsBindings: true,
       dsSchemaVersion: true,
       sitePages: {
+        where: { deletedAt: null },
         select: {
           id: true,
           name: true,

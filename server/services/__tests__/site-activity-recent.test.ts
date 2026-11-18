@@ -120,4 +120,11 @@ describe("listSiteActivity", () => {
     expect(rows).toHaveLength(3);
     expect(db.activityLog.findMany.mock.calls[0][0].take).toBe(12);
   });
+
+  it("a later page (Load more) reads only rows older than the oldest shown, from both sources", async () => {
+    const before = at(15);
+    await listSiteActivity("s1", "all", 30, before);
+    expect(db.activityLog.findMany.mock.calls[0][0].where).toEqual({ siteId: "s1", createdAt: { lt: before } });
+    expect(db.comment.findMany.mock.calls[0][0].where).toEqual({ siteId: "s1", createdAt: { lt: before } });
+  });
 });

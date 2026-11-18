@@ -1,0 +1,9 @@
+[
+ {
+  "nodeId": "500:342702",
+  "name": "V2 · Site didn’t load / truly view-only",
+  "family": "shell-components",
+  "shot": "shots/500-342702.png",
+  "note": "Compared live 2026-10-26 (editor-inspector): DRIFT — Forced via aborted sites.get. Banner above topbar y0-54 (board below it y56-97) + extra 'Copy details'; canvas/layers empty; inspector only 'View only until the site loads'; status in topbar. | prior: Load-failed banner, lock and echoes built (feat/design-2l9-editlock); not walked live (needs a forced load failure). Banner slot under topbar is an AquibraStudio request (REQUESTS.md #4)."
+ }
+]

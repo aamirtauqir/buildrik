@@ -81,6 +81,7 @@ export function createMockComposer(opts: CreateMockComposerOpts = {}): MockCompo
 
   const elements = {
     getAllPages: vi.fn(() => pages),
+    getElement: vi.fn(() => null),
     getActivePage: vi.fn(() => pages.find((p) => p.id === activePageId) ?? null),
     setActivePage: vi.fn((id: string) => {
       activePageId = id;
@@ -102,8 +103,10 @@ export function createMockComposer(opts: CreateMockComposerOpts = {}): MockCompo
     }),
     deletePage: vi.fn((id: string) => {
       const idx = pages.findIndex((p) => p.id === id);
-      if (idx >= 0) pages.splice(idx, 1);
+      if (idx < 0) return false;
+      pages.splice(idx, 1);
       emit(EVENTS.PROJECT_CHANGED, { type: "page:delete" });
+      return true;
     }),
     updatePage: vi.fn((id: string, patch: Partial<MockPage>) => {
       const page = pages.find((p) => p.id === id);
@@ -144,6 +147,7 @@ export function createMockComposer(opts: CreateMockComposerOpts = {}): MockCompo
       return c ? { component: { ...c }, instances: [] } : null;
     }),
     restoreDeletedComponent: vi.fn(async () => 0),
+    relinkInstances: vi.fn(() => 0),
   };
 
   const selection = {

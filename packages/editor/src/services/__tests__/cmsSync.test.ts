@@ -139,6 +139,7 @@ describe("cmsSync", () => {
       pageSlugPattern: null,
       pageSeoTitle: null,
       pageSeoDescription: null,
+      pageSocialImage: null,
       pageTemplatePath: null,
       expectedUpdatedAt: null,
     });

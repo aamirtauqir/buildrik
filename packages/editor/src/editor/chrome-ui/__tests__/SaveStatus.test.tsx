@@ -25,6 +25,9 @@ describe("SaveStatus", () => {
        this pill promised a local copy while the announcement beside it said
        "changes not saved". */
     ["offline", "Offline — not saved"],
+    /* Task 1.6, board B7-G02: the site never loaded — about this session,
+       not the stored site. Never "Saved". */
+    ["not-loaded", "Not loaded · nothing saved yet"],
   ] as const)("renders the %s truth", (state, copy) => {
     render(<SaveStatus state={state} />);
     expect(screen.getByText(copy)).toBeTruthy();
@@ -45,30 +48,27 @@ describe("SaveStatus", () => {
     expect(container.textContent).toBe("Saved 2m ago");
   });
 
-  // T8 compact tier 2: the timestamp is the bar's first concession, so it has to
-  // be droppable on its own — hence its own element, with "Saved" left behind.
-  it("keeps the timestamp in its own element so the compact tier can drop it", () => {
-    const { container } = render(<SaveStatus state="saved" savedAt={Date.now() - 120_000} />);
-    const root = container.firstElementChild!;
-    const stamp = root.lastElementChild!;
-    expect(stamp.textContent).toBe(" 2m ago");
-    stamp.remove();
-    expect(root.textContent).toBe("Saved");
-  });
-
-  it("no timestamp yet → 'Saved' alone, with nothing to drop", () => {
+  it("no timestamp yet → 'Saved' alone", () => {
     const { container } = render(<SaveStatus state="saved" />);
-    const root = container.firstElementChild!;
-    expect(root.textContent).toBe("Saved");
-    // Only the dot indicator — no separate stamp element.
-    expect(root.children).toHaveLength(1);
+    expect(container.textContent).toBe("Saved");
   });
 
-  it("the History door is a blue link with a green dot (board 4418:123573)", () => {
-    render(<SaveStatus state="saved" savedAt={Date.now()} onClick={() => {}} />);
-    const btn = screen.getByRole("button", { name: /History ›/ });
-    expect(btn.className).toContain("tw:text-[var(--bk-accent)]");
-    expect(btn.className).not.toContain("--bk-success-text");
-    expect(btn.querySelector('[aria-hidden="true"]')!.className).toContain("--bk-success");
+  /* 2L9 497:99485 / C05 10:2199: the board's saved and failed states. */
+  it("saved is muted text after a check — no dot, no door", () => {
+    render(<SaveStatus state="saved" savedAt={Date.now()} />);
+    const status = screen.getByTestId("save-status-saved");
+    expect(status.tagName).toBe("SPAN");
+    expect(status.textContent).toBe("Saved just now");
+    expect(status.className).toContain("tw:text-[var(--bk-ink-muted)]");
+    expect(status.querySelector("svg")).not.toBeNull();
+  });
+
+  it("a failed save reads \"Couldn’t save — Retry\" in the error tone, and is the retry", () => {
+    let clicked = 0;
+    render(<SaveStatus state="error" onClick={() => (clicked += 1)} />);
+    const btn = screen.getByRole("button", { name: "Couldn’t save — Retry" });
+    expect(btn.className).toContain("--bk-error-text");
+    btn.click();
+    expect(clicked).toBe(1);
   });
 });

@@ -7,7 +7,7 @@
  * @license BSD-3-Clause
  */
 
-import { adaptBaseStyleProps, defineSection, type AnySectionEntry } from "./_shared";
+import { adaptBaseStyleProps, defineSection, setSummary, type AnySectionEntry } from "./_shared";
 import { EffectsAdvancedSection } from "../effects/EffectsAdvancedSection";
 import { FiltersSection } from "../effects/FiltersSection";
 import { OpacitySection } from "../effects/OpacitySection";
@@ -15,6 +15,8 @@ import { ShadowSection } from "../effects/ShadowSection";
 import { TransformMotionSection } from "../effects/TransformMotionSection";
 
 const set = (v: string | undefined) => Boolean(v) && v !== "none";
+const TRANSFORM_KEYS = ["transform", "transition", "transition-property", "transition-duration", "transition-delay", "transition-timing-function"];
+const ADVANCED_KEYS = ["cursor", "mix-blend-mode", "text-shadow", "will-change"];
 
 export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
   opacity: defineSection({
@@ -46,25 +48,25 @@ export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
     adaptProps: adaptBaseStyleProps,
   }),
 
+  /* 2L9 161:12525: "Transform and transition  2 set", shut. */
   "transform-motion": defineSection({
     tab: "effects",
-    title: "Transform & motion",
-    open: "valued",
-    hasValue: (ctx) =>
-      ["transform", "transition", "transition-property", "transition-duration"].some((k) => set(ctx.authoredStyles[k])),
+    title: "Transform and transition",
+    open: "closed",
+    summary: setSummary(TRANSFORM_KEYS),
     Component: TransformMotionSection,
-    styleKeys: ["transform", "transition", "transition-property", "transition-duration", "transition-delay", "transition-timing-function"],
+    styleKeys: TRANSFORM_KEYS,
     adaptProps: adaptBaseStyleProps,
   }),
 
+  /* 2L9 36:2: "Advanced effects  None". */
   "effects-advanced": defineSection({
     tab: "effects",
-    title: "Advanced",
+    title: "Advanced effects",
     open: "closed",
-    summary: (ctx) =>
-      `Cursor: ${ctx.authoredStyles.cursor || "auto"} · Blend: ${ctx.authoredStyles["mix-blend-mode"] || "normal"}`,
+    summary: setSummary(ADVANCED_KEYS),
     Component: EffectsAdvancedSection,
-    styleKeys: ["cursor", "mix-blend-mode", "text-shadow", "will-change"],
+    styleKeys: ADVANCED_KEYS,
     adaptProps: adaptBaseStyleProps,
   }),
 };

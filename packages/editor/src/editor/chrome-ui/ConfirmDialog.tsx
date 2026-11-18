@@ -39,6 +39,9 @@ export interface ConfirmDialogProps {
    */
   tone?: "default" | "warning" | "destructive";
   busy?: boolean;
+  /** The confirm stays disabled until the dialog's own input allows it (a
+   *  typed-name confirm, design-2l9 142:55781 → 142:56347). Not busy: no spinner. */
+  confirmDisabled?: boolean;
   /** Forwarded to Modal, which stamps `<testId>` on the frame and
    *  `<testId>-foot` on the footer; the confirm button takes `<testId>-confirm`
    *  so a recipe can drive the dialog to its own result state. Confirms are
@@ -62,6 +65,13 @@ export interface ConfirmDialogProps {
   width?: ModalWidth;
   /** Forwarded to Modal — a ✕ at the head's right edge, where the board draws one. */
   closeButton?: boolean;
+  /** Forwarded to Modal — the actions at the left ("start") instead of the
+   *  right. Default "end", unchanged. */
+  actionsAlign?: "start" | "end";
+  /** "text" (default, unchanged): Cancel is a quiet text button. "outline":
+   *  a bordered white button, as design-2l9's page confirms draw it
+   *  (63:15255). */
+  cancelStyle?: "text" | "outline";
 }
 
 /** Long enough to read "3 pages deleted.", short enough not to be a step. */
@@ -82,7 +92,8 @@ const SUCCESS_MESSAGE = "tw:m-0 tw:mt-4 tw:text-[13px] tw:leading-5 tw:text-[var
 const SUCCESS_CLOSING = "tw:m-0 tw:mt-1 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 
 export function ConfirmDialog({
-  open, onClose, onConfirm, title, message, confirmLabel, cancelLabel = "Cancel", tone = "default", busy, testId, success, width, closeButton,
+  open, onClose, onConfirm, title, message, confirmLabel, cancelLabel = "Cancel", tone = "default", busy, confirmDisabled, testId, success, width, closeButton,
+  actionsAlign = "end", cancelStyle = "text",
 }: ConfirmDialogProps) {
   const [done, setDone] = React.useState(false);
 
@@ -141,13 +152,19 @@ export function ConfirmDialog({
       width={width}
       closeButton={closeButton}
       dismissOnScrimClick={tone === "default"}
+      footerAlign={actionsAlign}
       footer={
         <>
           <Button
             color="light"
             size="xs"
             onClick={onClose}
-            className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-gray-700)] tw:hover:text-[var(--bk-ink)]"
+            className={
+              cancelStyle === "outline"
+                ? "tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-ink)]"
+                : "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-gray-700)] tw:hover:text-[var(--bk-ink)]"
+            }
+            data-testid={testId ? `${testId}-cancel` : undefined}
           >
             {cancelLabel}
           </Button>
@@ -159,7 +176,7 @@ export function ConfirmDialog({
                 : undefined
             }
             size="xs"
-            disabled={busy}
+            disabled={busy || confirmDisabled}
             aria-busy={busy || undefined}
             data-testid={testId ? `${testId}-confirm` : undefined}
             onClick={() => {

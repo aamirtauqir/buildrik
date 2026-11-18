@@ -35,6 +35,7 @@ import {
   type ActivityFilter,
 } from "@/services/ActivityService";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
+import { SITE_ACTIVITY_PAGE_SIZE } from "@buildrik/shared/schemas/activity";
 
 export interface ActivityLogViewProps {
   /** Site the rows are scoped to. Null = opened without a project; the view
@@ -106,6 +107,9 @@ export const ActivityLogView: React.FC<ActivityLogViewProps> = ({ siteId, onOpen
   const [filter, setFilter] = React.useState<ActivityFilter>("all");
   const [state, setState] = React.useState<LoadState>("loading");
   const [rows, setRows] = React.useState<ActivityEntry[]>([]);
+  /* 2L9 B7-H13: a full page may have older rows behind it. */
+  const [hasMore, setHasMore] = React.useState(false);
+  const [moreState, setMoreState] = React.useState<"idle" | "loading" | "error">("idle");
 
   const fetchSeq = React.useRef(0);
 
@@ -118,6 +122,8 @@ export const ActivityLogView: React.FC<ActivityLogViewProps> = ({ siteId, onOpen
         const r = await fetchRecentActivity(siteId, next);
         if (seq !== fetchSeq.current) return; // stale
         setRows(r);
+        setHasMore(r.length >= SITE_ACTIVITY_PAGE_SIZE);
+        setMoreState("idle");
         setState(r.length === 0 ? "empty" : "ready");
       } catch (e) {
         if (seq !== fetchSeq.current) return;
@@ -140,6 +146,23 @@ export const ActivityLogView: React.FC<ActivityLogViewProps> = ({ siteId, onOpen
       fetchSeq.current++;
     };
   }, []);
+
+  const loadMore = React.useCallback(async () => {
+    const oldest = rows[rows.length - 1];
+    if (!siteId || !oldest) return;
+    const seq = fetchSeq.current;
+    setMoreState("loading");
+    try {
+      const older = await fetchRecentActivity(siteId, filter, oldest.createdAt);
+      if (seq !== fetchSeq.current) return; // the filter changed meanwhile
+      setRows((prev) => [...prev, ...older.filter((r) => !prev.some((p) => p.id === r.id))]);
+      setHasMore(older.length >= SITE_ACTIVITY_PAGE_SIZE);
+      setMoreState("idle");
+    } catch {
+      if (seq !== fetchSeq.current) return;
+      setMoreState("error");
+    }
+  }, [rows, siteId, filter]);
 
   const handleRetry = React.useCallback(() => {
     void load(filter);
@@ -215,8 +238,7 @@ export const ActivityLogView: React.FC<ActivityLogViewProps> = ({ siteId, onOpen
         {state === "error" && (
           <div className={STATE_BOX} data-testid="activity-error">
             <EmptyState
-              title="Couldn't load activity"
-              body="Something went wrong on our side. Retry, or reopen Activity in a moment."
+              title="Couldn’t load activity"
               action={
                 <Button type="button" size="xs" onClick={handleRetry}>
                   Retry
@@ -282,6 +304,26 @@ export const ActivityLogView: React.FC<ActivityLogViewProps> = ({ siteId, onOpen
               </li>
             ))}
           </ul>
+        )}
+        {state === "ready" && hasMore && (
+          <div className="tw:flex tw:flex-col tw:items-start tw:gap-1 tw:pt-2">
+            <Button
+              type="button"
+              color="light"
+              size="xs"
+              disabled={moreState === "loading"}
+              aria-busy={moreState === "loading" || undefined}
+              onClick={() => void loadMore()}
+              data-testid="activity-load-more"
+            >
+              {moreState === "loading" ? "Loading…" : "Load more"}
+            </Button>
+            {moreState === "error" && (
+              <span role="alert" className="tw:text-[12px] tw:text-[var(--bk-error-text)]">
+                Couldn’t load more. Try again.
+              </span>
+            )}
+          </div>
         )}
       </section>
     </div>

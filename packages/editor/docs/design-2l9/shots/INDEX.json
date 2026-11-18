@@ -1,0 +1,506 @@
+[
+ {
+  "nodeId": "277:345909",
+  "name": "GAP-FMC-Filter-base|Contact|Inbox",
+  "family": "site-delivery",
+  "inheritors": 35
+ },
+ {
+  "nodeId": "277:346467",
+  "name": "GAP-FMC-Export-ready-base|Contact|Inbox",
+  "family": "site-delivery",
+  "inheritors": 35
+ },
+ {
+  "nodeId": "277:336979",
+  "name": "GAP-FMC-base-All forms-Spam",
+  "family": "site-delivery",
+  "inheritors": 28
+ },
+ {
+  "nodeId": "278:61847",
+  "name": "GAP-ST-ACK \u00b7 Security saved \u2192 Overview",
+  "family": "site-delivery",
+  "inheritors": 24
+ },
+ {
+  "nodeId": "277:347031",
+  "name": "GAP-FMC-Configure-base|Contact|Inbox",
+  "family": "site-delivery",
+  "inheritors": 17
+ },
+ {
+  "nodeId": "272:24319",
+  "name": "GAP-FM-Export-Inbox-Contact \u00b7 CSV prepared",
+  "family": "site-delivery",
+  "inheritors": 2
+ },
+ {
+  "nodeId": "277:347389",
+  "name": "GAP-FMC-Delete-confirm-base|Contact|Inbox",
+  "family": "site-delivery",
+  "inheritors": 2
+ },
+ {
+  "nodeId": "272:27440",
+  "name": "GAP-FM-Unspam \u00b7 Acknowledged",
+  "family": "site-delivery",
+  "inheritors": 1
+ },
+ {
+  "nodeId": "233:10827",
+  "name": "B8-PB20 \u00b7 Publishing not switched on / flag off",
+  "family": "site-delivery",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "233:11377",
+  "name": "B8-PB21 \u00b7 Offline / needs a connection",
+  "family": "site-delivery",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "238:9980",
+  "name": "B8-S01 \u00b7 Site settings / Overview with plan card",
+  "family": "site-delivery",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "238:11192",
+  "name": "B8-S05 \u00b7 General / offline, save needs a connection",
+  "family": "site-delivery",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "238:13898",
+  "name": "B8-S14 \u00b7 Delete submissions / permanent, consequence confirm",
+  "family": "site-delivery",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "238:15344",
+  "name": "B8-S19 \u00b7 Domains as Editor / read-only with reason",
+  "family": "site-delivery",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "245:45416",
+  "name": "B8-AN02 \u00b7 Analytics / checking tracker status",
+  "family": "site-delivery",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "245:45673",
+  "name": "B8-AN03 \u00b7 Analytics / verified ID, waiting for data",
+  "family": "site-delivery",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "245:45931",
+  "name": "B8-AN04 \u00b7 Analytics / receiving tracker data",
+  "family": "site-delivery",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "245:46449",
+  "name": "B8-AN06 \u00b7 Analytics / verify error, retry retains values",
+  "family": "site-delivery",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "173:9757",
+  "name": "B5-D04 \u00b7 Heading bound to this page\u2019s Title",
+  "family": "cms",
+  "inheritors": 3
+ },
+ {
+  "nodeId": "260:235689",
+  "name": "B5-V01 \u00b7 CMS / Site variables / list and scope",
+  "family": "cms",
+  "inheritors": 3
+ },
+ {
+  "nodeId": "165:520",
+  "name": "B5-C02 \u00b7 CMS / Record / unsaved edit",
+  "family": "cms",
+  "inheritors": 1
+ },
+ {
+  "nodeId": "165:2184",
+  "name": "B5-C08 \u00b7 CMS / record leave guard",
+  "family": "cms",
+  "inheritors": 1
+ },
+ {
+  "nodeId": "173:10329",
+  "name": "B5-D05 \u00b7 Title text / binding subview",
+  "family": "cms",
+  "inheritors": 1
+ },
+ {
+  "nodeId": "173:16169",
+  "name": "B5-D16 \u00b7 CMS record / return to Heading binding",
+  "family": "cms",
+  "inheritors": 1
+ },
+ {
+  "nodeId": "257:52890",
+  "name": "B5-F29 \u00b7 Delete Summary?",
+  "family": "cms",
+  "inheritors": 1
+ },
+ {
+  "nodeId": "165:2",
+  "name": "B5-C01 \u00b7 CMS / Blog records at scale",
+  "family": "cms",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "165:797",
+  "name": "B5-C03 \u00b7 CMS / Record / saving",
+  "family": "cms",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "165:1072",
+  "name": "B5-C04 \u00b7 CMS / Record / failed save with draft retained",
+  "family": "cms",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "165:1625",
+  "name": "B5-C06 \u00b7 CMS / Record / offline draft retained",
+  "family": "cms",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "165:2917",
+  "name": "B5-C11 \u00b7 CMS / used field protected, display name editable",
+  "family": "cms",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "67:11915",
+  "name": "B3-P25 \u00b7 Home retained / page renamed",
+  "family": "editor",
+  "inheritors": 12
+ },
+ {
+  "nodeId": "63:6393",
+  "name": "B3-P01 \u00b7 Pages / manage without switching",
+  "family": "editor",
+  "inheritors": 6
+ },
+ {
+  "nodeId": "145:72343",
+  "name": "Return \u00b7 Canvas / View menu",
+  "family": "editor",
+  "inheritors": 5
+ },
+ {
+  "nodeId": "63:15939",
+  "name": "B3-P05 \u00b7 Page settings / SEO",
+  "family": "editor",
+  "inheritors": 4
+ },
+ {
+  "nodeId": "147:75914",
+  "name": "B3-L01 \u00b7 Layers / stable tool with selection footer",
+  "family": "editor",
+  "inheritors": 3
+ },
+ {
+  "nodeId": "101:29978",
+  "name": "B3-P54 \u00b7 New page / choose source",
+  "family": "editor",
+  "inheritors": 2
+ },
+ {
+  "nodeId": "558:448976",
+  "name": "Overlay \u00b7 Page switcher / B3-P28",
+  "family": "editor",
+  "inheritors": 2
+ },
+ {
+  "nodeId": "7:18654",
+  "name": "J-F1.01 \u00b7 Open existing Home",
+  "family": "editor",
+  "inheritors": 1
+ },
+ {
+  "nodeId": "63:13820",
+  "name": "B3-P02 \u00b7 About / page actions",
+  "family": "editor",
+  "inheritors": 1
+ },
+ {
+  "nodeId": "145:65011",
+  "name": "B3-C02 \u00b7 Canvas / grid size and snap off",
+  "family": "editor",
+  "inheritors": 1
+ },
+ {
+  "nodeId": "147:76329",
+  "name": "B3-L02 \u00b7 Layers / personal display preferences",
+  "family": "editor",
+  "inheritors": 1
+ },
+ {
+  "nodeId": "147:77189",
+  "name": "B3-L04 \u00b7 Layers / search results with parent paths",
+  "family": "editor",
+  "inheritors": 1
+ },
+ {
+  "nodeId": "10:2199",
+  "name": "C05 \u00b7 Save failed / edits retained",
+  "family": "recovery",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "10:3787",
+  "name": "C09 \u00b7 Narrow insertion / Inspector stays closed",
+  "family": "recovery",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "225:2821",
+  "name": "B7-G02 \u00b7 Site didn\u2019t load / banner and read-only canvas",
+  "family": "recovery",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "225:3353",
+  "name": "B7-G03 \u00b7 Session expired / unsaved changes kept",
+  "family": "recovery",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "225:3888",
+  "name": "B7-G04 \u00b7 Session expired banner / edits keep queueing",
+  "family": "recovery",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "225:4416",
+  "name": "B7-G05 \u00b7 Signed in again / queued changes sent",
+  "family": "recovery",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "225:4941",
+  "name": "B7-G06 \u00b7 Different account signed in / nothing sent",
+  "family": "recovery",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "225:5474",
+  "name": "B7-G07 \u00b7 Unsaved work found / server older, restore allowed",
+  "family": "recovery",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "225:6003",
+  "name": "B7-G08 \u00b7 Unsaved work found / server newer, no restore",
+  "family": "recovery",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "225:6532",
+  "name": "B7-G09 \u00b7 Unsaved work found / server time unknown",
+  "family": "recovery",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "203:34125",
+  "name": "B6-B02 \u00b7 Semantic primary token / exact edit target",
+  "family": "brand",
+  "inheritors": 2
+ },
+ {
+  "nodeId": "203:37214",
+  "name": "B6-B12 \u00b7 Dark mode / paired values and one owner",
+  "family": "brand",
+  "inheritors": 1
+ },
+ {
+  "nodeId": "203:38272",
+  "name": "B6-B15 \u00b7 Brand Import and export",
+  "family": "brand",
+  "inheritors": 1
+ },
+ {
+  "nodeId": "207:39217",
+  "name": "B6-B24 \u00b7 Radius / add, rename and delete",
+  "family": "brand",
+  "inheritors": 1
+ },
+ {
+  "nodeId": "203:33565",
+  "name": "B6-B01 \u00b7 Brand / colors",
+  "family": "brand",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "203:34892",
+  "name": "B6-B04 \u00b7 Invalid color / retained local field draft",
+  "family": "brand",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "203:35106",
+  "name": "B6-B05 \u00b7 Pending Brand save / leave guard",
+  "family": "brand",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "203:35546",
+  "name": "B6-B07 \u00b7 Brand starters / preview before apply",
+  "family": "brand",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "203:36082",
+  "name": "B6-B08 \u00b7 Starter preview / no writes yet",
+  "family": "brand",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "203:36613",
+  "name": "B6-B09 \u00b7 Starter apply / creating restore point",
+  "family": "brand",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "156:716",
+  "name": "B4-F01 \u00b7 Contact form / canonical child list",
+  "family": "inspector",
+  "inheritors": 7
+ },
+ {
+  "nodeId": "161:13919",
+  "name": "B4-I12 \u00b7 Text / device visibility and interactions",
+  "family": "inspector",
+  "inheritors": 3
+ },
+ {
+  "nodeId": "156:1316",
+  "name": "B4-F02 \u00b7 Email field / label, placeholder and submission key",
+  "family": "inspector",
+  "inheritors": 2
+ },
+ {
+  "nodeId": "156:6055",
+  "name": "B4-F10 \u00b7 Form delivery / Admin configuration",
+  "family": "inspector",
+  "inheritors": 2
+ },
+ {
+  "nodeId": "161:14772",
+  "name": "B4-I14 \u00b7 Interactions / presets first",
+  "family": "inspector",
+  "inheritors": 1
+ },
+ {
+  "nodeId": "161:15179",
+  "name": "B4-I15 \u00b7 Interaction / Fade in on scroll",
+  "family": "inspector",
+  "inheritors": 1
+ },
+ {
+  "nodeId": "165:17822",
+  "name": "B4-I20 \u00b7 Interaction / contextual commands",
+  "family": "inspector",
+  "inheritors": 1
+ },
+ {
+  "nodeId": "165:18662",
+  "name": "B4-I22 \u00b7 Interaction / deleted with exact undo",
+  "family": "inspector",
+  "inheritors": 1
+ },
+ {
+  "nodeId": "220:43545",
+  "name": "B6-K31 \u00b7 Import package / choose file",
+  "family": "components",
+  "inheritors": 4
+ },
+ {
+  "nodeId": "215:43588",
+  "name": "B6-K02 \u00b7 Components / This site with summary",
+  "family": "components",
+  "inheritors": 1
+ },
+ {
+  "nodeId": "220:42592",
+  "name": "B6-K28 \u00b7 Export Hero card / blocked by inaccessible image",
+  "family": "components",
+  "inheritors": 1
+ },
+ {
+  "nodeId": "215:44300",
+  "name": "B6-K04 \u00b7 Components / Component library, not on this site",
+  "family": "components",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "302:12190",
+  "name": "PLAY \u00b7 F2.02 \u00b7 Choose source",
+  "family": "play",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "302:13946",
+  "name": "PLAY \u00b7 F2.05 \u00b7 Binding details",
+  "family": "play",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "302:15235",
+  "name": "PLAY \u00b7 F2.08 \u00b7 Leave draft guard",
+  "family": "play",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "302:15605",
+  "name": "PLAY \u00b7 F2.09 \u00b7 Save and return pending",
+  "family": "play",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "168:21408",
+  "name": "Guard \u00b7 record to Fields",
+  "family": "resources",
+  "inheritors": 3
+ },
+ {
+  "nodeId": "168:21620",
+  "name": "Pending \u00b7 save record then Fields",
+  "family": "resources",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "222:47163",
+  "name": "B6-T10 \u00b7 Create page failed / nothing was changed",
+  "family": "templates",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "223:44891",
+  "name": "B6-T12 \u00b7 Replace Home / consequence confirm, backup on",
+  "family": "templates",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "500:342149",
+  "name": "StatusBadge",
+  "family": "shell-components",
+  "inheritors": 0
+ },
+ {
+  "nodeId": "500:342702",
+  "name": "V2 \u00b7 Site didn\u2019t load / truly view-only",
+  "family": "shell-components",
+  "inheritors": 0
+ }
+]

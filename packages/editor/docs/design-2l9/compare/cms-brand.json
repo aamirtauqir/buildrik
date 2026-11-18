@@ -1,0 +1,152 @@
+{
+  "165:2": {
+    "result": "drift",
+    "note": "Tabs+search+Title/Status/Updated table built; no status filter, sort, Columns, pagination; no Author col. Excerpt cell overflows into Updated (\"helps |Just now\"). RecordsTable key warning.",
+    "liveShot": "docs/design-2l9/compare/cms-brand/165-2.png"
+  },
+  "165:520": {
+    "result": "drift",
+    "note": "Record opens as full sheet; back link ABOVE tabs (board: tabs then back+title row); no Preview (unsaved) pane (only 'Preview ▸' toggle); labels raw keys; Save 98x28 vs board 160x32.",
+    "liveShot": "docs/design-2l9/compare/cms-brand/165-520.png"
+  },
+  "165:797": {
+    "result": "drift",
+    "note": "Footer + button read 'Saving...' as board, but Cancel is disabled while saving (board: enabled); no preview pane; sheet header 'New Blog ×' not on board.",
+    "liveShot": "docs/design-2l9/compare/cms-brand/165-797.png"
+  },
+  "165:1072": {
+    "result": "unreachable-live",
+    "note": "'Couldn’t save' banner only fires on a local-write exception (RecordSheet save catch). A forced server 500 on cms.entries.upsert is queued and shows the OFFLINE copy instead.",
+    "liveShot": "docs/design-2l9/compare/cms-brand/165-1072-500-reads-offline.png"
+  },
+  "165:1625": {
+    "result": "drift",
+    "note": "Banner copy matches, Save disabled matches. Banner sits above back link/tabs (y=109) instead of above fields; footer 'Not saved to the server yet' (red) vs board 'Offline · Not saved'.",
+    "liveShot": "docs/design-2l9/compare/cms-brand/165-1625.png"
+  },
+  "165:2184": {
+    "result": "drift",
+    "note": "Copy + 3 buttons match. Emphasis inverted: live primary=Save and leave, board primary=Keep editing. Dialog 560w at y=369 vs board 480w at y≈280.",
+    "liveShot": "docs/design-2l9/compare/cms-brand/165-2184.png"
+  },
+  "173:9757": {
+    "result": "unreachable-live",
+    "note": "Needs a Blog dynamic template page with a heading bound to Blog.title. QA site has no collection/template; converting a shared QA page was not done (other agents' tabs raised 2 site conflicts).",
+    "liveShot": ""
+  },
+  "173:10329": {
+    "result": "unreachable-live",
+    "note": "Binding subview needs a bound heading on a collection template page; same blocker as 173:9757.",
+    "liveShot": ""
+  },
+  "173:16169": {
+    "result": "unreachable-live",
+    "note": "Record opened from a Heading binding ('‹ Heading · Title binding' origin) needs a bound template page; same blocker as 173:9757.",
+    "liveShot": ""
+  },
+  "257:52890": {
+    "result": "drift",
+    "note": "'Delete excerpt?', 'Type 1 to confirm', Cancel/Delete field built. Adds breadcrumb + yellow callout; 'cannot be undone' vs board 30-day Recently deleted. Dialog 560w y=303 vs 720w y≈128.",
+    "liveShot": "docs/design-2l9/compare/cms-brand/257-52890.png"
+  },
+  "165:2917": {
+    "result": "drift",
+    "note": "Locked state unreachable (no bound field). Field inspector: inline left labels vs stacked; no Key column in table; Required as Yes/No pills vs checkbox; no 'Show N usages' or Save field.",
+    "liveShot": "docs/design-2l9/compare/cms-brand/165-2917.png"
+  },
+  "260:235689": {
+    "result": "drift",
+    "note": "Still a 280px drawer subview (main pane keeps showing Blog Fields); no 'Site variables' page header or '+ New variable' primary top-right; row = key/value/'0 placeholders'/⋯ matches.",
+    "liveShot": "docs/design-2l9/compare/cms-brand/260-235689.png"
+  },
+  "203:33565": {
+    "result": "drift",
+    "note": "Brand shell differs: back link and title on separate rows; bordered cards, round swatches; preview is a bordered 50%-zoom card, not a full-height grey column; nav Checks has no count.",
+    "liveShot": "docs/design-2l9/compare/cms-brand/203-33565.png"
+  },
+  "203:34125": {
+    "result": "drift",
+    "note": "Edit opens a token card (Change/Set/Used by/View) not board's Light/Dark hex fields + Picker, Used by/Aliased by links, Token actions. Reach note absent (0 uses).",
+    "liveShot": "docs/design-2l9/compare/cms-brand/203-34125.png"
+  },
+  "203:34892": {
+    "result": "drift",
+    "note": "Error copy matches exactly. Shown in a picker popover (not inline field); popover bottom 891px runs under footer (868), Cancel/Apply half-hidden.",
+    "liveShot": "docs/design-2l9/compare/cms-brand/203-34892.png"
+  },
+  "203:35106": {
+    "result": "unreachable-live",
+    "note": "Authority code:autosave-no-leave-guard: Brand edits autosave, no leave guard is built by decision.",
+    "liveShot": ""
+  },
+  "203:35546": {
+    "result": "drift",
+    "note": "Heading + strap copy match. Starters are 48px left-aligned rows in one card vs board 32px centered bordered buttons with gaps; 'From logo or URL' hidden (dsAi flag).",
+    "liveShot": "docs/design-2l9/compare/cms-brand/203-35546.png"
+  },
+  "203:36082": {
+    "result": "drift",
+    "note": "Copy matches (name, 'Preview only · Your Brand is unchanged', N colors line, Cancel · Apply starter). No 'Previewing {name}' label; buttons 66/98w vs board 111/160w.",
+    "liveShot": "docs/design-2l9/compare/cms-brand/203-36082.png"
+  },
+  "203:36613": {
+    "result": "drift",
+    "note": "'Preparing…' + restore-point copy match (create held, then aborted; nothing applied). Preparing button 91w vs board 160w; no 'Previewing' label; Brand shell drift.",
+    "liveShot": "docs/design-2l9/compare/cms-brand/203-36613.png"
+  },
+  "203:37214": {
+    "result": "drift",
+    "note": "'Mode · Off' is a heading not a select; tokens listed as name/'No dark value'/Set rows, not light+dark hex pairs+Picker; 'Turn on Auto…' secondary at top (board primary at bottom); extra cards.",
+    "liveShot": "docs/design-2l9/compare/cms-brand/203-37214.png"
+  },
+  "203:38272": {
+    "result": "drift",
+    "note": "Import | Export tabs vs one page with both sections; dashed dropzone vs button; Update matching/Add new only buttons vs select; extra 'or paste JSON'.",
+    "liveShot": "docs/design-2l9/compare/cms-brand/203-38272.png"
+  },
+  "207:39217": {
+    "result": "drift",
+    "note": "'+ Add radius' secondary inline with '‹ Other kinds' (board: primary on own row); value plain text not input; header band + swatch col + side token card not on board.",
+    "liveShot": "docs/design-2l9/compare/cms-brand/207-39217.png"
+  },
+  "220:43545": {
+    "result": "drift",
+    "note": "3 steps (Choose file › Check › Import) vs board 6; no 'Drop a .brcomponent file here' dropzone or Selected row; dialog 560w centered y=307 vs 720w y≈120.",
+    "liveShot": "docs/design-2l9/compare/cms-brand/220-43545.png"
+  },
+  "215:43588": {
+    "result": "drift",
+    "note": "Reached by inserting Hero Section locally (discarded). Scopes are horizontal tabs in a drawer, not left nav; no thumbs/badges/⋯/side detail/Recently deleted; Sort caret overlaps 'used'.",
+    "liveShot": "docs/design-2l9/compare/cms-brand/215-43588.png"
+  },
+  "220:42592": {
+    "result": "unreachable-live",
+    "note": "Blocked-by-inaccessible-image export state not built (no per-asset access data); rows have no ⋯/Export entry.",
+    "liveShot": ""
+  },
+  "215:44300": {
+    "result": "drift",
+    "note": "Library scope lists 'Not on this site'/'On this site'. No versions, Restricted row, sort, side detail. With 0 site components the manager shows 'No components yet' and hides library scope.",
+    "liveShot": "docs/design-2l9/compare/cms-brand/215-44300.png"
+  },
+  "168:21408": {
+    "result": "drift",
+    "note": "Copy matches board exactly. Same emphasis inversion as 165:2184 (Save and leave primary, Keep editing outlined); dialog 560w vs 480w.",
+    "liveShot": "docs/design-2l9/compare/cms-brand/168-21408.png"
+  },
+  "168:21620": {
+    "result": "drift",
+    "note": "Footer 'Saving...' + disabled 'Saving...' match, but secondary reads 'Stay here' (board 'Cancel'); header truncates 'Saving record... A clearer ...'.",
+    "liveShot": "docs/design-2l9/compare/cms-brand/168-21620.png"
+  },
+  "222:47163": {
+    "result": "unreachable-live",
+    "note": "CreatePageErrorModal fires only when importHTMLToActivePage throws locally; no network seam to force it.",
+    "liveShot": ""
+  },
+  "223:44891": {
+    "result": "drift",
+    "note": "Title/checkbox/CTA match. Copy 'takes this site’s brand colors and fonts' vs board 'has its own colors and fonts' (header says 'Own colours'). Full-screen takeover, no shell/backup banner; 560 vs 720w",
+    "liveShot": "docs/design-2l9/compare/cms-brand/223-44891.png"
+  }
+}

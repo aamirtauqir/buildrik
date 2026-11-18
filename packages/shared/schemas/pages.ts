@@ -98,3 +98,45 @@ export type CreatePageFolderInput = z.infer<typeof createPageFolderSchema>;
 export type UpdatePageFolderInput = z.infer<typeof updatePageFolderSchema>;
 export type MovePageToFolderInput = z.infer<typeof movePageToFolderSchema>;
 export type PageFolder = z.infer<typeof pageFolderSchema>;
+
+// ─── Page trash (design-2l9 A-21) ──────────────────────────────────────────
+// A page removed from the editor stays in "Recently deleted" for
+// PAGE_TRASH_RETENTION_DAYS, then the retention purge removes it.
+
+export const PAGE_TRASH_RETENTION_DAYS = 30;
+
+export const listPageTrashSchema = z.object({ siteId: z.string() });
+
+/** `slug` is the new URL when the page's own one is taken (board 142:53954). */
+export const restorePageSchema = z.object({
+  siteId: z.string(),
+  pageId: z.string(),
+  slug: z
+    .string()
+    .trim()
+    .min(1)
+    .max(100)
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Use lowercase letters, numbers and hyphens.")
+    .optional(),
+});
+
+/** ADMIN only; `confirmName` must equal the page's name (board 142:56347). */
+export const purgePageSchema = z.object({
+  siteId: z.string(),
+  pageId: z.string(),
+  confirmName: z.string(),
+});
+
+export const trashedPageSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  slug: z.string(),
+  deletedAt: z.date(),
+  deletedBy: z.object({ id: z.string(), name: z.string().nullable(), isYou: z.boolean() }).nullable(),
+  /** The caller's own folder the page sat in; null = top level. */
+  folderName: z.string().nullable(),
+});
+
+export type RestorePageInput = z.infer<typeof restorePageSchema>;
+export type PurgePageInput = z.infer<typeof purgePageSchema>;
+export type TrashedPage = z.infer<typeof trashedPageSchema>;

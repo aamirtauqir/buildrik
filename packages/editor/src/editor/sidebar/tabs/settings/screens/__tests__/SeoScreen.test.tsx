@@ -19,6 +19,7 @@ const { api, sync } = vi.hoisted(() => ({
     siteDetail: {
       settings: { get: { query: vi.fn() } },
       domains: { list: { query: vi.fn() } },
+      settingsOverview: { query: vi.fn().mockResolvedValue({ seo: { pagesWithoutDescription: 2 } }) },
     },
   },
   sync: { saveSiteSettings: vi.fn() },
@@ -96,9 +97,12 @@ describe("SEO · 8135:214533 — Defaults, Social profiles, the Pages strip, Ind
     ]) {
       expect(screen.getByLabelText(label).id).toBe(`social-${id}`);
     }
+    // B8-S08: the Defaults helper and the planned card.
+    expect(screen.getByTestId("set-seo-missing")).toHaveTextContent("2 pages have no description of their own.");
+    expect(screen.getByTestId("set-card-title-seo-analysis-planned")).toHaveTextContent("SEO analysis · Planned");
     expect(input("social-instagram").value).toBe("https://instagram.com/acme");
     expect(screen.getByTestId("set-seo-pages-strip")).toHaveTextContent(
-      "Page titles and descriptions can be overridden per page in Pages ›",
+      "Site-wide defaults. Pages can override them in Page settings ›",
     );
     expect(screen.getByTestId("set-card-indexing")).toHaveAttribute("data-open", "false");
     expect(screen.queryByLabelText("Twitter Handle")).toBeNull();

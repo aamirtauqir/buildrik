@@ -100,6 +100,7 @@ export class HTMLParser {
    *   not the engine, decides whether that is worth showing.
    */
   importHTMLToActivePage(html: string, onSection?: SectionProgress): void {
+    if (this.ctx.composer.writeLocked) return;
     this.ctx.composer.beginTransaction("import-html-to-active-page");
     try {
       const activePageId = this.ctx.getActivePageId();
@@ -155,6 +156,7 @@ export class HTMLParser {
    * Insert HTML into an element at a specific index
    */
   insertHTMLToElement(parentId: string, html: string, index?: number): Element[] {
+    if (this.ctx.composer.writeLocked) return [];
     const parent = this.ctx.elements.get(parentId);
     if (!parent || !html) return [];
 

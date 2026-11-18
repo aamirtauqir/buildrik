@@ -86,6 +86,11 @@ export interface PrePublishChecksProps {
   renderFix(label: string): React.ReactNode;
   /** The lifecycle's own row (Client approval), drawn with the server's. */
   children?: React.ReactNode;
+  /** The publish tray (boards 233:2 / 499:2656) lists only what needs
+   *  attention; the panel lists every row. */
+  hidePassing?: boolean;
+  /** The line under the rows. The tray's board words it differently. */
+  legend?: string;
 }
 
 export const PrePublishChecks: React.FC<PrePublishChecksProps> = ({
@@ -94,8 +99,11 @@ export const PrePublishChecks: React.FC<PrePublishChecksProps> = ({
   onRetry,
   renderFix,
   children,
+  hidePassing = false,
+  legend = "Red = blocks publish · Amber = advisory",
 }) => {
-  const rows = checks?.checks ?? [];
+  const all = checks?.checks ?? [];
+  const rows = hidePassing ? all.filter((c) => c.status !== "pass") : all;
   return (
     <div data-testid="publish-checks">
       {state === "loading" && (
@@ -115,7 +123,7 @@ export const PrePublishChecks: React.FC<PrePublishChecksProps> = ({
         </div>
       )}
 
-      {state === "ready" && rows.length === 0 && (
+      {state === "ready" && all.length === 0 && (
         <p className="tw:m-0 tw:py-2 tw:text-[12px] tw:text-[var(--bk-ink-muted)]">
           Open this site from the dashboard to see readiness checks.
         </p>
@@ -146,7 +154,7 @@ export const PrePublishChecks: React.FC<PrePublishChecksProps> = ({
 
       {state === "ready" && (rows.length > 0 || children) ? (
         <p className={LEGEND} data-testid="publish-checks-legend">
-          Red = blocks publish · Amber = advisory
+          {legend}
         </p>
       ) : null}
     </div>

@@ -1,12 +1,13 @@
 /**
- * Board 4418:142419 (Add › Manage components): a "‹  Add" back row, the
- * intro sentence, section headers with a count, rows without a chevron, and
- * "+ Create component" in the pinned footer.
+ * 2L9 215:43588 (B6-K02): the Components resource area — navigation with
+ * scope counts, "‹ Back to Add", search, sort and "+ Create component" in the
+ * header, and 40px rows with a scope chip and uses. (Replaced the drawer test
+ * for board 4418:142419: back row, pinned footer.)
  *
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { act, render, screen, fireEvent, waitFor } from "@testing-library/react";
 import * as React from "react";
 import { ToastProvider } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants";
@@ -15,34 +16,58 @@ import { createMockComposer } from "@/editor/sidebar/__tests__/test-utils/mockCo
 vi.mock("@/services/componentSync", () => ({ fetchComponentLibrary: vi.fn(async () => []) }));
 
 import { ComponentsTab } from "@/editor/sidebar/tabs/ComponentsTab";
+import { requestOpenMaster } from "@/editor/sidebar/tabs/component-library/openMasterRequest";
+import {
+  beginUpdateFromSelection,
+  cancelUpdateFromSelection,
+  chooseOnCanvas,
+  getSourcePick,
+  returnToReview,
+  setPickedSource,
+} from "@/editor/sidebar/tabs/component-library/sourcePick";
+import { fetchComponentLibrary } from "@/services/componentSync";
 
 const c = (id: string, name: string) => ({ id, name, masterTree: {}, createdAt: 1, updatedAt: 1, version: 1 }) as never;
 
 function mount(components: never[]) {
   const composer = createMockComposer({ components });
-  Object.assign(composer.components, { isAvailable: () => true, getInstancesOfComponent: () => new Array(6) });
+  Object.assign(composer.components, { isAvailable: () => true, getInstancesOfComponent: () => Array.from({ length: 6 }, (_, i) => ({ elementId: `i${i}` })) });
   render(
     <ToastProvider>
-      <ComponentsTab composer={composer as never} onCreateNew={vi.fn()} />
+      <ComponentsTab composer={composer as never} />
     </ToastProvider>,
   );
   return composer;
 }
 
-describe("ComponentsTab — board 4418:142419", () => {
-  it("draws the back row, intro, counted section header and chevron-less rows", async () => {
+describe("ComponentsTab — 2L9 215:43588 (B6-K02) resource area", () => {
+  it("draws the navigation, the header and 40px rows with scope chip and uses", async () => {
     const composer = mount([c("hdr", "Site header"), c("ftr", "Footer")]);
+    /* 215:46716 — "‹ Back to Add" returns to Add. */
     const back = await screen.findByTestId("comp-back-row");
-    expect(back.textContent?.replace(/\s+/g, " ")).toBe("‹ Add");
+    expect(back.textContent).toBe("‹ Back to Add");
     fireEvent.click(back);
     expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_SWITCH_TAB, { tab: "add" });
 
-    expect(screen.getByTestId("comp-intro").textContent).toBe(
-      "Manage saved masters for this site. Insert places an instance; edits to a master affect its instances.",
-    );
-    expect(screen.getByTestId("comp-section-header").textContent).toBe("YOUR COMPONENTS2");
-    expect(screen.getByTestId("comp-row-hdr").textContent).toBe("Site header6 on this site");
-    expect(screen.getByTestId("comp-footer").textContent).toBe("+ Create component");
+    /* 215:46695 — the scopes as a vertical list with counts, This site chosen. */
+    expect(screen.getAllByRole("tab").map((t) => t.getAttribute("aria-label"))).toEqual(["This page · 0", "This site · 2", "Component library · 0"]);
+    expect(screen.getByRole("tab", { name: "This site · 2" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tab", { name: "This site · 2" }).className).toContain("--bk-accent-subtle");
+    expect(screen.getByTestId("comp-import-open").textContent).toBe("Import package…");
+
+    /* 215:46714 — + Create component sits in the header, not a footer. */
+    expect(screen.getByTestId("comp-create").textContent).toBe("+ Create component");
+    expect(screen.queryByTestId("comp-footer")).toBeNull();
+
+    /* 215:46932 / 215:46933 — "This site · N", then 40px rows. */
+    expect(screen.getByTestId("comp-section-header").textContent).toBe("This site · 2");
+    expect(screen.getByTestId("comp-row-hdr").className).toContain("tw:h-10");
+    expect(screen.getByTestId("comp-row-scope-hdr").textContent).toBe("This site");
+    expect(screen.getByTestId("comp-row-count-hdr").textContent).toBe("6 uses");
+    /* 2L9 217:43947 — the full name on hover, however the row truncates it. */
+    /* 217:43947 (B6-K26) — the full name in the ink tooltip, not a native title. */
+    expect(screen.getByTestId("comp-row-name-hdr")).not.toHaveAttribute("title");
+    expect(screen.getAllByRole("tooltip", { hidden: true }).map((t) => t.textContent)).toContain("Site header");
   });
 
   /* Board 4418:166980: a master made in this session is badged New. */
@@ -52,10 +77,9 @@ describe("ComponentsTab — board 4418:142419", () => {
     expect(screen.queryByTestId("comp-row-new-hdr")).toBeNull();
   });
 
-  /* Board 4418:143126: after Detach all, the list opens on "N instances
-     detached" + "{name} is still saved…", and that master's row is dimmed
-     with "0 linked instances". */
-  it("reports a Detach all on the list and dims the master's row", async () => {
+  /* 2L9 217:41451 (B6-K17): after Detach all the row reads "0 uses" — no
+     notice above the list, no dimmed row — and the summary stays open. */
+  it("after Detach all the row reads 0 uses and the summary stays open", async () => {
     const composer = createMockComposer({ components: [c("menu", "Menu card"), c("hdr", "Site header")] });
     const live = new Map<string, string[]>([["menu", ["i1", "i2"]], ["hdr", ["i3"]]]);
     Object.assign(composer.components, {
@@ -63,27 +87,330 @@ describe("ComponentsTab — board 4418:142419", () => {
       getInstancesOfComponent: (id: string) => (live.get(id) ?? []).map((elementId) => ({ elementId })),
       detachInstance: vi.fn(async (elementId: string) => {
         for (const [k, v] of live) live.set(k, v.filter((x) => x !== elementId));
+        composer.emit(EVENTS.INSTANCE_DETACHED, { instanceId: elementId });
         return true;
       }),
       isInstance: () => false,
     });
     render(
       <ToastProvider>
-        <ComponentsTab composer={composer as never} onCreateNew={vi.fn()} />
+        <ComponentsTab composer={composer as never} />
       </ToastProvider>,
     );
     fireEvent.click(await screen.findByTestId("comp-row-menu"));
+    fireEvent.click(await screen.findByTestId("component-more"));
     fireEvent.click(await screen.findByTestId("component-detach-all"));
-    fireEvent.click(screen.getByTestId("component-detach-all-confirm-confirm"));
-    const notice = await screen.findByTestId("comp-detach-notice");
-    expect(notice.textContent).toBe("2 instances detachedMenu card is still saved. Existing page content keeps its appearance.");
-    expect(screen.getByTestId("comp-row-count-menu").textContent).toBe("0 linked instances");
-    expect(screen.getByTestId("comp-row-menu").className).toContain("tw:opacity-40");
-    expect(screen.getByTestId("comp-row-hdr").className).not.toContain("tw:opacity-40");
+    expect(await screen.findByText(/^Detached 2 instances on \d pages? from Menu card$/)).toBeTruthy();
+    expect(screen.queryByTestId("comp-detach-notice")).toBeNull();
+    expect(screen.getByTestId("comp-row-count-menu").textContent).toBe("0 uses");
+    expect(screen.getByTestId("comp-row-menu").className).not.toContain("tw:opacity-40");
+    expect(screen.getByTestId("component-usedon-toggle").textContent).toBe("Not used on any page");
   });
 
-  it("the empty state keeps the back row too", async () => {
+  it("the empty state keeps the navigation and the way back", async () => {
     mount([]);
-    expect((await screen.findByTestId("comp-back-row")).textContent?.replace(/\s+/g, " ")).toBe("‹ Add");
+    expect((await screen.findByTestId("comp-back-row")).textContent).toBe("‹ Back to Add");
+    expect(screen.getByTestId("comp-nav")).toBeInTheDocument();
+    expect(screen.getByTestId("comp-empty").textContent).toMatch(/^No components yet\./);
+  });
+
+  /* 215:47035 — choosing a row opens its summary beside the list; the list
+     stays and the row reads as chosen. Escape closes the summary. */
+  it("a chosen row opens the summary pane beside the list", async () => {
+    mount([c("hdr", "Site header"), c("ftr", "Footer")]);
+    fireEvent.click(await screen.findByTestId("comp-row-hdr"));
+    expect(screen.getByTestId("component-master")).toBeInTheDocument();
+    expect(screen.getByTestId("component-name").textContent).toBe("Site header");
+    expect(screen.getByTestId("comp-row-ftr")).toBeInTheDocument();
+    expect(screen.getByTestId("comp-row-hdr")).toHaveAttribute("aria-current", "true");
+    expect(screen.getByTestId("comp-row-hdr").className).toContain("--bk-accent-subtle");
+    fireEvent.click(screen.getByTestId("comp-row-ftr"));
+    expect(screen.getByTestId("component-name").textContent).toBe("Footer");
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.queryByTestId("component-master")).toBeNull();
+  });
+
+  /* 2L9 217:42647 (B6-K21): "Used in … ›" shows the places in the list's
+     stead; "‹ Back to {name}" brings the list and the summary back. */
+  it("Used in opens the places view and Back returns to the list", async () => {
+    mount([c("hdr", "Site header"), c("ftr", "Footer")]);
+    fireEvent.click(await screen.findByTestId("comp-row-hdr"));
+    fireEvent.click(screen.getByTestId("component-usedon-toggle"));
+    expect(screen.getByTestId("comp-usedon")).toBeInTheDocument();
+    expect(screen.queryByTestId("comp-row-ftr")).toBeNull();
+    expect(screen.queryByTestId("component-master")).toBeNull();
+    fireEvent.click(screen.getByTestId("comp-usedon-back"));
+    expect(screen.getByTestId("comp-row-ftr")).toBeInTheDocument();
+    expect(screen.getByTestId("component-name").textContent).toBe("Site header");
+  });
+
+  /* 217:43651 (B6-K25): This page with none — a 14/600 ink title and the
+     13 ink-soft how-to under it. */
+  it("This page with no masters says so and how to make one", async () => {
+    mount([c("hdr", "Site header")]);
+    fireEvent.click(await screen.findByRole("tab", { name: "This page · 0" }));
+    const empty = screen.getByTestId("comp-empty-page");
+    const [title, body] = Array.from(empty.querySelectorAll("p"));
+    expect(title.textContent).toBe("No components on this page yet");
+    expect(title.className).toContain("tw:text-[14px]");
+    expect(title.className).toContain("tw:font-semibold");
+    expect(body.textContent).toBe(
+      "Select a section on the canvas and choose Save as component… in Layers or the Inspector. Choose This page to keep it here only.",
+    );
+    expect(body.className).toContain("--bk-ink-soft");
+  });
+
+  /* 228:46316 (B6-K41): each row's ⋯ — Insert, Rename, Duplicate, Export…,
+     Delete (red). Opening it does not open the row. */
+  it("the row menu runs Insert, Rename, Duplicate and Delete", async () => {
+    const composer = mount([c("hdr", "Site header"), c("ftr", "Footer")]);
+    fireEvent.click(await screen.findByTestId("comp-row-more-hdr"));
+    expect(screen.queryByTestId("component-master")).toBeNull();
+    const items = ["comp-row-insert", "comp-row-rename", "comp-row-duplicate", "comp-row-export", "comp-row-delete"];
+    expect(items.map((id) => screen.getByTestId(id).textContent)).toEqual(["Insert", "Rename", "Duplicate", "Export…", "Delete"]);
+    expect(screen.getByTestId("comp-row-delete").className).toMatch(/error|red/);
+
+    fireEvent.click(screen.getByTestId("comp-row-duplicate"));
+    await waitFor(() => expect(composer.components.duplicateComponent).toHaveBeenCalledWith("hdr"));
+
+    fireEvent.click(screen.getByTestId("comp-row-more-hdr"));
+    fireEvent.click(screen.getByTestId("comp-row-insert"));
+    /* The shared insert answers in a toast either way (instantiate.ts). */
+    expect(await screen.findByText(/^(Component added to canvas|Open a page first to add this component\.)$/)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId("comp-row-more-hdr"));
+    fireEvent.click(screen.getByTestId("comp-row-rename"));
+    expect(screen.getByTestId("component-master")).toBeInTheDocument();
+    expect(screen.getByTestId("component-rename-input")).toHaveValue("Site header");
+
+    fireEvent.click(screen.getByTestId("comp-row-more-ftr"));
+    fireEvent.click(screen.getByTestId("comp-row-delete"));
+    expect(await screen.findByText("Delete “Footer”?")).toBeInTheDocument();
+  });
+
+  /* A Rename from the row menu is one request: a summary opened later must
+     not start in rename. */
+  it("Rename from the menu does not stick to later summaries", async () => {
+    mount([c("hdr", "Site header"), c("ftr", "Footer")]);
+    fireEvent.click(await screen.findByTestId("comp-row-more-hdr"));
+    fireEvent.click(screen.getByTestId("comp-row-rename"));
+    expect(screen.getByTestId("component-rename-input")).toBeInTheDocument();
+    fireEvent.keyDown(screen.getByTestId("component-rename-input"), { key: "Escape" });
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.queryByTestId("component-master")).toBeNull();
+    fireEvent.click(screen.getByTestId("comp-row-ftr"));
+    expect(screen.queryByTestId("component-rename-input")).toBeNull();
+    expect(screen.getByTestId("component-name").textContent).toBe("Footer");
+  });
+
+  /* 217:43115 (B6-K23): offline, the site's masters still list; a warning
+     note says so, the library count is "—" and the library asks for a
+     connection. Import and Export are local files here, so they stay. */
+  it("offline: note above the list, library count — and the library waits", async () => {
+    const online = vi.spyOn(navigator, "onLine", "get").mockReturnValue(false);
+    try {
+      mount([c("hdr", "Site header")]);
+      const note = await screen.findByTestId("comp-offline-note");
+      expect(note.textContent).toBe("You’re offline. This site’s components still work and sync later. Component library needs a connection.");
+      expect(note.className).toContain("--bk-warning-tint");
+      expect(screen.getByTestId("comp-row-hdr")).toBeInTheDocument();
+      expect(screen.getByRole("tab", { name: "Component library · —" })).toBeInTheDocument();
+      expect(screen.getByTestId("comp-import-open")).not.toBeDisabled();
+      fireEvent.click(screen.getByRole("tab", { name: "Component library · —" }));
+      expect(screen.getByTestId("comp-offline-note")).toBeInTheDocument();
+      expect(screen.queryByTestId("comp-empty-library")).toBeNull();
+    } finally {
+      online.mockRestore();
+    }
+  });
+
+  /* Back online, the note goes and the library count returns without a reload. */
+  it("coming back online clears the note and restores the library count", async () => {
+    const online = vi.spyOn(navigator, "onLine", "get").mockReturnValue(false);
+    /* Opened offline, the library fetch fails (null). */
+    vi.mocked(fetchComponentLibrary).mockResolvedValueOnce(null);
+    try {
+      mount([c("hdr", "Site header")]);
+      await screen.findByTestId("comp-offline-note");
+      online.mockReturnValue(true);
+      act(() => {
+        window.dispatchEvent(new Event("online"));
+      });
+      expect(screen.queryByTestId("comp-offline-note")).toBeNull();
+      expect(await screen.findByRole("tab", { name: "Component library · 0" })).toBeInTheDocument();
+    } finally {
+      online.mockRestore();
+    }
+  });
+
+  /* 228:46016 (B6-K40): opened from Layers' "Go to main component ›", the
+     header's way back reads "‹ Back to Layers · {name}" and returns to Layers
+     with the instance selected; the summary has no second back row. */
+  it("opened from Layers, the header goes back to Layers with the instance", async () => {
+    const composer = createMockComposer({ components: [c("hdr", "Site header"), c("ftr", "Footer")] });
+    const instance = { getId: () => "inst-1" };
+    Object.assign(composer.components, { isAvailable: () => true, getInstancesOfComponent: () => [] });
+    Object.assign(composer.elements, { getElement: (id: string) => (id === "inst-1" ? instance : null) });
+    Object.assign(composer.selection, { select: vi.fn() });
+    requestOpenMaster(composer as never, "hdr", "inst-1", "layers");
+    render(
+      <ToastProvider>
+        <ComponentsTab composer={composer as never} />
+      </ToastProvider>,
+    );
+    const back = await screen.findByTestId("comp-back-row");
+    expect(back.textContent).toBe("‹ Back to Layers · Site header");
+    expect(screen.getByTestId("component-name").textContent).toBe("Site header");
+    expect(screen.queryByTestId("component-back-row")).toBeNull();
+    fireEvent.click(back);
+    expect(composer.selection.select).toHaveBeenCalledWith(instance);
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_SWITCH_TAB, { tab: "layers" });
+  });
+
+  /* The way back belongs to the master the door opened: choosing another row
+     returns the header to "‹ Back to Add". The Inspector's door (no "from")
+     keeps the summary's "‹ Back to instance". */
+  it("Back to Layers does not follow to another master; the Inspector door keeps Back to instance", async () => {
+    const composer = createMockComposer({ components: [c("hdr", "Site header"), c("ftr", "Footer")] });
+    Object.assign(composer.components, { isAvailable: () => true, getInstancesOfComponent: () => [] });
+    Object.assign(composer.elements, { getElement: (id: string) => (id === "inst-1" ? { getId: () => "inst-1" } : null) });
+    Object.assign(composer.selection, { select: vi.fn() });
+    requestOpenMaster(composer as never, "hdr", "inst-1", "layers");
+    render(
+      <ToastProvider>
+        <ComponentsTab composer={composer as never} />
+      </ToastProvider>,
+    );
+    expect((await screen.findByTestId("comp-back-row")).textContent).toBe("‹ Back to Layers · Site header");
+    fireEvent.click(screen.getByTestId("comp-row-ftr"));
+    expect(screen.getByTestId("comp-back-row").textContent).toBe("‹ Back to Add");
+    act(() => requestOpenMaster(composer as never, "hdr", "inst-1"));
+    expect(screen.getByTestId("comp-back-row").textContent).toBe("‹ Back to Add");
+    expect(screen.getByTestId("component-back-row").textContent).toBe("‹ Back to instance");
+  });
+
+  /* 217:44243 (B6-K27): below the 1440 frame the navigation column folds
+     behind a "Components navigation" button in the header; its popover
+     holds the scopes and Import, and choosing a scope closes it. */
+  it("at 1280 the navigation folds behind Components navigation", async () => {
+    const mm = vi.spyOn(window, "matchMedia").mockImplementation(
+      (q: string) => ({ matches: q === "(max-width: 1439px)", media: q, addEventListener: () => {}, removeEventListener: () => {} }) as never,
+    );
+    try {
+      mount([c("hdr", "Site header")]);
+      const toggle = await screen.findByTestId("comp-compact-nav");
+      expect(toggle.textContent).toBe("Components navigation");
+      expect(screen.queryByTestId("comp-nav")).toBeNull();
+      fireEvent.click(toggle);
+      expect(screen.getByTestId("comp-import-open")).toBeInTheDocument();
+      fireEvent.click(screen.getByRole("tab", { name: "This page · 0" }));
+      expect(screen.getByTestId("comp-section-header").textContent).toBe("This page · 0");
+      expect(screen.queryByRole("tab", { name: "This site · 1" })).toBeNull();
+    } finally {
+      mm.mockRestore();
+    }
+  });
+
+  /* Import from the folded navigation opens the dialog and closes the
+     popover; widening past 1440 brings the column back. */
+  it("folded Import opens the dialog; widening restores the column", async () => {
+    let matches = true;
+    const listeners: Array<() => void> = [];
+    const mm = vi.spyOn(window, "matchMedia").mockImplementation(
+      (q: string) =>
+        ({
+          get matches() {
+            return matches;
+          },
+          media: q,
+          addEventListener: (_: string, fn: () => void) => listeners.push(fn),
+          removeEventListener: () => {},
+        }) as never,
+    );
+    try {
+      mount([c("hdr", "Site header")]);
+      fireEvent.click(await screen.findByTestId("comp-compact-nav"));
+      fireEvent.click(screen.getByTestId("comp-import-open"));
+      expect(screen.getByTestId("comp-import-continue")).toBeInTheDocument();
+      expect(screen.getByTestId("comp-compact-nav")).toHaveAttribute("aria-expanded", "false");
+      matches = false;
+      act(() => listeners.forEach((fn) => fn()));
+      expect(screen.getByTestId("comp-nav")).toBeInTheDocument();
+      expect(screen.queryByTestId("comp-compact-nav")).toBeNull();
+    } finally {
+      mm.mockRestore();
+    }
+  });
+
+  /* 217:40171 (B6-K12) → 217:40825 (B6-K15): "Update from selection…" puts
+     the explanation in the list's place; with a source chosen on the canvas,
+     the review shows what the update would do and Update commits it. */
+  it("Update from selection: choose, then review with the preview's counts", async () => {
+    const composer = mount([c("hdr", "Site header"), c("ftr", "Footer")]);
+    const section = { getId: () => "sec-3", getType: () => "section", getParent: () => root, getChildren: () => [], isLocked: () => false, getCustomData: () => undefined };
+    const root = { getId: () => "root", getType: () => "body", getParent: () => null, getChildren: () => [{ getId: () => "a" }, { getId: () => "b" }, section], isLocked: () => false, getCustomData: () => undefined };
+    Object.assign(composer.elements, {
+      getElement: (id: string) => (id === "sec-3" ? section : null),
+      getAllPages: () => [{ id: "home", name: "Home", root: { id: "root" } }],
+    });
+    Object.assign(composer.components, {
+      previewMasterUpdate: vi.fn(() => ({ instances: 6, overridesKept: 9, lost: [] })),
+      updateComponentMaster: vi.fn(async () => ({ updated: true, instancesSynced: 6, overridesDropped: 0 })),
+      snapshotComponent: () => null,
+      findInstanceContainingElement: () => null,
+    });
+    fireEvent.click(await screen.findByTestId("comp-row-hdr"));
+    fireEvent.click(screen.getByTestId("component-update"));
+
+    const choose = screen.getByTestId("comp-update-choose");
+    expect(choose.querySelector("h2")?.textContent).toBe("Update Site header from a selection");
+    expect(screen.queryByTestId("comp-row-ftr")).toBeNull();
+    expect(screen.queryByTestId("component-master")).toBeNull();
+
+    fireEvent.click(screen.getByTestId("comp-update-choose-canvas"));
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_LEFT_PANEL_CLOSE);
+    act(() => setPickedSource(composer as never, "sec-3"));
+    act(() => returnToReview(composer as never));
+
+    const review = screen.getByTestId("comp-update-review");
+    expect(review.querySelector("h2")?.textContent).toBe("Update Site header from Section 3 on Home");
+    expect(screen.getByTestId("comp-update-kept").textContent).toBe("Overrides kept9");
+    expect(screen.getByTestId("comp-update-lost").textContent).toBe("Overrides that no longer applyNone");
+    fireEvent.click(screen.getByTestId("comp-update-commit"));
+    expect(await screen.findByText("Site header updated from Section 3 on Home · 6 instances")).toBeInTheDocument();
+    expect(screen.getByTestId("comp-row-ftr")).toBeInTheDocument();
+  });
+
+  it("Cancel from the explanation returns to the list", async () => {
+    mount([c("hdr", "Site header")]);
+    fireEvent.click(await screen.findByTestId("comp-row-hdr"));
+    fireEvent.click(screen.getByTestId("component-update"));
+    fireEvent.click(screen.getByTestId("comp-update-cancel"));
+    expect(screen.queryByTestId("comp-update-choose")).toBeNull();
+    expect(screen.getByTestId("comp-row-hdr")).toBeInTheDocument();
+  });
+
+  /* A session whose master is gone ends instead of hanging on. */
+  it("an update session for a deleted master ends and the list returns", async () => {
+    const composer = mount([c("hdr", "Site header")]);
+    act(() => beginUpdateFromSelection(composer as never, "ghost"));
+    await waitFor(() => expect(getSourcePick(composer as never)).toBeNull());
+    expect(screen.getByTestId("comp-row-hdr")).toBeInTheDocument();
+  });
+
+  /* The chosen source was deleted after it was chosen: no Update, and why. */
+  it("a review whose source is gone cannot Update and says to choose another", async () => {
+    const composer = mount([c("hdr", "Site header")]);
+    Object.assign(composer.components, { previewMasterUpdate: () => null });
+    await screen.findByTestId("comp-row-hdr");
+    act(() => {
+      beginUpdateFromSelection(composer as never, "hdr");
+      chooseOnCanvas(composer as never);
+      setPickedSource(composer as never, "deleted-section");
+      returnToReview(composer as never);
+    });
+    expect(screen.getByTestId("comp-update-commit")).toBeDisabled();
+    expect(screen.getByTestId("comp-update-gone").textContent).toBe("The chosen section is no longer on the page. Choose another.");
+    act(() => cancelUpdateFromSelection(composer as never));
   });
 });

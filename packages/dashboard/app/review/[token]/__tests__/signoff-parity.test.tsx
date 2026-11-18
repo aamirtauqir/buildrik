@@ -90,31 +90,31 @@ describe("A · viewing (4418:121903)", () => {
   });
 });
 
-describe("B · commenting (4418:121999)", () => {
-  it("Request changes opens the notes beside the snapshot, signed crumb", () => {
+describe("Request changes (2L9 GAP-RV 276:30195)", () => {
+  it("opens the Request changes dialog over the snapshot", () => {
     reviewQuery.mockReturnValue(data());
     render(<ReviewClient token="t" />);
     fireEvent.click(screen.getByRole("button", { name: "Request changes" }));
-    expect(screen.getByText("Your notes")).toBeTruthy();
-    expect(screen.getByText("Logo bigger please")).toBeTruthy();
-    expect(screen.getByRole("banner").textContent).toContain("Signed as Sara");
-    fireEvent.click(screen.getByRole("button", { name: "Back to design" }));
-    expect(screen.queryByText("Your notes")).toBeNull();
+    expect(screen.getByText("Request changes to Round 3?")).toBeTruthy();
+    expect(screen.getByText("Your note will be posted before this round is marked Changes requested.")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(screen.queryByText("Request changes to Round 3?")).toBeNull();
   });
 });
 
 describe("C · D — closed rounds", () => {
-  it("C: You asked for changes · View the design · Add another note", () => {
+  it("C: Changes requested · Round n with the client's last note · Add another note (276:30445)", () => {
     reviewQuery.mockReturnValue(data({ status: "CHANGES_REQUESTED" }));
     render(<ReviewClient token="t" />);
-    expect(screen.getByRole("heading", { name: "You asked for changes" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Changes requested · Round 3" })).toBeTruthy();
+    expect(screen.getByText("Sara · “Logo bigger please”")).toBeTruthy();
     expect(screen.getByRole("banner").textContent).toContain("Review round 3");
     fireEvent.click(screen.getByRole("button", { name: "Add another note" }));
     expect(screen.getByText("Your notes")).toBeTruthy();
     // The round is closed — nothing left to send, only a way back.
     expect(screen.queryByText("Send change request")).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Back" }));
-    expect(screen.getByRole("heading", { name: "You asked for changes" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Changes requested · Round 3" })).toBeTruthy();
   });
 
   it("D: You approved this · View what you approved shows the snapshot, no verdict buttons", () => {
@@ -141,7 +141,7 @@ describe("F · revoked (4418:121971)", () => {
     const header = screen.getByRole("banner");
     expect(header.textContent).toContain("Ali's Studio");
     expect(header.textContent).toContain("Round 3");
-    expect(screen.getByText(/Ask Ali's Studio for a new one/)).toBeTruthy();
+    expect(screen.getByText(/Ali's Studio stopped this review. Ask them for a new link./)).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Try this link again" }));
     expect(refetch).toHaveBeenCalled();
     fireEvent.click(screen.getByRole("button", { name: "Request a new link" }));

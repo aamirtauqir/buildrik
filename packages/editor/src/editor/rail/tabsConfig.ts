@@ -131,7 +131,9 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     // Templates for IA symmetry in CREATION zone.
     pattern: "card-drill-in",
     shortcut: "⇧A",
-    mode: "panel",
+    // 2L9 215:43588 (B6-K02): a resource area — nav, list and detail beside
+    // the rail, like Assets and Settings — rendered by FullPageRouter.
+    mode: "fullpage",
     // Reclassified 2026-05-22: Components is a library (browse + insert
     // reusable patterns) — same mental class as Add/Templates. Moved to
     // CREATION zone for IA symmetry. Previously labeled "Comps" (truncated)
@@ -229,7 +231,8 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     // panel") + routable. The authoritative IA (14-screen-specs.md:8) promotes
     // it to a first-class rail tab in the pending 6-tab redesign.
     id: "content",
-    iconName: "LayoutGrid",
+    /* 497:99445 — the CMS glyph is the database. */
+    iconName: "Database",
     // v3 IA Q4: "CMS" — the panel IS the CMS (collections, records, fields,
     // dynamic pages, sources, {{site.*}} variables). "Content" read as
     // page copy and nobody looked here for collections (Critical UX-F-01).
@@ -278,7 +281,7 @@ export function getTabConfig(tabId: GroupedTabId): GroupedTabConfig | undefined 
 //   ai         → contextual: canvas selection ✨ + ⌘K command palette
 //   templates  → Pages panel "From template" (new-page flow) + ⌘K + shortcut T
 //   components → shortcut ⇧A + ⌘K ("Open Components"); reached from inside
-//                Add too — the Mine group's "Manage components ›" row
+//                Add too — the Mine group's "Components ›" row
 //                (G2-107) opens this same panel. v3 Q4 puts Components
 //                under Add, not Brand — an earlier version of this comment
 //                said "folds into Brand · components", which the v3 IA
@@ -287,12 +290,19 @@ export function getTabConfig(tabId: GroupedTabId): GroupedTabConfig | undefined 
 //   publish    → topbar Publish button
 //   history    → topbar ⋯ site menu ("Version history")
 //
+// design-2l9 (Figma 2L9OTGzBrL6kYmU18yA1c7, page 03, OD-3 default): the board
+// rail is these six plus "Help" at the foot (LeftSidebar's RailHelpMenu, board
+// 263:255084). The off-rail homes above are unchanged; Activity is the site
+// menu's "Activity log" + ⌘K, Review the topbar review chip + R.
+//
 // It is the one rail (the legacy zone rail and the E3 tool rail were deleted
 // with C5 G1-095). It reads GROUPED_TABS_CONFIG and never mutates it.
 
 /** The six rail items of the Figma contract, in board 52:2 order, one group. */
 export const RAIL_FIGMA: ReadonlyArray<{ zone: TabZone; ids: readonly GroupedTabId[] }> = [
-  { zone: "creation", ids: ["add", "layers", "pages", "assets", "content", "design"] },
+  /* design-2l9 Shell/Rail 497:99445: Add · Layers · Pages | Assets · CMS · Brand. */
+  { zone: "creation", ids: ["add", "layers", "pages"] },
+  { zone: "structure", ids: ["assets", "content", "design"] },
 ] as const;
 
 /** Flat set of tab ids that appear in the Figma rail (for filtering / tests). */

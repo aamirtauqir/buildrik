@@ -38,7 +38,7 @@ import { render as rtlRender, screen } from "@testing-library/react";
 import { CanvasFooterToolbar } from "../CanvasFooterToolbar";
 import { footerToolbarContainerStyles, wrapperStyles } from "../canvasStyles";
 
-const ALL_OFF = { guides: false, spacing: false, grid: false, rulers: false, badges: false, xray: false };
+const ALL_OFF = { guides: false, spacing: false, grid: false, rulers: false, badges: false, xray: false, outlines: false };
 
 beforeAll(() => {
   if (typeof globalThis.window !== "undefined" && !globalThis.window.matchMedia) {
@@ -92,22 +92,21 @@ describe("canvas toolbar containment", () => {
     expect([...bar.classList].some((c) => /^tw:overflow-x?-(auto|hidden|scroll)$/.test(c))).toBe(false);
   });
 
-  /* Board 5936:44788: one 44-tall row. The controls are four; the readout
-     at the right truncates (full text on hover) rather than wrap or hide. */
-  it("is one 44px row — the height the board draws", () => {
+  /* 2L9 board 7:18654: one row, 42 with its container's hairline (y 56–98).
+     The readout truncates (full text on hover) rather than wrap or hide. */
+  it("is one 41px row — 42 with the hairline, the height the board draws", () => {
     const bar = pill();
-    expect(bar.classList.contains("tw:h-[var(--bk-size-header)]")).toBe(true);
+    expect(bar.classList.contains("tw:h-[41px]")).toBe(true);
     expect(bar.classList.contains("tw:flex-wrap")).toBe(false);
   });
 
-  /* Overflow that cannot be scrolled to is the same as deleted. A centred
-     flex row spills off both ends and scrollLeft has no negative side, so at
-     1440 with a drawer open, undo, redo and the Wide device button sat left
-     of the bar's own left edge with no way to reach them. */
-  it("anchors its controls at the start, so overflow lands where the scroll can reach it", () => {
+  /* A centred flex row spills off both ends; the grid's side columns are
+     `minmax(0, …fr)`, so a long readout truncates and the devices and the
+     right group keep their size. */
+  it("lays out readout · devices · controls on a grid whose side columns can shrink to 0", () => {
     const bar = pill();
-    expect(bar.classList.contains("tw:justify-start")).toBe(true);
-    expect(bar.classList.contains("tw:justify-center")).toBe(false);
+    expect(bar.classList.contains("tw:grid")).toBe(true);
+    expect(bar.classList.contains("tw:grid-cols-[minmax(0,1.44fr)_auto_minmax(0,1fr)]")).toBe(true);
   });
 
   it("is opaque — a floating bar cannot show canvas content through itself", () => {
@@ -118,10 +117,9 @@ describe("canvas toolbar containment", () => {
   });
 });
 
-/* Owner decision 2026-10-03 (overrides boards 5936:44788 / 4428:44164, which
-   floated the bar 56 above the canvas bottom, inset 16, rounded + shadowed):
-   the bar is docked — in flow at the bottom of the canvas wrapper, full width,
-   flush to the bottom edge — so it never covers the page. */
+/* The bar is docked in flow, full width, so it never covers the page — at the
+   TOP of the canvas column since the 2026-10-26 board pass (2L9 7:18654; it
+   sat at the bottom per the 2026-10-03 owner override until then). */
 describe("canvas toolbar dock", () => {
   it("sits in flow under the scroll viewport, not absolutely over it", () => {
     expect(wrapperStyles.flexDirection).toBe("column");
@@ -130,11 +128,13 @@ describe("canvas toolbar dock", () => {
     expect(footerToolbarContainerStyles.flex).toBe("none");
   });
 
-  it("cancels the wrapper's 24px padding so it runs edge to edge and flush to the bottom", () => {
+  it("cancels the wrapper's 24px padding so it runs edge to edge and flush to the top", () => {
     expect(wrapperStyles.padding).toBe(24);
     expect(footerToolbarContainerStyles.margin).toBe(
-      "var(--bk-space-24) calc(-1 * var(--bk-space-24)) calc(-1 * var(--bk-space-24))",
+      "calc(-1 * var(--bk-space-24)) calc(-1 * var(--bk-space-24)) var(--bk-space-24)",
     );
+    expect(footerToolbarContainerStyles.borderBottom).toBe("1px solid var(--bk-gray-200)");
+    expect(footerToolbarContainerStyles.borderTop).toBeUndefined();
   });
 
   it("is a strip, not a floating card: no radius, no shadow, no side border", () => {

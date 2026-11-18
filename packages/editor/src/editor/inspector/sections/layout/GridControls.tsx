@@ -2,10 +2,10 @@
  * GridControls — a grid container's controls: Layout when Display is Grid
  * (board 17: "Columns [3]", "Gap [24 px]") and the Grid type block.
  *
- * Columns is a count: it writes `repeat(N, 1fr)`. Anything the count cannot
- * say — a custom track list, rows, flow, item alignment, content alignment,
- * row / column gap — sits behind More settings, so nothing the old Grid
- * section could do is lost.
+ * Columns is a count: it writes `repeat(N, 1fr)`; Tracks is the written
+ * track list (2L9 A02: "repeat(3, minmax(0, 1fr))"), then Rows, Flow, Align
+ * rows, Justify rows and Gap. Item alignment and row / column gap sit behind
+ * More settings, so nothing the old Grid section could do is lost.
  *
  * The one writer of grid-template-columns, grid-template-rows,
  * grid-auto-flow, justify-items, and justify-content / align-content /
@@ -38,8 +38,8 @@ export function columnCount(template: string | undefined): string {
 const FLOW_OPTIONS = [
   { value: "row", label: "Row" },
   { value: "column", label: "Column" },
-  { value: "row dense", label: "Row, dense" },
-  { value: "column dense", label: "Column, dense" },
+  { value: "row dense", label: "Row dense" },
+  { value: "column dense", label: "Column dense" },
 ];
 const CONTENT_OPTIONS = [
   { value: "start", label: "Start" },
@@ -73,40 +73,41 @@ export function GridControls({ styles, onChange, advanced }: GridControlsProps) 
   const [ownMore, setOwnMore] = React.useState(false);
   const more = advanced ?? ownMore;
   const count = columnCount(styles["grid-template-columns"]);
+  /* 2L9 A02 247:21762 "Grid layout": Columns · Tracks · Rows · Flow · Align
+     rows · Justify rows · Gap on the face; the item alignment grid behind
+     More settings. */
   return (
     <>
       <ColumnsRow value={count} onChange={onChange} />
+      <InputRow
+        label="Tracks"
+        property="grid-template-columns"
+        placeholder="repeat(3, 1fr)"
+        value={styles["grid-template-columns"] || ""}
+        onChange={(v) => onChange("grid-template-columns", v)}
+      />
+      <InputRow
+        label="Rows"
+        property="grid-template-rows"
+        placeholder="auto"
+        value={styles["grid-template-rows"] || ""}
+        onChange={(v) => onChange("grid-template-rows", v)}
+      />
+      <SelectRow label="Flow" property="grid-auto-flow" value={styles["grid-auto-flow"] || ""} options={FLOW_OPTIONS} onChange={(v) => onChange("grid-auto-flow", v)} />
+      <SelectRow label="Align rows" property="align-content" value={styles["align-content"] || ""} options={CONTENT_OPTIONS} onChange={(v) => onChange("align-content", v)} />
+      <SelectRow label="Justify rows" property="justify-content" value={styles["justify-content"] || ""} options={CONTENT_OPTIONS} onChange={(v) => onChange("justify-content", v)} />
       <GapRow styles={styles} onChange={onChange} advanced={more} />
       {more && (
-        <>
-          <InputRow
-            label="Column tracks"
-            property="grid-template-columns"
-            placeholder="1fr 1fr 1fr"
-            value={styles["grid-template-columns"] || ""}
-            onChange={(v) => onChange("grid-template-columns", v)}
-          />
-          <InputRow
-            label="Rows"
-            property="grid-template-rows"
-            placeholder="auto"
-            value={styles["grid-template-rows"] || ""}
-            onChange={(v) => onChange("grid-template-rows", v)}
-          />
-          <SelectRow label="Flow" property="grid-auto-flow" value={styles["grid-auto-flow"] || ""} options={FLOW_OPTIONS} onChange={(v) => onChange("grid-auto-flow", v)} />
-          <div className="bdi-row-ctrl">
-            <span className="bdi-lb">Items</span>
-            <div className="bdi-row-content">
-              <AlignmentGrid
-                justifyItems={styles["justify-items"] || "stretch"}
-                alignItems={styles["align-items"] || "stretch"}
-                onChange={onChange}
-              />
-            </div>
+        <div className="bdi-row-ctrl">
+          <span className="bdi-lb">Items</span>
+          <div className="bdi-row-content">
+            <AlignmentGrid
+              justifyItems={styles["justify-items"] || "stretch"}
+              alignItems={styles["align-items"] || "stretch"}
+              onChange={onChange}
+            />
           </div>
-          <SelectRow label="Justify" property="justify-content" value={styles["justify-content"] || ""} options={CONTENT_OPTIONS} onChange={(v) => onChange("justify-content", v)} />
-          <SelectRow label="Align rows" property="align-content" value={styles["align-content"] || ""} options={CONTENT_OPTIONS} onChange={(v) => onChange("align-content", v)} />
-        </>
+        </div>
       )}
       {advanced === undefined && <MoreSettingsToggle isOpen={ownMore} onToggle={() => setOwnMore((v) => !v)} />}
     </>

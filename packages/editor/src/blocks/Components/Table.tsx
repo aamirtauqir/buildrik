@@ -15,6 +15,10 @@ import { BLOCK_COLORS } from "../blockPalette";
  * for selection: that element is the table, typed `table`. Typing the wrapper
  * `table` instead would make its stored "div" defer to the type's own tag
  * (`Element.getTagName`) and publish a `<table>` inside a `<table>`.
+ *
+ * Style keys are CSS's own kebab-case — the names the Inspector reads and
+ * writes. As camelCase (`overflowX`) the wrapper's overflow read as unset in
+ * Wrapper layout (2L9 245:44049).
  */
 function buildTable(composer: Composer, parentId: string, dropIndex?: number): string | undefined {
   const tableWrapper = composer.elements.createElement("container", {
@@ -24,7 +28,7 @@ function buildTable(composer: Composer, parentId: string, dropIndex?: number): s
     },
     styles: {
       width: "100%",
-      overflowX: "auto",
+      "overflow-x": "auto",
     },
   });
 
@@ -38,11 +42,11 @@ function buildTable(composer: Composer, parentId: string, dropIndex?: number): s
     },
     styles: {
       width: "100%",
-      borderCollapse: "collapse",
+      "border-collapse": "collapse",
       background: BLOCK_COLORS.surface,
-      borderRadius: "var(--buildrick-design-radius-md)",
+      "border-radius": "var(--buildrick-design-radius-md)",
       overflow: "hidden",
-      boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+      "box-shadow": "0 1px 3px rgba(0, 0, 0, 0.1)",
     },
   });
   composer.elements.addElement(table, wrapperId);
@@ -68,13 +72,13 @@ function buildTable(composer: Composer, parentId: string, dropIndex?: number): s
       tagName: "th",
       styles: {
         padding: "14px var(--buildrick-design-space-4)",
-        textAlign: "left",
-        fontWeight: "600",
-        fontSize: "var(--buildrick-design-font-size-xs)",
+        "text-align": "left",
+        "font-weight": "600",
+        "font-size": "var(--buildrick-design-font-size-xs)",
         color: BLOCK_COLORS.text,
-        textTransform: "uppercase",
-        letterSpacing: "0.05em",
-        borderBottom: "2px solid " + BLOCK_COLORS.border,
+        "text-transform": "uppercase",
+        "letter-spacing": "0.05em",
+        "border-bottom": "2px solid " + BLOCK_COLORS.border,
       },
     });
     composer.elements.addElement(th, headerRow.getId());
@@ -103,7 +107,7 @@ function buildTable(composer: Composer, parentId: string, dropIndex?: number): s
     const tr = composer.elements.createElement("container", {
       tagName: "tr",
       styles: {
-        borderBottom: "1px solid " + BLOCK_COLORS.border,
+        "border-bottom": "1px solid " + BLOCK_COLORS.border,
       },
     });
     composer.elements.addElement(tr, tbody.getId());
@@ -113,7 +117,7 @@ function buildTable(composer: Composer, parentId: string, dropIndex?: number): s
       tagName: "td",
       styles: {
         padding: "14px var(--buildrick-design-space-4)",
-        fontWeight: "500",
+        "font-weight": "500",
         color: "#1e293b",
       },
     });
@@ -158,9 +162,9 @@ function buildTable(composer: Composer, parentId: string, dropIndex?: number): s
       styles: {
         display: "inline-block",
         padding: "var(--buildrick-design-space-1) var(--buildrick-design-space-3)",
-        borderRadius: "999px",
-        fontSize: "var(--buildrick-design-font-size-xs)",
-        fontWeight: "500",
+        "border-radius": "999px",
+        "font-size": "var(--buildrick-design-font-size-xs)",
+        "font-weight": "500",
         background:
           row.status === "Active" ? "#dcfce7" : row.status === "Pending" ? "#fef3c7" : "var(--buildrick-design-color-surface-muted)",
         color:
@@ -193,9 +197,9 @@ function buildTable(composer: Composer, parentId: string, dropIndex?: number): s
         padding: "6px var(--buildrick-design-space-3)",
         background: BLOCK_COLORS.surfaceSubtle,
         border: "none",
-        borderRadius: "6px",
-        fontSize: "var(--buildrick-design-font-size-xs)",
-        fontWeight: "500",
+        "border-radius": "6px",
+        "font-size": "var(--buildrick-design-font-size-xs)",
+        "font-weight": "500",
         color: BLOCK_COLORS.text,
         cursor: "pointer",
       },

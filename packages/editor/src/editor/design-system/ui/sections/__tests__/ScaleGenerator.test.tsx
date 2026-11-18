@@ -84,6 +84,16 @@ describe("ScaleGenerator (BRP1-M9)", () => {
     expect(u.getByTestId("brand-scale-dark").textContent).toBe(`Primary · Dark → Primary 400 · ${s.hexes[4]}`);
   });
 
+  it("B6-B60's copy: the title names the role, the count line, and the apply reads 'Add 11 tokens'", () => {
+    const u = mount(fake());
+    expect(u.getByTestId("brand-scale-title").textContent).toBe("Generate a scale from Primary");
+    expect(u.getByTestId("brand-scale-intro").textContent).toMatch(/^Creates Primary 50 … Primary 950 from #[0-9A-F]{6}\. Primary then uses the step that matches\. Nothing is added until you apply\.$/);
+    pick(u, "#C2410C");
+    expect(u.getByTestId("brand-scale-count").textContent).toBe("11 new color tokens · names Primary 50 to Primary 950");
+    fireEvent.click(u.getByTestId("brand-scale-preview"));
+    expect(u.getByTestId("brand-scale-confirm").textContent).toBe("Add 11 tokens");
+  });
+
   it("Preview paints a set whose Primary resolves to the picked colour", () => {
     const c = fake();
     const u = mount(c);

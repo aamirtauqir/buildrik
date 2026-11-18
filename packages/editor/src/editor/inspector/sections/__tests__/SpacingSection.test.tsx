@@ -1,7 +1,8 @@
 /**
- * SpacingSection — the SpacingBox only (DD-9b): margin outside, padding
- * inside, Link sides; no pairs, no gap rows. Each side carries its CSS
- * property, so an override lights a dot on that side (board 26).
+ * SpacingSection — 2L9 247:22853: one row per edge (Padding top · sides ·
+ * bottom, Margin top · bottom), sides splitting once they differ, a Source
+ * group for a token-bound edge; no gap rows. Each row carries its CSS
+ * property, so an override lights a dot on that row (board 26).
  *
  * @license BSD-3-Clause
  */
@@ -29,38 +30,53 @@ function renderSpacing(styles: Record<string, string> = {}, field?: Partial<Insp
   return { onChange, onBatchChange };
 }
 
-describe("SpacingSection — the box", () => {
-  it("reads longhands and the shorthand into the eight sides", () => {
-    renderSpacing({ padding: "24px 16px", "margin-top": "8px" });
-    expect(screen.getByLabelText("Padding top")).toHaveValue("24");
-    expect(screen.getByLabelText("Padding left")).toHaveValue("16");
-    expect(screen.getByLabelText("Margin top")).toHaveValue("8");
-    expect(screen.getByLabelText("Margin bottom")).toHaveValue("");
+const order = (names: string[]) => {
+  const els = names.map((n) => screen.getByLabelText(n));
+  return [...els].sort((x, y) => (x.compareDocumentPosition(y) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1)).map((el) => names[els.indexOf(el)]);
+};
+
+describe("SpacingSection — rows (247:22853)", () => {
+  it("Padding top · Padding sides · Padding bottom · Margin top · Margin bottom, from longhands and the shorthand", () => {
+    renderSpacing({ padding: "24px", "margin-top": "-8px" });
+    const names = ["Padding top", "Padding sides", "Padding bottom", "Margin top", "Margin bottom"];
+    expect(order(names)).toEqual(names);
+    expect(screen.getByLabelText("Padding sides")).toHaveValue("24");
+    expect(screen.getByLabelText("Margin top")).toHaveValue("-8");
+    expect(screen.queryByLabelText("Margin sides")).not.toBeInTheDocument();
   });
 
-  it("a side writes its own longhand", () => {
-    const { onChange } = renderSpacing();
-    fireEvent.change(screen.getByLabelText("Padding right"), { target: { value: "12" } });
-    expect(onChange).toHaveBeenCalledWith("padding-right", "12px");
-    fireEvent.change(screen.getByLabelText("Margin bottom"), { target: { value: "auto" } });
-    expect(onChange).toHaveBeenCalledWith("margin-bottom", "auto");
-  });
-
-  it("Link sides writes all four sides of that box in one change", () => {
+  it("an edge writes its own longhand; sides write left and right in one change", () => {
     const { onChange, onBatchChange } = renderSpacing();
-    fireEvent.click(screen.getByRole("button", { name: "Link sides" }));
-    expect(screen.getByRole("button", { name: "Link sides" })).toHaveAttribute("aria-pressed", "true");
-    fireEvent.change(screen.getByLabelText("Padding top"), { target: { value: "20" } });
-    expect(onBatchChange).toHaveBeenCalledWith({ "padding-top": "20px", "padding-right": "20px", "padding-bottom": "20px", "padding-left": "20px" });
-    expect(onChange).not.toHaveBeenCalled();
+    fireEvent.change(screen.getByLabelText("Padding top"), { target: { value: "12" } });
+    expect(onChange).toHaveBeenCalledWith("padding-top", "12px");
+    fireEvent.change(screen.getByLabelText("Padding sides"), { target: { value: "20" } });
+    expect(onBatchChange).toHaveBeenCalledWith({ "padding-left": "20px", "padding-right": "20px" });
   });
 
-  it("no padding / margin pairs and no gap rows (DD-9, DD-9b)", () => {
+  it("sides that differ split into Left / Right; a set margin side shows", () => {
+    renderSpacing({ padding: "24px 16px 24px 8px", "margin-left": "auto", "margin-right": "auto" });
+    expect(screen.getByLabelText("Padding left")).toHaveValue("8");
+    expect(screen.getByLabelText("Padding right")).toHaveValue("16");
+    expect(screen.queryByLabelText("Padding sides")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Margin sides")).toBeInTheDocument();
+  });
+
+  it("no gap rows (DD-9)", () => {
     renderSpacing();
-    expect(screen.queryByRole("group", { name: "Padding" })).not.toBeInTheDocument();
     expect(screen.queryByLabelText("Gap")).not.toBeInTheDocument();
     expect(screen.queryByLabelText("Row gap")).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /more settings/i })).not.toBeInTheDocument();
+  });
+
+  it("a token-bound edge gets the Source group with Unlink, and Remove local override when overridden", () => {
+    document.documentElement.style.setProperty("--buildrick-design-space-24", "24px");
+    const v = "var(--buildrick-design-space-24)";
+    const { onChange } = renderSpacing({ "padding-top": v }, { overrides: new Map([["padding-top", ["breakpoint"]]]) });
+    const source = screen.getByTestId("inspector-spacing-source");
+    expect(source.textContent).toContain("Padding top · spacing token · 24 px resolved");
+    fireEvent.click(screen.getByRole("button", { name: "Unlink to 24 px" }));
+    expect(onChange).toHaveBeenCalledWith("padding-top", "24px");
+    expect(screen.getByRole("button", { name: "Remove local override" })).toBeInTheDocument();
+    document.documentElement.style.removeProperty("--buildrick-design-space-24");
   });
 });
 
@@ -81,5 +97,31 @@ describe("SpacingSection — field context", () => {
   it("a mixed side says so instead of showing one element's value", () => {
     renderSpacing({ "padding-top": "32px" }, { mixedKeys: new Set(["padding-top"]) });
     expect(screen.getByRole("textbox", { name: "Padding top Mixed values" })).toHaveAttribute("placeholder", "Mixed");
+  });
+});
+
+describe("SpacingSection — the page panel (2L9 S06)", () => {
+  const renderPage = (styles: Record<string, string>, advancedExpanded = false) => {
+    const onBatchChange = vi.fn();
+    render(<SpacingSection styles={styles} onChange={vi.fn()} onBatchChange={onBatchChange} isOpen variant="page" advancedExpanded={advancedExpanded} onAdvancedToggle={vi.fn()} />);
+    return { onBatchChange };
+  };
+  const labels = () => Array.from(document.querySelectorAll(".bdi-lb")).map((l) => l.textContent?.trim());
+
+  it("four equal sides are one 'Padding' row, which writes all four; no margin rows while none is set", () => {
+    const { onBatchChange } = renderPage({ padding: "32px" });
+    expect(labels()).toEqual(["Padding"]);
+    fireEvent.change(screen.getByRole("textbox", { name: /^Padding/ }), { target: { value: "40" } });
+    expect(onBatchChange).toHaveBeenCalledWith({ "padding-top": "40px", "padding-right": "40px", "padding-bottom": "40px", "padding-left": "40px" });
+  });
+
+  it("sides that differ keep their own rows — one row would not be true", () => {
+    renderPage({ "padding-top": "32px", "padding-right": "16px", "padding-bottom": "32px", "padding-left": "16px" });
+    expect(labels()).toEqual(expect.arrayContaining(["Padding top", "Padding sides", "Padding bottom"]));
+  });
+
+  it("a set margin still shows its rows; More settings splits the padding again", () => {
+    renderPage({ padding: "32px", "margin-top": "8px" }, true);
+    expect(labels()).toEqual(expect.arrayContaining(["Padding top", "Margin top"]));
   });
 });

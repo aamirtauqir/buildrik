@@ -132,9 +132,7 @@ describe("AdvancedScreen — the frame's three cards, read from the Site row", (
     getMock.mockRejectedValueOnce(new Error("network"));
     const onLoadStateChange = vi.fn();
     setup({ projectId: "s1", onLoadStateChange });
-    expect(screen.getByTestId("set-load-title")).toHaveTextContent("Custom code");
-    expect(screen.getByTestId("set-load-card")).toHaveTextContent("Head, body and CSS injections for this site.");
-    expect(screen.getByTestId("set-load-state")).toHaveTextContent("Loading…");
+    expect(screen.getByTestId("set-load-title")).toHaveTextContent("Loading Custom code…");
     expect(onLoadStateChange).toHaveBeenLastCalledWith("loading");
 
     await waitFor(() => expect(screen.getByTestId("set-load-retry")).toBeInTheDocument());

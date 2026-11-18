@@ -1,6 +1,6 @@
 /**
  * PreviewOverlay tests — in-shell preview (shell state 7): sandboxed iframe
- * render, "‹ Back to canvas" + Escape exit, hidden when no html.
+ * render, "Back to editor" + Escape exit, hidden when no html.
  *
  * @license BSD-3-Clause
  */
@@ -34,17 +34,32 @@ describe("PreviewOverlay", () => {
     expect(frame.getAttribute("sandbox")).toBe("allow-same-origin");
   });
 
-  /* Board 4418:165611 (C5 G1-086): the way out is "‹ Back to canvas" in the
-     preview's own bar; the Done pill is gone, and each device names its width. */
-  it("'‹ Back to canvas' exits, and each device names its width", () => {
+  /* Re-baseline design-2l9 8:3262: the way out reads "Back to editor", the
+     bar names the page and that it is the draft, the fidelity note sits under
+     it; each device still names its width (4418:165611). */
+  it("'Back to editor' exits; page · Draft preview; each device names its width", () => {
     const onDone = vi.fn();
-    render(<PreviewOverlay html="<p>x</p>" onDone={onDone} />);
+    render(<PreviewOverlay html="<p>x</p>" onDone={onDone} pageName="Home" />);
     expect(screen.queryByRole("button", { name: "Done" })).toBeNull();
+    expect(screen.getByTestId("preview-title")).toHaveTextContent("Home · Draft preview");
+    expect(screen.getByTestId("preview-fidelity")).toHaveTextContent("Fonts and colors may differ slightly until published");
     expect(screen.getByTestId("bp-cell-desktop")).toHaveTextContent("Desktop1320px");
     expect(screen.getByTestId("bp-cell-tablet")).toHaveTextContent("Tablet768px");
     expect(screen.getByTestId("bp-cell-mobile")).toHaveTextContent("Mobile375px");
-    fireEvent.click(screen.getByRole("button", { name: "‹ Back to canvas" }));
+    fireEvent.click(screen.getByRole("button", { name: "Back to editor" }));
     expect(onDone).toHaveBeenCalledTimes(1);
+  });
+
+  it("opens at the device it is given (8:3262 'current Tablet')", () => {
+    render(<PreviewOverlay html="<p>x</p>" onDone={vi.fn()} initialDevice="tablet" />);
+    expect(screen.getByTestId("bp-cell-tablet")).toHaveAttribute("aria-pressed", "true");
+  });
+
+  it("mounted closed, each opening starts at the editor's device (A-22)", () => {
+    const { rerender } = render(<PreviewOverlay html={null} onDone={vi.fn()} initialDevice="desktop" />);
+    rerender(<PreviewOverlay html={null} onDone={vi.fn()} initialDevice="mobile" />);
+    rerender(<PreviewOverlay html="<p>x</p>" onDone={vi.fn()} initialDevice="mobile" />);
+    expect(screen.getByTestId("bp-cell-mobile")).toHaveAttribute("aria-pressed", "true");
   });
 
   it("Escape exits", () => {

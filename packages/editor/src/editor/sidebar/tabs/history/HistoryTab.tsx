@@ -19,7 +19,6 @@ import { useHistoryState } from "@/shared/hooks/useHistoryState";
 import { useAutoMilestone } from "@/shared/hooks/useAutoMilestone";
 import { VersionHistoryPanel } from "@/editor/panels/VersionHistoryPanel";
 import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
-import { SaveVersionFooter } from "@/editor/panels/version-history/SaveVersionFooter";
 import { PublishHistory } from "@/editor/shell/PublishHistory";
 import { ActivityView } from "./components/ActivityView";
 import { MilestoneSuggestionBanner } from "./components/MilestoneSuggestionBanner";
@@ -395,17 +394,10 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
 
         </div>
 
-        {(activeView === "session" || activeView === "saves") && savesSettled && (
-          <SavesPruneNote composer={composer} view={activeView} />
-        )}
-        {/* Saves draws this footer inside its own list; Session (4418:73791)
-            draws the same one under its rows. */}
-        {activeView === "session" && (
-          <SaveVersionFooter
-            composer={composer}
-            disabledReason={isViewer ? "Viewers can't save a version — ask an editor" : undefined}
-          />
-        )}
+        {/* 2L9 H01 (230:12999) draws Session with no footer: the list ends at
+            its keys hint. Saving a version lives on Saves, which draws
+            "+ Save a version" in its own list (H04). */}
+        {activeView === "saves" && savesSettled && <SavesPruneNote composer={composer} />}
       </div>
       {/* Time-Travel scrubber drawer (overlays canvas, not sidebar) */}
       <ConfirmDialog

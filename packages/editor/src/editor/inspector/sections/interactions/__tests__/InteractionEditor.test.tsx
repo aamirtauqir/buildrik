@@ -72,22 +72,31 @@ describe("InteractionEditor — timing writes (seconds ↔ ms)", () => {
 });
 
 describe("InteractionEditor — select writes", () => {
-  it("changing the animation type writes animation.type", () => {
-    const { onUpdate, container } = setup();
-    const [animationSelect] = Array.from(container.querySelectorAll("select"));
-    const nextValue = animationSelect.options[1].value;
-    fireEvent.change(animationSelect, { target: { value: nextValue } });
-    expect(onUpdate).toHaveBeenCalledWith(
-      "i1",
-      expect.objectContaining({
-        animation: expect.objectContaining({ type: nextValue }),
-      })
-    );
+  it("changing the effect writes animation.preset", () => {
+    const { onUpdate } = setup();
+    const effect = screen.getByLabelText("Effect") as HTMLSelectElement;
+    const nextValue = effect.options[1].value;
+    fireEvent.change(effect, { target: { value: nextValue } });
+    expect(onUpdate).toHaveBeenCalledWith("i1", expect.objectContaining({ animation: expect.objectContaining({ preset: nextValue }) }));
+  });
+
+  it("2L9 I15: Animate and Repeat write target and loop", () => {
+    const { onUpdate } = setup();
+    fireEvent.change(screen.getByLabelText("Animate"), { target: { value: "parent" } });
+    expect(onUpdate).toHaveBeenCalledWith("i1", expect.objectContaining({ animation: expect.objectContaining({ target: "parent" }) }));
+    fireEvent.change(screen.getByLabelText("Repeat"), { target: { value: "-1" } });
+    expect(onUpdate).toHaveBeenCalledWith("i1", expect.objectContaining({ animation: expect.objectContaining({ loop: -1 }) }));
+  });
+
+  it("2L9 I15: an easing stored by name reads as its option ('easeOut' → Ease out)", () => {
+    setup({ animation: { ...makeInteraction().animation, easing: "easeOut" } });
+    const easing = screen.getByLabelText("Easing") as HTMLSelectElement;
+    expect(easing.selectedOptions[0]?.textContent).toBe("Ease out");
   });
 
   it("changing the easing writes animation.easing", () => {
     const { onUpdate, container } = setup();
-    const easingSelect = Array.from(container.querySelectorAll("select"))[1];
+    const easingSelect = screen.getByLabelText("Easing") as HTMLSelectElement;
     const nextValue = easingSelect.options[1].value;
     fireEvent.change(easingSelect, { target: { value: nextValue } });
     expect(onUpdate).toHaveBeenCalledWith(
@@ -99,28 +108,41 @@ describe("InteractionEditor — select writes", () => {
   });
 });
 
-describe("InteractionEditor — actions", () => {
-  it("Preview fires onPreview with the interaction", () => {
+describe("InteractionEditor — actions (2L9 I15, I20)", () => {
+  const more = () => fireEvent.click(screen.getByRole("button", { name: "More…" }));
+
+  it("Play fires onPreview with the interaction", () => {
     const { onPreview, interaction } = setup();
-    fireEvent.click(screen.getByRole("button", { name: "Preview" }));
+    fireEvent.click(screen.getByRole("button", { name: "Play" }));
     expect(onPreview).toHaveBeenCalledWith(interaction);
   });
 
-  it("shows Disable for an enabled interaction and toggles it", () => {
+  it("More… holds Interaction actions: Disable for an enabled interaction, then Delete", () => {
     const { onToggleEnabled } = setup({ enabled: true });
-    fireEvent.click(screen.getByRole("button", { name: "Disable" }));
+    more();
+    expect(screen.getByRole("menu", { name: "Interaction actions" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("menuitem", { name: "Disable" }));
     expect(onToggleEnabled).toHaveBeenCalledWith("i1");
   });
 
-  it("shows Enable for a disabled interaction", () => {
+  it("a disabled interaction offers Enable and keeps its configuration visible (I21)", () => {
     setup({ enabled: false });
-    expect(screen.getByRole("button", { name: "Enable" })).toBeInTheDocument();
+    expect(screen.getByTestId("interaction-disabled")).toBeInTheDocument();
+    more();
+    expect(screen.getByRole("menuitem", { name: "Enable" })).toBeInTheDocument();
   });
 
   it("Delete fires onRemove", () => {
     const { onRemove } = setup();
-    fireEvent.click(screen.getByRole("button", { name: "Delete" }));
+    more();
+    fireEvent.click(screen.getByRole("menuitem", { name: "Delete" }));
     expect(onRemove).toHaveBeenCalledWith("i1");
+  });
+
+  it("Trigger changes the interaction's trigger", () => {
+    const { onUpdate } = setup();
+    fireEvent.change(screen.getByLabelText("Trigger"), { target: { value: "click" } });
+    expect(onUpdate).toHaveBeenCalledWith("i1", { trigger: "click" });
   });
 });
 
@@ -208,5 +230,42 @@ describe("InteractionEditor — timing validation (P-11c)", () => {
     expect(onUpdate).not.toHaveBeenCalled();
     fireEvent.blur(duration);
     expect(written(onUpdate)).toEqual([expect.objectContaining({ duration: 10000 })]);
+  });
+});
+
+describe("InteractionEditor — preview and target (2L9 I17 / I19)", () => {
+  it("I17: Play previews and becomes Stop with the restore note; Stop ends the preview", () => {
+    const onStopPreview = vi.fn();
+    const onPreview = vi.fn();
+    render(
+      <InteractionEditor interaction={makeInteraction()} onUpdate={vi.fn()} onRemove={vi.fn()} onToggleEnabled={vi.fn()} onPreview={onPreview} onStopPreview={onStopPreview} />,
+    );
+    fireEvent.click(screen.getByTestId("interaction-play"));
+    expect(onPreview).toHaveBeenCalled();
+    expect(screen.getByTestId("interaction-play")).toHaveTextContent("Stop");
+    expect(screen.getByTestId("interaction-previewing")).toHaveTextContent("Previewing on the canvas. Stopping restores the authored appearance.");
+    fireEvent.click(screen.getByTestId("interaction-play"));
+    expect(onStopPreview).toHaveBeenCalled();
+    expect(screen.getByTestId("interaction-play")).toHaveTextContent("Play");
+    expect(screen.queryByTestId("interaction-previewing")).toBeNull();
+  });
+
+  it("I19: a saved selector that matches nothing reads Missing target, with the fallback line", () => {
+    const interaction = makeInteraction({ animation: { ...makeInteraction().animation, target: "#gone" } as Interaction["animation"] });
+    render(<InteractionEditor interaction={interaction} onUpdate={vi.fn()} onRemove={vi.fn()} onToggleEnabled={vi.fn()} elementName="Text" />);
+    expect((screen.getByLabelText("Animate") as HTMLSelectElement).selectedOptions[0].textContent).toBe("Missing target");
+    expect(screen.getByTestId("interaction-missing-target")).toHaveTextContent(
+      "The saved target no longer exists. Output falls back to Text until you choose a target.",
+    );
+  });
+
+  it("I19: a selector that matches reads as itself, no warning", () => {
+    const node = document.createElement("div");
+    node.id = "here";
+    document.body.appendChild(node);
+    const interaction = makeInteraction({ animation: { ...makeInteraction().animation, target: "#here" } as Interaction["animation"] });
+    render(<InteractionEditor interaction={interaction} onUpdate={vi.fn()} onRemove={vi.fn()} onToggleEnabled={vi.fn()} />);
+    expect(screen.queryByTestId("interaction-missing-target")).toBeNull();
+    node.remove();
   });
 });

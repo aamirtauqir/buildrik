@@ -42,16 +42,20 @@ import {
   ConfirmDialog,
   Menu,
   MenuItem,
+  Modal,
   PanelHeader,
   Popover,
   SkeletonBlock,
   Spinner,
-  Textarea,
+  Select,
+  TextInput,
   Toolbar,
   Tooltip,
   useToast,
 } from "@/editor/chrome-ui";
 import { SendForReview } from "@/editor/shell/SendForReview";
+import { ReviewPreviewError } from "@/editor/shell/reviewSend";
+import { ReviewSentModal } from "@/editor/shell/modals/ReviewSentModal";
 import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
 import { EVENTS } from "@/shared/constants/events";
 import { anchorId, locateComment } from "./locate";
@@ -76,7 +80,7 @@ import {
 import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 
 export interface ReviewTabProps {
-  /** Opened from a History › Activity row: draw the "‹ Activity" row. */
+  /** Opened from a History › Activity row: draw the "‹ Back to Activity" row. */
   fromActivity?: boolean;
   isExpanded?: boolean;
   onExpandToggle?: () => void;
@@ -87,7 +91,13 @@ export interface ReviewTabProps {
   /** A re-send goes to whoever the round was sent to. The panel passes the
    *  round's `invitedEmail`; without it `submitReview` mints no token and the
    *  new round is invisible to the client — measured 2026-08-25. */
-  onResend?: (clientEmail?: string) => Promise<{ inviteEmailSent: boolean | null } | void>;
+  /** `preview: false` sends without the frozen preview — the designer's
+   *  choice after a render failure (Play F5.04), which the shell reports by
+   *  throwing `ReviewPreviewError` (`shell/reviewSend.ts`). */
+  onResend?: (
+    clientEmail?: string,
+    options?: { preview: boolean },
+  ) => Promise<{ inviteEmailSent: boolean | null } | void>;
   /** Composer for the orphan-comment events (Detached group + reattach) and
    *  for page names — the boards label groups "OPEN · HOME", not by page id. */
   composer?: import("@/engine").Composer | null;
@@ -105,12 +115,16 @@ const BAND =
   "tw:flex tw:items-center tw:gap-2 tw:w-full tw:px-4 tw:h-7 tw:bg-[var(--bk-bg-subtle)] " +
   "tw:text-[11px] tw:leading-4 tw:font-medium tw:uppercase tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)] " +
   "tw:border-0 tw:justify-between";
+/** 2L9 B8-R01's page mark over each group — "— Home —". */
+const PAGE_MARK = "tw:px-3 tw:pt-3 tw:pb-1 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 /** The band's trailing count — data/11 · mono, not the band's own Inter. */
 const BAND_COUNT =
   "tw:[font-family:var(--bk-font-mono)] tw:tabular-nums tw:text-[11px] tw:leading-4 tw:font-medium";
 const FOOT = "tw:border-t tw:border-[var(--bk-border)] tw:px-4 tw:py-3 tw:flex tw:flex-col tw:gap-2";
+/* The audience select at the text field's 32 height and 13px. */
+const COMPOSER_SELECT_THEME = { field: { select: { sizes: { md: "tw:h-8 tw:py-0 tw:pl-2.5 tw:pr-7 tw:text-[13px]" } } } };
 const COMPOSER =
-  "tw:border-t tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-subtle)] tw:px-3 tw:py-2.5 tw:flex tw:flex-col tw:gap-2";
+  "tw:border-t tw:border-[var(--bk-border)] tw:px-3 tw:py-2.5 tw:flex tw:flex-none tw:flex-col tw:gap-1";
 /* Board 4418:115784's "Locate ›": accent text, no chrome, 12/18. */
 const LOCATE =
   "tw:h-auto tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-accent)] tw:hover:underline";
@@ -119,6 +133,8 @@ const LOCATE =
 const DIALOG_BODY = "tw:flex tw:flex-col tw:gap-3 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
 const DIALOG_LINE = "tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]";
 const GHOST = "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
+/* A muted action on a comment's action line, flush like "Locate ›". */
+const ROW_GHOST = `${GHOST} tw:h-auto tw:p-0 tw:text-[12px] tw:leading-[18px] tw:focus:ring-0`;
 
 /** "2d" / "3h" / "12m" — the boards' scale, which is shorter than relTime's. */
 function shortAge(iso: string | Date): string {
@@ -133,27 +149,59 @@ function shortAge(iso: string | Date): string {
   return `${Math.round(h / 24)}d`;
 }
 
-/** "3 open · 9 resolved · Awaiting Sara" — board 4418:115784's status line.
- *  The tail is where the round stands: "Round 3" once its link is revoked
- *  (4418:116040), "Internal round" for a round no client link was minted for
- *  (6879:66771 drew "Not sent yet", which contradicted the round the user had
- *  just sent — L5-034), and a detached count slots in before it (4418:116906). */
-function statusLine(round: CurrentRound | null, open: number, resolved: number, detached = 0): string {
-  const counts = `${open} open · ${resolved} resolved${detached > 0 ? ` · ${detached} detached` : ""}`;
-  if (!round) return counts;
+/** "3 open · 1 resolved" — the counts that lead 2L9 B8-R01's filter row (a
+ *  detached count slots in after them, board 4418:116906). Where the round
+ *  stands is the round card's first line (`roundState`). */
+function statusLine(open: number, resolved: number, detached = 0): string {
+  return `${open} open · ${resolved} resolved${detached > 0 ? ` · ${detached} detached` : ""}`;
+}
+
+/** The round card's first line — "◐ Opened · Lena Weiss (lena@…) · 2h ago",
+ *  "◌ Link expired · Lena can no longer open it" (B8-R02), or where the round
+ *  stands. */
+function roundState(round: CurrentRound): string {
   const st = round.status?.toLowerCase();
-  const who = round.reviewerName ?? round.invitedEmail ?? "the reviewer";
-  const tail = round.revoked
-    ? `Round ${round.roundNumber}`
+  if (round.invitedEmail === null) return "◐ Internal round — no client invited";
+  if (round.linkExpired) return `◌ Link expired · ${round.reviewerName ?? round.invitedEmail} can no longer open it`;
+  const who =
+    round.reviewerName && round.invitedEmail
+      ? `${round.reviewerName} (${round.invitedEmail})`
+      : (round.reviewerName ?? round.invitedEmail);
+  if (!round.revoked && st === "pending" && round.reviewerLastSeenAt) {
+    const age = shortAge(round.reviewerLastSeenAt);
+    return `◐ Opened · ${who} · ${age === "just now" ? age : `${age} ago`}`;
+  }
+  const state = round.revoked
+    ? "Link revoked"
     : st === "changes_requested"
       ? "Changes requested"
       : st === "approved"
         ? "Approved"
-        : round.invitedEmail === null
-          ? "Internal round"
-          : `Awaiting ${who}`;
-  return `${counts} · ${tail}`;
+        : "Awaiting";
+  return `◐ ${state} · ${who}`;
 }
+
+/** "Sent 15 Oct · link works until 13 Jan" / "Sent 15 Jul · expired 13 Oct". */
+function sentLine(round: CurrentRound): string {
+  const sent = `Sent ${shortDate(round.createdAt)}`;
+  if (!round.expiresAt || round.revoked || round.invitedEmail === null) return sent;
+  return round.linkExpired
+    ? `${sent} · expired ${shortDate(round.expiresAt)}`
+    : `${sent} · link works until ${shortDate(round.expiresAt)}`;
+}
+
+/** "15 Oct" — the board's sent date. */
+function shortDate(iso: string | Date): string {
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? "" : d.toLocaleDateString(undefined, { day: "numeric", month: "short" });
+}
+
+type AudienceFilter = "client" | "team" | "all";
+const AUDIENCE_FILTERS: ReadonlyArray<{ id: AudienceFilter; label: string }> = [
+  { id: "client", label: "Client" },
+  { id: "team", label: "Team" },
+  { id: "all", label: "All" },
+];
 
 interface Group {
   key: string;
@@ -176,6 +224,8 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   const isViewer = useEditorRole() === "VIEWER";
   const [comments, setComments] = React.useState<ReviewComment[]>([]);
   const [resolvedOpen, setResolvedOpen] = React.useState(false);
+  /* 2L9 B8-R01: Client | Team | All over the thread. */
+  const [audience, setAudience] = React.useState<AudienceFilter>("all");
   const [draft, setDraft] = React.useState("");
   const [sending, setSending] = React.useState(false);
   const [replyError, setReplyError] = React.useState(false);
@@ -187,6 +237,14 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
      collapsed group — the older ones sit under "Earlier resolved". */
   const [sessionResolved, setSessionResolved] = React.useState<ReadonlySet<string>>(new Set());
   const [confirmRevoke, setConfirmRevoke] = React.useState(false);
+  /* 2L9 B8-R06 (237:11120): closing the panel over an unsent comment asks. */
+  const [confirmLeave, setConfirmLeave] = React.useState(false);
+  const close = onClose
+    ? () => {
+        if (draft.trim()) setConfirmLeave(true);
+        else onClose();
+      }
+    : undefined;
   const [confirmResend, setConfirmResend] = React.useState(false);
   const [roundMenuOpen, setRoundMenuOpen] = React.useState(false);
   // Orphaned pins (element deleted) — announced by the canvas CommentLayer.
@@ -194,6 +252,8 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   /* Board 4418:115766 — the comment being re-attached through the picker. */
   const [reattaching, setReattaching] = React.useState<ReviewComment | null>(null);
   const [resending, setResending] = React.useState(false);
+  /** The re-send's preview render failed; nothing was sent (F5.04). */
+  const [resendPreviewFailed, setResendPreviewFailed] = React.useState(false);
   const [notice, setNotice] = React.useState<string | null>(null);
   /* The banner's walk (retired ReviewBar's "Next ›"): steps through the OPEN
      comments in server order, switching page and selecting each anchor via
@@ -339,15 +399,16 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
     }
   };
 
-  const doResend = async () => {
+  const doResend = async (preview = true) => {
     setConfirmResend(false);
+    setResendPreviewFailed(false);
     if (!onResend) return;
     setResending(true);
     try {
       // Carry the round's client forward. `submitReview` only mints a token
       // when it is given an email, so a re-send without this produced a round
       // with `token: null` that the client could never open.
-      const outcome = await onResend(round?.invitedEmail ?? undefined);
+      const outcome = await onResend(round?.invitedEmail ?? undefined, { preview });
       await reload();
       /* The round lands either way — a mail failure must never fail the
          re-send. Saying nothing is what made a misconfigured SMTP look
@@ -357,6 +418,9 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
           ? "Round created — but the invite email didn't go out. Send your client the link yourself."
           : null,
       );
+    } catch (err) {
+      if (!(err instanceof ReviewPreviewError)) throw err;
+      setResendPreviewFailed(true);
     } finally {
       setResending(false);
     }
@@ -465,15 +529,18 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       </Popover>
     ) : null;
 
+  const siteName = composer?.getProjectMetadata?.()?.name;
   const header = (
     <>
       <PanelHeader
         title="Review"
+        /* 2L9 B8-R01: "Fieldwork Studio · Round 2" under the title. */
+        subtitle={round ? `${siteName ? `${siteName} · ` : ""}Round ${round.roundNumber}` : undefined}
         actions={roundMenu}
         isExpanded={isExpanded}
         onExpandToggle={onExpandToggle}
         onHelpClick={onHelpClick}
-        onClose={onClose}
+        onClose={close}
       />
       {fromActivity ? (
         <BackToActivityRow onBack={() => composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "activity" })} />
@@ -552,18 +619,67 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   const openComments = comments.filter((c) => c.status !== "RESOLVED");
   const detachedCount = openComments.filter((c) => detachedIds.has(c.id)).length;
 
-  /* Board 4418:115784: one mono status line under the header — counts and
-     where the round stands. No progress bar, no sent line. */
+  /* The banner's walk (retired ReviewBar's "Next ›"), now at the end of the
+     filter row: steps through the OPEN comments in server order. */
+  const walk = () => {
+    if (!composer || openComments.length === 0) return;
+    const i = walkCursor % openComments.length;
+    setWalkCursor(i + 1);
+    locateComment(composer, openComments[i]);
+  };
+  const walkable = Boolean(composer) && openComments.length > 0;
+
+  /* 2L9 B8-R01: one row under the round card — the counts, Client | Team |
+     All over the thread, and Next ›. */
   const progress = (
-    <div className="tw:flex tw:min-h-9 tw:w-full tw:flex-none tw:flex-col tw:justify-center tw:px-4" data-testid="review-status">
-      <span
-        className="tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:leading-4 tw:tabular-nums tw:text-[var(--bk-ink-soft)]"
-        data-testid="review-status-line"
-      >
-        {/* Board 4418:116906 counts a detached comment once — "3 open · 2
-            detached", not five open. */}
-        {statusLine(round, openComments.length - detachedCount, resolvedComments.length, detachedCount)}
-      </span>
+    <div className="tw:flex tw:w-full tw:flex-none tw:flex-col tw:gap-1 tw:px-3 tw:py-2" data-testid="review-status">
+      {/* Wraps in the 280 drawer: the counts keep their line, the filters
+          take the next. */}
+      <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-1">
+        <span
+          className="tw:mr-auto tw:whitespace-nowrap tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+          data-testid="review-status-line"
+        >
+          {/* Board 4418:116906 counts a detached comment once — "3 open · 2
+              detached", not five open. */}
+          {statusLine(openComments.length - detachedCount, resolvedComments.length, detachedCount)}
+        </span>
+        {total > 0 ? (
+          <span className="tw:flex tw:flex-none tw:items-center tw:gap-1" role="group" aria-label="Show comments from">
+            {AUDIENCE_FILTERS.map((f) => (
+              <Button
+                key={f.id}
+                color="light"
+                size="xs"
+                aria-pressed={audience === f.id}
+                className={`tw:h-7 tw:min-h-0 tw:px-2.5 tw:text-[12px] tw:font-normal ${
+                  audience === f.id
+                    ? "tw:border-transparent tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-ink)]"
+                    : "tw:bg-white tw:text-[var(--bk-ink)]"
+                }`}
+                onClick={() => setAudience(f.id)}
+                data-testid={`review-audience-${f.id}`}
+              >
+                {f.label}
+              </Button>
+            ))}
+          </span>
+        ) : null}
+        {round || total > 0 ? (
+          <Button
+            color="light"
+            size="xs"
+            className={`${LOCATE} tw:ml-1`}
+            onClick={walk}
+            disabled={!walkable}
+            /* Disabled without a reason is a bug, not a state (wireframes §5.8). */
+            title={walkable ? undefined : "No open comments to step through"}
+            data-testid="review-banner-next"
+          >
+            Next ›
+          </Button>
+        ) : null}
+      </div>
       {resending && round ? (
         <span className={META}>Sending round {round.roundNumber + 1}…</span>
       ) : notice ? (
@@ -618,11 +734,27 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
     );
   }
 
-  const detached = openComments.filter((c) => detachedIds.has(c.id));
+  const heard = (c: ReviewComment) => audience === "all" || (audience === "client") === (c.authorKind === "client");
+  const detached = openComments.filter((c) => detachedIds.has(c.id) && heard(c));
   const attached = comments.filter(
-    (c) => (c.status !== "RESOLVED" && !detachedIds.has(c.id)) || (c.status === "RESOLVED" && sessionResolved.has(c.id)),
+    (c) =>
+      heard(c) &&
+      ((c.status !== "RESOLVED" && !detachedIds.has(c.id)) || (c.status === "RESOLVED" && sessionResolved.has(c.id))),
   );
-  const earlierResolved = resolvedComments.filter((c) => !sessionResolved.has(c.id));
+  const earlierResolved = resolvedComments.filter((c) => !sessionResolved.has(c.id) && heard(c));
+
+  /* The canvas numbers each page's OPEN comments in server order
+     (CommentLayer's pins); the row wears the same number. */
+  const pinOf = new Map<string, number>();
+  {
+    const perPage = new Map<string, number>();
+    for (const c of comments) {
+      if (c.status !== "OPEN") continue;
+      const n = (perPage.get(c.pageId ?? "") ?? 0) + 1;
+      perPage.set(c.pageId ?? "", n);
+      pinOf.set(c.id, n);
+    }
+  }
 
   /* One id per row across the WHOLE list, in render order (detached, then the
      page groups, then resolved), so a probe or recipe can address the third row
@@ -650,7 +782,13 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
     if (c.status === "RESOLVED" && c.resolvedByName && !sessionResolved.has(c.id)) {
       return `resolved by ${c.resolvedByName} · ${shortAge(c.resolvedAt ?? c.createdAt)}`;
     }
-    return `${pageName(c.pageId)} · ${shortAge(c.createdAt)}`;
+    /* 2L9 B8-R01: the page heads the group, so the row names the element
+       ("Logo · 2m") — when the editor can see it (the active page's). */
+    const el = c.targetSelector ? composer?.elements?.getElement?.(anchorId(c.targetSelector)) : null;
+    const layer = el?.getCustomData?.("layerName");
+    const type = el?.getType?.();
+    const target = typeof layer === "string" && layer ? layer : type ? type.charAt(0).toUpperCase() + type.slice(1) : null;
+    return [target, shortAge(c.createdAt)].filter(Boolean).join(" · ");
   };
 
   /* FC-9 (fix-all 2026-09-25): viewers open Review read-only — server authz
@@ -663,14 +801,15 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
     if (isViewer) {
       return (
         <Tooltip content="Viewers can't resolve comments — ask an editor" placement="top" arrow={false}>
-          <Button color="light" size="xs" aria-disabled="true" onClick={() => {}} className={GHOST}>
+          <Button color="light" size="xs" aria-disabled="true" onClick={() => {}} className={LOCATE}>
             {label}
           </Button>
         </Tooltip>
       );
     }
     return (
-      <Button color="light" size="xs" onClick={() => void onResolve(c)} className={GHOST}>
+      <Button color="light" size="xs" onClick={() => void onResolve(c)} className={LOCATE}>
+        {c.status === "RESOLVED" ? null : <span aria-hidden="true">✓ </span>}
         {label}
       </Button>
     );
@@ -684,7 +823,8 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       key={c.id}
       data-testid={`review-comment-row-${rowIndex.get(c.id)}`}
       index={rowIndex.get(c.id)}
-      author={c.authorKind === "client" ? (c.authorName ?? "Client") : "You"}
+      author={c.authorKind === "client" ? (c.authorName ?? "Client") : (c.authorName ?? "You")}
+      pin={pinOf.get(c.id)}
       authorKind={c.authorKind === "client" ? "client" : "internal"}
       body={c.body}
       meta={rowMeta(c)}
@@ -703,37 +843,34 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
             }
           : undefined
       }
-      /* Board 4418:115784: the trailing slot is Locate › alone (accent);
-         Resolve sits on its own line under the row, Copy link beside it. */
-      actions={
-        extra?.detachedNote
-          ? undefined
-          : (c.targetSelector && (c.status !== "RESOLVED" || sessionResolved.has(c.id)) ? (
-          <Button color="light" size="xs" onClick={() => locate(c)} className={LOCATE} data-row-locate>
-            Locate ›
-          </Button>
-        ) : undefined)
-      }
-      /* Board 4418:116040: a revoked round's rows carry no Resolve / Copy
-         link line (interim owner default, 2026-09-24). */
+      /* 2L9 B8-R01: "Locate ›  ✓ Resolve" close the row. A revoked round's
+         rows keep Locate but carry no Resolve / Copy link (board 4418:116040,
+         interim owner default, 2026-09-24). */
       footer={
-        extra?.footer ?? (round?.revoked ? undefined : (
+        extra?.footer ?? (
           <>
-            {resolveButton(c)}
+            {c.targetSelector && (c.status !== "RESOLVED" || sessionResolved.has(c.id)) ? (
+              <Button color="light" size="xs" onClick={() => locate(c)} className={LOCATE} data-row-locate>
+                Locate ›
+              </Button>
+            ) : null}
+            {round?.revoked ? null : resolveButton(c)}
             {/* Not on board 4418:115784, kept by the owner rule (never
                 silently remove a capability): the only door to a comment's
                 deep link. Logged in designer-notes.md. */}
-            <Button
-              color="light"
-              size="xs"
-              onClick={() => void copyLink(c)}
-              className={GHOST}
-              data-row-copy-link
-            >
-              Copy link
-            </Button>
+            {round?.revoked ? null : (
+              <Button
+                color="light"
+                size="xs"
+                onClick={() => void copyLink(c)}
+                className={ROW_GHOST}
+                data-row-copy-link
+              >
+                Copy link
+              </Button>
+            )}
           </>
-        ))
+        )
       }
     />
   );
@@ -767,7 +904,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
                 <>
                   {isViewer ? (
                     <Tooltip content="Viewers can't reattach comments — ask an editor" placement="top" arrow={false}>
-                      <Button color="light" size="xs" aria-disabled="true" onClick={() => {}} className={GHOST}>
+                      <Button color="light" size="xs" aria-disabled="true" onClick={() => {}} className={ROW_GHOST}>
                         Reattach comment
                       </Button>
                     </Tooltip>
@@ -782,7 +919,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
                         if (composer && c.pageId && c.pageId !== active) composer.elements.setActivePage(c.pageId);
                         setReattaching(c);
                       }}
-                      className={GHOST}
+                      className={ROW_GHOST}
                     >
                       Reattach comment
                     </Button>
@@ -797,18 +934,10 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
 
       {groups.map((g, i) => (
         <div key={g.key}>
-          <div className={BAND} data-testid={`review-band-${i}`}>
-            {/* Board 156:2 marks where the open thread starts, then names
-                each page after it. */}
-            {/* Boards 4418:117140–118407: every group names its state
-                and page — "OPEN · CONTACT", and "RESOLVED · CONTACT" once
-                everything in it was resolved here. */}
-            <span data-testid={`review-band-label-${i}`}>
-              {g.comments.every((c) => c.status === "RESOLVED") ? "Resolved" : "Open"} · {g.label}
-            </span>
-            <span className={BAND_COUNT} data-testid={`review-band-count-${i}`}>
-              {g.comments.length}
-            </span>
+          {/* 2L9 B8-R01: each page's comments under "— Home —"; a row
+              resolved here says so itself ("· Resolved"). */}
+          <div className={PAGE_MARK} data-testid={`review-band-${i}`}>
+            <span data-testid={`review-band-label-${i}`}>— {g.label} —</span>
           </div>
           {g.comments.map((c) => row(c))}
         </div>
@@ -844,6 +973,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       composer={composer ?? null}
       disabledReason={isViewer ? "Viewers can't send for review — ask an editor" : undefined}
       reviewStatus={round ? { at: round.revision } : null}
+      roundNumber={round ? round.roundNumber + 1 : 1}
       onSent={(outcome) => {
         /* The panel keeps this, not SendForReview — that component is
            unmounted by the very reload this triggers. */
@@ -935,69 +1065,60 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
     </div>
   );
 
-  /* ── The round banner (C2 · board B3-05 7571:191619) ─────────────────────
-     Board 200:213's ReviewBar — a strip under the topbar with the open count,
-     a walk through the comments, Compare and Re-send — is retired (owner
-     decision D3): the topbar chip says WHERE the round stands and this
-     panel is where it is worked. What the bar owned that the panel did not
-     was the walk; it lives here now, in a band at the top of the drawer:
-     warning-tinted when the client asked for changes (B3-05), neutral while
-     the round is merely out. The re-send is the panel's own (confirm when
-     comments are open). Absent for a finished or revoked round. */
+  /* ── The round card (2L9 B8-R01 237:8258) ─────────────────────────────
+     Where the round stands and who it went to, when it was sent, and the
+     client's link. It replaces the C2 round banner (board B3-05), whose walk
+     (Next ›) now ends the filter row. An expired link (B8-R02) offers
+     Re-send here. */
   const changesRequested = round.status?.toLowerCase() === "changes_requested";
-  const roundLive = !round.revoked && (round.status?.toLowerCase() === "pending" || changesRequested);
-  const walk = () => {
-    if (!composer || openComments.length === 0) return;
-    const i = walkCursor % openComments.length;
-    setWalkCursor(i + 1);
-    locateComment(composer, openComments[i]);
+  const copyReviewLink = async (token: string) => {
+    try {
+      await writeClipboardText(reviewLinkUrl(token));
+      setNotice("Review link copied");
+    } catch {
+      setNotice("Couldn't copy the link. Open it from ⋯ › Open current review link.");
+    }
   };
-  const walkable = Boolean(composer) && openComments.length > 0;
-  /* A zero here was a count where a sentence belongs: `0 open` meant "your
-     client has not replied yet" and printed a number that says none of that.
-     The count earns its place the moment there IS one. */
-  const bannerLine =
-    openComments.length > 0
-      ? changesRequested
-        ? `${round.reviewerName ?? "Your reviewer"} asked for changes · ${openComments.length} open`
-        : `${openComments.length} open`
-      : changesRequested
-        ? "Changes requested — nothing left open"
-        : hasClientLink
-          ? "Sent — waiting on your client"
-          : "Internal round — no client invited";
-  const roundBanner = roundLive ? (
+  const roundCard = (
     <div
-      className={`tw:flex tw:items-center tw:gap-2 tw:px-3 tw:py-2 tw:border-b tw:border-[var(--bk-border)] ${
-        changesRequested ? "tw:bg-[var(--bk-warning-tint)]" : "tw:bg-[var(--bk-bg-subtle)]"
-      }`}
+      className="tw:mx-3 tw:mt-2 tw:flex tw:flex-none tw:flex-col tw:items-start tw:gap-1 tw:rounded-md tw:bg-[var(--bk-bg-subtle)] tw:p-3"
       role="region"
-      aria-label={changesRequested ? "Changes requested" : "Review in progress"}
+      aria-label={changesRequested ? "Changes requested" : "Review round"}
       data-testid="review-banner"
       data-tone={changesRequested ? "warning" : "neutral"}
     >
-      <span
-        className={`tw:min-w-0 tw:flex-1 tw:text-[12px] tw:leading-4 tw:font-medium ${
-          changesRequested ? "tw:text-[var(--bk-warning-text)]" : "tw:text-[var(--bk-ink-soft)]"
-        }`}
-        data-testid="review-banner-line"
-      >
-        {bannerLine}
+      <span className="tw:text-[13px] tw:leading-[18px] tw:text-[var(--bk-ink)]" data-testid="review-banner-line">
+        {roundState(round)}
       </span>
-      <Button
-        color="light"
-        size="xs"
-        className={`${GHOST} tw:h-6 tw:px-1.5 tw:text-[12px]`}
-        onClick={walk}
-        disabled={!walkable}
-        /* Disabled without a reason is a bug, not a state (wireframes §5.8). */
-        title={walkable ? undefined : "No open comments to step through"}
-        data-testid="review-banner-next"
-      >
-        Next ›
-      </Button>
+      <span className="tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="review-banner-sent">
+        {sentLine(round)}
+      </span>
+      {round.linkExpired && onResend ? (
+        /* B8-R02: the expired link's way forward — asks first, like the ⋯ row. */
+        <Button
+          color="light"
+          size="xs"
+          className="tw:mt-1 tw:h-7 tw:min-h-0 tw:px-3 tw:text-[13px] tw:font-normal"
+          disabled={resending || isViewer}
+          title={isViewer ? "Viewers can't resend the review link — ask an editor" : undefined}
+          onClick={() => setConfirmResend(true)}
+          data-testid="review-card-resend"
+        >
+          Re-send
+        </Button>
+      ) : liveToken ? (
+        <Button
+          color="light"
+          size="xs"
+          className={`${LOCATE} tw:mt-1`}
+          onClick={() => void copyReviewLink(liveToken)}
+          data-testid="review-copy-client-link"
+        >
+          Copy link ⧉
+        </Button>
+      ) : null}
     </div>
-  ) : null;
+  );
 
   /* Board 157:221 — sent, nothing back yet. */
   const emptyBody = (
@@ -1035,7 +1156,38 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
         </div>
       ) : null}
       {header}
-      {roundBanner}
+      {roundCard}
+
+      {/* Esc and the scrim keep editing; only "Discard changes" drops the
+          comment. */}
+      <Modal
+        open={confirmLeave}
+        onClose={() => setConfirmLeave(false)}
+        title="Leave without saving?"
+        kind="question"
+        testId="review-leave-confirm"
+        footer={
+          <>
+            <Button
+              color="light"
+              size="xs"
+              className="tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-ink)]"
+              onClick={() => {
+                setConfirmLeave(false);
+                setDraft("");
+                onClose?.();
+              }}
+            >
+              Discard changes
+            </Button>
+            <Button size="xs" onClick={() => setConfirmLeave(false)}>
+              Keep editing
+            </Button>
+          </>
+        }
+      >
+        <span className={DIALOG_BODY}>Your comment hasn’t been sent. It is kept here if you keep editing.</span>
+      </Modal>
 
       {/* Board 6879:67202 — revoke is a modal, opened from the ⋯ menu. */}
       <ConfirmDialog
@@ -1092,35 +1244,43 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
         age={shortAge}
       />
 
+      {/* 2L9 B8-R01: one line — who sees it, the comment, Send. Comments
+          from here are team-only (the client's review page lists only the
+          client's own notes), so the audience has that one choice until
+          client-visible replies exist (REQUESTS G-11, B8-R04). */}
       <div className={COMPOSER}>
-        <Textarea
-          className="tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700"
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          /* Board 4418:115784: the composer is a page comment — the page it
-             lands on is named under it. It stays team-only (the client's
-             review page lists only the client's own notes), so the board's
-             "Shared" is not claimed; designer note logged.
-             FC-9 (fix-all 2026-09-25): a viewer's textarea stays disabled —
-             the placeholder itself is the reason, since a disabled textarea
-             cannot carry a hover tooltip. */
-          placeholder={isViewer ? "Viewers can't comment — ask an editor" : `Comment on ${pageName(activePage ?? null)}…`}
-          disabled={isViewer}
-          rows={2}
-          maxLength={2000}
-        />
-        {replyError && (
-          <span className={META} role="alert">
-            Comment not sent. Your draft is still here.
-          </span>
-        )}
-        <span className={META} data-testid="review-composer-meta">Page comment · {pageName(activePage ?? null)} · team only</span>
-        <div className="tw:flex tw:items-center tw:justify-end tw:gap-2">
+        <div className="tw:flex tw:items-center tw:gap-1.5">
+          <Select
+            aria-label="Who sees this comment"
+            className="tw:w-[108px] tw:flex-none"
+            theme={COMPOSER_SELECT_THEME}
+            value="team"
+            onChange={() => undefined}
+            data-testid="review-composer-audience"
+          >
+            <option value="team">Team only</option>
+          </Select>
+          <TextInput
+            className="tw:min-w-0 tw:flex-1"
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                void send();
+              }
+            }}
+            /* FC-9 (fix-all 2026-09-25): a viewer's field stays disabled — the
+               placeholder itself is the reason. */
+            placeholder={isViewer ? "Viewers can't comment — ask an editor" : `Comment on ${pageName(activePage ?? null)}…`}
+            aria-label={`Comment on ${pageName(activePage ?? null)}`}
+            disabled={isViewer}
+            maxLength={2000}
+          />
           <Button
+            color="light"
             size="xs"
-            /* Board 4418:115784: Send is the blue primary — disabled is the
-               same blue, dimmed, not the grey the theme gives. */
-            className="tw:disabled:bg-[var(--bk-accent)] tw:disabled:text-[var(--bk-accent-on)] tw:disabled:opacity-50"
+            className="tw:h-8 tw:min-h-0 tw:flex-none tw:px-3 tw:text-[13px] tw:font-normal"
             disabled={!draft.trim() || sending || isViewer}
             onClick={() => void send()}
             aria-busy={sending || undefined}
@@ -1128,7 +1288,32 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
             {replyError ? "Retry send" : "Send"}
           </Button>
         </div>
+        {replyError && (
+          <span className={META} role="alert">
+            Comment not sent. Your draft is still here.
+          </span>
+        )}
       </div>
+
+      {/* 2L9 B8-R05 (237:10534): when the client asked for changes, the next
+          round is the primary under the composer — "Send Round 3 to Lena" —
+          beside how much of this one is resolved. It asks first, like the ⋯ row. */}
+      {changesRequested && hasClientLink && onResend ? (
+        <div className="tw:flex tw:flex-none tw:items-center tw:gap-3 tw:border-t tw:border-[var(--bk-border)] tw:px-3 tw:py-2.5" data-testid="review-next-round">
+          <Button
+            size="xs"
+            className="tw:h-8 tw:min-h-0 tw:px-3 tw:text-[13px] tw:font-normal"
+            disabled={resending || isViewer}
+            title={isViewer ? "Viewers can't send for review — ask an editor" : undefined}
+            onClick={() => setConfirmResend(true)}
+          >
+            Send Round {round.roundNumber + 1} to {round.reviewerName ?? round.invitedEmail}
+          </Button>
+          <span className={META}>
+            {resolvedComments.length} of {total} resolved
+          </span>
+        </div>
+      ) : null}
 
       <ReattachModal
         open={reattaching !== null}
@@ -1169,6 +1354,15 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
           composer?.emit("comments:refresh", {});
         }}
         onPickOnCanvas={reattaching ? () => composer?.emit("comments:reattach-start", { id: reattaching.id }) : undefined}
+      />
+
+      {/* Play F5.04 — the re-send's preview failed and nothing went out. */}
+      <ReviewSentModal
+        state={resendPreviewFailed ? "preview-failed" : null}
+        roundNumber={round.roundNumber + 1}
+        onClose={() => setResendPreviewFailed(false)}
+        onRetryPreview={() => void doResend(true)}
+        onSendWithoutPreview={() => void doResend(false)}
       />
 
       {/* Board 4418:120052 — the re-send confirm is a modal (G1-058), from the

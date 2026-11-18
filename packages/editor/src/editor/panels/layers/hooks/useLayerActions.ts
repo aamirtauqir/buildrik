@@ -121,17 +121,35 @@ export function useLayerActions(
     saveSetToStorage(currentPageId, "hidden", hiddenIds);
   }, [hiddenIds, currentPageId]);
 
-  const toggleVisibility = React.useCallback((id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
+  /* The one write to the dimmed set — the row's eye and the Inspector's
+     "Show normally" both land here. `hidden` omitted = toggle. */
+  const setDimmed = React.useCallback((id: string, hidden?: boolean) => {
     setHiddenIds((prev) => {
+      const isNowHidden = hidden ?? !prev.has(id);
+      if (isNowHidden === prev.has(id)) return prev;
       const next = new Set(prev);
-      const isNowHidden = !next.has(id);
       if (isNowHidden) next.add(id);
       else next.delete(id);
       pendingVisibilityRef.current = { id, hidden: isNowHidden };
       return next;
     });
   }, []);
+
+  const toggleVisibility = React.useCallback((id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDimmed(id);
+  }, [setDimmed]);
+
+  /* REQUESTS B-20 / 147:78900: the Inspector's "Dimmed in editor only ·
+     Show normally" asks; Layers owns the dimmed set and un-dims it. */
+  React.useEffect(() => {
+    if (!composer) return;
+    const onShowNormally = ({ id }: { id: string }) => setDimmed(id, false);
+    composer.on(EVENTS.LAYER_SHOW_NORMALLY_REQUESTED, onShowNormally);
+    return () => {
+      composer.off(EVENTS.LAYER_SHOW_NORMALLY_REQUESTED, onShowNormally);
+    };
+  }, [composer, setDimmed]);
 
   // Apply DOM visibility attribute after state commit (keeps side effects out of setState)
   React.useEffect(() => {

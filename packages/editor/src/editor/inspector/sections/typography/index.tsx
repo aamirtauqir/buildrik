@@ -1,7 +1,9 @@
 /**
  * Typography — Font, Font size, Line height, Weight, Colour, Align (boards 1,
  * 4), the rest behind More settings. The same body serves:
- *   - "Typography", open, on text types;
+ *   - "Typography", open, on text types (Font, Font size, Weight, Line
+ *     height, Text color — 2L9 161:8940; Text style and Align under More
+ *     settings);
  *   - "Text inside", closed with a one-line summary, on containers, buttons,
  *     form fields and widgets (board 17, owner answer 1) — the registry names
  *     the section and draws the summary;
@@ -17,6 +19,8 @@ import { Section, MoreSettingsToggle } from "@/editor/inspector/shared/controls"
 import { FontControls } from "./FontControls";
 import { FontPicker } from "./FontPicker";
 import { ADVANCED_TYPOGRAPHY_COUNT, TypographyControls } from "./TypographyControls";
+import { TextStyleRow } from "./TextStyleRow";
+import { NoteRow } from "../behaviourRows";
 
 // ============================================================================
 // TYPES
@@ -39,6 +43,13 @@ export interface TypographySectionProps {
   variant?: "element" | "page";
   /** What the element renders as where it sets nothing (Page panel: font, text colour). */
   inherited?: Readonly<Record<string, string>>;
+  /** The element (or page root) the section edits — Choose font opens for it. */
+  elementId?: string;
+  /** Head the section with the Brand "Text style" row (text types). */
+  textStyle?: boolean;
+  /** "Text inside" (2L9 247:23404): every row on the face, no More
+   *  settings, and the inheritance note. */
+  inside?: boolean;
 }
 
 // ============================================================================
@@ -56,14 +67,16 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
   composer,
   variant = "element",
   inherited,
+  elementId,
+  textStyle = false,
+  inside = false,
 }) => {
-  const handleFontChange = React.useCallback((value: string) => onChange("font-family", value), [onChange]);
   const isPage = variant === "page";
 
   return (
     <Section title="Typography" isOpen={isOpen} onToggle={onToggle} id="inspector-section-typography">
       <div className="tw:relative">
-        <FontPicker value={styles["font-family"] || ""} onChange={handleFontChange} composer={composer} inheritedValue={inherited?.["font-family"]} />
+        <FontPicker value={inherited?.["font-family"] || styles["font-family"] === "inherit" ? "" : (styles["font-family"] ?? "")} composer={composer} inheritedValue={inherited?.["font-family"]} elementId={elementId} />
       </div>
 
       <FontControls
@@ -75,12 +88,22 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
         inherited={inherited}
       />
 
-      {!isPage && advancedExpanded && (
-        <TypographyControls styles={styles} onChange={onChange} isMultiSelect={isMultiSelect} />
+      {!isPage && (advancedExpanded || inside) && (
+        <>
+          {/* The Brand type-style binding, behind More settings (2L9 161:8940). */}
+          {textStyle && <TextStyleRow styles={styles} onChange={onChange} />}
+          <TypographyControls styles={styles} onChange={onChange} isMultiSelect={isMultiSelect} />
+        </>
       )}
 
-      {!isPage && onAdvancedToggle && (
-        <MoreSettingsToggle isOpen={advancedExpanded} onToggle={() => onAdvancedToggle()} advancedCount={ADVANCED_TYPOGRAPHY_COUNT} />
+      {inside && <NoteRow>Inherited by descendants where applicable. Existing child overrides remain.</NoteRow>}
+
+      {!isPage && !inside && onAdvancedToggle && (
+        <MoreSettingsToggle
+          isOpen={advancedExpanded}
+          onToggle={() => onAdvancedToggle()}
+          advancedCount={ADVANCED_TYPOGRAPHY_COUNT + (textStyle ? 1 : 0)}
+        />
       )}
     </Section>
   );
@@ -93,15 +116,4 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
 export { FontPicker, SYSTEM_FONTS, useUploadedFonts, openSiteFonts, type SystemFont } from "./FontPicker";
 export { FontControls, FONT_WEIGHTS } from "./FontControls";
 export { TypographyControls, ADVANCED_TYPOGRAPHY_COUNT } from "./TypographyControls";
-export {
-  FontSearchInput,
-  CategoryTabs,
-  FontList,
-  FontPickerPanel,
-  primaryFamily,
-  namesFont,
-  CATEGORY_LABELS,
-  type FontPickerPanelProps,
-} from "./FontPickerDropdown";
-
 export default TypographySection;

@@ -1,5 +1,6 @@
 /**
- * ReviewTab — the round banner (C2 · board B3-05 7571:191619).
+ * ReviewTab — the round card (2L9 B8-R01 237:8258; was the C2 round banner,
+ * board B3-05 7571:191619) and the walk at the end of its filter row.
  *
  * The retired ReviewBar (board 200:213) drew a strip under the topbar: the
  * open count, a walk through the comments, Compare and Re-send. Owner
@@ -116,7 +117,9 @@ describe("the banner — when the board's band exists", () => {
     fetchReviewComments.mockResolvedValue([comment(), comment({ id: "c2" }), comment({ id: "c3" })]);
     mount();
     expect(await screen.findByTestId("review-banner")).toBeTruthy();
-    expect(screen.getByTestId("review-banner-line").textContent).toBe("3 open");
+    expect(screen.getByTestId("review-banner-line").textContent).toBe("◐ Awaiting · Ayesha (client@example.test)");
+    expect(screen.getByTestId("review-banner-sent").textContent).toMatch(/^Sent \d{1,2} \w{3}|^Sent \w{3} \d{1,2}/);
+    expect(screen.getByTestId("review-status-line").textContent).toBe("3 open · 0 resolved");
     expect(screen.getByRole("button", { name: "Next ›" })).toBeTruthy();
     /* No 4418 Review board draws a footer primary: the re-send is the
        panel ⋯ menu's row. */
@@ -151,43 +154,43 @@ describe("the banner — when the board's band exists", () => {
   });
 });
 
-describe("the banner — when it must not exist", () => {
-  const hidden = async () => {
+describe("the round card — follows the round", () => {
+  it("is absent with no round at all, and when the fetch fails", async () => {
+    fetchCurrentRound.mockResolvedValue(null);
+    fetchReviewComments.mockResolvedValue([]);
     mount();
     await waitFor(() => expect(fetchCurrentRound).toHaveBeenCalled());
     await waitFor(() => expect(screen.queryByLabelText("Loading review")).toBeNull());
     expect(screen.queryByTestId("review-banner")).toBeNull();
-  };
-
-  it("hides with no round at all", async () => {
-    fetchCurrentRound.mockResolvedValue(null);
-    fetchReviewComments.mockResolvedValue([]);
-    await hidden();
-  });
-
-  it("hides once the round is APPROVED — that round is finished", async () => {
-    fetchCurrentRound.mockResolvedValue(round({ status: "APPROVED" }));
-    fetchReviewComments.mockResolvedValue([comment()]);
-    await hidden();
-  });
-
-  it("hides on a revoked round", async () => {
-    fetchCurrentRound.mockResolvedValue(round({ revoked: true }));
-    fetchReviewComments.mockResolvedValue([comment()]);
-    await hidden();
-  });
-
-  it("hides when the fetch fails — the panel's own error state speaks", async () => {
+    cleanup();
     fetchCurrentRound.mockRejectedValue(new Error("offline"));
     fetchReviewComments.mockRejectedValue(new Error("offline"));
-    await hidden();
+    mount();
+    await waitFor(() => expect(screen.queryByLabelText("Loading review")).toBeNull());
+    expect(screen.queryByTestId("review-banner")).toBeNull();
   });
 
-  it("shows for CHANGES_REQUESTED, which is still work in flight", async () => {
-    fetchCurrentRound.mockResolvedValue(round({ status: "CHANGES_REQUESTED" }));
+  it("says an APPROVED round is approved, and a revoked link is revoked", async () => {
+    fetchCurrentRound.mockResolvedValue(round({ status: "APPROVED" }));
     fetchReviewComments.mockResolvedValue([comment()]);
     mount();
-    expect(await screen.findByTestId("review-banner")).toBeTruthy();
+    expect((await screen.findByTestId("review-banner-line")).textContent).toBe("◐ Approved · Ayesha (client@example.test)");
+    cleanup();
+    fetchCurrentRound.mockResolvedValue(round({ revoked: true }));
+    mount();
+    expect((await screen.findByTestId("review-banner-line")).textContent).toBe("◐ Link revoked · Ayesha (client@example.test)");
+  });
+
+  it("offers the client's link when the round still has one", async () => {
+    fetchCurrentRound.mockResolvedValue(round({ token: "tok" }));
+    fetchReviewComments.mockResolvedValue([]);
+    mount();
+    expect(await screen.findByTestId("review-copy-client-link")).toHaveTextContent("Copy link ⧉");
+    cleanup();
+    fetchCurrentRound.mockResolvedValue(round({ token: null }));
+    mount();
+    await screen.findByTestId("review-banner");
+    expect(screen.queryByTestId("review-copy-client-link")).toBeNull();
   });
 });
 
@@ -213,40 +216,62 @@ describe("the banner — Next walks the comments (the helper is locate.test.ts)"
   });
 });
 
-describe("the banner — a zero is not a status", () => {
-  it("with nothing open on a pending round it names the wait", async () => {
+describe("the round card — the link's facts (2L9 B8-R01 / R02)", () => {
+  it("says when the reviewer opened it and how long the link works", async () => {
+    fetchCurrentRound.mockResolvedValue(
+      round({
+        reviewerLastSeenAt: new Date(Date.now() - 2 * 3_600_000),
+        expiresAt: new Date("2027-01-13T12:00:00Z"),
+        linkExpired: false,
+      }),
+    );
+    fetchReviewComments.mockResolvedValue([]);
+    mount();
+    expect((await screen.findByTestId("review-banner-line")).textContent).toBe("◐ Opened · Ayesha (client@example.test) · 2h ago");
+    expect(screen.getByTestId("review-banner-sent").textContent).toMatch(/· link works until /);
+  });
+
+  it("an expired link says so and offers Re-send, which asks first", async () => {
+    fetchCurrentRound.mockResolvedValue(round({ expiresAt: new Date("2026-01-01T12:00:00Z"), linkExpired: true }));
+    fetchReviewComments.mockResolvedValue([]);
+    mount();
+    expect((await screen.findByTestId("review-banner-line")).textContent).toBe("◌ Link expired · Ayesha can no longer open it");
+    expect(screen.getByTestId("review-banner-sent").textContent).toMatch(/· expired /);
+    fireEvent.click(screen.getByTestId("review-card-resend"));
+    expect(await screen.findByRole("button", { name: "Send new review" })).toBeTruthy();
+  });
+});
+
+describe("the round card — a zero is not a status", () => {
+  it("with nothing open on a pending round it names the wait, not a count", async () => {
     fetchCurrentRound.mockResolvedValue(round({ openCommentCount: 0 }));
     fetchReviewComments.mockResolvedValue([]);
     mount();
-    expect((await screen.findByTestId("review-banner-line")).textContent).toBe("Sent — waiting on your client");
-    expect(screen.queryByText("0 open")).toBeNull();
+    expect((await screen.findByTestId("review-banner-line")).textContent).toBe("◐ Awaiting · Ayesha (client@example.test)");
   });
 
   /* L5-034: a round sent with a blank client email ("keep this internal")
-     has no client — it read "Sent — waiting on your client" over a status
-     line saying "Not sent yet". */
+     has no client. */
   it("an internal round (no client invited) speaks no client language", async () => {
     fetchCurrentRound.mockResolvedValue(round({ invitedEmail: null, reviewerName: null, openCommentCount: 0 }));
     fetchReviewComments.mockResolvedValue([comment({ status: "RESOLVED", authorKind: "internal", authorName: null })]);
     mount();
-    expect((await screen.findByTestId("review-banner-line")).textContent).toBe("Internal round — no client invited");
-    expect(screen.getByTestId("review-status-line").textContent).toBe("0 open · 1 resolved · Internal round");
+    expect((await screen.findByTestId("review-banner-line")).textContent).toBe("◐ Internal round — no client invited");
+    expect(screen.getByTestId("review-status-line").textContent).toBe("0 open · 1 resolved");
     expect(screen.getByText("All comments are resolved.")).toBeTruthy();
     expect(screen.queryByText(/waiting on your client|Client approval/)).toBeNull();
   });
 
-  it("with nothing open after changes were requested it says which", async () => {
-    fetchCurrentRound.mockResolvedValue(round({ status: "CHANGES_REQUESTED", openCommentCount: 0 }));
-    fetchReviewComments.mockResolvedValue([]);
-    mount();
-    expect((await screen.findByTestId("review-banner-line")).textContent).toBe("Changes requested — nothing left open");
-  });
-
-  it("names the reviewer and the count once changes were requested with comments open", async () => {
+  it("names a changes-requested round, and offers the next round at the foot (B8-R05)", async () => {
     fetchCurrentRound.mockResolvedValue(round({ status: "CHANGES_REQUESTED" }));
-    fetchReviewComments.mockResolvedValue([comment(), comment({ id: "c2" })]);
+    fetchReviewComments.mockResolvedValue([comment(), comment({ id: "c2", status: "RESOLVED" })]);
     mount();
-    expect((await screen.findByTestId("review-banner-line")).textContent).toBe("Ayesha asked for changes · 2 open");
+    expect((await screen.findByTestId("review-banner-line")).textContent).toBe("◐ Changes requested · Ayesha (client@example.test)");
+    const foot = screen.getByTestId("review-next-round");
+    expect(foot).toHaveTextContent("Send Round 2 to Ayesha");
+    expect(foot).toHaveTextContent("1 of 2 resolved");
+    fireEvent.click(screen.getByRole("button", { name: "Send Round 2 to Ayesha" }));
+    expect(await screen.findByRole("button", { name: "Send new review" })).toBeTruthy();
   });
 });
 
@@ -261,7 +286,7 @@ describe("Re-send from the panel carries the round's client forward", () => {
     mount(makeComposer(), { onResend });
     await openResend();
     fireEvent.click(await screen.findByRole("button", { name: "Send new review" }));
-    await waitFor(() => expect(onResend).toHaveBeenCalledWith("client@example.test"));
+    await waitFor(() => expect(onResend).toHaveBeenCalledWith("client@example.test", { preview: true }));
   });
 
   it("passes undefined for an internal round, which stays internal", async () => {
@@ -271,7 +296,7 @@ describe("Re-send from the panel carries the round's client forward", () => {
     mount(makeComposer(), { onResend });
     await openResend();
     fireEvent.click(await screen.findByRole("button", { name: "Send new review" }));
-    await waitFor(() => expect(onResend).toHaveBeenCalledWith(undefined));
+    await waitFor(() => expect(onResend).toHaveBeenCalledWith(undefined, { preview: true }));
   });
 
   it("reloads the round after the re-send lands", async () => {
@@ -285,5 +310,24 @@ describe("Re-send from the panel carries the round's client forward", () => {
     expect(await screen.findByText(/Sending round 2…/)).toBeTruthy();
     release();
     await waitFor(() => expect(fetchCurrentRound).toHaveBeenCalledTimes(2));
+  });
+});
+
+describe("Re-send — Play F5.04: a failed preview sends nothing and asks", () => {
+  it("offers Send without preview, which re-sends with preview off", async () => {
+    const { ReviewPreviewError } = await import("@/editor/shell/reviewSend");
+    const onResend = vi
+      .fn()
+      .mockRejectedValueOnce(new ReviewPreviewError(new Error("render")))
+      .mockResolvedValueOnce(undefined);
+    fetchCurrentRound.mockResolvedValue(round({ openCommentCount: 0 }));
+    fetchReviewComments.mockResolvedValue([]);
+    mount(makeComposer(), { onResend });
+    await openResend();
+    fireEvent.click(await screen.findByRole("button", { name: "Send new review" }));
+    expect(await screen.findByText("We couldn’t render a preview")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Send without preview" }));
+    await waitFor(() => expect(onResend).toHaveBeenLastCalledWith("client@example.test", { preview: false }));
+    await waitFor(() => expect(screen.queryByText("We couldn’t render a preview")).toBeNull());
   });
 });

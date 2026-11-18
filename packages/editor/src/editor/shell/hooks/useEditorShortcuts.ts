@@ -11,6 +11,7 @@
  *   Cmd/Ctrl+Shift+P      → UI_TOGGLE_COMMAND_PALETTE — an alias of ⌘K (the
  *                           retired canvas palette's chord; one palette now)
  *   Cmd/Ctrl+P            → toggle preview
+ *   ⇧⌘O / Ctrl+Alt+O      → UI_TOGGLE_PAGE_SWITCHER — the bottom bar's page switcher
  *   Cmd/Ctrl+J            → open the AI tab (composer ui:switch-tab → AITab)
  *   Escape                → close shortcuts modal
  *   F6 / Shift+F6         → cycle focus between shell regions (board 58:2)
@@ -50,6 +51,8 @@ import * as React from "react";
 import { isModalOpen } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { cycleRegion } from "../regionCycle";
+import { isPageSwitcherChord } from "../pageSwitcherChord";
+import { isMac } from "@/editor/canvas/menus/shortcutHint";
 import { EVENTS } from "@/shared/constants/events";
 
 // Modals subset the shortcut handler reads. Match the public surface of
@@ -140,6 +143,14 @@ export function useEditorShortcuts({
         return;
       }
 
+      /* ⇧⌘O / Ctrl+Alt+O — the bottom bar's page switcher, which owns its
+         open state. Below the editable-surface guard on purpose. */
+      if (isPageSwitcherChord(e, isMac())) {
+        e.preventDefault();
+        composer?.emit(EVENTS.UI_TOGGLE_PAGE_SWITCHER, {});
+        return;
+      }
+
       /* "?" — the keyboard sheet. The sheet's own listener closes it on a
          second press (this handler stands down while a modal is open). */
       if (isQuestionMark(e)) {
@@ -196,11 +207,6 @@ export function useEditorShortcuts({
       if ((e.ctrlKey || e.metaKey) && e.key === "/") {
         e.preventDefault();
         modals.setShowShortcuts(true);
-      }
-      if ((e.ctrlKey || e.metaKey) && e.key === "j") {
-        e.preventDefault();
-        // AI is one surface now — open the AITab rail panel.
-        composer.emit("ui:switch-tab", { tab: "ai" });
       }
       if (e.key === "Escape") {
         modals.setShowShortcuts(false);

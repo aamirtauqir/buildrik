@@ -94,20 +94,12 @@ export const TimeTravelHost: React.FC<{ composer: Composer | null }> = ({ compos
      through, and the composer goes read-only for the duration — the
      registry's own MUTATING_COMMANDS gate (CommandCenter.ts) then refuses
      Delete/duplicate/undo/redo/etc. the same way ?view=readonly does.
-     Restores whatever readOnly was before (not a hard-coded false — a
-     readOnly VIEW route sets it independently), and only once: exit() is
-     called first inside restore(), so this always restores before the
-     actual history write runs. */
-  const prevReadOnlyRef = React.useRef<boolean | null>(null);
+     It holds only its own "time-travel" lock, so view mode or a site that
+     never loaded keeps the composer read-only after the band closes. */
   React.useEffect(() => {
-    if (!composer) return;
-    if (active) {
-      if (prevReadOnlyRef.current === null) prevReadOnlyRef.current = composer.readOnly;
-      composer.readOnly = true;
-    } else if (prevReadOnlyRef.current !== null) {
-      composer.readOnly = prevReadOnlyRef.current;
-      prevReadOnlyRef.current = null;
-    }
+    if (!composer || !active) return;
+    composer.setEditLock("time-travel", true);
+    return () => composer.setEditLock("time-travel", false);
   }, [active, composer]);
 
   /* ⌃⇧T is global — it used to live in HistoryTab, so it only worked with the
@@ -219,6 +211,9 @@ export const TimeTravelHost: React.FC<{ composer: Composer | null }> = ({ compos
        already changed shape under it). Exiting first means there is no
        window where a completed write is still described as pending. */
     exit();
+    /* The restore below is a write: release the band's lock now rather than
+       when React next runs the effect cleanup. */
+    composer.setEditLock("time-travel", false);
     /* The "Before restoring" version is the way back from this restore. If it
        fails to save, restoring anyway overwrites the current state with no
        copy of it (DQ-011) — so stop and say so; the user can still choose to.
@@ -274,7 +269,8 @@ export const TimeTravelHost: React.FC<{ composer: Composer | null }> = ({ compos
         ? `Now — the draft as it is · ← steps back through ${newest} change${newest === 1 ? "" : "s"} · Esc exits`
         : frame.status === "none"
           ? `No preview for ${where} — restore would be blind · Esc exits`
-          : `Previewing ${where} — nothing is written until you restore · Esc exits`;
+          : /* 2L9 B7-H12 230:19126 */
+            `Showing ${where}. Nothing changes until you restore. · Esc exits`;
 
   return (
     <Portal>
@@ -303,7 +299,7 @@ export const TimeTravelHost: React.FC<{ composer: Composer | null }> = ({ compos
               onClick={() => {}}
               data-testid="tt-restore"
             >
-              Restore…
+              Restore to this point…
             </Button>
           </Tooltip>
         ) : (
@@ -314,7 +310,7 @@ export const TimeTravelHost: React.FC<{ composer: Composer | null }> = ({ compos
             onClick={() => setConfirming(true)}
             data-testid="tt-restore"
           >
-            Restore…
+            Restore to this point…
           </Button>
         )}
       </div>

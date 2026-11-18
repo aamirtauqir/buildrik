@@ -21,6 +21,12 @@ vi.mock("@/editor/shell/exportPublishPages", () => ({
 }));
 vi.mock("@/services/ReviewService", () => ({
   fetchCurrentRound: () => fetchCurrentRound(),
+  fetchApprovedSnapshot: async () => [{ path: "index.html", html: "<p>old</p>" }],
+}));
+const myRole = { role: "ADMIN" as string | null };
+vi.mock("@/services/RoleService", () => ({
+  fetchMyRole: async () => myRole.role,
+  roleAtLeast: (r: string | null, min: string) => (r === null ? null : ["VIEWER", "EDITOR", "ADMIN", "OWNER"].indexOf(r) >= ["VIEWER", "EDITOR", "ADMIN", "OWNER"].indexOf(min)),
 }));
 vi.mock("@/editor/chrome-ui", async () => {
   const actual = await vi.importActual<Record<string, unknown>>("@/editor/chrome-ui");
@@ -30,6 +36,7 @@ vi.mock("@/editor/chrome-ui", async () => {
 import { ToastProvider } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants/events";
 import { PublishConfirmModal } from "../PublishConfirmModal";
+import { publishTray } from "@/editor/shell/publishTrayStore";
 
 const composer = {} as never;
 
@@ -62,7 +69,7 @@ describe("PublishConfirmModal — it does not publish on its own", () => {
   it("publishes only when the user confirms", async () => {
     const onConfirm = vi.fn();
     renderModal({ onConfirm });
-    fireEvent.click(await screen.findByText("Publish now"));
+    fireEvent.click(await screen.findByText("Publish"));
     expect(onConfirm).toHaveBeenCalledTimes(1);
   });
 
@@ -79,30 +86,54 @@ describe("PublishConfirmModal — it does not publish on its own", () => {
     exportPublishPages.mockResolvedValue([]);
     renderModal();
     await waitFor(() => expect(screen.getByText(/0 pages/)).toBeTruthy());
-    const btn = (await screen.findByText("Publish now")).closest("button") as HTMLButtonElement;
+    const btn = (await screen.findByText("Publish")).closest("button") as HTMLButtonElement;
     expect(btn.disabled).toBe(true);
   });
 });
 
 describe("PublishConfirmModal — it states the real consequence", () => {
-  it("warns that a live site is replaced, and names the target", async () => {
+  it("names the live domain in the title and keeps the current release (B8-PB04)", async () => {
     renderModal({ isPublished: true, publishedUrl: "https://bellacucina.com" });
+    expect(screen.getByText("Publish to bellacucina.com")).toBeTruthy();
     await waitFor(() =>
-      expect(screen.getByText(/replaces the live site immediately/)).toBeTruthy(),
+      expect(screen.getByTestId("publish-fact-val-rollback").textContent).toContain(
+        "the current live release stays available to republish",
+      ),
     );
-    /* Board 914:4507 names the environment with the domain: "Production ·
-       bellacucina.com", not the bare host. */
-    expect(screen.getByText("Production · bellacucina.com")).toBeTruthy();
-    // Board B3-10: one question and one verb in every state.
-    expect(screen.getByText("Publish to production?")).toBeTruthy();
-    expect(screen.getByText("Publish now")).toBeTruthy();
+    expect(screen.getByText("1 Changes")).toBeTruthy();
+    expect(screen.getByText("5 Release")).toBeTruthy();
   });
 
-  it("does not claim a live site is being replaced on a first publish", async () => {
+  it("a first publish has no live release to keep", async () => {
     const { container } = renderModal({ isPublished: false });
     await waitFor(() => expect(screen.getByText(/2 pages/)).toBeTruthy());
-    expect(container.textContent).not.toContain("replaces the live site");
-    expect(screen.getByText("Publish now")).toBeTruthy();
+    expect(screen.getByText("Publish this site")).toBeTruthy();
+    expect(container.textContent).not.toContain("current live release");
+  });
+});
+
+describe("PublishConfirmModal — tips are acknowledged (B8-PB04 / Play F4.09)", () => {
+  it("Publish waits for “I’ve seen these”, with the reason under it", async () => {
+    publishTray.setIssues([{ id: "w", type: "warning", message: "2 images have no alt text" }]);
+    const onConfirm = vi.fn();
+    renderModal({ onConfirm });
+    await waitFor(() => expect(screen.getByText("1 advisory check")).toBeTruthy());
+    const btn = screen.getByText("Publish").closest("button") as HTMLButtonElement;
+    expect(btn.disabled).toBe(true);
+    expect(screen.getByTestId("publish-confirm-reason").textContent).toBe("Tick the boxes above to publish");
+    fireEvent.click(screen.getByTestId("publish-fact-tips-seen"));
+    expect(btn.disabled).toBe(false);
+    expect(screen.queryByTestId("publish-confirm-reason")).toBeNull();
+    fireEvent.click(btn);
+    expect(onConfirm).toHaveBeenCalledTimes(1);
+    publishTray.setIssues([]);
+  });
+
+  it("no tips, no box: Publish is ready", async () => {
+    renderModal();
+    await waitFor(() => expect(screen.getByText(/2 pages/)).toBeTruthy());
+    expect(screen.queryByTestId("publish-fact-tips-seen")).toBeNull();
+    expect((screen.getByText("Publish").closest("button") as HTMLButtonElement).disabled).toBe(false);
   });
 });
 
@@ -117,10 +148,11 @@ describe("PublishConfirmModal — approval line reflects the real round", () => 
     await waitFor(() => expect(screen.getByText(/Approved by Sara Khan/)).toBeTruthy());
   });
 
-  it("says not-sent when there is no round", async () => {
+  it("no round, no Approval row", async () => {
     fetchCurrentRound.mockResolvedValue(null);
     renderModal();
-    await waitFor(() => expect(screen.getByText("Not sent for review.")).toBeTruthy());
+    await waitFor(() => expect(screen.getByText(/2 pages/)).toBeTruthy());
+    await waitFor(() => expect(screen.queryByText("4 Approval")).toBeNull());
   });
 
   it("surfaces unresolved comments instead of implying sign-off", async () => {
@@ -136,8 +168,8 @@ describe("PublishConfirmModal — approval line reflects the real round", () => 
   it("never blocks on a failed review lookup — publish stays available", async () => {
     fetchCurrentRound.mockRejectedValue(new Error("network"));
     renderModal();
-    await waitFor(() => expect(screen.getByText("Not sent for review.")).toBeTruthy());
-    const btn = (await screen.findByText("Publish now")).closest("button") as HTMLButtonElement;
+    await waitFor(() => expect(screen.queryByText("4 Approval")).toBeNull());
+    const btn = (await screen.findByText("Publish")).closest("button") as HTMLButtonElement;
     expect(btn.disabled).toBe(false);
   });
 });
@@ -177,5 +209,44 @@ describe("PublishConfirmModal — regression: no unbacked controls", () => {
     for (const dead of ["Preview", "Schedule", "Changelog", "changelog note"]) {
       expect(container.textContent).not.toContain(dead);
     }
+  });
+});
+
+/* A-31 · B8-PB05 233:2418 / PB06 233:3034 — the stale-approval door opens the
+   same numbered confirm; StaleApprovalModal is gone. */
+describe("PublishConfirmModal — stale approval", () => {
+  const approved = {
+    id: "r1", status: "APPROVED", invitedEmail: "c@x.com", reviewerName: "Lena",
+    revoked: false, resolvedAt: "2026-10-15T10:00:00.000Z", createdAt: "2026-10-14T10:00:00.000Z",
+    revision: "1", roundNumber: 1, totalRounds: 1, openCommentCount: 0,
+  };
+
+  it("an Admin ticks 'Publish without a fresh review' before Publish opens; the row counts the changes", async () => {
+    myRole.role = "ADMIN";
+    fetchCurrentRound.mockResolvedValue(approved);
+    const onConfirm = vi.fn();
+    renderModal({ stale: true, onConfirm, isPublished: true, publishedUrl: "https://fieldwork.studio" });
+    await waitFor(() => expect(screen.getByTestId("publish-fact-val-approval")).toHaveTextContent(/edited since \(2 changes\)/));
+    const publish = screen.getByText("Publish").closest("button") as HTMLButtonElement;
+    expect(publish.disabled).toBe(true);
+    fireEvent.click(await screen.findByTestId("publish-confirm-override"));
+    expect(publish.disabled).toBe(false);
+    fireEvent.click(publish);
+    expect(onConfirm).toHaveBeenCalledTimes(1);
+  });
+
+  it("an Editor is offered a fresh review instead, and Publish stays shut", async () => {
+    myRole.role = "EDITOR";
+    fetchCurrentRound.mockResolvedValue(approved);
+    const emit = vi.fn();
+    const onClose = vi.fn();
+    renderModal({ stale: true, composer: { emit } as never, onClose });
+    expect(await screen.findByTestId("publish-confirm-stale-note")).toHaveTextContent(
+      "Publishing without a fresh review needs Admin access — or request a fresh review.",
+    );
+    expect((screen.getByText("Publish").closest("button") as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.click(screen.getByTestId("publish-confirm-request-review"));
+    expect(onClose).toHaveBeenCalled();
+    expect(emit).toHaveBeenCalledWith(EVENTS.UI_SWITCH_TAB, { tab: "review" });
   });
 });

@@ -17,6 +17,12 @@ import * as React from "react";
 import type { Composer } from "@/engine";
 import type { PageItem } from "../types";
 import { getStatusLabel } from "../utils/statusLabel";
+import { pageRoute } from "../utils/slug";
+
+/* Board 63:6393: the URL / state lines under a row's name, and the tag at
+   its right ("Current", "In Studio", "Folder"). */
+export const ROW_SUB = "tw:truncate tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+export const ROW_TAG = "tw:flex-none tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 import { Button, TextField } from "@/editor/chrome-ui";
 import { slugify } from "@shared/utils/helpers/string";
 import { RenameUrlDecision } from "./RenameUrlDecision";
@@ -46,6 +52,8 @@ interface Props {
   onRenameCancel: () => void;
   onRenameStart: () => void;
   onContextMenu: (x: number, y: number) => void;
+  /** ⌥↑ / ⌥↓ — the row menu's Move up / Move down (board 137:55343). */
+  onMove?: (direction: -1 | 1) => void;
   /** Board 141:40 search results: the owning folder, shown muted right. */
   searchContext?: string;
   /** Board 140:21 / 1171:4729 — 8px warning dot when the page has unsaved edits. */
@@ -75,6 +83,7 @@ export const PageRow = React.memo<Props>(
     onRenameCancel,
     onRenameStart,
     onContextMenu,
+    onMove,
     searchContext,
     isDirty = false,
   }) => {
@@ -247,6 +256,10 @@ export const PageRow = React.memo<Props>(
           onKeyDown={(e) => {
             if (e.key === "Enter" && !isRenaming) onSelect();
             if (e.key === "F2" && !isRenaming) onRenameStart();
+            if (e.altKey && (e.key === "ArrowUp" || e.key === "ArrowDown") && onMove && !isRenaming) {
+              e.preventDefault();
+              onMove(e.key === "ArrowUp" ? -1 : 1);
+            }
             /* `!isRenaming` for the same reason as its two neighbours: the
                rename input sits INSIDE this row, so its keystrokes bubble
                here. Without the guard, every space typed into a page name was
@@ -288,13 +301,8 @@ export const PageRow = React.memo<Props>(
             </svg>
           </span>
 
-          {/* v3 4418:90494: page rows keep the folder row's 12px disclosure
-              slot, empty, so names line up under the folder's glyph. */}
-          <span className="bd-pg-row-chev" aria-hidden="true" />
-
-          {/* Board 140:2: plain page rows carry NO icon — only Home draws
-              the roof glyph (140:19). */}
-          {page.isHome && (
+          {/* design-2l9 board 63:6393: every row draws its glyph — the roof
+              for Home, a page for the rest. */}
           <span className="bd-pg-row-icon" aria-hidden="true">
             <svg
               viewBox="0 0 24 24"
@@ -305,11 +313,19 @@ export const PageRow = React.memo<Props>(
               strokeLinejoin="round"
               aria-hidden="true"
             >
-              <path d="M3 11l9-8 9 8" />
-              <path d="M5 9.5V21h5v-6h4v6h5V9.5" />
+              {page.isHome ? (
+                <>
+                  <path d="M3 11l9-8 9 8" />
+                  <path d="M5 9.5V21h5v-6h4v6h5V9.5" />
+                </>
+              ) : (
+                <>
+                  <path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9z" />
+                  <path d="M14 3v6h6" />
+                </>
+              )}
             </svg>
           </span>
-          )}
 
           {isRenaming ? (
             <>
@@ -331,29 +347,36 @@ export const PageRow = React.memo<Props>(
             </>
           ) : (
             <>
-              <span
-                className="bd-pg-row-name"
-                data-testid={`page-row-name-${page.id}`}
-                title={page.name}
-                onDoubleClick={(e) => {
-                  e.stopPropagation();
-                  onRenameStart();
-                }}
-              >
-                {page.name}
+              {/* Board 63:6393: name, its URL under it, and a state that
+                  changes what publishes ("Hidden from publish") as a third
+                  line. */}
+              <span className="tw:flex tw:min-w-0 tw:flex-col">
+                <span
+                  className="bd-pg-row-name"
+                  data-testid={`page-row-name-${page.id}`}
+                  title={page.name}
+                  onDoubleClick={(e) => {
+                    e.stopPropagation();
+                    onRenameStart();
+                  }}
+                >
+                  {page.name}
+                </span>
+                <span className={ROW_SUB} data-testid={`page-row-path-${page.id}`}>{pageRoute(page)}</span>
+                {label && page.status && page.status !== "live" && (
+                  <span className={ROW_SUB} data-testid={`page-status-chip-${page.id}`}>{label}</span>
+                )}
               </span>
             </>
           )}
 
           {!isRenaming && <span className="tw:flex-1" aria-hidden="true" />}
 
-          {searchContext && (
-            <span
-              className="bd-pg-row-incontext"
-              data-testid={`page-row-incontext-${page.id}`}
-              aria-label={`in ${searchContext}`}
-            >
-              in {searchContext}
+          {/* Board 63:6393's right-hand tag: "Current" on the open page,
+              "In {Folder}" on a folder's page. */}
+          {!isRenaming && (page.isActive || searchContext) && (
+            <span className={ROW_TAG} data-testid={`page-row-incontext-${page.id}`}>
+              {page.isActive ? "Current" : `In ${searchContext}`}
             </span>
           )}
 
@@ -366,11 +389,7 @@ export const PageRow = React.memo<Props>(
               <span data-testid={`page-dirty-label-${page.id}`}>Unpublished</span>
             </span>
           )}
-          {!isRenaming && label && page.status && page.status !== "live" && (
-            <span className={`bd-pg-chip ${page.status}`} data-testid={`page-status-chip-${page.id}`} aria-hidden="true">
-              {label}
-            </span>
-          )}
+
 
           <Button
             className="bd-pg-row-overflow"
@@ -381,9 +400,10 @@ export const PageRow = React.memo<Props>(
             onClick={handleContextMenuClick}
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-              <circle cx="5" cy="12" r="1" fill="currentColor" />
-              <circle cx="12" cy="12" r="1" fill="currentColor" />
-              <circle cx="19" cy="12" r="1" fill="currentColor" />
+              {/* 94:13447: 3px dots, 4px apart — the bolder ⋯ every board draws. */}
+              <circle cx="5" cy="12" r="1.5" fill="currentColor" />
+              <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+              <circle cx="19" cy="12" r="1.5" fill="currentColor" />
             </svg>
           </Button>
         </div>

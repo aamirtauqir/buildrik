@@ -1,29 +1,38 @@
 /**
- * SessionExpiredModal — a 401 mid-session with unsaved work (board 813:4870,
- * redrawn 2026-08-28 on honest copy).
+ * SessionExpiredModal — signed out mid-session with unsaved work (2L9 B7-G03
+ * `225:3353`), and the persistent banner it leaves behind (B7-G04 `225:3888`).
  *
  * The truths this surface tells, verified against the code:
- *  · Unsaved work lives in THIS TAB — the network save path writes no
- *    localStorage, so "cached locally, sign in within 24h" (the old board's
- *    line) had no code behind it and is not said.
+ *  · Unsaved work lives in THIS TAB. It is also "in this browser" only when
+ *    a failed save kept a copy (`bk-unsaved-v1-<site>`) — said only then.
  *  · Signing in from another same-origin tab restores the cookie; every tRPC
  *    call sends credentials fresh, so "Try saving again" then succeeds with
  *    no reload and no state loss.
  *  · Sign in opens a NEW tab — a same-tab redirect would destroy the very
  *    work this surface exists to protect.
  *
- * Scrim / Escape map to Keep editing — an explicit visible choice (SaveStatus
- * keeps showing the error), so the shared ModalRoot infra and its focus trap
- * are used as-is rather than hand-rolling blockingness (codex, plan review).
+ * The count is the history stack since the last save — the honest
+ * approximation of "your N changes" (there is no per-change save marker).
+ * The labels list it used to show folds into that count: the board draws a
+ * number, not a list (L-F code-ahead disposition).
+ *
+ * Keep editing (and Escape / the scrim, which map to it) leaves the G04
+ * banner in the global slot — "changes aren't saving" stays on screen while
+ * edits keep queueing — and the next save that lands clears it, saying
+ * "Signed in again — N changes saved" (B7-G05 `225:4416`).
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { Button, ModalBody, ModalContent, ModalFooter, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
+import { Button, ModalContent, ModalRoot, ModalTitle, useToast } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
+import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
+import { readUnsaved } from "@/services/unsavedRecovery";
 import type { SaveOutcome } from "../hooks/useSaveCallback";
+import { BANNER_ID, clearGlobalBanner, showSessionExpiredBanner } from "../globalBanners";
+import { DIALOG_ACTION, DIALOG_ACTIONS, DIALOG_BODY, DIALOG_FRAME, DIALOG_TITLE } from "./recoveryDialog";
 
 export interface SessionExpiredModalProps {
   open: boolean;
@@ -34,20 +43,19 @@ export interface SessionExpiredModalProps {
   onKeepEditing: () => void;
 }
 
-/** Top labels from the history stack since the watermark — the honest
- *  approximation of "what is at risk" (there is no per-change save marker). */
-function changesAtRisk(
-  composer: Composer | null,
-  lastSavedAt: number | null
-): { labels: string[]; total: number } {
-  if (!composer) return { labels: [], total: 0 };
+/** Changes on the history stack since the watermark. */
+function changesSince(composer: Composer | null, lastSavedAt: number | null): number {
+  if (!composer) return 0;
   try {
     const stack = composer.history.getHistoryStack();
-    const since = lastSavedAt ? stack.filter((e) => e.timestamp > lastSavedAt) : stack;
-    return { labels: since.slice(0, 3).map((e) => e.label), total: since.length };
+    return (lastSavedAt ? stack.filter((e) => e.timestamp > lastSavedAt) : stack).length;
   } catch {
-    return { labels: [], total: 0 };
+    return 0;
   }
+}
+
+function signIn(): void {
+  window.open(`${DASHBOARD_URL}/auth?reason=session-expired`, "_blank", "noopener");
 }
 
 export const SessionExpiredModal: React.FC<SessionExpiredModalProps> = ({
@@ -59,13 +67,37 @@ export const SessionExpiredModal: React.FC<SessionExpiredModalProps> = ({
 }) => {
   const [retrying, setRetrying] = React.useState(false);
   const [retryFailed, setRetryFailed] = React.useState(false);
-  const risk = React.useMemo(
-    () => (open ? changesAtRisk(composer, lastSavedAt) : { labels: [], total: 0 }),
-    [open, composer, lastSavedAt]
-  );
+  const count = React.useMemo(() => (open ? changesSince(composer, lastSavedAt) : 0), [open, composer, lastSavedAt]);
+  const siteId = getSiteIdFromUrl();
+  const keptInBrowser = open && siteId !== null && readUnsaved(siteId) !== null;
 
-  const signIn = () => {
-    window.open(`${DASHBOARD_URL}/auth?reason=session-expired`, "_blank", "noopener");
+  const { addToast } = useToast();
+  /* The changes held when the session expired, until a save lands. */
+  const heldRef = React.useRef<number | null>(null);
+  React.useEffect(() => {
+    if (open && heldRef.current === null) heldRef.current = count;
+  }, [open, count]);
+
+  /* A save that lands means the session is back: the G04 banner goes, and
+     G05 says what went through. */
+  const savedAtRef = React.useRef(lastSavedAt);
+  React.useEffect(() => {
+    clearGlobalBanner(BANNER_ID.sessionExpired);
+    const advanced = lastSavedAt !== null && lastSavedAt !== savedAtRef.current;
+    savedAtRef.current = lastSavedAt;
+    const held = heldRef.current;
+    if (!advanced || held === null) return;
+    heldRef.current = null;
+    addToast({
+      tone: "success",
+      description:
+        held > 0 ? `Signed in again — ${held} ${held === 1 ? "change" : "changes"} saved` : "Signed in again — your changes are saved",
+    });
+  }, [lastSavedAt, addToast]);
+
+  const keepEditing = () => {
+    showSessionExpiredBanner(signIn);
+    onKeepEditing();
   };
 
   const retry = async () => {
@@ -81,56 +113,37 @@ export const SessionExpiredModal: React.FC<SessionExpiredModalProps> = ({
     }
   };
 
+  const changes = count > 0 ? `Your ${count} ${count === 1 ? "change is" : "changes are"}` : "Your changes are";
+  const where = keptInBrowser ? "in this tab and in this browser" : "in this tab";
+
+  /* 2L9 B7-G03 225:3353: 480 × 176 in the recovery dialogs' layout. */
   return (
-    <ModalRoot open={open} onOpenChange={(o) => !o && onKeepEditing()}>
-      <ModalContent size="question" srTitle="Your session expired">
-        <ModalTitle>Your session expired</ModalTitle>
-        {/* ModalBody carries the horizontal inset — same missing-gutter bug
-            as PublishConfirmModal (FINDING-008). */}
-        <ModalBody>
-        <p className="tw:my-2 tw:text-[13px] tw:leading-normal tw:text-[var(--bk-ink-muted)]">
-          You have unsaved changes — they live in this tab. Keep it open, sign
-          in again, then save.
-        </p>
-        {risk.total > 0 && (
-          <>
-            <p className="tw:m-0 tw:mb-1.5 tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-[0.04em] tw:text-[var(--bk-ink-muted)]">
-              {risk.total} {risk.total === 1 ? "change" : "changes"} at risk
-            </p>
-            <div className="tw:mb-3 tw:flex tw:flex-col tw:gap-1.5">
-              {risk.labels.map((label, i) => (
-                <div
-                  key={`${i}-${label}`}
-                  className="tw:rounded-[var(--bk-radius-sm)] tw:bg-[var(--bk-warning-tint)] tw:px-2.5 tw:py-2 tw:text-[12px] tw:text-[var(--bk-warning-text)]"
-                >
-                  {label}
-                </div>
-              ))}
-              {risk.total > risk.labels.length && (
-                <div className="tw:text-[11px] tw:text-[var(--bk-ink-muted)]">
-                  and {risk.total - risk.labels.length} more
-                </div>
-              )}
-            </div>
-          </>
-        )}
-        {retryFailed && (
-          <p className="tw:my-2 tw:text-[12px] tw:text-[var(--bk-error-text)]">
-            Still signed out — finish signing in first, then try again.
+    <ModalRoot open={open} onOpenChange={(o) => !o && keepEditing()}>
+      <ModalContent size="confirm" srTitle="Sign in again to save">
+        <div className={DIALOG_FRAME} data-testid="session-expired-dialog">
+          <ModalTitle inset={false} className={DIALOG_TITLE}>
+            Sign in again to save
+          </ModalTitle>
+          <p className={DIALOG_BODY} data-testid="session-expired-body">
+            Your session expired. {changes} kept {where}. Sign in again to save {count === 1 ? "it" : "them"}.
           </p>
-        )}
-        </ModalBody>
-        <ModalFooter>
-          <Button color="light" size="sm" onClick={onKeepEditing}>
-            Keep editing
-          </Button>
-          <Button color="light" size="sm" disabled={retrying} onClick={retry}>
-            {retrying ? "Saving…" : "Try saving again"}
-          </Button>
-          <Button size="sm" onClick={signIn}>
-            Sign in
-          </Button>
-        </ModalFooter>
+          {retryFailed && (
+            <p role="alert" className="tw:m-0 tw:text-[12px] tw:text-[var(--bk-error-text)]">
+              Still signed out — finish signing in first, then try again.
+            </p>
+          )}
+          <div className={DIALOG_ACTIONS}>
+            <Button color="light" size="sm" className={DIALOG_ACTION} onClick={keepEditing}>
+              Keep editing
+            </Button>
+            <Button color="light" size="sm" className={DIALOG_ACTION} disabled={retrying} onClick={retry}>
+              {retrying ? "Saving…" : "Try saving again"}
+            </Button>
+            <Button size="sm" className={`${DIALOG_ACTION} tw:px-6`} onClick={signIn}>
+              Sign in ↗
+            </Button>
+          </div>
+        </div>
       </ModalContent>
     </ModalRoot>
   );

@@ -66,6 +66,13 @@ interface PropertyFieldProps {
    direction. */
 const CLOBBERING_NAMES = new Set(["name", "id", "submit", "action", "method"]);
 
+/** The warning for a field name the sanitizer strips at publish, or null. */
+export function clobberingWarning(value: string): string | null {
+  const v = value.trim().toLowerCase();
+  if (!CLOBBERING_NAMES.has(v)) return null;
+  return `“${value.trim()}” won’t survive publishing — it collides with a form property, so the field ships with no name and its answer is dropped from the submission. Try “full${v === "name" ? "name" : "_" + v}”.`;
+}
+
 const PropertyField: React.FC<PropertyFieldProps> = ({
   prop,
   value,
@@ -113,13 +120,11 @@ const PropertyField: React.FC<PropertyFieldProps> = ({
         onChange={(v) => onChange(prop.id, v)}
         placeholder={prop.placeholder}
       />
-      {prop.id === "name" && CLOBBERING_NAMES.has(value.trim().toLowerCase()) && (
+      {prop.id === "name" && clobberingWarning(value) ? (
         <p style={styles.nameWarning} role="status">
-          &ldquo;{value.trim()}&rdquo; won&rsquo;t survive publishing — it collides with a form
-          property, so the field ships with no name and its answer is dropped from the submission.
-          Try &ldquo;full{value.trim().toLowerCase() === "name" ? "name" : "_" + value.trim().toLowerCase()}&rdquo;.
+          {clobberingWarning(value)}
         </p>
-      )}
+      ) : null}
     </>
   );
 };

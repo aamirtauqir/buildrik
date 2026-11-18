@@ -11,12 +11,13 @@
  */
 import type { Composer, Element } from "@/engine";
 import { runTransaction } from "@/shared/utils/helpers";
+import { lockOwner } from "@/engine/commands/commandOperations";
 
 type Toast = (t: { description: string; tone?: "info" }) => void;
 
 function refusal(element: Element): string | null {
   if (element.isRoot()) return "The page itself can't be wrapped.";
-  if (element.isLocked()) return "This element is locked — unlock it to wrap it.";
+  if (lockOwner(element)) return "This element is locked — unlock it to wrap it.";
   if (element.isComponentInstance()) return "Detach this component instance to wrap it.";
   return null;
 }

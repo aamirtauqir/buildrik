@@ -1,7 +1,8 @@
 /**
  * RecordSheet — a record's editor, laid wide over the records table
  * (4428:144760; new record 6749:59940; required-missing 5940:148412; save
- * failed 5940:148777; discard guard 6879:67190; record ⋯ 7103:76270;
+ * failed 5940:148777; leave guard with Save and leave 165:2184 / F2.08–F2.15;
+ * record ⋯ 7103:76270;
  * conflict 8139:217560; record / collection deleted 8139:217711 · 8139:217890).
  *
  * The fields pair up two to a row in the collection's own order; long text
@@ -18,43 +19,25 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { BACK } from "./paneStyles";
-import { MoreHorizontal, TriangleAlert, X } from "lucide-react";
+import { MoreHorizontal, TriangleAlert } from "lucide-react";
 import type { Composer } from "@/engine";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
 import { CMSValidationError } from "@/engine/cms/CollectionManager";
-import {
-  Button,
-  Chip,
-  IconButton,
-  Menu,
-  MenuItem,
-  Modal,
-  Popover,
-  Select,
-  Textarea,
-  TextInput,
-  ToggleSwitch,
-  useToast,
-} from "@/editor/chrome-ui";
-import type { MediaAsset, MediaAssetType } from "@/shared/types/media";
+import { Button, IconButton, Menu, MenuItem, Modal, Popover, ToggleSwitch, useToast } from "@/editor/chrome-ui";
 import { fieldDefault } from "@/editor/sidebar/tabs/content/contentPanelUtils";
-import { recordTitle } from "./RecordsTable";
+import { recordStatusBadge, recordTitle } from "./RecordsTable";
 import { TypedDeleteDialog } from "./TypedDeleteDialog";
 import { RecordPreview } from "./RecordPreview";
-import { RichTextField } from "./RichTextField";
-import { ReferenceField } from "./ReferenceField";
+import { RecordLeaveDialog, type RecordLeavePhase } from "./RecordLeaveDialog";
+import { RecordSheetFooter } from "./RecordSheetFooter";
+import { useQueuedSaveLock } from "./useQueuedSaveLock";
+import { RecordFieldControl, isEmptyValue, type OpenMediaLibrary } from "./RecordFieldControl";
 import { RecordTemplatePreviewDialog } from "./RecordTemplatePreviewDialog";
-import { applyCmsPattern, cmsSlugField, cmsSlugify, cmsValueError } from "@buildrik/shared/schemas/cms";
-import { cmsWorkspace, type CmsTab } from "./cmsWorkspaceStore";
+import { ConflictReviewDialog } from "./ConflictReviewDialog";
+import { applyCmsPattern, cmsSlugField, cmsSlugify } from "@buildrik/shared/schemas/cms";
+import { CMS_TAB_LABEL, cmsWorkspace, type CmsExitPage, type CmsTab, type CmsWorkspaceState } from "./cmsWorkspaceStore";
 import { shellDirty } from "@/editor/shell/shellDirtyRegistry";
 import { claimCmsConflict, isCmsConflictPending, type CmsConflict } from "@/services/cmsSync";
-
-export type OpenMediaLibrary = (
-  allowedTypes: MediaAssetType[],
-  onSelect: (asset: MediaAsset) => void,
-  forLabel?: string,
-) => void;
 
 export interface RecordSheetProps {
   composer: Composer | null;
@@ -62,10 +45,10 @@ export interface RecordSheetProps {
   /** null → a new record. */
   record: CMSContentItem | null;
   onClose: () => void;
-  /** Opened from an element (§13 Open record ›): "‹ Back to canvas" leads the
-   *  sheet's header — it covers the workspace's own. Absent, not drawn. */
-  onBackToCanvas?: () => void;
-  /** The sheet's own Records · Fields · Dynamic pages row leaves the sheet. */
+  /** The door's name for the workspace's way back ("Heading · Title
+   *  binding", 173:16169) — what the leave guard names as the destination. */
+  origin?: string | null;
+  /** "Choose a template page" from the saved-record preview. */
   onOpenTab: (tab: CmsTab) => void;
   /** Resolve when the save has either reached the server (true), been
    *  queued for retry (false), or been refused because another device changed
@@ -85,50 +68,24 @@ export interface RecordSheetProps {
   gone?: boolean;
 }
 
-const LABEL = "tw:block tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
-const FIELD = "tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:gap-1";
-const ERROR = "tw:text-[11px] tw:leading-4 tw:text-[var(--bk-error-text)]";
-/* 4428:144760 control: 32 tall, 10 inline, 13/20, radius 6. */
-const CONTROL =
-  "tw:[&_input]:h-8 tw:[&_input]:py-0 tw:[&_input]:pl-2.5 tw:[&_input]:text-[13px] tw:[&_input]:rounded-[6px] " +
-  "tw:[&_select]:h-8 tw:[&_select]:py-0 tw:[&_select]:pl-2.5 tw:[&_select]:text-[13px] tw:[&_select]:rounded-[6px]";
-const SMALL_BTN = "tw:h-7 tw:px-3 tw:py-1 tw:text-[13px] tw:leading-5 tw:font-medium tw:rounded-[6px]";
-/* 8139:217692 — the conflict choice: 32 tall, 12 inline, 13/20 medium. */
-const CHOICE_BTN = "tw:h-8 tw:px-3 tw:py-1 tw:text-[13px] tw:leading-5 tw:font-medium tw:rounded-[6px]";
-const NAV_TAB =
-  "tw:h-7 tw:min-h-0 tw:rounded-none tw:border-0 tw:border-b-2 tw:border-transparent tw:bg-transparent tw:px-2.5 tw:py-0 tw:text-[13px] " +
-  "tw:font-medium tw:leading-5 tw:text-[var(--bk-gray-700)] tw:shadow-none tw:enabled:hover:bg-transparent tw:enabled:hover:text-[var(--bk-ink)] tw:focus:ring-0";
 
-const OFFLINE = "Saved on this device only. The server is offline — the change will sync when you reconnect.";
+/* 165:1625 — the queued mirror: the change is on this device, not the server. */
+const OFFLINE = "Your edits are not saved to the server. Keep this tab open.";
+const FAILED = "Couldn’t save this record. Your changes are still here — try again.";
 
-const WIDE: ReadonlySet<CMSField["type"]> = new Set(["textarea", "richtext", "image", "file", "multiselect"]);
+/** A way out of a dirty record: where it goes, and how the guard names it.
+ *  `to` null → the guard names the record only (165:2184); `origin` → the
+ *  destination is an element back in the editor (173:17098). */
+interface LeaveIntent {
+  go: () => void;
+  to: string | null;
+  origin?: boolean;
+  /** A page picked in the Pages drawer over the workspace (122:44151). */
+  page?: CmsExitPage;
+}
 
 function blank(fields: CMSField[]): Record<string, unknown> {
   return Object.fromEntries(fields.map((f) => [f.slug, fieldDefault(f)]));
-}
-
-function isEmpty(v: unknown): boolean {
-  return v === undefined || v === null || (typeof v === "string" && v.trim() === "");
-}
-
-/** Pair short fields two to a row; wide ones stand alone. */
-function rowsOf(fields: CMSField[]): CMSField[][] {
-  const rows: CMSField[][] = [];
-  let pending: CMSField | null = null;
-  for (const f of [...fields].sort((a, b) => a.order - b.order)) {
-    if (WIDE.has(f.type)) {
-      if (pending) rows.push([pending]);
-      pending = null;
-      rows.push([f]);
-    } else if (pending) {
-      rows.push([pending, f]);
-      pending = null;
-    } else {
-      pending = f;
-    }
-  }
-  if (pending) rows.push([pending]);
-  return rows;
 }
 
 export function RecordSheet({
@@ -136,7 +93,7 @@ export function RecordSheet({
   collection,
   record,
   onClose,
-  onBackToCanvas,
+  origin = null,
   onOpenTab,
   onSave,
   onDelete,
@@ -154,7 +111,19 @@ export function RecordSheet({
   const [published, setPublished] = React.useState(initialPublished);
   const [saving, setSaving] = React.useState(false);
   const [saveError, setSaveError] = React.useState<string | null>(null);
-  const [leaveTo, setLeaveTo] = React.useState<null | (() => void)>(null);
+  const [leaveTo, setLeaveTo] = React.useState<LeaveIntent | null>(null);
+  /* F2.09 — "Save and leave" holds the way out while the save runs; a save
+     that does not reach the server pauses it (F2.14); "Stay here" drops it and
+     lets the save finish in place (F2.15). The ref is what the save reads when
+     it settles, so Stay here during the save is seen. */
+  const [returnTo, setReturnTo] = React.useState<LeaveIntent | null>(null);
+  const returnRef = React.useRef<LeaveIntent | null>(null);
+  const holdReturn = (intent: LeaveIntent | null) => {
+    returnRef.current = intent;
+    setReturnTo(intent);
+  };
+  const [returnCancelled, setReturnCancelled] = React.useState(false);
+  const stayRef = React.useRef(false);
   /* The safe answer takes focus: the Modal focuses its first control, which in
      the board's order is Discard — Enter would throw the edits away. */
   const keepRef = React.useRef<HTMLButtonElement | null>(null);
@@ -165,11 +134,12 @@ export function RecordSheet({
     return () => window.clearTimeout(id);
   }, [leaving]);
   const [menuOpen, setMenuOpen] = React.useState(false);
-  const [previewOpen, setPreviewOpen] = React.useState(false);
   const [typedDelete, setTypedDelete] = React.useState(false);
   const [templatePreviewOpen, setTemplatePreviewOpen] = React.useState(false);
 
   const lastRecordId = React.useRef<string | null>(record?.id ?? "new");
+  /* 165:2414: "your changed fields" are measured from the record as opened. */
+  const openedWith = React.useRef<Record<string, unknown>>(initial);
   React.useEffect(() => {
     /* Reset the form when the row being edited changes (or a new sheet opens);
        the saveError resets too — the new sheet has nothing to recover from.
@@ -179,6 +149,7 @@ export function RecordSheet({
     const currentId = record?.id ?? "new";
     if (currentId === lastRecordId.current) return;
     lastRecordId.current = currentId;
+    openedWith.current = initial;
     setForm(initial);
     setPublished(initialPublished);
     setSaveError(null);
@@ -187,7 +158,7 @@ export function RecordSheet({
   const dirty =
     published !== initialPublished ||
     collection.fields.some((f) => JSON.stringify(form[f.slug] ?? "") !== JSON.stringify(initial[f.slug] ?? ""));
-  const missing = collection.fields.filter((f) => f.validation?.required && isEmpty(form[f.slug]));
+  const missing = collection.fields.filter((f) => f.validation?.required && isEmptyValue(form[f.slug]));
   /* UI-08: a collection with no fields has nothing to store — Save made an
      empty record. */
   const noFields = collection.fields.length === 0;
@@ -200,19 +171,61 @@ export function RecordSheet({
   const leaving$ = React.useRef(false);
   const leave = (go: () => void) => {
     leaving$.current = true;
+    shellDirty.set("cms-record", false); // Play F2.12: a saved/discarded record must not meet the shell's "Unsaved changes"
     go();
   };
+  /* 126:36751: a page removed while the leave waited opens nothing — the
+     record and its draft stay, and the dialog says so. */
+  const [removedTo, setRemovedTo] = React.useState<string | null>(null);
+  /* 128:39584 — after "no longer available", the record says the draft stayed. */
+  const [removedNote, setRemovedNote] = React.useState<string | null>(null);
+  /* 125:35023 / 125:36161: a page leave that waits for the record to become
+     savable — "After saving: Open About" — until Save and leave or Cancel
+     navigation clears it. Real intent: returnTo holds the page. */
+  const [pending, setPending] = React.useState(false);
+  /* 122:43331 — Form / Preview. Preview renders the record from these fields. */
+  const [view, setView] = React.useState<"form" | "preview">("form");
+  const goTo = (intent: LeaveIntent) => {
+    if (intent.page && !intent.page.exists()) {
+      setRemovedTo(intent.page.name);
+      return;
+    }
+    leave(intent.go);
+  };
   /* A deleted record has nothing left to discard: its edit is already lost. */
-  const guard = (go: () => void) => (dirty && !gone ? setLeaveTo(() => go) : leave(go));
+  const guard = (go: () => void, to: string | null = null, toOrigin = false) =>
+    dirty && !gone ? setLeaveTo({ go, to, origin: toOrigin }) : leave(go);
+  /* Where a workspace move lands, in the guard's words (168:21408 · 168:21848 · 168:22290). */
+  const destinationOf = (next: CmsWorkspaceState): string | null => {
+    if (next.collectionId !== collection.id) {
+      return next.collectionId ? (composer?.cms.collections.getCollection(next.collectionId)?.name ?? null) : "CMS";
+    }
+    return next.recordId === null && next.tab !== "records" ? CMS_TAB_LABEL[next.tab] : null;
+  };
   /* UI-02: every other door out of this record — a drawer collection row, ⌘K,
      a table row, a tab — moves the workspace store, which asks here first. */
   const stillDirty = React.useRef(false);
   stillDirty.current = dirty && !gone;
+  const destinationRef = React.useRef(destinationOf);
+  destinationRef.current = destinationOf;
   React.useEffect(
     () =>
-      cmsWorkspace.setLeaveGuard((go) => {
+      cmsWorkspace.setLeaveGuard((go, next) => {
         if (leaving$.current || !stillDirty.current) return false;
-        setLeaveTo(() => go);
+        setLeaveTo({ go, to: destinationRef.current(next) });
+        return true;
+      }),
+    [],
+  );
+  /* The workspace header's "‹ {origin}" leaves the CMS: the same question,
+     naming the element it goes back to (173:17098). */
+  const originRef = React.useRef(origin);
+  originRef.current = origin;
+  React.useEffect(
+    () =>
+      cmsWorkspace.setExitGuard((go, page) => {
+        if (leaving$.current || !stillDirty.current) return false;
+        setLeaveTo(page ? { go, to: page.name, page } : { go, to: originRef.current, origin: originRef.current !== null });
         return true;
       }),
     [],
@@ -223,6 +236,7 @@ export function RecordSheet({
      toast. Closing the sheet with the choice still open hands it back to the
      toast (claimCmsConflict's release). */
   const [conflict, setConflict] = React.useState<CmsConflict | null>(null);
+  const [reviewing, setReviewing] = React.useState(false);
   const [resolving, setResolving] = React.useState(false);
   const conflictRef = React.useRef<CmsConflict | null>(null);
   const recordId = record?.id ?? null;
@@ -236,6 +250,7 @@ export function RecordSheet({
   }, [recordId]);
   const settleConflict = () => {
     conflictRef.current = null;
+    setReviewing(false);
     setConflict(null);
   };
 
@@ -268,13 +283,35 @@ export function RecordSheet({
       title: `Record saved · ${collection.name}`,
       description: "Changes to this record are live in the CMS. Published pages using this record will refresh on next build.",
     });
-    leave(onClose);
+    const back = returnRef.current;
+    holdReturn(null);
+    setReturnCancelled(false);
+    /* Stay here (F2.15): the save finished, the record stays open. A new
+       record has no row to stay on, so it closes as any save does. */
+    if (stayRef.current && record) {
+      stayRef.current = false;
+      return;
+    }
+    stayRef.current = false;
+    if (back) goTo(back);
+    else leave(onClose);
   };
+  const stayHere = () => {
+    holdReturn(null);
+    stayRef.current = true;
+    setReturnCancelled(true);
+  };
+  const queued = useQueuedSaveLock(record?.id ?? null, (how) => { // 126:35760 — a queued save holds the record
+    if (how === "conflict") return;
+    setSaveError(null);
+    stayRef.current = true;
+    closeSaved();
+  });
 
   /* Keep mine re-sends this device's copy; it can conflict again (the claim
      then holds the new choice), land, or queue. Use theirs replaces this
      device's copy with the server's, so the sheet's edits are gone with it. */
-  const choose = async (choice: "keepMine" | "useTheirs") => {
+  const choose = async (choice: "keepMine" | "useTheirs", merged?: Record<string, unknown>) => {
     const c = conflict;
     if (!c) return;
     setResolving(true);
@@ -282,10 +319,12 @@ export function RecordSheet({
       if (choice === "useTheirs") {
         await c.useTheirs();
         settleConflict();
-        leave(onClose);
+        const back = returnRef.current;
+        holdReturn(null);
+        leave(back ? back.go : onClose);
         return;
       }
-      const landed = await c.keepMine();
+      const landed = await c.keepMine(merged);
       if (isCmsConflictPending("entry", c.id)) return;
       settleConflict();
       if (landed) closeSaved();
@@ -296,6 +335,7 @@ export function RecordSheet({
   };
 
   const save = async () => {
+    setPending(false);
     setSaving(true);
     setSaveError(null);
     try {
@@ -320,13 +360,11 @@ export function RecordSheet({
       /* A published record is validated against the collection's rules
          (CollectionManager.updateContentItem); anything else is the save
          itself failing — say so where the save button is (5940:148777). */
-      setSaveError(
-        e instanceof CMSValidationError
-          ? e.message
-          : "Couldn’t save this record. Your changes are still here — try again.",
-      );
+      setSaveError(e instanceof CMSValidationError ? e.message : FAILED);
     } finally {
       setSaving(false);
+      setReturnCancelled(false);
+      stayRef.current = false;
     }
   };
 
@@ -360,7 +398,29 @@ export function RecordSheet({
   const autoSlug = !record && slugKey !== null && collection.fields.some((f) => f.slug === nameSlug);
   const [slugTouched, setSlugTouched] = React.useState(false);
   const nameField = collection.fields.find((f) => f.slug === nameSlug);
-  const nameMissing = Boolean(nameField) && isEmpty(form[nameSlug]);
+  const nameMissing = Boolean(nameField) && isEmptyValue(form[nameSlug]);
+  const canSave = !blocked && !noFields && !(!record && nameMissing);
+  /* 128:39389: a published record missing a required field cannot be saved —
+     said before the save, not after a refusal. */
+  const requiredBlock = published && missing.length > 0;
+  /* F2.14 — the save behind "Save and leave" did not land: the edits stay,
+     the way out waits for Retry and return. */
+  const paused = returnTo !== null && saveError !== null && !saving;
+  /* "Return to Heading" (174:14111): an element origin is named by its first
+     part, a CMS place in full. */
+  const pausedTo = returnTo?.to ? (returnTo.origin ? returnTo.to.split(" · ")[0] : returnTo.to) : null;
+  /* The page leave follows the real save (RecordLeaveDialog). */
+  const leavePhase: RecordLeavePhase | null = removedTo
+    ? "removed"
+    : pending
+      ? null
+    : leaveTo?.page
+      ? "ask"
+      : returnTo?.page && saving
+        ? "saving"
+        : returnTo?.page && paused
+          ? saveError === OFFLINE ? "queued" : saveError === FAILED ? "failed" : "refused"
+          : null;
   const set = (slug: string, v: unknown) => {
     if (slug === slugKey) setSlugTouched(true);
     setForm((p) => ({
@@ -370,141 +430,35 @@ export function RecordSheet({
     }));
   };
 
-  const control = (f: CMSField) => {
-    const id = `cms-field-${f.slug}`;
-    const v = form[f.slug];
-    const label = (
-      <label className={LABEL} htmlFor={id} id={`${id}-label`}>
-        {f.name}
-        {f.validation?.required ? " *" : ""}
-      </label>
-    );
-    /* Per-field rules run live (§10c) — the shared validator, so the sheet
-       says what the server would refuse: a slug's format, a number, a URL… */
-    const problem = isEmpty(v)
-      ? f.validation?.required && (published || saveError)
-        ? `${f.name} is required to publish`
-        : null
-      : cmsValueError(f, v);
-    const err = problem ? (
-      <span className={ERROR} data-testid={`cms-field-error-${f.slug}`}>{problem}</span>
-    ) : null;
-    if (f.type === "image") {
-      const src = typeof v === "string" ? v : "";
-      return (
-        <div className="tw:flex tw:flex-col tw:gap-1 tw:px-3" key={f.id} data-testid={id}>
-          <span className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink)]">{f.name}</span>
-          {src ? (
-            <span className="tw:flex tw:items-center tw:gap-2">
-              <img src={src} alt="" className="tw:size-10 tw:rounded tw:object-cover" />
-              <span className="tw:truncate tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-soft)]">{src.split("/").pop()}</span>
-            </span>
-          ) : (
-            <span className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink)]">No image yet · use Choose image</span>
-          )}
-          <span className="tw:flex tw:gap-2">
-            <Button
-              size="xs"
-              variant="secondary"
-              className={SMALL_BTN}
-              disabled={!onOpenMediaLibrary}
-              data-testid={`${id}-choose`}
-              onClick={() =>
-                onOpenMediaLibrary?.(["image"], (asset) => set(f.slug, asset.src), `${crumb} · ${f.name}`)
-              }
-            >
-              Choose image
-            </Button>
-            {src ? (
-              <Button size="xs" variant="ghost" className={SMALL_BTN} data-testid={`${id}-clear`} onClick={() => set(f.slug, "")}>
-                Remove
-              </Button>
-            ) : null}
-          </span>
-          {err}
-        </div>
-      );
-    }
-    let input: React.ReactNode;
-    if (f.type === "richtext") {
-      input = <RichTextField id={id} labelId={`${id}-label`} value={typeof v === "string" ? v : ""} onChange={(html) => set(f.slug, html)} />;
-    } else if (f.type === "textarea") {
-      input = (
-        <Textarea
-          id={id}
-          rows={2}
-          className="tw:min-h-[58px] tw:rounded-[6px] tw:bg-[var(--bk-bg-panel)] tw:px-2.5 tw:py-2 tw:text-[13px] tw:leading-5"
-          value={String(v ?? "")}
-          onChange={(e) => set(f.slug, e.target.value)}
-        />
-      );
-    } else if (f.type === "multiselect") {
-      /* PD-1: a chip per option; the value is the list of chosen options
-         (a text box here stored "a,b" over the array — UI-07). */
-      const chosen = Array.isArray(v) ? (v as string[]) : [];
-      input = f.options?.length ? (
-        <span className="tw:flex tw:flex-wrap tw:gap-1" role="group" aria-labelledby={`${id}-label`} data-testid={`${id}-chips`}>
-          {f.options.map((o) => (
-            <Chip
-              key={o}
-              label={o}
-              selected={chosen.includes(o)}
-              onClick={() => set(f.slug, chosen.includes(o) ? chosen.filter((x) => x !== o) : [...chosen, o])}
-            />
-          ))}
-        </span>
-      ) : (
-        <span className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">No options yet · add them in Fields</span>
-      );
-    } else if (f.type === "reference") {
-      input = <ReferenceField id={id} composer={composer} field={f} value={v} className={CONTROL} onChange={(rid) => set(f.slug, rid)} />;
-    } else if (f.type === "boolean") {
-      input = (
-        <Select id={id} sizing="sm" className={CONTROL} value={v ? "yes" : "no"} onChange={(e) => set(f.slug, e.target.value === "yes")}>
-          <option value="no">No</option>
-          <option value="yes">Yes</option>
-        </Select>
-      );
-    } else if (f.type === "select" && f.options?.length) {
-      input = (
-        <Select id={id} sizing="sm" className={CONTROL} value={String(v ?? "")} onChange={(e) => set(f.slug, e.target.value)}>
-          <option value="">—</option>
-          {f.options.map((o) => (
-            <option key={o} value={o}>
-              {o}
-            </option>
-          ))}
-        </Select>
-      );
-    } else {
-      const type = f.type === "number" ? "number" : f.type === "date" ? "date" : f.type === "datetime" ? "datetime-local" : f.type === "email" ? "email" : f.type === "url" ? "url" : "text";
-      input = (
-        <TextInput
-          id={id}
-          type={type}
-          sizing="sm"
-          className={CONTROL}
-          placeholder={autoSlug && f.slug === slugKey ? "auto from name" : f.placeholder}
-          value={v === undefined || v === null ? "" : String(v)}
-          onChange={(e) =>
-            set(f.slug, f.type === "number" ? (e.target.value === "" ? undefined : Number(e.target.value)) : e.target.value)
-          }
-        />
-      );
-    }
-    return (
-      <div className={FIELD} key={f.id} data-testid={id}>
-        {label}
-        {input}
-        {err}
-      </div>
-    );
-  };
+  const control = (f: CMSField) => (
+    <RecordFieldControl
+      key={f.id}
+      field={f}
+      value={form[f.slug]}
+      onChange={(v) => set(f.slug, v)}
+      composer={composer}
+      showRequired={published || saveError !== null}
+      placeholder={autoSlug && f.slug === slugKey ? "auto from name" : f.placeholder}
+      pickLabel={`${crumb} · ${f.name}`}
+      onOpenMediaLibrary={onOpenMediaLibrary}
+    />
+  );
+
+  const statusBadge = record ? recordStatusBadge(record) : null;
+  /* F2.09 — a way back to an element reads as the save while it runs. */
+  const returning = saving && origin !== null && !returnTo?.page; // 173:16635 / 174:13882 — a save from an element-opened record
+  React.useEffect(() => {
+    cmsWorkspace.setReturning(returning);
+    return () => cmsWorkspace.setReturning(false);
+  }, [returning]);
 
   return (
+    /* 2L9 165:520 — the record fills the workspace under its tabs: a back +
+       title row, the form on the left with the always-on Preview (unsaved)
+       column beside it, and the footer across both. */
     <div
-      className="tw:absolute tw:inset-0 tw:z-[var(--bk-z-chrome)] tw:flex tw:overflow-hidden tw:border tw:border-[var(--bk-gray-100)] tw:bg-[var(--bk-bg-panel)]"
-      role="dialog"
+      className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:bg-[var(--bk-bg-panel)]"
+      role="region"
       aria-label={`Record · ${crumb}`}
       data-testid="cms-sheet"
       onKeyDown={(e) => {
@@ -514,16 +468,34 @@ export function RecordSheet({
         }
       }}
     >
-      <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:gap-2 tw:px-8 tw:pb-3">
-      <header className="tw:flex tw:h-11 tw:w-[280px] tw:flex-none tw:items-center tw:gap-2 tw:px-4">
-        {onBackToCanvas ? (
-          <Button color="light" size="xs" className={`${BACK} tw:flex-none`} data-testid="cms-sheet-back-to-canvas" onClick={() => guard(onBackToCanvas)}>
-            ‹ Back to canvas
-          </Button>
-        ) : null}
-        <h3 className="tw:m-0 tw:min-w-0 tw:flex-1 tw:truncate tw:text-[14px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]" data-testid="cms-sheet-title">
-          {title}
+      {/* design-2l9 122:43331 — "Blog › Studio launch", then the Form /
+          Preview switch; the record menu keeps the far end. */}
+      <div className="tw:flex tw:h-12 tw:flex-none tw:items-center tw:gap-3 tw:pl-6 tw:pr-6">
+        <h3 className="tw:m-0 tw:min-w-0 tw:truncate tw:text-[13px] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)]" data-testid="cms-sheet-title">
+          {`${collection.name} › ${title}`}
         </h3>
+        {statusBadge && statusBadge.tone === "warning" ? (
+          <span className="tw:flex-none tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]" data-testid="cms-sheet-status">
+            {statusBadge.label}
+          </span>
+        ) : null}
+        <span className="tw:flex-1 tw:max-w-[392px]" />
+        <div className="tw:flex tw:flex-none tw:items-center tw:gap-1" role="group" aria-label="Record view">
+          {(["form", "preview"] as const).map((v) => (
+            <Button
+              key={v}
+              size="xs"
+              variant={view === v ? "secondary" : "ghost"}
+              aria-pressed={view === v}
+              className="tw:h-8 tw:min-h-0 tw:px-4 tw:text-[13px] tw:font-normal"
+              data-testid={`cms-sheet-view-${v}`}
+              onClick={() => setView(v)}
+            >
+              {v === "form" ? "Form" : "Preview"}
+            </Button>
+          ))}
+        </div>
+        <span className="tw:flex-1" />
         {record ? (
           <Popover
             open={menuOpen}
@@ -536,216 +508,264 @@ export function RecordSheet({
             }
           >
             <Menu label="Record menu">
-              <MenuItem
-                data-testid="cms-sheet-preview-template"
-                onClick={() => {
-                  setMenuOpen(false);
-                  setTemplatePreviewOpen(true);
-                }}
-              >
-                Preview saved record
-              </MenuItem>
               <MenuItem danger data-testid="cms-sheet-delete" onClick={() => void remove()}>
                 Delete record…
               </MenuItem>
             </Menu>
           </Popover>
         ) : null}
-        <IconButton label="Close record" size="sm" data-testid="cms-sheet-close" onClick={() => guard(onClose)}>
-          <X size={16} />
-        </IconButton>
-      </header>
-
-      <div className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:gap-2 tw:overflow-y-auto">
-        <nav className="tw:flex tw:h-9 tw:flex-none tw:items-center tw:gap-1 tw:px-4 tw:text-[13px] tw:leading-5" aria-label="Breadcrumb">
-          <Button
-            size="xs"
-            variant="link"
-            className="tw:h-auto tw:min-h-0 tw:p-0 tw:text-[13px] tw:font-normal"
-            data-testid="cms-sheet-crumb"
-            onClick={() => guard(onClose)}
-          >
-            {collection.name}
-          </Button>
-          <span className="tw:text-[var(--bk-gray-500)]">›</span>
-          <span className="tw:text-[var(--bk-ink)]">{crumb}</span>
-        </nav>
-        <div className="tw:flex tw:h-9 tw:flex-none tw:items-center tw:gap-1 tw:px-2" role="tablist" aria-label={`${collection.name} sections`}>
-          {(
-            [
-              ["records", "Records"],
-              ["fields", "Fields"],
-              ["dynamic-pages", "Dynamic pages"],
-            ] as const
-          ).map(([tab, label]) => (
-            <Button
-              key={tab}
-              role="tab"
-              aria-selected={tab === "records"}
-              size="xs"
-              className={`${NAV_TAB} ${tab === "records" ? "tw:border-[var(--bk-accent)] tw:text-[var(--bk-ink)]" : ""}`}
-              data-testid={`cms-sheet-tab-${tab}`}
-              onClick={() => (tab === "records" ? guard(onClose) : guard(() => onOpenTab(tab)))}
-            >
-              {label}
-            </Button>
-          ))}
-        </div>
-        {rowsOf(collection.fields).map((row) => (
-          <div key={row.map((f) => f.id).join("+")} className="tw:flex tw:w-full tw:items-start tw:gap-3">
-            {row.map(control)}
-          </div>
-        ))}
-        {/* 7116:76427 — "Preview ▸" opens the read-only card beside the form. */}
-        <Button
-          size="xs"
-          variant="link"
-          aria-expanded={previewOpen}
-          className="tw:h-auto tw:min-h-0 tw:self-start tw:p-0 tw:text-[12px] tw:font-medium"
-          data-testid="cms-sheet-preview"
-          onClick={() => setPreviewOpen((o) => !o)}
-        >
-          Preview ▸
-        </Button>
       </div>
 
-      {conflict && !gone ? (
-        /* 8139:217690 — the choice sits on the footer's rule, warning tint,
-           8px wider than the form on each side. */
-        <div
-          className="tw:-mx-2 tw:-mb-2 tw:flex tw:flex-none tw:flex-col tw:gap-2 tw:bg-[var(--bk-warning-tint)] tw:px-4 tw:py-3"
-          role="alert"
-          data-testid="cms-sheet-conflict"
-        >
-          <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
-            Someone else changed this record. Choose Keep mine or Use theirs.
-          </p>
-          <div className="tw:flex tw:h-8 tw:items-center tw:gap-2">
-            <Button
-              size="sm"
-              variant="ghost"
-              className={CHOICE_BTN}
-              disabled={resolving}
-              data-testid="cms-sheet-keep-mine"
-              onClick={() => void choose("keepMine")}
-            >
-              Keep mine
-            </Button>
-            <Button size="sm" className={CHOICE_BTN} disabled={resolving} data-testid="cms-sheet-use-theirs" onClick={() => void choose("useTheirs")}>
-              Use theirs
-            </Button>
-          </div>
-        </div>
-      ) : null}
-
-      <footer className="tw:flex tw:flex-none tw:flex-col tw:gap-2 tw:border-t tw:border-[var(--bk-gray-100)] tw:pt-2">
-        {blocked ? (
-          /* 8139:217560 / 8139:217711 — nothing here can publish until the
-             conflict is chosen or the sheet is left; the switch steps aside. */
-          <div className="tw:flex tw:h-11 tw:items-center tw:gap-2 tw:px-4" data-testid="cms-sheet-eligibility">
-            <span
-              className={`tw:size-1.5 tw:rounded-full ${gone ? "tw:bg-[var(--bk-gray-500)]" : "tw:bg-[var(--bk-warning)]"}`}
-              aria-hidden="true"
-            />
-            <span className="tw:flex-1 tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-gray-500)]">
-              {gone ? "This item is no longer available" : "Resolve the conflict before publishing"}
-            </span>
-          </div>
+      <div className="tw:flex tw:min-h-0 tw:flex-1 tw:gap-12 tw:overflow-hidden tw:pl-6 tw:pr-6">
+        {view === "preview" ? (
+          /* 122:43331 Preview: the record as these fields render it. */
+          <RecordPreview
+            dirty={dirty}
+            collection={collection}
+            form={form}
+            title={title}
+            onPreviewSaved={record ? () => setTemplatePreviewOpen(true) : undefined}
+          />
         ) : (
-        <div className="tw:flex tw:h-11 tw:items-center tw:gap-2 tw:px-4" data-testid="cms-sheet-eligibility">
+        <div className="tw:flex tw:min-h-0 tw:min-w-0 tw:max-w-[500px] tw:flex-1 tw:flex-col tw:gap-4 tw:overflow-y-auto tw:pb-4 tw:pt-4">
           <span
-            className={`tw:size-1.5 tw:rounded-full ${!record && !dirty ? "tw:bg-[var(--bk-ink-muted)]" : missing.length ? "tw:bg-[var(--bk-warning)]" : "tw:bg-[var(--bk-success)]"}`}
-            aria-hidden="true"
-          />
-          {!record && !dirty ? <TriangleAlert size={12} className="tw:flex-none tw:text-[var(--bk-warning-text)]" aria-hidden="true" /> : null}
-          <span
-            className={`tw:flex-1 tw:text-[13px] tw:leading-5 tw:font-medium ${missing.length ? "tw:text-[var(--bk-warning-text)]" : "tw:text-[var(--bk-success-text)]"}`}
+            className={`tw:flex-none tw:text-[12px] tw:leading-[18px] ${
+              saveError && !blocked && saveError !== OFFLINE
+                ? "tw:text-[var(--bk-error-text)]"
+                : dirty && !saving && !queued.locked
+                  ? "tw:text-[var(--bk-warning-text)]"
+                  : "tw:text-[var(--bk-ink-soft)]"
+            }`}
+            role={saveError && !blocked && !paused && saveError !== FAILED && saveError !== OFFLINE ? "alert" : undefined}
+            data-testid="cms-sheet-state"
           >
-            {!record && !dirty
-              ? "Not eligible — not saved yet"
-              : missing.length
-                ? `Not eligible for publishing — ${missing.map((f) => f.name).join(", ")} ${missing.length === 1 ? "is" : "are"} required`
-                : "Eligible for publishing"}
+            {"Record · "}
+            {gone
+              ? "Your change to it wasn't saved."
+              : conflict
+                ? "Your changes are waiting for a conflict choice."
+                : saving
+                  ? "Saving…"
+                  : paused
+                    ? "Couldn’t save · return paused"
+                    : saveError === FAILED
+                      ? /* 126:35945 — "Record · Couldn’t save — Retry". */
+                        "Couldn’t save — Retry"
+                      : saveError === OFFLINE
+                        ? "Offline, save pending"
+                        : saveError ??
+                          (noFields
+                            ? "Add a field to this collection before saving a record."
+                            : dirty
+                              ? "Unsaved changes"
+                              : record
+                                ? /* 173:16169 */ "Saved"
+                                : "New record · nothing saved yet")}
           </span>
-          <ToggleSwitch
-            checked={published}
-            label="Published"
-            sizing="sm"
-            data-testid="cms-sheet-published"
-            onChange={setPublished}
-          />
+
+          {paused ? (
+            <div className="tw:flex tw:flex-none tw:flex-col tw:gap-0.5 tw:rounded-[6px] tw:bg-[var(--bk-warning-tint)] tw:px-4 tw:py-2" role="alert" data-testid="cms-sheet-return-paused">
+              <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-warning-text)]">
+                {pausedTo ? `Your edits are still here. Return to ${pausedTo} is paused.` : "Your edits are still here. Leaving is paused."}
+              </p>
+              {saveError !== FAILED ? <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-error-text)]">{saveError}</p> : null}
+            </div>
+          ) : (saveError === FAILED || saveError === OFFLINE) && !blocked && !saving && !queued.locked ? (
+            /* 165:1072 (failed) · 165:1625 (offline): the banner sits over the
+               fields and says what happened to the edits. */
+            <div
+              className="tw:flex tw:flex-none tw:flex-col tw:gap-1 tw:rounded-[6px] tw:bg-[var(--bk-warning-tint)] tw:px-3 tw:py-3"
+              role="alert"
+              data-testid="cms-sheet-save-banner"
+            >
+              <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:font-semibold tw:text-[var(--bk-warning-text)]">
+                {saveError === OFFLINE ? "You’re offline" : "Couldn’t save"}
+              </p>
+              <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-warning-text)]">
+                {saveError === OFFLINE ? OFFLINE : "Your edits are still here. Retry when you’re ready."}
+              </p>
+            </div>
+          ) : returnCancelled && saving ? (
+            /* 126:37330 (a page leave) · 177:16850 (a return to the element): called off; the save runs on. */
+            <p className={`tw:m-0 tw:flex-none tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)] ${origin !== null ? "tw:rounded-[4px] tw:bg-[var(--bk-gray-100)] tw:px-3 tw:py-2" : ""}`} role="status" data-testid="cms-sheet-return-cancelled">
+              {origin !== null ? "Return cancelled. Your record save is still in progress." : "Record · Saving continues; stay here"}
+            </p>
+          ) : null}
+
+          {conflict && !gone ? (
+            /* 165:1903 — "Changed elsewhere" over the fields; Review opens the
+               per-field review (165:2414, ConflictReviewDialog). */
+            <div className="tw:flex tw:flex-none tw:items-start tw:gap-3 tw:rounded-[6px] tw:bg-[var(--bk-warning-tint)] tw:px-3 tw:py-3" role="alert" data-testid="cms-sheet-conflict">
+              <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:gap-1">
+                <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:font-semibold tw:text-[var(--bk-warning-text)]">Changed elsewhere</p>
+                <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-warning-text)]">
+                  Review the fields that changed before saving.
+                </p>
+              </div>
+              <Button size="xs" variant="secondary" className="tw:h-8 tw:px-4 tw:text-[13px] tw:font-medium" onClick={() => setReviewing(true)} data-testid="cms-sheet-conflict-review">
+                Review
+              </Button>
+              <ConflictReviewDialog
+                open={reviewing}
+                conflict={conflict}
+                fields={collection.fields}
+                base={openedWith.current}
+                resolving={resolving}
+                onCancel={() => setReviewing(false)}
+                onKeepMine={(merged) => void choose("keepMine", merged)}
+                onUseTheirs={() => void choose("useTheirs")}
+              />
+            </div>
+          ) : null}
+
+          {/* 126:37330 / 126:35760: a submitted save owns the fields until it settles. */}
+          <fieldset disabled={(returnCancelled && saving) || queued.locked} className="tw:m-0 tw:flex tw:min-w-0 tw:flex-col tw:gap-4 tw:border-0 tw:p-0">
+            {[...collection.fields].sort((a, b) => a.order - b.order).map(control)}
+          </fieldset>
+
+          {/* The publishing switch closes the form (165:2184's "Published —
+              included in the next site publish · Eligible for publishing"). */}
+          {blocked ? (
+            <div className="tw:flex tw:h-10 tw:flex-none tw:items-center tw:gap-2" data-testid="cms-sheet-eligibility">
+              <span className={`tw:size-1.5 tw:rounded-full ${gone ? "tw:bg-[var(--bk-gray-500)]" : "tw:bg-[var(--bk-warning)]"}`} aria-hidden="true" />
+              <span className="tw:flex-1 tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-gray-500)]">
+                {gone ? "This item is no longer available" : "Resolve the conflict before publishing"}
+              </span>
+            </div>
+          ) : (
+            <div className="tw:flex tw:flex-none tw:flex-col tw:gap-1" data-testid="cms-sheet-eligibility">
+              <ToggleSwitch checked={published} disabled={queued.locked} label="Published — included in the next site publish" sizing="sm" data-testid="cms-sheet-published" onChange={setPublished} />
+              <span className={`tw:flex tw:items-center tw:gap-1.5 tw:text-[12px] tw:leading-[18px] ${missing.length ? "tw:text-[var(--bk-warning-text)]" : "tw:text-[var(--bk-ink-soft)]"}`}>
+                {!record && !dirty ? <TriangleAlert size={12} className="tw:flex-none" aria-hidden="true" /> : null}
+                {!record && !dirty
+                  ? "Not eligible — not saved yet"
+                  : missing.length
+                    ? `Not eligible for publishing — ${missing.map((f) => f.name).join(", ")} ${missing.length === 1 ? "is" : "are"} required`
+                    : "Eligible for publishing"}
+              </span>
+            </div>
+          )}
+          {removedNote ? (
+            <p className="tw:m-0 tw:flex-none tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-warning-text)]" data-testid="cms-sheet-removed-note">
+              {`${removedNote} was removed. Your ${title} draft is retained.`}
+            </p>
+          ) : null}
         </div>
         )}
-        <div className="tw:flex tw:items-center tw:gap-2">
-          <span className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
-            <span
-              className={`tw:text-[12px] tw:leading-[18px] tw:font-medium ${saveError && !blocked ? "tw:text-[var(--bk-error-text)]" : "tw:text-[var(--bk-ink)]"}`}
-              role={saveError && !blocked ? "alert" : undefined}
-              data-testid="cms-sheet-state"
-            >
-              {gone
-                ? "Your change to it wasn't saved."
-                : conflict
-                  ? "Your changes are waiting for a conflict choice."
-                  : saveError ??
-                    (noFields
-                      ? "Add a field to this collection before saving a record."
-                      : dirty
-                        ? "Unsaved changes on this record"
-                        : record
-                          ? "No unsaved changes on this record"
-                          : "New record · nothing saved yet")}
-            </span>
-            {/* 6749:59940 — a new record says what Save needs and what it does. */}
-            {!record && !saveError && !blocked ? (
-              <span className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="cms-sheet-new-hint">
-                {nameMissing ? `Enter a ${nameField?.name ?? "name"} before saving. ` : ""}Save record creates this {singular} with every
-                field above. Publishing the site makes it live.
-              </span>
-            ) : null}
-          </span>
-          <Button size="xs" variant="secondary" className={SMALL_BTN} data-testid="cms-sheet-cancel" onClick={() => guard(onClose)}>
-            Cancel
-          </Button>
-          <Button size="xs" className={SMALL_BTN} disabled={blocked || noFields || (!dirty && !!record) || (!record && nameMissing) || saving} data-testid="cms-sheet-save" onClick={() => void save()}>
-            {saveError && !blocked ? "Retry save" : "Save record"}
-          </Button>
-        </div>
-      </footer>
       </div>
-      {previewOpen ? (
-        <RecordPreview collection={collection} record={record} form={form} title={title} onDelete={record ? () => void remove() : undefined} />
-      ) : null}
 
-      {/* 6879:67190 — the danger action first, the safe one last; "Keep
-          editing" takes focus, and Escape / the scrim give the same answer. */}
+      <RecordSheetFooter
+        pendingPage={pending && returnTo?.page && !saving ? returnTo.page.name : null}
+        onCancelNavigation={() => {
+          setPending(false);
+          holdReturn(null);
+        }}
+        saveDisabled={!canSave || requiredBlock || (!dirty && !!record) || saving || queued.locked}
+        saveLeaveDisabled={requiredBlock || !canSave}
+        saveLabel={saving ? "Saving…" : queued.locked ? "Save pending" : paused ? "Retry and return" : saveError && saveError !== OFFLINE && !blocked ? "Retry save" : "Save record"}
+        onSave={() => void save()}
+        cancel={returnTo && saving ? (returnTo.origin ? "stay-here" : "stay") : queued.locked || (returnCancelled && saving && origin === null) ? "unavailable" : saving && origin !== null ? "saving" : paused ? "drop-return" : "close"}
+        onStay={stayHere}
+        onDropReturn={() => holdReturn(null)}
+        onClose={() => guard(onClose)}
+        requiredNote={requiredBlock && !saving ? `Enter a ${missing[0].name.toLowerCase()} before saving.` : null}
+        newHint={
+          !record && !saveError && !blocked
+            ? `${nameMissing ? `Enter a ${nameField?.name ?? "name"} before saving. ` : ""}Save record creates this ${singular} with every field above. Publishing the site makes it live.`
+            : null
+        }
+      />
+
+      {/* 165:2184 · 168:21408 · 173:17098 — "Keep editing" takes focus, and
+          Escape / the scrim give the same answer; "Save and leave" saves, then
+          takes the way out the person chose. */}
       <Modal
-        open={leaveTo !== null}
+        open={leaveTo !== null && !leaveTo.page}
         onClose={() => setLeaveTo(null)}
-        title="Discard record changes?"
+        title="Leave without saving?"
         kind="form"
+        /* 165:2184 — a 480 dialog; the safe answer is the filled one. */
+        width="sm"
         testId="cms-discard"
         footer={
           <>
+            <Button ref={keepRef} variant="primary" onClick={() => setLeaveTo(null)} data-testid="cms-discard-keep">
+              Keep editing
+            </Button>
             <Button
-              variant="danger"
+              variant="secondary"
               onClick={() => {
-                const go = leaveTo;
+                const intent = leaveTo;
                 setLeaveTo(null);
-                if (go) leave(go);
+                if (intent) leave(intent.go);
               }}
               data-testid="cms-discard-confirm"
             >
-              Discard and leave
+              Discard changes
             </Button>
-            <Button ref={keepRef} variant="secondary" onClick={() => setLeaveTo(null)} data-testid="cms-discard-keep">
-              Keep editing
+            <Button
+              variant="secondary"
+              disabled={!canSave}
+              onClick={() => {
+                const intent = leaveTo;
+                setLeaveTo(null);
+                if (!intent) return;
+                holdReturn(intent);
+                void save();
+              }}
+              data-testid="cms-discard-save"
+            >
+              Save and leave
             </Button>
           </>
         }
       >
-        <p className="tw:m-0">{`${crumb} has unsaved changes. Keep editing to finish them, or discard the edits and leave the record.`}</p>
+        <p className="tw:m-0" data-testid="cms-discard-body">
+          {leaveTo?.origin && leaveTo.to
+            ? `Your destination is ${leaveTo.to}.`
+            : leaveTo?.to
+              ? `Save or discard the edits to “${crumb}” before opening ${leaveTo.to}.`
+              : `${crumb} has unsaved record edits.`}
+        </p>
       </Modal>
+      <RecordLeaveDialog
+        phase={leavePhase}
+        recordLabel={`${collection.name} record “${crumb}”`}
+        collectionName={collection.name}
+        to={removedTo ?? leaveTo?.page?.name ?? returnTo?.page?.name ?? ""}
+        current={composer?.elements.getActivePage?.()?.name ?? null}
+        toIsCurrent={!removedTo && Boolean(leaveTo?.page?.isCurrent)}
+        reason={leavePhase === "refused" ? saveError : null}
+        canSave={canSave}
+        keepRef={keepRef}
+        onKeepEditing={() => {
+          if (removedTo) {
+            setRemovedNote(removedTo);
+            setRemovedTo(null);
+          } else if (leaveTo) setLeaveTo(null);
+          else if (saving) stayHere();
+          /* A refusal keeps the page pending while the record is fixed. */
+          else if (leavePhase === "refused") setPending(true);
+          else {
+            if (leavePhase === "queued") queued.lock();
+            holdReturn(null);
+          }
+        }}
+        onDiscard={() => {
+          const intent = leaveTo;
+          setLeaveTo(null);
+          if (intent) goTo(intent);
+        }}
+        onSaveAndLeave={() => {
+          const intent = leaveTo;
+          setLeaveTo(null);
+          if (!intent) return;
+          holdReturn(intent);
+          if (requiredBlock) setPending(true);
+          else void save();
+        }}
+        onRetry={() => void save()}
+      />
       {record ? (
         <TypedDeleteDialog
           open={typedDelete}

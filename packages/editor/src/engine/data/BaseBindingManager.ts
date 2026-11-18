@@ -81,13 +81,19 @@ export abstract class BaseBindingManager<T extends BindingWithData> {
   /**
    * Bind (or replace) a binding for an element keyed by getBindingKey().
    */
-  bind(elementId: string, binding: T, historyLabel?: string): void {
+  /** Resolves once the binding has been applied to the element. Inside a
+   *  composer transaction the transaction's own step carries the bind (its
+   *  map and the applied value, when awaited before the transaction ends), so
+   *  no separate step is recorded or noted (design-2l9 187:21418). */
+  bind(elementId: string, binding: T, historyLabel?: string): Promise<void> {
+    if (this.composer.writeLocked) return Promise.resolve();
+    const inTransaction = this.composer.isTransactionActive?.() ?? false;
     /* A person binding from the inspector passes a label: the change is then
        one undo step. Bindings ARE in the history snapshot now
        (Composer.exportProject writes cmsBindings, importProject restores them,
        clearing first), so Undo restores the map and the text together. Loads
        and history restores go through import(), which never binds. */
-    if (historyLabel) this.composer.history?.flushPending?.();
+    if (historyLabel && !inTransaction) this.composer.history?.flushPending?.();
     const elementBindings = this.bindings.get(elementId) || [];
     const key = this.getBindingKey(binding);
     const existingIndex = elementBindings.findIndex((b) => this.getBindingKey(b) === key);
@@ -115,7 +121,7 @@ export abstract class BaseBindingManager<T extends BindingWithData> {
        is now untracked (see CMSBindingManager.applyBinding), so this is belt
        and braces; the order still matters if a subclass ever writes without
        the wrapper. */
-    void Promise.resolve(this.applyBinding(elementId, binding)).finally(() => {
+    return Promise.resolve(this.applyBinding(elementId, binding)).finally(() => {
       /* The map is saved with the project. A binding that resolves to nothing
          writes nothing into the element, so nothing else dirtied the project
          and it was never saved (live 2026-10-08) — same rule as unbind.
@@ -124,6 +130,7 @@ export abstract class BaseBindingManager<T extends BindingWithData> {
       const history = this.composer.history;
       if (history?.runWithoutTracking) history.runWithoutTracking(dirty);
       else dirty();
+      if (inTransaction) return;
       if (historyLabel) this.composer.history?.record?.(historyLabel);
       else this.composer.history?.noteUnrecordedAction?.("binding a field to content");
     });
@@ -133,6 +140,7 @@ export abstract class BaseBindingManager<T extends BindingWithData> {
    * Unbind a specific key for an element.
    */
   unbind(elementId: string, key: string): void {
+    if (this.composer.writeLocked) return;
     const elementBindings = this.bindings.get(elementId);
     if (!elementBindings) return;
 
@@ -155,6 +163,7 @@ export abstract class BaseBindingManager<T extends BindingWithData> {
    * Unbind everything for an element.
    */
   unbindAll(elementId: string, historyLabel?: string): void {
+    if (this.composer.writeLocked) return;
     if (historyLabel) this.composer.history?.flushPending?.();
     this.bindings.delete(elementId);
     this.composer.emit(EVENTS.BINDING_REMOVED, { elementId });

@@ -15,7 +15,7 @@ import type { Composer } from "@/engine";
 import type { Element } from "@/engine/elements/Element";
 import { EVENTS } from "@/shared/constants/events";
 import type { LayerItem } from "../types";
-import { getLayerPreview } from "../data/layerUtils";
+import { getAncestors, getLayerPreview } from "../data/layerUtils";
 import { hasStoredSet, loadSetFromStorage, saveSetToStorage } from "./layersPersistence";
 
 export interface UseLayerTreeReturn {
@@ -27,6 +27,8 @@ export interface UseLayerTreeReturn {
   expandIds: (ids: string[]) => void;
   expandAll: () => void;
   collapseAll: () => void;
+  /** Board 152:78185 "Collapse to selection": only the selection's ancestors stay open. */
+  collapseToSelection: (selectedIds: Iterable<string>) => void;
   getVisibleLayerIds: () => string[];
   totalCount: number;
 }
@@ -274,6 +276,15 @@ export function useLayerTree(
     setExpandedIds(new Set());
   }, []);
 
+  const collapseToSelection = React.useCallback(
+    (selectedIds: Iterable<string>) => {
+      const open = new Set<string>();
+      for (const id of selectedIds) for (const a of getAncestors(layers, id)) open.add(a.id);
+      setExpandedIds(open);
+    },
+    [layers],
+  );
+
   const getVisibleLayerIds = React.useCallback((): string[] => {
     const result: string[] = [];
     const walk = (items: LayerItem[]) => {
@@ -303,6 +314,7 @@ export function useLayerTree(
     expandIds,
     expandAll,
     collapseAll,
+    collapseToSelection,
     getVisibleLayerIds,
     totalCount,
   };

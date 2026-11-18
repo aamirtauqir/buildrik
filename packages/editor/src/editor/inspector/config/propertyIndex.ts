@@ -43,6 +43,10 @@ export function buildPropertyIndex(elementType: string): PropertyIndexRow[] {
       const entry = SECTION_REGISTRY[section];
       if (entry.capability && !entry.capability(caps)) continue;
       add({ label: entry.title, path: tabLabel, section, tab });
+      /* A CSS property's home is Style or Effects. Content rows write text
+         and attributes; a style key they read (an embed's legacy ratio box)
+         is not where that property is edited. */
+      if (tab === "content") continue;
       for (const property of entry.styleKeys) {
         if (property.startsWith("--")) continue;
         add({ label: humanize(property), path: `${tabLabel} › ${entry.title}`, section, tab, property });

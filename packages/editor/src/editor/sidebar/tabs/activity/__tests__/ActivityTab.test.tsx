@@ -2,7 +2,7 @@
 /**
  * Activity is its own right-column panel (board 4418:140587; owner ruling
  * 2026-09-25), not a History tab. A row opens its subject in the editor with
- * the sub-screen that makes the landing panel draw "‹ Activity".
+ * the sub-screen that makes the landing panel draw "‹ Back to Activity".
  */
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";

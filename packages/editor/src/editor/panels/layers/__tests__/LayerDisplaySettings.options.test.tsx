@@ -121,6 +121,9 @@ describe("LayersPanel — the options change the tree", () => {
     });
     mountPanel(composer);
     expect(screen.getByTestId("layer-row-lx-heading").className).not.toMatch(/bdc-cms-bound/);
+    /* 173:9757: the glyph shows without the preference; only the tint waits on it. */
+    expect(screen.getByTestId("layer-cms-badge-lx-heading")).toBeInTheDocument();
+    expect(screen.queryByTestId("layer-cms-badge-lx-text")).toBeNull();
     fireEvent.click(screen.getByLabelText("Highlight CMS-bound layers"));
     expect(screen.getByTestId("layer-row-lx-heading").className).toMatch(/bdc-cms-bound/);
     expect(screen.getByTestId("layer-cms-badge-lx-heading")).toBeInTheDocument();
@@ -132,5 +135,22 @@ describe("LayersPanel — the options change the tree", () => {
     expect(screen.queryByText("h1")).toBeNull();
     fireEvent.click(screen.getByLabelText("Show HTML tags"));
     expect(screen.getByText(/^h[1-6]$/)).toBeInTheDocument();
+  });
+});
+
+/* design-2l9 board 147:76329. Re-baseline: Layer display title + Close. */
+describe("LayerDisplaySettings — board 147:76329", () => {
+  it("is titled Layer display, ends with the footnote and Close", () => {
+    const onClose = vi.fn();
+    render(
+      <LayerDisplaySettings
+        prefs={{ showDimmed: true, showLockBadges: true, treeDensity: "comfortable", highlightCmsBound: false, showHtmlBadges: false } as LayerDisplayPrefs}
+        onChange={vi.fn()}
+        onClose={onClose}
+      />,
+    );
+    expect(screen.getByTestId("layers-display-title")).toHaveTextContent("Layer display");
+    fireEvent.click(screen.getByTestId("layers-display-close"));
+    expect(onClose).toHaveBeenCalled();
   });
 });

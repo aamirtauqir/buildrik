@@ -1,7 +1,9 @@
 /**
- * Visibility Section — Behaviour › Visibility (board 2): one checkbox per
- * breakpoint, "Desktop · Tablet · Mobile", ticked = shown there. Unticking
- * writes `--hide-<bp>: true`; ticking clears it.
+ * Visibility Section — Behavior › Visibility (board 2, 2L9 161:13919): "Show
+ * on these devices", one checkbox per breakpoint, "Desktop · Tablet ·
+ * Mobile", ticked = shown there. Unticking writes `--hide-<bp>: true`;
+ * ticking clears it. (The board's "Data conditions: Content › Conditions"
+ * note is not drawn: there are no conditions yet — REQUESTS #11.)
  *
  * @license BSD-3-Clause
  */
@@ -28,6 +30,8 @@ const VISIBILITY_BREAKPOINTS = (["desktop", "tablet", "mobile"] as const).map((i
   };
 });
 
+const andList = (xs: readonly string[]) => (xs.length <= 1 ? (xs[0] ?? "") : `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}`);
+
 export const VisibilitySection: React.FC<VisibilitySectionProps> = ({
   styles: elementStyles,
   onChange,
@@ -49,12 +53,16 @@ export const VisibilitySection: React.FC<VisibilitySectionProps> = ({
       id="inspector-section-visibility"
       preview={hiddenCount > 0 ? `hidden on ${hiddenCount}` : undefined}
     >
-      <div className="tw:flex tw:items-center tw:gap-1 tw:py-2" data-testid="visibility-show-on" role="group" aria-label="Show on">
+      <p className="tw:m-0 tw:pt-1 tw:pb-1 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" id="visibility-show-on-label">
+        Show on these devices
+      </p>
+      {/* 2L9 161:13919: one device per row, stacked. */}
+      <div className="tw:flex tw:flex-col tw:pl-2" data-testid="visibility-show-on" role="group" aria-labelledby="visibility-show-on-label">
         {VISIBILITY_BREAKPOINTS.map((bp) => {
           const shown = isVisible(bp.id);
           const id = `visibility-${bp.id}`;
           return (
-            <span key={bp.id} className="tw:flex tw:items-center tw:gap-1 tw:w-[84px]">
+            <span key={bp.id} className="tw:flex tw:h-10 tw:items-center tw:gap-3">
               <Checkbox
                 id={id}
                 data-testid={`visibility-check-${bp.id}`}
@@ -69,7 +77,7 @@ export const VisibilitySection: React.FC<VisibilitySectionProps> = ({
                   a pointer over a locked box read as editable (QA 2026-10-02). */}
               <label
                 htmlFor={id}
-                className={`${readOnly ? "tw:cursor-default" : "tw:cursor-pointer"} tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]`}
+                className={`${readOnly ? "tw:cursor-default" : "tw:cursor-pointer"} tw:text-[13px] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink)]`}
               >
                 {bp.label}
               </label>
@@ -77,6 +85,16 @@ export const VisibilitySection: React.FC<VisibilitySectionProps> = ({
           );
         })}
       </div>
+      {/* 2L9 I13: where it is hidden, said. The board adds "stays visible
+          here for editing"; the canvas hides it at that device too
+          (Canvas.css, matching the published page), so the line says what
+          does stay: the selection and its Layers row. */}
+      {hiddenCount > 0 ? (
+        <p className="tw:m-0 tw:pt-1 tw:pb-1 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="visibility-hidden-note">
+          Hidden on the live {andList(VISIBILITY_BREAKPOINTS.filter((bp) => !isVisible(bp.id)).map((bp) => bp.label))} page
+          {hiddenCount > 1 ? "s" : ""}. The canvas hides it there too; it stays selected and listed in Layers.
+        </p>
+      ) : null}
     </Section>
   );
 };

@@ -1,9 +1,7 @@
 /**
- * v3 board 4418:83498 (Layers · no results), redrawn 2026-10-10 for L2-031:
- * the state glyph, "No matching layers", "Try a different name, or clear the
- * search.", a "Clear search" button, and the outlined hand-off to ⌘K,
- * "Search everywhere for “carousel”". The empty tree ("No layers yet") no
- * longer shares this heading.
+ * design-2l9 board 147:79328 (Layers · no search matches): "No layers match
+ * “q”", "Search by name, type, tag or ID." and a Clear search link — no
+ * glyph, no "Nothing here yet", no ⌘K hand-off.
  *
  * @license BSD-3-Clause
  */
@@ -13,16 +11,14 @@ import "@testing-library/jest-dom";
 import { LayersNoResults } from "../components/LayersStateBlocks";
 
 describe("LayersNoResults", () => {
-  it("names the failed search, clears it, and hands the query to Search everywhere", () => {
-    const onSearchEverywhere = vi.fn();
+  it("names the failed search and clears it", () => {
     const onClear = vi.fn();
-    render(<LayersNoResults search="carousel" onSearchEverywhere={onSearchEverywhere} onClear={onClear} />);
-    expect(screen.getByTestId("layers-no-results-title")).toHaveTextContent("No matching layers");
+    render(<LayersNoResults search="carousel" onClear={onClear} />);
+    expect(screen.getByTestId("layers-no-results-title")).toHaveTextContent("No layers match “carousel”");
+    expect(screen.getByTestId("layers-no-results-text")).toHaveTextContent("Search by name, type, tag or ID.");
     expect(screen.getByTestId("layers-no-results")).not.toHaveTextContent("Nothing here yet");
-    expect(screen.getByTestId("layers-no-results-text")).toHaveTextContent("Try a different name, or clear the search.");
+    expect(screen.queryByRole("button", { name: /Search everywhere/ })).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Clear search" }));
     expect(onClear).toHaveBeenCalledTimes(1);
-    fireEvent.click(screen.getByRole("button", { name: "Search everywhere for “carousel”" }));
-    expect(onSearchEverywhere).toHaveBeenCalledWith("carousel");
   });
 });

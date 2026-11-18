@@ -19,6 +19,7 @@ export { GridOverlay } from "./GridOverlay";
 export { RemoteCursorsOverlay } from "./RemoteCursorsOverlay";
 // Canvas UX enhancements
 export { SelectionLabel } from "./SelectionLabel";
+export { ListCountCaption } from "./ListCountCaption";
 export type { SelectionLabelProps } from "./SelectionLabel";
 export { SmartGuidesOverlay } from "./SmartGuidesOverlay";
 export { CanvasOverlayGroup } from "./CanvasOverlayGroup";

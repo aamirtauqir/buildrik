@@ -15,22 +15,28 @@ import * as React from "react";
 import { MoreHorizontal, Table2 } from "lucide-react";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants";
-import { Button, IconButton, Menu, MenuItem, MenuSeparator, PanelSearch, Popover, Tabs, useToast } from "@/editor/chrome-ui";
+import { Button, IconButton, Menu, MenuItem, MenuSeparator, Popover, Tabs, useToast } from "@/editor/chrome-ui";
 import { useContentPanel } from "@/editor/sidebar/tabs/content/useContentPanel";
-import { DynamicPagesPane } from "./DynamicPagesPane";
+import { ConditionsView, VariablesView } from "@/editor/sidebar/tabs/content/ContentViews";
+import { variableUsage } from "@/editor/sidebar/tabs/content/variableUsage";
+import { DynamicPagesPane, type DynamicPagesSave } from "./DynamicPagesPane";
 import { CollectionSettingsPane } from "./CollectionSettingsPane";
 import { FieldsTable } from "./FieldsTable";
 import { FieldInspector } from "./FieldInspector";
 import { fieldUsage } from "./fieldUsage";
 import { AddFieldDialog } from "./AddFieldDialog";
-import { cmsWorkspace, useCmsWorkspace, type CmsTab } from "./cmsWorkspaceStore";
+import { CMS_TAB_LABEL, cmsWorkspace, useCmsWorkspace, type CmsTab } from "./cmsWorkspaceStore";
 import { RecordsTable, recordTitle } from "./RecordsTable";
-import { RecordSheet, type OpenMediaLibrary } from "./RecordSheet";
-import { BACK } from "./paneStyles";
+import { RecordSheet } from "./RecordSheet";
+import type { OpenMediaLibrary } from "./RecordFieldControl";
 import { ImportRecordsButton, useImportRecords } from "./useImportRecords";
 import { CsvImportDialog } from "./CsvImportDialog";
 import { onCmsGone } from "@/services/cmsSync";
-import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
+import type { CMSCollection, CMSContentItem, CMSField, CMSFieldType } from "@/shared/types/cms";
+import type { TypeChangeMode } from "./TypeChangeDialog";
+import { planConversion } from "./fieldConversion";
+import { FIELD_TYPE_LABEL } from "./fieldTypes";
+import { isEmptyCmsValue } from "@buildrik/shared/schemas/cms";
 
 export interface CmsWorkspaceProps {
   composer: Composer | null;
@@ -43,28 +49,20 @@ export interface CmsWorkspaceProps {
   onBackToCanvas?: () => void;
 }
 
-const HEADER =
-  "tw:flex tw:h-14 tw:flex-none tw:items-center tw:gap-3 tw:px-5 tw:border-b tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)]";
-const TITLE = "tw:m-0 tw:text-[16px] tw:leading-6 tw:font-semibold tw:tracking-[-0.16px] tw:text-[var(--bk-ink)] tw:whitespace-nowrap";
+/* 2L9 165:2 — a 56 header on the page's 24 gutter: way back, "Blog · N
+   records", the tab's primary action and the collection ⋯. */
+const HEADER = "tw:flex tw:h-14 tw:flex-none tw:items-center tw:gap-6 tw:pl-6 tw:pr-4 tw:bg-[var(--bk-bg-panel)]";
+const TITLE = "tw:m-0 tw:text-[14px] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)] tw:whitespace-nowrap";
 const META = "tw:text-[13px] tw:leading-5 tw:text-[var(--bk-gray-500)] tw:whitespace-nowrap";
 /* 4428:143466 — 28 tall, 12 inline, 13/20 medium. Same-property utilities so
    they displace flowbite's xs size. */
-const PRIMARY = "tw:h-7 tw:px-3 tw:py-1 tw:text-[13px] tw:leading-5 tw:font-medium tw:rounded-[6px]";
-const TAB_ROW =
-  "tw:flex tw:h-10 tw:flex-none tw:items-center tw:gap-1 tw:pl-3 tw:pr-5 tw:border-b tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)]";
-/* 7432:143178 — an underlined tab, not the shared pill: 40 tall, 10 inline,
-   13/20 medium, ink-soft; the selected one is accent with a 2px accent rule. */
-const TAB =
-  "tw:h-10 tw:rounded-none tw:px-2.5 tw:font-medium tw:leading-5 tw:text-[var(--bk-ink-soft)] tw:border-b-2 tw:border-transparent " +
-  "tw:hover:bg-transparent tw:aria-selected:bg-transparent tw:aria-selected:hover:bg-transparent " +
-  "tw:aria-selected:border-[var(--bk-accent)] tw:aria-selected:text-[var(--bk-accent-text)]";
+const PRIMARY = "tw:h-8 tw:min-w-[148px] tw:px-4 tw:py-0 tw:text-[13px] tw:leading-5 tw:font-medium tw:rounded-[6px]";
+/* 165:2 — the four tabs are the shared tinted pills, 24 in, a 48 band. */
+const TAB_ROW = "tw:flex tw:h-12 tw:flex-none tw:items-center tw:pl-6 tw:pr-6 tw:bg-[var(--bk-bg-panel)]";
+const TAB = "tw:h-8 tw:min-w-[96px] tw:px-4 tw:font-medium";
 
-/* A quiet 28-tall action at the header's start; a rule parts it from the title. */
-
-const TABS = [
-  { id: "records", label: "Records" },
-  { id: "fields", label: "Fields" },
-] as const;
+/* 165:2 — all four of a collection's tabs are named in the row. */
+const TABS = (Object.entries(CMS_TAB_LABEL) as [CmsTab, string][]).map(([id, label]) => ({ id, label }));
 
 /** The inspector-slot hint column (4428:140486 "Select a collection"). */
 function HintColumn({ title, hint, testId }: { title: string; hint: string; testId: string }) {
@@ -83,8 +81,13 @@ function plural(n: number, one: string, many = `${one}s`): string {
   return `${n} ${n === 1 ? one : many}`;
 }
 
+/** The way back with no element origin (165:2, 176:21830). */
+const backToEditor = (page: string | undefined) => (page ? `Back to Editor · ${page}` : "Back to Editor");
+
 export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary, onBackToCanvas }: CmsWorkspaceProps) {
   const panel = useContentPanel(composer);
+  /* B5-V01: the Site variables page's "+ New variable" asks its list to add. */
+  const [varAdd, setVarAdd] = React.useState(0);
   const { addToast } = useToast();
   const ws = useCmsWorkspace();
   /* 8139:217711 / 8139:217890 — an edit the server refused because another
@@ -107,8 +110,8 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [csvImportOpen, setCsvImportOpen] = React.useState(false);
   const [addingField, setAddingField] = React.useState(false);
+  const [dpSave, setDpSave] = React.useState<DynamicPagesSave | null>(null);
   const [fieldId, setFieldId] = React.useState<string | null>(null);
-  const [query, setQuery] = React.useState("");
   const { loadRecords } = panel;
   /* CMS-01: the record a "new" sheet's first save created. A later save from
      the same sheet (Retry after a queued or refused write) updates it — the
@@ -123,14 +126,8 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
     if (collection) void loadRecords(collection.id);
   }, [collection?.id, loadRecords]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  /* 6819:59209 had the topbar field search an open collection ("Search Menu
-     items…"); owner decision 2026-10-03 moves it under the tab row, over the
-     records it filters. Leaving the collection drops the query, as handing
-     the topbar field back used to. */
-  const collectionName = collection?.name ?? null;
-  React.useEffect(() => {
-    setQuery("");
-  }, [collectionName]);
+  /* A visit's way back ends with the visit (F2.06 origin). */
+  React.useEffect(() => cmsWorkspace.holdVisit(), []);
 
   /* 4428:140486 — while the workspace covers the canvas the topbar crumb
      reads "<site> › CMS", not the page behind it. */
@@ -166,14 +163,103 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
   }, [composer, refKey, panel.recordCounts]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const importer = useImportRecords(composer, collection);
-  const back = onBackToCanvas ? (
-    <>
-      <Button color="light" size="xs" className={BACK} data-testid="cms-ws-back-to-canvas" onClick={onBackToCanvas}>
-        ‹ Back to canvas
-      </Button>
-      <span className="tw:h-5 tw:w-px tw:bg-[var(--bk-border)]" aria-hidden="true" />
-    </>
+  /* 165:2 "‹ Back to Editor · Home" / 173:16169 "‹ Heading · Title
+     binding" — through the open record's guard (cmsWorkspace.exit). */
+  /* 165:2 / 173:16169 — the way back sits 66 in; the title starts at 273
+     whether or not there is one. */
+  const back = ws.returning ? (
+    /* 173:16635 — a grey 232 pill where the way back was, at the pane's edge. */
+    <span
+      className="tw:flex tw:h-8 tw:w-[232px] tw:flex-none tw:items-center tw:justify-center tw:rounded-[6px] tw:bg-[var(--bk-gray-100)] tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]"
+      role="status"
+      data-testid="cms-sheet-returning"
+    >
+      Saving record…
+    </span>
+  ) : onBackToCanvas ? (
+    <Button
+      size="xs"
+      variant="link"
+      className="tw:ml-[42px] tw:h-auto tw:min-h-0 tw:w-[183px] tw:flex-none tw:justify-start tw:truncate tw:p-0 tw:text-[13px] tw:font-normal"
+      data-testid="cms-ws-back-to-canvas"
+      onClick={() =>
+        cmsWorkspace.exit(() => {
+          cmsWorkspace.openRecord(null);
+          onBackToCanvas();
+        })
+      }
+    >
+      {/* 165:2 / 176:21830: with no element origin, the way back names the
+          editor and the page it kept open. */}
+      ‹ {ws.origin ?? backToEditor(composer?.elements.getActivePage?.()?.name)}
+    </Button>
   ) : null;
+
+  /* 2L9 B5-V01 `260:235689`: Site variables is a page of the workspace —
+     the drawer keeps its list, this pane holds the variables. */
+  if (!collection && ws.page === "variables") {
+    return (
+      <div className="tw:flex tw:h-full tw:min-h-0" data-testid="cms-workspace" data-bk-full-page="">
+        <section className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:bg-[var(--bk-bg-panel)]" data-testid="cms-ws-variables">
+          <header className={HEADER} data-testid="cms-ws-header">
+            {back}
+            <h2 className={TITLE}>Site variables</h2>
+            <span className="tw:flex-1" />
+            <Button size="xs" className={PRIMARY} data-testid="cms-ws-new-variable" onClick={() => setVarAdd((n) => n + 1)}>
+              + New variable
+            </Button>
+          </header>
+          <div className="tw:min-h-0 tw:flex-1">
+            <VariablesView
+              page
+              addSignal={varAdd}
+              variables={panel.variables}
+              onBack={() => cmsWorkspace.openCollection(null)}
+              onChange={panel.setVariables}
+              usages={variableUsage(composer)}
+              onOpenUse={(id) => {
+                const el = composer?.elements.getElement(id);
+                if (!composer || !el) return;
+                composer.selection.select(el);
+                composer.emit("ui:switch-tab", { tab: "layers" });
+              }}
+            />
+          </div>
+        </section>
+      </div>
+    );
+  }
+
+  /* 176:21830 (D39): Conditions is a page of the workspace — a read-only
+     index; Locate leaves for the canvas, opens the element's page and selects
+     it, so its Inspector (Content › Conditions) is where the rule is edited. */
+  if (!collection && ws.page === "conditions") {
+    return (
+      <div className="tw:flex tw:h-full tw:min-h-0" data-testid="cms-workspace" data-bk-full-page="">
+        <section className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:bg-[var(--bk-bg-panel)]" data-testid="cms-ws-conditions">
+          <header className={HEADER} data-testid="cms-ws-header">
+            {back}
+            <h2 className={TITLE}>Conditions</h2>
+          </header>
+          <div className="tw:min-h-0 tw:flex-1">
+            <ConditionsView
+              conditions={panel.conditions}
+              onLocate={(row) =>
+                cmsWorkspace.exit(() => {
+                  cmsWorkspace.openRecord(null);
+                  onBackToCanvas?.();
+                  if (!composer) return;
+                  if (row.pageId && composer.elements.getActivePage()?.id !== row.pageId) composer.elements.setActivePage(row.pageId);
+                  const el = composer.elements.getElement(row.elementId);
+                  if (el) composer.selection.select(el);
+                })
+              }
+            />
+          </div>
+        </section>
+      </div>
+    );
+  }
 
   if (!collection) {
     const records = Object.values(panel.recordCounts).reduce((a, b) => a + b, 0);
@@ -228,15 +314,69 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
       <Button size="xs" className={PRIMARY} data-testid="cms-ws-add-field" onClick={() => setAddingField(true)}>
         + Add field
       </Button>
+    ) : ws.tab === "dynamic-pages" && dpSave ? (
+      /* 165:3693 — the Dynamic pages form saves from the header, top-right. */
+      <Button size="xs" variant="secondary" className={PRIMARY} data-testid="cms-dp-save" disabled={dpSave.disabled} onClick={dpSave.run}>
+        {dpSave.saving ? "Saving…" : "Save"}
+      </Button>
     ) : null;
 
   const usage = fieldUsage(composer, collection);
   const selectedField = ws.tab === "fields" ? collection.fields.find((f) => f.id === fieldId) ?? null : null;
   const deleteField = async (id: string) => {
     const field = collection.fields.find((f) => f.id === id);
-    setFieldId(null);
+    /* The dialog shows "Deleting {field}…" until this lands (257:53280);
+       a throw leaves it open with Retry. */
     await panel.deleteField(collection.id, id);
+    setFieldId(null);
     if (field) addToast({ tone: "success", title: "Field deleted", description: `${field.name} has been removed from ${collection.name}.` });
+  };
+  /* 257:53846 / 259:95932 — a default for a field becoming Required: saved on
+     the field, written into each published record that has no value, then
+     Required goes on. Existing values are kept. */
+  const fillDefault = async (field: CMSField, value: unknown): Promise<number> => {
+    if (!composer) return 0;
+    const empty = panel.records.filter((r) => r.status === "published" && isEmptyCmsValue(r.data[field.slug]));
+    await composer.cms.collections.updateField(collection.id, field.id, { defaultValue: value });
+    for (const r of empty) {
+      await panel.saveRecord(collection.id, r.id, { ...r.data, [field.slug]: value }, true);
+    }
+    await composer.cms.collections.updateField(collection.id, field.id, {
+      defaultValue: value,
+      validation: { ...field.validation, required: true },
+    });
+    await loadRecords(collection.id);
+    addToast({
+      tone: "success",
+      title: `${field.name} is required`,
+      description: `Default saved to ${empty.length} previously empty published record${empty.length === 1 ? "" : "s"}. Existing values were kept.`,
+    });
+    return empty.length;
+  };
+  /* 257:51318 / 257:52278 / 259:95573 — the type moves first (so a
+     published record's save is checked against it), then each stored value
+     is written converted, or cleared. A refused write rejects; the dialog
+     offers Retry, which plans again from what is stored now. */
+  const changeType = async (field: CMSField, to: CMSFieldType, mode: TypeChangeMode): Promise<void> => {
+    if (!composer) return;
+    const plan = planConversion(field, panel.records, to);
+    if (field.type !== to) await composer.cms.collections.updateField(collection.id, field.id, { type: to });
+    const writes: Array<[CMSContentItem, unknown]> =
+      mode === "convert" ? plan.converts.map((c) => [c.record, c.value]) : plan.touched.map((r) => [r, undefined]);
+    for (const [record, value] of writes) {
+      const data = { ...record.data };
+      if (value === undefined) delete data[field.slug];
+      else data[field.slug] = value;
+      const result = await panel.saveRecord(collection.id, record.id, data, record.status === "published");
+      if (result.invalid || result.conflict) throw new Error(result.invalid ?? "conflict");
+    }
+    await loadRecords(collection.id);
+    const n = writes.length;
+    addToast({
+      tone: "success",
+      title: mode === "convert" ? `${field.name} converted` : `${n} value${n === 1 ? "" : "s"} cleared`,
+      description: mode === "convert" ? `${n} value${n === 1 ? "" : "s"} converted and saved.` : `${field.name} is now ${FIELD_TYPE_LABEL[to]}.`,
+    });
   };
   /* "Open the binding" — select the bound element and go back to the canvas. */
   const openUse = (elementId: string) => {
@@ -276,7 +416,7 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
       <div className="tw:flex tw:flex-col tw:items-center tw:pt-[132px] tw:text-center" data-testid="cms-ws-no-records">
         <Table2 size={20} className="tw:text-[var(--bk-ink-soft)]" aria-hidden="true" />
         <p className="tw:m-0 tw:mt-3 tw:text-[16px] tw:leading-6 tw:font-semibold tw:text-[var(--bk-ink)]">No records yet</p>
-        <p className="tw:m-0 tw:mt-2 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">Add your first record.</p>
+        <p className="tw:m-0 tw:mt-2 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">Add your first record or import existing records.</p>
         <div className="tw:mt-3 tw:flex tw:gap-2">
           <Button size="xs" className={`${PRIMARY} tw:h-8`} data-testid="cms-ws-empty-add" onClick={() => cmsWorkspace.openRecord("new")}>
             Add record
@@ -289,7 +429,7 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
             data-testid="cms-ws-empty-import-csv"
             onClick={() => setCsvImportOpen(true)}
           >
-            Import CSV
+            Import CSV…
           </Button>
         </div>
       </div>
@@ -301,7 +441,6 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
         key={collection.id}
         collection={collection}
         records={panel.records}
-        query={query}
         referenceLabels={referenceLabels}
         onOpenRecord={(id) => cmsWorkspace.openRecord(id)}
       />
@@ -309,143 +448,30 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
   } else if (ws.tab === "fields") {
     body = <FieldsTable collection={collection} usage={usage} selectedId={selectedField?.id ?? null} onSelect={setFieldId} />;
   } else if (ws.tab === "dynamic-pages") {
-    body = <DynamicPagesPane composer={composer} collection={collection} records={panel.records} />;
+    body = (
+      <DynamicPagesPane
+        composer={composer}
+        collection={collection}
+        records={panel.records}
+        onSaveAction={setDpSave}
+        /* 187:21418 — a made collection page opens on the canvas, Layers beside it. */
+        onOpenPage={(pageId) =>
+          cmsWorkspace.exit(() => {
+            composer?.elements.setActivePage(pageId);
+            composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "layers" });
+          })
+        }
+      />
+    );
   } else if (ws.tab === "settings") {
     body = <CollectionSettingsPane composer={composer} collection={collection} records={panel.records} />;
   } else {
     body = null;
   }
 
-  const hint =
-    selectedField
-      ? null
-      : isEmpty
-      ? { title: "Add your first record", hint: "It opens here for editing." }
-      : ws.tab === "dynamic-pages"
-        ? { title: "Select a page", hint: "Generated pages open here and under Pages." }
-        : ws.tab === "fields"
-          ? { title: "Select a field", hint: "Click a row to open its settings — type, key, required and validation." }
-        : ws.tab === "settings"
-          ? { title: "Settings apply to every record", hint: "Rename, re-sync or delete this collection here." }
-          : null;
-
-  return (
-    /* data-bk-full-page: this view covers the canvas column, so toasts take the window corner (8139:217711). */
-    <div className="tw:relative tw:flex tw:h-full tw:min-h-0" data-testid="cms-workspace" data-bk-full-page="">
-      <section className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:bg-[var(--bk-bg-panel)]">
-        <header className={HEADER} data-testid="cms-ws-header">
-          {back}
-          <h2 className={TITLE} data-testid="cms-ws-title">{collection.name}</h2>
-          <span className={META} data-testid="cms-ws-meta">
-            · {ws.tab === "fields" ? plural(collection.fields.length, "field") : plural(count, "record")}
-          </span>
-          <span className="tw:flex-1" />
-          {primary}
-        </header>
-        <div className={TAB_ROW}>
-          <Tabs
-            tabs={TABS}
-            value={ws.tab}
-            onChange={(id) => cmsWorkspace.setTab(id as CmsTab)}
-            label={`${collection.name} sections`}
-            className="tw:p-0 tw:gap-1"
-            tabClassName={TAB}
-            data-testid="cms-ws-tabs"
-          />
-          {/* 7096:76270 — the collection ⋯ holds the two tabs the row has no
-              room to name, plus Import JSON (B13): the Records modal it lived
-              in is retired, and a capability does not go quietly. */}
-          <Popover
-            open={menuOpen}
-            onClose={() => setMenuOpen(false)}
-            label="Collection menu"
-            trigger={
-              <IconButton
-                label="Collection menu"
-                className="tw:size-10"
-                pressed={menuOpen || ws.tab === "dynamic-pages" || ws.tab === "settings"}
-                data-testid="cms-ws-more"
-                onClick={() => setMenuOpen((v) => !v)}
-              >
-                <MoreHorizontal size={20} />
-              </IconButton>
-            }
-          >
-            <Menu label="Collection menu">
-              <MenuItem selected={ws.tab === "dynamic-pages"} data-testid="cms-ws-menu-dynamic" onClick={() => { setMenuOpen(false); cmsWorkspace.setTab("dynamic-pages"); }}>
-                Dynamic pages
-              </MenuItem>
-              <MenuItem selected={ws.tab === "settings"} data-testid="cms-ws-menu-settings" onClick={() => { setMenuOpen(false); cmsWorkspace.setTab("settings"); }}>
-                Settings
-              </MenuItem>
-              <MenuSeparator />
-              <MenuItem data-testid="cms-ws-menu-import-csv" onClick={() => { setMenuOpen(false); setCsvImportOpen(true); }}>
-                Import CSV…
-              </MenuItem>
-              <MenuItem data-testid="cms-ws-menu-import" onClick={() => { setMenuOpen(false); importer.pick(); }}>
-                Import JSON…
-              </MenuItem>
-              {/* External connectors need OAuth apps + credentials that don't
-                  exist in any env, plus a security review (fix-all round,
-                  2026-09-25 decision) — a clear disabled row, not a dead
-                  button that looks live. */}
-              <MenuItem disabled kbd="Coming soon" data-testid="cms-ws-menu-import-sheets">
-                Google Sheets
-              </MenuItem>
-              <MenuItem disabled kbd="Coming soon" data-testid="cms-ws-menu-import-airtable">
-                Airtable
-              </MenuItem>
-            </Menu>
-          </Popover>
-        </div>
-        {importer.status}
-        {ws.tab === "records" && !isEmpty ? (
-          <PanelSearch
-            placeholder={`Search ${collection.name}…`}
-            value={query}
-            onChange={setQuery}
-            className="tw:max-w-[352px]"
-            data-testid="cms-ws-search"
-          />
-        ) : null}
-        <div className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col">{body}</div>
-      </section>
-      {addingField ? (
-        <AddFieldDialog
-          collection={collection}
-          onClose={() => setAddingField(false)}
-          collections={panel.collections}
-          onAdd={(field) => panel.addField(collection.id, field)}
-        />
-      ) : null}
-      {selectedField ? (
-        <FieldInspector
-          composer={composer}
-          collection={collection}
-          collections={panel.collections}
-          field={selectedField}
-          records={panel.records}
-          uses={usage.get(selectedField.slug) ?? []}
-          onClose={() => setFieldId(null)}
-          onDeleteField={deleteField}
-          onOpenUse={openUse}
-        />
-      ) : null}
-      {csvImportOpen ? (
-        <CsvImportDialog
-          collection={collection}
-          onClose={() => setCsvImportOpen(false)}
-          /* DM-15: the import wrote on the server and the hydrate wrote to
-             this browser's store behind the engine; its cache still held the
-             pre-import rows, so "Imported 4 of 4" showed none of them until a
-             reload. Re-read the store, then the table. */
-          onImported={() =>
-            void Promise.resolve(composer?.cms.collections.refreshFromStorage()).then(() => loadRecords(collection.id))
-          }
-        />
-      ) : null}
-      {hint ? <HintColumn title={hint.title} hint={hint.hint} testId="cms-ws-hint" /> : null}
-      {ws.recordId && (ws.recordId === "new" || sheetRecord) ? (
+  /* 2L9 165:520 — an open record fills the workspace under its tabs. */
+  const sheetOpen = Boolean(ws.recordId && (ws.recordId === "new" || sheetRecord));
+  const sheet = sheetOpen ? (
         <RecordSheet
           key={ws.recordId}
           composer={composer}
@@ -456,17 +482,7 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
             setGone(null);
             cmsWorkspace.openRecord(null);
           }}
-          /* The sheet covers the workspace header: opened from an element
-             (Open record ›), its own back closes it and returns to the
-             canvas in one step (§13). */
-          onBackToCanvas={
-            onBackToCanvas
-              ? () => {
-                  cmsWorkspace.openRecord(null);
-                  onBackToCanvas();
-                }
-              : undefined
-          }
+          origin={ws.origin}
           onOpenTab={(tab) => cmsWorkspace.setTab(tab)}
           onSave={async (data, published) => {
             const isNew = ws.recordId === "new";
@@ -487,6 +503,131 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
             await panel.saveRecord(collection.id, null, r.data, r.status === "published");
           }}
           onOpenMediaLibrary={onOpenMediaLibrary}
+        />
+  ) : null;
+
+  const hint =
+    selectedField || sheetOpen
+      ? null
+      : isEmpty
+      ? { title: "Add your first record", hint: "It opens here for editing." }
+      : ws.tab === "dynamic-pages"
+        ? { title: "Select a page", hint: "Generated pages open here and under Pages." }
+        : ws.tab === "fields"
+          ? { title: "Select a field", hint: "Click a row to open its settings — type, key, required and validation." }
+        : ws.tab === "settings"
+          ? { title: "Settings apply to every record", hint: "Rename, re-sync or delete this collection here." }
+          : null;
+
+  return (
+    /* data-bk-full-page: this view covers the canvas column, so toasts take the window corner (8139:217711). */
+    <div className="tw:relative tw:flex tw:h-full tw:min-h-0" data-testid="cms-workspace" data-bk-full-page="">
+      <section className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:bg-[var(--bk-bg-panel)]">
+        <header className={HEADER} data-testid="cms-ws-header">
+          {back}
+          <h2 className={TITLE} data-testid="cms-ws-title">
+            {collection.name}
+            <span className="tw:font-semibold" data-testid="cms-ws-meta">
+              {" · "}
+              {plural(count, "record")}
+            </span>
+          </h2>
+          <span className="tw:flex-1" />
+          {sheetOpen ? null : primary}
+          {/* 254:82143 — the collection ⋯ holds the imports (B13: the Records
+              modal they lived in is retired, and a capability does not go
+              quietly) and the connectors that are planned. */}
+          <Popover
+            open={menuOpen}
+            onClose={() => setMenuOpen(false)}
+            label="Collection menu"
+            trigger={
+              <IconButton
+                label="Collection menu"
+                className="tw:size-8"
+                pressed={menuOpen}
+                data-testid="cms-ws-more"
+                onClick={() => setMenuOpen((v) => !v)}
+              >
+                <MoreHorizontal size={16} />
+              </IconButton>
+            }
+          >
+            <Menu label="Collection menu">
+              <MenuItem data-testid="cms-ws-menu-import-csv" onClick={() => { setMenuOpen(false); setCsvImportOpen(true); }}>
+                Import CSV…
+              </MenuItem>
+              <MenuItem data-testid="cms-ws-menu-import" onClick={() => { setMenuOpen(false); importer.pick(); }}>
+                Import JSON…
+              </MenuItem>
+              {/* External connectors need OAuth apps + credentials that don't
+                  exist in any env, plus a security review (fix-all round,
+                  2026-09-25 decision) — a clear disabled row, not a dead
+                  button that looks live. */}
+              <MenuSeparator />
+              <MenuItem disabled kbd="Planned" data-testid="cms-ws-menu-import-sheets">
+                Google Sheets
+              </MenuItem>
+              <MenuItem disabled kbd="Planned" data-testid="cms-ws-menu-import-airtable">
+                Airtable
+              </MenuItem>
+            </Menu>
+          </Popover>
+        </header>
+        <div className={TAB_ROW}>
+          <Tabs
+            tabs={TABS}
+            value={ws.tab}
+            onChange={(id) => cmsWorkspace.setTab(id as CmsTab)}
+            label={`${collection.name} sections`}
+            className="tw:gap-2 tw:p-0"
+            tabClassName={TAB}
+            data-testid="cms-ws-tabs"
+          />
+        </div>
+        {importer.status}
+        {/* 165:2917 — a selected field's settings (or a tab's hint) sit beside
+            the table, under the header and tabs. */}
+        <div className="tw:flex tw:min-h-0 tw:flex-1">
+          <div className="tw:flex tw:min-h-0 tw:min-w-0 tw:flex-1 tw:flex-col">{sheetOpen ? sheet : body}</div>
+          {selectedField ? (
+            <FieldInspector
+              composer={composer}
+              collection={collection}
+              collections={panel.collections}
+              field={selectedField}
+              records={panel.records}
+              uses={usage.get(selectedField.slug) ?? []}
+              onClose={() => setFieldId(null)}
+              onDeleteField={deleteField}
+              onOpenUse={openUse}
+              onSetDefault={fillDefault}
+              onChangeType={changeType}
+            />
+          ) : null}
+          {hint ? <HintColumn title={hint.title} hint={hint.hint} testId="cms-ws-hint" /> : null}
+        </div>
+      </section>
+      {addingField ? (
+        <AddFieldDialog
+          collection={collection}
+          onClose={() => setAddingField(false)}
+          collections={panel.collections}
+          onAdd={(field) => panel.addField(collection.id, field)}
+          onOpenMediaLibrary={onOpenMediaLibrary}
+        />
+      ) : null}
+      {csvImportOpen ? (
+        <CsvImportDialog
+          collection={collection}
+          onClose={() => setCsvImportOpen(false)}
+          /* DM-15: the import wrote on the server and the hydrate wrote to
+             this browser's store behind the engine; its cache still held the
+             pre-import rows, so "Imported 4 of 4" showed none of them until a
+             reload. Re-read the store, then the table. */
+          onImported={() =>
+            void Promise.resolve(composer?.cms.collections.refreshFromStorage()).then(() => loadRecords(collection.id))
+          }
         />
       ) : null}
       {importer.input}

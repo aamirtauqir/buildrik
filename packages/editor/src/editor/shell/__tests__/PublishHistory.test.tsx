@@ -153,7 +153,7 @@ describe("republish", () => {
     renderIt();
     await pickVersion(2);
     // confirm dialog names both versions + reassures nothing is rewritten
-    expect(screen.getByText("Republish v2 as v4?")).toBeInTheDocument();
+    expect(screen.getByText(/^Republish v2( to .+)?\?$/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: CONFIRM_BUTTON }));
     await waitFor(() => expect(rollbackToVersion).toHaveBeenCalledWith("s1", "j2"));
   });
@@ -200,7 +200,7 @@ describe("republish", () => {
     rollbackToVersion.mockClear();
     fireEvent.click(screen.getByRole("button", { name: /try again/i }));
 
-    expect(screen.getByText("Republish v2 as v4?")).toBeInTheDocument();
+    expect(screen.getByText(/^Republish v2( to .+)?\?$/)).toBeInTheDocument();
     expect(rollbackToVersion).not.toHaveBeenCalled();
   });
 
@@ -320,26 +320,18 @@ describe("board 184:24 — the republish confirm names the versions", () => {
     await pickVersion(2);
   };
 
-  it("titles itself with the target and the replacement — 'Republish v5 as v7' (G1-052)", async () => {
+  /* 2L9 B7-H10 230:18022 — the title names the target and where it goes. */
+  it("titles itself with the target — 'Republish v13 to <domain>?'", async () => {
     await openConfirm();
-    expect(await screen.findByText("Republish v2 as v4?")).toBeInTheDocument();
+    expect(await screen.findByText(/^Republish v2( to .+)?\?$/)).toBeInTheDocument();
   });
 
   it("names target, replacement and the version staying in history", async () => {
     await openConfirm();
     // ROWS is v3 live, so rolling back to v2 re-publishes it as v4.
     expect(
-      await screen.findByText(/This publishes v2 again as v4\. Your current v3 stays in history/),
+      await screen.findByText(/The live site goes back to v2, published again as v4\. Your current draft is not changed\. v3 stays in this list\./),
     ).toBeInTheDocument();
-  });
-
-  it("carries board 4418:73440's info block — the live version stays in history", async () => {
-    await openConfirm();
-    // Not a repeat of the sentence above it: that one is about the live
-    // version, this one is about the LIST — which is what makes a rollback
-    // safe to try at all.
-    expect(await screen.findByText("Your current published version remains in history.")).toBeInTheDocument();
-    expect(screen.getByText("v4 will name v2 as its source.")).toBeInTheDocument();
   });
 
   it("names the target on the confirm button too", async () => {

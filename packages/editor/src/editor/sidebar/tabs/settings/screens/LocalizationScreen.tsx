@@ -1,12 +1,12 @@
 /**
- * Languages — 8135:214023 (default) · 8135:214262 (remove-locale confirm).
+ * Languages — 2L9 B8-S07 (238:11810) · 8135:214262 (remove-locale confirm).
  *
  * Two cards, two save models (Phase B §1 row 14):
- *  - **Default locale** is a footer field: picking one only stages it, the
+ *  - **Default language** is a footer field: picking one only stages it, the
  *    footer's Save writes `Site.defaultLocale` (the screen's own save handler,
  *    `updateSiteColumns`), and the composer adopts it as saved — the exported
  *    document's `lang` reads `seo.language` (WCAG 3.1.1).
- *  - **Locales** are objects that save immediately (SA-16): `Add locale`
+ *  - **Languages** are objects that save immediately (SA-16): `+ Add language`
  *    (AddLocaleDialog) and `Remove` each write `enabledLocales` at once and
  *    re-read the table — never carrying the staged default with them.
  *    Remove always asks first (OWNER OVERRIDE 2026-10-04 — supersedes Q-B6
@@ -21,7 +21,7 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/chrome-ui";
+import { Button, useToast } from "@/editor/chrome-ui";
 import { getBuildrikClient } from "@/services/api-client";
 import { updateSiteColumns } from "@/services/BuildrikSyncProvider";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
@@ -29,7 +29,6 @@ import { devError } from "@/shared/utils/devLogger";
 import {
   Field,
   LoadCard,
-  SaveErrorBanner,
   SCREEN_EMPTY,
   SCREEN_FIELD_ERROR,
   Screen,
@@ -49,18 +48,15 @@ interface LocalesRead {
   summary: LocalesSummary;
 }
 
-/* 8135:214246 / 8135:214250: header 28 tall in 11/500 caps, rows 40 tall in
-   13, columns 360 · 420 · 236 with 12 between; the card's 16 spaces them. */
-const COLS = ["tw:w-90", "tw:w-105", "tw:min-w-0 tw:flex-1"] as const;
-const ROW = "tw:flex tw:items-center tw:gap-3";
-const HEAD = `${ROW} tw:h-7 tw:text-[length:var(--bk-text-11)] tw:font-medium tw:uppercase tw:leading-5 tw:text-[var(--bk-ink-muted)]`;
-const BODY_ROW = `${ROW} tw:h-10 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]`;
-/* 8135:214240 `Button · Add locale`: primary, 32 tall, 12 in, 13/500. */
-const ADD_BTN =
-  "tw:h-8 tw:shrink-0 tw:rounded-[var(--bk-radius-md)] tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-medium " +
-  "tw:focus:ring-0 tw:focus:shadow-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
+/* 2L9 B8-S07 (238:11810): ruled rows — name 240, the status line, and an
+   outline Remove 140 wide; the saved default has no action. */
+const ROW = "tw:flex tw:min-h-12 tw:items-center tw:gap-3 tw:border-b tw:border-[var(--bk-border)] tw:py-2";
+const NAME = "tw:w-60 tw:shrink-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]";
+const LINE = "tw:m-0 tw:min-w-0 tw:flex-1 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
+const REMOVE =
+  "tw:h-8 tw:w-35 tw:shrink-0 tw:justify-start tw:bg-[var(--bk-bg-subtle)] tw:text-[length:var(--bk-text-13)] tw:font-normal tw:text-[var(--bk-ink-muted)]";
+const NOTE = "tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 
-const nameOf = (code: string) => `${localeLabel(code)} (${code})`;
 
 export const LocalizationScreen: React.FC<ScreenProps> = ({
   composer,
@@ -69,10 +65,11 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
   registerSaveHandler,
   onLoadStateChange,
   registerRetryLoad,
-  saveError,
+  registerFooterMessage,
   fieldErrors,
   readOnly,
 }) => {
+  const { addToast, removeToast } = useToast();
   /* What the server holds, and the default staged for the footer's Save. */
   const [savedDefault, setSavedDefault] = React.useState("en");
   const [defaultLocale, setDefaultLocale] = React.useState("en");
@@ -83,6 +80,14 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
   const [removing, setRemoving] = React.useState<LocaleRow | null>(null);
   const [busy, setBusy] = React.useState(false);
   const [actionError, setActionError] = React.useState<string | null>(null);
+  /* GAP-ST-L04 / L05 (277:25943 / 277:26152): the last language removed or
+     put back by Undo this visit — both save at once, so the footer and the
+     note say it stands apart from the staged default. */
+  const [localeEvent, setLocaleEvent] = React.useState<{ code: string; kind: "removed" | "restored" } | null>(null);
+
+  /* The toast's Undo runs after later edits: it reads the list as it is then. */
+  const enabledRef = React.useRef(enabledLocales);
+  enabledRef.current = enabledLocales;
 
   const siteName = composer?.getProjectMetadata?.()?.name ?? "";
 
@@ -109,6 +114,20 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
   React.useEffect(() => {
     onDirtyChange?.(dirty);
   }, [dirty, onDirtyChange]);
+
+  /* 238:11810's footer names both defaults while one is staged. */
+  React.useEffect(() => {
+    if (!registerFooterMessage) return;
+    const event = localeEvent ? `${localeLabel(localeEvent.code)} ${localeEvent.kind}` : null;
+    registerFooterMessage(
+      dirty
+        ? `Unsaved default: ${localeLabel(defaultLocale)} · ${event ? `${event} immediately` : `saved default: ${localeLabel(savedDefault)}`}`
+        : event
+          ? `Saved default: ${localeLabel(savedDefault)} · ${localeLabel(localeEvent!.code)} remains ${localeEvent!.kind}`
+          : null,
+    );
+    return () => registerFooterMessage(null);
+  }, [registerFooterMessage, dirty, defaultLocale, savedDefault, localeEvent]);
 
   /** The table's counts follow the server (a new default is complete at `/`). */
   const refreshTable = React.useCallback(async () => {
@@ -176,6 +195,27 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
     try {
       await writeLocales(enabledLocales.filter((c) => c !== code));
       setRemoving(null);
+      setLocaleEvent({ code, kind: "removed" });
+      /* 238:11810: "Français removed · Undo" — Undo adds it back, once. */
+      let undone = false;
+      const toastId = addToast({
+        description: `${localeLabel(code)} removed`,
+        duration: 8000,
+        action: {
+          label: "Undo",
+          onClick: () => {
+            if (undone) return;
+            undone = true;
+            removeToast(toastId);
+            if (enabledRef.current.includes(code)) return;
+            void writeLocales([...enabledRef.current, code])
+              .then(() => setLocaleEvent({ code, kind: "restored" }))
+              .catch((error: unknown) =>
+                setActionError(`${localeLabel(code)} was not added back: ${error instanceof Error ? error.message : "try again."}`),
+              );
+          },
+        },
+      });
     } catch (error) {
       setActionError(`${localeLabel(code)} was not removed: ${error instanceof Error ? error.message : "try again."}`);
       setRemoving(null);
@@ -199,7 +239,6 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
       <Screen>
         <LoadCard
           title="Languages"
-          line="Default locale, enabled locales and translation progress."
           state={load.state}
           errorLine="Couldn't load your locales. Check your connection, then try again."
           onRetry={load.retry}
@@ -223,21 +262,8 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
 
   return (
     <Screen>
-      {saveError ? <SaveErrorBanner message={saveError} /> : null}
-
-      {/* C-7 (PD-39): the publish pipeline emits the default locale only. Not
-          on 8135:214023; kept because it is true (owner, 2026-10-04) — as one
-          muted 12/20 line, this screen's note style, not a yellow strip, so
-          the cards sit 36px below the board's place instead of 68. */}
-      <p
-        className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-5 tw:text-[var(--bk-ink-muted)]"
-        data-testid="set-loc-publish-note"
-      >
-        Per-language pages publish in a later release. Today, publishing ships the default locale only — the rows below track translation progress, not live routes.
-      </p>
-
-      <SettingsCard title="Default locale">
-        <Field label="Default locale" htmlFor="default-locale" span="full">
+      <SettingsCard title="Default language">
+        <Field label="Default" htmlFor="default-locale" span="full">
           <Select
             id="default-locale"
             value={defaultLocale}
@@ -247,7 +273,7 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
           >
             {enabledLocales.map((code) => (
               <option key={code} value={code}>
-                {nameOf(code)}
+                {localeLabel(code)}
               </option>
             ))}
           </Select>
@@ -257,73 +283,87 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
             </div>
           ) : null}
         </Field>
-        <p className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
-          Save the default locale with Save below.
-        </p>
+        <p className={NOTE}>Changing the default applies on the next publish.</p>
       </SettingsCard>
 
-      <SettingsCard title="Locales">
-        <div className="tw:flex tw:h-8 tw:items-center tw:gap-4">
-          <p className="tw:m-0 tw:min-w-0 tw:flex-1 tw:text-[length:var(--bk-text-12)] tw:font-medium tw:leading-5 tw:text-[var(--bk-ink-muted)]">
-            Saves immediately
-          </p>
-          {/* A write: disabled, not hidden, on the read-only screen. */}
-          <Button size="xs" className={ADD_BTN} disabled={readOnly} onClick={() => setAddOpen(true)} data-testid="set-loc-add">
-            Add locale
-          </Button>
-        </div>
+      <SettingsCard title="Languages">
         {actionError ? (
           <div role="alert" className={SCREEN_FIELD_ERROR} data-testid="set-loc-action-error">
             {actionError}
           </div>
         ) : null}
-        <div id="locales" role="table" aria-label="Locales" className="tw:flex tw:flex-col tw:gap-4" data-testid="set-loc-table">
-          <div role="row" className={HEAD}>
-            <span role="columnheader" className={COLS[0]}>Locale</span>
-            <span role="columnheader" className={COLS[1]}>Translated pages</span>
-            <span role="columnheader" className={COLS[2]}>
-              <span className="tw:sr-only">Actions</span>
-            </span>
-          </div>
+        <div id="locales" role="list" aria-label="Languages" className="tw:flex tw:flex-col" data-testid="set-loc-table">
           {rows.map((row) => {
-            const isDefault = row.code === savedDefault;
+            const isSaved = row.code === savedDefault;
+            const isChosen = dirty && row.code === defaultLocale;
+            const pages = isSaved ? `${row.translated} pages translated` : `${row.translated} of ${row.total} pages translated`;
+            const restored = localeEvent?.kind === "restored" && localeEvent.code === row.code;
+            const status = isSaved
+              ? `Saved default · ${pages}`
+              : isChosen
+                ? `Chosen default · unsaved · ${pages}`
+                : restored
+                  ? `Restored · ${pages}`
+                  : pages;
             return (
-              <div key={row.code} role="row" className={BODY_ROW} data-testid={`set-loc-row-${row.code}`}>
-                <span role="cell" className={COLS[0]}>
+              <div key={row.code} role="listitem" className={ROW} data-testid={`set-loc-row-${row.code}`}>
+                <span className={NAME}>
+                  {/* The name opens the Translation checklist. */}
                   <Button
                     variant="link"
-                    className="tw:min-h-5 tw:text-[var(--bk-ink)]"
+                    className="tw:min-h-5 tw:text-[var(--bk-ink)] tw:no-underline tw:hover:underline"
                     onClick={() => setChecklist(row)}
                     data-testid={`set-loc-row-open-${row.code}`}
                   >
-                    {nameOf(row.code)}
+                    {localeLabel(row.code)}
                   </Button>
                 </span>
-                <span role="cell" className={COLS[1]} data-testid={`set-loc-row-pages-${row.code}`}>
-                  {row.translated} of {row.total}
-                </span>
-                <span role="cell" className={COLS[2]}>
-                  {isDefault ? (
-                    <span className="tw:text-[var(--bk-accent)]" data-testid={`set-loc-row-default-${row.code}`}>
-                      Default
-                    </span>
-                  ) : (
-                    <Button
-                      variant="link"
-                      className="tw:min-h-5"
-                      disabled={readOnly || busy || enabledLocales.length <= 1}
-                      onClick={() => setRemoving(row)}
-                      data-testid={`set-loc-row-remove-${row.code}`}
-                    >
-                      Remove
-                    </Button>
-                  )}
-                </span>
+                <p className={LINE} data-testid={`set-loc-row-pages-${row.code}`}>
+                  {status}
+                </p>
+                {isSaved ? null : (
+                  <Button
+                    variant="secondary"
+                    size="xs"
+                    className={REMOVE}
+                    disabled={readOnly || busy || enabledLocales.length <= 1}
+                    onClick={() => setRemoving(row)}
+                    data-testid={`set-loc-row-remove-${row.code}`}
+                  >
+                    Remove
+                  </Button>
+                )}
               </div>
             );
           })}
         </div>
+        {/* A write: disabled, not hidden, on the read-only screen. */}
+        <Button
+          variant="link"
+          className="tw:min-h-8 tw:self-start tw:px-3 tw:no-underline tw:hover:underline"
+          disabled={readOnly}
+          onClick={() => setAddOpen(true)}
+          data-testid="set-loc-add"
+        >
+          + Add language
+        </Button>
       </SettingsCard>
+
+      {/* C-7 (PD-39) and SA-16, as 238:11810's footnote. Removing still asks
+          first (owner override 2026-10-04), so the board's "removed
+          immediately" reads as "saves at once". */}
+      <p className={`${NOTE} tw:max-w-180`} data-testid="set-loc-publish-note">
+        {localeEvent?.kind === "removed"
+          ? `Only the default language is staged. ${localeLabel(localeEvent.code)} was removed immediately. Saving or discarding the default will not restore it. Publishing currently emits the default locale only.`
+          : localeEvent?.kind === "restored"
+            ? `Default language changes are staged. ${localeLabel(localeEvent.code)} was restored immediately. Saving or discarding the default does not change the locale list. Publishing currently emits the default locale only.`
+            : "Only the default language is staged. Adding or removing a language saves at once — saving or discarding the default will not undo it. Publishing currently emits the default locale only."}
+      </p>
+      {localeEvent?.kind === "restored" && dirty ? (
+        <p className={`${NOTE} tw:max-w-180`} data-testid="set-loc-undo-note">
+          Undo restored only {localeLabel(localeEvent.code)}. It did not change the staged {localeLabel(defaultLocale)} default.
+        </p>
+      ) : null}
 
       <AddLocaleDialog
         open={addOpen}

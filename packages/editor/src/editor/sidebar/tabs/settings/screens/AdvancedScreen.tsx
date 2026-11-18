@@ -136,9 +136,9 @@ const CodeCard: React.FC<{
           </label>
           {siteColumn ? <SiteColumnGate field={siteColumn}>{well}</SiteColumnGate> : well}
         </div>
-        {children ? <div className="tw:pl-49">{children}</div> : null}
+        {children ? <div className="tw:pl-51">{children}</div> : null}
         {error ? (
-          <div role="alert" className={`${SCREEN_FIELD_ERROR} tw:pl-49`}>
+          <div role="alert" className={`${SCREEN_FIELD_ERROR} tw:pl-51`}>
             {error}
           </div>
         ) : null}
@@ -262,7 +262,6 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({
       <Screen>
         <LoadCard
           title="Custom code"
-          line="Head, body and CSS injections for this site."
           state={load.state}
           errorLine="Couldn't load your custom code. Check your connection, then try again."
           onRetry={load.retry}

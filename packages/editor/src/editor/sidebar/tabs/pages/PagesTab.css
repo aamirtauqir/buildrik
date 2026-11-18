@@ -10,8 +10,8 @@
 .bd-pg-panel {
   /* File-local design knobs — keep the four most-coupled dimensions in one place
      so density tweaks and footer-clearance edits stay coherent. */
-  --pg-row-h: 32px;        /* board 140:2 — uniform; see PagesTab.rowHeight.test.ts */
-  --pg-row-h-active: 32px;
+  --pg-row-h: 40px;        /* design-2l9 63:6393 — two-line rows; PagesTab.rowHeight.test.ts */
+  --pg-row-h-active: 40px;
   --pg-icon-box: 24px;
   --pg-icon-glyph: 12px;
   --pg-footer-clearance: 120px;
@@ -25,36 +25,6 @@
 
 /* PanelShell.Header owns header chrome; no .bd-pg-header rules needed. */
 
-.bd-pg-selectall {
-  display: flex;
-  align-items: center;
-  gap: var(--bk-space-8);
-  height: 28px;
-  padding: 0 var(--bk-space-12);
-  margin: 0 6px var(--bk-space-4);
-  border-radius: 4px;
-  background: var(--bk-bg-subtle);
-  cursor: pointer;
-  font: 500 var(--bk-text-12) var(--bk-font-ui);
-  /* ink-soft, not ink-muted: measured 4.39:1 on this band's own bg-subtle
-     ground, under the 4.5 floor. No board draws this row — it is the code's
-     own affordance — so nothing was traded away by raising it. */
-  color: var(--bk-ink-soft);
-}
-.bd-pg-selectall:hover { background: rgba(15, 23, 42, 0.06); color: var(--bk-ink); }
-.bd-pg-selectall-checkbox {
-  width: 14px; height: 14px;
-  display: grid;
-  place-items: center;
-  border-radius: 3px;
-  border: 1.5px solid var(--bk-border-medium);
-  background: var(--bk-bg-card);
-}
-.bd-pg-selectall-checkbox.on {
-  background: var(--bk-accent);
-  border-color: var(--bk-accent);
-  color: var(--bk-accent-on);
-}
 /* .bd-pg-add-ghost (+ :hover) removed 2026-05-24 — JSX consumer deleted
    in earlier Pages refactor; CSS left orphan. */
 
@@ -82,9 +52,10 @@
   align-items: center;
   /* v3 4418:90494 row grid: 24 checkbox slot at 12, then 12 disclosure,
      16 icon, label — 4 apart; pills end 16 in. */
-  gap: var(--bk-space-4);
-  padding: 0 var(--bk-space-16) 0 var(--bk-space-12);
-  border-radius: 4px;
+  gap: var(--bk-space-8);
+  margin: 0 var(--bk-space-12);
+  padding: var(--bk-space-4) var(--bk-space-8);
+  border-radius: var(--bk-radius-md);
   cursor: pointer;
   user-select: none;
   color: var(--bk-ink);
@@ -95,9 +66,11 @@
    bar (4418:90494 / 4418:165158 draw Home open and untinted) — the page tabs
    and the crumb say which page is open; tint means SELECTED here. */
 .bd-pg-row:hover { background: var(--bk-bg-subtle); color: var(--bk-ink); }
+/* design-2l9 63:6393: the open page is tinted (its tag says "Current"). */
+.bd-pg-row.active { background: var(--bk-accent-tint); }
 
 /* ─── ROW VARIANTS ────────────────────────────────────────────────────── */
-.bd-pg-row.nested { padding-left: 28px; }
+.bd-pg-row.nested { padding-left: var(--bk-space-24); }
 .bd-pg-row.folder-row .bd-pg-row-icon { color: var(--bk-ink-muted); }
 /* Board 141:78 tints every SELECTED row, not just its checkbox: the three
    rows the bulk bar is counting all sit on accent-tint. Without it the only
@@ -122,7 +95,7 @@
   background: var(--bk-bg-card);
   transition: 100ms;
 }
-.bd-pg-panel:not(.bulk-mode) .bd-pg-row-checkbox { visibility: hidden; }
+.bd-pg-panel:not(.bulk-mode) .bd-pg-row-checkbox { display: none; }
 .bd-pg-row-checkbox svg { width: 10px; height: 10px; color: var(--bk-accent-on); opacity: 0; }
 .bd-pg-row.selected .bd-pg-row-checkbox svg { opacity: 1; }
 /* Folder-row checkbox states — board 140:11-12 + Checkbox 12:26 mixed rule. */
@@ -178,7 +151,7 @@
   display: grid;
   place-items: center;
 }
-.bd-pg-row-icon svg { width: var(--pg-icon-glyph); height: var(--pg-icon-glyph); }
+.bd-pg-row-icon svg { width: 16px; height: 16px; }
 
 /* Rename input + its validation error. `.bd-pg-row-name` below has had a rule
    since the Pages arc; these two never did, so renaming a page showed a default
@@ -254,49 +227,20 @@
   width: var(--pg-icon-box); height: var(--pg-icon-box);
   min-width: var(--pg-icon-box); min-height: 0;
   padding: 0;
-  display: none;
+  /* design-2l9 63:6393: every row's ⋯ is always drawn. */
+  display: grid;
   place-items: center;
   border-radius: 4px;
-  color: var(--bk-ink-muted);
+  color: var(--bk-ink-soft);
   flex-shrink: 0;
   background: transparent;
   border: 0;
   cursor: pointer;
 }
-.bd-pg-row:hover .bd-pg-row-overflow { display: grid; }
 .bd-pg-row-overflow:hover { background: rgba(15,23,42,0.06); color: var(--bk-ink); }
-.bd-pg-row-overflow svg { width: var(--pg-icon-glyph); height: var(--pg-icon-glyph); }
+.bd-pg-row-overflow svg { width: var(--bk-space-16); height: var(--bk-space-16); } /* 2L9: the ⋯ is ~12 wide, 3px dots */
 
 /* ─── HOME CHIP + STATUS CHIP ─────────────────────────────────────────── */
-.bd-pg-home-chip,
-.bd-pg-chip {
-  /* 4418:93381 row "Contact" (7469:170014): a 22-tall pill, 8 inset, 11/16
-     Regular — not the old 16-tall medium chip. */
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 22px;
-  padding: 0 var(--bk-space-8);
-  border-radius: var(--bk-radius-full);
-  font: 400 var(--bk-text-11)/16px var(--bk-font-ui);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-.bd-pg-home-chip {
-  background: var(--bk-accent-tint);
-  color: var(--bk-accent);
-}
-.bd-pg-chip.live      { background: var(--bk-success-tint); color: var(--bk-success-text); }
-.bd-pg-chip.draft     { background: var(--bk-bg-subtle); color: var(--bk-ink-soft); }
-.bd-pg-chip.scheduled { background: var(--bk-warning-tint); color: var(--bk-warning-text); }
-.bd-pg-chip.hidden    { background: var(--bk-bg-subtle); color: var(--bk-ink-soft); } /* contrast-fix per design review */
-.bd-pg-chip.error     { background: var(--bk-error-tint); color: var(--bk-error); }
-.bd-pg-chip .dot,
-.bd-pg-home-chip .dot {
-  width: 4px; height: 4px;
-  border-radius: var(--bk-radius-full);
-  background: currentColor;
-}
 
 /* ─── DROP INDICATOR ──────────────────────────────────────────────────── */
 .bd-pg-drop-indicator {
@@ -312,47 +256,6 @@
 /* ─── FOLDER ──────────────────────────────────────────────────────────── */
 .bd-pg-folder { display: block; }
 .bd-pg-folder-children { padding-left: 0; }
-/* v3 4418:90494: "ⓘ" 12px gray-500, then "3 pages" 11/16 muted, both
-   straight after the folder name. */
-.bd-pg-folder-info {
-  display: inline-grid;
-  place-items: center;
-  width: 12px;
-  height: 16px;
-  flex-shrink: 0;
-  font: 400 12px/16px var(--bk-font-ui);
-  color: var(--bk-gray-500);
-  cursor: help;
-}
-.bd-pg-folder-count {
-  flex-shrink: 0;
-  color: var(--bk-ink-muted);
-  font: 400 11px/16px var(--bk-font-ui);
-}
-.bd-pg-folder-actions {
-  display: none;
-  gap: 2px;
-  margin-left: 2px;
-}
-.bd-pg-row.folder-row:hover .bd-pg-folder-actions { display: inline-flex; }
-.bd-pg-folder-act {
-  display: inline-grid;
-  place-items: center;
-  width: var(--pg-icon-box);
-  height: var(--pg-icon-box);
-  padding: 0;
-  border: 0;
-  border-radius: 4px;
-  background: transparent;
-  color: var(--bk-ink-muted);
-  cursor: pointer;
-}
-.bd-pg-folder-act:hover {
-  background: rgba(15, 23, 42, 0.06);
-  color: var(--bk-ink);
-}
-.bd-pg-folder-act.danger:hover { color: var(--bk-error); }
-.bd-pg-folder-act svg { width: var(--pg-icon-glyph); height: var(--pg-icon-glyph); }
 .bd-pg-page-wrap { position: relative; }
 .bd-pg-page-eject {
   position: absolute;
@@ -399,198 +302,120 @@
 
 /* ─── FOOTER ──────────────────────────────────────────────────────────── */
 .bd-pg-footer {
-  /* v3 4418:90494: the legend (or a search's match count) over a 36-tall
-     band with a top rule, "+ Add page" 16 in. */
+  /* design-2l9 63:6393: "+ Add page" full width, then From template ·
+     New folder — pinned to the panel's foot (the legend sits under the rows). */
   position: absolute;
   bottom: 0; left: 0; right: 0;
   display: flex;
   flex-direction: column;
   background: var(--bk-bg-panel);
 }
-.bd-pg-footer > :last-child {
-  height: 36px;
-  padding: 0 var(--bk-space-16);
-  border-top: 1px solid var(--bk-border);
-}
-.bd-pg-legend {
-  margin: 0;
-  padding: 0 var(--bk-space-16) var(--bk-space-8);
-  font: 400 11px/16px var(--bk-font-ui);
-  color: var(--bk-gray-500);
-}
 
-/* ─── BULK TOOLBAR (dark floating pill) ───────────────────────────────── */
-.bd-pg-bulk-toolbar {
-  /* Board 141:119: a full-width 44-tall band on ink pinned at the bottom — it
-     takes the footer's place while a selection is active. */
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  align-items: center;
-  gap: var(--bk-space-8);
-  height: 44px; padding: 0 var(--bk-space-16);
-  background: var(--bk-ink);
-  /* Board 141:119 sets the type and the ink on the BAND, not on the count —
-     every label on it is 12/18 card-white, and the count was the only child
-     that said so. */
-  color: var(--bk-bg-card);
-  font: 400 12px/18px var(--bk-font-ui);
-  z-index: 10;
-}
-.bd-pg-bulk-count {
-  white-space: nowrap;
-}
-.bd-pg-bulk-count b { color: var(--bk-bg-card); font-weight: 500; }
-.bd-pg-bulk-toolbar button {
-  /* Board 141:120-123: plain 12px card-white text actions on the ink band. */
-  padding: var(--bk-space-4) var(--bk-space-8);
-  border-radius: var(--bk-radius-md);
-  background: transparent;
-  color: var(--bk-bg-card);
-  border: 0;
-  font: 400 12px/18px var(--bk-font-ui);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background 100ms;
-}
-.bd-pg-bulk-toolbar button:hover { background: var(--bk-gray-700); color: var(--bk-bg-card); }
-.bd-pg-bulk-toolbar button.danger { color: var(--bk-red-500); }
-.bd-pg-bulk-toolbar button.danger:hover { background: var(--bk-gray-700); color: var(--bk-red-500); }
 .bd-pg-drawer-scrim {
   position: fixed;
   inset: 0;
-  z-index: 90;
+  z-index: var(--bk-z-overlay);
   background: rgba(17, 24, 39, 0.6);
 }
 .bd-pg-drawer {
+  /* design-2l9 board 63:15939: a 720×700 dialog, radius 8. */
   position: fixed;
-  z-index: 91;
+  /* The overlay layer, with its scrim: the leave guard (a chrome-ui modal,
+     whose overlay is on this same layer) mounts later and so draws over this
+     dialog — at 91 it sat hidden behind it. */
+  z-index: var(--bk-z-overlay);
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: var(--bk-size-dialog-md);
-  height: 520px;
+  width: 720px;
+  height: min(700px, calc(100vh - 32px));
   display: flex;
   flex-direction: column;
   background: var(--bk-bg-card);
-  border-radius: 16px;
+  border-radius: var(--bk-radius-lg);
   box-shadow: var(--bk-shadow-overlay);
-  animation: bd-pg-drawer-in var(--bk-motion-base) var(--bk-ease-default);
 }
-@keyframes bd-pg-drawer-in{
-  from { transform: translate(-50%, calc(-50% + 8px)); opacity: 0; }
-  to   { transform: translate(-50%, -50%); opacity: 1; }}
-
+/* Title and ✕ on one 56-tall row over a hairline. */
 .bd-pg-drawer-hdr {
-  /* Board header: 16 semibold title, 14px gap, then the text-link tab row. */
   display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding: var(--bk-space-24) var(--bk-space-28) 0;
+  align-items: center;
+  gap: var(--bk-space-12);
+  height: var(--bk-size-topbar);
+  padding: 0 var(--bk-space-12) 0 var(--bk-space-20);
+  border-bottom: 1px solid var(--bk-border);
   flex-shrink: 0;
-  position: relative;
 }
-
-/* Board 2838:12107 — the header's ✕. Figma exports it as the third child of
-   the header's flex column; a close sits at the card's top-right corner, so
-   the header is the positioning context and the glyph is pinned to it. */
 .bd-pg-drawer-close {
-  position: absolute;
-  top: var(--bk-space-20);
-  right: var(--bk-space-20);
-  padding: var(--bk-space-4);
+  margin-left: auto;
+  padding: var(--bk-space-4) var(--bk-space-8);
   border: 0;
   background: transparent;
-  font: 400 13px var(--bk-font-ui);
+  font: 400 15px var(--bk-font-ui);
   line-height: 1;
-  color: var(--bk-ink-muted);
+  color: var(--bk-ink-soft);
   cursor: pointer;
-  transition: color 100ms;
 }
 .bd-pg-drawer-close:hover { color: var(--bk-ink); }
-
 .bd-pg-drawer-title {
-  font: 600 16px var(--bk-font-ui);
+  font: 600 14px var(--bk-font-ui);
   color: var(--bk-ink);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
+/* The tabs: a segmented row, the active one a tinted 115×28 pill. */
 .bd-pg-drawer-tabs {
   display: flex;
-  gap: var(--bk-space-20);
+  gap: 0;
+  padding: var(--bk-space-8) var(--bk-space-8) 0;
   flex-shrink: 0;
 }
 .bd-pg-drawer-tab {
-  /* Board: bare 14px text links — active is blue-500 semibold, no underline. */
-  padding: 0;
+  width: 116px;
+  height: var(--bk-size-control-xs);
+  justify-content: center;
   border: 0;
+  border-radius: var(--bk-radius-md);
   background: transparent;
-  font: 500 14px var(--bk-font-ui);
-  color: var(--bk-ink-muted);
+  font: 500 13px var(--bk-font-ui);
+  color: var(--bk-ink-soft);
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: color 100ms;
 }
-/* :not() keeps this off the ACTIVE tab. A bare `:hover` is class+pseudo —
-   (0,2,0) — and beat `.bd-pg-drawer-tab--active` at (0,1,0), so the tab you
-   had just clicked went from board blue-500 to ink under the pointer that
-   clicked it. Measured, not read: the SEO board passed its active-tab colour
-   and the Social/Advanced boards failed it, because those two are reached by
-   a click and the cursor is still there. */
 .bd-pg-drawer-tab:not(.bd-pg-drawer-tab--active):hover { color: var(--bk-ink); }
-.bd-pg-drawer-tab--active { color: var(--bk-blue-500); font-weight: 600; }
-.bd-pg-drawer-tab-chip {
-  font: 500 var(--bk-text-11) var(--bk-font-mono);
-  padding: 1px 6px;
-  border-radius: var(--bk-radius-full);
-  color: var(--bk-warning);
-  background: var(--bk-warning-tint);
-}
-
+.bd-pg-drawer-tab--active { color: var(--bk-accent-text); background: var(--bk-accent-tint); }
 .bd-pg-drawer-body {
   flex: 1;
   overflow-y: auto;
-  padding: var(--bk-space-16) var(--bk-space-28) var(--bk-space-24);
+  padding: var(--bk-space-20) var(--bk-space-24) var(--bk-space-12);
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--bk-space-8);
 }
-/* Board field labels: 13/500 ink-muted on all three S3.7 boards (302:1988,
-   302:2014, 302:2036 and their siblings). BK_LABEL_CLASS ships 12px ink-soft
-   and is a chrome-wide primitive measured against many other boards, so it is
-   NOT moved — the override is scoped to this drawer. Two classes deep on
-   purpose: a single-class rule ties `tw:text-xs` on specificity and loses on
-   source order. */
+/* Board field labels: 13/600 ink. Two classes deep so a `tw:` size on the
+   label primitive does not win on source order. */
 .bd-pg-drawer-body label {
   font-size: 13px;
-  font-weight: 500;
-  color: var(--bk-ink-muted);
+  font-weight: 600;
+  color: var(--bk-ink);
 }
-/* v3 boards 6887:73809 / 73848 / 73882: 32h fields, radius 6, 13px text
-   (the S3.7 boards drew 42h / radius 8 / 14px). */
-/* Every text-ish input, not just [type=text]: the OG image field is
-   `type="url"` and missed all three rules, so it shipped 10px shorter than
-   the two fields above it with a different radius and type size. */
-.bd-pg-drawer-body input:not([type="checkbox"]):not([type="radio"]) {
-  height: 32px;
+/* Board fields are filled gray, borderless, 28 tall, radius 6. */
+.bd-pg-drawer-body input:not([type="checkbox"]):not([type="radio"]),
+.bd-pg-drawer-body select,
+.bd-pg-drawer-body textarea {
+  min-height: var(--bk-size-control-xs);
+  border-color: transparent;
   border-radius: var(--bk-radius-md);
+  background-color: var(--bk-gray-100);
   font-size: 13px;
 }
-.bd-pg-drawer-body textarea { border-radius: var(--bk-radius-md); font-size: 13px; }
-/* Decision #20 foot — Cancel · Done, right-aligned, under a hairline
-   (boards 6887:73809 / 73848 / 73882). */
+.bd-pg-drawer-body input:not([type="checkbox"]):not([type="radio"]),
+.bd-pg-drawer-body select { height: var(--bk-size-control-xs); padding-block: 0; }
+/* Cancel · Save, right-aligned. */
 .bd-pg-drawer-foot {
   display: flex;
   justify-content: flex-end;
   gap: var(--bk-space-8);
-  padding: var(--bk-space-12) var(--bk-space-28);
-  border-top: 1px solid var(--bk-border);
+  padding: var(--bk-space-12) var(--bk-space-12) var(--bk-space-12);
   flex-shrink: 0;
 }
 
@@ -615,7 +440,6 @@
 /* ─── A11Y FOCUS RING ─────────────────────────────────────────────────── */
 .bd-pg-row:focus-visible,
 .bd-pg-row-overflow:focus-visible,
-.bd-pg-bulk-toolbar button:focus-visible,
 .bd-pg-drawer-back:focus-visible,
 .bd-pg-drawer-save:focus-visible,
 .bd-pg-drawer-tab:focus-visible {
@@ -677,9 +501,3 @@
    The folder a page lives in is real information, not a disabled control.
    `ink-muted` (4.83:1) matches its secondary role and clears AA. Founder call
    2026-09-08; size and line box unchanged. */
-.bd-pg-row-incontext {
-  flex-shrink: 0;
-  /* v3 4418:92256: same 13/20 as the name it qualifies. */
-  font: 400 13px/20px var(--bk-font-ui);
-  color: var(--bk-ink-muted);
-}

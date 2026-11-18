@@ -15,18 +15,22 @@ const baseProps = {
   selectedCount: 3,
   selectedNames: ["Menu", "Contact", "About"],
   folders,
+  anyInFolder: true,
   onDuplicate: vi.fn(),
   onMoveToFolder: vi.fn(),
   onRemoveFromFolders: vi.fn(),
   onDelete: vi.fn(),
+  onClear: vi.fn(),
 };
 
 describe("BulkToolbar", () => {
-  it("renders count with tabular className", () => {
-    const { container } = render(<BulkToolbar {...baseProps} />);
-    expect(screen.getByText("3")).toBeInTheDocument();
-    expect(screen.getByText(/selected/)).toBeInTheDocument();
-    expect(container.querySelector(".bd-pg-bulk-count.tabular")).not.toBeNull();
+  // re-baseline: Pages bulk band — board 139:47668: "3 selected" with Clear, then the three actions.
+  it("reads 'n selected' and Clear ends the selection", () => {
+    const onClear = vi.fn();
+    render(<BulkToolbar {...baseProps} onClear={onClear} />);
+    expect(screen.getByTestId("pages-bulk-count")).toHaveTextContent("3 selected");
+    fireEvent.click(screen.getByTestId("pages-bulk-clear"));
+    expect(onClear).toHaveBeenCalledTimes(1);
   });
 
   it("does NOT render disabled Publish or Unpublish buttons (anti-slop)", () => {
@@ -40,7 +44,8 @@ describe("BulkToolbar", () => {
     render(<BulkToolbar {...baseProps} />);
     fireEvent.click(screen.getByText(/Move to/));
     expect(screen.getByText("Move 3 pages to…")).toBeInTheDocument();
-    expect(screen.getByText(/Menu, Contact and About · Choose a folder/)).toBeInTheDocument();
+    /* design-2l9 board 139:51389's line. Re-baseline: bulk Move dialog. */
+    expect(screen.getByText("Menu, Contact and About. Only your folder organization changes; page URLs and the homepage stay the same.")).toBeInTheDocument();
     expect(screen.getByText("Top level (no folder)")).toBeInTheDocument();
   });
 
@@ -48,7 +53,7 @@ describe("BulkToolbar", () => {
     const fn = vi.fn();
     render(<BulkToolbar {...baseProps} onMoveToFolder={fn} />);
     fireEvent.click(screen.getByText(/Move to…/));
-    fireEvent.click(screen.getByRole("button", { name: "Move to Marketing" }));
+    fireEvent.click(screen.getByRole("button", { name: "Move 3 pages" }));
     expect(fn).toHaveBeenCalledWith("f1");
   });
 
@@ -64,21 +69,38 @@ describe("BulkToolbar", () => {
     render(<BulkToolbar {...baseProps} onRemoveFromFolders={fn} />);
     fireEvent.click(screen.getByText(/Move to…/));
     fireEvent.click(screen.getByText("Top level (no folder)"));
-    fireEvent.click(screen.getByRole("button", { name: "Move to top level" }));
+    fireEvent.click(screen.getByRole("button", { name: "Move 3 pages" }));
     expect(fn).toHaveBeenCalledTimes(1);
   });
 
-  it("Delete button has danger class", () => {
-    const { container } = render(<BulkToolbar {...baseProps} />);
-    const danger = container.querySelector("button.danger");
-    expect(danger?.textContent).toMatch(/Delete/);
+  it("pages all at the top level get no Top level choice (139:51389)", () => {
+    render(<BulkToolbar {...baseProps} anyInFolder={false} />);
+    fireEvent.click(screen.getByText(/Move to…/));
+    expect(screen.getByText("Marketing")).toBeInTheDocument();
+    expect(screen.queryByText("Top level (no folder)")).toBeNull();
   });
 
-  it("toolbar root has class .bd-pg-bulk-toolbar with role toolbar", () => {
-    const { container } = render(<BulkToolbar {...baseProps} />);
-    const toolbar = container.querySelector(".bd-pg-bulk-toolbar");
-    expect(toolbar).not.toBeNull();
-    expect(toolbar?.getAttribute("role")).toBe("toolbar");
+  it("with the homepage alone selected, Delete is off and the reason is said (139:52895)", () => {
+    const onDelete = vi.fn();
+    render(<BulkToolbar {...baseProps} selectedCount={1} selectedNames={["Home"]} homeSelected="Home" onDelete={onDelete} />);
+    expect(screen.getByTestId("pages-bulk-delete")).toBeDisabled();
+    expect(screen.getByTestId("pages-bulk-home-note")).toHaveTextContent("Home is the homepageSet another page as the homepage before deleting Home.");
+  });
+
+  it("with the homepage among others, Delete stays on (the others go) and the note stays", () => {
+    render(<BulkToolbar {...baseProps} homeSelected="Home" />);
+    expect(screen.getByTestId("pages-bulk-delete")).not.toBeDisabled();
+    expect(screen.getByTestId("pages-bulk-home-note")).toBeInTheDocument();
+  });
+
+  it("Delete reads in the error red", () => {
+    render(<BulkToolbar {...baseProps} />);
+    expect(screen.getByRole("button", { name: "Delete" }).className).toContain("tw:text-[var(--bk-error)]");
+  });
+
+  it("is a toolbar named by its count", () => {
+    render(<BulkToolbar {...baseProps} />);
+    expect(screen.getByRole("toolbar", { name: "3 pages selected" })).toBeInTheDocument();
   });
 
   it("does not render legacy pg-bulk__* classes", () => {

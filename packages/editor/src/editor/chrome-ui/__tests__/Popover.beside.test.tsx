@@ -63,6 +63,39 @@ describe("Popover beside= (P-4)", () => {
     expect(dialog.style.top).toBe("490px");
   });
 
+  it("besideTop lines the panel up with that element inside the column; without it, the trigger (default unchanged)", async () => {
+    const col = mountColumn();
+    const rect = Element.prototype.getBoundingClientRect;
+    Element.prototype.getBoundingClientRect = function (this: Element) {
+      if (this.classList?.contains("strip")) return { left: 1140, right: 1440, top: 120, bottom: 160, width: 300, height: 40, x: 1140, y: 120, toJSON: () => ({}) } as DOMRect;
+      return rect.call(this);
+    };
+    render(
+      <>
+        <div className="strip" />
+        <Popover open onClose={() => {}} trigger={<button>More</button>} label="Actions" beside=".col" besideTop=".strip">
+          <div>menu</div>
+        </Popover>
+      </>,
+      { container: col },
+    );
+    const dialog = await screen.findByRole("dialog", { name: "Actions" });
+    expect(dialog.style.left).toBe("849px");
+    expect(dialog.style.top).toBe("120px");
+  });
+
+  it("besideTop that matches nothing falls back to the trigger's top", async () => {
+    const col = mountColumn();
+    render(
+      <Popover open onClose={() => {}} trigger={<button>More</button>} label="Actions" beside=".col" besideTop=".missing">
+        <div>menu</div>
+      </Popover>,
+      { container: col },
+    );
+    const dialog = await screen.findByRole("dialog", { name: "Actions" });
+    expect(dialog.style.top).toBe("490px");
+  });
+
   it("a press inside the portalled panel does not count as outside", async () => {
     const col = mountColumn();
     const onClose = vi.fn();

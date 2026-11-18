@@ -1,9 +1,10 @@
 /**
- * SEO — 8135:214533 (default) · 8135:214820 (Indexing open) · 8135:215066
- * (indexing off). Three cards, each a disclosure: Defaults (title,
- * description, Open Graph image) and Social profiles open, Indexing closed —
- * plus the strip that per-page overrides live in Pages, and, while indexing is
- * off, the notice that says what that does.
+ * SEO — 2L9 B8-S08 238:12118: "Site-wide defaults. Pages can override them
+ * in Page settings ›", the Defaults card (Title, Description stacked, "<n>
+ * pages have no description of their own.", and — kept, undrawn — the Open
+ * Graph image), then "SEO analysis · Planned". Kept below (code-ahead):
+ * Social profiles (open) and Indexing (closed) disclosures, and, while
+ * indexing is off, the notice that says what that does.
  *
  * Values come from the Site row on open (load card / Try again). Edits stay
  * here until Save:
@@ -120,7 +121,7 @@ export const SeoScreen: React.FC<ScreenProps> = ({
   const [canonical, setCanonical] = React.useState("");
   const [savedCanonical, setSavedCanonical] = React.useState("");
   const [origin, setOrigin] = React.useState<string | null>(null);
-  const [open, setOpen] = React.useState({ defaults: true, social: true, indexing: false });
+  const [open, setOpen] = React.useState({ social: true, indexing: false });
 
   /* The values the server holds — dirty is a difference from them, so typing
      a field back to its saved value is clean again. (Canonical has its own
@@ -138,16 +139,20 @@ export const SeoScreen: React.FC<ScreenProps> = ({
     }),
   );
 
-  const load = useServerLoad<{ row: SeoRow; domains: SiteDomainRow[] }>(
+  /* B8-S08: "2 pages have no description of their own." — the Overview's fact. */
+  const [pagesWithoutDescription, setPagesWithoutDescription] = React.useState<number | null>(null);
+  const load = useServerLoad<{ row: SeoRow; domains: SiteDomainRow[]; missing: number | null }>(
     projectId,
     async (client: BuildrikApiClient, siteId) => {
-      const [row, domains] = await Promise.all([
+      const [row, domains, overview] = await Promise.all([
         client.siteDetail.settings.get.query({ siteId }),
         client.siteDetail.domains.list.query({ siteId }).catch((): SiteDomainRow[] => []),
+        client.siteDetail.settingsOverview.query({ siteId }).catch(() => null),
       ]);
-      return { row, domains };
+      return { row, domains, missing: overview?.seo.pagesWithoutDescription ?? null };
     },
-    ({ row, domains }) => {
+    ({ row, domains, missing }) => {
+      setPagesWithoutDescription(missing);
       setMetaTitle(row.metaTitle ?? "");
       setMetaDescription(row.metaDescription ?? "");
       setOgImage(row.ogImage ?? "");
@@ -209,7 +214,6 @@ export const SeoScreen: React.FC<ScreenProps> = ({
     if (!fieldErrors) return;
     const keys = Object.keys(fieldErrors);
     setOpen((o) => ({
-      defaults: o.defaults || keys.some((k) => /^seo\.(metaTitle|metaDescription|defaultOgImage)/.test(k)),
       social: o.social || keys.some((k) => k.startsWith("seo.socialLinks")),
       indexing: o.indexing || keys.some((k) => k === "canonicalUrl" || /^seo\.(allowIndexing|robotsTxt)/.test(k)),
     }));
@@ -259,7 +263,6 @@ export const SeoScreen: React.FC<ScreenProps> = ({
       <Screen>
         <LoadCard
           title="SEO"
-          line="Search defaults, social profiles and indexing."
           state={load.state}
           errorLine="Couldn't load your SEO settings. Check your connection, then try again."
           onRetry={load.retry}
@@ -283,14 +286,28 @@ export const SeoScreen: React.FC<ScreenProps> = ({
     <Screen>
       {saveError ? <SaveErrorBanner message={saveError} /> : null}
 
-      <SettingsCard
-        title="Defaults"
-        open={open.defaults}
-        onToggle={toggle("defaults")}
-        anchors={["seo-meta-title", "seo-meta-description", "seo-og"]}
-      >
-        <div className="tw:grid tw:grid-cols-2 tw:gap-x-6 tw:gap-y-4">
-          <Field label="Title" htmlFor="seo-meta-title" siteColumn="seo.metaTitle">
+      {/* B8-S08 238:12118: the scope of these defaults, and where pages override them. */}
+      <p className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="set-seo-pages-strip">
+        Site-wide defaults. Pages can override them in{" "}
+        {/* Navigation stays live on the read-only screen: an anchor, which
+            the shell's disabled fieldset does not disable. */}
+        <Button
+          href="#pages"
+          variant="link"
+          className="tw:inline-flex tw:min-h-5 tw:p-0 tw:align-baseline tw:font-normal tw:text-[var(--bk-ink-muted)] tw:no-underline tw:hover:underline"
+          onClick={(e: React.MouseEvent) => {
+            e.preventDefault();
+            composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "pages" });
+          }}
+          data-testid="set-seo-pages-link"
+        >
+          Page settings ›
+        </Button>
+      </p>
+
+      <SettingsCard title="Defaults">
+        <div className="tw:flex tw:flex-col tw:gap-2.5">
+          <Field label="Title" htmlFor="seo-meta-title" siteColumn="seo.metaTitle" span="full">
             <Input
               id="seo-meta-title"
               type="text"
@@ -302,7 +319,7 @@ export const SeoScreen: React.FC<ScreenProps> = ({
             />
             {titleError ? <div role="alert" className={SCREEN_FIELD_ERROR}>{titleError}</div> : null}
           </Field>
-          <Field label="Description" htmlFor="seo-meta-description" siteColumn="seo.metaDescription">
+          <Field label="Description" htmlFor="seo-meta-description" siteColumn="seo.metaDescription" span="full">
             <Input
               id="seo-meta-description"
               type="text"
@@ -313,6 +330,11 @@ export const SeoScreen: React.FC<ScreenProps> = ({
               }}
             />
             {descriptionError ? <div role="alert" className={SCREEN_FIELD_ERROR}>{descriptionError}</div> : null}
+            {pagesWithoutDescription ? (
+              <p className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="set-seo-missing">
+                {`${pagesWithoutDescription} ${pagesWithoutDescription === 1 ? "page has" : "pages have"} no description of their own.`}
+              </p>
+            ) : null}
           </Field>
           <Field label="Open Graph image URL" htmlFor="seo-og" siteColumn="seo.defaultOgImage" span="full">
             <Input
@@ -330,6 +352,11 @@ export const SeoScreen: React.FC<ScreenProps> = ({
         </div>
       </SettingsCard>
 
+
+      <SettingsCard title="SEO analysis · Planned">
+        <p className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]">Reserved for a later version.</p>
+      </SettingsCard>
+
       <SocialProfilesCard
         values={social}
         errors={serverSocialErrors}
@@ -339,28 +366,6 @@ export const SeoScreen: React.FC<ScreenProps> = ({
           setSocial((s) => ({ ...s, [network]: value }));
         }}
       />
-
-      {/* 8135:214533 draws the strip under open Defaults; 8135:214820 (Defaults
-          closed) has none. */}
-      {open.defaults ? (
-        <div className={`${NOTICE} tw:bg-[var(--bk-accent-tint)]`} data-testid="set-seo-pages-strip">
-          Page titles and descriptions can be overridden per page in{" "}
-          {/* Navigation stays live on the read-only screen: an anchor, which
-              the shell's disabled fieldset does not disable. */}
-          <Button
-            href="#pages"
-            variant="link"
-            className="tw:inline-flex tw:min-h-5 tw:align-baseline tw:text-[var(--bk-ink)]"
-            onClick={(e: React.MouseEvent) => {
-              e.preventDefault();
-              composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "pages" });
-            }}
-            data-testid="set-seo-pages-link"
-          >
-            Pages ›
-          </Button>
-        </div>
-      ) : null}
 
       <SettingsCard
         title="Indexing"

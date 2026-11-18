@@ -8,7 +8,7 @@ import type JSZip from "jszip";
 import { escapeStyleText, isSafeElementId } from "@buildrik/shared/schemas/element-markup";
 import { DarkModeSchema } from "@buildrik/shared/schemas/design-tokens";
 import type { PageData } from "@/shared/types";
-import { isPageLive, pageFileNames, resolveHomePageId } from "./pageFiles";
+import { isPageLive, pageFileNames, paginatedFileName, resolveHomePageId } from "./pageFiles";
 import type {
   ExportConfig,
   ExportResult,
@@ -837,10 +837,16 @@ export class ExportEngine {
       const fileName = this.pageHrefs.get(page.id) ?? "index.html";
 
       // Apply CMS resolution if mode is not 'none'
+      /* B-30 (2L9 B5-D80): a Collection list split into pages publishes
+         page 1 here and pages 2…n as `<page>/page/k` — the same page
+         rendered with the list on page k. A generated name another page
+         already owns is not written (the content scanner reports it). */
+      const pageCounts = new Map<string, number>();
+      const unpaged = html;
+      const pageHref = (k: number) => this.pageHrefPrefix + paginatedFileName(fileName, k);
       if (cmsOptions.mode !== "none") {
-        html = await this.cmsResolver.resolve(html, { ...cmsOptions, pageFile: fileName });
+        html = await this.cmsResolver.resolve(unpaged, { ...cmsOptions, pageFile: fileName, pageHref, pageCounts });
       }
-
 
       files.push({
         name: fileName,
@@ -848,6 +854,18 @@ export class ExportEngine {
         type: "html",
         pageId: page.id,
       });
+
+      const owned = new Set(this.pageHrefs.values());
+      const lastPage = Math.max(1, ...pageCounts.values());
+      for (let k = 2; k <= lastPage; k++) {
+        const name = paginatedFileName(fileName, k);
+        if (owned.has(name)) continue;
+        files.push({
+          name,
+          content: await this.cmsResolver.resolve(unpaged, { ...cmsOptions, pageFile: fileName, pageHref, listPage: k }),
+          type: "html",
+        });
+      }
     }
 
     // Add sitemap if requested and baseUrl is provided

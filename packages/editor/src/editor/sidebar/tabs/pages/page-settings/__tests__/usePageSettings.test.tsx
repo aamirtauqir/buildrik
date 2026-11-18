@@ -329,8 +329,9 @@ describe("usePageSettings save", () => {
     expect(patch.settings.seo.metaTitle).toBeUndefined();
   });
 
-  /* #20: Done is the retry — the failure toast carries no Retry action. */
-  it("sets saveState=error, resolves false and offers no Retry when updatePage rejects", async () => {
+  /* design-2l9 63:18189: the failure is said inline in the dialog (its
+     primary becomes Retry save), not in a toast. */
+  it("sets saveState=error and resolves false when updatePage rejects — no toast", async () => {
     const composer = createMockComposer({});
     (composer.elements.updatePage as unknown as Mock).mockRejectedValueOnce(new Error("boom"));
     const { result } = setup(composer, page());
@@ -342,9 +343,7 @@ describe("usePageSettings save", () => {
 
     await waitFor(() => expect(result.current.saveState).toBe("error"));
     expect(ok).toBe(false);
-    const toast = lastToast();
-    expect(toast).toMatchObject({ tone: "error" });
-    expect(toast?.action).toBeUndefined();
+    expect(lastToast()?.tone).not.toBe("error");
   });
 });
 

@@ -50,11 +50,17 @@ function failureOf(err: unknown): ActivityReadFailure {
 export async function fetchRecentActivity(
   siteId: string | null | undefined,
   filter: ActivityFilter,
+  /** Load more: only rows older than this (the oldest row shown). */
+  before?: string | Date,
 ): Promise<ActivityEntry[]> {
   if (!siteId) return [];
   let rows: ActivityEntry[];
   try {
-    rows = await getBuildrikClient(DASHBOARD_URL).activity.recent.query({ siteId, filter });
+    rows = await getBuildrikClient(DASHBOARD_URL).activity.recent.query({
+      siteId,
+      filter,
+      ...(before ? { before: new Date(before) } : {}),
+    });
   } catch (err) {
     throw new ActivityReadError(failureOf(err));
   }

@@ -35,7 +35,19 @@ export interface SheetRow {
   keys: string;
   /** What the chord does, as the user reads it. */
   description: string;
+  /** The chord on Windows/Linux when it is not `keys` with ⌘ read as Ctrl. */
+  otherKeys?: string;
 }
+
+/** The chord a row binds on this platform. */
+export function rowKeys(row: SheetRow, isMac: boolean): string {
+  return isMac || !row.otherKeys ? row.keys : row.otherKeys;
+}
+
+/** The bottom bar's page switcher (useEditorShortcuts). Not Ctrl+Shift+O off
+ *  the Mac — that is Chrome's bookmark manager — and not ⌘P, which is
+ *  Preview. */
+export const PAGE_SWITCHER_KEYS = { mac: "shift+ctrl+o", other: "ctrl+alt+o" } as const;
 
 export interface SheetGroup {
   title: string;
@@ -131,11 +143,10 @@ export const CHROME_CHORDS: ChromeChord[] = [
   { id: "edit-reorder-ends", group: "Edit", keys: "alt+Home / alt+End", description: "Move to first / last position" },
 
   // ── View — CanvasFooterToolbar (zoom, overlays), StudioHeader (⌘K),
-  //          useEditorShortcuts (⌘P, ⌘⇧P, ⌘/, ⌘J), StudioModals (?) ────────
+  //          useEditorShortcuts (⌘P, ⌘⇧P, ⌘/), StudioModals (?) ────────────
   { id: "view-palette", group: "View", keys: "ctrl+k / ctrl+shift+p", description: "Command palette" },
   { id: "view-sheet", group: "View", keys: "? / ctrl+/", description: "Keyboard shortcuts" },
   { id: "view-preview", group: "View", keys: "ctrl+p", description: "Preview" },
-  { id: "view-ai", group: "View", keys: "ctrl+j", description: "Ask AI" },
   { id: "view-zoom-in", group: "View", keys: "ctrl++", description: "Zoom in" },
   { id: "view-zoom-out", group: "View", keys: "ctrl+-", description: "Zoom out" },
   /* ⌘0 is 100%, ⌘1 fits, ⌘2 zooms to the selection — measured at 1440×900
@@ -155,6 +166,13 @@ export const CHROME_CHORDS: ChromeChord[] = [
   { id: "panel-site-settings", group: "Panels", keys: "ctrl+,", description: "Site settings" },
   { id: "panel-version-history", group: "Panels", keys: "ctrl+h", description: "Version history" },
   { id: "panel-comment-mode", group: "Panels", keys: "C", description: "Comment mode" },
+  {
+    id: "panel-page-switcher",
+    group: "Panels",
+    keys: PAGE_SWITCHER_KEYS.mac,
+    otherKeys: PAGE_SWITCHER_KEYS.other,
+    description: "Switch page",
+  },
 
   // ── Regions — useEditorShortcuts / regionCycle ───────────────────────────
   { id: "region-cycle", group: "Regions", keys: "F6 / shift+F6", description: "Cycle between regions" },

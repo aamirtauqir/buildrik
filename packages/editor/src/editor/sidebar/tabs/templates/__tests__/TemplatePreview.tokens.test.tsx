@@ -26,3 +26,23 @@ describe("TemplatePreview — token placeholders", () => {
     expect(doc).not.toContain("{{token.");
   });
 });
+
+/* design-2l9 105:29094: a New-page visit makes that page — no Replace page…;
+   Desktop · Tablet · Mobile set the preview width, one picked. */
+describe("TemplatePreview — creating a page", () => {
+  const t = { id: "t", name: "SaaS Landing", html: "<p>x</p>" } as TemplateItem;
+  it("offers Create page alone while creating", () => {
+    render(<TemplatePreview template={t} creating onCreatePage={vi.fn()} onReplacePage={vi.fn()} onBack={vi.fn()} />);
+    expect(screen.queryByTestId("tpl-ws-replace")).toBeNull();
+    expect(screen.getByRole("button", { name: "Create page" })).toBeTruthy();
+  });
+
+  it("the width row picks one device", async () => {
+    const { fireEvent } = await import("@testing-library/react");
+    render(<TemplatePreview template={t} onCreatePage={vi.fn()} onReplacePage={vi.fn()} onBack={vi.fn()} />);
+    expect(screen.getByTestId("tpl-ws-viewport-desktop").getAttribute("aria-pressed")).toBe("true");
+    fireEvent.click(screen.getByTestId("tpl-ws-viewport-tablet"));
+    expect(screen.getByTestId("tpl-ws-viewport-tablet").getAttribute("aria-pressed")).toBe("true");
+    expect((screen.getByTitle("Preview: SaaS Landing") as HTMLIFrameElement).style.width).toBe("768px");
+  });
+});

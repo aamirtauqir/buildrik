@@ -3,13 +3,17 @@
  * element tree), for the media / embed / widget body tests.
  * @license BSD-3-Clause
  */
-import { render } from "@testing-library/react";
+import { render as rtlRender } from "@testing-library/react";
+import { ToastProvider } from "@/editor/chrome-ui";
 import { vi } from "vitest";
 import { createTestComposer } from "@/engine/__tests__/test-utils/realComposer";
 import type { ElementData } from "@/shared/types";
 import { TypeBlockSection } from "../TypeBlockSection";
 
-export function renderBlock(element: Partial<ElementData> & { id: string; type: ElementData["type"] }, extra: { onOpenMediaLibrary?: ReturnType<typeof vi.fn>; styles?: Record<string, string> } = {}) {
+/* The Field block's Type change answers with a receipt toast (2L9 F30). */
+const render = (ui: React.ReactElement) => rtlRender(ui, { wrapper: ToastProvider });
+
+export function renderBlock(element: Partial<ElementData> & { id: string; type: ElementData["type"] }, extra: { onOpenMediaLibrary?: ReturnType<typeof vi.fn>; styles?: Record<string, string>; also?: ElementData[] } = {}) {
   const composer = createTestComposer();
   composer.importProject({
     pages: [
@@ -18,7 +22,7 @@ export function renderBlock(element: Partial<ElementData> & { id: string; type: 
         name: "Home",
         slug: "",
         isHome: true,
-        root: { id: "root", type: "container", tagName: "div", children: [{ tagName: "div", children: [], ...element } as ElementData] },
+        root: { id: "root", type: "container", tagName: "div", children: [{ tagName: "div", children: [], ...element } as ElementData, ...(extra.also ?? [])] },
       },
     ],
   } as never);
@@ -27,7 +31,7 @@ export function renderBlock(element: Partial<ElementData> & { id: string; type: 
   const utils = render(
     <TypeBlockSection
       element={{ id: element.id, type: element.type }}
-      targetIds={[element.id]}
+      targetIds={[element.id, ...(extra.also ?? []).map((e) => e.id)]}
       composer={composer}
       styles={extra.styles ?? {}}
       onChange={onChange}

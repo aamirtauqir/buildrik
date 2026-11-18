@@ -1,35 +1,28 @@
 /**
- * DarkModeCard — Brand › Colour mode's "Dark mode" card, board BRP1-M8:
+ * DarkModeCard — Brand › Dark mode, Figma 2L9 B6-B12…B14:
  *
- *   8224:238726  off                Auto | [Off] · "Dark mode is off for this site."
- *                                   · [Light preview] (Dark preview disabled)
- *   8224:241285  preview-disabled   the same card — Dark preview is disabled
- *   8224:239369  auto               [Auto] | Off · Light preview · Dark preview
- *   8230:232622  auto-dark-preview  the auto card with the preview in dark
- *   8224:240003  generated-aliases  "Generated missing dark values", one line
- *                                   per filled token, Cancel · Preview in dark
- *   8224:240644  dark-preview       the same, canvas in dark, Cancel · Confirm
+ *   B6-B12  Mode · Off   "Website appearance" — "Auto follows the visitor’s
+ *                        device appearance. Editor controls stay light." —
+ *                        [Turn on Auto…]
+ *   B6-B13  confirm      "Turn on automatic dark mode?" — what Auto adds (the
+ *                        generated dark values, or "No new values are
+ *                        needed."), the restore-point line, Cancel · Turn on Auto
+ *                        (+ Preview in dark when values are generated)
+ *   B6-B14  Mode · Auto  [Turn off Auto]
  *
- * Off → Auto fills every semantic colour that has no dark value first
- * (`proposeMissingDarks`, D11). Nothing missing: a restore point, then
- * `setDarkMode("auto")`. Something missing: the list, a dark preview of the
- * proposal on the canvas, and Confirm → restore point → `setDarkMode("auto",
- * tokens)` — Dark mode and the filled values in ONE transaction, one ⌘Z.
- * A restore point that cannot be saved blocks the switch (OQ-6). Auto → Off
- * takes no restore point (OQ-7): it removes nothing.
- *
- * The preview is recomputed from the saved tokens on every settings change
- * (`useBrandPreview`), so a ⌘Z mid-preview never leaves a stale set painted,
- * and it is cleared on Cancel, on Confirm and on unmount.
- *
- * The board's auto line also says "New sites start with Auto." — new sites
- * start Off in 1c (OQ-1), so that sentence is not drawn.
+ * Turning Auto on fills every semantic colour with no dark value first
+ * (`proposeMissingDarks`, D11), takes a restore point, then ONE
+ * `setDarkMode("auto", tokens?)` — one ⌘Z. A restore point that cannot be
+ * saved blocks the switch (OQ-6). Auto → Off takes no restore point (OQ-7).
+ * "Preview in dark" paints the proposal through the preview layer
+ * (`useBrandPreview`), recomputed on every settings change and cleared on
+ * Cancel, on Turn on Auto and on unmount.
  *
  * @license BSD-3-Clause
  */
 import * as React from "react";
 import type { Composer } from "@/engine/Composer";
-import { Button } from "@/editor/chrome-ui";
+import { Button, Modal } from "@/editor/chrome-ui";
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 import { proposeMissingDarks } from "@/engine/designSystem/scale";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
@@ -48,7 +41,7 @@ export const RESTORE_POINT_FAILED = "We couldn't save a restore point — nothin
 const SECONDARY = `${SMALL_ACTION} tw:text-[var(--bk-gray-700)]`;
 const LINE = "tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]";
 
-type Phase = "idle" | "aliases" | "preview";
+type Phase = "idle" | "confirm" | "preview";
 
 export interface DarkModeCardProps {
   composer: Composer | null | undefined;
@@ -88,18 +81,12 @@ export const DarkModeCard: React.FC<DarkModeCardProps> = ({ composer, previewThe
       return ok;
     });
 
-  const chooseAuto = () => {
+  const askAuto = () => {
     if (siteMode === "auto" || phase !== "idle") return;
-    if (proposal.filled.length === 0) {
-      void switchOn();
-      return;
-    }
     setFailed(false);
-    setPhase("aliases");
+    setPhase("confirm");
   };
-  const chooseOff = () => {
-    /* Mid-flow, Off is Cancel: the board draws it live (8224:240003). */
-    if (phase !== "idle") return cancel();
+  const turnOff = () => {
     if (siteMode === "off") return;
     composer?.designSystem.setDarkMode("off", "Turn off dark mode");
   };
@@ -113,79 +100,99 @@ export const DarkModeCard: React.FC<DarkModeCardProps> = ({ composer, previewThe
     setPhase("idle");
   };
 
-  const pending = phase !== "idle";
   const nameOf = (id: string) => {
     const t = store.all.find((x) => x.id === id);
     return t ? (t.friendlyName ?? t.name) : id;
   };
+  const semanticCount = store.all.filter((t) => t.kind === "color" && t.layer === "semantic" && !t.replacedBy).length;
+  const generated = proposal.filled.map((id) => (
+    <p key={id} className={LINE} data-testid={`brand-dark-alias-${id}`} data-hex={resolveTokenLiteral(proposal.tokens, id, "dark") ?? ""}>
+      {nameOf(id)} → {displayValue(resolveTokenLiteral(proposal.tokens, id, "dark") ?? "")}
+    </p>
+  ));
+  const failedNotice = failed && (
+    <p className={`${NOTICE} tw:w-full tw:bg-[var(--bk-error-tint)]`} role="alert" data-testid="brand-dark-mode-error">
+      {RESTORE_POINT_FAILED}
+    </p>
+  );
+  const confirmButton = (
+    <Button type="button" variant="primary" size="xs" className={SMALL_ACTION} onClick={() => void switchOn()} disabled={guard.busy} data-testid="brand-dark-mode-confirm">
+      {failed ? "Retry" : "Turn on Auto"}
+    </Button>
+  );
+  const cancelButton = (
+    <Button type="button" variant="secondary" size="xs" className={SECONDARY} onClick={cancel} disabled={guard.busy} data-testid="brand-dark-mode-cancel">
+      Cancel
+    </Button>
+  );
 
   return (
-    <section aria-label="Dark mode" className={CARD} data-testid="brand-dark-mode" data-dark-mode-state={pending ? phase : siteMode}>
-      <p className={TITLE}>Dark mode</p>
-      <p className={COPY}>Auto follows each visitor’s device. Off publishes only your light theme.</p>
-      <div className="tw:flex tw:items-center tw:gap-2" role="group" aria-label="Dark mode">
-        {/* While the switch is pending neither is drawn chosen (8224:240003). */}
-        <SegButton on={!pending && siteMode === "auto"} onClick={chooseAuto} testId="brand-dark-mode-auto" disabled={guard.busy}>
-          Auto
-        </SegButton>
-        <SegButton on={!pending && siteMode === "off"} onClick={chooseOff} testId="brand-dark-mode-off" disabled={guard.busy}>
-          Off
-        </SegButton>
-      </div>
+    <section aria-label="Dark mode" className={CARD} data-testid="brand-dark-mode" data-dark-mode-state={phase !== "idle" ? phase : siteMode}>
+      <p className={TITLE} data-testid="brand-dark-mode-state">Mode · {siteMode === "auto" ? "Auto" : "Off"}</p>
+      <p className={`${LINE} tw:font-semibold`}>Website appearance</p>
+      <p className={COPY}>Auto follows the visitor’s device appearance. Editor controls stay light.</p>
 
-      {pending ? (
+      {phase === "preview" ? (
         <>
-          <p className={TITLE}>Generated missing dark values</p>
-          <p className={COPY}>Your existing dark values are kept. These missing aliases will be added.</p>
-          {proposal.filled.map((id) => (
-            <p key={id} className={LINE} data-testid={`brand-dark-alias-${id}`} data-hex={resolveTokenLiteral(proposal.tokens, id, "dark") ?? ""}>
-              {nameOf(id)} → {displayValue(resolveTokenLiteral(proposal.tokens, id, "dark") ?? "")}
-            </p>
-          ))}
+          <p className={TITLE}>Generated dark values</p>
+          {generated}
           <p className={`${NOTICE} tw:w-full tw:bg-[var(--bk-accent-tint)]`} role="status">
-            Preview only · Confirm creates a restore point and turns on Auto. Cancel keeps Dark mode Off.
+            Preview only · Turn on Auto creates a restore point first. Cancel keeps Dark mode Off.
           </p>
+          {failedNotice}
+          <div className="tw:flex tw:items-center tw:gap-2">
+            {cancelButton}
+            {confirmButton}
+          </div>
         </>
       ) : siteMode === "off" ? (
-        <p className={COPY} data-testid="brand-dark-mode-note">Dark mode is off for this site.</p>
+        <Button type="button" variant="secondary" size="xs" className={`${SECONDARY} tw:self-start`} onClick={askAuto} disabled={guard.busy} data-testid="brand-dark-mode-auto">
+          Turn on Auto…
+        </Button>
       ) : (
-        <p className={COPY} data-testid="brand-dark-mode-note">Your site has light and dark values.</p>
+        <Button type="button" variant="secondary" size="xs" className={`${SECONDARY} tw:self-start`} onClick={turnOff} data-testid="brand-dark-mode-off">
+          Turn off Auto
+        </Button>
       )}
 
-      {failed && (
-        <p className={`${NOTICE} tw:w-full tw:bg-[var(--bk-error-tint)]`} role="alert" data-testid="brand-dark-mode-error">
-          {RESTORE_POINT_FAILED}
-        </p>
+      {phase === "idle" && previewTheme && onPreviewTheme && (
+        <PreviewSwitch theme={previewTheme} onChange={onPreviewTheme} siteOff={siteMode === "off"} />
       )}
 
-      {pending ? (
-        <div className="tw:flex tw:items-center tw:gap-2">
-          <Button type="button" variant="secondary" size="xs" className={SECONDARY} onClick={cancel} disabled={guard.busy} data-testid="brand-dark-mode-cancel">
-            Cancel
-          </Button>
-          {phase === "aliases" ? (
-            <Button type="button" variant="primary" size="xs" className={SMALL_ACTION} onClick={showDark} data-testid="brand-dark-mode-preview">
-              Preview in dark
-            </Button>
+      <Modal
+        open={phase === "confirm"}
+        onClose={cancel}
+        title="Turn on automatic dark mode?"
+        testId="brand-dark-mode-dialog"
+        footer={
+          <>
+            {cancelButton}
+            {proposal.filled.length > 0 && (
+              <Button type="button" variant="secondary" size="xs" className={SECONDARY} onClick={showDark} disabled={guard.busy} data-testid="brand-dark-mode-preview">
+                Preview in dark
+              </Button>
+            )}
+            {confirmButton}
+          </>
+        }
+      >
+        <div className="tw:flex tw:flex-col tw:gap-2">
+          {proposal.filled.length === 0 ? (
+            <p className={COPY}>
+              Your {semanticCount} semantic color{semanticCount === 1 ? "" : "s"} already have dark values. No new values are needed.
+            </p>
           ) : (
-            <Button type="button" variant="primary" size="xs" className={SMALL_ACTION} onClick={() => void switchOn()} disabled={guard.busy} data-testid="brand-dark-mode-confirm">
-              {failed ? "Retry" : "Confirm"}
-            </Button>
+            <>
+              <p className={COPY}>
+                {proposal.filled.length} color{proposal.filled.length === 1 ? " has" : "s have"} no dark value. These are generated:
+              </p>
+              {generated}
+            </>
           )}
+          <p className={COPY}>A restore point is created first. Auto and any generated dark values apply as one Undo step.</p>
+          {failedNotice}
         </div>
-      ) : (
-        <>
-          {failed && (
-            <Button type="button" variant="primary" size="xs" className={SMALL_ACTION} onClick={() => void switchOn()} disabled={guard.busy} data-testid="brand-dark-mode-retry">
-              Retry
-            </Button>
-          )}
-          {previewTheme && onPreviewTheme && (
-            <PreviewSwitch theme={previewTheme} onChange={onPreviewTheme} siteOff={siteMode === "off"} />
-          )}
-          {siteMode === "off" && <p className={`${COPY} tw:text-[var(--bk-ink-muted)]`}>Existing sites start with Dark mode Off.</p>}
-        </>
-      )}
+      </Modal>
     </section>
   );
 };

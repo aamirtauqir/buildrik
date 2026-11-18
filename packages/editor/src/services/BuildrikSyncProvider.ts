@@ -13,7 +13,7 @@ import { fetchMyRole, roleAtLeast } from "./RoleService";
 import { resumeKeepingUnsaved } from "./unsavedRecovery";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 import { dropSessionMediaUrls } from "@/shared/utils/html";
-import type { PageMeta, PageSettings, ProjectData, ProjectSettings, SiteSEO, SlugChange } from "@/shared/types/project";
+import type { PageData, PageMeta, PageSettings, ProjectData, ProjectSettings, SiteSEO, SlugChange } from "@/shared/types/project";
 import type { ProjectSettingsPatch } from "@buildrik/shared/schemas/project-settings";
 import type { updateSiteSettingsSchema } from "@buildrik/shared/schemas/site-detail";
 import { SITE_COLUMN_FIELDS } from "@buildrik/shared/schemas/site-column-fields";
@@ -612,13 +612,6 @@ export function getEditorPlanTier(): EditorPlanTier {
   return _editorPlanTier;
 }
 
-let _editorWorkspaceName: string | null = null;
-
-/** The open site's workspace name, for the Settings workspace doors. Null before load or in the demo. */
-export function getEditorWorkspaceName(): string | null {
-  return _editorWorkspaceName;
-}
-
 /** Duplicate a site (`sites.duplicate`, EDITOR). Throws the server's message
  *  on refusal — e.g. the plan's site limit — so the caller can say it. */
 export async function duplicateSite(siteId: string): Promise<{ id: string; name: string }> {
@@ -631,6 +624,31 @@ export async function duplicateSite(siteId: string): Promise<{ id: string; name:
  *  DELETE. Throws the server's message on refusal. */
 export async function deleteSite(siteId: string, siteName: string): Promise<void> {
   await getClient().sites.delete.mutate({ id: siteId, confirmName: siteName });
+}
+
+/**
+ * One `pages.list`-shaped row → the editor's PageData. Shared by the project
+ * load and the page-trash restore (A-21), which hands back the same row shape.
+ */
+export function pageDataFromRow(row: unknown): PageData {
+  const p = row as DashboardPageRow;
+  return {
+    id: p.id,
+    name: p.name,
+    slug: p.slug,
+    isHome: p.isHomePage,
+    /* A page that has never been saved stores `[]`. Each gets its OWN root,
+       with an id derived from the page: one shared DEFAULT_ROOT object
+       made every blank page one element, so an edit on one landed on all. */
+    root: (p.blocks && typeof p.blocks === "object" && !Array.isArray(p.blocks))
+      ? p.blocks
+      : (blankPageRoot(p.id) as ElementData),
+    settings: p.settings,
+    meta: p.meta ?? undefined,
+    updatedAt: p.updatedAt,
+    slugManuallySet: p.slugManuallySet ?? false,
+    slugHistory: p.slugHistory ?? [],
+  };
 }
 
 /**
@@ -678,23 +696,7 @@ export function projectDataFromRows(
   return {
     version: "1.0",
     pagesOrder: sortedPages.map((p) => p.id),
-    pages: sortedPages.map((p) => ({
-      id: p.id,
-      name: p.name,
-      slug: p.slug,
-      isHome: p.isHomePage,
-      /* A page that has never been saved stores `[]`. Each gets its OWN root,
-         with an id derived from the page: one shared DEFAULT_ROOT object
-         made every blank page one element, so an edit on one landed on all. */
-      root: (p.blocks && typeof p.blocks === "object" && !Array.isArray(p.blocks))
-        ? p.blocks
-        : (blankPageRoot(p.id) as ElementData),
-      settings: p.settings,
-      meta: p.meta ?? undefined,
-      updatedAt: p.updatedAt,
-      slugManuallySet: p.slugManuallySet ?? false,
-      slugHistory: p.slugHistory ?? [],
-    })),
+    pages: sortedPages.map(pageDataFromRow),
     // projectStyles holds StyleEngine CSS rules ({id, selector, properties}).
     // Legacy data also contains design-token entries ({id, kind, cssVar, ...})
     // from before tokens migrated to TokenRegistry — those fail StyleEngine
@@ -753,7 +755,6 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
 
     // Capture the workspace plan so plan-gated editor UI reads the real tier.
     _editorPlanTier = mapDashboardPlan((settingsResult as { plan?: unknown } | null)?.plan);
-    _editorWorkspaceName = settingsResult?.workspaceName ?? null;
 
     // 61-conflict: record the load-time version as the save baseline.
     const loadedLastEditedAt = (site as { lastEditedAt?: string | Date | null }).lastEditedAt;

@@ -18,7 +18,7 @@ import { useLayerContextActions } from "./hooks/useLayerContextActions";
 import { useLayersState } from "./hooks/useLayersState";
 import { LayerTreeItem } from "./LayerTreeItem";
 import { itemMatches } from "./hooks/useLayerSearch";
-import { findById as findLayer, flattenTree, getDisplayName } from "./data/layerUtils";
+import { findById as findLayer, flattenTree, getAncestors, getDisplayName } from "./data/layerUtils";
 import { LayersNoResults } from "./components/LayersStateBlocks";
 import type { LayersPanelProps } from "./types";
 import { Button, ConfirmDialog, useToast } from "@/editor/chrome-ui";
@@ -48,18 +48,22 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
   }, [search, stateSearch, setSearch]);
 
   // Expand/collapse-all from LayersTab
-  const { expandAll, collapseAll } = state.treeHook;
+  const { expandAll, collapseAll, collapseToSelection } = state.treeHook;
+  const { selectedIds } = state.selectionHook;
   React.useEffect(() => {
     if (!composer) return;
     const onExpand = () => expandAll();
     const onCollapse = () => collapseAll();
+    const onCollapseToSelection = () => collapseToSelection(selectedIds);
     composer.on("layers:expand-all", onExpand);
     composer.on("layers:collapse-all", onCollapse);
+    composer.on(EVENTS.LAYERS_COLLAPSE_TO_SELECTION, onCollapseToSelection);
     return () => {
       composer.off("layers:expand-all", onExpand);
       composer.off("layers:collapse-all", onCollapse);
+      composer.off(EVENTS.LAYERS_COLLAPSE_TO_SELECTION, onCollapseToSelection);
     };
-  }, [composer, expandAll, collapseAll]);
+  }, [composer, expandAll, collapseAll, collapseToSelection, selectedIds]);
 
   const totalCount = state.treeHook.totalCount;
   const selectedCount = state.selectionHook.selectedIds.size;
@@ -388,24 +392,42 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
     });
   }, [composer, selectedCount, state.selectionHook, addToast]);
 
-  const dimmedSelection = React.useMemo(() => {
-    const id = selectedElement?.id;
-    if (!id || selectedCount > 1 || !state.hiddenIds.has(id)) return null;
-    const item = findLayer(state.layers, id);
-    return item ? { id, name: getDisplayName(id, item.type, state.actionsHook.customNames, item.preview) } : null;
-  }, [selectedElement?.id, selectedCount, state.hiddenIds, state.layers, state.actionsHook.customNames]);
-
   // Filter tree by search only (no category filters in Minimal Tree design)
   const treeFiltered = state.filterTree(state.layers);
   const matchCount = state.searchHook.countMatches(state.layers, state.actionsHook.customNames);
 
   /* Stats for LayersTab's count footer; `matches` while a filter is on
-     (4418:79355 "1 of 12 layers match “button”"). */
+     (147:77189 "5,000 layers · 12 matches"). */
   const matches = state.searchHook.isSearching ? matchCount : null;
+  /* Board 152:78614 "… · 1 selected inside Hero": the one selected row sits
+     in a folded branch — name the outermost folded ancestor, the row a user
+     would open to find it. */
+  const { expandedIds } = state.treeHook;
+  const hiddenIn = React.useMemo(() => {
+    const id = selectedElement?.id;
+    if (!id || selectedCount !== 1) return null;
+    const folded = getAncestors(state.layers, id).find((a) => !expandedIds.has(a.id));
+    return folded ? getDisplayName(folded.id, folded.type, state.actionsHook.customNames, folded.preview) : null;
+  }, [selectedElement?.id, selectedCount, state.layers, expandedIds, state.actionsHook.customNames]);
+  /* Boards 147:77668 / 147:78110 / 147:78900: the one selected layer's state
+     — "Locked", "Locked by Hero" (a locked ancestor), "Dimmed". */
+  const selectionState = React.useMemo(() => {
+    const id = selectedElement?.id;
+    if (!id || selectedCount !== 1 || !composer) return null;
+    const el = composer.elements.getElement(id);
+    if (el?.isLocked?.()) return "Locked";
+    for (let p = el?.getParent?.(); p; p = p.getParent()) {
+      if (p.isLocked?.()) {
+        const item = findLayer(state.layers, p.getId());
+        return `Locked by ${item ? getDisplayName(item.id, item.type, state.actionsHook.customNames, item.preview) : "a parent"}`;
+      }
+    }
+    return state.hiddenIds.has(id) ? "Dimmed" : null;
+  }, [selectedElement?.id, selectedCount, composer, state.layers, state.hiddenIds, state.actionsHook.customNames]);
   React.useEffect(() => {
     if (!composer) return;
-    composer.emit("layers:stats-change", { total: totalCount, selected: selectedCount, matches });
-  }, [composer, totalCount, selectedCount, matches]);
+    composer.emit("layers:stats-change", { total: totalCount, selected: selectedCount, matches, hiddenIn, selectionState });
+  }, [composer, totalCount, selectedCount, matches, hiddenIn, selectionState]);
 
   // Board 143:2 (Layers · filtered): search results render FLAT — only the
   // matching rows, no indentation, no chevrons, no ancestor context. The
@@ -415,13 +437,17 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
     const q = state.search.toLowerCase();
     const names = state.actionsHook.customNames;
     const flat: typeof treeFiltered = [];
-    const walk = (items: typeof treeFiltered) => {
+    /* design-2l9 147:77189: each result names where it sits ("Services ›
+       Card 1") — its ancestors under the page. */
+    const walk = (items: typeof treeFiltered, path: string[]) => {
       for (const it of items) {
-        if (itemMatches(it, names, q)) flat.push({ ...it, children: [], depth: 0 });
-        walk(it.children as typeof treeFiltered);
+        if (itemMatches(it, names, q)) {
+          flat.push({ ...it, children: [], depth: 0, searchPath: path.length ? path.join(" › ") : undefined });
+        }
+        walk(it.children as typeof treeFiltered, [...path, getDisplayName(it.id, it.type, names, it.preview)]);
       }
     };
-    walk(treeFiltered);
+    walk(treeFiltered, []);
     return flat;
   }, [treeFiltered, state.searchHook.isSearching, state.search, state.actionsHook.customNames]);
 
@@ -492,24 +518,40 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
       <div
         ref={state.treeContainerRef}
         id="bd-layers-tree"
-        /* Filtered rows are flat (4418:79355): no chevron slot, the glyph
-           sits where depth 0's chevron would. */
-        className={`bdc-layers-tree${state.displayPrefs.treeDensity === "compact" ? " bdc-layers-tree-compact" : ""}${
-          state.searchHook.isSearching ? " tw:[&_.bdc-lr-chev]:hidden!" : ""
-        }`}
+        /* design-2l9 147:77189 / 147:79728: search results keep the chevron,
+           at depth 0's place, with the path under the row. */
+        className={`bdc-layers-tree${state.displayPrefs.treeDensity === "compact" ? " bdc-layers-tree-compact" : ""}`}
         role="tree"
         aria-label="Page structure"
       >
+        {/* design-2l9 147:75914: the open page heads its tree. */}
+        {activePage && !state.searchHook.isSearching && (
+          <div className="tw:flex tw:h-8 tw:items-center tw:gap-2 tw:px-3 tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink)]" data-testid="layers-page-row">
+            {/* 101:42581: an empty page's row is its name alone. */}
+            {state.layers.length > 0 && (
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="tw:flex-none tw:text-[var(--bk-ink-soft)]">
+                <path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9z" />
+                <path d="M14 3v6h6" />
+              </svg>
+            )}
+            <span className="tw:truncate">{activePage.name}</span>
+          </div>
+        )}
         {state.layers.length === 0 && <LayersEmptyState />}
 
         {state.searchHook.isSearching && filteredLayers.length === 0 && (
           <LayersNoResults
             search={state.search}
-            onSearchEverywhere={composer ? (query) => composer.emit(EVENTS.UI_TOGGLE_COMMAND_PALETTE, { query }) : undefined}
             onClear={onClearSearch}
           />
         )}
 
+        {/* design-2l9 147:77189: a head line over the results. */}
+        {state.searchHook.isSearching && filteredLayers.length > 0 && (
+          <p className="tw:m-0 tw:px-3 tw:pb-1 tw:text-[13px] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)]" data-testid="layers-search-head">
+            {`${matchCount.toLocaleString("en-US")} match${matchCount === 1 ? "" : "es"} in ${totalCount.toLocaleString("en-US")} layers`}
+          </p>
+        )}
         {filteredLayers.map((layer) => (
           <LayerTreeItem
             key={layer.id}
@@ -546,6 +588,18 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
             selecting={selecting}
           />
         ))}
+        {state.searchHook.isSearching && filteredLayers.length > 0 && onClearSearch && (
+          <Button
+            type="button"
+            color="light"
+            size="xs"
+            data-testid="layers-search-clear"
+            className="tw:mx-3 tw:mt-2 tw:h-8 tw:px-3 tw:text-[13px] tw:font-normal tw:focus:ring-0"
+            onClick={onClearSearch}
+          >
+            Clear search
+          </Button>
+        )}
         {dropFeedback && (
           /* v3 4418:83699: the refusal is a dark card under the rows. */
           <div
@@ -557,24 +611,6 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
             {dropFeedback.message}
           </div>
         )}
-        {dimmedSelection && (
-          /* v3 4418:79800: the selected layer is dimmed — say what dimming
-             is (editor only) and where site hiding lives, with the way back. */
-          <div className="tw:flex tw:flex-col tw:items-start tw:gap-1.5 tw:px-3 tw:pt-4 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]" data-testid="layers-dimmed-note">
-            <p className="tw:m-0">{dimmedSelection.name} is dimmed in the editor. It still appears on the live site.</p>
-            <p className="tw:m-0">To hide on the site, use Inspector → Visibility.</p>
-            <Button
-              type="button"
-              color="light"
-              size="xs"
-              className="tw:h-7 tw:px-4 tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink-soft)] tw:focus:ring-0"
-              data-testid="layers-dimmed-show"
-              onClick={(e: React.MouseEvent) => state.toggleVisibility(dimmedSelection.id, e)}
-            >
-              Show normally in editor
-            </Button>
-          </div>
-        )}
       </div>
       <LayersScrollThumb containerRef={state.treeContainerRef} />
       </div>
@@ -584,6 +620,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
           y={state.contextMenu.y}
           nodeId={state.contextMenu.nodeId}
           hasClipboard={!!composer?.clipboard?.length}
+          isInstance={!!composer?.components?.isInstance(state.contextMenu.nodeId)}
           nodeName={state.contextMenu.nodeName}
           selectedCount={selectedCount}
           inSelection={state.selectionHook.selectedIds.has(state.contextMenu.nodeId)}

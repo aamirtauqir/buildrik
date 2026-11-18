@@ -70,6 +70,7 @@ export class ElementChildren {
    * Move element to new parent
    */
   moveTo(parent: Element, index?: number): void {
+  if (this.getComposer().writeLocked) return;
     // Remove from current parent
     const currentParent = this.getParentRef();
     if (currentParent) {

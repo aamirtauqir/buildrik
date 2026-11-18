@@ -22,13 +22,14 @@ export const MODAL_FRAME_BASE_CLASS =
   "tw:max-h-[80vh] tw:max-w-[calc(100vw-32px)] tw:[font-family:var(--bk-font-ui)]";
 /* The dialog boards (7564:185450 delete folder, 6752:59256 New page, and
    every confirm since the 2026-09-20 DS pass): pad 24, gap 16, radius 12
-   (radius/card), a 20/30 semibold title, 14/20 ink body, and the action row
-   right-aligned INSIDE the padding — no footer strip, no rule above it. */
+   (radius/card), a 16/24 semibold title (2L9: 165:2184, 223:44891, 257:52890
+   — it was 20/30 before), 14/20 ink body, and the action row right-aligned
+   INSIDE the padding — no footer strip, no rule above it. */
 export const MODAL_HEAD_CLASS = "tw:flex tw:flex-col tw:gap-1 tw:pt-6 tw:px-6 tw:pb-4";
 /* The head's ✕: 32 square, centred 36 in from the top-right corner. */
 const MODAL_CLOSE_CLASS = "tw:absolute tw:top-5 tw:right-5 tw:text-[var(--bk-ink-muted)] tw:hover:text-[var(--bk-ink)]";
 export const MODAL_TITLE_CLASS =
-  "tw:text-[length:var(--bk-text-20)] tw:leading-[var(--bk-leading-30)] tw:tracking-[-0.24px] tw:font-semibold tw:text-[var(--bk-ink)]";
+  "tw:text-[length:var(--bk-text-16)] tw:leading-[var(--bk-leading-24)] tw:font-semibold tw:text-[var(--bk-ink)]";
 export const MODAL_SUBTITLE_CLASS = "tw:text-[length:var(--bk-text-13)] tw:text-[var(--bk-ink-muted)]";
 export const MODAL_BODY_CLASS =
   "tw:px-6 tw:pt-0 tw:pb-4 tw:overflow-auto tw:text-[length:var(--bk-text-14)] tw:leading-5 tw:text-[var(--bk-ink)]";
@@ -100,14 +101,22 @@ export interface ModalProps {
   testId?: string;
   /** A ✕ at the head's right edge (6752:59256 New page draws one). */
   closeButton?: boolean;
+  /** Where the footer's buttons sit — "end" (default, right) or "start"
+   *  (left, as design-2l9's page confirms draw them, e.g. 63:15255). */
+  footerAlign?: "start" | "end";
+  /** Where the frame sits. Default: the 2L9 dialog placement (top at 31vh).
+   *  "workspace": a tall dialog drawn from the workspace's top, under the
+   *  topbar (187:20616). "panel": over a full-width panel's content, top
+   *  128 (CMS Fields 257:51318). */
+  placement?: "default" | "workspace" | "panel";
 }
 
 export function Modal({
-  open, onClose, title, subtitle, kind = "question", width, children, footer, dismissOnScrimClick, dirty, testId, closeButton,
+  open, onClose, title, subtitle, kind = "question", width, children, footer, dismissOnScrimClick, dirty, testId, closeButton, footerAlign = "end", placement = "default",
 }: ModalProps) {
   const titleId = React.useId();
   return (
-    <OverlayMount open={open} onClose={onClose} labelledBy={titleId} dismissOnScrimClick={dismissOnScrimClick} dirty={dirty}>
+    <OverlayMount open={open} onClose={onClose} labelledBy={titleId} dismissOnScrimClick={dismissOnScrimClick} dirty={dirty} align={placement === "default" ? "center" : placement}>
       <div className={[MODAL_FRAME_BASE_CLASS, WIDTH_CLASS[width ?? KIND_WIDTH[kind]], closeButton ? "tw:relative" : ""].join(" ")} data-testid={testId}>
         <div className={MODAL_HEAD_CLASS}>
           <span className={MODAL_TITLE_CLASS} id={titleId}>
@@ -117,7 +126,7 @@ export function Modal({
         </div>
         {children ? <div className={MODAL_BODY_CLASS}>{children}</div> : null}
         {footer ? (
-          <div className={MODAL_FOOT_CLASS} data-testid={`modal-foot-${testId ?? "modal"}`}>
+          <div className={footerAlign === "start" ? `${MODAL_FOOT_CLASS} tw:justify-start!` : MODAL_FOOT_CLASS} data-testid={`modal-foot-${testId ?? "modal"}`}>
             {footer}
           </div>
         ) : null}

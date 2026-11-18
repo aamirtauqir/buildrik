@@ -1,27 +1,19 @@
 /**
- * ColorTokenList — the Colours page's table, board 7315:80955.
+ * ColorTokenList — the Colors page, Figma 2L9 B6-B01.
  *
- * TOKEN · LIGHT · DARK · USED, one 40px row per token, swatch on the gutter.
- * Clicking a row selects it; the workspace draws the selected token's card in
- * the right column (light / dark values, usage, brand-check status), which is
- * where the drawer-era row furniture went: the search field, the All / Issues
- * pills and their WCAG banner, the per-row "[lint]" tag and the group headings
- * are not on the board. The brand checks moved to the Brand checks page, which
- * is the one place the workspace lists them; the contrast fix went with them.
+ * One card per colour, grouped ("4 semantic colors" first, then the other
+ * groups Pro reveals): the token's name and "Edit ›", its values as
+ * "Light #1A56DB     Dark #60A5FA", and its reach — "Used by 42 places",
+ * "· through aliases" when other tokens point at it. The card is the control:
+ * a click (or Enter) opens the token's edit page ("‹ Colors" drill-in, B6-B02),
+ * which the workspace draws in place of this list.
  *
- * The TOKEN cell prints the id in Pro — "color-primary", which is what the
- * board draws — and the friendly name in Beginner, whose contract is to hide
- * ids. The row draws no lint state; the Brand checks page and the selected
- * token's card carry the findings.
- *
- * USAGE (BRP1-M5, 8224:229485 / 8224:230173) is the site-wide count:
- * "Used by N" — above zero, a click highlights those elements in the live
- * preview — or "Can't count right now" while some site content (saved
- * components) is unread, with the board's warning notice under the table.
+ * USAGE (BRP1-M5) is the site-wide count; above zero the "Used by" line is
+ * the door to the canvas highlight. "Can’t count right now" while some site
+ * content (saved components) is unread, with the board's notice (B6-B59).
  *
  * Beginner mode's filter is upstream (`filterTokensByMode`); this list only
- * knows how many it hid, so an empty Beginner view blames the mode and not a
- * search the user never typed.
+ * knows how many it hid, so an empty Beginner view blames the mode.
  *
  * @license BSD-3-Clause
  */
@@ -30,13 +22,6 @@ import * as React from "react";
 import type { DesignToken } from "@/editor/design-system/types";
 import { Button, EmptyState } from "@/editor/chrome-ui";
 import type { TokenUsageCount } from "@buildrik/shared/tokens";
-import {
-  TokenTable,
-  TokenTableRow,
-  TOKEN_CELL_NAME,
-  TOKEN_CELL_PREVIEW,
-  TOKEN_CELL_VALUE,
-} from "../tokens/TokenTable";
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 
 export interface ColorTokenListProps {
@@ -47,8 +32,9 @@ export interface ColorTokenListProps {
   usageCounts?: ReadonlyMap<string, TokenUsageCount>;
   /** "Used by N" (N > 0) clicked — highlight that token's elements. */
   onShowUsage?: (tokenId: string) => void;
-  /** The token whose card the right column shows. */
+  /** The token being edited, if any (its card reads selected). */
   selectedTokenId?: string | null;
+  /** A card (or its "Edit ›") was chosen — open its edit page. */
   onSelectToken?: (tokenId: string) => void;
   /** Pro prints the token id; Beginner the friendly name. */
   isPro?: boolean;
@@ -59,27 +45,35 @@ export interface ColorTokenListProps {
   allTokens?: readonly DesignToken[];
 }
 
-/* 7315:80955: swatch gutter 52 · TOKEN 180 · LIGHT 120 · DARK 120 · USAGE
-   (BRP1-M5 renames the last column). */
-const TEMPLATE = "52px 180px 120px 120px minmax(0, 1fr)";
-const COLUMNS = ["Token", "Light", "Dark", "Usage"] as const;
-
-/* 8224:229485 "Action · Used by 14": 13/20 medium gray-700. The cell keeps
-   the column's left edge, so the 12px inset the board's ghost draws is not
-   added here (it would push the text off the header's line). */
-const USAGE_TEXT = "tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:text-[var(--bk-gray-700)]";
+/* B6-B01's usage line: 13/20, muted; the highlight door is the same text. */
+const USAGE_TEXT = "tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
 /* The ghost Button's focus ring drew on a mouse click (the workspace nav hit
    the same, NAV_ROW): keyboard focus keeps it, a click does not. */
 const USAGE_ACTION =
-  `tw:h-7 tw:min-h-0 tw:rounded-[var(--bk-radius-md)] tw:p-0 tw:enabled:hover:text-[var(--bk-accent)] ${USAGE_TEXT} ` +
+  `tw:h-5 tw:min-h-0 tw:rounded-[var(--bk-radius-sm)] tw:p-0 tw:enabled:hover:text-[var(--bk-accent)] ${USAGE_TEXT} ` +
   "tw:focus:ring-0 tw:focus:[box-shadow:none] tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 
 /* Board order: the role-named semantic tokens first, then brand, surface,
    state, and the primitive scale Pro reveals. */
 const GROUP_ORDER = ["semantic", "brand", "surface", "state", "primitive"];
+const GROUP_LABEL: Record<string, string> = {
+  semantic: "semantic", brand: "brand", surface: "surface", state: "state", primitive: "palette",
+};
 
-/** The table's row order — the workspace selects the first row by default. */
-export function orderColourTokens(tokens: readonly DesignToken[]): DesignToken[] {
+/** How many other tokens alias this one ("· through aliases", B6-B01). */
+export function aliasedByCount(tokens: readonly DesignToken[], id: string): number {
+  return tokens.filter((t) => t.id !== id && Object.values(t.modes).some((m) => m && "alias" in m && m.alias === id)).length;
+}
+
+/* B6-B01 (203:33565): unboxed rows — square swatch, name with "Edit ›" at
+   the row's end, the values and reach under it — in a 494 column. */
+const CARD =
+  "tw:group tw:flex tw:w-full tw:max-w-[494px] tw:items-start tw:gap-3 tw:rounded-[var(--bk-radius-sm)] tw:p-1 tw:-m-1 tw:text-left tw:outline-none tw:cursor-pointer " +
+  "tw:hover:bg-[var(--bk-bg-subtle)] tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
+const MONO = "tw:[font-family:var(--bk-font-mono)] tw:tabular-nums tw:whitespace-pre";
+
+/** The cards' order: semantic first, then brand, surface, state, palette. */
+function orderColourTokens(tokens: readonly DesignToken[]): DesignToken[] {
   return [...tokens].sort((a, b) => {
     const ga = GROUP_ORDER.indexOf(a.group ?? "");
     const gb = GROUP_ORDER.indexOf(b.group ?? "");
@@ -104,12 +98,17 @@ function isLikelyLightValue(hex: string): boolean {
   return r + g + b > 600;
 }
 
-/** The 16px round swatch on the gutter; light values get a visible edge. */
+/** "Used by 42 places · through aliases" (B6-B01). */
+function usageLine(n: number, viaAliases: boolean): string {
+  return `Used by ${n} place${n === 1 ? "" : "s"}${viaAliases ? " · through aliases" : ""}`;
+}
+
+/** The 16px round swatch; light values get a visible edge. */
 const ColorSwatch: React.FC<{ value: string }> = ({ value }) => (
   <span
     aria-hidden="true"
     data-testid="brand-color-swatch"
-    className={`tw:relative tw:inline-block tw:size-4 tw:flex-none tw:rounded-full tw:border ${
+    className={`tw:relative tw:inline-block tw:size-7 tw:flex-none tw:rounded-[var(--bk-radius-xs)] tw:border ${
       isLikelyLightValue(value) ? "tw:border-[var(--bk-gray-300)]" : "tw:border-[var(--bk-alpha-ink-10)]"
     }`}
     style={{ background: value }}
@@ -161,70 +160,100 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
     );
   }
 
+  const groups = GROUP_ORDER.concat([""])
+    .map((g) => ({ g, items: ordered.filter((t) => (GROUP_ORDER.includes(t.group ?? "") ? t.group === g : g === "")) }))
+    .filter((x) => x.items.length > 0);
+
   return (
-    <div data-color-token-list>
-      <TokenTable columns={COLUMNS} template={TEMPLATE} label="Colour tokens">
-        {ordered.map((token) => {
-          const currentValue = resolveTokenLiteral(allTokens, token.id, "light") ?? "";
-          const darkValue = token.modes.dark ? resolveTokenLiteral(allTokens, token.id, "dark") : null;
-          const usage = usageCounts?.get(token.id) ?? 0;
-          return (
-            <TokenTableRow
-              key={token.id}
-              tokenId={token.id}
-              template={TEMPLATE}
-              selected={selectedTokenId === token.id}
-              onSelect={() => onSelectToken?.(token.id)}
-            >
-              <span className={TOKEN_CELL_PREVIEW}>
-                <ColorSwatch value={currentValue} />
-              </span>
-              <span className={TOKEN_CELL_NAME}>
-                <span className="tw:truncate" data-testid={`brand-token-name-${token.id}`}>
-                  {isPro ? token.id : (token.friendlyName ?? token.name)}
-                </span>
-              </span>
-              <span className={TOKEN_CELL_VALUE}>{displayValue(currentValue)}</span>
-              <span className={TOKEN_CELL_VALUE} data-testid={`brand-token-dark-${token.id}`}>
-                {darkValue ? displayValue(darkValue) : "—"}
-              </span>
-              <span className="tw:flex tw:min-w-0 tw:items-center tw:pr-3" data-testid={`brand-token-used-${token.id}`}>
-                {usage === "unknown" ? (
-                  <span className={`tw:truncate ${USAGE_TEXT}`}>Can&apos;t count right now</span>
-                ) : usage > 0 && onShowUsage ? (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="xs"
-                    className={USAGE_ACTION}
-                    aria-label={`Used by ${usage} — highlight on the canvas`}
-                    onClick={(e: React.MouseEvent) => {
-                      e.stopPropagation();
-                      onShowUsage(token.id);
-                    }}
-                    data-testid={`brand-token-usage-show-${token.id}`}
-                  >
-                    Used by {usage}
-                  </Button>
-                ) : (
-                  <span className={USAGE_TEXT}>Used by {usage}</span>
-                )}
-              </span>
-            </TokenTableRow>
-          );
-        })}
-      </TokenTable>
+    <div data-color-token-list className="tw:flex tw:flex-col tw:gap-4">
       {[...ordered].some((t) => usageCounts?.get(t.id) === "unknown") && (
-        /* 8224:230855 "Notice · warning", 16 under the table card — held at
-           the pane's foot while a long table scrolls under it. */
+        /* B6-B59: the notice sits over the list, under the page actions. */
         <p
           role="status"
           data-testid="brand-usage-unknown-notice"
-          className="tw:sticky tw:bottom-0 tw:mt-4 tw:mb-0 tw:bg-[var(--bk-warning-tint)] tw:p-3 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink)]"
+          className="tw:m-0 tw:bg-[var(--bk-warning-tint)] tw:p-3 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink)]"
         >
-          Can&apos;t count right now. Some site content couldn&apos;t be checked. Try again before deleting a token.
+          We can’t count where colors are used right now. Editing still works; deleting is blocked until the count is back.
         </p>
       )}
+      {groups.map(({ g, items }) => (
+        <section key={g || "other"} className="tw:flex tw:flex-col tw:gap-2" aria-label={`${items.length} ${GROUP_LABEL[g] ?? "other"} colors`}>
+          <p className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid={`brand-colour-group-${g || "other"}`}>
+            {items.length} {GROUP_LABEL[g] ?? "other"} color{items.length === 1 ? "" : "s"}
+          </p>
+          <ul className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-5 tw:p-0">
+            {items.map((token) => {
+              const currentValue = resolveTokenLiteral(allTokens, token.id, "light") ?? "";
+              const darkValue = token.modes.dark ? resolveTokenLiteral(allTokens, token.id, "dark") : null;
+              const usage = usageCounts?.get(token.id) ?? 0;
+              const viaAliases = aliasedByCount(allTokens, token.id) > 0;
+              const selected = selectedTokenId === token.id;
+              return (
+                <li key={token.id}>
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    aria-pressed={selected}
+                    aria-label={`Edit ${isPro ? token.id : (token.friendlyName ?? token.name)}`}
+                    data-token-row={token.id}
+                    data-testid={`brand-token-row-${token.id}`}
+                    onClick={() => onSelectToken?.(token.id)}
+                    onKeyDown={(e) => {
+                      if (e.target !== e.currentTarget) return;
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        onSelectToken?.(token.id);
+                      }
+                    }}
+                    className={`${CARD}${selected ? " tw:bg-[var(--bk-bg-subtle)]" : ""}`}
+                  >
+                    <ColorSwatch value={currentValue} />
+                    <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:gap-1">
+                      <div className="tw:flex tw:items-center tw:gap-2">
+                        <span
+                          className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-[length:var(--bk-text-14)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]"
+                          data-testid={`brand-token-name-${token.id}`}
+                        >
+                          {isPro ? token.id : (token.friendlyName ?? token.name)}
+                        </span>
+                        <span aria-hidden="true" className="tw:flex-none tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:text-[var(--bk-accent)]">
+                          Edit ›
+                        </span>
+                      </div>
+                      <span className={`${MONO} tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]`}>
+                        Light <span data-testid={`brand-token-light-${token.id}`}>{displayValue(currentValue)}</span>
+                        {"     "}Dark <span data-testid={`brand-token-dark-${token.id}`}>{darkValue ? displayValue(darkValue) : "—"}</span>
+                      </span>
+                      <span className="tw:flex tw:min-w-0 tw:items-center" data-testid={`brand-token-used-${token.id}`}>
+                        {usage === "unknown" ? (
+                          <span className={`tw:truncate ${USAGE_TEXT}`}>Can’t count right now</span>
+                        ) : usage > 0 && onShowUsage ? (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="xs"
+                            className={USAGE_ACTION}
+                            aria-label={`Used by ${usage} — highlight on the canvas`}
+                            onClick={(e: React.MouseEvent) => {
+                              e.stopPropagation();
+                              onShowUsage(token.id);
+                            }}
+                            data-testid={`brand-token-usage-show-${token.id}`}
+                          >
+                            {usageLine(usage, viaAliases)}
+                          </Button>
+                        ) : (
+                          <span className={USAGE_TEXT}>{usageLine(usage, viaAliases)}</span>
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ))}
     </div>
   );
 };

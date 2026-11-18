@@ -22,25 +22,24 @@ const field = (label: string) => (screen.getByTestId(`inspector-row-${label.toLo
 describe("FontControls — board 1's rows", () => {
   it("Font size, Line height, Weight, Colour, Align — in that order, nothing else", () => {
     const { container } = renderFont();
-    expect(labels(container)).toEqual(["Font size", "Line height", "Weight", "Colour", "Align"]);
+    expect(labels(container)).toEqual(["Font size", "Weight", "Line height", "Text color"]);
   });
 
-  it("shows the size's number, 16 when unset", () => {
+  it("shows the size's number", () => {
     renderFont({ "font-size": "32px" });
     expect(field("Font size")).toHaveValue("32");
   });
 
-  it("the weight reads as its number, like the board", () => {
+  it("the weight reads by name, like the 2L9 board ('Regular', 'Semibold')", () => {
     renderFont({ "font-weight": "600" });
     const select = screen.getByLabelText("Weight") as HTMLSelectElement;
     expect(select.value).toBe("600");
-    expect(select.selectedOptions[0].textContent).toBe("600");
+    expect(select.selectedOptions[0].textContent).toBe("Semibold");
   });
 
-  it("Align is Left · Center · Right", () => {
+  it("no Align in the face — it is under More settings (2L9 161:8940)", () => {
     renderFont({ "text-align": "center" });
-    expect(screen.getByRole("radio", { name: "Center" })).toHaveAttribute("aria-checked", "true");
-    expect(screen.queryByRole("button", { name: "Justify" })).toBeNull();
+    expect(screen.queryByRole("radio", { name: "Center" })).toBeNull();
   });
 });
 
@@ -53,14 +52,12 @@ describe("FontControls — writes", () => {
     expect(onChange).toHaveBeenCalledWith("line-height", "28px");
   });
 
-  it("weight, colour and align write their properties", () => {
+  it("weight and colour write their properties", () => {
     const { onChange } = renderFont();
     fireEvent.change(screen.getByLabelText("Weight"), { target: { value: "300" } });
     expect(onChange).toHaveBeenCalledWith("font-weight", "300");
-    fireEvent.change(screen.getByRole("textbox", { name: "Colour value" }), { target: { value: "ff0000" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "Text color value" }), { target: { value: "ff0000" } });
     expect(onChange).toHaveBeenCalledWith("color", "#ff0000");
-    fireEvent.click(screen.getByRole("radio", { name: "Right" }));
-    expect(onChange).toHaveBeenCalledWith("text-align", "right");
   });
 
   it("a size bound to a type style shows the size it resolves to — no chain button here", () => {
@@ -72,10 +69,35 @@ describe("FontControls — writes", () => {
 });
 
 describe("FontControls — Page panel (board 21)", () => {
-  it("only the text colour, labelled Text colour", () => {
+  it("only the text colour, labelled Text color", () => {
     const { container, onChange } = renderFont({}, "page");
-    expect(labels(container)).toEqual(["Text colour"]);
-    fireEvent.change(screen.getByRole("textbox", { name: "Text colour value" }), { target: { value: "333333" } });
+    expect(labels(container)).toEqual(["Text color"]);
+    fireEvent.change(screen.getByRole("textbox", { name: "Text color value" }), { target: { value: "333333" } });
     expect(onChange).toHaveBeenCalledWith("color", "#333333");
+  });
+});
+
+describe("FontControls — what the cascade resolves (2L9 S21)", () => {
+  const inherited = { "font-size": "32px", "font-weight": "600", "line-height": "38.4px" };
+
+  it("an unset row reads the resolved value '· inherited' — never a guessed default", () => {
+    render(<FontControls styles={{ "font-size": "16px" }} onChange={vi.fn()} inherited={inherited} />);
+    expect(field("Font size")).toHaveValue("");
+    expect(field("Font size")).toHaveAttribute("placeholder", "32 px · inherited");
+    expect(field("Line height")).toHaveAttribute("placeholder", "1.2 × · inherited");
+    const weight = screen.getByLabelText("Weight") as HTMLSelectElement;
+    expect(weight.value).toBe("");
+    expect(weight.selectedOptions[0].textContent).toBe("600 · inherited");
+  });
+
+  it("no unit dropdown on an inherited row until it has a value of its own", () => {
+    render(<FontControls styles={{}} onChange={vi.fn()} inherited={inherited} />);
+    expect(screen.queryByLabelText("Font size unit")).toBeNull();
+  });
+
+  it("with nothing resolved the rows keep their plain placeholders", () => {
+    render(<FontControls styles={{}} onChange={vi.fn()} />);
+    expect(field("Line height")).toHaveAttribute("placeholder", "1.5");
+    expect((screen.getByLabelText("Weight") as HTMLSelectElement).selectedOptions[0].textContent).toBe("Default");
   });
 });

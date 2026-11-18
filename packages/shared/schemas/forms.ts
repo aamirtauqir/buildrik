@@ -31,6 +31,17 @@ export const listSubmissionsSchema = z.object({
   perPage: z.number().min(1).max(50).default(20),
 });
 
+/* Export follows the editor's view and form filters (2L9 GAP-FM-Export-*):
+   an omitted flag means "either", so the dashboard's whole-site export is
+   unchanged. */
+export const exportSubmissionsSchema = z.object({
+  siteId: z.string(),
+  formBlockId: z.string().optional(),
+  isSpam: z.boolean().optional(),
+  isArchived: z.boolean().optional(),
+  format: z.enum(["csv", "json"]),
+});
+
 export const updateSubmissionSchema = z.object({
   id: z.string(),
   isRead: z.boolean().optional(),
@@ -69,5 +80,6 @@ export const updateFormBlockSchema = z
 
 export type FormSubmissionInput = z.infer<typeof formSubmissionSchema>;
 export type ListSubmissionsInput = z.infer<typeof listSubmissionsSchema>;
+export type ExportSubmissionsInput = z.infer<typeof exportSubmissionsSchema>;
 export type GetFormBlockInput = z.infer<typeof getFormBlockSchema>;
 export type UpdateFormBlockInput = z.infer<typeof updateFormBlockSchema>;

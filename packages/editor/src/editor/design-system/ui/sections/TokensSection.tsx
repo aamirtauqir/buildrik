@@ -17,7 +17,7 @@
  */
 import * as React from "react";
 import { ColorTokenList } from "../colors/ColorTokenList";
-import { KindTokenList } from "../tokens/KindTokenList";
+import { KindTokenList, type KindRowActions } from "../tokens/KindTokenList";
 import {
   useColorRegistry,
   useSpacingRegistry,
@@ -57,6 +57,8 @@ interface TokensSectionProps {
   onSelectToken?: (tokenId: string) => void;
   /** Colours' "Used by N" — highlight that token's elements (BRP1-M5). */
   onShowUsage?: (tokenId: string) => void;
+  /** The Other kinds pages' in-place edits (2L9 B6-B24/B25/B54/B55). */
+  kindActions?: KindRowActions;
 }
 
 export const TokensSection: React.FC<TokensSectionProps> = ({
@@ -66,6 +68,7 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
   selectedTokenId = null,
   onSelectToken,
   onShowUsage,
+  kindActions,
 }) => {
   const mode = useDSModeOptional()?.mode ?? "beginner";
   const isPro = mode === "pro";
@@ -152,6 +155,7 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
       allTokens={r.tokens}
       kindLabel={openKind}
       hiddenByModeCount={filterTokensByMode(r.tokens, "pro").length - visible.length}
+      actions={kindActions}
       {...selection}
     />
   );

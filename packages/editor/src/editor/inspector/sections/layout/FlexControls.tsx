@@ -8,6 +8,11 @@
  * cannot say: reverse order, distribute (space-between …), stretch /
  * baseline, align content, row / column gap.
  *
+ * Layout's "Children layout" (2L9 247:21216, 36:2) draws the same settings
+ * as select rows instead (`variant="rows"`): Direction · Justify · Align
+ * items · Gap, with Wrap and Align lines once the children wrap and Wrap /
+ * Row gap / Column gap behind More settings.
+ *
  * The one writer of flex-direction, flex-wrap, justify-content (flex),
  * align-items (flex) and align-content (flex).
  *
@@ -27,6 +32,8 @@ export interface FlexControlsProps {
   /** The owner's More settings state (Layout). Absent = the controls keep
    *  their own toggle (the Flex type block). */
   advanced?: boolean;
+  /** "grid" (default) — board 16's align grid; "rows" — 2L9's select rows. */
+  variant?: "grid" | "rows";
 }
 
 const DIRECTIONS = [
@@ -53,6 +60,18 @@ const stopIndex = (v: string | undefined): number => {
   if (!v || v === "flex-start" || v === "start" || v === "normal" || v === "stretch") return 0;
   return -1;
 };
+
+const DIRECTION_OPTIONS = [
+  { value: "row", label: "Row" },
+  { value: "column", label: "Column" },
+  { value: "row-reverse", label: "Row reverse" },
+  { value: "column-reverse", label: "Column reverse" },
+];
+const WRAP_OPTIONS = [
+  { value: "nowrap", label: "No wrap" },
+  { value: "wrap", label: "Wrap" },
+  { value: "wrap-reverse", label: "Wrap reverse" },
+];
 
 const JUSTIFY_OPTIONS = [
   { value: "flex-start", label: "Start" },
@@ -143,7 +162,27 @@ function AlignGrid({ styles, onBatchChange }: { styles: Record<string, string>; 
   );
 }
 
-export function FlexControls({ styles, onChange, onBatchChange, advanced }: FlexControlsProps) {
+/** 2L9 247:21216: every flex setting as a select row. */
+function FlexRows({ styles, onChange, more }: { styles: Record<string, string>; onChange: FlexControlsProps["onChange"]; more: boolean }) {
+  const wrap = styles["flex-wrap"] || "nowrap";
+  const wraps = wrap !== "nowrap";
+  return (
+    <>
+      <SelectRow label="Direction" property="flex-direction" value={styles["flex-direction"] || "row"} options={DIRECTION_OPTIONS} onChange={(v) => onChange("flex-direction", v)} />
+      {(wraps || more) && (
+        <SelectRow label="Wrap" property="flex-wrap" value={wrap} options={WRAP_OPTIONS} onChange={(v) => onChange("flex-wrap", v)} />
+      )}
+      <SelectRow label="Justify" property="justify-content" value={styles["justify-content"] || "flex-start"} options={JUSTIFY_OPTIONS} onChange={(v) => onChange("justify-content", v)} />
+      <SelectRow label="Align items" property="align-items" value={styles["align-items"] || "stretch"} options={ALIGN_ITEMS_OPTIONS} onChange={(v) => onChange("align-items", v)} />
+      {wraps && (
+        <SelectRow label="Align lines" property="align-content" value={styles["align-content"] || "stretch"} options={ALIGN_CONTENT_OPTIONS} onChange={(v) => onChange("align-content", v)} />
+      )}
+      <GapRow styles={styles} onChange={onChange} advanced={more} />
+    </>
+  );
+}
+
+export function FlexControls({ styles, onChange, onBatchChange, advanced, variant = "grid" }: FlexControlsProps) {
   const [ownMore, setOwnMore] = React.useState(false);
   const more = advanced ?? ownMore;
   const wrapId = React.useId();
@@ -154,6 +193,8 @@ export function FlexControls({ styles, onChange, onBatchChange, advanced }: Flex
   const axis = direction.startsWith("column") ? "column" : "row";
   const wrap = styles["flex-wrap"] || "nowrap";
   const batch = onBatchChange ?? ((c: Record<string, string>) => Object.entries(c).forEach(([k, v]) => onChange(k, v)));
+
+  if (variant === "rows") return <FlexRows styles={styles} onChange={onChange} more={more} />;
 
   return (
     <>

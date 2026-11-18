@@ -43,11 +43,11 @@ afterEach(() => {
 });
 
 describe("FolderTree — smart folders", () => {
-  it("renders Recent / In use / Unused with their counts", () => {
+  it("renders Recent / Used on this site / No known placements with their counts (2L9 B6-A01)", () => {
     mount({ recentCount: 2, inUseCount: 5, unusedCount: 3 });
     expect(screen.getByText("Recent")).toBeInTheDocument();
-    expect(screen.getByText("In use")).toBeInTheDocument();
-    expect(screen.getByText("Unused")).toBeInTheDocument();
+    expect(screen.getByText("Used on this site")).toBeInTheDocument();
+    expect(screen.getByText("No known placements")).toBeInTheDocument();
     expect(screen.getByText("2")).toBeInTheDocument();
     expect(screen.getByText("5")).toBeInTheDocument();
     expect(screen.getByText("3")).toBeInTheDocument();
@@ -63,7 +63,7 @@ describe("FolderTree — smart folders", () => {
   it("the active smart folder row carries the active class", () => {
     const { container } = mount({ smartFolder: "unused" });
     const active = container.querySelector(".mgr-node.active");
-    expect(active?.textContent).toContain("Unused");
+    expect(active?.textContent).toContain("No known placements");
   });
 
   it("'All assets' is active only when neither folder nor smart folder is set", () => {

@@ -1,7 +1,8 @@
 /**
- * v3 board 4418:83911 (S·Layers · empty), redrawn 2026-10-10 for L2-031: the
- * state glyph, "No layers yet" and "Add an element to start building this
- * page." — no button; Add is the rail item beside the drawer.
+ * design-2l9 board 101:42581: an empty page's Layers is its page row and one
+ * muted line — "Empty page · Add elements to begin" — no button; Add is the
+ * rail item beside the drawer. re-baseline: Layers empty (was v3 4418:83911's
+ * "No layers yet" block).
  *
  * @license BSD-3-Clause
  */
@@ -13,8 +14,7 @@ import { LayersEmptyState } from "../components/LayersEmptyState";
 describe("LayersEmptyState", () => {
   it("reads as the board draws it, with no button", () => {
     render(<LayersEmptyState />);
-    expect(screen.getByTestId("layers-empty-title")).toHaveTextContent("No layers yet");
-    expect(screen.getByTestId("layers-empty-text")).toHaveTextContent("Add an element to start building this page.");
+    expect(screen.getByTestId("layers-empty")).toHaveTextContent("Empty page · Add elements to begin");
     expect(screen.queryByRole("button")).toBeNull();
   });
 });

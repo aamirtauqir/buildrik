@@ -24,7 +24,8 @@ if (process.env.PW_ALLOW_REMOTE !== "true" && (process.env.BROWSERSTACK_USERNAME
   );
 }
 
-const PORT = 5051;
+// Parallel design-2l9 lanes each run their own probe server (plan Task 0.0).
+const PORT = Number(process.env.PROBE_PORT ?? 5051);
 
 export default defineConfig({
   testDir: "./e2e",

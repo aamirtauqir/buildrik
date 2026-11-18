@@ -93,7 +93,8 @@ describe("PageFolder (flat model)", () => {
     ).not.toBeNull();
   });
 
-  it("clicking disclosure invokes onToggle", () => {
+  /* design-2l9 63:6393 draws no disclosure: the row is the toggle. */
+  it("clicking the folder row invokes onToggle", () => {
     const onToggle = vi.fn();
     const { container } = render(
       <PageFolder
@@ -103,10 +104,9 @@ describe("PageFolder (flat model)", () => {
         onToggle={onToggle}
       />,
     );
-    const disclosure = screen.getByLabelText(
-      "Collapse Marketing",
-    ) as HTMLElement;
-    fireEvent.click(disclosure);
+    const row = container.querySelector(".folder-row") as HTMLElement;
+    expect(row).toHaveAttribute("aria-expanded", "true");
+    fireEvent.click(row);
     expect(onToggle).toHaveBeenCalled();
   });
 
@@ -167,14 +167,9 @@ describe("PageFolder (flat model)", () => {
   });
 });
 
-/* L3-012: "New folder" made a folder called "New Folder" and left it there —
-   the naming step was skipped. A just-created folder opens in rename. */
-describe("PageFolder — a new folder starts in rename", () => {
-  it("opens its name field when created", () => {
-    render(<PageFolder folder={{ ...folder, name: "New Folder" }} pages={[]} {...baseProps} startRenaming />);
-    expect(screen.getByLabelText("Rename folder")).toHaveValue("New Folder");
-  });
-
+/* design-2l9 127:36696 — "New folder" asks for the name first, so a
+   folder never mounts already in rename. */
+describe("PageFolder — no folder opens in rename by itself", () => {
   it("an existing folder does not", () => {
     render(<PageFolder folder={folder} pages={pages} {...baseProps} />);
     expect(screen.queryByLabelText("Rename folder")).toBeNull();

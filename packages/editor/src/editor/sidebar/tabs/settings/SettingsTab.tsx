@@ -1,44 +1,41 @@
 /**
- * SettingsTab — the Settings shell around whichever screen is open (Phase B
- * IA, proposal §25 / plan M0; visuals stay the existing shell's until the M0
- * boards land).
+ * SettingsTab — the Settings shell around whichever screen is open (2L9
+ * page 06, B8-S01 238:9980 / B8-S02 238:10283).
  *
  *   ┌ sidebar 256 ─────────┬ pane ─────────────────────────────────────────┐
- *   │ ‹ Back to canvas     │ Group / Screen               [action | Upgrade]│
- *   │ Settings             │ <site> · all pages · applies on next publish   │
- *   │ <site>               │ subtitle                                       │
- *   │ ⌕ Search             │                                                │
- *   │ ▸ Overview           ├────────────────────────────────────────────────┤
- *   │ SITE · SEARCH & …    │ [read-only banner] the screen's cards          │
- *   │ … DANGER ZONE        ├────────────────────────────────────────────────┤
- *   │ ── Managed in        │ Discard  Save   status   (only when needed)    │
- *   │    workspace ↗       │                                                │
- *   │ Your role · Perms    │                                                │
+ *   │ ⌕ Search settings    │ ‹ Back to Editor · Home   Screen  [action]     │
+ *   │ Overview             │ (Applies on next publish)                      │
+ *   │ SITE · SEARCH & …    ├────────────────────────────────────────────────┤
+ *   │ … ADVANCED           │ [read-only banner] the screen's cards          │
+ *   │ ORGANIZATION         ├────────────────────────────────────────────────┤
+ *   │ WORKSPACE ↗          │ status            Discard  Save settings       │
+ *   │ Your role: Admin     │                                                │
+ *   │ Permissions ›        │                                                │
  *   └──────────────────────┴────────────────────────────────────────────────┘
  *
  * The shell owns: the nav and its doors (Brand ↗ → the Brand panel; Members /
- * Billing / Integrations & webhooks → the dashboard), the scope line, the
+ * Billing / Integrations → the dashboard), the scope chip, the
  * read-only state (`SCREEN_MIN_ROLE`), the plan gate's `Upgrade`, the footer
  * and its states, the save path (BE-3: the settings mutations, never
  * `sites.saveProject`), the Saved toast, field errors, and the Unsaved
- * settings guard (Back to canvas / Escape / any nav click while dirty). The
+ * settings guard (Back to Editor / Escape / any nav click while dirty). The
  * screen owns its cards, its load card and its save-error banner.
  *
- * Search Mode — OWNER OVERRIDE 2026-10-04 (boards 6816:60270 / 8134:212121
- * draw the field always on, at the top of the nav; to update): the field is
- * gone from the sidebar. The `Search` entry swaps the whole sidebar in place
- * for a focused field and a ✕ — header, Overview, groups, workspace doors and
- * role foot all step away — and typing lists `searchSettings` results (screens
- * and fields) live; ↑/↓ move, Enter or a click opens the result's screen and
- * lands on its field, leaving Search Mode. ✕ and Escape leave it too, clear
- * the query and give back the sidebar as it was (current row, scroll).
+ * Search — 2L9 B8-S20 238:15632 (owner 2026-10-26: the board wins over the
+ * 2026-10-04 Search Mode): an always-on "Search settings" field at the top of
+ * the nav; typing lists `searchSettings` results (screens and fields) in a
+ * card in the pane, over the open screen (kept mounted, so its edits stay):
+ * "<n> results for “<q>”", one row per result with "Open ›". ↑/↓ move, Enter
+ * or Open lands on the result's screen and field and clears the field;
+ * Escape clears it.
  *
  * @license BSD-3-Clause
  */
 
+import { useOnlineStatus } from "@/shared/hooks/useOnlineStatus";
 import * as React from "react";
-import { ChevronLeft, Search as SearchIcon, X } from "lucide-react";
-import { Badge, Button, IconButton, Kbd, TextInput, useToast } from "@/editor/chrome-ui";
+import { ChevronLeft, Search as SearchIcon } from "lucide-react";
+import { Badge, Button, TextInput, useToast } from "@/editor/chrome-ui";
 import { usePanelNavigation } from "@/editor/sidebar/shared/usePanelNavigation";
 import {
   type SettingsTabProps,
@@ -49,7 +46,6 @@ import {
   type SettingsFlush,
   type SettingsFlushResult,
   type SettingsScreenId,
-  type SettingsPaneId,
   type ScreenLoadState,
   type SettingsOpenRequest,
   type RedirectRepair,
@@ -61,13 +57,10 @@ import {
   SCREEN_MIN_ROLE,
   SCREEN_SAVE_MODEL,
   SCREEN_SCOPE,
-  scopeLine,
-  workspaceScopeLine,
+  SCOPE_LINE,
   WORKSPACE_LINKS,
   SAVE_ERROR_MESSAGES,
   isSettingsScreenId,
-  isSettingsPaneId,
-  NAV_ICONS,
   SET_BTN,
   SET_HEAD_BTN,
   SET_EYEBROW,
@@ -87,15 +80,18 @@ import {
   OverviewScreen,
   AccessScreen,
   DangerZoneScreen,
-  WorkspaceDoorScreen,
 } from "./index";
-import { UnsavedSettingsDialog } from "./components/UnsavedSettingsDialog";
+import { UnsavedSettingsDialog, type UnsavedGuardPhase } from "./components/UnsavedSettingsDialog";
+import { SettingsPermissionsDialog } from "./components/SettingsPermissionsDialog";
+import { WorkspaceDoorDialog } from "./components/WorkspaceDoorDialog";
+import { PublishSettingsGuard, type PublishGuardPhase } from "./components/PublishSettingsGuard";
+import { publishTray } from "@/editor/shell/publishTrayStore";
 import { shellDirty } from "@/editor/shell/shellDirtyRegistry";
+import { requestBrandReturn } from "@/editor/design-system/ui/brandOpenRequest";
 import { searchSettings, type SearchEntry } from "./searchIndex";
 import type { ProjectSettings } from "@/shared/types/project";
 import {
   getEditorPlanTier,
-  getEditorWorkspaceName,
   getSiteIdFromUrl,
   planSettingsSave,
   saveSiteSettings,
@@ -106,6 +102,7 @@ import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { EVENTS } from "@/shared/constants/events";
 import { roleAtLeast } from "@/services/RoleService";
 import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
+import { fetchMyRole } from "@/services/RoleService";
 
 import "./settings.css";
 
@@ -118,15 +115,34 @@ const SETTINGS_SCREENS = [
   ...SETTINGS_NAV.flatMap((n) => (n.kind === "door" ? [] : [{ id: n.id, title: n.title }])),
 ];
 
-/** "Only admins can change …" — who the read-only banner names. */
-const ROLE_NOUN = { VIEWER: "viewers", EDITOR: "editors", DESIGNER: "editors", ADMIN: "admins", OWNER: "the workspace owner" } as const;
+/** "Changing General needs Admin access." (2L9 B8-SH05 / SH10) — the role the read-only banner names. */
+const ROLE_LABEL = { VIEWER: "Viewer", EDITOR: "Editor", DESIGNER: "Editor", ADMIN: "Admin", OWNER: "Owner" } as const;
 
-const PLAN_LABEL: Record<PlanTier, string> = { starter: "Free", pro: "Pro", enterprise: "Business" };
 
 /** A flush's result as one shape: plain settings are a flush with no extra columns. */
 function asFlush(result: ProjectSettings | SettingsFlush): SettingsFlush {
   return "settings" in result ? result : { settings: result };
 }
+
+/** A nav id's name as the guard says it — "Languages", "Brand", "Billing". */
+function navTitle(id: SettingsNavId): string {
+  if (id === "overview") return "Overview";
+  return SETTINGS_NAV.find((n) => n.id === id)?.title.replace(/ ↗$/, "") ?? id;
+}
+
+/** Screens whose board writes its own scope chip (B8-S07, B8-S10). */
+const SCOPE_LINE_FOR: Record<string, string> = {
+  localization: "Default locale: next publish · Locales: saved now",
+  redirects: "Rules saved now · reach visitors on next publish",
+};
+
+/** Offline is drawn per board: Security headers (SH04) and Analytics (AN07)
+ *  put a banner over the cards and "· changes stay here"; every other footer
+ *  screen only says it in the footer (General, S05). */
+const OFFLINE_BANNER_SCREENS: ReadonlySet<string> = new Set(["headers", "analytics"]);
+/** Screens that print the offline line themselves, in place (B8-SH04). */
+const OFFLINE_LINE_IN_SCREEN: ReadonlySet<string> = new Set(["headers"]);
+
 
 function isScreenLocked(screenId: SettingsNavId, userPlan: PlanTier): boolean {
   const required = isSettingsScreenId(screenId) ? SCREEN_PLAN_REQUIREMENTS[screenId] : undefined;
@@ -136,35 +152,29 @@ function isScreenLocked(screenId: SettingsNavId, userPlan: PlanTier): boolean {
 
 // ─── Row chrome ──────────────────────────────────────────────────────────────
 
-/* M0 (4418:144988, drawn on 8134:212121): 32-tall rows, 8 in, a 20 icon
-   slot 8 from a 12px label; the current row sits on the accent tint with a
-   14/600 accent label. `size="xs"` gives the Button its 32; everything else
-   is replaced per property through twMerge. */
+/* 2L9 B8-S01 (238:9980): 32-tall text rows, 12 in from the group label's
+   edge, no glyph; the current row sits on the accent tint. `size="xs"` gives
+   the Button its 32; everything else is replaced per property through
+   twMerge. */
 const NAV_ROW =
-  "tw:flex tw:h-8 tw:w-full tw:items-center tw:justify-start tw:gap-2 tw:rounded-[var(--bk-radius-lg)] tw:border-0 " +
-  "tw:bg-transparent tw:px-2 tw:py-1.5 tw:text-left tw:text-[length:var(--bk-text-12)] tw:font-normal tw:leading-5 " +
+  "tw:flex tw:h-8 tw:w-full tw:items-center tw:justify-start tw:gap-2 tw:rounded-[var(--bk-radius-sm)] tw:border-0 " +
+  "tw:bg-transparent tw:pl-3 tw:pr-2 tw:py-1.5 tw:text-left tw:text-[length:var(--bk-text-13)] tw:font-normal tw:leading-5 " +
   "tw:text-[var(--bk-ink)] tw:no-underline tw:enabled:hover:bg-[var(--bk-bg-subtle)] tw:hover:bg-[var(--bk-bg-subtle)] " +
   "tw:focus:ring-0 tw:focus:[box-shadow:none] tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 const NAV_ROW_ON =
-  "tw:bg-[var(--bk-accent-tint)] tw:text-[length:var(--bk-text-14)] tw:font-semibold tw:text-[var(--bk-accent)] " +
-  "tw:enabled:hover:bg-[var(--bk-accent-tint)] tw:enabled:hover:text-[var(--bk-accent)]";
+  "tw:bg-[var(--bk-accent-tint)] tw:font-medium tw:text-[var(--bk-ink)] " +
+  "tw:enabled:hover:bg-[var(--bk-accent-tint)]";
 
-/* M0's pill — Billing's plan, a locked row's "Pro": 22 tall, accent hairline
-   on the accent tint, 11/500. */
-const NAV_PILL =
-  "tw:inline-flex tw:h-5.5 tw:shrink-0 tw:items-center tw:rounded-full tw:border tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)] tw:px-2 tw:py-0 " +
-  "tw:text-[length:var(--bk-text-11)] tw:font-medium tw:leading-4 tw:text-[var(--bk-accent)]";
+/* B8-S01's group label: 11px uppercase, muted, 8 above its rows. */
+const NAV_GROUP =
+  "tw:flex tw:h-6 tw:items-center tw:text-[length:var(--bk-text-11)] tw:font-medium tw:uppercase tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 
-/* M0's group label: 24 tall, 8 in, 11px uppercase in ink. */
-const NAV_GROUP = "tw:flex tw:h-6 tw:items-center tw:pl-2 tw:text-[length:var(--bk-text-11)] tw:uppercase tw:leading-4 tw:text-[var(--bk-ink)]";
-
-/* Search Mode's field: 36 tall, 12px, on the subtle fill until focused. */
+/* B8-S20: the always-on field — 28 tall, 13px, on the subtle fill until focused. */
 const INPUT_THEME = {
   field: {
     input: {
       base: "tw:[&::-webkit-search-cancel-button]:hidden tw:rounded-[var(--bk-radius-sm)]! tw:placeholder:text-[var(--bk-ink-muted)]",
-      /* 36 tall, 12px — the theme's own `md` is 32 / 13. */
-      sizes: { md: "tw:h-9 tw:py-0 tw:text-[length:var(--bk-text-12)]" },
+      sizes: { md: "tw:h-7 tw:py-0 tw:text-[length:var(--bk-text-13)]" },
       colors: {
         gray:
           "tw:border-transparent tw:bg-[var(--bk-bg-subtle)] tw:focus:border-[var(--bk-accent)] tw:focus:bg-[var(--bk-bg-panel)] tw:focus:ring-[var(--bk-accent)]",
@@ -173,22 +183,12 @@ const INPUT_THEME = {
   },
 };
 
-const NavRowIcon: React.FC<{ id: SettingsNavId }> = ({ id }) => {
-  /* 4418:127313 marks Overview with a dot, not a glyph. */
-  if (id === "overview") {
-    return (
-      <span className="tw:flex tw:size-5 tw:shrink-0 tw:items-center tw:justify-center" aria-hidden>
-        <span className="tw:size-1.5 tw:rounded-full tw:bg-current" />
-      </span>
-    );
-  }
-  const Icon = NAV_ICONS[id];
-  return (
-    <span className="tw:flex tw:size-5 tw:shrink-0 tw:items-center tw:justify-center" aria-hidden>
-      <Icon size={18} />
-    </span>
-  );
-};
+/* B8-S20: the results card — the settings card's shape, ruled 48 rows 10
+   apart; the keyboard's row reads medium (the board draws no highlight). */
+const SEARCH_CARD =
+  "tw:flex tw:w-full tw:max-w-180 tw:flex-col tw:rounded-[var(--bk-radius-card)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:p-4";
+const SEARCH_ROW =
+  "tw:flex tw:min-h-12 tw:cursor-pointer tw:items-center tw:gap-3 tw:border-b tw:border-[var(--bk-border)] tw:break-words";
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
@@ -217,7 +217,7 @@ export const SettingsTab: React.FC<
   });
   /* A position saved before Phase B can name a screen that no longer exists
      (`integrations`): it lands on the Overview. */
-  const currentScreen: SettingsPaneId = isSettingsPaneId(persistedScreen) ? persistedScreen : "overview";
+  const currentScreen: SettingsScreenId = isSettingsScreenId(persistedScreen) ? persistedScreen : "overview";
 
   // The site name, read from the composer the way the topbar reads it.
   const [siteName, setSiteName] = React.useState("Untitled site");
@@ -254,40 +254,54 @@ export const SettingsTab: React.FC<
   /* The ONE writer of the dirty flag: state (renders the footer), the ref
      (same-gesture click handlers) and this tab's shell-registry entry, all
      synchronously. The registry must not lag an effect behind: Discard /
-     Save and continue clear it and leave in the same handler, and the
+     Save and leave clear it and leave in the same handler, and the
      shell's tab-switch guard reads it as the leave lands (B-1). */
+  /* GAP-ST-T01 / GAP-ST-ACK: after a save the footer says so ("Saved ·
+     applies on next publish") until the next edit or screen — including on
+     the screen a Save and leave lands on (`carryAckRef`, read by the reset). */
+  const [savedAck, setSavedAck] = React.useState(false);
+  const carryAckRef = React.useRef(false);
   const markScreenDirty = React.useCallback((dirty: boolean) => {
+    if (dirty) setSavedAck(false);
     setScreenIsDirty(dirty);
     screenIsDirtyRef.current = dirty;
     shellDirty.set("settings", dirty);
   }, []);
 
-  /* What the Unsaved settings dialog was raised for. Its Discard finishes
+  /* What the unsaved-changes guard was raised for. Its Discard finishes
      that intent — the door out, or the screen that was clicked — after the
      edits are rolled back. */
   type Pending = { kind: "leave" } | { kind: "nav"; id: SettingsNavId };
   const [guardOpen, setGuardOpen] = React.useState(false);
+  /* ask → saving (Save and leave) → failed (the save was refused) — 2L9 B8-GUARD / B8-SAVING / GAP-ST-E. */
+  const [guardPhase, setGuardPhase] = React.useState<UnsavedGuardPhase>("ask");
   const pendingRef = React.useRef<Pending | null>(null);
-  /* Search Mode (owner 2026-10-04): the sidebar's own state while it is up. */
-  const [searchOpen, setSearchOpen] = React.useState(false);
+  /* The dialog names where the guarded move was going; the ref alone would not re-render it. */
+  const [pending, setPending] = React.useState<Pending | null>(null);
+  const raiseGuard = React.useCallback((next: Pending) => {
+    pendingRef.current = next;
+    setPending(next);
+    setGuardPhase("ask");
+    setGuardOpen(true);
+  }, []);
+  /* The search field's query and its active result (B8-S20). */
   const [query, setQuery] = React.useState("");
   const [activeResult, setActiveResult] = React.useState(0);
-  /* What Search Mode hands back on close: the nav's scroll, and focus to the entry. */
   const navRef = React.useRef<HTMLElement | null>(null);
-  const navScrollRef = React.useRef(0);
-  const searchEntryRef = React.useRef<HTMLButtonElement | null>(null);
-  const refocusEntryRef = React.useRef(false);
   /* Bumped when a result lands on a field of the screen already open — the
      screen does not change, so the landing effect needs its own nudge. */
   const [fieldJump, setFieldJump] = React.useState(0);
   const [loadState, setLoadState] = React.useState<ScreenLoadState>("ready");
   const [saveError, setSaveError] = React.useState<string | null>(null);
   const [saving, setSaving] = React.useState(false);
+  /* "Permissions ›" (B8-PM01): opens over the screen, which keeps its draft. */
+  const [permissionsOpen, setPermissionsOpen] = React.useState(false);
+  /* GAP-ST-ORG: the workspace row whose dashboard page just opened in a new tab. */
+  const [doorTitle, setDoorTitle] = React.useState<string | null>(null);
   const [resetKey, setResetKey] = React.useState(0);
   /* A Search result names a field; it is scrolled to once its screen is on. */
   const pendingFieldRef = React.useRef<string | null>(null);
-  /* A Search result with no field lands focus on its screen's nav row — the
-     field it was typed in goes with Search Mode. */
+  /* A Search result with no field lands focus on its screen's nav row. */
   const focusNavRowRef = React.useRef(false);
   /* The screen's own invalid fields (they disable Save) and the fields the
      server refused on the last Save (handed back to the screen). */
@@ -324,6 +338,8 @@ export const SettingsTab: React.FC<
      the register, on mount and on a screen change alike. */
   React.useLayoutEffect(() => {
     markScreenDirty(false);
+    setSavedAck(carryAckRef.current);
+    carryAckRef.current = false;
     setGuardOpen(false);
     setSaveError(null);
     setLoadState("ready");
@@ -375,39 +391,46 @@ export const SettingsTab: React.FC<
     (id: SettingsNavId) => {
       switch (id) {
         case "branding":
+          /* GAP-ST-T03 (D-11): Brand's door then reads "‹ Back to Site
+             settings" and returns to this screen. */
+          if (composer) requestBrandReturn(composer, { screen: currentScreen });
           onOpenDesignTab?.();
           return;
+        case "members":
+        case "billing":
+        case "webhooks":
+          /* GAP-ST-ORG 277:38019: the dashboard page opens in a new tab and
+             a dialog says so over the screen, whose draft stays. */
+          window.open(`${DASHBOARD_URL}${WORKSPACE_LINKS[id]}`, "_blank", "noopener,noreferrer");
+          setDoorTitle(navTitle(id));
+          return;
         default:
-          /* Workspace rows (Members, Billing, Integrations & webhooks) open
-             their door card in the pane (8139:217358); its button leaves for
-             the dashboard. */
           navigateTo(id);
       }
     },
-    [navigateTo, onOpenDesignTab],
+    [navigateTo, onOpenDesignTab, composer, currentScreen],
   );
 
   const requestNav = React.useCallback(
     (id: SettingsNavId) => {
       if (id === currentScreen) return;
-      if (screenIsDirtyRef.current) {
-        pendingRef.current = { kind: "nav", id };
-        setGuardOpen(true);
+      /* Leaving for the dashboard in a new tab keeps this screen and its draft. */
+      if (screenIsDirtyRef.current && id !== "members" && id !== "billing" && id !== "webhooks") {
+        raiseGuard({ kind: "nav", id });
         return;
       }
       performNav(id);
     },
-    [currentScreen, performNav],
+    [currentScreen, performNav, raiseGuard],
   );
 
   const requestLeave = React.useCallback(() => {
     if (screenIsDirtyRef.current) {
-      pendingRef.current = { kind: "leave" };
-      setGuardOpen(true);
+      raiseGuard({ kind: "leave" });
       return;
     }
     leave();
-  }, [leave]);
+  }, [leave, raiseGuard]);
 
   /* `openLeftPanelToTab("settings", <id>)`. An id matching no screen (an old
      link to the removed Integrations screen) is left alone rather than
@@ -439,51 +462,26 @@ export const SettingsTab: React.FC<
   }, [currentScreen]);
   const clearRepair = React.useCallback(() => setRepair(null), []);
 
-  // ─── Search Mode ──────────────────────────────────────────────────────
+  // ─── Search ───────────────────────────────────────────────────────────
 
-  const openSearch = React.useCallback(() => {
-    navScrollRef.current = navRef.current?.scrollTop ?? 0;
+  const clearSearch = React.useCallback(() => {
     setQuery("");
     setActiveResult(0);
-    setSearchOpen(true);
   }, []);
-  const closeSearch = React.useCallback((refocusEntry = true) => {
-    refocusEntryRef.current = refocusEntry;
-    setQuery("");
-    setActiveResult(0);
-    setSearchOpen(false);
-  }, []);
-  /* The nav re-mounts on close: put its scroll back before paint. */
-  React.useLayoutEffect(() => {
-    if (searchOpen) return;
-    if (navRef.current) navRef.current.scrollTop = navScrollRef.current;
-    if (refocusEntryRef.current) {
-      refocusEntryRef.current = false;
-      /* preventScroll: the entry sits at the nav's top, and a plain focus()
-         scrolls it into view — undoing the restore above (measured live:
-         140 → 0 at 1440×732). */
-      searchEntryRef.current?.focus({ preventScroll: true });
-    }
-  }, [searchOpen]);
 
   React.useEffect(() => {
-    if (!focusNavRowRef.current || searchOpen || guardOpen) return;
+    if (!focusNavRowRef.current || guardOpen) return;
     focusNavRowRef.current = false;
     navRef.current?.querySelector<HTMLElement>('[aria-current="page"]')?.focus();
-  }, [currentScreen, searchOpen, guardOpen, fieldJump]);
+  }, [currentScreen, guardOpen, fieldJump]);
 
   // Escape is one more door out — guarded like the rest. The dialogs own
-  // their own Escape while they are up; an input keeps its own. Search Mode
-  // takes it first: Escape there closes the search, never Settings.
+  // their own Escape while they are up; an input keeps its own (the search
+  // field's Escape clears it, never Settings).
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
       if (guardOpen) return;
-      if (searchOpen) {
-        e.preventDefault();
-        closeSearch();
-        return;
-      }
       const target = e.target as HTMLElement | null;
       const tag = target?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target?.isContentEditable) return;
@@ -492,10 +490,12 @@ export const SettingsTab: React.FC<
     };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
-  }, [guardOpen, requestLeave, searchOpen, closeSearch]);
+  }, [guardOpen, requestLeave]);
 
   // ─── The guard ────────────────────────────────────────────────────────
 
+  /* Keep editing, and — while the save runs — Stay in {Screen}: the
+     destination is dropped; a running save carries on and lands here. */
   const handleKeepEditing = React.useCallback(() => {
     pendingRef.current = null;
     setGuardOpen(false);
@@ -543,17 +543,11 @@ export const SettingsTab: React.FC<
 
   const current = SETTINGS_NAV.find((n) => n.id === currentScreen);
   const isOverview = currentScreen === "overview";
-  const workspaceDoor =
-    currentScreen === "members" || currentScreen === "billing" || currentScreen === "webhooks" ? currentScreen : null;
-  /* A screen with its own rules — not the Overview, not a workspace door. */
-  const screenId =
-    currentScreen === "overview" || currentScreen === "members" || currentScreen === "billing" || currentScreen === "webhooks"
-      ? null
-      : currentScreen;
+  /* A screen with its own rules — not the Overview. */
+  const screenId = currentScreen === "overview" ? null : currentScreen;
   const screenRules = screenId
     ? { minRole: SCREEN_MIN_ROLE[screenId], saveModel: SCREEN_SAVE_MODEL[screenId], scope: SCREEN_SCOPE[screenId] }
     : null;
-  const workspaceName = getEditorWorkspaceName() ?? "Your workspace";
 
   /* BE-3: what a composer-backed screen's Save does with the settings its
      flush returned. With a site: the changed Site columns and JSON-only keys
@@ -591,8 +585,19 @@ export const SettingsTab: React.FC<
   );
 
   /* `then` runs after a save succeeds: the Saved toast after the footer's
-     Save, the pending nav / exit after the guard's Save and continue. */
-  const handleSave = React.useCallback((then?: () => void) => {
+     Save, the pending nav / exit after the guard's Save and leave. */
+  const showSavedToast = React.useCallback(() => {
+    /* 4418:165469 / M19: a toast (bottom-left, dark), the change's scope and
+       the way to ship it. Publish opens the Publish panel — it does not
+       publish. */
+    addToast({
+      title: "Saved · applies on next publish",
+      description: "Your site settings are saved.",
+      action: { label: "Publish", onClick: () => composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "publish" }) },
+    });
+  }, [addToast, composer]);
+
+  const handleSave = React.useCallback((then?: () => void, onFailed?: () => void) => {
     if (saving) return;
     const failed = (err: unknown) => {
       /* Called off by the user (General's slug confirm → Cancel): nothing was
@@ -607,21 +612,15 @@ export const SettingsTab: React.FC<
       setServerFieldErrors(err instanceof SettingsSaveError && Object.keys(err.fieldErrors).length > 0 ? err.fieldErrors : undefined);
       setSaveError(SAVE_ERROR_MESSAGES[currentScreen] ??
         `Changes to ${current?.title ?? "settings"} were not saved. Your changes are still here. Review the values, then retry.`);
+      onFailed?.();
     };
     const succeeded = () => {
       setSaveError(null);
       setServerFieldErrors(undefined);
       markScreenDirty(false);
+      setSavedAck(true);
       if (then) then();
-      /* 4418:165469 / M19: a toast (bottom-left, dark), the change's scope and
-         the way to ship it. Publish opens the Publish panel — it does not
-         publish. */
-      else
-        addToast({
-          title: "Saved · applies on next publish",
-          description: "Your site settings are saved.",
-          action: { label: "Publish", onClick: () => composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "publish" }) },
-        });
+      else showSavedToast();
     };
     const screenHandler = screenSaveHandlerRef.current;
     let run: Promise<void> | void;
@@ -651,20 +650,74 @@ export const SettingsTab: React.FC<
     }
     setSaving(true);
     run.then(succeeded, failed).finally(() => setSaving(false));
-  }, [composer, current, currentScreen, saving, addToast, siteName, markScreenDirty, persistSettings]);
+  }, [current, currentScreen, saving, showSavedToast, markScreenDirty, persistSettings]);
 
-  /* The guard's Save and continue (4418:165478): save, then finish whatever
-     raised the guard. A failed save leaves the dialog down and the screen's
-     save-error banner up, with the edits still there. */
-  const handleSaveAndContinue = React.useCallback(() => {
-    const pending = pendingRef.current;
-    handleSave(() => {
-      pendingRef.current = null;
-      setGuardOpen(false);
-      if (!pending || pending.kind === "leave") leave();
-      else performNav(pending.id);
-    });
-  }, [handleSave, leave, performNav]);
+  /* The guard's Save and leave (B8-GUARD) and Retry save and leave
+     (GAP-ST-E): the dialog shows the save running, then finishes whatever
+     raised the guard — read at the END, so a Stay in {Screen} pressed while
+     the save ran keeps the user here (with the Saved toast). A refused save
+     turns the dialog to its failed phase, the destination kept, and the
+     screen's banner goes up behind it. */
+  /* GAP-ST-PG / PS / PF: the topbar's Publish while this screen holds an
+     edit. The tray opens through `publishTray`; while the screen is dirty it
+     is closed again at once and the guard asks first. `publishAnywayRef`
+     lets the one open that the guard itself makes through. */
+  const [publishGuard, setPublishGuard] = React.useState<PublishGuardPhase | null>(null);
+  const [savingForPublish, setSavingForPublish] = React.useState(false);
+  const publishAnywayRef = React.useRef(false);
+  React.useEffect(
+    () =>
+      publishTray.subscribe(() => {
+        if (!publishTray.get().open) {
+          publishAnywayRef.current = false;
+          return;
+        }
+        if (publishAnywayRef.current || !screenIsDirtyRef.current) return;
+        publishTray.close();
+        setPublishGuard("ask");
+      }),
+    [],
+  );
+  const openPublish = React.useCallback(() => {
+    setPublishGuard(null);
+    publishAnywayRef.current = true;
+    publishTray.open();
+  }, []);
+  const saveThenPublish = React.useCallback(() => {
+    setPublishGuard(null);
+    setSavingForPublish(true);
+    handleSave(
+      () => {
+        setSavingForPublish(false);
+        openPublish();
+      },
+      () => {
+        setSavingForPublish(false);
+        setPublishGuard("failed");
+      },
+    );
+  }, [handleSave, openPublish]);
+
+  const handleSaveAndLeave = React.useCallback(() => {
+    setGuardPhase("saving");
+    handleSave(
+      () => {
+        const target = pendingRef.current;
+        pendingRef.current = null;
+        setGuardOpen(false);
+        if (!target) showSavedToast();
+        else if (target.kind === "leave") leave();
+        else {
+          /* Only a settings screen re-renders the footer; a door (Brand ↗) leaves it be. */
+          carryAckRef.current = isSettingsScreenId(target.id);
+          performNav(target.id);
+        }
+      },
+      () => {
+        if (pendingRef.current) setGuardPhase("failed");
+      },
+    );
+  }, [handleSave, leave, performNav, showSavedToast]);
 
   const openBilling = React.useCallback(() => {
     window.open(`${DASHBOARD_URL}${WORKSPACE_LINKS.billing}`, "_blank", "noopener,noreferrer");
@@ -677,6 +730,18 @@ export const SettingsTab: React.FC<
      links — no centred LockedScreen, no header Upgrade. */
   const ownsLock = locked && isSettingsScreenId(currentScreen) && SCREENS_WITH_OWN_PLAN_LOCK.has(currentScreen);
   const editorRole = useEditorRole();
+  /* 2L9 B8-SH09 (245:50045): until the role lookup has answered, a draft may
+     be made but Save waits — "Checking your access… · Save unavailable". The
+     lookup is RoleService's one cached request; this only learns when it is
+     done (useEditorRole's null means "unknown" as well as "not yet"). */
+  const [roleSettled, setRoleSettled] = React.useState(false);
+  React.useEffect(() => {
+    let live = true;
+    void fetchMyRole().then(() => live && setRoleSettled(true));
+    return () => {
+      live = false;
+    };
+  }, []);
   /* PD-1 (M7): Site columns are the dashboard's, mirrored from the editor only
      for an ADMIN. Below ADMIN (a KNOWN role — unknown stays editable, the
      server decides) the fields that edit them are read-only and say why; the
@@ -689,11 +754,6 @@ export const SettingsTab: React.FC<
   const readOnly = !!screenRules && !locked && roleAtLeast(editorRole, screenRules.minRole) === false;
 
   const renderScreen = (): React.ReactNode => {
-    if (workspaceDoor && current) {
-      return (
-        <WorkspaceDoorScreen door={workspaceDoor} title={current.title} workspaceName={workspaceName} onClose={() => requestNav("overview")} />
-      );
-    }
     if (!screenId) return <OverviewScreen projectId={projectId} siteName={siteName} onOpenScreen={requestNav} />;
     const required = SCREEN_PLAN_REQUIREMENTS[screenId];
     if (locked && required && !ownsLock) {
@@ -709,7 +769,13 @@ export const SettingsTab: React.FC<
     if (!readOnly || !screenRules || !current || screenId === "danger-zone") return screenNode;
     return (
       <>
-        <ReadOnlyBanner who={ROLE_NOUN[screenRules.minRole]} screen={current.title} />
+        <ReadOnlyBanner
+          message={
+            screenId === "domains"
+              ? /* B8-S19 238:15344 draws Domains' own sentence. */ "Domains need Admin access. Ask an admin to change them."
+              : `Changing ${current.title} needs ${ROLE_LABEL[screenRules.minRole]} access.`
+          }
+        />
         {/* A disabled fieldset disables every native control inside it; its
             cards sit 16 apart, as on the editable screen (set-body's gap). */}
         <fieldset disabled className="tw:m-0 tw:flex tw:min-w-0 tw:flex-col tw:gap-4 tw:border-0 tw:p-0" data-testid="set-readonly-screen">
@@ -727,7 +793,9 @@ export const SettingsTab: React.FC<
       registerSaveHandler,
       registerFlushHandler,
       onLoadStateChange: setLoadState,
-      saveError,
+      /* B8-S04 / GAP-ST-E: a refused save is said in the footer, not in a
+         banner over the cards — screens get no save banner. */
+      saveError: null,
       registerHeaderAction,
       registerHeader,
       saveModel: SCREEN_SAVE_MODEL[screenId],
@@ -771,38 +839,50 @@ export const SettingsTab: React.FC<
     ? "Overview"
     : `${current.title.replace(/ ↗$/, "")}${screenHeader?.title ? ` / ${screenHeader.title}` : ""}`;
   const headScope = screenRules
-    ? scopeLine(screenRules.scope, siteName)
-    : workspaceDoor
-      ? workspaceScopeLine(workspaceName)
-      : scopeLine("lifecycle", siteName);
+    ? SCOPE_LINE_FOR[screenId as string] ?? SCOPE_LINE[screenRules.scope]
+    : SCOPE_LINE.lifecycle;
 
   const immediate = screenRules?.saveModel === "immediate";
-  const footStatus: { text: string; tone: "muted" | "danger" } =
-    loadState === "loading"
+  const online = useOnlineStatus();
+  const footStatus: { text: string; tone: "muted" | "ink" | "danger" } =
+    !online && loadState === "ready"
+      ? { text: OFFLINE_BANNER_SCREENS.has(currentScreen) ? "Needs a connection · changes stay here, unsaved" : "Needs a connection — your edits stay on this screen, unsaved", tone: "ink" }
+      : !roleSettled && loadState === "ready"
+      ? { text: "Checking your access… · Save unavailable", tone: "muted" }
+      : saving
+      /* GAP-ST-PS 277:41957. */
+      ? { text: savingForPublish ? `Saving ${headTitle} before opening Publish…` : "Saving settings…", tone: "muted" }
+      : loadState === "loading"
       ? { text: "Loading settings…", tone: "muted" }
       : loadState === "error"
-        ? { text: "Settings could not load", tone: "danger" }
+        ? { text: "Settings unavailable · Retry to continue", tone: "muted" }
         : footerMessage
           ? { text: footerMessage, tone: "muted" }
           : saveError
-            ? { text: "Not saved", tone: "danger" }
+            ? { text: "Couldn’t save — Retry. Your edits are still here.", tone: "danger" }
             : screenIsDirty
-              ? { text: "Unsaved changes", tone: "muted" }
-              : { text: "All changes saved", tone: "muted" };
+              ? { text: "Unsaved changes", tone: "ink" }
+              : savedAck && screenRules?.scope === "publish"
+                ? { text: "Saved · applies on next publish", tone: "muted" }
+                : { text: "Saved", tone: "muted" };
   /* The footer is there while something waits to be saved, a save failed, or
      a footer screen's read is pending or failed — never on the Overview, a
      locked or read-only screen. An immediate screen gets it only while it
      still holds an edit (Redirects' 404 switch, until it applies at once). */
   const showFooter =
     !!screenRules && !locked && !readOnly && (!immediate || screenIsDirty || !!saveError);
+  /* B8-S02: "Unsaved changes" sits in ink; a screen's own note stays muted. */
   const FOOT_TONE = {
     muted: "tw:text-[var(--bk-ink-muted)]",
+    ink: "tw:text-[var(--bk-ink)]",
     danger: "tw:text-[var(--bk-error)]",
   } as const;
 
   // ─── Sidebar rows ─────────────────────────────────────────────────────
 
-  /* Back to canvas's href: this editor's own URL without the Settings deep
+  /* The page the editor keeps open behind Settings — "‹ Back to Editor · Home". */
+  const pageName = composer?.elements?.getActivePage?.()?.name ?? null;
+  /* Back to Editor's href: this editor's own URL without the Settings deep
      link (`/edit/<siteId>?settings=…` → `/edit/<siteId>`). */
   const canvasHref = (() => {
     const url = new URL(window.location.href);
@@ -810,19 +890,19 @@ export const SettingsTab: React.FC<
     return `${url.pathname}${url.search}${url.hash}`;
   })();
 
-  /* Search Mode's results: screens and their fields, in the index's order. */
+  /* The search's results: screens and their fields, in the index's order. */
   const trimmed = query.trim();
   const results = React.useMemo(() => (trimmed ? searchSettings(trimmed) : []), [trimmed]);
   const activeIndex = Math.min(activeResult, Math.max(results.length - 1, 0));
   /* ↑/↓ can wrap to a result far below the fold: keep the active one in view. */
   React.useEffect(() => {
-    if (!searchOpen) return;
+    if (!trimmed) return;
     document.getElementById(`set-search-option-${activeIndex}`)?.scrollIntoView?.({ block: "nearest" });
-  }, [searchOpen, activeIndex]);
+  }, [trimmed, activeIndex]);
   const openResult = (entry: SearchEntry) => {
     pendingFieldRef.current = entry.fieldId ?? null;
     focusNavRowRef.current = !entry.fieldId;
-    closeSearch(false);
+    clearSearch();
     if (entry.screen === currentScreen) setFieldJump((n) => n + 1);
     else requestNav(entry.screen);
   };
@@ -830,7 +910,7 @@ export const SettingsTab: React.FC<
     if (e.key === "Escape") {
       e.preventDefault();
       e.stopPropagation();
-      closeSearch();
+      clearSearch();
     } else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
       e.preventDefault();
       if (results.length === 0) return;
@@ -858,18 +938,8 @@ export const SettingsTab: React.FC<
         onClick={() => requestNav(n.id)}
         data-testid={`set-nav-${n.id}`}
       >
-        <NavRowIcon id={n.id} />
+        {/* B8-S01 draws no plan pills: a locked screen says so when it opens. */}
         <span className="tw:min-w-0 tw:flex-1 tw:truncate" data-locked={rowLocked || undefined}>{n.title}</span>
-        {/* M0: a plan-locked row says so before it is opened; Billing carries the plan. */}
-        {rowLocked ? (
-          <span className={NAV_PILL} data-testid={`set-nav-pro-${n.id}`}>
-            Pro
-          </span>
-        ) : n.id === "billing" ? (
-          <span className={NAV_PILL} data-testid="set-nav-plan">
-            {PLAN_LABEL[effectivePlan]}
-          </span>
-        ) : null}
       </Button>
     );
   };
@@ -877,15 +947,13 @@ export const SettingsTab: React.FC<
   return (
     <div className="tw:flex tw:h-full tw:min-h-0 tw:w-full tw:bg-[var(--bk-bg-panel)] tw:[font-family:var(--bk-font-ui)]" data-testid="set-root">
       {/* ── Sidebar (M0, 8134:212121) ───────────────────────────────────── */}
-      <aside className="tw:flex tw:w-64 tw:shrink-0 tw:flex-col tw:border-r tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)]">
-        {searchOpen ? (
-          /* Search Mode (owner 2026-10-04): the field and its ✕, then the results — nothing else. */
-          <div className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col" data-testid="set-search-mode">
-            <div className="tw:flex tw:shrink-0 tw:items-center tw:gap-1 tw:px-4 tw:pt-3 tw:pb-2">
+      <aside className="tw:flex tw:w-60 tw:shrink-0 tw:flex-col tw:border-r tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)]">
+        <>
+            <div className="tw:shrink-0 tw:px-4 tw:pt-4">
+              {/* B8-S20 238:15632: the always-on field; its results list in the pane. */}
               <TextInput
                 type="search"
                 role="combobox"
-                autoFocus
                 icon={SearchIcon}
                 value={query}
                 onChange={(e) => {
@@ -893,134 +961,18 @@ export const SettingsTab: React.FC<
                   setActiveResult(0);
                 }}
                 onKeyDown={onSearchKeyDown}
-                placeholder="Search site settings"
+                placeholder="Search settings"
                 aria-label="Search site settings"
                 aria-autocomplete="list"
                 aria-expanded={results.length > 0}
                 aria-controls="set-search-results"
                 aria-activedescendant={results[activeIndex] ? `set-search-option-${activeIndex}` : undefined}
-                className="tw:min-w-0 tw:flex-1"
+                className="tw:w-full"
                 theme={INPUT_THEME}
                 data-testid="set-search-input"
               />
-              <IconButton
-                label="Close search"
-                onClick={() => closeSearch()}
-                className="tw:size-8 tw:min-h-0 tw:min-w-0 tw:shrink-0 tw:text-[var(--bk-ink-muted)]"
-                data-testid="set-search-close"
-              >
-                <X size={16} aria-hidden />
-              </IconButton>
             </div>
-            <div className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:overflow-y-auto tw:px-4 tw:pb-4">
-              <ul
-                id="set-search-results"
-                role="listbox"
-                aria-label="Settings search results"
-                className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-0.5 tw:p-0"
-                data-testid="set-search-results"
-              >
-                {results.map((entry, i) => (
-                  <li
-                    key={entry.id}
-                    id={`set-search-option-${i}`}
-                    role="option"
-                    aria-selected={i === activeIndex}
-                    className={`tw:flex tw:cursor-pointer tw:flex-col tw:rounded-[var(--bk-radius-lg)] tw:px-2 tw:py-1.5 ${i === activeIndex ? "tw:bg-[var(--bk-accent-tint)]" : ""}`}
-                    /* Keeps focus in the field: the keyboard stays on the list. */
-                    onMouseDown={(e) => e.preventDefault()}
-                    onMouseMove={() => setActiveResult(i)}
-                    onClick={() => openResult(entry)}
-                    data-testid={`set-search-result-${entry.id}`}
-                  >
-                    <span className="tw:truncate tw:text-[length:var(--bk-text-12)] tw:font-medium tw:leading-5 tw:text-[var(--bk-ink)]">
-                      {entry.title}
-                    </span>
-                    <span className="tw:truncate tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
-                      {`${entry.group} · ${entry.description}`}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-              {!trimmed ? (
-                <p className="tw:m-0 tw:px-2 tw:py-2 tw:text-[length:var(--bk-text-12)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="set-search-hint">
-                  Type to find a setting, an option or a feature.
-                </p>
-              ) : results.length === 0 ? (
-                <p className="tw:m-0 tw:break-words tw:px-2 tw:py-2 tw:text-[length:var(--bk-text-12)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="set-search-empty" role="status">
-                  {`No settings match "${trimmed}"`}
-                </p>
-              ) : null}
-              {trimmed ? (
-                /* 6816:60270's hand-off: the same query, everywhere (⌘K). */
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="xs"
-                  className="tw:mt-4 tw:h-auto tw:min-h-0 tw:w-full tw:shrink-0 tw:items-start tw:justify-between tw:gap-2 tw:rounded-md tw:px-2.5 tw:py-2 tw:text-left tw:text-[length:var(--bk-text-12)] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink)]"
-                  onClick={() => composer?.emit?.(EVENTS.UI_TOGGLE_COMMAND_PALETTE, { query: trimmed })}
-                  data-testid="set-search-everywhere"
-                >
-                  <span className="tw:min-w-0 tw:break-words">{`Search everywhere for "${trimmed}"`}</span>
-                  <Kbd>⌘K</Kbd>
-                </Button>
-              ) : null}
-            </div>
-          </div>
-        ) : (
-          <>
-            <div className="tw:flex tw:shrink-0 tw:flex-col tw:px-4 tw:pt-3">
-              {/* OWNER OVERRIDE 2026-10-04 (M0 4418:144988 / 8134:212121 draw a
-                  quiet button; to update): a real link to the canvas, styled as
-                  the text link. A plain click stays in the page and goes
-                  through the Unsaved guard; ⌘/Ctrl/Shift-click and middle-click
-                  are the browser's — the canvas in a new tab or window. */}
-              <Button
-                href={canvasHref}
-                variant="link"
-                size="xs"
-                className="tw:h-8 tw:w-54 tw:justify-center tw:gap-0.5 tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:no-underline tw:hover:underline"
-                onClick={(e: React.MouseEvent<HTMLElement>) => {
-                  if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-                  e.preventDefault();
-                  requestLeave();
-                }}
-                data-testid="set-back"
-              >
-                <ChevronLeft size={12} aria-hidden />
-                Back to canvas
-              </Button>
-              <h2
-                className="tw:m-0 tw:mt-2.5 tw:text-[length:var(--bk-text-24)] tw:font-semibold tw:leading-8 tw:tracking-[-0.015em] tw:text-[var(--bk-ink)]"
-                data-testid="set-title"
-              >
-                Settings
-              </h2>
-              <div className="tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-gray-500)]" data-testid="set-site">
-                {siteName}
-              </div>
-            </div>
-            <div className="tw:shrink-0 tw:px-4 tw:pt-3">
-              {/* Owner 2026-10-04: the entry into Search Mode, where the always-on field was (6816:60270).
-                  Outside the scrolling nav, so it is always in reach and opening it
-                  never moves the nav scroll Search Mode gives back. */}
-              <Button
-                ref={searchEntryRef}
-                type="button"
-                variant="ghost"
-                size="xs"
-                className={`${NAV_ROW} tw:shrink-0 tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-muted)]`}
-                onClick={openSearch}
-                aria-label="Search settings"
-                data-testid="set-search-mode-open"
-              >
-                <span className="tw:flex tw:size-5 tw:shrink-0 tw:items-center tw:justify-center" aria-hidden>
-                  <SearchIcon size={16} />
-                </span>
-                <span className="tw:min-w-0 tw:flex-1 tw:truncate">Search</span>
-              </Button>
-            </div>
-            <nav ref={navRef} className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:overflow-y-auto tw:px-4 tw:pb-4 tw:pt-1" aria-label="Settings sections">
+            <nav ref={navRef} className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:gap-0.5 tw:overflow-y-auto tw:px-4 tw:pb-4 tw:pt-0.5" aria-label="Settings sections">
               <Button
                 type="button"
                 variant="ghost"
@@ -1030,76 +982,90 @@ export const SettingsTab: React.FC<
                 onClick={() => requestNav("overview")}
                 data-testid="set-nav-overview"
               >
-                <NavRowIcon id="overview" />
                 <span className="tw:min-w-0 tw:flex-1 tw:truncate">Overview</span>
               </Button>
               {SETTINGS_NAV_GROUP_ORDER.map((group) => {
-                const rows = SETTINGS_NAV.filter((n) => n.group === group);
+                /* B8-S01 hides the Brand ↗ door (the rail reaches Brand); it
+                   stays a search result, which keeps its return (D-11). */
+                const rows = SETTINGS_NAV.filter((n) => n.group === group && n.kind !== "door");
                 if (rows.length === 0) return null;
-                /* M0: the workspace doors sit apart, under a separator, as
-                   "Managed in workspace settings ↗" — they are not this site's. */
-                if (group === "workspace") {
-                  return (
-                    <React.Fragment key={group}>
-                      <hr className="tw:my-0 tw:h-px tw:w-full tw:shrink-0 tw:border-0 tw:bg-[var(--bk-border)]" aria-hidden />
-                      <div
-                        className="tw:flex tw:h-10 tw:shrink-0 tw:items-center tw:pl-2 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink)]"
-                        data-testid={`set-nav-group-${group}`}
-                      >
-                        {`${SETTINGS_NAV_GROUPS[group]} ↗`}
-                      </div>
-                      {rows.map(renderRow)}
-                    </React.Fragment>
-                  );
-                }
+                /* B8-S01: the workspace doors are the last group, "ORGANIZATION
+                   WORKSPACE ↗" — they leave for the dashboard, not this site. */
                 return (
                   <React.Fragment key={group}>
                     <div className={`${NAV_GROUP} tw:shrink-0`} data-testid={`set-nav-group-${group}`}>
-                      {SETTINGS_NAV_GROUPS[group]}
+                      {group === "workspace" ? `${SETTINGS_NAV_GROUPS[group]} ↗` : SETTINGS_NAV_GROUPS[group]}
                     </div>
                     {rows.map(renderRow)}
                   </React.Fragment>
                 );
               })}
             </nav>
-            {/* S5 Q1: every role sees who they are and can open what that allows
-                (the Permissions dialog, PermissionsHost). Not on the M0 board —
-                an owner decision (2026-10-02) the board predates. */}
+            {/* S5 Q1 / B8-S01: who you are, then the way to what that allows
+                (B8-PM01: the settings minimum-role matrix, SettingsPermissionsDialog), on two lines. */}
             {editorRole ? (
-              <div className="tw:flex tw:shrink-0 tw:items-center tw:gap-1 tw:border-t tw:border-[var(--bk-border)] tw:px-6 tw:py-2 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="set-role">
-                <span>{`Your role: ${editorRole.charAt(0)}${editorRole.slice(1).toLowerCase()}`}</span>
-                <span aria-hidden>·</span>
+              <div className="tw:flex tw:shrink-0 tw:flex-col tw:items-start tw:gap-2 tw:px-4 tw:pt-2 tw:pb-4" data-testid="set-role">
+                <span className="tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+                  {`Your role: ${editorRole.charAt(0)}${editorRole.slice(1).toLowerCase()}`}
+                </span>
                 <Button
                   type="button"
                   variant="link"
-                  className="tw:h-auto tw:min-h-0 tw:px-0 tw:text-[length:var(--bk-text-11)] tw:leading-4"
-                  onClick={() => composer?.emit(EVENTS.UI_OPEN_PERMISSIONS, undefined)}
+                  className="tw:h-auto tw:min-h-0 tw:px-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:no-underline tw:hover:underline"
+                  onClick={() => setPermissionsOpen(true)}
                   data-testid="set-role-permissions"
                 >
-                  Permissions
+                  Permissions ›
                 </Button>
               </div>
             ) : null}
-          </>
-        )}
+        </>
       </aside>
 
       {/* ── Pane ────────────────────────────────────────────────────────── */}
       <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
-        {/* 8134:212121: a 112 white band — the screen's title (20/28) and the
-            scope line under it (M1); the screen's own action or the plan
-            gate's Upgrade at the right. */}
-        <header className="tw:flex tw:h-28 tw:shrink-0 tw:items-start tw:justify-between tw:gap-3 tw:bg-[var(--bk-bg-panel)] tw:px-12 tw:pt-6">
-          <div className="tw:flex tw:min-w-0 tw:flex-col tw:gap-1">
-            <h2
-              className="tw:m-0 tw:truncate tw:text-[length:var(--bk-text-20)] tw:font-semibold tw:leading-7 tw:tracking-[-0.24px] tw:text-[var(--bk-ink)]"
-              data-testid="set-head-title"
-            >
-              {headTitle}
-            </h2>
-            <p className="tw:m-0 tw:truncate tw:text-[length:var(--bk-text-12)] tw:leading-5 tw:text-[var(--bk-gray-500)]" data-testid="set-head-scope">
-              {headScope}
-            </p>
+        {/* 2L9 B8-S02 (238:10283): "‹ Back to Editor · {page}" then the
+            screen's title (20/600) on one line, the scope chip under it; the
+            screen's own action or the plan gate's Upgrade at the right. */}
+        <header className="tw:flex tw:h-26 tw:shrink-0 tw:items-start tw:justify-between tw:gap-3 tw:bg-[var(--bk-bg-panel)] tw:px-6 tw:pt-3">
+          <div className="tw:flex tw:min-w-0 tw:flex-col tw:gap-2">
+            <div className="tw:flex tw:min-w-0 tw:items-center tw:gap-5">
+              {/* OWNER OVERRIDE 2026-10-04: a real link to the canvas, styled as
+                  the text link. A plain click stays in the page and goes
+                  through the unsaved-changes guard; ⌘/Ctrl/Shift-click and
+                  middle-click are the browser's — the canvas in a new tab. */}
+              <Button
+                href={canvasHref}
+                variant="link"
+                size="xs"
+                className="tw:h-8 tw:shrink-0 tw:gap-0.5 tw:px-0 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:leading-5 tw:no-underline tw:hover:underline"
+                onClick={(e: React.MouseEvent<HTMLElement>) => {
+                  if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+                  e.preventDefault();
+                  requestLeave();
+                }}
+                data-testid="set-back"
+              >
+                <ChevronLeft size={12} aria-hidden />
+                {pageName ? `Back to Editor · ${pageName}` : "Back to Editor"}
+              </Button>
+              <h2
+                className="tw:m-0 tw:truncate tw:text-[length:var(--bk-text-20)] tw:font-semibold tw:leading-7 tw:tracking-[-0.24px] tw:text-[var(--bk-ink)]"
+                data-testid="set-head-title"
+              >
+                {headTitle}
+              </h2>
+            </div>
+            {/* B8-S01: the Overview draws no scope chip. */}
+            {/* B8-S01 / S16: the Overview and the Danger zone draw no scope chip. */}
+            {isOverview || screenRules?.scope === "lifecycle" ? null : (
+              <p
+                className="tw:m-0 tw:w-fit tw:max-w-full tw:truncate tw:rounded-full tw:bg-[var(--bk-bg-subtle)] tw:px-2.5 tw:text-[length:var(--bk-text-12)] tw:leading-6 tw:text-[var(--bk-ink-soft)]"
+                data-testid="set-head-scope"
+              >
+                {headScope}
+              </p>
+            )}
             {screenHeader?.subtitle ? (
               <p className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-5 tw:text-[var(--bk-gray-500)]" data-testid="set-head-sub">
                 {screenHeader.subtitle}
@@ -1117,10 +1083,59 @@ export const SettingsTab: React.FC<
 
         <div
           key={resetKey}
-          className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:gap-4 tw:overflow-y-auto tw:bg-[var(--bk-gray-50)] tw:px-12 tw:py-6"
+          className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:gap-3 tw:overflow-y-auto tw:bg-[var(--bk-bg-panel)] tw:px-6 tw:pb-6"
           data-testid="set-body"
         >
-          {renderScreen()}
+          {!online && showFooter && OFFLINE_BANNER_SCREENS.has(currentScreen) && !OFFLINE_LINE_IN_SCREEN.has(currentScreen) ? (
+            /* B8-SH04 245:48768: the screen stays; only Save waits for the network. */
+            <div
+              role="status"
+              className="tw:w-full tw:max-w-180 tw:shrink-0 tw:rounded-[var(--bk-radius-sm)] tw:bg-[var(--bk-warning-tint)] tw:px-4 tw:py-3 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-warning-text)]"
+              data-testid="set-offline"
+            >
+              {/* B8-AN07 words it for the screen whose status needs the network. */}
+              {currentScreen === "analytics" ? "You’re offline. Last known settings remain visible." : "You’re offline. Save settings needs a connection."}
+            </div>
+          ) : null}
+          {trimmed ? (
+            /* B8-S20: the results card replaces the screen in view; the screen
+               stays mounted underneath so its edits survive the search. */
+            <section className={SEARCH_CARD} data-testid="set-search-results-card">
+              <h3 className="tw:m-0 tw:mb-1 tw:text-[length:var(--bk-text-14)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]" role="status">
+                {results.length === 0
+                  ? `No settings match “${trimmed}”`
+                  : `${results.length} ${results.length === 1 ? "result" : "results"} for “${trimmed}”`}
+              </h3>
+              <ul id="set-search-results" role="listbox" aria-label="Settings search results" className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-2.5 tw:p-0" data-testid="set-search-results">
+                {results.map((entry, i) => (
+                  <li
+                    key={entry.id}
+                    id={`set-search-option-${i}`}
+                    role="option"
+                    aria-selected={i === activeIndex}
+                    className={`${SEARCH_ROW}${i === activeIndex ? " tw:font-medium" : ""}`}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onMouseMove={() => setActiveResult(i)}
+                    onClick={() => openResult(entry)}
+                    data-testid={`set-search-result-${entry.id}`}
+                  >
+                    <span className="tw:w-60 tw:shrink-0 tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]">
+                      {entry.fieldId ? `${entry.group} › ${entry.title}` : entry.title}
+                    </span>
+                    <span className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
+                      {entry.description}
+                    </span>
+                    <span className="tw:w-35 tw:shrink-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-accent)]" aria-hidden>
+                      Open ›
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
+          <div className={trimmed ? "tw:hidden" : "tw:contents"} data-testid="set-screen">
+            {renderScreen()}
+          </div>
         </div>
 
         {/* 8134:212121 / 8134:212718: a footer screen always has its save bar —
@@ -1129,34 +1144,42 @@ export const SettingsTab: React.FC<
             door, a locked or read-only screen; an immediate screen gets it
             only while it still holds an edit. */}
         {!showFooter ? null : (
-          <footer className="tw:flex tw:h-11 tw:shrink-0 tw:items-center tw:justify-end tw:gap-2 tw:border-t tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-4">
+          <footer className="tw:flex tw:h-14 tw:shrink-0 tw:items-center tw:justify-end tw:gap-2 tw:border-t tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-6">
             <span
-              className={`tw:min-w-0 tw:flex-1 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] ${FOOT_TONE[footStatus.tone]}`}
+              className={`tw:min-w-0 tw:flex-1 tw:text-[length:var(--bk-text-13)] tw:leading-5 ${FOOT_TONE[footStatus.tone]}`}
               role="status"
               data-testid="set-foot-status"
             >
               {footStatus.text}
             </span>
+            {/* B8-SH07 / SH12 / SH13: while a save runs, or the screen's read is
+                pending or failed, the footer is the status and Save only.
+                B8-AN01: a clean screen draws "Saved" and Save settings, no Discard. */}
+            {saving ||
+            loadState !== "ready" ||
+            (!online && OFFLINE_BANNER_SCREENS.has(currentScreen)) ||
+            (!screenIsDirty && !saveError) ? null : (
             <Button
               type="button"
-              variant="ghost"
+              variant="secondary"
               size="xs"
-              className={`${SET_BTN} tw:h-7 tw:px-3 tw:text-[var(--bk-gray-700)]`}
+              className={`${SET_BTN} tw:px-6`}
               disabled={!screenIsDirty && !saveError}
               onClick={rollBack}
               data-testid="set-foot-discard"
             >
               Discard
             </Button>
+            )}
             <Button
               type="button"
               size="xs"
-              className={`${SET_BTN} tw:h-7 tw:px-3`}
-              disabled={loadState !== "ready" || saving || clientFieldErrors !== null || (!screenIsDirty && !saveError)}
+              className={`${SET_BTN} tw:px-6`}
+              disabled={!online || !roleSettled || loadState !== "ready" || saving || clientFieldErrors !== null || (!screenIsDirty && !saveError)}
               onClick={() => handleSave()}
               data-testid="set-foot-save"
             >
-              {saveError && !footerMessage ? "Retry save" : "Save"}
+              {saving ? "Saving…" : "Save settings"}
             </Button>
           </footer>
         )}
@@ -1164,11 +1187,25 @@ export const SettingsTab: React.FC<
 
       <UnsavedSettingsDialog
         open={guardOpen}
-        siteName={siteName}
+        phase={guardPhase}
+        screenName={current?.title.replace(/ ↗$/, "") ?? "Overview"}
+        destination={
+          !pending || pending.kind === "leave"
+            ? { kind: "leave" }
+            : { kind: "screen", name: navTitle(pending.id) }
+        }
         onKeepEditing={handleKeepEditing}
         onDiscard={handleDiscard}
-        onSaveAndContinue={handleSaveAndContinue}
-        saving={saving}
+        onSaveAndLeave={handleSaveAndLeave}
+      />
+      <SettingsPermissionsDialog open={permissionsOpen} onClose={() => setPermissionsOpen(false)} />
+      <WorkspaceDoorDialog title={doorTitle} onClose={() => setDoorTitle(null)} />
+      <PublishSettingsGuard
+        phase={publishGuard}
+        screenName={headTitle}
+        onKeepEditing={() => setPublishGuard(null)}
+        onPublishWithout={openPublish}
+        onSaveAndContinue={saveThenPublish}
       />
     </div>
   );

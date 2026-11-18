@@ -10,8 +10,9 @@ import { Popover, Button, TextField } from "@/editor/chrome-ui";
 import { ChevronDown, Link2, Link2Off } from "lucide-react";
 import * as React from "react";
 import { useInspectorField } from "./InspectorFieldContext";
+import { useSharedColor } from "./ColorSources";
 import { FieldDot } from "./FieldDot";
-import { ErrorLine, useFieldError } from "./Section";
+import { ErrorLine } from "./Section";
 import { fieldTestId, labelTestId, rowTestId } from "./ControlRow";
 import { useColorRegistry } from "@/editor/design-system/state/TokenRegistryContext";
 import { isTokenVar, extractVarName, cssVarToTokenId } from "../tokenBindingDetection";
@@ -60,8 +61,34 @@ export function colourTokenLabel(tokenId: string): string {
   return rest.length ? `${head} / ${rest.join(" ")}` : head;
 }
 
-// Hex without "#" prefix — matches mock's "FFFFFF" display
-const stripHash = (val: string): string => (val.startsWith("#") ? val.slice(1) : val);
+/* 2L9 boards read a hex with its "#" ("#111827"); engine styles sometimes
+   store it bare ("333333"). */
+const RGBA = /^rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(?:,\s*([\d.]+%?)\s*)?\)$/i;
+const HEX_ALPHA = /^#?([0-9A-Fa-f]{6})\s*\/\s*(\d{1,3})\s*%$/;
+const hex2 = (n: number) => Math.max(0, Math.min(255, n)).toString(16).padStart(2, "0").toUpperCase();
+
+const showHex = (val: string): string => {
+  const v = val.trim();
+  if (/^[0-9A-Fa-f]{3}$|^[0-9A-Fa-f]{6}$|^[0-9A-Fa-f]{8}$/.test(v)) return `#${v.toUpperCase()}`;
+  if (/^#[0-9A-Fa-f]{3,8}$/.test(v)) return v.toUpperCase();
+  /* 2L9 161:12525: a translucent colour reads "#111827 / 12%". */
+  const m = v.match(RGBA);
+  if (m) {
+    const hex = `#${hex2(+m[1])}${hex2(+m[2])}${hex2(+m[3])}`;
+    if (m[4] === undefined) return hex;
+    const a = m[4].endsWith("%") ? parseFloat(m[4]) : parseFloat(m[4]) * 100;
+    return a >= 100 ? hex : `${hex} / ${Math.round(a)}%`;
+  }
+  return v;
+};
+
+/** "#111827 / 12%" back to the rgba() it reads as; null when it is not that. */
+const readHexAlpha = (v: string): string | null => {
+  const m = v.match(HEX_ALPHA);
+  if (!m) return null;
+  const n = parseInt(m[1], 16);
+  return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${Math.min(100, +m[2]) / 100})`;
+};
 
 // ============================================================================
 // COLOR INPUT
@@ -92,8 +119,11 @@ export const ColorInput: React.FC<ColorInputProps> = ({
   property,
   inheritedValue,
 }) => {
-  const field = useInspectorField(property);
-  const value = ownValue || (field.mixed ? "" : (inheritedValue ?? ""));
+  const baseField = useInspectorField(property);
+  /* B05: Mixed only by source — every target shows one colour — reads that colour. */
+  const shared = useSharedColor(property);
+  const field = shared ? { ...baseField, mixed: false } : baseField;
+  const value = shared?.value ?? (ownValue || (field.mixed ? "" : (inheritedValue ?? "")));
   const [isOpen, setIsOpen] = React.useState(false);
 
   const { tokens: colorTokens } = useColorRegistry();
@@ -103,6 +133,7 @@ export const ColorInput: React.FC<ColorInputProps> = ({
     id: t.id,
     name: t.name,
     value: resolveTokenLiteral(colorTokens, t.id, "light") ?? "",
+    source: "alias" in t.modes.light ? t.modes.light.alias : undefined,
     cssVar: t.cssVar,
   }));
   /* The picker offers the Brand page's own set — live semantic colours. It
@@ -134,13 +165,15 @@ export const ColorInput: React.FC<ColorInputProps> = ({
     ? (boundToken?.value ?? resolveVar(value))
     : isValidHexColor(normalizeHex(value))
       ? normalizeHex(value)
-      : isKeyword
+      : RGBA.test(value.trim())
+        ? value.trim()
+        : isKeyword
         ? /* CSS keywords (red, currentColor…) paint fine as a background;
              an unknown word degrades to transparent, never to a lie. */
           value
         : "transparent";
 
-  const display = isBound ? (boundToken?.name ?? value) : stripHash(value || "");
+  const display = isBound ? (boundToken?.name ?? value) : showHex(value || "");
 
   /* Name the token the revert would restore, resolved the same way the bound
      path resolves its own — a button reading "Relink to token" would be the
@@ -173,7 +206,7 @@ export const ColorInput: React.FC<ColorInputProps> = ({
      does is flagged on Enter / blur (DD-19) and Esc puts the value back. */
   const [hexText, setHexText] = React.useState(display);
   const [invalid, setInvalid] = React.useState(false);
-  const errorId = useFieldError(invalid ? HEX_ERROR : null);
+  const errorId = React.useId();
   React.useEffect(() => {
     setHexText(display);
     setInvalid(false);
@@ -185,7 +218,7 @@ export const ColorInput: React.FC<ColorInputProps> = ({
     if (/^[0-9A-Fa-f]{3}$|^[0-9A-Fa-f]{6}$/.test(v)) return `#${v}`;
     if (isValidHexColor(v)) return v;
     if (v === "transparent" || v === "inherit" || v === "currentColor") return v;
-    return null;
+    return readHexAlpha(v);
   };
 
   const tokenName = boundToken ? colourTokenLabel(boundToken.id) : tokenId ? colourTokenLabel(tokenId) : display;
@@ -316,6 +349,7 @@ export const ColorInput: React.FC<ColorInputProps> = ({
           }
         >
           <ColorFillPopover
+            target={field.target}
             tokens={pickerEntries}
             boundTokenId={boundToken?.id ?? null}
             currentHex={swatchColor === "transparent" ? "" : swatchColor}

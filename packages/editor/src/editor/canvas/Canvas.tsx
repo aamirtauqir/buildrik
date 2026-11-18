@@ -5,9 +5,10 @@
  * @license BSD-3-Clause
  */
 
+import { useShowHiddenElements } from "./hiddenElementsPref";
 import * as React from "react";
 import { EVENTS } from "@/shared/constants/events";
-import { requestInsertGroup, requestGenerateBlock } from "@/editor/sidebar/tabs/build/insertGroupRequest";
+import { requestInsertGroup } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 import { useVisibleFrameSpan } from "./hooks/useVisibleFrameSpan";
 import { useCanvasNavigationGuard } from "./hooks/useCanvasNavigationGuard";
 
@@ -23,8 +24,11 @@ import type { CanvasProps, CanvasRef } from "./Canvas.types";
 import { DEVICE_SIZES } from "./Canvas.types";
 import { CanvasEmptyCTA } from "./CanvasEmptyCTA";
 import { CanvasLoadingSkeleton } from "./CanvasLoadingSkeleton";
+import { useEditLocks } from "@/editor/shared/useEditLocks";
 import { useProjectLoading } from "../shell/hooks/useProjectLoading";
 import { CanvasFooterToolbar } from "./CanvasFooterToolbar";
+import { CanvasRecordBar } from "./CanvasRecordBar";
+import { ComponentSourcePickBar } from "./ComponentSourcePickBar";
 import { DeviceFramePreview, DeviceFrameToggle } from "./DeviceFramePreview";
 import {
   wrapperStyles,
@@ -47,6 +51,7 @@ import {
   useSliderRuntime,
   useCountdownRuntime,
   useAccordionRuntime,
+  useTabsModalRuntime,
   useCanvasEditorFlags,
   useCanvasContextMenu,
   useCursorSync,
@@ -80,23 +85,27 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       composer,
       device,
       zoom,
-      onAIRequest,
       showSpacing = false,
       showBadges = false,
       showGuides = true,
       showGrid = false,
       showRulers = false,
       showXRay = false,
+      showOutlines = false,
       showFooterToolbar = true,
-      readOnly = false,
+      readOnly: readOnlyProp = false,
       onZoomChange,
       onOverlayChange,
       onDeviceChange,
-      canUndo,
-      canRedo,
     },
     ref
   ) => {
+    /* Any engine edit lock (view, time travel, a site that has not loaded)
+       withholds the same handlers view mode does: the engine would refuse the
+       write anyway, and an affordance that does nothing teaches distrust. */
+    const editLocks = useEditLocks(composer);
+    const readOnly = readOnlyProp || editLocks.length > 0;
+    const notLoaded = editLocks.includes("not-loaded");
     const canvasRef = React.useRef<HTMLDivElement>(null);
     const wrapperRef = React.useRef<HTMLDivElement>(null);
     /* The scrolling viewport, one level inside the wrapper. Zoom-to-fit and
@@ -177,7 +186,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     // UI state hooks
     const { contextMenu, setContextMenu, menuData, closeContextMenu } = useCanvasContextMenu({
       composer,
-      onAIRequest,
       addToast,
     });
 
@@ -186,7 +194,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       const el = selectedId && composer ? composer.elements.getElement(selectedId) : null;
       return el ? { id: selectedId as string, type: el.getType?.() ?? "element" } : null;
     }, [composer, selectedId]);
-    const { label: readoutLabel, dims: readoutDims } = useSelectionReadout(composer, selectedForReadout);
+    const { label: readoutLabel, dims: readoutDims, path: readoutPath } = useSelectionReadout(composer, selectedForReadout);
 
     const { spacingIndicators } = useCanvasIndicators({
       composer,
@@ -206,7 +214,19 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     const { calculateSnapping } = useCanvasSnapping(composer);
 
     // Inline editing (must be before useSelectionBehavior since it needs editing.id)
-    const { editing, handleDoubleClick } = useCanvasInlineEdit({ composer, canvasRef });
+    /* design-2l9 TX03 / TX04: a committed text edit says so, and its Undo
+       reverts that one step (captureUndo — refuses once something newer). */
+    const { editing, handleDoubleClick } = useCanvasInlineEdit({
+      composer,
+      canvasRef,
+      onCommitted: ({ linkChanged }) => {
+        const undo = composer?.history?.captureUndo?.();
+        addToast({ description: linkChanged ? "Text and link updated." : "Text updated.", tone: "info", ...(undo ? { action: { label: "Undo", onClick: () => { undo(); } } } : {}) });
+      },
+    });
+
+    /* 176:19089 / 176:19451: draw condition-hidden elements as ghosts, or not at all. */
+    const showHidden = useShowHiddenElements();
 
     // Selection behavior hook (click-through, additive, hit expansion)
     const { handleClick: handleSelectionClick } = useSelectionBehavior({
@@ -215,33 +235,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       onContextMenuClose: closeContextMenu,
     });
 
-    // Inspector pick mode — subscribe to inspector:pick-start/cancel events
-    // emitted by the ProInspector Crosshair button. While active, next canvas
-    // click resolves the element under cursor and selects it instead of
-    // running normal selection behavior. Escape key cancels.
-    const [pickMode, setPickMode] = React.useState(false);
-    React.useEffect(() => {
-      if (!composer) return;
-      const start = () => setPickMode(true);
-      const cancel = () => setPickMode(false);
-      composer.on("inspector:pick-start", start);
-      composer.on("inspector:pick-cancel", cancel);
-      return () => {
-        composer.off("inspector:pick-start", start);
-        composer.off("inspector:pick-cancel", cancel);
-      };
-    }, [composer]);
-    React.useEffect(() => {
-      if (!pickMode) return;
-      const onKey = (e: KeyboardEvent) => {
-        if (e.key === "Escape") {
-          setPickMode(false);
-          composer?.emit("inspector:pick-cancel");
-        }
-      };
-      document.addEventListener("keydown", onKey);
-      return () => document.removeEventListener("keydown", onKey);
-    }, [pickMode, composer]);
 
     // Inline editing commands (delegated to useCanvasInlineCommands)
     const { handleInlineCommand } = useCanvasInlineCommands({
@@ -289,6 +282,9 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       addGuide,
       removeGuide,
       updateGuide,
+      savedGuides,
+      setGuideLocked,
+      restoreGuide,
     } = useCanvasGuides({ composer, enabled: showRulers });
 
     // Hover, marquee, keyboard
@@ -380,14 +376,30 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       el.style.marginBottom = `${-el.offsetHeight * (1 - scale)}px`;
     }, [scale, device, canvasSize.width, canvasSize.height]);
 
+    /* The publish tray (design-2l9 Task 1.7) narrows the canvas column and
+       asks for the authored width to fit beside it — width only, 24 px clear
+       of each edge, and never zooming IN: a page that already fits stays at
+       the user's zoom. Board 499:2656 draws exactly this (46% at 740 px). */
+    const handleFitWidth = React.useCallback(() => {
+      const content = canvasRef.current;
+      const viewport = scrollRef.current;
+      if (!content || !viewport || !composer) return;
+      const cw = content.offsetWidth;
+      const room = viewport.clientWidth - 48;
+      if (!cw || room <= 0) return;
+      const current = composer.getState().zoom / 100;
+      if (cw * current <= room) return;
+      composer.setZoom(Math.floor((room / cw) * 100));
+    }, [composer]);
+
     React.useEffect(() => {
       if (!composer) return;
-      const handler = () => handleFitToScreen();
+      const handler = (data?: { widthOnly?: boolean }) => (data?.widthOnly ? handleFitWidth() : handleFitToScreen());
       composer.on(EVENTS.ZOOM_FIT, handler);
       return () => {
         composer.off(EVENTS.ZOOM_FIT, handler);
       };
-    }, [composer, handleFitToScreen]);
+    }, [composer, handleFitToScreen, handleFitWidth]);
 
     React.useEffect(() => {
       if (!composer) return;
@@ -509,6 +521,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     // 13) — the runtimes the published page gets, on the same rule.
     useCountdownRuntime({ canvasRef, content: displayContent });
     useAccordionRuntime({ canvasRef, content: displayContent });
+    useTabsModalRuntime({ canvasRef, content: displayContent, selectedId });
     // Lock styling and the Layers eye are editor-only DOM flags, re-derived
     // after every render of the canvas HTML (audit 2026-10-08 P1-5).
     useCanvasEditorFlags({ canvasRef, composer, content: displayContent });
@@ -648,29 +661,12 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     }, [liveAnnouncement, announce]);
 
     // Canvas click handler - wraps selection behavior with focus management.
-    // If inspector pick mode is active, intercept: resolve target element id
-    // from the nearest [data-buildrick-id] ancestor, select it via composer,
-    // emit inspector:pick-result, exit pick mode, and skip the normal
-    // click-through/additive selection path.
     const handleCanvasClick = React.useCallback(
       (e: React.MouseEvent) => {
         wrapperRef.current?.focus();
-        if (pickMode && composer) {
-          const target = (e.target as HTMLElement).closest("[data-buildrick-id]") as HTMLElement | null;
-          const id = target?.getAttribute("data-buildrick-id") ?? null;
-          if (id) {
-            const el = composer.elements.getElement(id);
-            if (el) composer.selection.select(el);
-          }
-          composer.emit("inspector:pick-result", id);
-          setPickMode(false);
-          e.preventDefault();
-          e.stopPropagation();
-          return;
-        }
         handleSelectionClick(e);
       },
-      [handleSelectionClick, pickMode, composer]
+      [handleSelectionClick]
     );
 
     /* The grey around the page is canvas too. The column's 24px padding and
@@ -720,6 +716,20 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       ? { width: `${activeCustomWidth}px`, height: DEVICE_SIZES[device].height }
       : DEVICE_SIZES[device];
     const showWidthLabel = device !== "desktop" || activeCustomWidth !== null;
+    /* The bar's "{width} px" (board 7:18654): the frame's own width — fluid
+       Desktop fills the column, so it is read, not looked up. offsetWidth is
+       pre-zoom, the authored width. */
+    const [frameWidth, setFrameWidth] = React.useState(0);
+    React.useEffect(() => {
+      const el = frameRef.current;
+      if (!el) return;
+      const read = () => setFrameWidth(Math.round(el.offsetWidth));
+      read();
+      if (typeof ResizeObserver === "undefined") return;
+      const ro = new ResizeObserver(read);
+      ro.observe(el);
+      return () => ro.disconnect();
+    }, [device, activeCustomWidth, deviceFrameActive]);
     const emptyCtaSpan = useVisibleFrameSpan(scrollRef, frameRef, isCanvasEmpty && !readOnly && !startedBlank);
 
     /* readOnly withholds every handler that can change the document — inline
@@ -727,9 +737,10 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
        mouse-move stay: selection changes nothing when there is no inspector to
        drive, and comment pinning needs the pointer. */
     return (
-      /* data-bk-toast-anchor / -floor: toasts sit 16px in from this column's
-         right and 16px above the footer toolbar (owner decision 2026-10-03,
-         Settings / CMS toast boards) — chrome-ui/Toast measures both. */
+      /* data-bk-toast-anchor: toasts sit 16px in from this column's right and
+         bottom (owner decision 2026-10-03, Settings / CMS toast boards) —
+         chrome-ui/Toast measures it. The canvas bar is at the top now, so
+         there is no floor above the column's bottom. */
       <div
         ref={wrapperRef}
         tabIndex={0}
@@ -738,6 +749,65 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
         style={wrapperStyles}
         data-bk-toast-anchor=""
       >
+        {/* The canvas bar (2L9 boards 7:18654, 497:339497 …): at the TOP of
+            the canvas column, under the topbar — readout · devices · width ·
+            zoom · View. It was docked at the bottom (owner override
+            2026-10-03); the 2L9 boards draw it here (owner 2026-10-26: every
+            difference follows the board). */}
+        {showFooterToolbar && onZoomChange && onOverlayChange && (
+          <div style={footerToolbarContainerStyles}>
+            <CanvasFooterToolbar
+              overlays={{
+                guides: showGuides,
+                spacing: showSpacing,
+                grid: showGrid,
+                rulers: showRulers,
+                badges: showBadges,
+                xray: showXRay,
+                outlines: showOutlines,
+              }}
+              zoom={zoom}
+              onOverlayChange={onOverlayChange}
+              onZoomChange={onZoomChange}
+              onFitToScreen={handleFitToScreen}
+              onZoomToSelection={handleZoomToSelection}
+              guides={{ list: savedGuides, add: addGuide, update: updateGuide, setLocked: setGuideLocked, remove: removeGuide, restore: restoreGuide }}
+              gridSize={gridSize}
+              onGridSizeChange={composer ? (size) => composer.setGridSize(size) : undefined}
+              readout={readoutPath}
+              readoutTitle={readoutDims ? `${readoutLabel} · ${readoutDims}` : readoutLabel}
+              pageWidth={activeCustomWidth ?? (frameWidth || undefined)}
+              device={device}
+              onDeviceChange={
+                onDeviceChange
+                  ? (d) => {
+                      setCustomWidth(null);
+                      onDeviceChange(d);
+                    }
+                  : undefined
+              }
+              customWidth={activeCustomWidth}
+              onCustomWidth={
+                onDeviceChange
+                  ? (width) => {
+                      const bp = getBreakpointForWidth(width);
+                      if (bp !== device) onDeviceChange(bp);
+                      setCustomWidth({ width, device: bp });
+                    }
+                  : undefined
+              }
+            />
+            <DeviceFrameToggle
+              active={deviceFrameActive}
+              onToggle={() => setDeviceFrameActive((v) => !v)}
+              device={device}
+            />
+          </div>
+        )}
+        {/* 173:12022 — on a collection template page: which record the canvas previews. */}
+        {showFooterToolbar && !readOnly ? <CanvasRecordBar composer={composer} /> : null}
+        {/* 217:40475 / 217:40648 — choosing a component's source on the canvas. */}
+        {!readOnly ? <ComponentSourcePickBar composer={composer} /> : null}
         <div ref={scrollRef} className="bd-canvas-scroll">
         <DeviceFramePreview device={device} active={deviceFrameActive}>
         {/* A column only when the width label is drawn under the page; on
@@ -769,7 +839,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
              crosshair showed over the empty gutter and nowhere else, which is
              the one part of the canvas with nothing to pick. The attribute
              hands it to a rule that reaches the subtree instead. */
-          data-bk-pick={pickMode ? "true" : undefined}
           style={getCanvasStyles(size, device, scale, isDragOver)}
         >
           {/* Element animations resolve against these. The canvas had none
@@ -794,6 +863,8 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             data-testid="canvas"
             data-device={device}
             data-xray-mode={showXRay ? "true" : undefined}
+            data-outlines={showOutlines ? "true" : undefined}
+            data-bk-hide-conditional={showHidden ? undefined : "true"}
             data-badges={showBadges ? "true" : undefined}
             data-drag-active={isDragOver ? "true" : undefined}
             data-invalid-drop={isDragOver && !isValidDrop ? "true" : undefined}
@@ -803,6 +874,15 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
           />
 
           {showLoadingCanvas && <CanvasLoadingSkeleton />}
+
+          {/* Board B7-G02: after a failed load the canvas is neutral — no
+              skeleton (nothing is on its way), no build invitation (nothing can
+              be saved), and not the banner's sentence a second time. */}
+          {pageIsEmpty && notLoaded && !projectLoading && (
+            <div className="bd-canvas-loading tw:items-center tw:justify-center" data-testid="canvas-not-loaded">
+              <span className="tw:text-[13px] tw:text-[var(--bk-ink-muted)]">Nothing to show here yet</span>
+            </div>
+          )}
 
           {/* "Start with a template, or drop your first section" with Browse
              templates / Start blank — build CTAs, and Browse templates emits an
@@ -830,14 +910,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
                 if (!composer) return;
                 composer.emit("ui:switch-tab", { tab: "add" });
                 requestInsertGroup(composer, "blocks");
-              }}
-              /* v3 FC-3: "Describe your site" CREATES the first section — that
-                 is Add's generator (same door as ⌘K "Generate a block with
-                 AI…"), not the right-column AI, which only ever EDITS an
-                 existing selection and has none to work with on an empty
-                 canvas. */
-              onDescribe={() => {
-                if (composer) requestGenerateBlock(composer);
               }}
               onStartBlank={() => {
                 setStartedBlank(true);
@@ -912,57 +984,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
         </DeviceFramePreview>
         </div>
 
-        {/* Canvas Footer Toolbar - Overlays & Zoom (IA Redesign 2026) */}
-        {showFooterToolbar && onZoomChange && onOverlayChange && (
-          <div style={footerToolbarContainerStyles} data-bk-toast-floor="">
-            <CanvasFooterToolbar
-              overlays={{
-                guides: showGuides,
-                spacing: showSpacing,
-                grid: showGrid,
-                rulers: showRulers,
-                badges: showBadges,
-                xray: showXRay,
-              }}
-              zoom={zoom}
-              onOverlayChange={onOverlayChange}
-              onZoomChange={onZoomChange}
-              onFitToScreen={handleFitToScreen}
-              onZoomToSelection={handleZoomToSelection}
-              gridSize={gridSize}
-              onGridSizeChange={composer ? (size) => composer.setGridSize(size) : undefined}
-              readout={readoutDims ? `${readoutLabel} · ${readoutDims}` : readoutLabel}
-              device={device}
-              onDeviceChange={
-                onDeviceChange
-                  ? (d) => {
-                      setCustomWidth(null);
-                      onDeviceChange(d);
-                    }
-                  : undefined
-              }
-              customWidth={activeCustomWidth}
-              onCustomWidth={
-                onDeviceChange
-                  ? (width) => {
-                      const bp = getBreakpointForWidth(width);
-                      if (bp !== device) onDeviceChange(bp);
-                      setCustomWidth({ width, device: bp });
-                    }
-                  : undefined
-              }
-              canUndo={canUndo}
-              canRedo={canRedo}
-              onUndo={composer ? () => composer.history.undo() : undefined}
-              onRedo={composer ? () => composer.history.redo() : undefined}
-            />
-            <DeviceFrameToggle
-              active={deviceFrameActive}
-              onToggle={() => setDeviceFrameActive((v) => !v)}
-              device={device}
-            />
-          </div>
-        )}
 
         {contextMenu && menuData && (
           <ElementContextMenu

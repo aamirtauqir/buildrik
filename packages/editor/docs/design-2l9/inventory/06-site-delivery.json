@@ -1,0 +1,3671 @@
+{
+ "233:2": {
+  "status": "drift",
+  "note": "shell/lifecycle.ts:256 — phase1 T1.7 tray. Board: red check blocks publish; code re-labels \"Publish anyway\" — behaviour conflict, needs own…",
+  "archetype": "PB01 blocking check"
+ },
+ "233:649": {
+  "status": "drift",
+  "note": "sidebar/tabs/publish/PublishTab.tsx:1001 — phase1 T1.7: no tray; panel has Checks/Release to/Changes/Last deploy, CTA \"Publish to productio…",
+  "archetype": "PB02 tray ready"
+ },
+ "233:1237": {
+  "status": "drift",
+  "note": "shell/PublishDiffView.tsx:1 — phase1 T1.7: diff is version↔version only; draft-vs-live per-page Compare needs P-2",
+  "archetype": "PB03 What will change"
+ },
+ "233:1802": {
+  "status": "drift",
+  "note": "shell/modals/PublishConfirmModal.tsx:85 — \"Publish to production?\" facts confirm; no tick boxes; stale override is a separate modal",
+  "archetype": "PB04-06 review-and-publish dialog"
+ },
+ "233:2418": {
+  "status": "drift",
+  "note": "shell/modals/PublishConfirmModal.tsx:85 — \"Publish to production?\" facts confirm; no tick boxes; stale override is a separate modal",
+  "archetype": "PB04-06 review-and-publish dialog"
+ },
+ "233:3034": {
+  "status": "drift",
+  "note": "shell/modals/PublishConfirmModal.tsx:85 — \"Publish to production?\" facts confirm; no tick boxes; stale override is a separate modal",
+  "archetype": "PB04-06 review-and-publish dialog"
+ },
+ "233:3648": {
+  "status": "drift",
+  "note": "sidebar/tabs/publish/PublishTab.tsx:724 — progress block exists; no step list/elapsed, no topbar \"Publishing n/3\", Cancel not Admin+queued-…",
+  "archetype": "PB07-08 publishing progress"
+ },
+ "233:4197": {
+  "status": "drift",
+  "note": "sidebar/tabs/publish/PublishTab.tsx:724 — progress block exists; no step list/elapsed, no topbar \"Publishing n/3\", Cancel not Admin+queued-…",
+  "archetype": "PB07-08 publishing progress"
+ },
+ "233:4748": {
+  "status": "drift",
+  "note": "sidebar/tabs/publish/PublishTab.tsx:809 — result block exists; \"See what changed\" missing (P-4)",
+  "archetype": "PB09 published"
+ },
+ "233:5303": {
+  "status": "drift",
+  "note": "sidebar/tabs/publish/PublishTab.tsx:534 — Try again + View log exist; copy must name the live version kept",
+  "archetype": "PB10 publish failed"
+ },
+ "233:5851": {
+  "status": "drift",
+  "note": "sidebar/tabs/publish/PublishTab.tsx:553 — pollLost \"Check status\" exists; start-timeout state (Try again off) not distinct",
+  "archetype": "PB11-12 lost/unknown start"
+ },
+ "233:6396": {
+  "status": "drift",
+  "note": "sidebar/tabs/publish/PublishTab.tsx:553 — pollLost \"Check status\" exists; start-timeout state (Try again off) not distinct",
+  "archetype": "PB11-12 lost/unknown start"
+ },
+ "233:6942": {
+  "status": "missing",
+  "note": "no \"live but not recorded\" outcome in usePublishJob",
+  "archetype": "PB13 live not recorded"
+ },
+ "233:7488": {
+  "status": "drift",
+  "note": "sidebar/tabs/publish/PublishTab.tsx:810 — simulation notice exists; board wants server flag (P-5) and tray copy",
+  "archetype": "PB14 simulation"
+ },
+ "233:8034": {
+  "status": "drift",
+  "note": "sidebar/tabs/publish/PublishGateBanner.tsx:1 — gate banner exists; tray layout and \"Waiting on review\" reason differ",
+  "archetype": "PB15 changes requested gate"
+ },
+ "233:8594": {
+  "status": "missing",
+  "note": "no publish-time password-on-Free block or Remove-protection-and-publish confirm",
+  "archetype": "PB16-17 password on Free"
+ },
+ "233:9161": {
+  "status": "missing",
+  "note": "no publish-time password-on-Free block or Remove-protection-and-publish confirm",
+  "archetype": "PB16-17 password on Free"
+ },
+ "233:9714": {
+  "status": "drift",
+  "note": "sidebar/tabs/publish/UnpublishConfirmModal.tsx:62 — types UNPUBLISH; board types the domain, Admin only",
+  "archetype": "PB18 unpublish typed"
+ },
+ "233:10270": {
+  "status": "drift",
+  "note": "shell/lifecycle.ts:237 — PB20 copy matches; PB19/PB21 copy differs (\"Publishing needs Editor access\", \"Needs a connection\"); tray T1.7",
+  "archetype": "PB19-21 publish refused reasons"
+ },
+ "233:10827": {
+  "status": "drift",
+  "note": "shell/lifecycle.ts:237 — PB20 copy matches; PB19/PB21 copy differs (\"Publishing needs Editor access\", \"Needs a connection\"); tray T1.7",
+  "archetype": "PB19-21 publish refused reasons"
+ },
+ "233:11377": {
+  "status": "drift",
+  "note": "shell/lifecycle.ts:237 — PB20 copy matches; PB19/PB21 copy differs (\"Publishing needs Editor access\", \"Needs a connection\"); tray T1.7",
+  "archetype": "PB19-21 publish refused reasons"
+ },
+ "233:11934": {
+  "status": "missing",
+  "note": "no site-limit publish lock in lifecycle publishBlocker",
+  "archetype": "PB22 over Free limit"
+ },
+ "233:12491": {
+  "status": "drift",
+  "note": "sidebar/tabs/publish/PublishTab.tsx:520 — \"Checking readiness…\" vs tray \"Checking…\"",
+  "archetype": "PB23 checks loading"
+ },
+ "233:13038": {
+  "status": "blocked:handoff-note",
+  "note": "annotation frame, not a UI state; recommend out-of-scope",
+  "archetype": "handoff/spec note"
+ },
+ "236:4951": {
+  "status": "drift",
+  "note": "export/ExportModal.tsx:288 — title \"Export site as X\"; Vue/Next \"Soon\" shown (ExportOptions.tsx:29); no Free custom-code note",
+  "archetype": "EX01-03 export dialog tabs"
+ },
+ "236:5523": {
+  "status": "drift",
+  "note": "export/ExportModal.tsx:288 — title \"Export site as X\"; Vue/Next \"Soon\" shown (ExportOptions.tsx:29); no Free custom-code note",
+  "archetype": "EX01-03 export dialog tabs"
+ },
+ "236:6085": {
+  "status": "drift",
+  "note": "export/ExportModal.tsx:288 — title \"Export site as X\"; Vue/Next \"Soon\" shown (ExportOptions.tsx:29); no Free custom-code note",
+  "archetype": "EX01-03 export dialog tabs"
+ },
+ "236:6656": {
+  "status": "match",
+  "note": "export/ExportModal.tsx:503 — \"Preparing your export…\" + \"Exporting…\" (:457)",
+  "archetype": "EX04 preparing"
+ },
+ "236:7208": {
+  "status": "drift",
+  "note": "export/ExportModal.tsx:383 — phases exist; \"Export ready — <file> downloaded\" and reason line copy differ",
+  "archetype": "EX05-06 ready/failed"
+ },
+ "236:7760": {
+  "status": "drift",
+  "note": "export/ExportModal.tsx:383 — phases exist; \"Export ready — <file> downloaded\" and reason line copy differ",
+  "archetype": "EX05-06 ready/failed"
+ },
+ "236:8312": {
+  "status": "missing",
+  "note": "no offline handling in ExportModal",
+  "archetype": "EX07 offline"
+ },
+ "236:8864": {
+  "status": "missing",
+  "note": "no preview load-error state with Retry",
+  "archetype": "EX08 preview failed"
+ },
+ "236:9417": {
+  "status": "drift",
+  "note": "shell/IssuesPanel.tsx:213 — errors-first exists; no \"n block publishing · n tips\" summary or per-row location",
+  "archetype": "IS01/IS03 issues list"
+ },
+ "236:9961": {
+  "status": "missing",
+  "note": "no \"‹ Back to Issues · Fixing 1 of 2\" band after Fix",
+  "archetype": "IS02 fixing band"
+ },
+ "236:10492": {
+  "status": "drift",
+  "note": "shell/IssuesPanel.tsx:213 — errors-first exists; no \"n block publishing · n tips\" summary or per-row location",
+  "archetype": "IS01/IS03 issues list"
+ },
+ "236:11031": {
+  "status": "blocked:handoff-note",
+  "note": "annotation frame, not a UI state; recommend out-of-scope",
+  "archetype": "handoff/spec note"
+ },
+ "237:8258": {
+  "status": "drift",
+  "note": "sidebar/tabs/review/ReviewTab.tsx:141 — L-F. Status line/page groups/Locate exist; round card, Client/Team/All, Next ›, audience picker dif…",
+  "archetype": "R01-05 review task panel"
+ },
+ "237:8840": {
+  "status": "drift",
+  "note": "sidebar/tabs/review/ReviewTab.tsx:141 — L-F. Status line/page groups/Locate exist; round card, Client/Team/All, Next ›, audience picker dif…",
+  "archetype": "R01-05 review task panel"
+ },
+ "237:9422": {
+  "status": "drift",
+  "note": "sidebar/tabs/review/ReviewTab.tsx:141 — L-F. Status line/page groups/Locate exist; round card, Client/Team/All, Next ›, audience picker dif…",
+  "archetype": "R01-05 review task panel"
+ },
+ "237:9951": {
+  "status": "drift",
+  "note": "sidebar/tabs/review/ReviewTab.tsx:141 — L-F. Status line/page groups/Locate exist; round card, Client/Team/All, Next ›, audience picker dif…",
+  "archetype": "R01-05 review task panel"
+ },
+ "237:10534": {
+  "status": "drift",
+  "note": "sidebar/tabs/review/ReviewTab.tsx:141 — L-F. Status line/page groups/Locate exist; round card, Client/Team/All, Next ›, audience picker dif…",
+  "archetype": "R01-05 review task panel"
+ },
+ "237:11120": {
+  "status": "missing",
+  "note": "no leave guard for an unsent reply",
+  "archetype": "R06 unsent reply guard"
+ },
+ "237:11712": {
+  "status": "drift",
+  "note": "shell/SendForReview.tsx:110 — code silently sends without preview; board stops and asks",
+  "archetype": "R07 preview render failed"
+ },
+ "237:12304": {
+  "status": "drift",
+  "note": "packages/dashboard/app/review/[token]/review-client.tsx:478 — notes + approve exist; no pins, anchored composer, device switch, 6-digit cod…",
+  "archetype": "R08-14 client review page"
+ },
+ "237:12354": {
+  "status": "drift",
+  "note": "packages/dashboard/app/review/[token]/review-client.tsx:478 — notes + approve exist; no pins, anchored composer, device switch, 6-digit cod…",
+  "archetype": "R08-14 client review page"
+ },
+ "237:12411": {
+  "status": "drift",
+  "note": "packages/dashboard/app/review/[token]/review-client.tsx:478 — notes + approve exist; no pins, anchored composer, device switch, 6-digit cod…",
+  "archetype": "R08-14 client review page"
+ },
+ "237:12474": {
+  "status": "drift",
+  "note": "packages/dashboard/app/review/[token]/review-client.tsx:478 — notes + approve exist; no pins, anchored composer, device switch, 6-digit cod…",
+  "archetype": "R08-14 client review page"
+ },
+ "237:12524": {
+  "status": "drift",
+  "note": "packages/dashboard/app/review/[token]/review-client.tsx:478 — notes + approve exist; no pins, anchored composer, device switch, 6-digit cod…",
+  "archetype": "R08-14 client review page"
+ },
+ "237:12576": {
+  "status": "drift",
+  "note": "packages/dashboard/app/review/[token]/review-client.tsx:478 — notes + approve exist; no pins, anchored composer, device switch, 6-digit cod…",
+  "archetype": "R08-14 client review page"
+ },
+ "237:12609": {
+  "status": "drift",
+  "note": "packages/dashboard/app/review/[token]/review-client.tsx:478 — notes + approve exist; no pins, anchored composer, device switch, 6-digit cod…",
+  "archetype": "R08-14 client review page"
+ },
+ "237:12639": {
+  "status": "blocked:handoff-note",
+  "note": "annotation frame, not a UI state; recommend out-of-scope",
+  "archetype": "handoff/spec note"
+ },
+ "238:9980": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/OverviewScreen.tsx:175 — plan card exists, trial card missing; settings is a full-page portal (FullPageRouter…",
+  "archetype": "S01 Overview"
+ },
+ "238:10283": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:1157 — footer \"Save\" vs \"Save settings\"; scope chip copy; \"Back to canvas\" vs \"‹ Back to Editor · Hom…",
+  "archetype": "S02-04 General staged save"
+ },
+ "238:10586": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:1157 — footer \"Save\" vs \"Save settings\"; scope chip copy; \"Back to canvas\" vs \"‹ Back to Editor · Hom…",
+  "archetype": "S02-04 General staged save"
+ },
+ "238:10889": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:1157 — footer \"Save\" vs \"Save settings\"; scope chip copy; \"Back to canvas\" vs \"‹ Back to Editor · Hom…",
+  "archetype": "S02-04 General staged save"
+ },
+ "238:11192": {
+  "status": "missing",
+  "note": "no offline detection in Settings",
+  "archetype": "S05 offline save"
+ },
+ "238:11495": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — \"Unsaved settings\"/\"Save and continue\" vs \"Leave without saving?\"/\"Save and…",
+  "archetype": "S06 leave guard"
+ },
+ "238:11810": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/LocalizationScreen.tsx:65 — staged default vs immediate locales; removal Undo + translated counts differ",
+  "archetype": "S07 Languages"
+ },
+ "238:12118": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/SeoScreen.tsx:101 — no Page settings link, no \"SEO analysis · Planned\"",
+  "archetype": "S08 SEO"
+ },
+ "238:12413": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/DomainsScreen.tsx:141 — cards/DNS view differ; Make primary + Undo present",
+  "archetype": "S09 Domains"
+ },
+ "238:12721": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/RedirectsScreen.tsx:286 — delete + Undo exist; \"Redirects · 3 of 100\" header, scope copy differ",
+  "archetype": "S10 Redirects"
+ },
+ "238:13017": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/AccessScreen.tsx:201 — password card exists; checkbox copy + trial line differ",
+  "archetype": "S11 Access"
+ },
+ "238:13310": {
+  "status": "missing",
+  "note": "no turn-off-and-publish consequence confirm",
+  "archetype": "S12 Access off and publish"
+ },
+ "238:13598": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/FormsScreen.tsx:92 — single all-forms inbox; no form filter, bulk select, \"Delete n\"",
+  "archetype": "S13-14 Form submissions"
+ },
+ "238:13898": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/FormsScreen.tsx:92 — single all-forms inbox; no form filter, bulk select, \"Delete n\"",
+  "archetype": "S13-14 Form submissions"
+ },
+ "238:14186": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/AdvancedScreen.tsx:151 — \"Saved · not published on Free\" line missing",
+  "archetype": "S15 Custom code on Free"
+ },
+ "238:14472": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/DangerZoneScreen.tsx:104 — archive/transfer/delete + typed delete exist (DeleteSiteModal); copy differs",
+  "archetype": "S16-17 Danger zone"
+ },
+ "238:14765": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/DangerZoneScreen.tsx:104 — archive/transfer/delete + typed delete exist (DeleteSiteModal); copy differs",
+  "archetype": "S16-17 Danger zone"
+ },
+ "238:15056": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/SlugChangeDialog.tsx:41 — title + \"Change URL\" match; body copy differs",
+  "archetype": "S18 change site URL"
+ },
+ "238:15344": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:712 — ReadOnlyBanner exists; copy \"Domains need Admin access…\" differs",
+  "archetype": "S19 Domains read-only"
+ },
+ "238:15632": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:1015 — search mode exists; result row \"Screen › Group › Field\" + Open › differ",
+  "archetype": "S20 settings search"
+ },
+ "238:15920": {
+  "status": "missing",
+  "note": "no compact settings navigation at 1280×640",
+  "archetype": "S21 1280 collapsed nav"
+ },
+ "238:16303": {
+  "status": "blocked:handoff-note",
+  "note": "annotation frame, not a UI state; recommend out-of-scope",
+  "archetype": "handoff/spec note"
+ },
+ "239:12234": {
+  "status": "missing",
+  "note": "dashboard account settings has no usage-data toggle",
+  "archetype": "S22-24 Account › Privacy"
+ },
+ "239:12256": {
+  "status": "missing",
+  "note": "dashboard account settings has no usage-data toggle",
+  "archetype": "S22-24 Account › Privacy"
+ },
+ "239:12280": {
+  "status": "missing",
+  "note": "dashboard account settings has no usage-data toggle",
+  "archetype": "S22-24 Account › Privacy"
+ },
+ "245:45159": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/AnalyticsScreen.tsx:376 — 4 providers + verify pill exist; tracker disclaimer, status copy, footer states dif…",
+  "archetype": "AN analytics provider screen"
+ },
+ "245:45416": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/AnalyticsScreen.tsx:376 — 4 providers + verify pill exist; tracker disclaimer, status copy, footer states dif…",
+  "archetype": "AN analytics provider screen"
+ },
+ "245:45673": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/AnalyticsScreen.tsx:376 — 4 providers + verify pill exist; tracker disclaimer, status copy, footer states dif…",
+  "archetype": "AN analytics provider screen"
+ },
+ "245:45931": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/AnalyticsScreen.tsx:376 — 4 providers + verify pill exist; tracker disclaimer, status copy, footer states dif…",
+  "archetype": "AN analytics provider screen"
+ },
+ "245:46189": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/AnalyticsScreen.tsx:376 — 4 providers + verify pill exist; tracker disclaimer, status copy, footer states dif…",
+  "archetype": "AN analytics provider screen"
+ },
+ "245:46449": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/AnalyticsScreen.tsx:376 — 4 providers + verify pill exist; tracker disclaimer, status copy, footer states dif…",
+  "archetype": "AN analytics provider screen"
+ },
+ "245:46707": {
+  "status": "missing",
+  "note": "no offline state",
+  "archetype": "AN07 offline"
+ },
+ "245:46965": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/AnalyticsScreen.tsx:376 — 4 providers + verify pill exist; tracker disclaimer, status copy, footer states dif…",
+  "archetype": "AN analytics provider screen"
+ },
+ "245:47222": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/AnalyticsScreen.tsx:376 — 4 providers + verify pill exist; tracker disclaimer, status copy, footer states dif…",
+  "archetype": "AN analytics provider screen"
+ },
+ "245:47479": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/AnalyticsScreen.tsx:376 — 4 providers + verify pill exist; tracker disclaimer, status copy, footer states dif…",
+  "archetype": "AN analytics provider screen"
+ },
+ "245:47736": {
+  "status": "match",
+  "note": "sidebar/tabs/settings/screens/AnalyticsScreen.tsx:134 — all board copy present",
+  "archetype": "AN11 not configured"
+ },
+ "245:47988": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/HeadersScreen.tsx:117 — fields exist; \"Browser policies\" group, HSTS \"1 year · 31536000 seconds\" labels, cust…",
+  "archetype": "SH security headers screen"
+ },
+ "245:48243": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/HeadersScreen.tsx:117 — fields exist; \"Browser policies\" group, HSTS \"1 year · 31536000 seconds\" labels, cust…",
+  "archetype": "SH security headers screen"
+ },
+ "245:48510": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/HeadersScreen.tsx:117 — fields exist; \"Browser policies\" group, HSTS \"1 year · 31536000 seconds\" labels, cust…",
+  "archetype": "SH security headers screen"
+ },
+ "245:48768": {
+  "status": "missing",
+  "note": "no offline state",
+  "archetype": "SH04 offline"
+ },
+ "245:49024": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/HeadersScreen.tsx:117 — fields exist; \"Browser policies\" group, HSTS \"1 year · 31536000 seconds\" labels, cust…",
+  "archetype": "SH security headers screen"
+ },
+ "245:49280": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/HeadersScreen.tsx:117 — fields exist; \"Browser policies\" group, HSTS \"1 year · 31536000 seconds\" labels, cust…",
+  "archetype": "SH security headers screen"
+ },
+ "245:49535": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/HeadersScreen.tsx:117 — fields exist; \"Browser policies\" group, HSTS \"1 year · 31536000 seconds\" labels, cust…",
+  "archetype": "SH security headers screen"
+ },
+ "245:49790": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/HeadersScreen.tsx:117 — fields exist; \"Browser policies\" group, HSTS \"1 year · 31536000 seconds\" labels, cust…",
+  "archetype": "SH security headers screen"
+ },
+ "245:50045": {
+  "status": "missing",
+  "note": "no \"Checking your access… · Save unavailable\" footer state",
+  "archetype": "SH09 checking access"
+ },
+ "245:50300": {
+  "status": "drift",
+  "note": "shell/modals/PermissionsModal.tsx:52 — modal lists editor actions; board = settings min-role matrix (data in constants.ts:168)",
+  "archetype": "PM permissions matrix"
+ },
+ "245:50545": {
+  "status": "missing",
+  "note": "no per-field settings conflict; CMS has the pattern (services/cmsSync.ts:219)",
+  "archetype": "CF settings conflict"
+ },
+ "245:50779": {
+  "status": "missing",
+  "note": "no per-field settings conflict; CMS has the pattern (services/cmsSync.ts:219)",
+  "archetype": "CF settings conflict"
+ },
+ "245:51002": {
+  "status": "missing",
+  "note": "no per-field settings conflict; CMS has the pattern (services/cmsSync.ts:219)",
+  "archetype": "CF settings conflict"
+ },
+ "245:51225": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — save-and-continue to pending nav exists; dialog copy differs",
+  "archetype": "SG01 guard keeps destination"
+ },
+ "245:51515": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:988 — \"Back to canvas\" vs \"‹ Back to Editor · Home\"; phase1 shell",
+  "archetype": "Return to editor"
+ },
+ "245:51921": {
+  "status": "blocked:handoff-note",
+  "note": "annotation frame, not a UI state; recommend out-of-scope",
+  "archetype": "handoff/spec note"
+ },
+ "248:15601": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/AnalyticsScreen.tsx:376 — 4 providers + verify pill exist; tracker disclaimer, status copy, footer states dif…",
+  "archetype": "AN analytics provider screen"
+ },
+ "248:15849": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/HeadersScreen.tsx:117 — fields exist; \"Browser policies\" group, HSTS \"1 year · 31536000 seconds\" labels, cust…",
+  "archetype": "SH security headers screen"
+ },
+ "248:16058": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/HeadersScreen.tsx:117 — fields exist; \"Browser policies\" group, HSTS \"1 year · 31536000 seconds\" labels, cust…",
+  "archetype": "SH security headers screen"
+ },
+ "248:16302": {
+  "status": "drift",
+  "note": "shell/modals/PermissionsModal.tsx:52 — Permissions over each screen; matrix copy differs",
+  "archetype": "Permissions return"
+ },
+ "248:16547": {
+  "status": "drift",
+  "note": "shell/modals/PermissionsModal.tsx:52 — Permissions over each screen; matrix copy differs",
+  "archetype": "Permissions return",
+  "inheritsFrom": "248:16302"
+ },
+ "248:16786": {
+  "status": "drift",
+  "note": "shell/modals/PermissionsModal.tsx:52 — Permissions over each screen; matrix copy differs",
+  "archetype": "Permissions return"
+ },
+ "248:17038": {
+  "status": "drift",
+  "note": "shell/modals/PermissionsModal.tsx:52 — Permissions over each screen; matrix copy differs",
+  "archetype": "Permissions return",
+  "inheritsFrom": "248:16302"
+ },
+ "248:17278": {
+  "status": "drift",
+  "note": "shell/modals/PermissionsModal.tsx:52 — Permissions over each screen; matrix copy differs",
+  "archetype": "Permissions return",
+  "inheritsFrom": "248:16302"
+ },
+ "248:17522": {
+  "status": "drift",
+  "note": "shell/modals/PermissionsModal.tsx:52 — Permissions over each screen; matrix copy differs",
+  "archetype": "Permissions return",
+  "inheritsFrom": "248:16302"
+ },
+ "248:17752": {
+  "status": "drift",
+  "note": "shell/modals/PermissionsModal.tsx:52 — Permissions over each screen; matrix copy differs",
+  "archetype": "Permissions return",
+  "inheritsFrom": "248:16302"
+ },
+ "248:17989": {
+  "status": "drift",
+  "note": "shell/modals/PermissionsModal.tsx:52 — Permissions over each screen; matrix copy differs",
+  "archetype": "Permissions return"
+ },
+ "248:18203": {
+  "status": "drift",
+  "note": "shell/modals/PermissionsModal.tsx:52 — Permissions over each screen; matrix copy differs",
+  "archetype": "Permissions return",
+  "inheritsFrom": "248:16302"
+ },
+ "248:18486": {
+  "status": "drift",
+  "note": "shell/modals/PermissionsModal.tsx:52 — Permissions over each screen; matrix copy differs",
+  "archetype": "Permissions return",
+  "inheritsFrom": "248:16302"
+ },
+ "248:18768": {
+  "status": "drift",
+  "note": "shell/modals/PermissionsModal.tsx:52 — Permissions over each screen; matrix copy differs",
+  "archetype": "Permissions return",
+  "inheritsFrom": "248:16302"
+ },
+ "248:19049": {
+  "status": "drift",
+  "note": "shell/modals/PermissionsModal.tsx:52 — Permissions over each screen; matrix copy differs",
+  "archetype": "Permissions return",
+  "inheritsFrom": "248:16302"
+ },
+ "248:19325": {
+  "status": "drift",
+  "note": "shell/modals/PermissionsModal.tsx:52 — Permissions over each screen; matrix copy differs",
+  "archetype": "Permissions return",
+  "inheritsFrom": "248:16302"
+ },
+ "248:19606": {
+  "status": "drift",
+  "note": "shell/modals/PermissionsModal.tsx:52 — Permissions over each screen; matrix copy differs",
+  "archetype": "Permissions return"
+ },
+ "248:19866": {
+  "status": "drift",
+  "note": "shell/modals/PermissionsModal.tsx:52 — Permissions over each screen; matrix copy differs",
+  "archetype": "Permissions return",
+  "inheritsFrom": "248:16302"
+ },
+ "248:20145": {
+  "status": "drift",
+  "note": "shell/modals/PermissionsModal.tsx:52 — Permissions over each screen; matrix copy differs",
+  "archetype": "Permissions return"
+ },
+ "248:20428": {
+  "status": "drift",
+  "note": "shell/modals/PermissionsModal.tsx:52 — Permissions over each screen; matrix copy differs",
+  "archetype": "Permissions return"
+ },
+ "248:20642": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; board names the destination",
+  "archetype": "GUARD general draft → dest"
+ },
+ "248:20853": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — button \"Saving…\" only; board \"Saving General settings… · Stay in General\"",
+  "archetype": "SAVING general draft → dest"
+ },
+ "248:21107": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; board names the destination",
+  "archetype": "GUARD general draft → dest",
+  "inheritsFrom": "248:20642"
+ },
+ "248:21318": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — button \"Saving…\" only; board \"Saving General settings… · Stay in General\"",
+  "archetype": "SAVING general draft → dest"
+ },
+ "248:21572": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; board names the destination",
+  "archetype": "GUARD general draft → dest",
+  "inheritsFrom": "248:20642"
+ },
+ "248:21783": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — button \"Saving…\" only; board \"Saving General settings… · Stay in General\"",
+  "archetype": "SAVING general draft → dest"
+ },
+ "248:22037": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; board names the destination",
+  "archetype": "GUARD general draft → dest",
+  "inheritsFrom": "248:20642"
+ },
+ "248:22248": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — button \"Saving…\" only; board \"Saving General settings… · Stay in General\"",
+  "archetype": "SAVING general draft → dest"
+ },
+ "248:22502": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; board names the destination",
+  "archetype": "GUARD general draft → dest",
+  "inheritsFrom": "248:20642"
+ },
+ "248:22713": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — button \"Saving…\" only; board \"Saving General settings… · Stay in General\"",
+  "archetype": "SAVING general draft → dest"
+ },
+ "248:22967": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; board names the destination",
+  "archetype": "GUARD general draft → dest",
+  "inheritsFrom": "248:20642"
+ },
+ "248:23178": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — button \"Saving…\" only; board \"Saving General settings… · Stay in General\"",
+  "archetype": "SAVING general draft → dest"
+ },
+ "248:23432": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; board names the destination",
+  "archetype": "GUARD general draft → dest",
+  "inheritsFrom": "248:20642"
+ },
+ "248:23644": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — button \"Saving…\" only; board \"Saving General settings… · Stay in General\"",
+  "archetype": "SAVING general draft → dest"
+ },
+ "248:23901": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; board names the destination",
+  "archetype": "GUARD general draft → dest",
+  "inheritsFrom": "248:20642"
+ },
+ "248:24113": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — button \"Saving…\" only; board \"Saving General settings… · Stay in General\"",
+  "archetype": "SAVING general draft → dest"
+ },
+ "248:24370": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; board names the destination",
+  "archetype": "GUARD general draft → dest",
+  "inheritsFrom": "248:20642"
+ },
+ "248:24582": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — button \"Saving…\" only; board \"Saving General settings… · Stay in General\"",
+  "archetype": "SAVING general draft → dest"
+ },
+ "248:24839": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; board names the destination",
+  "archetype": "GUARD general draft → dest",
+  "inheritsFrom": "248:20642"
+ },
+ "248:25052": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — button \"Saving…\" only; board \"Saving General settings… · Stay in General\"",
+  "archetype": "SAVING general draft → dest"
+ },
+ "252:47222": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/AnalyticsScreen.tsx:324 — load/error exist; \"Couldn’t load Analytics\" copy differs",
+  "archetype": "AN13-14 load states"
+ },
+ "252:47480": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/AnalyticsScreen.tsx:324 — load/error exist; \"Couldn’t load Analytics\" copy differs",
+  "archetype": "AN13-14 load states"
+ },
+ "252:47733": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:786 — shell load/error exist; per-screen copy differs",
+  "archetype": "SH12-13 load states"
+ },
+ "252:47989": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:786 — shell load/error exist; per-screen copy differs",
+  "archetype": "SH12-13 load states"
+ },
+ "252:48242": {
+  "status": "missing",
+  "note": "no compact nav popover / fixed footer at 1280×640",
+  "archetype": "AN15-16 / SH14-15 compact 1280"
+ },
+ "252:48492": {
+  "status": "missing",
+  "note": "no compact nav popover / fixed footer at 1280×640",
+  "archetype": "AN15-16 / SH14-15 compact 1280"
+ },
+ "252:48740": {
+  "status": "missing",
+  "note": "no compact nav popover / fixed footer at 1280×640",
+  "archetype": "AN15-16 / SH14-15 compact 1280"
+ },
+ "252:48979": {
+  "status": "missing",
+  "note": "no compact nav popover / fixed footer at 1280×640",
+  "archetype": "AN15-16 / SH14-15 compact 1280"
+ },
+ "252:49216": {
+  "status": "drift",
+  "note": "shell/modals/PermissionsModal.tsx:52 — modal lists editor actions; board = settings min-role matrix (data in constants.ts:168)",
+  "archetype": "PM permissions matrix"
+ },
+ "252:49487": {
+  "status": "drift",
+  "note": "shell/modals/PermissionsModal.tsx:52 — modal lists editor actions; board = settings min-role matrix (data in constants.ts:168)",
+  "archetype": "PM permissions matrix"
+ },
+ "272:21156": {
+  "status": "missing",
+  "note": "no Spam/Archived views or form filter (server listSubmissions supports them)",
+  "archetype": "FM Spam/Archived/filter views"
+ },
+ "272:21455": {
+  "status": "missing",
+  "note": "no Spam/Archived views or form filter (server listSubmissions supports them)",
+  "archetype": "FM Spam/Archived/filter views"
+ },
+ "272:21754": {
+  "status": "missing",
+  "note": "no Spam/Archived views or form filter (server listSubmissions supports them)",
+  "archetype": "FM Spam/Archived/filter views"
+ },
+ "272:22068": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/FormsScreen.tsx:92 — all-forms inbox + detail + delete exist; per-form header, bulk select, counts differ",
+  "archetype": "FM inbox list"
+ },
+ "272:22382": {
+  "status": "missing",
+  "note": "no Spam/Archived views or form filter (server listSubmissions supports them)",
+  "archetype": "FM Spam/Archived/filter views"
+ },
+ "272:22660": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/FormsScreen.tsx:92 — all-forms inbox + detail + delete exist; per-form header, bulk select, counts differ",
+  "archetype": "FM inbox list"
+ },
+ "272:22932": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/FormsScreen.tsx:92 — all-forms inbox + detail + delete exist; per-form header, bulk select, counts differ",
+  "archetype": "FM inbox list"
+ },
+ "272:23206": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/FormsScreen.tsx:188 — error line exists; selection-kept + pending states differ",
+  "archetype": "FM08/10 delete pending/failed"
+ },
+ "272:23475": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/FormsScreen.tsx:92 — all-forms inbox + detail + delete exist; per-form header, bulk select, counts differ",
+  "archetype": "FM inbox list"
+ },
+ "272:23770": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/FormsScreen.tsx:188 — error line exists; selection-kept + pending states differ",
+  "archetype": "FM08/10 delete pending/failed"
+ },
+ "272:24050": {
+  "status": "missing",
+  "note": "view-aware export needs server (exportSubmissions has no view, server/trpc/routers/forms.ts:91)",
+  "archetype": "FM export per view/form · Preparing CSV"
+ },
+ "272:24319": {
+  "status": "missing",
+  "note": "view-aware export needs server (exportSubmissions has no view, server/trpc/routers/forms.ts:91)",
+  "archetype": "FM export per view/form · CSV prepared"
+ },
+ "272:24592": {
+  "status": "missing",
+  "note": "view-aware export needs server (exportSubmissions has no view, server/trpc/routers/forms.ts:91)",
+  "archetype": "FM export per view/form · CSV failed"
+ },
+ "272:24871": {
+  "status": "missing",
+  "note": "view-aware export needs server (exportSubmissions has no view, server/trpc/routers/forms.ts:91)",
+  "archetype": "FM export per view/form · Preparing CSV"
+ },
+ "272:25119": {
+  "status": "missing",
+  "note": "view-aware export needs server (exportSubmissions has no view, server/trpc/routers/forms.ts:91)",
+  "archetype": "FM export per view/form · CSV prepared",
+  "inheritsFrom": "272:24319"
+ },
+ "272:25371": {
+  "status": "missing",
+  "note": "view-aware export needs server (exportSubmissions has no view, server/trpc/routers/forms.ts:91)",
+  "archetype": "FM export per view/form · CSV failed"
+ },
+ "272:25629": {
+  "status": "missing",
+  "note": "view-aware export needs server (exportSubmissions has no view, server/trpc/routers/forms.ts:91)",
+  "archetype": "FM export per view/form · Preparing CSV"
+ },
+ "272:25877": {
+  "status": "missing",
+  "note": "view-aware export needs server (exportSubmissions has no view, server/trpc/routers/forms.ts:91)",
+  "archetype": "FM export per view/form · CSV prepared",
+  "inheritsFrom": "272:24319"
+ },
+ "272:26129": {
+  "status": "missing",
+  "note": "view-aware export needs server (exportSubmissions has no view, server/trpc/routers/forms.ts:91)",
+  "archetype": "FM export per view/form · CSV failed"
+ },
+ "272:26387": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/FormsScreen.tsx:192 — Export CSV exists; preparing/ready/failed copy differs",
+  "archetype": "FM export Inbox/All forms · Preparing CSV"
+ },
+ "272:26650": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/FormsScreen.tsx:192 — Export CSV exists; preparing/ready/failed copy differs",
+  "archetype": "FM export Inbox/All forms · CSV prepared"
+ },
+ "272:26917": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/FormsScreen.tsx:192 — Export CSV exists; preparing/ready/failed copy differs",
+  "archetype": "FM export Inbox/All forms · CSV failed"
+ },
+ "272:27190": {
+  "status": "missing",
+  "note": "no Unspam/Unarchive actions (updateSubmission supports isSpam/isArchived)",
+  "archetype": "FM unspam/unarchive · Pending"
+ },
+ "272:27440": {
+  "status": "missing",
+  "note": "no Unspam/Unarchive actions (updateSubmission supports isSpam/isArchived)",
+  "archetype": "FM unspam/unarchive · Acknowledged"
+ },
+ "272:27718": {
+  "status": "missing",
+  "note": "no Unspam/Unarchive actions (updateSubmission supports isSpam/isArchived)",
+  "archetype": "FM unspam/unarchive · Failed"
+ },
+ "272:27978": {
+  "status": "missing",
+  "note": "no Unspam/Unarchive actions (updateSubmission supports isSpam/isArchived)",
+  "archetype": "FM unspam/unarchive · Pending"
+ },
+ "272:28228": {
+  "status": "missing",
+  "note": "no Unspam/Unarchive actions (updateSubmission supports isSpam/isArchived)",
+  "archetype": "FM unspam/unarchive · Acknowledged",
+  "inheritsFrom": "272:27440"
+ },
+ "272:28506": {
+  "status": "missing",
+  "note": "no Unspam/Unarchive actions (updateSubmission supports isSpam/isArchived)",
+  "archetype": "FM unspam/unarchive · Failed"
+ },
+ "272:28766": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/FormsScreen.tsx:7 — Configure in Inspector exists; no \"‹ Back to submissions\" return",
+  "archetype": "FM11 configure return"
+ },
+ "272:29123": {
+  "status": "blocked:handoff-note",
+  "note": "annotation frame, not a UI state; recommend out-of-scope",
+  "archetype": "handoff/spec note"
+ },
+ "276:28306": {
+  "status": "missing",
+  "note": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+  "archetype": "GAP-RV approval with code"
+ },
+ "276:28376": {
+  "status": "missing",
+  "note": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+  "archetype": "GAP-RV approval with code"
+ },
+ "276:28444": {
+  "status": "missing",
+  "note": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+  "archetype": "GAP-RV approval with code"
+ },
+ "276:28504": {
+  "status": "missing",
+  "note": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+  "archetype": "GAP-RV approval with code"
+ },
+ "276:28558": {
+  "status": "missing",
+  "note": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+  "archetype": "GAP-RV approval with code"
+ },
+ "276:28616": {
+  "status": "missing",
+  "note": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+  "archetype": "GAP-RV approval with code"
+ },
+ "276:28687": {
+  "status": "missing",
+  "note": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+  "archetype": "GAP-RV approval with code"
+ },
+ "276:28752": {
+  "status": "missing",
+  "note": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+  "archetype": "GAP-RV approval with code"
+ },
+ "276:28811": {
+  "status": "missing",
+  "note": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+  "archetype": "GAP-RV approval with code"
+ },
+ "276:28873": {
+  "status": "missing",
+  "note": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+  "archetype": "GAP-RV approval with code"
+ },
+ "276:28938": {
+  "status": "missing",
+  "note": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+  "archetype": "GAP-RV approval with code"
+ },
+ "276:29002": {
+  "status": "missing",
+  "note": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+  "archetype": "GAP-RV approval with code"
+ },
+ "276:29064": {
+  "status": "missing",
+  "note": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+  "archetype": "GAP-RV approval with code"
+ },
+ "276:29130": {
+  "status": "missing",
+  "note": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+  "archetype": "GAP-RV approval with code"
+ },
+ "276:29206": {
+  "status": "missing",
+  "note": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+  "archetype": "GAP-RV approval with code"
+ },
+ "276:29254": {
+  "status": "missing",
+  "note": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+  "archetype": "GAP-RV approval with code"
+ },
+ "276:29300": {
+  "status": "missing",
+  "note": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+  "archetype": "GAP-RV approval with code"
+ },
+ "276:29338": {
+  "status": "missing",
+  "note": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+  "archetype": "GAP-RV approval with code"
+ },
+ "276:29371": {
+  "status": "missing",
+  "note": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+  "archetype": "GAP-RV approval with code"
+ },
+ "276:29404": {
+  "status": "missing",
+  "note": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+  "archetype": "GAP-RV approval with code"
+ },
+ "276:29453": {
+  "status": "missing",
+  "note": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+  "archetype": "GAP-RV approval with code"
+ },
+ "276:29496": {
+  "status": "missing",
+  "note": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+  "archetype": "GAP-RV approval with code"
+ },
+ "276:29533": {
+  "status": "missing",
+  "note": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+  "archetype": "GAP-RV approval with code"
+ },
+ "276:29573": {
+  "status": "missing",
+  "note": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+  "archetype": "GAP-RV approval with code"
+ },
+ "276:29616": {
+  "status": "missing",
+  "note": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+  "archetype": "GAP-RV approval with code"
+ },
+ "276:29658": {
+  "status": "missing",
+  "note": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+  "archetype": "GAP-RV approval with code"
+ },
+ "276:29698": {
+  "status": "missing",
+  "note": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+  "archetype": "GAP-RV approval with code"
+ },
+ "276:29742": {
+  "status": "missing",
+  "note": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+  "archetype": "GAP-RV approval with code"
+ },
+ "276:29801": {
+  "status": "missing",
+  "note": "no phone pin placement, pan, comments sheet on the client page",
+  "archetype": "GAP-RV phone placement/comments"
+ },
+ "276:29852": {
+  "status": "missing",
+  "note": "no phone pin placement, pan, comments sheet on the client page",
+  "archetype": "GAP-RV phone placement/comments"
+ },
+ "276:29893": {
+  "status": "missing",
+  "note": "no phone pin placement, pan, comments sheet on the client page",
+  "archetype": "GAP-RV phone placement/comments"
+ },
+ "276:29945": {
+  "status": "missing",
+  "note": "no phone pin placement, pan, comments sheet on the client page",
+  "archetype": "GAP-RV phone placement/comments"
+ },
+ "276:29997": {
+  "status": "missing",
+  "note": "no phone pin placement, pan, comments sheet on the client page",
+  "archetype": "GAP-RV phone placement/comments"
+ },
+ "276:30041": {
+  "status": "missing",
+  "note": "no phone pin placement, pan, comments sheet on the client page",
+  "archetype": "GAP-RV phone placement/comments"
+ },
+ "276:30092": {
+  "status": "missing",
+  "note": "no phone pin placement, pan, comments sheet on the client page",
+  "archetype": "GAP-RV phone placement/comments"
+ },
+ "276:30128": {
+  "status": "missing",
+  "note": "no phone pin placement, pan, comments sheet on the client page",
+  "archetype": "GAP-RV phone placement/comments"
+ },
+ "276:30195": {
+  "status": "drift",
+  "note": "packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
+  "archetype": "GAP-RV request-changes flow"
+ },
+ "276:30262": {
+  "status": "drift",
+  "note": "packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
+  "archetype": "GAP-RV request-changes flow"
+ },
+ "276:30321": {
+  "status": "drift",
+  "note": "packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
+  "archetype": "GAP-RV request-changes flow"
+ },
+ "276:30380": {
+  "status": "drift",
+  "note": "packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
+  "archetype": "GAP-RV request-changes flow"
+ },
+ "276:30445": {
+  "status": "drift",
+  "note": "packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
+  "archetype": "GAP-RV request-changes flow"
+ },
+ "276:30499": {
+  "status": "drift",
+  "note": "packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
+  "archetype": "GAP-RV request-changes flow"
+ },
+ "276:30572": {
+  "status": "drift",
+  "note": "packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
+  "archetype": "GAP-RV request-changes flow"
+ },
+ "276:30625": {
+  "status": "drift",
+  "note": "packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
+  "archetype": "GAP-RV request-changes flow"
+ },
+ "276:30670": {
+  "status": "drift",
+  "note": "packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
+  "archetype": "GAP-RV request-changes flow"
+ },
+ "276:30715": {
+  "status": "drift",
+  "note": "packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
+  "archetype": "GAP-RV request-changes flow"
+ },
+ "276:30766": {
+  "status": "drift",
+  "note": "packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
+  "archetype": "GAP-RV request-changes flow"
+ },
+ "276:30803": {
+  "status": "drift",
+  "note": "packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
+  "archetype": "GAP-RV request-changes flow"
+ },
+ "276:30862": {
+  "status": "blocked:handoff-note",
+  "note": "annotation frame, not a UI state; recommend out-of-scope",
+  "archetype": "handoff/spec note"
+ },
+ "277:25315": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/LocalizationScreen.tsx:65 — staged-default save/ack/failure + Français Undo states differ",
+  "archetype": "GAP-ST-L Languages default save"
+ },
+ "277:25524": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/LocalizationScreen.tsx:65 — staged-default save/ack/failure + Français Undo states differ",
+  "archetype": "GAP-ST-L Languages default save"
+ },
+ "277:25733": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/LocalizationScreen.tsx:65 — staged-default save/ack/failure + Français Undo states differ",
+  "archetype": "GAP-ST-L Languages default save"
+ },
+ "277:25943": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/LocalizationScreen.tsx:65 — staged-default save/ack/failure + Français Undo states differ",
+  "archetype": "GAP-ST-L Languages default save"
+ },
+ "277:26152": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/LocalizationScreen.tsx:65 — staged-default save/ack/failure + Français Undo states differ",
+  "archetype": "GAP-ST-L Languages default save"
+ },
+ "277:26371": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/HeadersScreen.tsx:61 — HSTS presets exist; saved/saving/failure copy differs",
+  "archetype": "GAP-ST-H HSTS save"
+ },
+ "277:26615": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/HeadersScreen.tsx:61 — HSTS presets exist; saved/saving/failure copy differs",
+  "archetype": "GAP-ST-H HSTS save"
+ },
+ "277:26859": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/HeadersScreen.tsx:61 — HSTS presets exist; saved/saving/failure copy differs",
+  "archetype": "GAP-ST-H HSTS save"
+ },
+ "277:27105": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — lands on destination after save; ack copy differs",
+  "archetype": "GAP-ST-T acknowledged target"
+ },
+ "277:27321": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — lands on destination after save; ack copy differs",
+  "archetype": "GAP-ST-T acknowledged target"
+ },
+ "277:27516": {
+  "status": "missing",
+  "note": "Brand has only \"‹ Back to canvas\" (design-system/ui/BrandWorkspace.tsx:254); no return to Site settings (L-D)",
+  "archetype": "GAP-ST Brand return to settings"
+ },
+ "277:27746": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
+  "archetype": "GAP-ST guard draft→dest"
+ },
+ "277:27988": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button",
+  "archetype": "GAP-ST saving→dest"
+ },
+ "277:28233": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog",
+  "archetype": "GAP-ST save failed→dest"
+ },
+ "277:28527": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
+  "archetype": "GAP-ST guard draft→dest",
+  "inheritsFrom": "277:27746"
+ },
+ "277:28769": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button",
+  "archetype": "GAP-ST saving→dest"
+ },
+ "277:29014": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog",
+  "archetype": "GAP-ST save failed→dest"
+ },
+ "277:29308": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
+  "archetype": "GAP-ST guard draft→dest",
+  "inheritsFrom": "277:27746"
+ },
+ "277:29551": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button",
+  "archetype": "GAP-ST saving→dest"
+ },
+ "277:29797": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog",
+  "archetype": "GAP-ST save failed→dest"
+ },
+ "277:30094": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
+  "archetype": "GAP-ST guard draft→dest",
+  "inheritsFrom": "277:27746"
+ },
+ "277:30337": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button",
+  "archetype": "GAP-ST saving→dest"
+ },
+ "277:30583": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog",
+  "archetype": "GAP-ST save failed→dest"
+ },
+ "277:30880": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
+  "archetype": "GAP-ST guard draft→dest",
+  "inheritsFrom": "277:27746"
+ },
+ "277:31124": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button",
+  "archetype": "GAP-ST saving→dest"
+ },
+ "277:31371": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog",
+  "archetype": "GAP-ST save failed→dest"
+ },
+ "277:31671": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
+  "archetype": "GAP-ST guard draft→dest",
+  "inheritsFrom": "277:27746"
+ },
+ "277:31915": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button",
+  "archetype": "GAP-ST saving→dest"
+ },
+ "277:32162": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog",
+  "archetype": "GAP-ST save failed→dest"
+ },
+ "277:32462": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
+  "archetype": "GAP-ST guard draft→dest",
+  "inheritsFrom": "277:27746"
+ },
+ "277:32706": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button",
+  "archetype": "GAP-ST saving→dest"
+ },
+ "277:32953": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog",
+  "archetype": "GAP-ST save failed→dest"
+ },
+ "277:33253": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
+  "archetype": "GAP-ST guard draft→dest",
+  "inheritsFrom": "277:27746"
+ },
+ "277:33497": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button",
+  "archetype": "GAP-ST saving→dest"
+ },
+ "277:33744": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog",
+  "archetype": "GAP-ST save failed→dest"
+ },
+ "277:34044": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
+  "archetype": "GAP-ST guard draft→dest",
+  "inheritsFrom": "277:27746"
+ },
+ "277:34288": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button",
+  "archetype": "GAP-ST saving→dest"
+ },
+ "277:34535": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog",
+  "archetype": "GAP-ST save failed→dest"
+ },
+ "277:34835": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
+  "archetype": "GAP-ST guard draft→dest",
+  "inheritsFrom": "277:27746"
+ },
+ "277:35080": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button",
+  "archetype": "GAP-ST saving→dest"
+ },
+ "277:35328": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog",
+  "archetype": "GAP-ST save failed→dest"
+ },
+ "277:35631": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
+  "archetype": "GAP-ST guard draft→dest",
+  "inheritsFrom": "277:27746"
+ },
+ "277:35876": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button",
+  "archetype": "GAP-ST saving→dest"
+ },
+ "277:36124": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog",
+  "archetype": "GAP-ST save failed→dest"
+ },
+ "277:36427": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
+  "archetype": "GAP-ST guard draft→dest",
+  "inheritsFrom": "277:27746"
+ },
+ "277:36672": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button",
+  "archetype": "GAP-ST saving→dest"
+ },
+ "277:36920": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog",
+  "archetype": "GAP-ST save failed→dest"
+ },
+ "277:37223": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
+  "archetype": "GAP-ST guard draft→dest",
+  "inheritsFrom": "277:27746"
+ },
+ "277:37468": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button",
+  "archetype": "GAP-ST saving→dest"
+ },
+ "277:37716": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog",
+  "archetype": "GAP-ST save failed→dest"
+ },
+ "277:38019": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/WorkspaceDoorScreen.tsx:30 — door card exists; \"Organization workspace · X\", \"Back to Site settings\" copy dif…",
+  "archetype": "GAP-ST-ORG workspace door"
+ },
+ "277:38294": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/WorkspaceDoorScreen.tsx:30 — door card exists; \"Organization workspace · X\", \"Back to Site settings\" copy dif…",
+  "archetype": "GAP-ST-ORG workspace door",
+  "inheritsFrom": "277:38019"
+ },
+ "277:38571": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/WorkspaceDoorScreen.tsx:30 — door card exists; \"Organization workspace · X\", \"Back to Site settings\" copy dif…",
+  "archetype": "GAP-ST-ORG workspace door",
+  "inheritsFrom": "277:38019"
+ },
+ "277:38850": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/WorkspaceDoorScreen.tsx:30 — door card exists; \"Organization workspace · X\", \"Back to Site settings\" copy dif…",
+  "archetype": "GAP-ST-ORG workspace door",
+  "inheritsFrom": "277:38019"
+ },
+ "277:39121": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/WorkspaceDoorScreen.tsx:30 — door card exists; \"Organization workspace · X\", \"Back to Site settings\" copy dif…",
+  "archetype": "GAP-ST-ORG workspace door",
+  "inheritsFrom": "277:38019"
+ },
+ "277:39394": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/WorkspaceDoorScreen.tsx:30 — door card exists; \"Organization workspace · X\", \"Back to Site settings\" copy dif…",
+  "archetype": "GAP-ST-ORG workspace door",
+  "inheritsFrom": "277:38019"
+ },
+ "277:39669": {
+  "status": "drift",
+  "note": "shell/modals/PermissionsModal.tsx:52 — matrix copy differs",
+  "archetype": "GAP-ST-PM permissions return"
+ },
+ "277:39946": {
+  "status": "missing",
+  "note": "Settings portal has no Publish; no \"Save settings first?\" pre-publish guard",
+  "archetype": "GAP-ST publish from settings · PB draft-excluded"
+ },
+ "277:40172": {
+  "status": "missing",
+  "note": "Settings portal has no Publish; no \"Save settings first?\" pre-publish guard",
+  "archetype": "GAP-ST publish from settings · PC draft-excluded"
+ },
+ "277:40414": {
+  "status": "missing",
+  "note": "Settings portal has no Publish; no \"Save settings first?\" pre-publish guard",
+  "archetype": "GAP-ST publish from settings · PR draft-excluded"
+ },
+ "277:40643": {
+  "status": "missing",
+  "note": "Settings portal has no Publish; no \"Save settings first?\" pre-publish guard",
+  "archetype": "GAP-ST publish from settings · PW draft-excluded"
+ },
+ "277:40858": {
+  "status": "missing",
+  "note": "Settings portal has no Publish; no \"Save settings first?\" pre-publish guard",
+  "archetype": "GAP-ST publish from settings · PB included"
+ },
+ "277:41075": {
+  "status": "missing",
+  "note": "Settings portal has no Publish; no \"Save settings first?\" pre-publish guard",
+  "archetype": "GAP-ST publish from settings · PC included"
+ },
+ "277:41305": {
+  "status": "missing",
+  "note": "Settings portal has no Publish; no \"Save settings first?\" pre-publish guard",
+  "archetype": "GAP-ST publish from settings · PR included"
+ },
+ "277:41525": {
+  "status": "missing",
+  "note": "Settings portal has no Publish; no \"Save settings first?\" pre-publish guard",
+  "archetype": "GAP-ST publish from settings · PW included"
+ },
+ "277:41731": {
+  "status": "missing",
+  "note": "Settings portal has no Publish; no \"Save settings first?\" pre-publish guard",
+  "archetype": "GAP-ST publish from settings"
+ },
+ "277:41957": {
+  "status": "missing",
+  "note": "Settings portal has no Publish; no \"Save settings first?\" pre-publish guard",
+  "archetype": "GAP-ST publish from settings"
+ },
+ "277:42171": {
+  "status": "missing",
+  "note": "Settings portal has no Publish; no \"Save settings first?\" pre-publish guard",
+  "archetype": "GAP-ST publish from settings"
+ },
+ "277:42403": {
+  "status": "missing",
+  "note": "Settings portal has no Publish; no \"Save settings first?\" pre-publish guard",
+  "archetype": "GAP-ST publish from settings · PB draft-excluded",
+  "inheritsFrom": "277:39946"
+ },
+ "277:42668": {
+  "status": "missing",
+  "note": "Settings portal has no Publish; no \"Save settings first?\" pre-publish guard",
+  "archetype": "GAP-ST publish from settings · PC draft-excluded",
+  "inheritsFrom": "277:40172"
+ },
+ "277:42964": {
+  "status": "missing",
+  "note": "Settings portal has no Publish; no \"Save settings first?\" pre-publish guard",
+  "archetype": "GAP-ST publish from settings · PR draft-excluded"
+ },
+ "277:43232": {
+  "status": "missing",
+  "note": "Settings portal has no Publish; no \"Save settings first?\" pre-publish guard",
+  "archetype": "GAP-ST publish from settings · PW draft-excluded",
+  "inheritsFrom": "277:40643"
+ },
+ "277:43486": {
+  "status": "missing",
+  "note": "Settings portal has no Publish; no \"Save settings first?\" pre-publish guard",
+  "archetype": "GAP-ST publish from settings · PB included",
+  "inheritsFrom": "277:40858"
+ },
+ "277:43742": {
+  "status": "missing",
+  "note": "Settings portal has no Publish; no \"Save settings first?\" pre-publish guard",
+  "archetype": "GAP-ST publish from settings · PC included",
+  "inheritsFrom": "277:41075"
+ },
+ "277:44020": {
+  "status": "missing",
+  "note": "Settings portal has no Publish; no \"Save settings first?\" pre-publish guard",
+  "archetype": "GAP-ST publish from settings · PR included"
+ },
+ "277:44279": {
+  "status": "missing",
+  "note": "Settings portal has no Publish; no \"Save settings first?\" pre-publish guard",
+  "archetype": "GAP-ST publish from settings · PW included",
+  "inheritsFrom": "277:41525"
+ },
+ "277:44524": {
+  "status": "missing",
+  "note": "Settings portal has no Publish; no \"Save settings first?\" pre-publish guard",
+  "archetype": "GAP-ST publish from settings",
+  "inheritsFrom": "277:41731"
+ },
+ "277:44804": {
+  "status": "missing",
+  "note": "Settings portal has no Publish; no \"Save settings first?\" pre-publish guard",
+  "archetype": "GAP-ST publish from settings"
+ },
+ "277:45057": {
+  "status": "missing",
+  "note": "Settings portal has no Publish; no \"Save settings first?\" pre-publish guard",
+  "archetype": "GAP-ST publish from settings"
+ },
+ "277:45344": {
+  "status": "missing",
+  "note": "Settings portal has no Publish; no \"Save settings first?\" pre-publish guard",
+  "archetype": "GAP-ST publish from settings · PB included",
+  "inheritsFrom": "277:40858"
+ },
+ "277:45611": {
+  "status": "missing",
+  "note": "Settings portal has no Publish; no \"Save settings first?\" pre-publish guard",
+  "archetype": "GAP-ST publish from settings · PC included",
+  "inheritsFrom": "277:41075"
+ },
+ "277:45909": {
+  "status": "missing",
+  "note": "Settings portal has no Publish; no \"Save settings first?\" pre-publish guard",
+  "archetype": "GAP-ST publish from settings · PR included"
+ },
+ "277:46179": {
+  "status": "missing",
+  "note": "Settings portal has no Publish; no \"Save settings first?\" pre-publish guard",
+  "archetype": "GAP-ST publish from settings · PW included",
+  "inheritsFrom": "277:41525"
+ },
+ "277:46436": {
+  "status": "blocked:handoff-note",
+  "note": "annotation frame, not a UI state; recommend out-of-scope",
+  "archetype": "handoff/spec note"
+ },
+ "277:107093": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/LocalizationScreen.tsx:65 — staged-default save/ack/failure + Français Undo states differ",
+  "archetype": "GAP-ST-L Languages default save"
+ },
+ "277:107302": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/LocalizationScreen.tsx:65 — staged-default save/ack/failure + Français Undo states differ",
+  "archetype": "GAP-ST-L Languages default save"
+ },
+ "277:107511": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/LocalizationScreen.tsx:65 — staged-default save/ack/failure + Français Undo states differ",
+  "archetype": "GAP-ST-L Languages default save"
+ },
+ "277:107722": {
+  "status": "missing",
+  "note": "Brand has only \"‹ Back to canvas\" (design-system/ui/BrandWorkspace.tsx:254); no return to Site settings (L-D)",
+  "archetype": "GAP-ST Brand return to settings"
+ },
+ "277:107940": {
+  "status": "missing",
+  "note": "Brand has only \"‹ Back to canvas\" (design-system/ui/BrandWorkspace.tsx:254); no return to Site settings (L-D)",
+  "archetype": "GAP-ST Brand return to settings"
+ },
+ "277:336979": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · dataset"
+ },
+ "277:337275": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · dataset",
+  "inheritsFrom": "277:336979"
+ },
+ "277:337616": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · dataset",
+  "inheritsFrom": "277:336979"
+ },
+ "277:337913": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · dataset",
+  "inheritsFrom": "277:336979"
+ },
+ "277:338210": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · dataset",
+  "inheritsFrom": "277:336979"
+ },
+ "277:338525": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · dataset",
+  "inheritsFrom": "277:336979"
+ },
+ "277:338822": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · dataset",
+  "inheritsFrom": "277:336979"
+ },
+ "277:339119": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · dataset",
+  "inheritsFrom": "277:336979"
+ },
+ "277:339484": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · dataset",
+  "inheritsFrom": "277:336979"
+ },
+ "277:339781": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · dataset",
+  "inheritsFrom": "277:336979"
+ },
+ "277:340098": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · dataset",
+  "inheritsFrom": "277:336979"
+ },
+ "277:340396": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · dataset",
+  "inheritsFrom": "277:336979"
+ },
+ "277:340693": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · dataset",
+  "inheritsFrom": "277:336979"
+ },
+ "277:341010": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · dataset",
+  "inheritsFrom": "277:336979"
+ },
+ "277:341355": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · dataset",
+  "inheritsFrom": "277:336979"
+ },
+ "277:341672": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · dataset",
+  "inheritsFrom": "277:336979"
+ },
+ "277:341969": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · dataset",
+  "inheritsFrom": "277:336979"
+ },
+ "277:342267": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · dataset",
+  "inheritsFrom": "277:336979"
+ },
+ "277:342582": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · dataset",
+  "inheritsFrom": "277:336979"
+ },
+ "277:342880": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · dataset",
+  "inheritsFrom": "277:336979"
+ },
+ "277:343177": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · dataset",
+  "inheritsFrom": "277:336979"
+ },
+ "277:343492": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · dataset",
+  "inheritsFrom": "277:336979"
+ },
+ "277:343790": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · dataset",
+  "inheritsFrom": "277:336979"
+ },
+ "277:344087": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · dataset",
+  "inheritsFrom": "277:336979"
+ },
+ "277:344402": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · dataset",
+  "inheritsFrom": "277:336979"
+ },
+ "277:344699": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · dataset",
+  "inheritsFrom": "277:336979"
+ },
+ "277:344997": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · dataset",
+  "inheritsFrom": "277:336979"
+ },
+ "277:345312": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · dataset",
+  "inheritsFrom": "277:336979"
+ },
+ "277:345609": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · dataset",
+  "inheritsFrom": "277:336979"
+ },
+ "277:345909": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter"
+ },
+ "277:346192": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:346467": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready"
+ },
+ "277:346746": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:347031": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Configure"
+ },
+ "277:347389": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Delete-confirm"
+ },
+ "277:347673": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Delete-pending"
+ },
+ "277:347952": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Delete-failed"
+ },
+ "277:348244": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:348506": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:348760": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:349018": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:349282": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Configure",
+  "inheritsFrom": "277:347031"
+ },
+ "277:349640": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Delete-confirm",
+  "inheritsFrom": "277:347389"
+ },
+ "277:349903": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Delete-pending"
+ },
+ "277:350161": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Delete-failed"
+ },
+ "277:350433": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:350695": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:350949": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:351207": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:351471": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Configure",
+  "inheritsFrom": "277:347031"
+ },
+ "277:351829": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Delete-confirm",
+  "inheritsFrom": "277:347389"
+ },
+ "277:352092": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Delete-pending"
+ },
+ "277:352350": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Delete-failed"
+ },
+ "277:352622": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:352899": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:353168": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:353441": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:353724": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:353983": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:354234": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:354489": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:354754": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:355013": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:355264": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:355519": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:355784": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:356042": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:356292": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:356546": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:356806": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Configure",
+  "inheritsFrom": "277:347031"
+ },
+ "277:357166": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:357426": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:357678": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:357934": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:358196": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Configure",
+  "inheritsFrom": "277:347031"
+ },
+ "277:358556": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:358816": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:359068": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:359324": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:359586": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Configure",
+  "inheritsFrom": "277:347031"
+ },
+ "277:359946": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:360224": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:360494": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:360768": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:361052": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:361312": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:361564": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:361820": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:362086": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:362346": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:362598": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:362854": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:363120": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:363400": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:363672": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:363948": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:364230": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Configure",
+  "inheritsFrom": "277:347031"
+ },
+ "277:364590": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:364842": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:365086": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:365334": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:365588": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Configure",
+  "inheritsFrom": "277:347031"
+ },
+ "277:365948": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:366208": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:366460": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:366716": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:366978": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Configure",
+  "inheritsFrom": "277:347031"
+ },
+ "277:367338": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:367618": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:367890": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:368166": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:368452": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:368704": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:368948": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:369196": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:369454": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:369714": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:369966": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:370222": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:370488": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:370768": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:371040": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:371316": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:371598": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Configure",
+  "inheritsFrom": "277:347031"
+ },
+ "277:371958": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:372218": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:372470": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:372726": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:372988": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Configure",
+  "inheritsFrom": "277:347031"
+ },
+ "277:373348": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:373600": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:373844": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:374092": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:374346": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Configure",
+  "inheritsFrom": "277:347031"
+ },
+ "277:374706": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:374986": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:375258": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:375534": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:375820": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:376080": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:376332": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:376588": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:376854": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:377106": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:377350": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:377598": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:377856": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:378134": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:378404": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:378678": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:378958": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Configure",
+  "inheritsFrom": "277:347031"
+ },
+ "277:379318": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:379570": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:379814": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:380062": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:380316": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Configure",
+  "inheritsFrom": "277:347031"
+ },
+ "277:380676": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:380936": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:381188": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:381444": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:381706": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Configure",
+  "inheritsFrom": "277:347031"
+ },
+ "277:382066": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:382344": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:382614": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:382888": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:383172": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:383424": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:383668": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:383916": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:384174": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:384434": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:384686": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:384942": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:385208": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:385486": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:385756": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:386030": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:386310": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Configure",
+  "inheritsFrom": "277:347031"
+ },
+ "277:386670": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:386930": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:387182": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:387438": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:387700": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Configure",
+  "inheritsFrom": "277:347031"
+ },
+ "277:388060": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:388312": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:388556": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:388804": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:389058": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Configure",
+  "inheritsFrom": "277:347031"
+ },
+ "277:389418": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:389696": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:389966": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:390240": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:390524": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:390784": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:391036": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:391292": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:391558": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Filter",
+  "inheritsFrom": "277:345909"
+ },
+ "277:391810": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-pending"
+ },
+ "277:392054": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-ready",
+  "inheritsFrom": "277:346467"
+ },
+ "277:392302": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Export-failed"
+ },
+ "277:392558": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · No-selection-export"
+ },
+ "277:392836": {
+  "status": "blocked:handoff-note",
+  "note": "annotation frame, not a UI state; recommend out-of-scope",
+  "archetype": "handoff/spec note"
+ },
+ "278:61847": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+  "archetype": "GAP-ST-ACK saved→dest"
+ },
+ "278:62059": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+  "archetype": "GAP-ST-ACK saved→dest",
+  "inheritsFrom": "278:61847"
+ },
+ "278:62270": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+  "archetype": "GAP-ST-ACK saved→dest",
+  "inheritsFrom": "278:61847"
+ },
+ "278:62472": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+  "archetype": "GAP-ST-ACK saved→dest",
+  "inheritsFrom": "278:61847"
+ },
+ "278:62678": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+  "archetype": "GAP-ST-ACK saved→dest",
+  "inheritsFrom": "278:61847"
+ },
+ "278:62897": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+  "archetype": "GAP-ST-ACK saved→dest",
+  "inheritsFrom": "278:61847"
+ },
+ "278:63104": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+  "archetype": "GAP-ST-ACK saved→dest",
+  "inheritsFrom": "278:61847"
+ },
+ "278:63294": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+  "archetype": "GAP-ST-ACK saved→dest",
+  "inheritsFrom": "278:61847"
+ },
+ "278:63547": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+  "archetype": "GAP-ST-ACK saved→dest",
+  "inheritsFrom": "278:61847"
+ },
+ "278:63803": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+  "archetype": "GAP-ST-ACK saved→dest",
+  "inheritsFrom": "278:61847"
+ },
+ "278:64000": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+  "archetype": "GAP-ST-ACK saved→dest",
+  "inheritsFrom": "278:61847"
+ },
+ "278:64204": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+  "archetype": "GAP-ST-ACK saved→dest",
+  "inheritsFrom": "278:61847"
+ },
+ "278:64710": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+  "archetype": "GAP-ST-ACK saved→dest",
+  "inheritsFrom": "278:61847"
+ },
+ "278:64922": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+  "archetype": "GAP-ST-ACK saved→dest",
+  "inheritsFrom": "278:61847"
+ },
+ "278:65133": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+  "archetype": "GAP-ST-ACK saved→dest",
+  "inheritsFrom": "278:61847"
+ },
+ "278:65350": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+  "archetype": "GAP-ST-ACK saved→dest",
+  "inheritsFrom": "278:61847"
+ },
+ "278:65556": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+  "archetype": "GAP-ST-ACK saved→dest",
+  "inheritsFrom": "278:61847"
+ },
+ "278:65775": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+  "archetype": "GAP-ST-ACK saved→dest",
+  "inheritsFrom": "278:61847"
+ },
+ "278:65982": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+  "archetype": "GAP-ST-ACK saved→dest",
+  "inheritsFrom": "278:61847"
+ },
+ "278:66172": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+  "archetype": "GAP-ST-ACK saved→dest",
+  "inheritsFrom": "278:61847"
+ },
+ "278:66425": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+  "archetype": "GAP-ST-ACK saved→dest",
+  "inheritsFrom": "278:61847"
+ },
+ "278:66681": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+  "archetype": "GAP-ST-ACK saved→dest",
+  "inheritsFrom": "278:61847"
+ },
+ "278:66878": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+  "archetype": "GAP-ST-ACK saved→dest",
+  "inheritsFrom": "278:61847"
+ },
+ "278:67124": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+  "archetype": "GAP-ST-ACK saved→dest",
+  "inheritsFrom": "278:61847"
+ },
+ "278:67328": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+  "archetype": "GAP-ST-ACK saved→dest",
+  "inheritsFrom": "278:61847"
+ },
+ "278:67847": {
+  "status": "missing",
+  "note": "Brand has only \"‹ Back to canvas\" (design-system/ui/BrandWorkspace.tsx:254); no return to Site settings (L-D)",
+  "archetype": "GAP-ST Brand return to settings"
+ },
+ "278:68065": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
+  "archetype": "GAP-ST guard draft→dest",
+  "inheritsFrom": "277:27746"
+ },
+ "278:68277": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button",
+  "archetype": "GAP-ST saving→dest"
+ },
+ "278:68492": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog",
+  "archetype": "GAP-ST save failed→dest"
+ },
+ "278:68754": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
+  "archetype": "GAP-ST guard draft→dest",
+  "inheritsFrom": "277:27746"
+ },
+ "278:68967": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button",
+  "archetype": "GAP-ST saving→dest"
+ },
+ "278:69183": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog",
+  "archetype": "GAP-ST save failed→dest"
+ },
+ "278:69448": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
+  "archetype": "GAP-ST guard draft→dest",
+  "inheritsFrom": "277:27746"
+ },
+ "278:69662": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button",
+  "archetype": "GAP-ST saving→dest"
+ },
+ "278:69879": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog",
+  "archetype": "GAP-ST save failed→dest"
+ },
+ "278:70147": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
+  "archetype": "GAP-ST guard draft→dest",
+  "inheritsFrom": "277:27746"
+ },
+ "278:70362": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button",
+  "archetype": "GAP-ST saving→dest"
+ },
+ "278:70580": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog",
+  "archetype": "GAP-ST save failed→dest"
+ },
+ "278:70851": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
+  "archetype": "GAP-ST guard draft→dest",
+  "inheritsFrom": "277:27746"
+ },
+ "278:71067": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button",
+  "archetype": "GAP-ST saving→dest"
+ },
+ "278:71286": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog",
+  "archetype": "GAP-ST save failed→dest"
+ },
+ "278:71560": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
+  "archetype": "GAP-ST guard draft→dest",
+  "inheritsFrom": "277:27746"
+ },
+ "278:71777": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button",
+  "archetype": "GAP-ST saving→dest"
+ },
+ "278:71997": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog",
+  "archetype": "GAP-ST save failed→dest"
+ },
+ "278:72274": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
+  "archetype": "GAP-ST guard draft→dest",
+  "inheritsFrom": "277:27746"
+ },
+ "278:72492": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button",
+  "archetype": "GAP-ST saving→dest"
+ },
+ "278:72713": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog",
+  "archetype": "GAP-ST save failed→dest"
+ },
+ "278:72993": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
+  "archetype": "GAP-ST guard draft→dest",
+  "inheritsFrom": "277:27746"
+ },
+ "278:73212": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button",
+  "archetype": "GAP-ST saving→dest"
+ },
+ "278:73434": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog",
+  "archetype": "GAP-ST save failed→dest"
+ },
+ "278:73717": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
+  "archetype": "GAP-ST guard draft→dest",
+  "inheritsFrom": "277:27746"
+ },
+ "278:73937": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button",
+  "archetype": "GAP-ST saving→dest"
+ },
+ "278:74160": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog",
+  "archetype": "GAP-ST save failed→dest"
+ },
+ "278:74446": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
+  "archetype": "GAP-ST guard draft→dest",
+  "inheritsFrom": "277:27746"
+ },
+ "278:74667": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button",
+  "archetype": "GAP-ST saving→dest"
+ },
+ "278:74891": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog",
+  "archetype": "GAP-ST save failed→dest"
+ },
+ "278:75180": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
+  "archetype": "GAP-ST guard draft→dest",
+  "inheritsFrom": "277:27746"
+ },
+ "278:75402": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button",
+  "archetype": "GAP-ST saving→dest"
+ },
+ "278:75627": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog",
+  "archetype": "GAP-ST save failed→dest"
+ },
+ "278:75919": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
+  "archetype": "GAP-ST guard draft→dest",
+  "inheritsFrom": "277:27746"
+ },
+ "278:76142": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button",
+  "archetype": "GAP-ST saving→dest"
+ },
+ "278:76368": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog",
+  "archetype": "GAP-ST save failed→dest"
+ },
+ "278:76663": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
+  "archetype": "GAP-ST guard draft→dest",
+  "inheritsFrom": "277:27746"
+ },
+ "278:76887": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button",
+  "archetype": "GAP-ST saving→dest"
+ },
+ "278:77114": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog",
+  "archetype": "GAP-ST save failed→dest"
+ },
+ "278:77412": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/WorkspaceDoorScreen.tsx:30 — door card exists; \"Organization workspace · X\", \"Back to Site settings\" copy dif…",
+  "archetype": "GAP-ST-ORG workspace door",
+  "inheritsFrom": "277:38019"
+ },
+ "278:77665": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/WorkspaceDoorScreen.tsx:30 — door card exists; \"Organization workspace · X\", \"Back to Site settings\" copy dif…",
+  "archetype": "GAP-ST-ORG workspace door",
+  "inheritsFrom": "277:38019"
+ },
+ "278:77920": {
+  "status": "drift",
+  "note": "sidebar/tabs/settings/screens/WorkspaceDoorScreen.tsx:30 — door card exists; \"Organization workspace · X\", \"Back to Site settings\" copy dif…",
+  "archetype": "GAP-ST-ORG workspace door",
+  "inheritsFrom": "277:38019"
+ },
+ "278:78177": {
+  "status": "drift",
+  "note": "shell/modals/PermissionsModal.tsx:52 — matrix copy differs",
+  "archetype": "GAP-ST-PM permissions return",
+  "inheritsFrom": "277:39669"
+ },
+ "278:79269": {
+  "status": "missing",
+  "note": "no phone pin placement, pan, comments sheet on the client page",
+  "archetype": "GAP-RV phone placement/comments"
+ },
+ "278:79319": {
+  "status": "missing",
+  "note": "no phone pin placement, pan, comments sheet on the client page",
+  "archetype": "GAP-RV phone placement/comments"
+ },
+ "278:79355": {
+  "status": "missing",
+  "note": "no phone pin placement, pan, comments sheet on the client page",
+  "archetype": "GAP-RV phone placement/comments"
+ },
+ "278:79409": {
+  "status": "missing",
+  "note": "no phone pin placement, pan, comments sheet on the client page",
+  "archetype": "GAP-RV phone placement/comments"
+ },
+ "278:79447": {
+  "status": "missing",
+  "note": "no phone pin placement, pan, comments sheet on the client page",
+  "archetype": "GAP-RV phone placement/comments"
+ },
+ "278:79482": {
+  "status": "missing",
+  "note": "no phone pin placement, pan, comments sheet on the client page",
+  "archetype": "GAP-RV phone placement/comments"
+ },
+ "278:79538": {
+  "status": "missing",
+  "note": "no phone pin placement, pan, comments sheet on the client page",
+  "archetype": "GAP-RV phone placement/comments"
+ },
+ "278:79588": {
+  "status": "missing",
+  "note": "no phone pin placement, pan, comments sheet on the client page",
+  "archetype": "GAP-RV phone placement/comments"
+ },
+ "278:79632": {
+  "status": "missing",
+  "note": "no phone pin placement, pan, comments sheet on the client page",
+  "archetype": "GAP-RV phone placement/comments"
+ },
+ "278:79671": {
+  "status": "missing",
+  "note": "no phone pin placement, pan, comments sheet on the client page",
+  "archetype": "GAP-RV phone placement/comments"
+ },
+ "278:79729": {
+  "status": "drift",
+  "note": "packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
+  "archetype": "GAP-RV request-changes flow"
+ },
+ "278:79787": {
+  "status": "drift",
+  "note": "packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
+  "archetype": "GAP-RV request-changes flow"
+ },
+ "278:79826": {
+  "status": "drift",
+  "note": "packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
+  "archetype": "GAP-RV request-changes flow"
+ },
+ "278:79879": {
+  "status": "missing",
+  "note": "no phone pin placement, pan, comments sheet on the client page",
+  "archetype": "GAP-RV phone placement/comments"
+ },
+ "278:79931": {
+  "status": "missing",
+  "note": "no phone pin placement, pan, comments sheet on the client page",
+  "archetype": "GAP-RV phone placement/comments"
+ },
+ "279:137412": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Zero-selection-filter"
+ },
+ "279:137695": {
+  "status": "missing",
+  "note": "filter/view/export context grid; views, form filter, view-aware export absent",
+  "archetype": "FMC context grid · Zero-selection-configure"
+ },
+ "280:70080": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · entry"
+ },
+ "280:70169": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · ready"
+ },
+ "280:70255": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · pending"
+ },
+ "280:70335": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · receipt"
+ },
+ "280:70392": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · approved"
+ },
+ "280:70440": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · incorrect"
+ },
+ "280:70526": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · expired"
+ },
+ "280:70609": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · sending"
+ },
+ "280:70688": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · sent"
+ },
+ "280:70767": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · sendfail"
+ },
+ "280:70849": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · rate"
+ },
+ "280:70930": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · already"
+ },
+ "280:71009": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · failure"
+ },
+ "280:71092": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · offline"
+ },
+ "280:71195": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · approved-comments"
+ },
+ "280:71247": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · entry",
+  "inheritsFrom": "280:70080"
+ },
+ "280:71336": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · ready",
+  "inheritsFrom": "280:70169"
+ },
+ "280:71422": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · pending"
+ },
+ "280:71502": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · receipt",
+  "inheritsFrom": "280:70335"
+ },
+ "280:71559": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · approved",
+  "inheritsFrom": "280:70392"
+ },
+ "280:71607": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · incorrect"
+ },
+ "280:71693": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · expired"
+ },
+ "280:71776": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · sending"
+ },
+ "280:71855": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · sent",
+  "inheritsFrom": "280:70688"
+ },
+ "280:71934": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · sendfail"
+ },
+ "280:72016": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · rate"
+ },
+ "280:72097": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · already"
+ },
+ "280:72176": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · failure"
+ },
+ "280:72259": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · offline"
+ },
+ "280:72362": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · approved-comments",
+  "inheritsFrom": "280:71195"
+ },
+ "280:72414": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · entry",
+  "inheritsFrom": "280:70080"
+ },
+ "280:72505": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · ready",
+  "inheritsFrom": "280:70169"
+ },
+ "280:72593": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · pending"
+ },
+ "280:72675": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · receipt",
+  "inheritsFrom": "280:70335"
+ },
+ "280:72734": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · approved",
+  "inheritsFrom": "280:70392"
+ },
+ "280:72784": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · incorrect"
+ },
+ "280:72872": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · expired"
+ },
+ "280:72957": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · sending"
+ },
+ "280:73038": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · sent",
+  "inheritsFrom": "280:70688"
+ },
+ "280:73119": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · sendfail"
+ },
+ "280:73203": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · rate"
+ },
+ "280:73286": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · already"
+ },
+ "280:73367": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · failure"
+ },
+ "280:73452": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · offline"
+ },
+ "280:73557": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · approved-comments",
+  "inheritsFrom": "280:71195"
+ },
+ "280:73611": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · entry",
+  "inheritsFrom": "280:70080"
+ },
+ "280:73698": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · ready",
+  "inheritsFrom": "280:70169"
+ },
+ "280:73782": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · pending"
+ },
+ "280:73860": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · receipt",
+  "inheritsFrom": "280:70335"
+ },
+ "280:73914": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · approved",
+  "inheritsFrom": "280:70392"
+ },
+ "280:73959": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · incorrect"
+ },
+ "280:74043": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · expired"
+ },
+ "280:74124": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · sending"
+ },
+ "280:74201": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · sent",
+  "inheritsFrom": "280:70688"
+ },
+ "280:74278": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · sendfail"
+ },
+ "280:74358": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · rate"
+ },
+ "280:74437": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · already"
+ },
+ "280:74514": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · failure"
+ },
+ "280:74595": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · offline"
+ },
+ "280:74696": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · approved-comments",
+  "inheritsFrom": "280:71195"
+ },
+ "280:74750": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · entry",
+  "inheritsFrom": "280:70080"
+ },
+ "280:74839": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · ready",
+  "inheritsFrom": "280:70169"
+ },
+ "280:74925": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · pending"
+ },
+ "280:75005": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · receipt",
+  "inheritsFrom": "280:70335"
+ },
+ "280:75062": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · approved",
+  "inheritsFrom": "280:70392"
+ },
+ "280:75110": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · incorrect"
+ },
+ "280:75196": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · expired"
+ },
+ "280:75279": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · sending"
+ },
+ "280:75358": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · sent",
+  "inheritsFrom": "280:70688"
+ },
+ "280:75437": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · sendfail"
+ },
+ "280:75519": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · rate"
+ },
+ "280:75600": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · already"
+ },
+ "280:75679": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · failure"
+ },
+ "280:75762": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · offline"
+ },
+ "280:75865": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval · approved-comments",
+  "inheritsFrom": "280:71195"
+ },
+ "280:75919": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval"
+ },
+ "280:76137": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval",
+  "inheritsFrom": "280:75919"
+ },
+ "280:76186": {
+  "status": "missing",
+  "note": "OTP approval per device origin; needs R-13 + phone placement",
+  "archetype": "GAP-RVC device-origin approval",
+  "inheritsFrom": "280:75919"
+ }
+}

@@ -1,13 +1,16 @@
 /**
- * FormsScreen tests — 8136:216977: one inbox for every form (FORM · FROM ·
- * RECEIVED · STATUS · Delete · Configure in Inspector ›), Export CSV above
- * the notice, the FROM cell opening the fields (marking read), delete that
- * asks first, the load / empty states, and pagination bounds.
+ * FormsScreen tests — 2L9 page 06: B8-S13 238:13598 (views, form filter,
+ * count line, selectable rows, "Delete n", Showing … · sorted newest first,
+ * retention line), GAP-FM01/02 (Spam / Archived + Unspam / Unarchive),
+ * GAP-FM04 (All forms: Choose a form to configure), GAP-FM07–10 (delete
+ * confirm, pending, acknowledged, failed with the selection kept), the row
+ * name opening the fields (marking read), the load / empty states and
+ * pagination bounds.
  *
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent, cleanup, waitFor, within } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup, waitFor, within, act } from "@testing-library/react";
 import * as React from "react";
 import { createMockComposer } from "@/editor/sidebar/__tests__/test-utils/mockComposer";
 import { EVENTS } from "@/shared/constants/events";
@@ -73,6 +76,12 @@ function setup(projectId: string | null = "s1") {
   return { composer, ...utils };
 }
 
+/* GAP-FMC 277:345909: the filter is a small dialog — Cancel · All forms · each form. */
+function pickForm(id: string) {
+  fireEvent.click(screen.getByTestId("set-forms-filter"));
+  fireEvent.click(screen.getByTestId(`set-forms-filter-${id}`));
+}
+
 describe("FormsScreen — gating + empty states", () => {
   it("shows the dashboard-only message with no projectId", () => {
     setup(null);
@@ -103,14 +112,14 @@ describe("FormsScreen — gating + empty states", () => {
   });
 });
 
-describe("FormsScreen — 8136:216977 the inbox", () => {
-  it("lists every form's inbox in one table with the board's columns", async () => {
+describe("FormsScreen — 238:13598 views, filter and rows", () => {
+  it("opens on the Inbox for all forms: views, filter, count line, rows, showing line, retention", async () => {
     listBlocks.mockResolvedValue([block("f1", "Reservation", 1), block("f2", "Catering", 1)]);
     listSubs.mockResolvedValue(
       pageOf(
         [
-          sub("a", { name: "Hina", email: "hina.raza@gmail.com" }),
-          sub("b", { email: "events@zeeshan.co" }, { formBlockId: "f2", isRead: true }),
+          sub("a", { name: "Hina Raza", email: "hina.raza@gmail.com", message: "Table for 4 on Friday" }),
+          sub("b", { email: "events@zeeshan.co", message: "Catering for 40" }, { formBlockId: "f2", isRead: true }),
         ],
         2,
       ),
@@ -118,34 +127,40 @@ describe("FormsScreen — 8136:216977 the inbox", () => {
     setup();
     await screen.findByTestId("set-forms-table");
     expect(listSubs).toHaveBeenCalledWith({ siteId: "s1", page: 1, perPage: 20, isArchived: false, isSpam: false });
-    expect(screen.getByText("Submissions · All Forms")).toBeInTheDocument();
-    expect(screen.getByTestId("set-forms-notice")).toHaveTextContent(
-      "Submissions are live records. Restoring a draft does not change this inbox.",
-    );
-    expect(within(screen.getByTestId("set-forms-table")).getAllByRole("columnheader").map((h) => h.textContent)).toEqual([
-      "Form",
-      "From",
-      "Received",
-      "Status",
-      "Actions",
-      "Configuration",
-    ]);
+    expect(within(screen.getByTestId("set-forms-views")).getAllByRole("button").map((b) => b.textContent)).toEqual(["Inbox", "Spam", "Archived"]);
+    expect(screen.getByTestId("set-forms-view-inbox")).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByTestId("set-forms-filter").textContent).toBe("Form: All forms");
+    expect(screen.getByTestId("set-forms-count")).toHaveTextContent("Inbox · 2 submissions");
+    expect(screen.getByText("Submissions · All forms")).toBeInTheDocument();
     const a = screen.getByTestId("set-forms-row-a");
-    expect(a).toHaveTextContent("Reservation");
-    expect(a).toHaveTextContent("hina.raza@gmail.com");
-    expect(a).toHaveTextContent("2 Jul, 19:41");
-    expect(screen.getByTestId("set-forms-status-a")).toHaveTextContent("New");
-    expect(screen.getByTestId("set-forms-status-b")).toHaveTextContent("Read");
-    expect(screen.getByTestId("set-forms-row-b")).toHaveTextContent("Catering");
-    expect(screen.getByTestId("set-forms-configure-a")).toHaveTextContent("Configure in Inspector ›");
+    expect(a).toHaveTextContent("Select Hina Raza");
+    expect(a).toHaveTextContent("Hina Raza · Reservation");
+    expect(a).toHaveTextContent("Table for 4 on Friday");
+    expect(screen.getByTestId("set-forms-status-a")).toHaveTextContent("2 Jul · Inbox · New");
+    expect(screen.getByTestId("set-forms-status-b")).toHaveTextContent("2 Jul · Inbox");
+    expect(screen.getByTestId("set-forms-row-b")).toHaveTextContent("events@zeeshan.co · Catering");
+    expect(screen.getByTestId("set-forms-selected")).toHaveTextContent("0 selected");
+    expect(screen.getByTestId("set-forms-delete")).toHaveTextContent("Delete 0");
+    expect(screen.getByTestId("set-forms-delete")).toBeDisabled();
+    expect(screen.getByTestId("set-forms-showing")).toHaveTextContent("Showing 2 of 2 · sorted newest first");
+    expect(screen.getByTestId("set-forms-retention")).toHaveTextContent("Submissions are kept 365 days, then permanently deleted.");
+    expect(screen.queryByTestId("set-forms-move")).toBeNull();
     expect(screen.queryByRole("button", { name: /add form/i })).toBeNull();
   });
 
-  it("Configure in Inspector selects the form element on its page and leaves Settings", async () => {
+  it("All forms cannot be configured (GAP-FM04); one form can, and Configure selects its element and leaves Settings", async () => {
     listBlocks.mockResolvedValue([block("f1", "Reservation", 1)]);
     listSubs.mockResolvedValue(pageOf([sub("a", { email: "x@y.co" })], 1));
     const { composer } = setup();
-    fireEvent.click(await screen.findByTestId("set-forms-configure-a"));
+    const configure = await screen.findByTestId("set-forms-configure");
+    expect(configure).toHaveTextContent("Choose a form to configure");
+    expect(configure).toBeDisabled();
+    expect(screen.getByTestId("set-forms-configure-hint")).toHaveTextContent("Select a single form before configuring it in Inspector.");
+    pickForm("f1");
+    await waitFor(() => expect(listSubs).toHaveBeenLastCalledWith(expect.objectContaining({ formBlockId: "f1", page: 1 })));
+    expect(screen.getByText("Submissions · Reservation")).toBeInTheDocument();
+    expect(screen.queryByTestId("set-forms-configure-hint")).toBeNull();
+    fireEvent.click(screen.getByTestId("set-forms-configure"));
     expect(locate).toHaveBeenCalledWith(composer, { pageId: "p-home", targetSelector: "el-f1" });
     expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_SWITCH_TAB, { tab: "layers" });
   });
@@ -155,12 +170,67 @@ describe("FormsScreen — 8136:216977 the inbox", () => {
     listBlocks.mockResolvedValue([block("f1", "Reservation", 1)]);
     listSubs.mockResolvedValue(pageOf([sub("a", { email: "x@y.co" })], 1));
     const { composer } = setup();
-    fireEvent.click(await screen.findByTestId("set-forms-configure-a"));
+    fireEvent.click(await screen.findByTestId("set-forms-filter"));
+    fireEvent.click(screen.getByTestId("set-forms-filter-f1"));
+    fireEvent.click(await screen.findByText("Configure in Inspector"));
     expect(screen.getByTestId("set-save-error")).toHaveTextContent("Reservation is no longer on its page.");
     expect(composer.emit).not.toHaveBeenCalledWith(EVENTS.UI_SWITCH_TAB, expect.anything());
   });
 
-  it("the FROM cell opens the fields and marks a new submission read", async () => {
+  it("Spam and Archived (GAP-FM01/02) query their view and offer Unspam / Unarchive", async () => {
+    listBlocks.mockResolvedValue([block("f1", "Contact", 1)]);
+    listSubs.mockResolvedValue(pageOf([sub("a", { name: "Taylor", message: "Buy now" }, { isSpam: true })], 1));
+    setup();
+    await screen.findByTestId("set-forms-table");
+    fireEvent.click(screen.getByTestId("set-forms-view-spam"));
+    await waitFor(() => expect(listSubs).toHaveBeenLastCalledWith(expect.objectContaining({ isSpam: true, isArchived: false })));
+    expect(await screen.findByTestId("set-forms-move")).toHaveTextContent("Unspam");
+    expect(screen.getByTestId("set-forms-count")).toHaveTextContent("Spam · 1 submission");
+    expect(screen.getByTestId("set-forms-status-a")).toHaveTextContent("2 Jul · Spam");
+    fireEvent.click(screen.getByTestId("set-forms-view-archived"));
+    await waitFor(() => expect(listSubs).toHaveBeenLastCalledWith(expect.objectContaining({ isSpam: false, isArchived: true })));
+    expect(await screen.findByTestId("set-forms-move")).toHaveTextContent("Unarchive");
+  });
+
+  it("Unspam moves the selection back to the Inbox and says so; a failure keeps the selection (272:27718)", async () => {
+    listBlocks.mockResolvedValue([block("f1", "Contact", 1)]);
+    listSubs.mockResolvedValue(pageOf([sub("a", { name: "Taylor" }, { isSpam: true }), sub("b", { name: "Jordan" }, { isSpam: true })], 2));
+    setup();
+    await screen.findByTestId("set-forms-table");
+    fireEvent.click(screen.getByTestId("set-forms-view-spam"));
+    fireEvent.click(await screen.findByTestId("set-forms-select-a"));
+    expect(screen.getByTestId("set-forms-selected")).toHaveTextContent("1 selected");
+    fireEvent.click(screen.getByTestId("set-forms-move"));
+    await waitFor(() => expect(api.forms.updateSubmission.mutate).toHaveBeenCalledWith({ id: "a", isSpam: false }));
+    expect(await screen.findByTestId("set-forms-ack")).toHaveTextContent("1 submission moved from Spam to Inbox.");
+    expect(screen.getByTestId("set-forms-selected")).toHaveTextContent("0 selected");
+
+    api.forms.updateSubmission.mutate.mockRejectedValueOnce(new Error("503"));
+    fireEvent.click(screen.getByTestId("set-forms-select-b"));
+    fireEvent.click(screen.getByTestId("set-forms-move"));
+    expect(await screen.findByText("Couldn’t move the submission")).toBeInTheDocument();
+    expect(screen.getByText("The submission is still in Spam. Your selection is kept.")).toBeInTheDocument();
+    expect(screen.getByTestId("set-forms-selected")).toHaveTextContent("1 selected");
+  });
+
+  it("while an Unspam runs, a dialog says the row stays in Spam until confirmed (272:27190)", async () => {
+    listBlocks.mockResolvedValue([block("f1", "Contact", 1)]);
+    listSubs.mockResolvedValue(pageOf([sub("a", { name: "Taylor" }, { isSpam: true })], 1));
+    let release!: () => void;
+    api.forms.updateSubmission.mutate.mockImplementation(() => new Promise((r) => (release = () => r({}))));
+    setup();
+    await screen.findByTestId("set-forms-table");
+    fireEvent.click(screen.getByTestId("set-forms-view-spam"));
+    fireEvent.click(await screen.findByTestId("set-forms-select-a"));
+    fireEvent.click(screen.getByTestId("set-forms-move"));
+    expect(await screen.findByText("Unspam submission…")).toBeInTheDocument();
+    expect(screen.getByText("The selected submission stays in Spam until the server confirms the move to Inbox.")).toBeInTheDocument();
+    expect(screen.getByTestId("set-forms-move-check")).toHaveTextContent("Check status");
+    await act(async () => release());
+    await waitFor(() => expect(screen.queryByText("Unspam submission…")).not.toBeInTheDocument());
+  });
+
+  it("the row name opens the fields and marks a new submission read", async () => {
     listBlocks.mockResolvedValue([block("f1", "Contact", 1)]);
     listSubs.mockResolvedValue(pageOf([sub("a", { email: "x@y.co", message: "Table for 4" })], 1));
     setup();
@@ -169,23 +239,70 @@ describe("FormsScreen — 8136:216977 the inbox", () => {
     await waitFor(() => expect(api.forms.updateSubmission.mutate).toHaveBeenCalledWith({ id: "a", isRead: true }));
   });
 
-  it("Export CSV downloads every form's submissions", async () => {
+  it("the form filter asks in a dialog, keeps the view, and a form change keeps the selection", async () => {
+    listBlocks.mockResolvedValue([block("f1", "Contact", 2)]);
+    listSubs.mockResolvedValue(pageOf([sub("a", { name: "Mara" }), sub("b", { name: "Jonas" })], 2));
+    setup();
+    fireEvent.click(await screen.findByTestId("set-forms-select-a"));
+    fireEvent.click(screen.getByTestId("set-forms-filter"));
+    expect(screen.getByText("Filter submissions")).toBeInTheDocument();
+    expect(screen.getByText("Inbox view is kept. Change the form to update counts and CSV scope.")).toBeInTheDocument();
+    const foot = screen.getByTestId("modal-foot-set-forms-filter-dialog");
+    expect(Array.from(foot.querySelectorAll("button")).map((b) => b.textContent)).toEqual(["Cancel", "All forms", "Contact"]);
+    fireEvent.click(screen.getByTestId("set-forms-filter-f1"));
+    await waitFor(() => expect(listSubs).toHaveBeenLastCalledWith(expect.objectContaining({ formBlockId: "f1" })));
+    await waitFor(() => expect(screen.getByTestId("set-forms-selected")).toHaveTextContent("1 selected"));
+    expect(screen.getByTestId("set-forms-filter").textContent).toBe("Form: Contact");
+  });
+
+  it("Export CSV exports the current view and form, then says what it held (GAP-FM-Export)", async () => {
     Object.assign(URL, { createObjectURL: vi.fn(() => "blob:x"), revokeObjectURL: vi.fn() });
     const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
     listBlocks.mockResolvedValue([block("f1", "Contact", 1)]);
     listSubs.mockResolvedValue(pageOf([sub("a", { email: "x@y.co" })], 1));
     setup();
     await screen.findByTestId("set-forms-table");
+    pickForm("f1");
+    fireEvent.click(screen.getByTestId("set-forms-view-spam"));
+    await waitFor(() => expect(listSubs).toHaveBeenLastCalledWith(expect.objectContaining({ formBlockId: "f1", isSpam: true })));
+    await waitFor(() => expect(screen.getByTestId("set-forms-export")).not.toBeDisabled());
     fireEvent.click(screen.getByTestId("set-forms-export"));
-    await waitFor(() => expect(api.forms.exportSubmissions.query).toHaveBeenCalledWith({ siteId: "s1", format: "csv" }));
-    await waitFor(() => expect(click).toHaveBeenCalled());
+    await waitFor(() =>
+      expect(api.forms.exportSubmissions.query).toHaveBeenLastCalledWith({
+        siteId: "s1",
+        formBlockId: "f1",
+        isSpam: true,
+        isArchived: false,
+        format: "csv",
+      }),
+    );
+    expect(await screen.findByText("CSV ready")).toBeInTheDocument();
+    expect(screen.getByTestId("set-forms-export-line")).toHaveTextContent(
+      "1 submission · Contact · Spam. Your selection and filters are unchanged.",
+    );
+    expect(click).toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Back to submissions" }));
+    await waitFor(() => expect(screen.queryByText("CSV ready")).toBeNull());
     click.mockRestore();
   });
 
-  it("fromOf takes the first email-looking field; receivedAt is `d Mon, HH:MM`", () => {
-    expect(fromOf({ name: "K", contact: "k.mahmood@outlook.com" })).toBe("k.mahmood@outlook.com");
-    expect(fromOf({ name: "Kamal" })).toBe("Kamal");
-    expect(receivedAt(new Date(2026, 6, 1, 16, 55))).toBe("1 Jul, 16:55");
+  it("a failed export creates nothing and offers Try again", async () => {
+    api.forms.exportSubmissions.query.mockRejectedValueOnce(new Error("503"));
+    listBlocks.mockResolvedValue([block("f1", "Contact", 1)]);
+    listSubs.mockResolvedValue(pageOf([sub("a", { email: "x@y.co" })], 1));
+    setup();
+    await screen.findByTestId("set-forms-table");
+    fireEvent.click(screen.getByTestId("set-forms-export"));
+    expect(await screen.findByText("Couldn’t export submissions")).toBeInTheDocument();
+    expect(screen.getByText("No CSV was created. Your filters and selection are kept.")).toBeInTheDocument();
+    expect(api.forms.exportSubmissions.query).toHaveBeenCalledWith({ siteId: "s1", isSpam: false, isArchived: false, format: "csv" });
+  });
+
+  it("fromOf prefers a name, then an email, then the first value; receivedAt is `d Mon`", () => {
+    expect(fromOf({ name: "Kamal", contact: "k.mahmood@outlook.com" })).toBe("Kamal");
+    expect(fromOf({ phone: "123", contact: "k.mahmood@outlook.com" })).toBe("k.mahmood@outlook.com");
+    expect(fromOf({ phone: "123" })).toBe("123");
+    expect(receivedAt(new Date(2026, 6, 1, 16, 55))).toBe("1 Jul");
     expect(receivedAt("junk")).toBe("—");
   });
 });
@@ -213,29 +330,64 @@ describe("FormsScreen — pagination bounds", () => {
   });
 });
 
-describe("FormsScreen — delete submission asks first", () => {
+describe("FormsScreen — bulk delete asks first (GAP-FM07–10)", () => {
   async function ready() {
     listBlocks.mockResolvedValue([block("f1", "Contact")]);
-    listSubs.mockResolvedValue(pageOf([sub("sub-1", { email: "visitor@example.com" }, { isRead: true })], 1));
+    listSubs.mockResolvedValue(
+      pageOf([sub("s-1", { name: "Mara Lenz" }, { isRead: true }), sub("s-2", { name: "Jonas Peters" }, { isRead: true })], 2),
+    );
     setup();
-    fireEvent.click(await screen.findByTestId("set-forms-delete-sub-1"));
+    fireEvent.click(await screen.findByTestId("set-forms-select-s-1"));
+    fireEvent.click(screen.getByTestId("set-forms-select-s-2"));
+    expect(screen.getByTestId("set-forms-delete")).toHaveTextContent("Delete 2");
+    fireEvent.click(screen.getByTestId("set-forms-delete"));
   }
 
-  it("does NOT reach the server on the first click, and names the submission", async () => {
+  it("does NOT reach the server on the first click; asks with B8-S14's copy, Cancel first", async () => {
     await ready();
     expect(api.forms.deleteSubmission.mutate).not.toHaveBeenCalled();
-    expect(screen.getByText("Delete this submission?")).toBeInTheDocument();
-    expect(screen.getByText(/can't be recovered/i)).toHaveTextContent("visitor@example.com");
+    expect(screen.getByText("Delete 2 submissions permanently?")).toBeInTheDocument();
+    expect(screen.getByText("Submissions can’t be restored after they’re deleted.")).toBeInTheDocument();
+    const foot = screen.getByTestId("modal-foot-set-forms-delete-confirm");
+    expect(Array.from(foot.querySelectorAll("button")).map((b) => b.textContent)).toEqual(["Cancel", "Delete"]);
   });
 
-  it("cancelling leaves it; confirming deletes it", async () => {
+  it("Cancel leaves them; confirming deletes both and acknowledges (FM09)", async () => {
     await ready();
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
-    await waitFor(() => expect(screen.queryByText("Delete this submission?")).toBeNull());
+    await waitFor(() => expect(screen.queryByText("Delete 2 submissions permanently?")).toBeNull());
     expect(api.forms.deleteSubmission.mutate).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByTestId("set-forms-delete-sub-1"));
-    fireEvent.click(screen.getByRole("button", { name: "Delete submission" }));
-    await waitFor(() => expect(api.forms.deleteSubmission.mutate).toHaveBeenCalledWith({ id: "sub-1" }));
+    fireEvent.click(screen.getByTestId("set-forms-delete"));
+    fireEvent.click(screen.getByTestId("set-forms-delete-ok"));
+    await waitFor(() => expect(api.forms.deleteSubmission.mutate).toHaveBeenCalledTimes(2));
+    expect(await screen.findByTestId("set-forms-ack")).toHaveTextContent("2 submissions permanently deleted.");
+  });
+
+  it("while deleting, the dialog says the rows stay listed until confirmed (FM08)", async () => {
+    let release!: () => void;
+    api.forms.deleteSubmission.mutate.mockImplementation(() => new Promise((r) => (release = () => r({}))));
+    await ready();
+    fireEvent.click(screen.getByTestId("set-forms-delete-ok"));
+    expect(await screen.findByText("Deleting 2 submissions…")).toBeInTheDocument();
+    expect(screen.getByText(/remain listed until deletion is confirmed/)).toBeInTheDocument();
+    /* 272:23206: one "Check status" (re-reads the list), no Cancel, no second delete. */
+    expect(screen.queryByRole("button", { name: /permanently|Cancel/ })).not.toBeInTheDocument();
+    const reads = api.forms.listSubmissions.query.mock.calls.length;
+    fireEvent.click(screen.getByTestId("set-forms-delete-check"));
+    await waitFor(() => expect(api.forms.listSubmissions.query.mock.calls.length).toBe(reads + 1));
+    await act(async () => release());
+  });
+
+  it("a failed delete keeps the selection and offers Try again (FM10)", async () => {
+    api.forms.deleteSubmission.mutate.mockRejectedValue(new Error("503"));
+    await ready();
+    fireEvent.click(screen.getByTestId("set-forms-delete-ok"));
+    expect(await screen.findByText("Couldn’t delete the submissions")).toBeInTheDocument();
+    expect(screen.getByText("Both submissions are still in All forms · Inbox. Your selection is kept.")).toBeInTheDocument();
+    expect(screen.getByTestId("set-forms-selected")).toHaveTextContent("2 selected");
+    api.forms.deleteSubmission.mutate.mockResolvedValue({});
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+    expect(await screen.findByTestId("set-forms-ack")).toHaveTextContent("2 submissions permanently deleted.");
   });
 });
 
@@ -247,7 +399,7 @@ describe("FormsScreen — submissions error is recoverable (F11)", () => {
     expect(await screen.findByText("Failed to load submissions.")).toBeInTheDocument();
     listSubs.mockResolvedValue(pageOf([sub("s1", { email: "a@b.com" })], 1));
     fireEvent.click(screen.getByTestId("subs-error-retry"));
-    expect(await screen.findByText("a@b.com")).toBeInTheDocument();
+    expect(await screen.findByText("Select a@b.com")).toBeInTheDocument();
     expect(screen.queryByText("Failed to load submissions.")).toBeNull();
   });
 });

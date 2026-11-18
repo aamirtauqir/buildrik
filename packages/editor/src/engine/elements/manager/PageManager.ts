@@ -85,6 +85,9 @@ export class PageManager {
     /* L3-001: a slug another page holds broke every save of the site (the
        server's (siteId, slug) unique key) — take the next free one instead. */
     if (page.slug) page.slug = uniqueSlug(page.slug, this.existingSlugs());
+    /* Refused while an edit lock holds: the caller gets a page that was never
+       registered, so nothing it does with it reaches the document. */
+    if (this.ctx.composer.writeLocked) return page;
 
     this.ctx.pages.set(page.id, page);
     this.ctx.buildElementTree(page.root);
@@ -123,6 +126,7 @@ export class PageManager {
     id: string,
     data: Partial<Pick<PageData, "name" | "slug" | "settings" | "slugManuallySet" | "meta">>
   ): void {
+    if (this.ctx.composer.writeLocked) return;
     const page = this.ctx.pages.get(id);
     if (!page) return;
 
@@ -189,6 +193,7 @@ export class PageManager {
    * cap; templates apply rarely enough that 25 is decades of edits).
    */
   recordAppliedTemplate(pageId: string, entry: { templateId: string; version?: string; appliedAt?: string }): void {
+    if (this.ctx.composer.writeLocked) return;
     const page = this.ctx.pages.get(pageId);
     if (!page) return;
     const stack = (page.meta?.appliedTemplates ?? []).slice();
@@ -212,6 +217,7 @@ export class PageManager {
    * across flows. No-op if the template was not applied.
    */
   removeAppliedTemplate(pageId: string, templateId: string): void {
+    if (this.ctx.composer.writeLocked) return;
     const page = this.ctx.pages.get(pageId);
     if (!page) return;
     const stack = (page.meta?.appliedTemplates ?? []).slice();
@@ -247,6 +253,7 @@ export class PageManager {
 
   /** Mark a page as home (single home) */
   setHomePage(id: string): void {
+    if (this.ctx.composer.writeLocked) return;
     if (!this.ctx.pages.has(id)) return;
 
     this.ctx.pages.forEach((page, pageId) => {
@@ -262,6 +269,7 @@ export class PageManager {
 
   /** Delete a page. Returns false if the page didn't exist. */
   deletePage(id: string): boolean {
+    if (this.ctx.composer.writeLocked) return false;
     const page = this.ctx.pages.get(id);
     if (!page) return false;
 
@@ -301,6 +309,7 @@ export class PageManager {
    * - Always isHome=false (only the source keeps Home status).
    */
   duplicatePage(sourceId: string): PageData | null {
+    if (this.ctx.composer.writeLocked) return null;
     const source = this.ctx.pages.get(sourceId);
     if (!source) return null;
 
@@ -345,10 +354,20 @@ export class PageManager {
   /**
    * Reorder pages. `afterId === null` prepends.
    * Rebuilds the Map preserving every page, inserting `pageId` at the new position.
+   *
+   * One composer history step (design-2l9 A-13): the Pages receipts offer
+   * Undo, and there is one undo (topbar / ⌘Z). A pending edit is committed
+   * first so it is not coalesced into the move, and the move is committed
+   * before returning so an Undo pressed straight after undoes the move.
+   * Page FOLDERS are per-user and stored outside the document, so a folder
+   * move is not a document change and has no history entry.
    */
   reorderPage(pageId: string, afterId: string | null): boolean {
+    if (this.ctx.composer.writeLocked) return false;
     if (!this.ctx.pages.has(pageId)) return false;
     if (afterId !== null && !this.ctx.pages.has(afterId)) return false;
+    const { composer } = this.ctx;
+    composer.history?.flushPending();
 
     const ids = Array.from(this.ctx.pages.keys()).filter((id) => id !== pageId);
     const insertIndex = afterId === null ? 0 : ids.indexOf(afterId) + 1;
@@ -363,7 +382,10 @@ export class PageManager {
     }
 
     const page = this.ctx.pages.get(pageId);
-    this.ctx.composer.emit(EVENTS.PROJECT_CHANGED, { type: "page:reordered", page });
+    composer.beginTransaction?.("Reorder pages");
+    composer.emit(EVENTS.PROJECT_CHANGED, { type: "page:reordered", page });
+    composer.endTransaction?.();
+    composer.history?.flushPending();
     return true;
   }
 

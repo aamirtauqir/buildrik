@@ -38,6 +38,7 @@ import {
   SmartGuidesOverlay,
   SectionReorderHandles,
   SelectionLabel,
+  ListCountCaption,
 } from "./";
 
 // ─── Props ───────────────────────────────────────────────────────────────────
@@ -265,6 +266,14 @@ export function CanvasOverlayGroup({
               canvasRef={canvasRef as React.RefObject<HTMLDivElement | null>}
             />
           )}
+          {/* D95 (195:28058): what a selected Collection list shows, under it. */}
+          {selectedIds.length === 1 && canvasRef.current && composer.cms?.bindings?.getCollectionBinding?.(selectedId) ? (
+            <ListCountCaption
+              composer={composer}
+              elementId={selectedId}
+              canvasRef={canvasRef as React.RefObject<HTMLDivElement | null>}
+            />
+          ) : null}
           {selectedIds.length === 1 && !isResizing && canvasRef.current && (
             <UnifiedSelectionToolbar
               composer={composer}
@@ -319,7 +328,10 @@ export function CanvasOverlayGroup({
           onMouseDown={(e) => e.preventDefault()}
           onClick={(e) => e.stopPropagation()}
         >
-          <RichTextEditor onCommand={onInlineCommand} />
+          <RichTextEditor
+            onCommand={onInlineCommand}
+            blockTag={canvasRef.current?.querySelector(`[data-buildrick-id="${editing.id}"]`)?.tagName.toLowerCase()}
+          />
         </div>
       )}
 

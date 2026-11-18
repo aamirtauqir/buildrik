@@ -156,7 +156,16 @@ describe("fetchPublishStatus", () => {
       publishedUrl: null,
       error: null,
       deploymentId: "dep-1",
+      /* A-32: the job's start (else its creation) — absent in this fixture. */
+      startedAt: null,
     });
+  });
+
+  it("A-32: carries the job's start, falling back to its creation, as ISO", async () => {
+    publishStatusQuery.mockResolvedValueOnce({ ...job("QUEUED"), startedAt: null, createdAt: new Date("2026-10-30T10:00:00.000Z") });
+    expect((await fetchPublishStatus("job-1")).startedAt).toBe("2026-10-30T10:00:00.000Z");
+    publishStatusQuery.mockResolvedValueOnce({ ...job("BUILDING"), startedAt: "2026-10-30T10:00:05.000Z", createdAt: "2026-10-30T10:00:00.000Z" });
+    expect((await fetchPublishStatus("job-1")).startedAt).toBe("2026-10-30T10:00:05.000Z");
   });
 
   it("resolves publishedUrl from sites.get once the job is COMPLETED", async () => {
@@ -200,6 +209,12 @@ describe("cancelPublish", () => {
 });
 
 describe("fetchSitePublishState", () => {
+  it("carries the workspace's scheduled deletion (2L9 B7-G20/G21)", async () => {
+    sitesGetQuery.mockResolvedValueOnce({ workspace: { deletionScheduledAt: "2026-11-12T00:00:00.000Z" } });
+    const state = await fetchSitePublishState("site-1");
+    expect(state.workspaceDeletionAt).toBe("2026-11-12T00:00:00.000Z");
+  });
+
   it("reports published only when status is PUBLISHED AND a url exists", async () => {
     sitesGetQuery.mockResolvedValueOnce({ status: "PUBLISHED", publishedUrl: "https://x.vercel.app" });
 
@@ -212,6 +227,7 @@ describe("fetchSitePublishState", () => {
       hasUnpublishedChanges: null,
       lastPublishedAt: null,
       lastEditedAt: null,
+      workspaceDeletionAt: null,
     });
   });
 
@@ -224,6 +240,7 @@ describe("fetchSitePublishState", () => {
       hasUnpublishedChanges: null,
       lastPublishedAt: null,
       lastEditedAt: null,
+      workspaceDeletionAt: null,
     });
   });
 
@@ -237,6 +254,7 @@ describe("fetchSitePublishState", () => {
       hasUnpublishedChanges: null,
       lastPublishedAt: null,
       lastEditedAt: null,
+      workspaceDeletionAt: null,
     });
   });
 
@@ -250,6 +268,7 @@ describe("fetchSitePublishState", () => {
       publishedUrl: "https://x.vercel.app",
       lastPublishedAt: "2026-08-20T10:00:00.000Z",
       lastEditedAt: "2026-08-21T09:00:00.000Z",
+      workspaceDeletionAt: null,
     });
     const state = await fetchSitePublishState("site-1");
     expect(state.hasUnpublishedChanges).toBe(true);
@@ -262,6 +281,7 @@ describe("fetchSitePublishState", () => {
       publishedUrl: "https://x.vercel.app",
       lastPublishedAt: "2026-08-21T10:00:00.000Z",
       lastEditedAt: "2026-08-20T09:00:00.000Z",
+      workspaceDeletionAt: null,
     });
     expect((await fetchSitePublishState("site-1")).hasUnpublishedChanges).toBe(false);
   });
@@ -275,6 +295,7 @@ describe("fetchSitePublishState", () => {
       publishedUrl: null,
       lastPublishedAt: null,
       lastEditedAt: "2026-08-21T09:00:00.000Z",
+      workspaceDeletionAt: null,
     });
     expect((await fetchSitePublishState("site-1")).hasUnpublishedChanges).toBeNull();
   });

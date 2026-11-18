@@ -83,11 +83,17 @@ function classifyPublishBlock(msg: string): PublishBlockReason {
 export interface UsePublishJobResult {
   uiState: PublishUiState;
   jobId: string | null;
+  /** The Vercel deployment the job created, once it has one — a job that
+   *  failed after its upload started carries it too (`sites.publishStatus`
+   *  already returns it). Shown beside the job id when a deploy fails. */
+  deploymentId: string | null;
   progress: number;
   publishedUrl: string | null;
   error: string | null;
   /** The failed job's per-step build log — board 784:4403's "View log". */
   steps: PublishStep[] | null;
+  /** When the running job began (ISO), for the tray's "Elapsed" (A-32). */
+  startedAt: string | null;
   /** Set when the approval gate blocked the publish; drives the acknowledge UX. */
   blockedReason: PublishBlockReason;
   publish: (
@@ -394,12 +400,14 @@ export function usePublishJob(): UsePublishJobResult {
     unpublished,
     uiState,
     jobId,
+    deploymentId: status?.deploymentId ?? null,
     progress: status?.progress ?? 0,
     publishedUrl: status?.publishedUrl ?? hydratedUrl,
     lastPublishedAt: hydrated?.lastPublishedAt ?? null,
     hasUnpublishedChanges: hydrated?.hasUnpublishedChanges ?? null,
     error,
     steps: status?.steps ?? null,
+    startedAt: status?.startedAt ?? null,
     blockedReason,
     publish,
     cancel,

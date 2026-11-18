@@ -62,6 +62,7 @@ const composer = {
 const failedJob = (steps: UsePublishJobResult["steps"]): UsePublishJobResult => ({
   uiState: "failed",
   jobId: "job-1",
+  deploymentId: null,
   progress: 20,
   publishedUrl: null,
   error: "Build error on Home — 3 unresolved links.",
@@ -70,6 +71,7 @@ const failedJob = (steps: UsePublishJobResult["steps"]): UsePublishJobResult => 
   lastPublishedAt: null,
   hasUnpublishedChanges: null,
   unpublished: vi.fn(),
+  startedAt: null,
   pollLost: false,
   publish: vi.fn(),
   cancel: vi.fn(),

@@ -143,10 +143,19 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
      them, measured in the running editor. `htmlFor` also makes the visible
      label a click target, which a bare <label> never was. */
   const id = React.useId();
+  /* 2L9 36:2 (Effects specimen): a value box beside the slider, the unit
+     after it — typed values commit on Enter or blur, clamped to the range. */
+  const [draft, setDraft] = React.useState<string | null>(null);
+  const commit = () => {
+    if (draft === null) return;
+    const n = parseFloat(draft);
+    setDraft(null);
+    if (!field.readOnly && Number.isFinite(n) && n !== value) onChange(Math.max(min, Math.min(max, n)));
+  };
   return (
     <div className="bdi-row-ctrl">
       <label className="bdi-lb" htmlFor={id}>{label}</label>
-      <div className="bdi-row-content">
+      <div className="bdi-row-content tw:gap-2">
         <TextInput
           id={id}
           type="range"
@@ -162,16 +171,24 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
           step={step}
           style={sliderStyle}
         />
-        <span
-          style={{
-            font: "500 11px var(--bk-font-ui)",
-            color: "var(--bk-ink-muted)",
-            minWidth: 32,
-            textAlign: "right",
-            fontVariantNumeric: "tabular-nums",
+        <TextInput
+          sizing="sm"
+          inputMode="decimal"
+          aria-label={`${label} value`}
+          aria-readonly={field.readOnly || undefined}
+          className="tw:w-11 tw:shrink-0"
+          value={draft ?? (field.mixed ? "" : String(value))}
+          placeholder={field.mixed ? "Mixed" : undefined}
+          onChange={(e) => setDraft(e.target.value)}
+          onBlur={commit}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") commit();
+            else if (e.key === "Escape") setDraft(null);
           }}
-        >
-          {field.mixed ? "Mixed" : `${value}${unit}`}
+          data-testid={`inspector-slider-value-${label.toLowerCase()}`}
+        />
+        <span className="tw:w-4 tw:shrink-0 tw:text-[11px] tw:text-[var(--bk-ink-muted)]" aria-hidden="true">
+          {unit}
         </span>
       </div>
     </div>

@@ -7,7 +7,8 @@
  * @license BSD-3-Clause
  */
 
-import { render, screen, fireEvent } from "@testing-library/react";
+import { act, render, screen, fireEvent } from "@testing-library/react";
+import { openSubview, useSubview } from "@/editor/inspector/tabs/subviewStore";
 import { describe, it, expect, vi } from "vitest";
 import { TypographySection } from "../index";
 import { textSummary, TEXT_SECTIONS } from "@/editor/inspector/sections/registry/text";
@@ -18,32 +19,49 @@ const labels = (c: HTMLElement) => Array.from(c.querySelectorAll(".bdi-lb")).map
 describe("Typography section", () => {
   it("board 1's rows: Font, Font size, Line height, Weight, Colour, Align", () => {
     const { container } = render(<TypographySection styles={{}} onChange={vi.fn()} isOpen onAdvancedToggle={vi.fn()} />);
-    expect(labels(container)).toEqual(["Font", "Font size", "Line height", "Weight", "Colour", "Align"]);
+    expect(labels(container)).toEqual(["Font", "Font size", "Weight", "Line height", "Text color"]);
     expect(screen.getByRole("button", { name: /More settings/ })).toBeInTheDocument();
   });
 
   it("More settings opens the rest", () => {
     const { container } = render(<TypographySection styles={{}} onChange={vi.fn()} isOpen advancedExpanded onAdvancedToggle={vi.fn()} />);
-    expect(labels(container)).toEqual(expect.arrayContaining(["Transform", "Decoration", "Letter", "Word", "Style"]));
+    expect(labels(container)).toEqual(expect.arrayContaining(["Transform", "Decoration", "Letter spacing", "Word spacing", "Font style"]));
+  });
+
+  it("Text inside (247:23404): every row on the face, no More settings, the inheritance note", () => {
+    const { container } = render(<TypographySection styles={{}} onChange={vi.fn()} isOpen inside onAdvancedToggle={vi.fn()} />);
+    expect(labels(container)).toEqual(expect.arrayContaining(["Font", "Letter spacing", "Vertical align"]));
+    expect(screen.queryByRole("button", { name: /More settings/ })).toBeNull();
+    expect(screen.getByText("Inherited by descendants where applicable. Existing child overrides remain.")).toBeInTheDocument();
   });
 
   it("Page panel (board 21): Font and Text colour only, no More settings", () => {
     const { container } = render(<TypographySection styles={{}} onChange={vi.fn()} isOpen variant="page" onAdvancedToggle={vi.fn()} advancedExpanded />);
-    expect(labels(container)).toEqual(["Font", "Text colour"]);
+    expect(labels(container)).toEqual(["Font", "Text color"]);
     expect(screen.queryByRole("button", { name: /More settings/ })).toBeNull();
   });
 
-  it("the Font field reads the family, not its fallback stack", () => {
+  it("the Font field reads the family and its source, not its fallback stack", () => {
     render(<TypographySection styles={{ "font-family": "Inter, sans-serif" }} onChange={vi.fn()} isOpen />);
-    expect(screen.getByRole("button", { name: "Font family" }).textContent).toBe("Inter");
+    /* 2L9 R01: the family, then where it comes from; the written stack below. */
+    expect(screen.getByRole("button", { name: "Font family" }).textContent).toBe("Inter · Google Fonts");
+    expect(screen.getByTestId("font-applied-stack")).toHaveTextContent("Applied stack: Inter, sans-serif");
   });
 
-  it("picking a font writes font-family", () => {
-    const onChange = vi.fn();
-    render(<TypographySection styles={{}} onChange={onChange} isOpen />);
+  it("the Font row opens Choose font (R02) for the section's element", () => {
+    function Open() {
+      const sub = useSubview();
+      return <span data-testid="subview">{sub ? `${sub.kind}:${sub.elementId}` : "none"}</span>;
+    }
+    render(
+      <>
+        <TypographySection styles={{}} onChange={vi.fn()} isOpen elementId="el-typo" />
+        <Open />
+      </>,
+    );
     fireEvent.click(screen.getByRole("button", { name: "Font family" }));
-    fireEvent.click(screen.getByRole("option", { name: /Georgia/ }));
-    expect(onChange).toHaveBeenCalledWith("font-family", "Georgia, serif");
+    expect(screen.getByTestId("subview")).toHaveTextContent("font-picker:el-typo");
+    act(() => openSubview(null));
   });
 });
 

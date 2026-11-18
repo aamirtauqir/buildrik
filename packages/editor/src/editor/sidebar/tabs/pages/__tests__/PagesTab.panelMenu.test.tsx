@@ -33,13 +33,11 @@ function mount(): MockComposer {
 const openMenu = () => fireEvent.click(screen.getByTestId("pages-panel-menu"));
 
 describe("PagesTab — header ⋯ menu", () => {
-  it("offers Select pages… · Listings · Show structure · Reload (v3 7069:79383); the band links are gone", () => {
+  it("offers Select pages… · Listings · Show structure · Reload · Recently deleted (board 65:17148, A-21)", () => {
     mount();
-    expect(screen.queryByText(/Listings/)).toBeNull();
-    expect(screen.queryByText(/Structure/)).toBeNull();
     openMenu();
     const labels = screen.getAllByRole("menuitem").map((el) => el.textContent?.trim());
-    expect(labels).toEqual(["Select pages…", "Listings", "Show structure", "Reload"]);
+    expect(labels).toEqual(["Select pages…", "Listings", "Show structure", "Reload", "Recently deleted"]);
   });
 
   it("select mode swaps the ⋯ for Done, which leaves it (v3 7069:78984)", () => {
@@ -68,12 +66,23 @@ describe("PagesTab — header ⋯ menu", () => {
     mount();
     openMenu();
     fireEvent.click(screen.getByTestId("pages-open-structure"));
-    expect(screen.getByText(/routes?/i)).toBeInTheDocument();
-    // back to the tree, then the other view
-    fireEvent.click(screen.getByTestId("pages-structure-back"));
+    expect(screen.getByTestId("pages-structure")).toBeInTheDocument();
     openMenu();
     fireEvent.click(screen.getByTestId("pages-open-listings"));
-    expect(screen.getByTestId("pages-listings-back")).toBeInTheDocument();
+    expect(screen.queryByTestId("pages-structure")).toBeNull();
+    expect(screen.getByRole("tab", { name: "Listings" })).toHaveAttribute("aria-selected", "true");
+  });
+
+  /* design-2l9 board 63:6393: Pages · Listings · Structure as tabs under the
+     search, and the count in the title. */
+  it("switches views from the tabs; the title counts the pages", () => {
+    mount();
+    expect(screen.getByText(/^Pages · \d+$/)).toBeInTheDocument();
+    expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual(["Pages", "Listings", "Structure"]);
+    fireEvent.click(screen.getByRole("tab", { name: "Structure" }));
+    expect(screen.getByTestId("pages-structure")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("tab", { name: "Pages" }));
+    expect(screen.queryByTestId("pages-structure")).toBeNull();
   });
 
   it("Reload re-syncs the page list", () => {

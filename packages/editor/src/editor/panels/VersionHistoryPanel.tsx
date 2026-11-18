@@ -30,6 +30,7 @@ import { ALL_SAVES, SavesFilter, applySavesFilter, type SavesFilterValue } from 
 import { versionDisplayName } from "@/shared/utils/versionLabel";
 import { versionChangeCounts } from "@/shared/utils/versionChangeCounts";
 import { useHistoryState } from "@/shared/hooks/useHistoryState";
+import { useOnline } from "@/editor/design-system/state/useOnline";
 
 // CompareView + toggle-pill style constants moved to
 // ./version-history/CompareView.tsx (D3 Stage 2, audit-remediation 2026-05-08).
@@ -85,6 +86,10 @@ const NOTICE_BASE =
   "tw:flex tw:flex-col tw:gap-[2px] tw:px-[var(--bk-space-16)] tw:py-2.5";
 /* Board 4418:74511 — 13/20 ink-soft body, then a 12/16 muted footnote. */
 /* 4418:173587 / 6881:70883 — the details overlay's 13/20 ink lines. */
+/* 2L9 B7-H15 (230:20770): a plain muted line under the filter row, not a
+   tinted callout. */
+const OFFLINE_NOTE =
+  "tw:m-0 tw:px-3 tw:pb-1 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 const DETAILS_LINE = "tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
 const RESTORE_CONFIRM_BODY = "tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-soft)]";
 const RESTORE_CONFIRM_SUB = "tw:mt-3 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]";
@@ -129,6 +134,12 @@ export function VersionHistoryPanel({
   const [restoreConfirmId, setRestoreConfirmId] = React.useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = React.useState<string | null>(null);
   const [restoringId, setRestoringId] = React.useState<string | null>(null);
+  /* 2L9 B7-H15: offline, the list stays readable and says when it was read. */
+  const online = useOnline();
+  const [loadedAt, setLoadedAt] = React.useState<number | null>(null);
+  React.useEffect(() => {
+    if (!isLoading && !loadError) setLoadedAt(Date.now());
+  }, [isLoading, loadError]);
 
   // Expanded row state (Compare view)
   const [expandedId, setExpandedId] = React.useState<string | null>(null);
@@ -163,11 +174,16 @@ export function VersionHistoryPanel({
   /* The last restore, with its way back. A restore resets the undo stack and
      its only undo lived in an 8-second toast (L5-044), so it stays here, on
      the Saves panel, until dismissed or replaced by the next restore. */
-  const [lastRestore, setLastRestore] = React.useState<{ label: string; safetyId: string } | null>(null);
+  const [lastRestore, setLastRestore] = React.useState<{ label: string; sub: string; safetyId: string } | null>(null);
+  /* The safety save's name, for 2L9 H06's "“Before restoring” saved first." */
+  const savedAsRef = React.useRef<string | null>(null);
   React.useEffect(() => {
     if (!composer) return;
     const onPruned = (p: { removed: number; kept: number }) => setPruned(p);
-    const onRestoring = (p: { targetName: string; savedAs: string | null }) => setRestoring(p);
+    const onRestoring = (p: { targetName: string; savedAs: string | null }) => {
+      savedAsRef.current = p.savedAs;
+      setRestoring(p);
+    };
     const onRestored = (p?: { safetyVersionId?: string }) => {
       setRestoring(null);
       safetyIdRef.current = p?.safetyVersionId ?? null;
@@ -198,6 +214,7 @@ export function VersionHistoryPanel({
     setRestoringId(versionId);
     const target = versions.find((v) => v.id === versionId);
     safetyIdRef.current = null;
+    savedAsRef.current = null;
     try {
       const ok = await restoreVersion(versionId);
       if (!ok) {
@@ -212,9 +229,16 @@ export function VersionHistoryPanel({
       const safetyId = safetyIdRef.current;
       /* No target in this list = the Undo of a restore (its safety save was
          created after the list was read). */
-      const label = target ? `Restored to ${formatTime(target.createdAt)}` : "Restore undone";
-      addToast({ description: label, tone: "success", duration: 8000 });
-      setLastRestore(target && safetyId ? { label, safetyId } : null);
+      /* 2L9 B7-H06 230:15797: the outcome and its way back are one surface —
+         the notice when there is a safety save to return to, else a toast. */
+      const label = target ? `Draft restored from “${versionDisplayName(target)}”.` : "Restore undone";
+      const savedAs = savedAsRef.current;
+      const sub = savedAs ? `“${savedAs}” saved first.` : "Your work from before is kept as a save.";
+      if (target && safetyId) setLastRestore({ label, sub, safetyId });
+      else {
+        setLastRestore(null);
+        addToast({ description: label, tone: "success", duration: 8000 });
+      }
     } catch {
       pushToast("Restore failed", "error");
     } finally {
@@ -245,6 +269,7 @@ export function VersionHistoryPanel({
   const handleDeleteCancel = () => {
     setDeleteConfirmId(null);
   };
+  const deleteVersionTarget = deleteConfirmId ? versions.find((v) => v.id === deleteConfirmId) ?? null : null;
 
   const handleRename = React.useCallback(
     async (versionId: string, name: string) => {
@@ -425,7 +450,7 @@ export function VersionHistoryPanel({
       {lastRestore && !restoring && (
         <div className={NOTICE_RESTORING} role="status" data-testid="history-undo-restore-notice">
           <strong className={NOTICE_STRONG}>{lastRestore.label}</strong>
-          <span className={NOTICE_SUB}>Your work from before is kept as a save.</span>
+          <span className={NOTICE_SUB}>{lastRestore.sub}</span>
           <span className="tw:flex tw:gap-2 tw:pt-1">
             <Button
               size="xs"
@@ -456,13 +481,32 @@ export function VersionHistoryPanel({
         </div>
       )}
 
-      {versions.length > 0 && (
-        <SavesFilter
-          versions={versions}
-          currentUserId={currentUserId}
-          value={savesFilter}
-          onChange={setSavesFilter}
-        />
+      {/* 2L9 B7-H04: "Filter: All ▾" and "Save a version" share the row
+          above the list. */}
+      <SavesFilter
+        versions={versions}
+        currentUserId={currentUserId}
+        value={savesFilter}
+        onChange={setSavesFilter}
+        action={
+          <SaveVersionFooter
+            composer={composer}
+            placement="header"
+            disabledReason={
+              readOnly
+                ? "Viewers can't save a version — ask an editor"
+                : !online
+                  ? "Needs a connection to save a version"
+                  : undefined
+            }
+          />
+        }
+      />
+      {!online && (
+        <p className={OFFLINE_NOTE} role="status" data-testid="saves-offline-note">
+          Needs a connection to save, restore or delete versions.
+          {loadedAt ? ` This list was loaded at ${formatTime(loadedAt)}.` : ""}
+        </p>
       )}
 
       {/* Version List — virtualization + row rendering owned by VersionList.
@@ -472,11 +516,8 @@ export function VersionHistoryPanel({
         filteredVersions={filteredVersions}
         totalCount={versions.length}
         restoringId={restoringId}
-        deleteConfirmId={deleteConfirmId}
         onRestoreRequest={handleRestoreClick}
         onDeleteRequest={handleDeleteRequest}
-        onDeleteConfirm={handleDeleteConfirm}
-        onDeleteCancel={handleDeleteCancel}
         onCompare={handleCompare}
         onDetails={setDetailsId}
         onRename={handleRename}
@@ -551,9 +592,19 @@ export function VersionHistoryPanel({
           />
         </div>
       )}
-      <SaveVersionFooter
-        composer={composer}
-        disabledReason={readOnly ? "Viewers can't save a version — ask an editor" : undefined}
+      {/* 2L9 B7-H07 — the interim confirm until RT-D1 (server soft delete). */}
+      <ConfirmDialog
+        open={deleteVersionTarget !== null}
+        onClose={handleDeleteCancel}
+        onConfirm={() => {
+          if (deleteVersionTarget) void handleDeleteConfirm(deleteVersionTarget.id);
+        }}
+        title={deleteVersionTarget ? `Delete “${versionDisplayName(deleteVersionTarget)}”?` : ""}
+        message="This version can’t be restored after it’s deleted."
+        confirmLabel="Delete version"
+        cancelLabel="Cancel"
+        tone="destructive"
+        testId="history-delete-confirm"
       />
     </div>
   );

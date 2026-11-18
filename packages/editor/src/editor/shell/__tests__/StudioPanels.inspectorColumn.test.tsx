@@ -13,13 +13,19 @@ import * as React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, act, cleanup, fireEvent } from "@testing-library/react";
 
-vi.mock("@/editor/canvas/Canvas", () => ({ Canvas: React.forwardRef(() => null) }));
+/* The Canvas stub keeps the props it was last given (A-12 reads them). */
+const canvasProps = vi.hoisted(() => ({ current: {} as Record<string, unknown> }));
+vi.mock("@/editor/canvas/Canvas", () => ({
+  Canvas: React.forwardRef((props: Record<string, unknown>) => {
+    canvasProps.current = props;
+    return null;
+  }),
+}));
 vi.mock("@/editor/sidebar/LeftSidebar", () => ({ LeftSidebar: () => null }));
 vi.mock("@/editor/sidebar/FullPageView", () => ({ FullPageView: () => null }));
 vi.mock("@/editor/sidebar/TabRouter", () => ({
   TabRouter: ({ activeTab }: { activeTab: string }) => <div data-testid={`column-tab-${activeTab}`} />,
 }));
-vi.mock("../PageTabBar", () => ({ PageTabBar: () => null }));
 vi.mock("@/editor/cms/CmsWorkspace", () => ({
   default: ({ onBackToCanvas }: { onBackToCanvas?: () => void }) => (
     <div data-testid="cms-workspace">
@@ -38,7 +44,11 @@ vi.mock("@/editor/design-system/ui/ProjectTokensApplier", () => ({ ProjectTokens
 vi.mock("../hooks/useBlockInsertion", () => ({ useBlockInsertion: () => ({ handleBlockClick: () => {} }) }));
 vi.mock("../hooks/useClipboardToasts", () => ({ useClipboardToasts: () => {} }));
 vi.mock("../hooks/useAltTextAutoTrigger", () => ({ useAltTextAutoTrigger: () => {} }));
-vi.mock("@/editor/sidebar/tabs/pages/usePageCommands", () => ({ usePageJumpList: () => [], usePageCommands: () => {} }));
+vi.mock("@/editor/sidebar/tabs/pages/usePageCommands", () => ({ usePageCommands: () => {} }));
+/* The real BottomBar renders; the shell's page list is one page, "Home". */
+vi.mock("../usePageSummaries", () => ({
+  usePageSummaries: () => [{ id: "home", name: "Home", slug: "/", kind: "static", isHome: true, dirty: false, depth: 0 }],
+}));
 vi.mock("@/services/BuildrikSyncProvider", () => ({ getSiteIdFromUrl: () => "site-1" }));
 vi.mock("@shared/utils/editorViewMode", () => ({ getEditorViewMode: () => ({ readOnlyView: false }) }));
 vi.mock("../hooks/useEditorRole", () => ({ useViewerChrome: () => false }));
@@ -73,6 +83,7 @@ function makeComposer() {
   const handlers = new Map<string, Set<(p?: unknown) => void>>();
   return {
     readOnly: false,
+    setEditLock: vi.fn(),
     on: (ev: string, fn: (p?: unknown) => void) => {
       if (!handlers.has(ev)) handlers.set(ev, new Set());
       handlers.get(ev)!.add(fn);
@@ -80,7 +91,7 @@ function makeComposer() {
     off: (ev: string, fn: (p?: unknown) => void) => handlers.get(ev)?.delete(fn),
     emit: (ev: string, p?: unknown) => [...(handlers.get(ev) ?? [])].forEach((fn) => fn(p)),
     selection: { clear: vi.fn(), select: vi.fn() },
-    elements: { getElement: () => null },
+    elements: { getElement: () => null, getActivePage: () => ({ id: "home" }) },
   };
 }
 type FakeComposer = ReturnType<typeof makeComposer>;
@@ -106,7 +117,7 @@ function selectingComposer(ids: string[]) {
     ...base,
     selection,
     live,
-    elements: { getElement: (id: string) => live.get(id) ?? null },
+    elements: { getElement: (id: string) => live.get(id) ?? null, getActivePage: () => ({ id: "home" }) },
   };
 }
 
@@ -160,7 +171,7 @@ describe("StudioPanels — a section-focus request always lands on a visible ins
 
     expect(screen.queryByTestId("ai-tab")).toBeNull();
     expect(screen.getByTestId("pro-inspector").getAttribute("data-revealed")).toBe("content");
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+    expect(screen.queryByTestId("show-inspector")).toBeNull();
   });
 
   it("with a column tab (History) open: the tab closes and the section is revealed", async () => {
@@ -179,12 +190,12 @@ describe("StudioPanels — a section-focus request always lands on a visible ins
     const composer = makeComposer();
     render(<Harness composer={composer} />);
     act(() => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR));
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("true");
+    expect(screen.queryByTestId("show-inspector")).not.toBeNull(); // hidden: S30's reserved column
 
     act(() => composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "content" }));
     await flushFrame();
 
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+    expect(screen.queryByTestId("show-inspector")).toBeNull();
     expect(screen.getByTestId("pro-inspector").getAttribute("data-revealed")).toBe("content");
   });
 
@@ -200,27 +211,29 @@ describe("StudioPanels — a section-focus request always lands on a visible ins
 });
 
 
-/* Board 36 (Inspector v4 · Inspector hidden): the canvas runs full width and
-   carries its own way back — "Show inspector ⌘\" at its top right. That
-   button replaced the "Inspector hidden · Show" toast (GW-3 / M-2), which was
-   the way back only while no board drew one. */
-describe("StudioPanels — Show inspector on the canvas (board 36)", () => {
-  const showButton = () => screen.queryByRole("button", { name: "Show inspector" });
+/* 2L9 S30 (258:36770, Inspector hidden): the column stays reserved and empty,
+   with "Show Inspector" at its top right (it was board 36's full-width canvas
+   with the button on it). That button replaced the "Inspector hidden · Show"
+   toast (GW-3 / M-2). The inspector stays mounted, invisible, under it. */
+describe("StudioPanels — Show Inspector in the reserved column (2L9 S30)", () => {
+  const showButton = () => screen.queryByRole("button", { name: "Show Inspector" });
 
-  it("hiding the inspector puts Show inspector ⌘\\ on the canvas; it brings the inspector back", () => {
+  it("hiding the inspector keeps its column with Show Inspector in it; the button brings the inspector back", () => {
     const composer = makeComposer();
     render(<Harness composer={composer} />);
     expect(showButton()).toBeNull();
     act(() => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR));
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("true");
-    const button = showButton()!;
-    expect(button.textContent).toContain("Show inspector");
-    expect(button.textContent).toContain("⌘\\");
-    expect(button.getAttribute("aria-keyshortcuts")).toBe("Meta+\\");
-    /* On the canvas, not in the (hidden) column. */
-    expect(inspectorColumn().contains(button)).toBe(false);
-    fireEvent.click(button);
     expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+    expect(screen.getByTestId("inspector-body-host").getAttribute("aria-hidden")).toBe("true");
+    const button = showButton()!;
+    /* 2L9 S30 (258:36770): "Show Inspector"; ⌘\ is announced and in the tooltip. */
+    expect(button.textContent).toBe("Show Inspector");
+    expect(button.getAttribute("aria-keyshortcuts")).toBe("Meta+\\");
+    expect(button.getAttribute("title")).toBe("Show Inspector (⌘\\)");
+    /* In the reserved column. */
+    expect(inspectorColumn().contains(button)).toBe(true);
+    fireEvent.click(button);
+    expect(screen.getByTestId("inspector-body-host").getAttribute("aria-hidden")).toBeNull();
     expect(showButton()).toBeNull();
   });
 
@@ -237,7 +250,7 @@ describe("StudioPanels — Show inspector on the canvas (board 36)", () => {
     act(() => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR));
     act(() => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR));
     expect(showButton()).toBeNull();
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+    expect(screen.queryByTestId("show-inspector")).toBeNull();
   });
 
   it("not drawn while a mode fills the column (AI) — the column is open", () => {
@@ -254,7 +267,7 @@ describe("StudioPanels — Show inspector on the canvas (board 36)", () => {
     act(() => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR));
     unmount();
     render(<Harness composer={makeComposer()} />);
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+    expect(screen.queryByTestId("show-inspector")).toBeNull();
     expect(showButton()).toBeNull();
   });
 });
@@ -271,7 +284,7 @@ describe("StudioPanels — ‹ Inspector leads to the inspector (M-1)", () => {
     fireEvent.click(screen.getByRole("button", { name: "‹ Inspector" }));
     expect(screen.queryByTestId("ai-tab")).toBeNull();
     expect(screen.getByTestId("pro-inspector")).toBeTruthy();
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+    expect(screen.queryByTestId("show-inspector")).toBeNull();
   });
 
   it("AI's ✕ leaves a hidden inspector hidden", () => {
@@ -280,7 +293,7 @@ describe("StudioPanels — ‹ Inspector leads to the inspector (M-1)", () => {
     act(() => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR));
     act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" }));
     fireEvent.click(screen.getByRole("button", { name: "Close AI" }));
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("true");
+    expect(screen.queryByTestId("show-inspector")).not.toBeNull(); // hidden: S30's reserved column
   });
 
   it("Issues' back row gets the same promise", () => {
@@ -298,7 +311,7 @@ describe("StudioPanels — ‹ Inspector leads to the inspector (M-1)", () => {
     fireEvent.click(screen.getByRole("button", { name: "Issues back" }));
     expect(onCloseIssues).toHaveBeenCalled();
     rerender(<Harness composer={composer} issuesOpen={false} onCloseIssues={onCloseIssues} />);
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+    expect(screen.queryByTestId("show-inspector")).toBeNull();
   });
 });
 
@@ -309,21 +322,21 @@ describe("StudioPanels — the column opens for every panel it hosts", () => {
     const composer = makeComposer();
     const { rerender } = render(<Harness composer={composer} />);
     act(() => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR));
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("true");
+    expect(screen.queryByTestId("show-inspector")).not.toBeNull(); // hidden: S30's reserved column
 
     act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" }));
     expect(screen.getByTestId("ai-tab")).toBeTruthy();
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+    expect(screen.queryByTestId("show-inspector")).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Close AI" }));
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("true");
+    expect(screen.queryByTestId("show-inspector")).not.toBeNull(); // hidden: S30's reserved column
 
     act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "history" }));
     expect(screen.getByTestId("column-tab-history")).toBeTruthy();
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+    expect(screen.queryByTestId("show-inspector")).toBeNull();
 
     rerender(<Harness composer={composer} issuesOpen renderIssuesPanel={() => <div data-testid="issues" />} />);
     expect(screen.getByTestId("issues")).toBeTruthy();
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+    expect(screen.queryByTestId("show-inspector")).toBeNull();
   });
 });
 
@@ -434,6 +447,39 @@ describe("StudioPanels — the CMS workspace returns to the bound element (§13)
     expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
   });
 
+  /* C-12 / Play F2.12 302:16675: the round trip ends on the binding the
+     door was opened from, not on the bare canvas. */
+  it("Back to canvas reopens the inspector on the originating binding", async () => {
+    const composer = selectingComposer(["el-1"]);
+    composer.selection.select(composer.live.get("el-1")!);
+    render(<Harness composer={composer as unknown as FakeComposer} leftPanelTab="layers" />);
+    act(() =>
+      composer.emit(EVENTS.UI_CMS_OPEN, {
+        collectionId: "col-1",
+        recordId: "rec-1",
+        binding: { section: "cms-binding", property: "title" },
+      }),
+    );
+    await screen.findByTestId("cms-workspace");
+    fireEvent.click(screen.getByRole("button", { name: "‹ Back to canvas" }));
+    await flushFrame();
+    await flushFrame();
+    expect(screen.getByTestId("pro-inspector").getAttribute("data-revealed")).toBe("cms-binding");
+    expect(screen.queryByTestId("show-inspector")).toBeNull();
+  });
+
+  it("a door without a binding returns to the bare canvas", async () => {
+    const composer = selectingComposer(["el-1"]);
+    composer.selection.select(composer.live.get("el-1")!);
+    render(<Harness composer={composer as unknown as FakeComposer} leftPanelTab="layers" />);
+    act(() => composer.emit(EVENTS.UI_CMS_OPEN, { collectionId: "col-1", recordId: "rec-1" }));
+    await screen.findByTestId("cms-workspace");
+    fireEvent.click(screen.getByRole("button", { name: "‹ Back to canvas" }));
+    await flushFrame();
+    await flushFrame();
+    expect(screen.getByTestId("pro-inspector").getAttribute("data-revealed")).toBe("");
+  });
+
   it("a drawer that was closed before the door is closed again", async () => {
     const composer = selectingComposer(["el-1"]);
     composer.selection.select(composer.live.get("el-1")!);
@@ -487,5 +533,105 @@ describe("StudioPanels — the CMS workspace returns to the bound element (§13)
     act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "content" }));
     await screen.findByTestId("cms-workspace");
     expect(screen.queryByRole("button", { name: "‹ Back to canvas" })).toBeNull();
+  });
+});
+
+/* 2L9 Shell/BottomBar Context=Resource area (497:99474): while CMS, Brand,
+   Settings or Assets cover the canvas, the bottom bar drops the page switcher
+   and says the page is still open, with the way back. */
+describe("StudioPanels — bottom bar in resource areas", () => {
+  it("the editor shows the page switcher in the bottom bar", () => {
+    render(<Harness composer={makeComposer()} />);
+    expect(screen.getByTestId("page-switcher-trigger")).toBeTruthy();
+    expect(screen.queryByTestId("bottom-bar-resource")).toBeNull();
+  });
+
+  it.each(["content", "design", "settings"])(
+    "resource area %s renders no page switcher; ‹ Back to Editor returns to Home",
+    async (tab) => {
+      const composer = selectingComposer([]);
+      render(<Harness composer={composer as unknown as FakeComposer} leftPanelTab="layers" />);
+      act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab }));
+      const bar = await screen.findByTestId("bottom-bar-resource");
+      expect(screen.queryByTestId("page-switcher-trigger")).toBeNull();
+      expect(bar.textContent).toBe("Editor keeps Home open — return with‹ Back to Editor");
+
+      fireEvent.click(screen.getByRole("button", { name: "‹ Back to Editor" }));
+
+      expect(screen.queryByTestId("bottom-bar-resource")).toBeNull();
+      expect(screen.queryByTestId("cms-workspace")).toBeNull();
+      expect(screen.getByTestId("layout-shell").className).not.toContain("layout-shell--fullpage");
+      expect(screen.getByTestId("page-switcher-trigger").textContent).toContain("Home");
+    },
+  );
+
+  /* C-10 / D-10 / E-10: Brand, Settings and Assets render in the fullpage
+     slot, not a window-wide portal — so the slot has to be in fullpage mode
+     whenever one of them is the active surface, drawer open or not (Settings
+     stays the active tab when the drawer is closed under it). */
+  it.each(["design", "settings"])("%s keeps the resource-area layout with the drawer closed", (tab) => {
+    const composer = selectingComposer([]);
+    render(<Harness composer={composer as unknown as FakeComposer} leftPanelTab={tab} initialOpen={false} />);
+    expect(screen.getByTestId("layout-shell").className).toContain("layout-shell--fullpage");
+    expect(screen.getByTestId("bottom-bar-resource")).toBeTruthy();
+  });
+});
+
+/* A-12 / board 145:64586: "Show outlines" is the shell's canvas-view
+   preference — personal, kept across reloads, handed to the canvas (and so
+   to the footer's View menu). Other overlay rows still go to the caller. */
+describe("StudioPanels — the Show outlines preference (A-12)", () => {
+  type OverlayChange = (overlay: string, enabled: boolean) => void;
+  it("toggling outlines reaches the canvas and survives a remount; other rows pass through", () => {
+    const onOverlayChange = vi.fn();
+    const composer = makeComposer();
+    const view = render(<Harness composer={composer} onOverlayChange={onOverlayChange} />);
+    expect(canvasProps.current.showOutlines).toBe(false);
+    act(() => (canvasProps.current.onOverlayChange as OverlayChange)("outlines", true));
+    expect(canvasProps.current.showOutlines).toBe(true);
+    expect(onOverlayChange).not.toHaveBeenCalled();
+    act(() => (canvasProps.current.onOverlayChange as OverlayChange)("rulers", true));
+    expect(onOverlayChange).toHaveBeenCalledWith("rulers", true);
+    view.unmount();
+    render(<Harness composer={makeComposer()} />);
+    expect(canvasProps.current.showOutlines).toBe(true);
+  });
+});
+
+describe("StudioPanels — ‹ Back to Issues after Fix › (A-39, Play F4.02 303:32650)", () => {
+  const ISSUES = (onBack: () => void) => <div data-testid="issues-panel-stub" onClick={onBack} />;
+  function mountAt(issuesOpen: boolean, selected: string | null, composer: FakeComposer) {
+    return (
+      <Harness
+        composer={composer}
+        issuesOpen={issuesOpen}
+        renderIssuesPanel={ISSUES}
+        onCloseIssues={() => {}}
+        selectedElement={selected ? ({ id: selected, type: "container" } as never) : null}
+      />
+    );
+  }
+
+  it("a Fix › that selects an element heads the Inspector with the way back, which reopens Issues", () => {
+    const composer = makeComposer();
+    const open = vi.fn();
+    composer.on(EVENTS.UI_OPEN_ISSUES, open);
+    const { rerender } = render(mountAt(true, null, composer));
+    rerender(mountAt(false, "list-1", composer));
+    fireEvent.click(screen.getByRole("button", { name: "‹ Back to Issues" }));
+    expect(open).toHaveBeenCalledTimes(1);
+    expect(screen.queryByTestId("inspector-back-to-issues")).toBeNull();
+  });
+
+  it("a plain close draws nothing, and selecting something else drops the row", () => {
+    const composer = makeComposer();
+    const { rerender } = render(mountAt(true, "a", composer));
+    rerender(mountAt(false, "a", composer));
+    expect(screen.queryByTestId("inspector-back-to-issues")).toBeNull();
+    rerender(mountAt(true, "a", composer));
+    rerender(mountAt(false, "b", composer));
+    expect(screen.getByTestId("inspector-back-to-issues")).toBeInTheDocument();
+    rerender(mountAt(false, "c", composer));
+    expect(screen.queryByTestId("inspector-back-to-issues")).toBeNull();
   });
 });

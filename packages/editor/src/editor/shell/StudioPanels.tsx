@@ -33,8 +33,8 @@ import { FullPageView } from "../sidebar/FullPageView";
 import type { SettingsOpenRequest } from "../sidebar/tabs/settings/types";
 import type { TemplatesOpenRequest } from "@/editor/sidebar/tabs/templates/TemplatesTab";
 import type { PageSettingsOpenRequest } from "../sidebar/tabs/pages/types";
-import { usePageCommands, usePageJumpList } from "../sidebar/tabs/pages/usePageCommands";
-import { cmsWorkspace, type CmsOpenRequest } from "@/editor/cms/cmsWorkspaceStore";
+import { usePageCommands } from "../sidebar/tabs/pages/usePageCommands";
+import { cmsWorkspace, useCmsWorkspace, type CmsOpenRequest } from "@/editor/cms/cmsWorkspaceStore";
 import { TokenRegistryProvider, DSModeProvider, StylePresetRegistryProvider } from "@/editor/design-system";
 import { MigrationProgressMount } from "@/editor/design-system/ui/MigrationProgressMount";
 import { DSLintRunner } from "@/editor/design-system/ui/DSLintRunner";
@@ -44,7 +44,8 @@ import { useBlockInsertion } from "./hooks/useBlockInsertion";
 import { useClipboardToasts } from "./hooks/useClipboardToasts";
 import { useConnectOfferToast } from "./hooks/useConnectOfferToast";
 import { useAltTextAutoTrigger } from "./hooks/useAltTextAutoTrigger";
-import { PageTabBar } from "./PageTabBar";
+import { BottomBar } from "./BottomBar";
+import { usePageSummaries } from "./usePageSummaries";
 import { RightColumnPanel } from "./RightColumnPanel";
 import { useColumnPanelEscape } from "./hooks/useColumnPanelEscape";
 import type { NextMove } from "./lifecycle";
@@ -53,6 +54,8 @@ import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { getEditorViewMode } from "@shared/utils/editorViewMode";
 import { useViewerChrome } from "./hooks/useEditorRole";
 import { ViewerRoleNotice } from "./ViewerRoleNotice";
+import { PublishTray } from "./PublishTray";
+import { publishTray, usePublishTray } from "./publishTrayStore";
 
 const CmsWorkspace = React.lazy(() => import("@/editor/cms/CmsWorkspace"));
 
@@ -76,8 +79,11 @@ export interface StudioPanelsProps {
   } | null;
   device: DeviceType;
   onDeviceChange?: (device: DeviceType) => void;
-  /** Whether undo/redo steps are available — drives the canvas footer toolbar. */
+  /** @deprecated Read by nothing: Undo/Redo live in the topbar (Task 1.2),
+   *  which reads `useHistoryState`. Still passed by AquibraStudio (founder
+   *  WIP); delete with that call site (REQUESTS.md #1). */
   canUndo?: boolean;
+  /** @deprecated See `canUndo`. */
   canRedo?: boolean;
   zoom: number;
   onZoomChange: (zoom: number) => void;
@@ -96,7 +102,6 @@ export interface StudioPanelsProps {
   showRulers?: boolean;
   showXRay?: boolean;
   onOverlayChange?: (overlay: keyof CanvasOverlayState, enabled: boolean) => void;
-  onAIRequest?: (payload: { elementId: string; elementType?: string }) => void;
   onOpenMediaLibrary?: (
     allowedTypes: MediaAssetType[],
     onSelect: (asset: MediaAsset) => void,
@@ -149,6 +154,17 @@ export interface StudioPanelsProps {
 /** How long a section-focus request waits for the inspector body (m-1). */
 const PENDING_FOCUS_MS = 500;
 
+/* A-12 / board 145:64586 "Show outlines": a personal canvas-view preference
+   ("Personal editor view"), kept in this browser. */
+const OUTLINES_KEY = "bk-canvas-show-outlines";
+function readOutlines(): boolean {
+  try {
+    return localStorage.getItem(OUTLINES_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
 /** Gives a held selection back after an escalation (P-5, §13). An element
  *  deleted meanwhile is not brought back. */
 function restoreSelection(composer: Composer, ids: readonly string[]): void {
@@ -165,12 +181,18 @@ interface CmsReturn {
   tab: string;
   drawerOpen: boolean;
   ids: string[];
+  /** The inspector binding the door was on, reopened on the way back (C-12). */
+  binding?: FocusSectionPayload;
 }
 
-/* Board 36 (7995:210885): a 188 × 28 panel action, 20 in from the canvas's
-   top right, label and shortcut centred, 13/500 gray-700. */
+/** A CMS door may name the inspector binding it was opened from, so "‹ Back to
+ *  canvas" ends on that binding (Play F2.12 `302:16675`). */
+type CmsDoorRequest = CmsOpenRequest & { binding?: FocusSectionPayload };
+
+/* 2L9 S30 (258:36770): a 144 × 32 "Show Inspector", 13/500 gray-700, 48
+   down and 20 in from the reserved column's top right. */
 const SHOW_INSPECTOR =
-  "tw:absolute tw:top-5 tw:right-5 tw:z-[var(--bk-z-chrome)] tw:h-7 tw:w-[188px] tw:gap-1.5 tw:rounded-md " +
+  "tw:absolute tw:top-12 tw:right-5 tw:z-[var(--bk-z-chrome)] tw:h-8 tw:w-[144px] tw:gap-1.5 tw:rounded-md " +
   "tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-3 tw:py-1 tw:text-[13px] tw:leading-5 " +
   "tw:font-medium tw:text-[var(--bk-gray-700)] tw:focus:ring-0";
 
@@ -221,8 +243,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   selectedElement,
   device,
   onDeviceChange,
-  canUndo,
-  canRedo,
   zoom,
   onZoomChange,
   isLeftPanelOpen,
@@ -237,7 +257,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   showRulers = false,
   showXRay = false,
   onOverlayChange,
-  onAIRequest,
   onOpenMediaLibrary,
   onOpenIconPicker,
   onOpenCreateCollection,
@@ -277,10 +296,10 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   /* v3 FC-2: page-jump ⌘K rows registered from the shell — always present,
      like Layers/Assets/Records/Templates — instead of only while the Pages
      drawer happens to be mounted (PagesTab no longer calls this). */
-  const pageJumpList = usePageJumpList(composer);
+  const pageSummaries = usePageSummaries(composer);
   usePageCommands(
     composer,
-    pageJumpList,
+    pageSummaries,
     React.useCallback((id: string) => composer?.elements.setActivePage(id), [composer]),
     React.useCallback(() => composer?.emit(EVENTS.UI_NEW_PAGE_REQUESTED, {}), [composer]),
   );
@@ -306,7 +325,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
      KeybindingManager listens on window in the capture phase, so click-then-
      Delete still worked. One flag on the gateway closes every chord at once. */
   React.useEffect(() => {
-    if (composer) composer.readOnly = readOnlyView;
+    composer?.setEditLock("view", readOnlyView);
   }, [composer, readOnlyView]);
 
   /* useLayoutEffect, not useEffect: this class now drives LAYOUT as well as the
@@ -411,6 +430,25 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   React.useEffect(() => {
     if (issuesOpen) setAiInInspector(false);
   }, [issuesOpen]);
+  /* Play F4.02 / C02.2 (303:32650, 353:24957) — A-39: Issues closed because
+     Fix › / Open image › selected an element, so the Inspector heads with
+     "‹ Back to Issues" while that element stays selected. A plain close (✕,
+     Escape) selects nothing new and draws no row. */
+  const [issuesReturn, setIssuesReturn] = React.useState<string | null>(null);
+  const selectedAtIssuesOpen = React.useRef<string | null>(null);
+  const issuesWasOpen = React.useRef(false);
+  React.useEffect(() => {
+    const sel = selectedElement?.id ?? null;
+    if (issuesOpen && !issuesWasOpen.current) {
+      selectedAtIssuesOpen.current = sel;
+      setIssuesReturn(null);
+    } else if (!issuesOpen && issuesWasOpen.current) {
+      setIssuesReturn(sel && sel !== selectedAtIssuesOpen.current ? sel : null);
+    } else if (!issuesOpen && issuesReturn && sel !== issuesReturn) {
+      setIssuesReturn(null);
+    }
+    issuesWasOpen.current = issuesOpen;
+  }, [issuesOpen, selectedElement?.id, issuesReturn]);
 
   /* A click on the empty canvas closes the Layers drawer (prototype B10 /
      C4#18) — the canvas clears the selection itself. */
@@ -447,8 +485,28 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
      inspector with the CMS workspace. The canvas stays mounted underneath
      (its iframe and engine state survive the round trip); the inspector
      column closes so the workspace spans both. */
-  const cmsWorkspaceOpen = !readOnlyView && isLeftPanelOpen && railTab === "content";
+  /* 122:43815: the Pages drawer can sit over an open record (overPages). */
+  const cmsOverPages = useCmsWorkspace().overPages === true;
+  const cmsWorkspaceOpen =
+    !readOnlyView && isLeftPanelOpen && (railTab === "content" || (railTab === "pages" && cmsOverPages));
+  React.useEffect(() => {
+    if (cmsOverPages && (railTab !== "pages" || !isLeftPanelOpen)) cmsWorkspace.setOverPages(false);
+  }, [cmsOverPages, railTab, isLeftPanelOpen]);
   const [cmsReturn, setCmsReturn] = React.useState<CmsReturn | null>(null);
+  const [showOutlines, setShowOutlines] = React.useState(readOutlines);
+  /* Outlines are the shell's own preference; every other View row is the caller's. */
+  const handleOverlayChange = React.useCallback(
+    (overlay: keyof CanvasOverlayState, enabled: boolean) => {
+      if (overlay !== "outlines") return onOverlayChange?.(overlay, enabled);
+      setShowOutlines(enabled);
+      try {
+        localStorage.setItem(OUTLINES_KEY, String(enabled));
+      } catch {
+        /* Storage refused (private mode): the preference lasts this session. */
+      }
+    },
+    [onOverlayChange],
+  );
   /* Leaving the workspace any other way (the rail, a closed drawer) ends the
      visit: the return is not offered to a later, unrelated one. */
   const cmsWasOpen = React.useRef(cmsWorkspaceOpen);
@@ -463,19 +521,49 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
     onLeftPanelTabChange?.(back.tab, () => {
       if (!back.drawerOpen) onLeftPanelToggle?.();
       restoreSelection(composer, back.ids);
+      /* After the selection lands (a selection change drops a held focus
+         request) and the workspace has left the column. */
+      const binding = back.binding;
+      if (binding) requestAnimationFrame(() => composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, binding));
     });
   }, [cmsReturn, composer, onLeftPanelTabChange, onLeftPanelToggle]);
   /* L1-027: Escape steps out of the CMS workspace, as the Help legend
      promises — Back to canvas after a bound-element door, else the drawer
      closes and the canvas returns. */
   useColumnPanelEscape(cmsWorkspaceOpen, () => (cmsReturn ? backToCanvas() : onLeftPanelToggle?.()));
+  /* design-2l9 Task 1.7 — the publish tray docks in this column (boards
+     499:2656 / 233:2), wider than the inspector, and replaces whatever the
+     column held. One right-column mode at a time: opening the tray closes
+     Issues, AI and a column tab; opening one of those closes the tray. */
+  const trayState = usePublishTray();
+  const trayShown = trayState.open && !readOnlyView;
+  React.useEffect(() => {
+    if (!trayState.open) return;
+    if (issuesOpen) onCloseIssues?.();
+    if (rightColumnTab) onLeftPanelToggle?.();
+    setAiInInspector(false);
+    // Only on the tray's opening — the effect below handles the reverse.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [trayState.open]);
+  React.useEffect(() => {
+    /* The shell's publish door (AquibraStudio's requestPublish) still opens
+       the Publish panel once a publish starts. While the tray is open the
+       tray IS that surface — it shows the run — so the panel request is
+       folded into it instead of replacing it. */
+    if (trayState.open && rightColumnTab && activeTabId === "publish") {
+      onLeftPanelToggle?.();
+      return;
+    }
+    if (rightColumnTab || issuesOpen || aiInInspector) publishTray.close();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rightColumnTab, issuesOpen, aiInInspector]);
   const inspectorOpen = isInspectorColumnOpen({
     readOnlyView,
     viewerChrome,
     fullPage: effectiveFullPageMode,
     cmsWorkspaceOpen,
     inspectorShown,
-    columnModeOpen: rightColumnTab || issuesOpen || aiInInspector,
+    columnModeOpen: rightColumnTab || issuesOpen || aiInInspector || trayShown,
   });
   /* Board 36's "Show inspector ⌘\": only when the user hid the inspector and
      nothing else fills or replaces its column. */
@@ -484,7 +572,12 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   /* The inspector BODY (ProInspector) is on screen: its column is open and no
      mode (Issues · a column tab · AI) has replaced it. */
   const inspectorBodyShown =
-    !readOnlyView && inspectorOpen && !(issuesOpen && renderIssuesPanel) && !rightColumnTab && !aiInInspector;
+    !readOnlyView &&
+    inspectorOpen &&
+    !(issuesOpen && renderIssuesPanel) &&
+    !rightColumnTab &&
+    !aiInInspector &&
+    !trayShown;
 
   /* I-1: UI_INSPECTOR_FOCUS_SECTION ("Bind to CMS field…", "Add
      interaction", ⌘K Jump to property) is heard by the inspector body. With a
@@ -617,7 +710,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
        request waits here for it. */
     const openPageSettings = (data: PageSettingsOpenRequest) => {
       onLeftPanelTabChange?.("pages", () => {
-        setPagesOpen({ pageId: data.pageId, tab: data.tab });
+        setPagesOpen({ pageId: data.pageId, tab: data.tab, redirectSaved: data.redirectSaved });
         openDrawer();
       });
     };
@@ -628,10 +721,12 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
        collection ›) remembers where it was opened, so the workspace can offer
        "‹ Back to canvas". A request with nothing selected (⌘K) has no element
        to return to; one made from inside the workspace keeps the first. */
-    const openCms = (data: CmsOpenRequest) => {
+    const openCms = (data: CmsDoorRequest) => {
       const ids = composer.selection.getSelectedIds();
       const from: CmsReturn | null =
-        ids.length > 0 && !cmsWorkspaceOpen ? { tab: activeTabId, drawerOpen: isLeftPanelOpen, ids } : null;
+        ids.length > 0 && !cmsWorkspaceOpen
+          ? { tab: activeTabId, drawerOpen: isLeftPanelOpen, ids, binding: data.binding }
+          : null;
       onLeftPanelTabChange?.("content", () => {
         cmsWorkspace.openRequest(data);
         if (from) setCmsReturn(from);
@@ -705,6 +800,19 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
       composer.off("ui:switch-tab", handler);
     };
   }, [composer, onLeftPanelTabChange, isLeftPanelOpen, onLeftPanelToggle, viewerChrome, addToast]);
+
+  /* 2L9 B6-K13: choosing a component's source on the canvas gives the canvas
+     the room — the left panel closes (sourcePick.chooseOnCanvas). */
+  React.useEffect(() => {
+    if (!composer) return;
+    const close = () => {
+      if (isLeftPanelOpen) onLeftPanelToggle?.();
+    };
+    composer.on(EVENTS.UI_LEFT_PANEL_CLOSE, close);
+    return () => {
+      composer.off(EVENTS.UI_LEFT_PANEL_CLOSE, close);
+    };
+  }, [composer, isLeftPanelOpen, onLeftPanelToggle]);
 
   // Canvas hover sync
   React.useEffect(() => {
@@ -829,11 +937,19 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
            (Founder call, 2026-08-23.) */
         drawerOpen={(!readOnlyView || viewerChrome) && isLeftPanelOpen && !effectiveFullPageMode && !rightColumnTab}
         drawerWidth={drawerWidth}
-        fullPageMode={!readOnlyView && effectiveFullPageMode && isLeftPanelOpen}
+        /* The fullpage slot hosts the resource area (Assets, Settings,
+           Brand — FullPageRouter shape 1), so its layout follows the slot's
+           content: mounted ⇔ fullpage, whether or not the drawer is open. */
+        fullPageMode={effectiveFullPageMode}
         // Open whenever not fullpage — the no-selection state is a DRAWN
         // board (2 lines + ✦ Ask AI); gating on selectedElement collapsed the
         // column to 1px, so that state rendered off-viewport, unseeable.
-        inspectorOpen={inspectorOpen}
+        /* 2L9 S30: a hidden inspector keeps its column, empty, with the way back. */
+        inspectorOpen={inspectorOpen || showInspectorDoor}
+        /* The tray's column is wider than the inspector's (board 499:2656).
+           `order-2`: after the global banner slot (order 1), which sits under
+           the topbar — see GlobalBannerSlot's SLOT_CLASS. */
+        className={trayShown ? "tw:order-2 tw:[--layout-inspector-width:var(--bk-size-task-host)]" : "tw:order-2"}
         style={styles.container}
       >
         {/* Left Sidebar — merged rail + panel. Absent in view mode, except for
@@ -867,8 +983,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
 
         {/* Canvas Area — main editing surface */}
         <LayoutShell.Canvas>
-          {/* Board 4418:123573: the page tabs head the canvas column. */}
-          <PageTabBar composer={composer} />
           <div style={styles.canvasPattern} />
           <div ref={composerContainerRef} style={styles.canvasContent}>
             <Canvas
@@ -886,33 +1000,12 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
               showGrid={showGrid}
               showRulers={showRulers}
               showXRay={showXRay}
-              onAIRequest={onAIRequest}
+              showOutlines={showOutlines}
               onOpenImageEditor={handleEditMedia}
               onZoomChange={onZoomChange}
-              onOverlayChange={onOverlayChange}
+              onOverlayChange={handleOverlayChange}
               onDeviceChange={onDeviceChange}
-              canUndo={canUndo}
-              canRedo={canRedo}
             />
-            {/* Board 36: with the inspector hidden the canvas runs full width
-                and carries the way back at its top right. */}
-            {showInspectorDoor ? (
-              <Button
-                color="light"
-                size="xs"
-                className={SHOW_INSPECTOR}
-                aria-label="Show inspector"
-                aria-keyshortcuts={"Meta+\\"}
-                title={"Show inspector (⌘\\)"}
-                data-testid="show-inspector"
-                onClick={() => setInspectorShown(true)}
-              >
-                Show inspector
-                <kbd className="tw:font-[inherit]" aria-hidden="true">
-                  {"⌘\\"}
-                </kbd>
-              </Button>
-            ) : null}
           </div>
           {/* FC-7 takeover shape 2 of 3 (see FullPageRouter.tsx's "THE THREE
               TAKEOVER SHAPES" contract): an in-place region over the canvas,
@@ -946,8 +1039,32 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             </LayoutShell.Inspector>
           ) : null
         ) : (
-        <LayoutShell.Inspector>
-          {issuesOpen && renderIssuesPanel ? (
+        <LayoutShell.Inspector className={showInspectorDoor ? "tw:relative tw:bg-[var(--bk-bg-subtle)]!" : ""}>
+          {/* 2L9 S30 (258:36770): the hidden inspector's column stays reserved
+              and empty, "Show Inspector" at its top right. ProInspector stays
+              mounted under it (invisible), so tab and scroll survive. */}
+          {showInspectorDoor ? (
+            <Button
+              color="light"
+              size="xs"
+              className={SHOW_INSPECTOR}
+              aria-keyshortcuts={"Meta+\\"}
+              title={"Show Inspector (⌘\\)"}
+              data-testid="show-inspector"
+              onClick={() => setInspectorShown(true)}
+            >
+              Show Inspector
+            </Button>
+          ) : null}
+          {trayShown ? (
+            <PublishTray
+              composer={composer}
+              publishJob={publishJob}
+              nextMove={nextMove ?? null}
+              onRequestPublish={onRequestPublish}
+              issues={trayState.issues}
+            />
+          ) : issuesOpen && renderIssuesPanel ? (
             renderIssuesPanel(() => {
               onCloseIssues?.();
               setInspectorShown(true);
@@ -976,9 +1093,25 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
                 a :hover state to Base. `invisible` keeps the layout box, so
                 the scroll offset survives, and takes it out of the tab order
                 and the accessibility tree. */}
+            {issuesReturn && !aiInInspector && !showInspectorDoor ? (
+              <div className="tw:flex tw:flex-none tw:justify-center tw:pt-2" data-testid="inspector-back-to-issues">
+                <Button
+                  type="button"
+                  variant="link"
+                  size="xs"
+                  className="tw:h-8 tw:text-[13px] tw:font-normal"
+                  onClick={() => {
+                    setIssuesReturn(null);
+                    composer?.emit(EVENTS.UI_OPEN_ISSUES);
+                  }}
+                >
+                  ‹ Back to Issues
+                </Button>
+              </div>
+            ) : null}
             <div
-              className={aiInInspector ? "tw:absolute tw:inset-0 tw:invisible tw:pointer-events-none" : "tw:contents"}
-              aria-hidden={aiInInspector || undefined}
+              className={aiInInspector || showInspectorDoor ? "tw:absolute tw:inset-0 tw:invisible tw:pointer-events-none" : "tw:contents"}
+              aria-hidden={aiInInspector || showInspectorDoor || undefined}
               data-testid="inspector-body-host"
             >
               <ProInspector
@@ -995,12 +1128,11 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
         </LayoutShell.Inspector>
         )}
 
-        {/* FullPage View — Templates, Assets, Settings, Design (replaces canvas area).
-            Mounted ONLY in fullpage mode. It used to render on every tab and
-            rely on the slot's display:none, so the Media DRAWER kept a whole
-            second LibraryManager (and its media state) mounted invisibly —
-            and once the library became a portaled overlay (Clone
-            3695:45155) that invisible copy was on screen at boot. */}
+        {/* FullPage View — the resource area (Assets, Settings, Brand render
+            in this slot) and the Templates portal. Mounted ONLY in fullpage
+            mode. It used to render on every tab and rely on the slot's
+            display:none, so the Media DRAWER kept a whole second
+            LibraryManager (and its media state) mounted invisibly. */}
         {effectiveFullPageMode && (
         <LayoutShell.FullPage>
           <FullPageView
@@ -1024,6 +1156,21 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           />
         </LayoutShell.FullPage>
         )}
+
+        {/* 2L9 Shell/BottomBar (497:99485): the page switcher across the
+            bottom, or — while a resource area covers the canvas — the way back. */}
+        <LayoutShell.Footer>
+          <BottomBar
+            composer={composer}
+            pages={pageSummaries}
+            resourceArea={(!readOnlyView && effectiveFullPageMode) || cmsWorkspaceOpen}
+            onBackToEditor={() => {
+              if (!cmsWorkspaceOpen) handleFullPageClose();
+              else if (cmsReturn) backToCanvas();
+              else onLeftPanelToggle?.();
+            }}
+          />
+        </LayoutShell.Footer>
       </LayoutShell>
 
       {/* Clone 3686:42317 — Site fonts. Mounted once, here, and opened by

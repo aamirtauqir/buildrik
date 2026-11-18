@@ -79,6 +79,11 @@ const ACTION_DESCRIPTIONS: Record<string, string> = {
   "keyboard-reorder": "Reordered layer",
   reorder: "Reordered layer",
   "reorder-section": "Reordered section",
+  "reorder pages": "Reordered pages",
+  "duplicate pages": "Duplicated pages",
+  "close label": "Changed the close label",
+  "insert local modal": "Inserted a modal",
+  "detach instance": "Detached component instance",
   "move-layer-top": "Brought layer to front",
   "move-layer-bottom": "Sent layer to back",
   // Group / arrange
@@ -115,6 +120,9 @@ const ACTION_DESCRIPTIONS: Record<string, string> = {
   "link-target-change": "Changed link target",
   "animation-change": "Changed animation",
   "bind-collection-list": "Bound the collection list",
+  // B-11 conditions (recorded labels are the receipt's own words)
+  "activate legacy condition": "Activated the old condition",
+  "remove legacy condition": "Removed the old condition",
   "interactions-change": "Changed interactions",
   // Media / components
   "replace media": "Replaced media",
@@ -138,6 +146,22 @@ const DESTRUCTIVE_LABELS = new Set([
   "delete-layers",
   "cut",
 ]);
+
+/* A domain receipt whose Undo says its own result (design-2l9 187:22586:
+   "{page} removed. Collection link needs repair · Open CMS") runs that undo
+   through here, and the generic "Undo: …" bar stays down for it — one
+   message per action. Explicit, never inferred from the label: the flag is
+   up only while `run` executes, and history emits HISTORY_UNDO synchronously
+   inside `undo()`. */
+let ownReceiptUndo = false;
+export function undoWithOwnReceipt(run: () => boolean): boolean {
+  ownReceiptUndo = true;
+  try {
+    return run();
+  } finally {
+    ownReceiptUndo = false;
+  }
+}
 
 export function useHistoryFeedback(
   composer: Composer | null,
@@ -170,6 +194,7 @@ export function useHistoryFeedback(
        back no matter what it reverted. Destructive labels keep the longer
        linger they had. */
     const handleUndo = (data: { entry: { label?: string } }) => {
+      if (ownReceiptUndo) return;
       const action = formatLabel(data.entry.label);
       const isDestructive = DESTRUCTIVE_LABELS.has(data.entry.label?.toLowerCase() ?? "");
       addToast({

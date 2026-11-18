@@ -1,3 +1,4 @@
+import * as React from "react";
 /**
  * LinkSection — successful href writes (URL / page / target), initial
  * hydration from the element's href, and non-linkable gating. Validation
@@ -13,6 +14,9 @@ import { render, fireEvent, screen } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { LinkSection } from "../LinkSection";
 import { makeMockComposer, makeMockElement } from "@/editor/inspector/__tests__/harness";
+import { ToastProvider as __ToastProvider } from "@/editor/chrome-ui";
+/* LinkSection raises toasts (B5-D90): render it under the provider. */
+const renderT = (ui: React.ReactElement) => render(ui, { wrapper: __ToastProvider });
 
 function renderLink(opts: {
   type?: string;
@@ -21,7 +25,7 @@ function renderLink(opts: {
 } = {}) {
   const el = makeMockElement({ id: "e1", type: opts.type ?? "link", attrs: opts.attrs });
   const composer = makeMockComposer({ element: el, pages: opts.pages });
-  const utils = render(
+  const utils = renderT(
     <LinkSection
       selectedElement={{ id: "e1", type: opts.type ?? "link" }}
       composer={composer as never}

@@ -1,32 +1,26 @@
 /**
- * BrandWorkspace — the Brand surface, as the full-canvas workspace the owner
- * chose on 2026-09-21 (OD-1: "sab se new design implement karna hai" — board
- * `7315:80955` and its pages are the single Brand design; the 280/700 drawer
- * this replaces is `ARCHIVE · STATES · Brand … superseded 21 Sep 2026`).
+ * BrandWorkspace — the Brand surface, a full workspace (owner OD-1,
+ * 2026-09-21), drawn to Figma 2L9 page 05 (boards B6-B01…B62, canonical since
+ * 2026-10-22).
  *
- *   ┌ nav 256 ──────────┬ 32 ┬ pane 620 ─────────────────┬ 32 ┬ preview 468 ─┬ 32 ┐
- *   │  ‹ Back to canvas │    │ Colours  18 tokens · light │    │ Live preview ·│    │
- *   │ Brand             │    │              [+ Add token] │    │ Home     50% ▾│    │
- *   │ site name         │    ├────────────────────────────┤    │  page at zoom │    │
- *   │                   │    │ TOKEN  LIGHT  DARK  USED   │    ├───────────────┤    │
- *   │ Colours        18 │    │ ● color-primary #1A56DB …  │    │ ▇ token card  │    │
- *   │ Colour mode       │    │ …                          │    │ Light value … │    │
- *   │ …                 │    ├────────────────────────────┤    │ Used by …     │    │
- *   │ Beginner | Pro    │    │      (edits apply at once) │    │ ✓ Brand checks│    │
- *   └───────────────────┴────┴────────────────────────────┴────┴───────────────┴────┘
+ *   ┌ nav 256 ──────────┬ main ──────────────────────────────┬ preview 468 ─┐
+ *   │ Brand             │ ‹ Back to Editor · Home             │               │
+ *   │ Tokens            │ Colors · 4   Review changes  Restore│ Website       │
+ *   │  Colors           │ Changes apply as you edit — undo …  │ preview       │
+ *   │  Typography       │ [+ Add color] [Generate scale]      │               │
+ *   │  Spacing          │ ─ the page ─                        │ token card    │
+ *   │  Other kinds ›    │                                     │               │
+ *   │ Reusable styles   │                                     │               │
+ *   │  Type styles · …  │                                     │               │
+ *   │  Classes          │                                     │               │
+ *   │ Tools             │                                     │               │
+ *   │  Dark mode …      │                                     │               │
+ *   └───────────────────┴─────────────────────────────────────┴───────────────┘
  *
- * Measured off 7315:80955 at 1440×900 (C1 (ii)): nav 256 with the Brand head,
- * main gutters 40 top / 32 sides, pane content 620, preview column 468, the
- * page action at the header's right, the page's table in a bordered card.
- *
- * Nav order is the board's (decision #15), Colours landing (#28): Colours ·
- * Colour mode · Fonts & type styles · Component styles · Classes · Presets ·
- * Brand checks · Starters · Spacing · Import / export. Two departures, both
- * recorded in the C1 (i) commit: the board's `Styles` page (7316:82153) has no
- * code behind it (03 G3-142 NOT IMPLEMENTED, "hide") and is not a nav row; and
- * the ten token kinds the workspace boards do not draw (03 G3-130 — only
- * Spacing got a page, W-7) stay reachable behind the same "More token kinds"
- * disclosure the drawer's Tokens list used, so no kind loses its editor.
+ * The door is "‹ Back to Editor · <page>", or "‹ Back to Site settings" when
+ * Site settings opened Brand (GAP-ST-T03; `requestBrandReturn`). No Undo /
+ * Redo inside Brand: the topbar holds the one undo, and every write here is
+ * on that stack.
  *
  * Save model (spec §4, Brand Part 1a Task 10): autosave + ONE undo stack.
  * Every edit is one `composer.designSystem.setTokens` transaction the moment
@@ -44,10 +38,10 @@
 import * as React from "react";
 import { BRAND_READ_ONLY_COPY, BRAND_READ_ONLY_FAILED_COPY } from "@/shared/constants/brandReadOnly";
 import { ChevronLeft } from "lucide-react";
-import { Button, IconButton, Menu, MenuItem, MenuLabel, MenuSeparator, Popover, Select, Tooltip, useToast } from "@/editor/chrome-ui";
+import { Button, Modal, Popover, Tooltip, useToast } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine/Composer";
 import { EVENTS } from "@/shared/constants/events";
-import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
+import { resolveTokenLiteral, setTokenAlias, setTokenLiteral } from "@buildrik/shared/tokens";
 import type { SpacingPreset } from "../state/spacingRegistry";
 import {
   useColorRegistry,
@@ -75,27 +69,28 @@ import type { DesignToken, StylePreset, TokenKind } from "../types";
 import type { TokensForKindRegistry } from "../state/kindRegistry";
 import { generateColorTokenId, generateColorCssVar } from "../utils/exportUtils";
 import { DSModeProvider, useDSModeOptional } from "../state/DSModeContext";
-import { AIPromptModal } from "./AIPromptModal";
 import { TokenAddDialog } from "./modals/TokenAddDialog";
 import { SessionEditsPopover } from "./SessionEditsPopover";
 import { BrandPreview } from "./BrandPreview";
+import { BrandCard, BrandChevron, BrandRow } from "./BrandCard";
 import { BrandLivePreview } from "./BrandLivePreview";
-import { orderColourTokens } from "./colors/ColorTokenList";
+import { aliasedByCount } from "./colors/ColorTokenList";
+import { ColorTokenEditor } from "./colors/ColorTokenEditor";
 import { TokenDetailView } from "./sections/TokenDetailView";
+import { TokenDeleteDialog } from "./sections/TokenDeleteDialog";
 import { TokensSection } from "./sections/TokensSection";
 import { StylesSection } from "./sections/StylesSection";
-import { ComponentsSection } from "./sections/ComponentsSection";
-import { ReusableStylesSection, reusableStylesCount } from "./sections/ReusableStylesSection";
+import { ReusableStylesSection } from "./sections/ReusableStylesSection";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
 import { ExportSection } from "./sections/ExportSection";
-import { LintSection, brandChecksCaption, contrastFixFor } from "./sections/LintSection";
+import { LintSection, contrastFixFor } from "./sections/LintSection";
 import { filterTokensByMode } from "../utils/semanticKind";
 import { ClassesSection } from "./sections/ClassesSection";
 import { ClassAddDialog } from "./sections/ClassAddDialog";
-import { TypographySection, fontsCaption } from "./sections/TypographySection";
+import { TypographySection } from "./sections/TypographySection";
 import { openSiteFonts } from "@/editor/inspector/sections/typography";
 import { requestInsertGroup } from "@/editor/sidebar/tabs/build/insertGroupRequest";
-import { takeBrandPageRequest, takeBrandTokenRequest } from "./brandOpenRequest";
+import { takeBrandPageRequest, takeBrandReturn, takeBrandTokenRequest } from "./brandOpenRequest";
 import { ConnectTokensCheck } from "./sections/ConnectTokensCheck";
 import { StartersSection } from "./sections/StartersSection";
 import { BrandFromSource } from "./sections/BrandFromSource";
@@ -104,6 +99,7 @@ import { DarkModeCard } from "./sections/DarkModeCard";
 import { ScaleGenerator } from "./sections/ScaleGenerator";
 import { RestorePointsSection } from "./sections/RestorePointsSection";
 import { useSiteDarkMode } from "../state/useSiteDarkMode";
+import { useOnline } from "../state/useOnline";
 import { useBrandPreview } from "../state/useBrandPreview";
 import { DarkModeSchema } from "@buildrik/shared/schemas/design-tokens";
 import type { BrandPreview as CanvasPreview } from "@/engine/designSystem/types";
@@ -122,70 +118,125 @@ import {
 
 // ─── Pages ────────────────────────────────────────────────────────────────────
 
-/** The board's nav, in its order (`7315:80955` read from the re-dump). */
-const NAV = [
-  { id: "colours",          label: "Colours" },
-  { id: "colour-mode",      label: "Colour mode" },
-  { id: "fonts",            label: "Fonts & type styles" },
-  { id: "styles",           label: "Styles" },
-  { id: "component-styles", label: "Component styles" },
-  { id: "classes",          label: "Classes" },
-  { id: "presets",          label: "Presets" },
-  { id: "brand-checks",     label: "Brand checks" },
-  { id: "starters",         label: "Starters" },
-  { id: "spacing",          label: "Spacing" },
-  { id: "export",           label: "Import / export" },
+/** 2L9 B6-B01's nav: three groups, in the board's order. Page ids are the
+ *  code's (deep links and `requestBrandPage` callers use them); labels are
+ *  the board's. */
+const NAV_GROUPS = [
+  {
+    label: "Tokens",
+    rows: [
+      { id: "colours",     label: "Colors" },
+      { id: "fonts",       label: "Typography" },
+      { id: "spacing",     label: "Spacing" },
+      { id: "other-kinds", label: "Other kinds ›" },
+    ],
+  },
+  {
+    label: "Reusable styles",
+    rows: [
+      { id: "styles",  label: "Type styles · Presets" },
+      { id: "classes", label: "Classes" },
+    ],
+  },
+  {
+    label: "Tools",
+    rows: [
+      { id: "colour-mode",  label: "Dark mode" },
+      { id: "brand-checks", label: "Checks" },
+      { id: "starters",     label: "Starters" },
+      { id: "export",       label: "Import / export" },
+    ],
+  },
 ] as const;
 
-type NavId = (typeof NAV)[number]["id"];
+type NavId = (typeof NAV_GROUPS)[number]["rows"][number]["id"];
 
-/* The token kinds no workspace board draws (03 G3-130). Colour, type and
-   spacing have pages of their own above; these ten keep the drawer's generic
-   list, one page each, behind a disclosure. */
+/* The eleven kinds with no page of their own on the board's nav: each is a
+   page under "Other kinds ›" (B6-B23), with the board's one-line description. */
 const MORE_KINDS = [
-  { kind: "radius",     label: "Radius" },
-  { kind: "shadow",     label: "Shadow" },
-  { kind: "motion",     label: "Motion" },
-  { kind: "border",     label: "Border" },
-  { kind: "opacity",    label: "Opacity" },
-  { kind: "zindex",     label: "Z-index" },
-  { kind: "breakpoint", label: "Breakpoint" },
-  { kind: "grid",       label: "Grid" },
-  { kind: "sizing",     label: "Sizing" },
-  { kind: "icon",       label: "Icon" },
-  { kind: "imagery",    label: "Imagery" },
-] as const satisfies ReadonlyArray<{ kind: TokenKind; label: string }>;
+  { kind: "radius",     label: "Radius",     description: "Corner rounding" },
+  { kind: "shadow",     label: "Shadow",     description: "Elevation and depth" },
+  { kind: "motion",     label: "Motion",     description: "Durations and easing" },
+  { kind: "border",     label: "Border",     description: "Border widths" },
+  { kind: "opacity",    label: "Opacity",    description: "Transparency steps" },
+  { kind: "zindex",     label: "Z-index",    description: "Stacking order" },
+  { kind: "breakpoint", label: "Breakpoint", description: "Layout widths for devices" },
+  { kind: "grid",       label: "Grid",       description: "Columns and gutters" },
+  { kind: "sizing",     label: "Sizing",     description: "Fixed widths and heights" },
+  { kind: "icon",       label: "Icon",       description: "Icon sizes" },
+  { kind: "imagery",    label: "Imagery",    description: "Image ratios and treatments" },
+] as const satisfies ReadonlyArray<{ kind: TokenKind; label: string; description: string }>;
 
 type MoreKind = (typeof MORE_KINDS)[number]["kind"];
-/* "connect" — Connect to tokens (BRP1-M7), a page under Brand checks;
-   "brand-from-source" — Brand from logo or website (BRP1-M11), reached from
-   Starters behind dsAi; "scale" — the colour scale generator (BRP1-M9),
-   under Colours. None has a nav row: its parent row stays current.
-   "restore-points" (BRP1-M10) is the header's action on every page; no nav
-   row is current on it. */
+
+const LENGTH = /^-?(\d+\.?\d*|\.\d+)(px|rem|em|%|vw|vh|ch)$|^0$/;
+/** Why `value` cannot be a `kind` token's value (B6-B25: "Use a length such
+ *  as 8px or 0.5rem. Nothing was changed."), or null when it can. */
+function kindValueError(kind: MoreKind, value: string): string | null {
+  if (!value) return "Enter a value. Nothing was changed.";
+  switch (kind) {
+    case "radius":
+    case "border":
+    case "sizing":
+    case "icon":
+    case "breakpoint":
+      return LENGTH.test(value) ? null : "Use a length such as 8px or 0.5rem. Nothing was changed.";
+    case "opacity": {
+      const n = Number(value);
+      return value.trim() !== "" && Number.isFinite(n) && n >= 0 && n <= 1 ? null : "Use a number from 0 to 1, such as 0.6. Nothing was changed.";
+    }
+    case "zindex":
+      return /^-?\d+$/.test(value) ? null : "Use a whole number, such as 10. Nothing was changed.";
+    default:
+      return null;
+  }
+}
+/* Pages with no nav row of their own; the row named in `parentRow` stays
+   current on them:
+   "connect"          — Connect to Brand colors (BRP1-M7), under Checks;
+   "brand-from-source"— From logo or URL (BRP1-M11), under Starters, dsAi;
+   "scale"            — the colour scale generator (BRP1-M9), under Colors;
+   "presets"          — the catalogue's preset drill-in, under
+                        Type styles · Presets (B6-B26);
+   "kind-*"           — under Other kinds;
+   (Restore points is the header's popover, B6-B39 — not a page.) */
 const FROM_SOURCE = "brand-from-source";
-export type BrandPageId = NavId | `kind-${MoreKind}` | "connect" | typeof FROM_SOURCE | "scale" | "restore-points";
+type SubPageId = "connect" | typeof FROM_SOURCE | "scale" | "presets";
+export type BrandPageId = NavId | `kind-${MoreKind}` | SubPageId;
+
+const SUB_PAGES: readonly SubPageId[] = ["connect", FROM_SOURCE, "scale", "presets"];
 
 const LANDING: BrandPageId = "colours";
 
 function isPageId(value: string): value is BrandPageId {
   return (
-    value === "connect" || value === FROM_SOURCE || value === "scale" || value === "restore-points" ||
-    NAV.some((n) => n.id === value) || MORE_KINDS.some((k) => `kind-${k.kind}` === value)
+    (SUB_PAGES as readonly string[]).includes(value) ||
+    NAV_GROUPS.some((g) => g.rows.some((n) => n.id === value)) ||
+    MORE_KINDS.some((k) => `kind-${k.kind}` === value)
   );
 }
 
-function pageLabel(id: BrandPageId): string {
-  if (id === "connect") return "Connect to tokens";
-  if (id === FROM_SOURCE) return "Brand from logo or website";
-  if (id === "scale") return "Colour scale generator";
-  if (id === "restore-points") return "Restore points";
-  /* BRP1-M8 titles the Colour mode page by its card: "Dark mode". */
-  if (id === "colour-mode") return "Dark mode";
-  return NAV.find((n) => n.id === id)?.label
-    ?? MORE_KINDS.find((k) => `kind-${k.kind}` === id)?.label
-    ?? id;
+/** The nav row that stays current while `page` is open. */
+function parentRow(page: BrandPageId): BrandPageId | null {
+  if (page.startsWith("kind-")) return "other-kinds";
+  if (page === "connect") return "brand-checks";
+  if (page === FROM_SOURCE) return "starters";
+  if (page === "scale") return "colours";
+  if (page === "presets") return "styles";
+  return page;
 }
+
+function pageLabel(id: BrandPageId): string {
+  if (id === "connect") return "Connect to Brand colors";
+  if (id === FROM_SOURCE) return "From logo or URL";
+  if (id === "presets") return "Presets";
+  if (id === "other-kinds") return "Other kinds";
+  for (const g of NAV_GROUPS) for (const n of g.rows) if (n.id === id) return n.label;
+  return MORE_KINDS.find((k) => `kind-${k.kind}` === id)?.label ?? id;
+}
+
+/** The strap under every page title (B6-B01): autosave, one undo. */
+const STRAP = "Changes apply as you edit — undo any time";
 
 // ─── Row chrome (7315:80955: 32-tall rows on a 2px rhythm, 14px, accent tint when on) ──
 
@@ -201,17 +252,19 @@ const NAV_ROW =
 const NAV_ROW_ON =
   "tw:bg-[var(--bk-accent-tint)] tw:font-medium tw:text-[var(--bk-accent)] " +
   "tw:enabled:hover:bg-[var(--bk-accent-tint)] tw:enabled:hover:text-[var(--bk-accent)]";
-/* The count at the row's right — "18" on Colours, "2" on Brand checks — stays
-   muted on the active row too (measured: rgb(107,114,128) on the tint). */
-const NAV_COUNT =
-  "tw:flex-none tw:tabular-nums tw:text-[length:var(--bk-text-14)] tw:font-normal tw:leading-5 tw:text-[var(--bk-ink-muted)]";
 /* The header's page action (7315:80955 "+ Add token": 28 tall, 13px, hairline). */
-/* Spacing's ⋯ menu: the three presets on the 4px grid (spacingRegistry). */
+/* B6-B22: the three presets on the 4px grid (spacingRegistry), segmented. */
 const SPACING_PRESETS: [SpacingPreset, string][] = [
-  ["compact", "Compact · 2px"],
-  ["normal", "Normal · 4px"],
-  ["spacious", "Spacious · 6px"],
+  ["compact", "Compact"],
+  ["normal", "Normal"],
+  ["spacious", "Spacious"],
 ];
+const SEG_TRACK =
+  "tw:box-border tw:inline-flex tw:h-7 tw:items-center tw:gap-0.5 tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:p-px";
+const SEG_ITEM =
+  "tw:h-6 tw:min-h-0 tw:rounded-[var(--bk-radius-sm)] tw:border-0 tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:focus:ring-0 tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
+const SEG_ITEM_ON = "tw:bg-[var(--bk-gray-100)] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-gray-100)]";
+const SEG_ITEM_OFF = "tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]";
 
 /* The disabled look is spelled out: on a read-only site the action is
    disabled by its EditLock fieldset, not by its own prop, and flowbite only
@@ -243,6 +296,23 @@ function EditLock({ locked, children }: { locked: boolean; children: React.React
   );
 }
 
+/** Below the boards' 1440 frame (B6-B51 is drawn at 1280 × 640) the three
+ *  columns do not fit: nav 256 + preview 468 leave the pane too little. */
+const COMPACT_QUERY = "(max-width: 1439px)";
+function useCompactWidth(): boolean {
+  const query = () => (typeof window !== "undefined" && typeof window.matchMedia === "function" ? window.matchMedia(COMPACT_QUERY) : null);
+  const [compact, setCompact] = React.useState(() => query()?.matches ?? false);
+  React.useEffect(() => {
+    const mq = query();
+    if (!mq) return;
+    const sync = () => setCompact(mq.matches);
+    sync();
+    mq.addEventListener?.("change", sync);
+    return () => mq.removeEventListener?.("change", sync);
+  }, []);
+  return compact;
+}
+
 // ─── BrandWorkspace ───────────────────────────────────────────────────────────
 
 export interface BrandWorkspaceProps {
@@ -251,7 +321,7 @@ export interface BrandWorkspaceProps {
   projectId?: string | null;
   /** A page to land on instead of Colours — `openLeftPanelToTab("design", <id>)`. */
   initialPage?: string;
-  /** `‹ Back to canvas` / Escape, after the guard has been answered. */
+  /** `‹ Back to Editor` / Escape (not called when Site settings opened Brand: that door reopens Settings). */
   onClose?: () => void;
 }
 
@@ -266,17 +336,19 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   /* Shared with DSLintBanner via `useDSLint` so the row count, the banner and
      the Brand checks page can never disagree. */
   const lintIssues = useDSLint(composer);
-  /* Ignored (suppressed) checks, named in the Brand checks caption (G3-123:
-     no pill band). Read here rather than stored: `useDSLint` re-renders this
-     component whenever `lint:changed` fires, every suppress and unsuppress. */
-  const suppressedCount = composer?.designSystem?.lintState?.suppressedCount?.() ?? 0;
+  /* Ignored (suppressed) checks — Checks' "Show ignored · N" (B6-B18). Read
+     here rather than stored: `useDSLint` re-renders this component whenever
+     `lint:changed` fires, every suppress and unsuppress. */
+  const lintState = composer?.designSystem?.lintState;
+  const ignoredChecks = (lintState?.suppressedIds?.() ?? []).map((tokenId) => {
+    const first = lintState?.getIssues(tokenId)[0];
+    return { tokenId, rule: first?.type, message: first?.message };
+  });
   const [page, setPage] = React.useState<BrandPageId>(() => {
     const requested = takeBrandPageRequest(composer) ?? initialPage;
     return requested && isPageId(requested) ? requested : LANDING;
   });
   const [showAddToken, setShowAddToken] = React.useState(false);
-  const [spacingMenuOpen, setSpacingMenuOpen] = React.useState(false);
-  const [aiOpen, setAiOpen] = React.useState(false);
   const [classAddOpen, setClassAddOpen] = React.useState(false);
 
   /* What the live preview SHOWS (BRP1-M8): the Brand preview layer's tokens
@@ -332,6 +404,18 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   const imagery    = useImageryRegistry();
   const store      = useProjectTokenStore();
   const readOnly   = store.readOnly;
+  /* B6-B43: offline, edits still apply (autosave retries); restore points
+     and reading a website need the server. */
+  const online     = useOnline();
+  /* B6-B51…B53: under 1440 wide the nav and the preview fold away. */
+  const compact = useCompactWidth();
+  const [compactNavOpen, setCompactNavOpen] = React.useState(false);
+  const [restoreOpen, setRestoreOpen] = React.useState(false);
+  /* B6-B54: a kind row's "Delete…" — the same delete / replace dialog the
+     token card uses. `deleteCount` re-reads the usage on Retry count. */
+  const [deleteFor, setDeleteFor] = React.useState<string | null>(null);
+  const [, setDeleteCount] = React.useState(0);
+  const [compactPreview, setCompactPreview] = React.useState(false);
   /* "No brand set" (4418:49685): the site has never saved a token. */
   const isFirstLoad = !composer?.getProjectSettings()?.designTokens?.length;
 
@@ -362,6 +446,10 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
     k === "color" ? color : k === "spacing" ? spacing : k && isMoreKind(k) ? moreKindRegistry[k] : null;
   /* A refused write (read-only, or a set that would not validate) changed
      nothing — say so rather than letting the edit look applied. */
+  /* A receipt (B6-B10/B20/B40): what happened, and "Undo" — the one undo,
+     composer.history, never a Brand-local stack. */
+  const receipt = (description: string) =>
+    addToast({ description, tone: "success", action: { label: "Undo", onClick: () => { store.undo(); } } });
   const refused = (what: string) => addToast({ description: `${what} wasn't applied — nothing was changed.`, tone: "error" });
   const handleAddToken = (token: DesignToken) => {
     setShowAddToken(false);
@@ -370,11 +458,22 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
     addToast({ description: `Token "${token.name}" added`, tone: "success" });
   };
 
-  /* `‹ Back to canvas` / Escape: nothing is staged, so nothing to guard. */
-  const requestLeave = React.useCallback(() => onClose?.(), [onClose]);
+  /* GAP-ST-T03: opened from Site settings, the door goes back there, to the
+     screen it came from. Taken once on mount, like the page and token holds. */
+  const [brandReturn] = React.useState(() => takeBrandReturn(composer));
 
-  /* Component styles (7316:82755) lists the Add › Blocks sections; a row
-     leaves Brand for Add with BLOCKS open, where that section lives. */
+  /* `‹ Back` / Escape: nothing is staged, so nothing to guard (autosave,
+     B6-B05's guard → authority code:autosave-no-leave-guard). */
+  const requestLeave = React.useCallback(() => {
+    if (brandReturn?.to === "settings" && composer) {
+      composer.emit(EVENTS.UI_PANEL_OPEN, brandReturn.screen ? { panel: "settings", screen: brandReturn.screen } : { panel: "settings" });
+      return;
+    }
+    onClose?.();
+  }, [onClose, brandReturn, composer]);
+
+  /* "Browse section blocks in Add ›" (B6-B26) leaves Brand for Add with
+     BLOCKS open. */
   const openSectionInAdd = React.useCallback(() => {
     onClose?.();
     if (!composer) return;
@@ -387,7 +486,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
-      if (showAddToken || aiOpen || classAddOpen) return;
+      if (showAddToken || classAddOpen) return;
       /* An open popover, menu or dialog owns this Escape (the token card's ⋯
          menu, the font picker, the rename / replace dialogs). Leaving the
          workspace on the same keypress that closed a menu was found live. */
@@ -403,23 +502,25 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
        unmounts it before a later listener could see it was open. */
     window.addEventListener("keydown", handler, true);
     return () => window.removeEventListener("keydown", handler, true);
-  }, [showAddToken, aiOpen, classAddOpen, requestLeave]);
+  }, [showAddToken, classAddOpen, requestLeave]);
 
   // ─ Pane content ─
   const visibleColors = filterTokensByMode(color.tokens ?? [], isBeginner ? "beginner" : "pro");
 
-  /* The site name under "Brand" (7315:80955 draws the site's own name there;
-     "Bella Cucina" is the board's sample). Same read the topbar makes. */
-  const [siteName, setSiteName] = React.useState("");
+  /* "‹ Back to Editor · Home" (B6-B01): the door names the page the editor
+     kept open ("Home" is the board's sample). The workspace covers the
+     canvas, so a page switch cannot happen while it is up; PROJECT_LOADED
+     covers a reload under it. */
+  const [editorPageName, setEditorPageName] = React.useState("");
   React.useEffect(() => {
     if (!composer || typeof composer.on !== "function") return;
-    const read = () => setSiteName(composer.getProjectMetadata?.()?.name ?? "");
+    const read = () => setEditorPageName(composer.elements?.getActivePage?.()?.name ?? "");
     read();
+    composer.on(EVENTS.PAGE_CHANGED, read);
     composer.on(EVENTS.PROJECT_LOADED, read);
-    composer.on(EVENTS.PROJECT_METADATA_CHANGED, read);
     return () => {
+      composer.off(EVENTS.PAGE_CHANGED, read);
       composer.off(EVENTS.PROJECT_LOADED, read);
-      composer.off(EVENTS.PROJECT_METADATA_CHANGED, read);
     };
   }, [composer]);
 
@@ -437,6 +538,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   /* A page change drops the selection — unless the move is FOR a token
      (Brand checks' Open), which lands on its page with its card open. */
   const openPage = (id: BrandPageId, tokenId: string | null = null) => {
+    setCompactNavOpen(false);
     setPage(id);
     setSelectedTokenId(tokenId);
     setUsageTokenId(null);
@@ -465,7 +567,8 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
      card open. A token page with nothing selected (landing, a page change)
      selects its first row. */
   const firstRowId = (() => {
-    if (page === "colours") return orderColourTokens(visibleColors)[0]?.id;
+    /* Colors opens a token only on purpose ("Edit ›", B6-B02): no default. */
+    if (page === "colours") return undefined;
     if (page === "spacing") return spacing.tokens[0]?.id;
     if (page.startsWith("kind-")) return moreKindRegistry[page.slice(5) as MoreKind]?.tokens[0]?.id;
     return undefined;
@@ -521,6 +624,16 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
     if (next === allTokens) return;
     if (!store.commit(next, "Edit token")) refused(`"${tok.name}"`);
   };
+  /* B6-B02's alias select: the light mode points at another token, or back
+     to a literal of the value it shows now. One commit, one ⌘Z. */
+  const aliasToken = (id: string, targetId: string | null) => {
+    const tok = tokenById(id);
+    if (!tok) return;
+    const next = targetId
+      ? setTokenAlias(allTokens, id, targetId)
+      : setTokenLiteral(allTokens, id, "light", resolveTokenLiteral(allTokens, id, "light") ?? "");
+    if (!store.commit(next, "Edit token")) refused(`"${tok.name}"`);
+  };
   const deleteToken = (id: string, opts?: { replaceWith?: string }) => {
     const tok = tokenById(id);
     if (!tok) return;
@@ -530,10 +643,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
     /* 8224:233678 "replaced": the toast names both and the one undo. */
     const replacement = opts?.replaceWith ? tokenById(opts.replaceWith) : undefined;
     if (replacement) {
-      addToast({
-        description: `${tok.friendlyName ?? tok.name} replaced with ${replacement.friendlyName ?? replacement.name} · Undo ⌘Z`,
-        tone: "info",
-      });
+      receipt(`${tok.friendlyName ?? tok.name} replaced with ${replacement.friendlyName ?? replacement.name}.`);
     }
   };
   const resetToken = (id: string) => {
@@ -543,7 +653,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
     if (!store.commit(allTokens.map((t) => (t.id === id ? seed : t)), "Reset token")) {
       return refused(`Resetting "${tok.name}"`);
     }
-    addToast({ description: `${tok.friendlyName ?? tok.name} reset to default · Undo ⌘Z`, tone: "info" });
+    receipt(`${tok.friendlyName ?? tok.name} reset to default.`);
   };
   const renameToken = (id: string, newId: string) => {
     const tok = tokenById(id);
@@ -553,67 +663,41 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
     if (!ok) refused(`Renaming "${tok.name}"`);
   };
 
-  const caption = (() => {
-    switch (page) {
-      case "colours":          return `${visibleColors.length} tokens · light / dark`;
-      case "colour-mode":      return "Light and dark values";
-      case "fonts":            return fontsCaption(type.tokens);
-      case "styles":           return `Reusable · ${reusableStylesCount(type.tokens, allPresets)}`;
-      case "component-styles": return "Default appearance by component";
-      case "classes":          return "Names shared across elements";
-      case "presets":          return "Section and element presets";
-      case "brand-checks":     return brandChecksCaption(lintIssues, suppressedCount);
-      case "starters":         return "Pick a starter to apply it to the site";
-      case FROM_SOURCE:        return "";
-      case "spacing":          return `${spacing.tokens.length} tokens · presets + custom`;
-      case "export":           return "Move the brand in and out";
-      case "connect":          return "";
-      case "scale":            return "";
-      case "restore-points":   return "";
-      default: {
-        const n = moreKindRegistry[page.slice("kind-".length) as MoreKind]?.tokens.length ?? 0;
-        return `${n} token${n === 1 ? "" : "s"}`;
-      }
-    }
-  })();
+  /* The page title (B6-B01 "Colors · 4", B6-B18 "Checks · 2"): the two
+     counts the boards draw ride in the title; every other page is its name.
+     The scale generator sits under Colors and keeps its title. */
+  const checksLabel = lintIssues.length > 0 ? `Checks · ${lintIssues.length}` : "Checks";
+  const title =
+    page === "colours" && selectedToken ? "Colors"
+    : page === "colours" || page === "scale" ? `Colors · ${visibleColors.length}`
+    : page === "brand-checks" ? checksLabel
+    : pageLabel(page);
 
-  /* The header's page action — each board draws one at the top right. */
+  /* The page's actions, at the top of the body under the strap (B6-B01:
+     "+ Add color · Generate scale"). */
   const pageAction = (() => {
     switch (page) {
       case "colours":
+        if (selectedToken) return null;
         return (
-          <Button type="button" variant="secondary" size="xs" className={PAGE_ACTION} onClick={() => setShowAddToken(true)} data-testid="brand-page-action">
-            + Add token
-          </Button>
+          <>
+            <Button type="button" variant="primary" size="xs" className={`${PAGE_ACTION} tw:border-transparent tw:text-white!`} onClick={() => setShowAddToken(true)} data-testid="brand-page-action">
+              + Add color
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              size="xs"
+              className={PAGE_ACTION}
+              onClick={() => openScale("color-primary")}
+              data-testid="brand-generate-scale"
+            >
+              Generate scale
+            </Button>
+          </>
         );
-      case "styles":
-      case "component-styles": {
-        /* 7316:82755 / 7316:82153's page action. Gated on the SAME flag that decides
-           whether an AIClient is built at all (useComposerInit.ts:132): with
-           it off the modal would open over a service with no client and answer
-           with AIAssistService's developer string. Blocked, never hidden, and
-           aria-disabled so the reason stays reachable by keyboard. */
-        const aiOn = isFeatureEnabled("dsAi");
-        const cta = (
-          <Button
-            type="button"
-            variant="secondary"
-            size="xs"
-            className={PAGE_ACTION}
-            onClick={aiOn ? () => setAiOpen(true) : undefined}
-            aria-disabled={aiOn ? undefined : "true"}
-            data-open-ai-assist
-            data-testid="brand-page-action"
-          >
-            ✦ Generate with AI
-          </Button>
-        );
-        return aiOn ? cta : (
-          <Tooltip content="Coming soon: AI component styles aren't available yet" placement="bottom" arrow={false}>
-            {cta}
-          </Tooltip>
-        );
-      }
+      /* "styles" has no page action: its ✦ Generate with AI is gone — no AI
+         entry points in the editor UI (owner, 2026-10-17). */
       case "classes":
         return (
           <Button type="button" variant="secondary" size="xs" className={PAGE_ACTION} onClick={() => setClassAddOpen(true)} data-testid="brand-page-action">
@@ -624,100 +708,111 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
         /* 7316:84555's page action. The checks also run by themselves on
            every edit; this runs them now (useDSLint's one trigger). */
         return (
-          <Button
-            type="button"
-            variant="secondary"
-            size="xs"
-            className={PAGE_ACTION}
-            onClick={() => composer?.emit?.(EVENTS.BRAND_CHECKS_RUN, undefined)}
-            data-testid="brand-page-action"
-          >
-            Run checks
-          </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              size="xs"
+              className={PAGE_ACTION}
+              onClick={() => composer?.emit?.(EVENTS.BRAND_CHECKS_RUN, undefined)}
+              data-testid="brand-page-action"
+            >
+              Run checks
+            </Button>
         );
       case "spacing":
-      default:
-        if (page === "spacing" || page.startsWith("kind-")) {
-          /* Spacing (7576:197036) is the "Tokens · <kind>" pattern; its
-             header switches kind — the one entry to the eleven others. */
-          return (
-            <div className="tw:flex tw:items-center tw:gap-2">
-            <Select
-              sizing="sm"
-              aria-label="Token kind"
-              value={page}
-              onChange={(e) => openPage(e.target.value as BrandPageId)}
-              data-testid="brand-kind-switch"
-            >
-              <option value="spacing">Spacing</option>
-              {MORE_KINDS.map((k) => (
-                <option key={k.kind} value={`kind-${k.kind}`}>
-                  {k.label}
-                </option>
+        /* B6-B22: the three presets as one segmented control, then Reset to
+           defaults; each is one write. "+ Add spacing" is code-ahead (the
+           board adds none) and stays. */
+        return (
+          <>
+            <div role="group" aria-label="Spacing preset" className={SEG_TRACK} data-testid="brand-spacing-presets">
+              {SPACING_PRESETS.map(([p, label]) => (
+                <Button
+                  key={p}
+                  type="button"
+                  color="light"
+                  size="xs"
+                  aria-pressed={spacing.activePreset === p}
+                  className={`${SEG_ITEM} ${spacing.activePreset === p ? SEG_ITEM_ON : SEG_ITEM_OFF}`}
+                  onClick={() => {
+                    if (!spacing.applyPreset(p)) refused("The spacing preset");
+                  }}
+                  data-testid={`spacing-preset-${p}`}
+                >
+                  {label}
+                </Button>
               ))}
-            </Select>
-            <Button type="button" variant="secondary" size="xs" className={PAGE_ACTION} onClick={() => setShowAddToken(true)} data-testid="brand-page-action">
-              + Add token
-            </Button>
-            {page === "spacing" ? (
-              /* Owner ruling 2026-09-24: applying a whole preset comes back
-                 (removed in 91ab74b33 for parity) — in a menu, so the page
-                 still draws no chips (7576:197036). Each action is one write. */
-              <Popover
-                open={spacingMenuOpen}
-                onClose={() => setSpacingMenuOpen(false)}
-                placement="bottom-end"
-                label="Spacing actions"
-                trigger={
-                  <IconButton label="Spacing actions" onClick={() => setSpacingMenuOpen((v) => !v)} data-testid="brand-spacing-menu">
-                    ⋯
-                  </IconButton>
-                }
-              >
-                <Menu label="Spacing actions">
-                  <MenuLabel>Apply preset</MenuLabel>
-                  {SPACING_PRESETS.map(([p, label]) => (
-                    <MenuItem
-                      key={p}
-                      radio
-                      selected={spacing.activePreset === p}
-                      onClick={() => {
-                        setSpacingMenuOpen(false);
-                        if (!spacing.applyPreset(p)) refused("The spacing preset");
-                      }}
-                      data-testid={`spacing-preset-${p}`}
-                    >
-                      {label}
-                    </MenuItem>
-                  ))}
-                  <MenuSeparator />
-                  <MenuItem
-                    onClick={() => {
-                      setSpacingMenuOpen(false);
-                      if (spacing.resetToDefaults()) addToast({ description: "Spacing reset to defaults.", tone: "info" });
-                      else refused("Resetting spacing");
-                    }}
-                    data-testid="spacing-reset-defaults"
-                  >
-                    Reset to defaults
-                  </MenuItem>
-                </Menu>
-              </Popover>
-            ) : null}
             </div>
-          );
-        }
-        return null;
+            <Button
+              type="button"
+              variant="ghost"
+              size="xs"
+              className={`${PAGE_ACTION} tw:border-transparent tw:bg-transparent`}
+              onClick={() => {
+                if (spacing.resetToDefaults()) addToast({ description: "Spacing reset to defaults.", tone: "info" });
+                else refused("Resetting spacing");
+              }}
+              data-testid="spacing-reset-defaults"
+            >
+              Reset to defaults
+            </Button>
+            <Button type="button" variant="secondary" size="xs" className={PAGE_ACTION} onClick={() => setShowAddToken(true)} data-testid="brand-page-action">
+              + Add spacing
+            </Button>
+          </>
+        );
       case "fonts":
-        /* The fonts a site can pick from are its Site fonts — the same door
-           the font picker's "Manage site fonts" opens. */
+        /* B6-B21: the fonts a site can pick from are its Site fonts — the
+           same door the font picker's "Manage site fonts" opens. */
         return (
           <Button type="button" variant="secondary" size="xs" className={PAGE_ACTION} onClick={() => openSiteFonts(composer)} data-testid="brand-page-action">
-            + Add a font
+            Manage site fonts ›
           </Button>
         );
+      default: {
+        if (!page.startsWith("kind-")) return null;
+        /* B6-B24: "+ Add radius" — the kind's own name. */
+        const kind = MORE_KINDS.find((k) => `kind-${k.kind}` === page);
+        return (
+          <Button type="button" variant="secondary" size="xs" className={PAGE_ACTION} onClick={() => setShowAddToken(true)} data-testid="brand-page-action">
+            + Add {kind?.label.toLowerCase() ?? "token"}
+          </Button>
+        );
+      }
     }
   })();
+
+  /* The token's edit controls — the Colors drill-in's body (B6-B02), the
+     right column's card on the other token pages. */
+  const detailCard = (tok: DesignToken) => (
+            <TokenDetailView
+              key={tok.id}
+              token={tok}
+              composer={composer}
+              allTokens={allTokens}
+              mode={shownMode}
+              onValueChange={changeToken}
+              /* Same gate as rename (G3-138): type and spacing have no delete
+                 path; offering Delete for them was a silent no-op. */
+              onDelete={(() => {
+                const k = kindOf(tok);
+                return k === "color" || isMoreKind(k) ? deleteToken : undefined;
+              })()}
+              onReset={(() => {
+                const k = kindOf(tok);
+                return SEED_BY_ID.has(tok.id) && (k === "color" || isMoreKind(k)) ? resetToken : undefined;
+              })()}
+              /* Only colour and the generic kinds can rename; type and spacing
+                 have no rename path, and a Rename that silently did nothing
+                 was G3-137's defect — the item is disabled for them. */
+              onRename={(() => {
+                const k = kindOf(tok);
+                return k === "color" || isMoreKind(k) ? renameToken : undefined;
+              })()}
+              onDeleted={() => setSelectedTokenId(null)}
+              onGenerateScale={isSemanticColour(tok) ? openScale : undefined}
+            />
+  );
 
   const tokenPageProps = {
     onAddTokenClick: () => setShowAddToken(true),
@@ -734,32 +829,70 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
 
   const renderPage = (): React.ReactNode => {
     switch (page) {
-      case "colours":
+      case "colours": {
+        if (!selectedToken) return <TokensSection {...tokenPageProps} openKind="color" />;
+        /* B6-B02: the token's edit page, in place of the list. */
+        const reach = composer?.designSystem?.tokenUsage?.getCount?.(selectedToken.id);
         return (
-          <>
-            <TokensSection {...tokenPageProps} openKind="color" />
-            {/* 8222:232627's actions row under the colour tables. */}
-            <div className="tw:mt-4 tw:flex tw:items-center tw:gap-2" data-testid="brand-colours-actions">
-              <Button
-                type="button"
-                variant="secondary"
-                size="xs"
-                className={PAGE_ACTION}
-                onClick={() => openScale("color-primary")}
-                data-testid="brand-generate-scale"
-              >
-                Generate colour scale
-              </Button>
-              <Button type="button" variant="secondary" size="xs" className={PAGE_ACTION} onClick={() => openPage("connect")} data-testid="brand-colours-connect">
-                Connect to tokens
-              </Button>
-              {isFeatureEnabled("dsAi") && (
-                <Button type="button" variant="secondary" size="xs" className={PAGE_ACTION} onClick={() => openPage(FROM_SOURCE)} data-testid="brand-colours-from-source">
-                  From logo or URL
-                </Button>
-              )}
-            </div>
-          </>
+          <div className="tw:flex tw:max-w-[620px] tw:flex-col tw:gap-4" data-testid="brand-token-edit">
+            <Button
+              type="button"
+              variant="link"
+              size="xs"
+              className="tw:h-7 tw:max-w-[446px] tw:px-0 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:leading-5"
+              onClick={() => setSelectedTokenId(null)}
+              data-testid="brand-back-colours"
+            >
+              ‹ Colors
+            </Button>
+            <h3 className="tw:m-0 tw:text-[length:var(--bk-text-14)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]" data-testid="brand-token-edit-name">
+              {isBeginner ? (selectedToken.friendlyName ?? selectedToken.name) : selectedToken.id}
+            </h3>
+            {typeof reach === "number" && reach > 0 && (
+              /* B6-B02 / B6-B30: what an edit here reaches, before it is made. */
+              <p className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink)]" data-testid="brand-token-reach">
+                This changes {reach} place{reach === 1 ? "" : "s"} across the site
+                {aliasedByCount(allTokens, selectedToken.id) > 0 ? ", including uses through aliases." : "."}
+              </p>
+            )}
+            <ColorTokenEditor
+                token={selectedToken}
+                composer={composer}
+                allTokens={allTokens}
+                mode={shownMode}
+                onValueChange={changeToken}
+                onAliasChange={aliasToken}
+                onSelectToken={setSelectedTokenId}
+                onShowUsage={tokenPageProps.onShowUsage}
+                onRename={renameToken}
+                onDelete={deleteToken}
+                onReset={SEED_BY_ID.has(selectedToken.id) ? resetToken : undefined}
+                onDeleted={() => setSelectedTokenId(null)}
+                onGenerateScale={isSemanticColour(selectedToken) ? openScale : undefined}
+              />
+          </div>
+        );
+      }
+      case "other-kinds":
+        /* B6-B23: one row per kind, its page behind it. */
+        return (
+          <div className="tw:flex tw:flex-col tw:gap-3">
+            <p className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
+              Each kind has its own page. Values use that kind’s validator.
+            </p>
+            <BrandCard label="Other kinds" data-testid="brand-other-kinds">
+              {MORE_KINDS.map((k) => (
+                <BrandRow
+                  key={k.kind}
+                  data-testid={`brand-kind-row-${k.kind}`}
+                  onSelect={() => openPage(`kind-${k.kind}`)}
+                  trailing={<BrandChevron />}
+                  name={k.label}
+                  sub={k.description}
+                />
+              ))}
+            </BrandCard>
+          </div>
         );
       case "scale":
         return (
@@ -767,8 +900,9 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
             key={scaleRole}
             composer={composer}
             roleId={scaleRole}
+            onBack={() => openPage("colours")}
             /* 8224:243869's toast. */
-            onApplied={() => addToast({ description: "Colour scale applied · Undo ⌘Z", tone: "info" })}
+            onApplied={() => receipt("Color scale added.")}
           />
         );
       case "colour-mode":
@@ -798,10 +932,9 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
             selectedTokenId={selectedTokenId}
             onSelectToken={setSelectedTokenId}
             onOpenPresets={() => openPage("presets")}
+            onBrowseBlocks={openSectionInAdd}
           />
         );
-      case "component-styles":
-        return <ComponentsSection onOpenSection={openSectionInAdd} />;
       case "classes":
         return <ClassesSection composer={composer} />;
       case "presets":
@@ -824,6 +957,9 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
             }}
             onOpen={openToken}
             onConnect={() => openPage("connect")}
+            onIgnore={lintState ? (id) => lintState.suppress(id) : undefined}
+            ignored={ignoredChecks}
+            onRestore={lintState ? (id) => lintState.unsuppress(id) : undefined}
           />
         );
       case "connect":
@@ -834,85 +970,104 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
             onPreview={setConnectIds}
             onBack={() => openPage("colours")}
             /* 8224:236236's toast. */
-            onApplied={() => addToast({ description: "Tokens connected · Undo ⌘Z", tone: "info" })}
-          />
-        );
-      case "restore-points":
-        return (
-          <RestorePointsSection
-            composer={composer}
-            /* 8224:245787's toast. */
-            onRestored={() => addToast({ description: "Brand restored · Undo ⌘Z", tone: "info" })}
-            onFailed={() => refused("That restore point")}
+            onApplied={(n) => receipt(`Connected ${n} color usage${n === 1 ? "" : "s"}.`)}
           />
         );
       case "starters":
         return (
           <StartersSection
+            composer={composer}
             projectId={projectId}
             onOpenFromSource={isFeatureEnabled("dsAi") ? () => openPage(FROM_SOURCE) : undefined}
+            /* B6-B10: back on Colors with the receipt. */
+            onApplied={(name) => {
+              openPage("colours");
+              receipt(`Applied ${name}. Restore point created.`);
+            }}
           />
         );
       case FROM_SOURCE:
         return <BrandFromSource composer={composer ?? null} />;
       case "spacing":
-        return <TokensSection {...tokenPageProps} openKind="spacing" />;
+        return (
+          <>
+            <p className="tw:m-0 tw:mb-3 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="brand-spacing-note">
+              Spacing steps can be changed but not renamed or deleted.
+            </p>
+            <TokensSection {...tokenPageProps} openKind="spacing" />
+          </>
+        );
       case "export":
         return (
-          /* 4418:168885: a 760 panel centred in the main area — no page
-             header, no preview column. Its ✕ goes back to Colours. */
-          <div className="tw:mx-auto tw:w-full tw:max-w-[760px]">
-            <ExportSection onClose={() => openPage("colours")} />
-          </div>
+          /* B6-B15 / B6-B48: Import | Export tabs on an ordinary page. */
+          <ExportSection composer={composer} />
         );
       default: {
         const kind = page.slice("kind-".length) as MoreKind;
-        return <TokensSection {...tokenPageProps} openKind={kind} />;
+        return (
+          <TokensSection
+            {...tokenPageProps}
+            openKind={kind}
+            kindActions={{
+              validate: (v) => kindValueError(kind, v),
+              onValueChange: (id, v) => changeToken(id, v),
+              onRename: renameToken,
+              onDelete: setDeleteFor,
+              onReset: resetToken,
+              isSeed: (id) => SEED_BY_ID.has(id),
+              takenIds: allTokens.map((t) => t.id),
+            }}
+          />
+        );
       }
     }
   };
 
-  /** `slot` names the row when its target moves (the Other tokens row lands
-   *  on whichever kind is open). */
-  const navRow = (id: BrandPageId, label: string, count?: number, slot: string = id) => {
-    /* The eleven other kinds are reached from Spacing's kind switch, so the
-       Spacing row stays current on their pages. */
-    const active =
-      page === id ||
-      (id === "spacing" && page.startsWith("kind-")) ||
-      (id === "brand-checks" && page === "connect") ||
-      (id === "starters" && page === FROM_SOURCE) ||
-      (id === "colours" && page === "scale");
+  /* B6-B50: leaving a page whose flow is previewing on the canvas (logo/URL,
+     a starter, the scale, Dark Auto) asks first — the preview would go with
+     the page. Read live, not from state: a flow clears its preview and moves
+     on in the same handler. The theme switch's own preview never asks. */
+  const [discardAsk, setDiscardAsk] = React.useState<BrandPageId | null>(null);
+  const flowPreviewing = () => {
+    const live = composer?.designSystem?.preview;
+    return Boolean(live && live.source !== "canvas" && !themePreview.active);
+  };
+  const requestPage = (id: BrandPageId) => {
+    if (id !== page && flowPreviewing()) {
+      setCompactNavOpen(false);
+      setDiscardAsk(id);
+      return;
+    }
+    openPage(id);
+  };
+  const PREVIEW_WHAT: Partial<Record<BrandPageId, string>> = {
+    [FROM_SOURCE]: "colors read from a website or logo",
+    starters: "a starter",
+    scale: "a color scale",
+    "colour-mode": "generated dark values",
+  };
+  const previewPages: readonly BrandPageId[] = [FROM_SOURCE, "starters", "scale", "colour-mode"];
+
+  const currentRow = parentRow(page);
+  const navRow = (id: NavId, label: string) => {
+    const active = currentRow === id;
     return (
       <Button
-        key={slot}
+        key={id}
         type="button"
         variant="ghost"
         size="xs"
         className={`${NAV_ROW}${active ? ` ${NAV_ROW_ON}` : ""}`}
         aria-current={active ? "page" : undefined}
-        onClick={() => openPage(id)}
-        data-section-id={slot}
-        data-testid={`brand-row-${slot}`}
+        onClick={() => requestPage(id)}
+        data-section-id={id}
+        data-testid={`brand-row-${id}`}
       >
-        <span className="tw:min-w-0 tw:flex-1 tw:truncate" data-testid={`brand-row-label-${slot}`}>
-          {label}
+        <span className="tw:min-w-0 tw:flex-1 tw:truncate" data-testid={`brand-row-label-${id}`}>
+          {id === "brand-checks" ? checksLabel : label}
         </span>
-        {count !== undefined && (
-          <span className={NAV_COUNT} data-testid={`brand-row-count-${id}`}>
-            {count}
-          </span>
-        )}
       </Button>
     );
-  };
-
-  /* The count the board draws beside two rows: the palette size on Colours,
-     the open findings on Brand checks (only while there are any). */
-  const navCount = (id: NavId): number | undefined => {
-    if (id === "colours") return visibleColors.length;
-    if (id === "brand-checks" && lintIssues.length > 0) return lintIssues.length;
-    return undefined;
   };
 
   /* The preview card's Light / Dark switch, on every page that has the
@@ -921,10 +1076,32 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
     <ColorModeToggle theme={shownMode} onChange={setPreviewTheme} siteOff={siteDarkMode === "off"} locked={previewLocked} />
   ) : undefined;
 
-  /* Import / export is drawn as a panel, not a page with a preview. */
-  const isPanelPage = page === "export";
 
   const isTokenPage = page === "colours" || page === "fonts" || page === "styles" || page === "spacing" || page.startsWith("kind-");
+
+  /* The door out (B6-B01 "‹ Back to Editor · Home"; GAP-ST-T03 "‹ Back to
+     Site settings" when Site settings opened Brand). */
+  const backLabel =
+    brandReturn?.to === "settings" ? "Back to Site settings"
+    : brandReturn?.to === "editor" ? `Back to ${brandReturn.label}`
+    : editorPageName ? `Back to Editor · ${editorPageName}` : "Back to Editor";
+
+  const navList = (
+    <nav className="tw:flex tw:flex-col tw:gap-4 tw:px-2 tw:pb-4 tw:pt-4" aria-label="Brand pages">
+          {NAV_GROUPS.map((g) => (
+            <div key={g.label} className="tw:flex tw:flex-col tw:gap-0.5" role="group" aria-labelledby={`brand-nav-group-${g.label}`} data-testid="brand-nav-group">
+              <p
+                id={`brand-nav-group-${g.label}`}
+                className="tw:m-0 tw:px-3 tw:pb-1 tw:text-[length:var(--bk-text-12)] tw:font-medium tw:leading-[18px] tw:text-[var(--bk-ink-muted)]"
+              >
+                {g.label}
+              </p>
+              {/* B6-B01: the nav names the open findings, "Checks · 2". */}
+              {g.rows.map((n) => navRow(n.id, n.id === "brand-checks" ? checksLabel : n.label))}
+            </div>
+          ))}
+        </nav>
+  );
 
   return (
     <div
@@ -932,10 +1109,25 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
       data-testid="brand-panel"
       className="tw:flex tw:h-full tw:min-h-0 tw:w-full tw:bg-[var(--bk-bg-panel)] tw:[font-family:var(--bk-font-ui)]"
     >
-      {/* ── Nav ─────────────────────────────────────────────────────────── */}
+      {/* ── Nav: "Brand", then the three groups (B6-B01) ─────────────────── */}
+      {!compact && (
       <aside className="tw:flex tw:w-64 tw:shrink-0 tw:flex-col tw:overflow-y-auto tw:border-r tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)]">
-        {/* 7315:80955: the back link sits centred on the nav's first line. */}
-        <div className="tw:flex tw:justify-center tw:pt-5" data-testid="brand-back-row">
+        <div className="tw:flex tw:flex-col tw:px-4 tw:pt-5" data-testid="brand-nav-head">
+          <h1 className="tw:m-0 tw:text-[length:var(--bk-text-20)] tw:font-semibold tw:leading-[30px] tw:text-[var(--bk-ink)]">
+            Brand
+          </h1>
+        </div>
+        {navList}
+      </aside>
+      )}
+
+      {/* ── Main: the door, the header (title · Review changes · Restore
+           points, the strap under it), then pane + preview column. ──────── */}
+      <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:px-8 tw:pt-5">
+        {/* B6-B01 (203:33565): "‹ Back to Editor · Home  Colors · 4" on one
+            row; Review changes · Restore points ▾ · the strap on the next. */}
+        <header className="tw:flex tw:shrink-0 tw:flex-col tw:gap-2" data-testid="brand-header">
+          <div className="tw:flex tw:h-[30px] tw:items-center tw:gap-4" data-testid="brand-back-row">
           <Button
             type="button"
             variant="link"
@@ -944,86 +1136,132 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
             data-testid="brand-back-link"
           >
             <ChevronLeft size={12} aria-hidden />
-            Back to canvas
+            {backLabel}
           </Button>
-        </div>
-        <div className="tw:flex tw:flex-col tw:px-4 tw:pt-4" data-testid="brand-nav-head">
-          <h1 className="tw:m-0 tw:text-[length:var(--bk-text-24)] tw:font-semibold tw:leading-8 tw:text-[var(--bk-ink)]">
-            Brand
-          </h1>
-          {siteName && (
-            <span
-              className="tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]"
-              data-testid="brand-nav-site"
-            >
-              {siteName}
-            </span>
-          )}
-        </div>
-        {/* 72 down to the first row — 7315:80955 leaves the band under the
-            site name empty. */}
-        <nav className="tw:flex tw:flex-col tw:gap-0.5 tw:px-2 tw:pb-4 tw:pt-18" aria-label="Brand pages">
-          {NAV.map((n) => navRow(n.id, n.label, navCount(n.id)))}
-        </nav>
-      </aside>
-
-      {/* ── Main: header over pane + preview column (BRP1-M3 8222:232627):
-           32 top / 32 sides, the 30-tall header spans both columns, the
-           columns start 20 under it, 32 between them. ───────────────────── */}
-      <div className={`tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:px-8 ${isPanelPage ? "tw:pt-10" : "tw:pt-8"}`}>
-        {/* The board's header: the 700-wide title, then the actions. No
-            Save — every edit is already applied (autosave). The page caption
-            (counts, ignored checks) is kept beside the title; the board draws
-            none. */}
-        {!isPanelPage && (
-          <header className="tw:flex tw:h-[30px] tw:shrink-0 tw:items-center tw:gap-2" data-testid="brand-header">
-            <div className="tw:flex tw:w-[700px] tw:min-w-0 tw:shrink tw:items-baseline tw:gap-2.5">
               <h2
-                className="tw:m-0 tw:shrink-0 tw:text-[length:var(--bk-text-20)] tw:font-semibold tw:leading-[30px] tw:tracking-[-0.24px] tw:text-[var(--bk-ink)]"
+                className="tw:m-0 tw:min-w-0 tw:flex-1 tw:truncate tw:text-[length:var(--bk-text-20)] tw:font-semibold tw:leading-[30px] tw:tracking-[-0.24px] tw:text-[var(--bk-ink)]"
                 data-testid="brand-page-title"
               >
-                {pageLabel(page)}
+                {title}
               </h2>
-              <p className="tw:m-0 tw:min-w-0 tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="brand-page-caption">
-                {caption}
-              </p>
+              {compact && (
+                /* B6-B51/B52: below 1440 the nav folds behind this button. */
+                <Popover
+                  open={compactNavOpen}
+                  onClose={() => setCompactNavOpen(false)}
+                  placement="bottom"
+                  label="Brand navigation"
+                  trigger={
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="xs"
+                      className={PAGE_ACTION}
+                      aria-expanded={compactNavOpen}
+                      onClick={() => setCompactNavOpen((v) => !v)}
+                      data-testid="brand-compact-nav"
+                    >
+                      Brand navigation
+                    </Button>
+                  }
+                >
+                  <div className="tw:w-64">
+                    <p className="tw:m-0 tw:px-4 tw:pt-3 tw:text-[length:var(--bk-text-14)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]">Brand</p>
+                    {navList}
+                  </div>
+                </Popover>
+              )}
             </div>
-            {/* "Review changes" (spec §4): non-blocking, this session's
-                edits with Revert — drawn at 0 too (8222:230854). */}
-            <SessionEditsPopover
-              edits={store.edits}
-              onRevert={(key) => {
-                if (!store.revert(key)) refused("That revert");
-              }}
-              disabled={readOnly}
-              extraActions={
-                <>
-                  {/* BRP1-M3 (8222:232627): "Restore points", a borderless
-                      action right after Review changes, on every page (the
-                      page's own action follows it). Opening the list is a read, so
-                      it stays live on a read-only site (Restore does not). */}
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="xs"
-                    className={`${PAGE_ACTION} tw:border-transparent tw:bg-transparent`}
-                    aria-current={page === "restore-points" ? "page" : undefined}
-                    onClick={() => openPage("restore-points")}
-                    data-testid="brand-restore-points-action"
-                  >
-                    Restore points
-                  </Button>
-                  <EditLock locked={readOnly}>{pageAction}</EditLock>
-                </>
-              }
-            />
+            <div className="tw:flex tw:min-h-8 tw:flex-wrap tw:items-center tw:gap-2">
+              {/* "Review changes" (spec §4): non-blocking, this session's
+                  edits with Revert. No Undo / Redo here: the topbar's is the
+                  one undo (GAP-ST boards draw a pair — not adopted). */}
+              <SessionEditsPopover
+                edits={store.edits}
+                onRevert={(key) => {
+                  if (!store.revert(key)) refused("That revert");
+                }}
+                disabled={readOnly}
+                extraActions={
+                  /* Opening the list is a read, so it stays live on a
+                     read-only site (Restore does not) — but it is a server
+                     read: offline it waits, and says why (B6-B43). */
+                  <>
+                    <Popover
+                      open={restoreOpen}
+                      onClose={() => setRestoreOpen(false)}
+                      placement="bottom-end"
+                      label="Restore points"
+                      trigger={
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          size="xs"
+                          className={PAGE_ACTION}
+                          aria-expanded={restoreOpen}
+                          aria-haspopup="dialog"
+                          disabled={!online}
+                          aria-describedby={online ? undefined : "brand-restore-offline"}
+                          onClick={() => setRestoreOpen((v) => !v)}
+                          data-testid="brand-restore-points-action"
+                        >
+                          Restore points ▾
+                        </Button>
+                      }
+                    >
+                      {/* B6-B39: the checkpoints in a popover off the header. */}
+                      <div className="tw:w-[420px]">
+                        <RestorePointsSection
+                          composer={composer}
+                          onRestored={(label) => {
+                            setRestoreOpen(false);
+                            receipt(`Restored “${label}”.`);
+                          }}
+                          onFailed={() => refused("That restore point")}
+                        />
+                      </div>
+                    </Popover>
+                    <p className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="brand-page-strap">
+                      {STRAP}
+                    </p>
+                    {!online && (
+                      <span id="brand-restore-offline" className="tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">
+                        Restore points need a connection
+                      </span>
+                    )}
+                  </>
+                }
+              />
+              {compact && (
+                /* B6-B53: the preview takes the list's place, not a column. */
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="xs"
+                  className={`${PAGE_ACTION} tw:border-transparent tw:bg-transparent`}
+                  aria-pressed={compactPreview}
+                  onClick={() => setCompactPreview((v) => !v)}
+                  data-testid="brand-compact-preview"
+                >
+                  {compactPreview ? "Hide website preview" : "Show website preview"}
+                </Button>
+              )}
+            </div>
           </header>
-        )}
-      <div className={`tw:flex tw:min-h-0 tw:flex-1 tw:gap-8 ${isPanelPage ? "" : "tw:mt-5"}`}>
+      <div className={"tw:mt-5 tw:flex tw:min-h-0 tw:flex-1 tw:gap-8"}>
         {/* ── Pane ──────────────────────────────────────────────────────── */}
-        <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col" data-testid="brand-pane">
+        <div className={`tw:min-w-0 tw:flex-1 tw:flex-col ${compact && compactPreview ? "tw:hidden" : "tw:flex"}`} data-testid="brand-pane">
           {/* BRP1-M1 (8222:229015 / 229636 / 230245): a flat warning-tint
               strip, 12 in, 12/18 ink — no border, no radius — 20 over the body. */}
+          {!online && !readOnly && (
+            <div
+              role="status"
+              data-testid="brand-offline-banner"
+              className="tw:mb-5 tw:bg-[var(--bk-warning-tint)] tw:p-3 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink)]"
+            >
+              You’re offline. Token edits still apply here and save when you reconnect. Restore points and reading a website need a connection.
+            </div>
+          )}
           {readOnly && (
             <div
               role="alert"
@@ -1031,6 +1269,23 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
               className="tw:mb-5 tw:bg-[var(--bk-warning-tint)] tw:p-3 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink)]"
             >
               {(store.readOnlyReason && BRAND_READ_ONLY_COPY[store.readOnlyReason]) || BRAND_READ_ONLY_FAILED_COPY}
+            </div>
+          )}
+          {(page.startsWith("kind-") || pageAction) && (
+            <div className="tw:mb-4 tw:flex tw:shrink-0 tw:items-center tw:gap-2" data-testid="brand-page-actions">
+              {page.startsWith("kind-") && (
+                <Button
+                  type="button"
+                  variant="link"
+                  size="xs"
+                  className="tw:h-7 tw:px-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)] tw:enabled:hover:text-[var(--bk-accent)] tw:enabled:hover:no-underline"
+                  onClick={() => openPage("other-kinds")}
+                  data-testid="brand-back-other-kinds"
+                >
+                  ‹ Other kinds
+                </Button>
+              )}
+              <EditLock locked={readOnly}>{pageAction}</EditLock>
             </div>
           )}
           <div id={`design-section-${page}`} className="tw:min-h-0 tw:flex-1 tw:overflow-y-auto tw:pb-4" data-testid="brand-page-body">
@@ -1063,7 +1318,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
 
             {/* Import / export stays usable read-only: export is a read, and
                 an import is refused by the one write path (setTokens). */}
-            <EditLock locked={readOnly && !isPanelPage}>{renderPage()}</EditLock>
+            <EditLock locked={readOnly && page !== "export"}>{renderPage()}</EditLock>
             {usageToken && (
               /* 8224:231539: 16 under the table, the token's reach in one line —
                  held at the pane's foot, so a long table cannot push it out of view. */
@@ -1080,9 +1335,10 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
         </div>
 
         {/* ── Preview column ────────────────────────────────────────────── */}
-        {!isPanelPage && (
+        {(!compact || compactPreview) && (
         <aside
-          className="tw:flex tw:w-[468px] tw:shrink-0 tw:flex-col tw:gap-4 tw:overflow-y-auto tw:pb-4"
+          /* 2L9 B6-B01: a full-height grey column to the window's edge. */
+          className={`tw:flex tw:flex-col tw:gap-4 tw:overflow-y-auto tw:bg-[var(--bk-bg-subtle)] tw:px-6 tw:py-5 ${compact ? "tw:min-w-0 tw:flex-1" : "tw:-mr-8 tw:w-[468px] tw:shrink-0"}`}
           data-testid="brand-preview-column"
         >
           {composer?.exportHTML ? (
@@ -1128,19 +1384,6 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
               </p>
             </section>
           )}
-          {page === "restore-points" && (
-            /* 8224:244521's guidance card under the preview. */
-            <section aria-label="About restore points" className={SIDE_CARD} data-testid="brand-restore-guide">
-              <p className={SIDE_CARD_TITLE}>Changes apply instantly</p>
-              <p className={SIDE_CARD_BODY}>
-                Every edit updates your canvas. Use ⌘Z to undo, including changes made on the canvas.
-              </p>
-              <p className={`${SIDE_CARD_BODY} tw:font-semibold tw:text-[var(--bk-ink)]`}>Primitives → Semantic tokens → Elements</p>
-              <p className={SIDE_CARD_BODY}>
-                Edit Primary to change only Primary. Edit its palette value to update every token that uses it.
-              </p>
-            </section>
-          )}
           {usageToken && usageIds.length > 0 && usageHighlight.active && (
             <UsageHighlightCard
               active={usageHighlight.active}
@@ -1150,42 +1393,59 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
               onClear={() => setUsageTokenId(null)}
             />
           )}
-          {isTokenPage && selectedToken && (
-            <EditLock locked={readOnly}>
-            <TokenDetailView
-              key={selectedToken.id}
-              token={selectedToken}
-              composer={composer}
-              allTokens={allTokens}
-              mode={shownMode}
-              onValueChange={changeToken}
-              /* Same gate as rename (G3-138): type and spacing have no delete
-                 path; offering Delete for them was a silent no-op. */
-              onDelete={(() => {
-                const k = kindOf(selectedToken);
-                return k === "color" || isMoreKind(k) ? deleteToken : undefined;
-              })()}
-              onReset={(() => {
-                const k = kindOf(selectedToken);
-                return SEED_BY_ID.has(selectedToken.id) && (k === "color" || isMoreKind(k)) ? resetToken : undefined;
-              })()}
-              /* Only colour and the generic kinds can rename; type and spacing
-                 have no rename path, and a Rename that silently did nothing
-                 was G3-137's defect — the item is disabled for them. */
-              onRename={(() => {
-                const k = kindOf(selectedToken);
-                return k === "color" || isMoreKind(k) ? renameToken : undefined;
-              })()}
-              onDeleted={() => setSelectedTokenId(null)}
-              onGenerateScale={isSemanticColour(selectedToken) ? openScale : undefined}
-            />
-            </EditLock>
-          )}
+          {isTokenPage && page !== "colours" && selectedToken && <EditLock locked={readOnly}>{detailCard(selectedToken)}</EditLock>}
         </aside>
         )}
       </div>
       </div>
 
+      <Modal
+        open={discardAsk !== null}
+        onClose={() => setDiscardAsk(null)}
+        title="Discard this preview?"
+        testId="brand-discard-preview"
+        footer={
+          <>
+            <Button type="button" variant="secondary" size="xs" onClick={() => setDiscardAsk(null)} data-testid="brand-discard-keep">
+              Keep previewing
+            </Button>
+            <Button
+              type="button"
+              size="xs"
+              onClick={() => {
+                const next = discardAsk;
+                setDiscardAsk(null);
+                if (next) openPage(next);
+              }}
+              data-testid="brand-discard-continue"
+            >
+              Discard and continue
+            </Button>
+          </>
+        }
+      >
+        <p className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]">
+          You are previewing {PREVIEW_WHAT[page] ?? "a change"}.{" "}
+          {discardAsk && previewPages.includes(discardAsk)
+            ? `Opening ${pageLabel(discardAsk)} starts a different preview.`
+            : `Opening ${discardAsk ? pageLabel(discardAsk) : "another page"} ends it.`}{" "}
+          Nothing has been applied yet.
+        </p>
+      </Modal>
+      {deleteFor && tokenById(deleteFor) && (
+        <TokenDeleteDialog
+          open
+          token={tokenById(deleteFor)!}
+          usage={composer?.designSystem?.tokenUsage?.getCount?.(deleteFor) ?? 0}
+          allTokens={allTokens}
+          onClose={() => setDeleteFor(null)}
+          onDelete={(opts) => {
+            deleteToken(deleteFor, opts);
+            setDeleteFor(null);
+          }}
+          onRetry={() => setDeleteCount((n) => n + 1)}
+        />
+      )}
       <ClassAddDialog open={classAddOpen} composer={composer} onClose={() => setClassAddOpen(false)} />
 
       {addKind && (
@@ -1198,18 +1458,6 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
           onAdd={handleAddToken}
         />
       )}
-      <AIPromptModal
-        open={aiOpen}
-        onOpenChange={setAiOpen}
-        service={composer?.aiAssistService ?? null}
-        /* No onAccept: there is nowhere for the schema to go yet. It is a
-           preset BINDING schema ({componentTypeId, variants, bindings}), not an
-           element tree, so ComponentManager.createComponent — which needs an
-           existing elementId — is the wrong target; the real home is the style
-           preset registries, and mapping into them is a feature, not a wiring.
-           Omitting the prop hides the Accept button, where before it rendered,
-           took the click and dropped the schema. */
-      />
     </div>
   );
 };

@@ -62,67 +62,26 @@ import type { PageItem } from "../types";
 
 // ─── AddPageButton (Pencil screen c0ad1) ─────────────────────────────────────
 
+/* design-2l9 board 63:6393: a full-width "+ Add page", then From template
+   and New folder side by side (New folder left the ⋯ overflow). Re-baseline:
+   Pages footer. */
 describe("AddPageButton", () => {
-  it("renders Add Page button", () => {
-    render(<AddPageButton onAddBlank={vi.fn()} />);
-    expect(screen.getByRole("button", { name: /add new page/i })).toBeTruthy();
-  });
-
-  it("calls onAddBlank directly when primary button is clicked", () => {
+  it("draws Add page, then From template and New folder, each acting", () => {
     const onAddBlank = vi.fn();
-    render(<AddPageButton onAddBlank={onAddBlank} />);
-    fireEvent.click(screen.getByRole("button", { name: /add new page/i }));
-    expect(onAddBlank).toHaveBeenCalledTimes(1);
-  });
-
-  /* "From template" left the ⋮ overflow on 2026-08-28 — buried there, the
-     template route was invisible (the flow walk's own probe missed it). It is
-     a visible sibling now; the overflow holds only "New folder". */
-  it("shows From template as a visible sibling when onFromTemplate provided", () => {
     const onFromTemplate = vi.fn();
-    render(<AddPageButton onAddBlank={vi.fn()} onFromTemplate={onFromTemplate} />);
-    const btn = screen.getByRole("button", { name: /from template/i });
-    fireEvent.click(btn);
-    expect(onFromTemplate).toHaveBeenCalledTimes(1);
-  });
-
-  it("does not show the overflow for onFromTemplate alone — only onAddFolder earns it", () => {
-    render(<AddPageButton onAddBlank={vi.fn()} onFromTemplate={vi.fn()} />);
-    expect(screen.queryByRole("button", { name: /more add options/i })).toBeNull();
-  });
-
-  it("does not show overflow button when no extra options provided", () => {
-    render(<AddPageButton onAddBlank={vi.fn()} />);
-    expect(screen.queryByRole("button", { name: /more add options/i })).toBeNull();
-    expect(screen.queryByRole("button", { name: /from template/i })).toBeNull();
-  });
-
-  it("calls onAddBlank when primary button clicked", () => {
-    const onAddBlank = vi.fn();
-    render(<AddPageButton onAddBlank={onAddBlank} />);
-    fireEvent.click(screen.getByRole("button", { name: /add new page/i }));
-    expect(onAddBlank).toHaveBeenCalledTimes(1);
-    // Popover should close
-    expect(screen.queryByText("Blank page")).toBeNull();
-  });
-
-  it("overflow menu holds New folder only", () => {
     const onAddFolder = vi.fn();
-    render(<AddPageButton onAddBlank={vi.fn()} onFromTemplate={vi.fn()} onAddFolder={onAddFolder} />);
-    fireEvent.click(screen.getByRole("button", { name: /more add options/i }));
-    expect(screen.queryByRole("menuitem", { name: /from template/i })).toBeNull();
-    fireEvent.click(screen.getByText("New folder"));
-    expect(onAddFolder).toHaveBeenCalledTimes(1);
-    expect(screen.queryByText("New folder")).toBeNull();
+    render(<AddPageButton onAddBlank={onAddBlank} onFromTemplate={onFromTemplate} onAddFolder={onAddFolder} />);
+    expect(screen.getAllByRole("button").map((b) => b.textContent)).toEqual(["+ Add page", "From template", "New folder"]);
+    fireEvent.click(screen.getByRole("button", { name: /add new page/i }));
+    fireEvent.click(screen.getByTestId("pages-from-template"));
+    fireEvent.click(screen.getByTestId("pages-new-folder"));
+    expect([onAddBlank, onFromTemplate, onAddFolder].map((f) => f.mock.calls.length)).toEqual([1, 1, 1]);
+    expect(screen.queryByRole("button", { name: /more add options/i })).toBeNull();
   });
 
-  it("toggles overflow menu closed on second overflow button click", () => {
-    render(<AddPageButton onAddBlank={vi.fn()} onAddFolder={vi.fn()} />);
-    const btn = screen.getByRole("button", { name: /more add options/i });
-    fireEvent.click(btn);
-    expect(screen.getByText("New folder")).toBeTruthy();
-    fireEvent.click(btn);
-    expect(screen.queryByText("New folder")).toBeNull();
+  it("draws only Add page when nothing else is offered", () => {
+    render(<AddPageButton onAddBlank={vi.fn()} />);
+    expect(screen.getAllByRole("button")).toHaveLength(1);
   });
 });
 
@@ -192,10 +151,11 @@ describe("PageRow active indicator", () => {
   });
 
   /* v3 board 4418:93381 chips non-live pages (C5 G2-071); V1's 140:2 drew none. */
-  it("scheduled status is chipped and announced", () => {
+  /* design-2l9 63:6393: the state is a line under the URL, not a chip. */
+  it("scheduled status is a line under the URL and announced", () => {
     const page = makePage({ status: "scheduled" });
     const { container } = render(<PageRow page={page} {...baseProps} />);
-    expect(container.querySelector(".bd-pg-chip.scheduled")?.textContent).toBe("Scheduled");
+    expect(container.querySelector('[data-testid="page-status-chip-page-1"]')?.textContent).toBe("Scheduled");
     const row = container.querySelector(".bd-pg-row");
     expect(row?.getAttribute("aria-label") ?? "").toContain("Scheduled");
   });

@@ -1,8 +1,8 @@
 /**
- * UnsavedSettingsDialog — board 4418:165478 "Unsaved settings" (560): the
- * guard on every door out of a dirty settings screen. One `it` per
- * prototype fact a DOM assertion can prove; the visual half is the live
- * walk's shot pair.
+ * UnsavedSettingsDialog — 2L9 page 06: B8-S06 238:11495 / B8-GUARD 248:20642
+ * (ask), B8-SAVING 248:20853 (saving), GAP-ST-E 277:28233 (failed). The
+ * screen and destination names are props; the board's sample data is not
+ * copied.
  *
  * @license BSD-3-Clause
  */
@@ -13,69 +13,105 @@ import "@testing-library/jest-dom";
 import * as React from "react";
 import { UnsavedSettingsDialog } from "../UnsavedSettingsDialog";
 
-function mount(over: Partial<React.ComponentProps<typeof UnsavedSettingsDialog>> = {}) {
-  const props = { open: true, siteName: "Bella Cucina", onKeepEditing: vi.fn(), onDiscard: vi.fn(), onSaveAndContinue: vi.fn(), ...over };
+type Props = React.ComponentProps<typeof UnsavedSettingsDialog>;
+
+function mount(over: Partial<Props> = {}) {
+  const props: Props = {
+    open: true,
+    phase: "ask",
+    screenName: "General",
+    destination: { kind: "screen", name: "Languages" },
+    onKeepEditing: vi.fn(),
+    onDiscard: vi.fn(),
+    onSaveAndLeave: vi.fn(),
+    ...over,
+  };
   render(<UnsavedSettingsDialog {...props} />);
   return props;
 }
 
-describe("4418:165478 · Unsaved settings", () => {
-  it("carries the board's title and body, at 560", () => {
+const buttons = () => [...screen.getByTestId("set-unsaved-foot").querySelectorAll("button")].map((b) => b.textContent);
+
+describe("B8-GUARD 248:20642 · Leave without saving?", () => {
+  it("names the screen and the destination, at 480", () => {
     mount();
-    expect(screen.getByTestId("set-unsaved-title")).toHaveTextContent("Unsaved settings");
+    expect(screen.getByTestId("set-unsaved-title")).toHaveTextContent("Leave without saving?");
     expect(screen.getByTestId("set-unsaved-body")).toHaveTextContent(
-      "These settings have not been saved. Save them and continue, keep editing, or discard the pending edits.",
+      "Your General changes are unsaved. Continue to Languages after saving or discarding them.",
     );
-    expect(screen.getByTestId("set-unsaved")).toHaveClass("tw:w-[560px]");
-    expect(screen.getByTestId("set-unsaved")).toHaveAttribute("aria-label", "Unsaved settings · Bella Cucina");
+    expect(screen.getByTestId("set-unsaved")).toHaveClass("tw:w-[var(--bk-size-dialog-sm)]");
+    expect(screen.getByTestId("set-unsaved")).toHaveAttribute("aria-label", "Leave without saving?");
   });
 
-  it("Discard changes · Keep editing · Save and continue, in that order; Keep editing takes focus", () => {
-    const props = mount();
-    const keep = screen.getByTestId("set-unsaved-keep");
-    const discard = screen.getByTestId("set-unsaved-discard");
-    const save = screen.getByTestId("set-unsaved-save");
-    expect([...screen.getByTestId("set-unsaved-foot").querySelectorAll("button")].map((b) => b.textContent)).toEqual([
-      "Discard changes", "Keep editing", "Save and continue",
-    ]);
-    expect(keep).toHaveTextContent("Keep editing");
-    expect(discard).toHaveTextContent("Discard changes");
-    fireEvent.click(save);
-    expect(props.onSaveAndContinue).toHaveBeenCalledTimes(1);
-    expect(document.activeElement).toBe(keep);
-    /* 32 high, in the library modal's shape: flowbite's xs (h-8) on both. */
-    expect(keep).toHaveClass("tw:h-8");
-    expect(discard).toHaveClass("tw:h-8");
-    expect(discard).toHaveClass("tw:bg-[var(--bk-error)]");
+  it("leaving Settings (B8-S06): save before you go, or discard", () => {
+    mount({ destination: { kind: "leave" } });
+    expect(screen.getByTestId("set-unsaved-body")).toHaveTextContent(
+      "Your General changes are unsaved. Save them before you go, or discard them.",
+    );
+  });
 
+  it("Discard changes · Save and leave · Keep editing, in that order; Keep editing is the primary and takes focus", () => {
+    const props = mount();
+    expect(buttons()).toEqual(["Discard changes", "Save and leave", "Keep editing"]);
+    const keep = screen.getByTestId("set-unsaved-keep");
+    expect(document.activeElement).toBe(keep);
+    /* Primary = flowbite's default colour (the accent); the other two are outlines. */
+    expect(screen.getByTestId("set-unsaved-discard").className).not.toContain("tw:bg-[var(--bk-error)]");
+    expect(keep).toHaveClass("tw:h-8");
+    fireEvent.click(screen.getByTestId("set-unsaved-save"));
+    expect(props.onSaveAndLeave).toHaveBeenCalledTimes(1);
     fireEvent.click(keep);
     expect(props.onKeepEditing).toHaveBeenCalledTimes(1);
     expect(props.onDiscard).not.toHaveBeenCalled();
-    fireEvent.click(discard);
+    fireEvent.click(screen.getByTestId("set-unsaved-discard"));
     expect(props.onDiscard).toHaveBeenCalledTimes(1);
   });
 
-  it("Escape keeps editing rather than discarding", () => {
+  it("Escape and the scrim keep editing rather than discarding", () => {
     const props = mount();
     fireEvent.keyDown(document, { key: "Escape" });
-    expect(props.onKeepEditing).toHaveBeenCalledTimes(1);
-    expect(props.onDiscard).not.toHaveBeenCalled();
-  });
-
-  it("the scrim keeps editing too", () => {
-    const props = mount();
     fireEvent.mouseDown(screen.getByTestId("overlay-scrim"));
-    expect(props.onKeepEditing).toHaveBeenCalledTimes(1);
+    expect(props.onKeepEditing).toHaveBeenCalledTimes(2);
     expect(props.onDiscard).not.toHaveBeenCalled();
-  });
-
-  it("names the dialog without a site when none is known", () => {
-    mount({ siteName: "" });
-    expect(screen.getByTestId("set-unsaved")).toHaveAttribute("aria-label", "Unsaved settings");
   });
 
   it("renders nothing while closed", () => {
     mount({ open: false });
     expect(screen.queryByTestId("set-unsaved")).toBeNull();
+  });
+});
+
+describe("B8-SAVING 248:20853 · saving on the way out", () => {
+  it("says the save is running and where it goes next; the one way back is Stay in {Screen}", () => {
+    const props = mount({ phase: "saving" });
+    expect(screen.getByTestId("set-unsaved-title")).toHaveTextContent("Saving General settings…");
+    expect(screen.getByTestId("set-unsaved-body")).toHaveTextContent(
+      "Your destination is Languages. Wait for the save result; if it fails, your changes stay here.",
+    );
+    expect(buttons()).toEqual(["Stay in General"]);
+    expect(document.activeElement).toBe(screen.getByTestId("set-unsaved-keep"));
+    fireEvent.click(screen.getByTestId("set-unsaved-keep"));
+    expect(props.onKeepEditing).toHaveBeenCalledTimes(1);
+    expect(props.onDiscard).not.toHaveBeenCalled();
+  });
+});
+
+describe("GAP-ST-E 277:28233 · save failed on the way out", () => {
+  it("has not left; Keep editing (primary) · Retry save and leave, the destination kept", () => {
+    const props = mount({ phase: "failed", screenName: "Security headers", destination: { kind: "screen", name: "Overview" } });
+    expect(screen.getByTestId("set-unsaved-title")).toHaveTextContent("Couldn’t save Security headers");
+    expect(screen.getByTestId("set-unsaved-body")).toHaveTextContent("Your changes are still here. You have not left this screen.");
+    expect(screen.getByTestId("set-unsaved-note")).toHaveTextContent(
+      "Requested destination: Overview. Retry uses this same destination.",
+    );
+    expect(buttons()).toEqual(["Keep editing", "Retry save and leave"]);
+    expect(document.activeElement).toBe(screen.getByTestId("set-unsaved-keep"));
+    fireEvent.click(screen.getByTestId("set-unsaved-save"));
+    expect(props.onSaveAndLeave).toHaveBeenCalledTimes(1);
+  });
+
+  it("names the editor when the way out was Back to Editor", () => {
+    mount({ phase: "failed", destination: { kind: "leave" } });
+    expect(screen.getByTestId("set-unsaved-note")).toHaveTextContent("Requested destination: the editor.");
   });
 });

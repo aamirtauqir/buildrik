@@ -15,10 +15,12 @@
 
 import * as React from "react";
 import type { Composer } from "@/engine";
-import { fetchCurrentRound, type CurrentRound } from "@/services/ReviewService";
+import { fetchApprovedSnapshot, fetchCurrentRound, type CurrentRound } from "@/services/ReviewService";
 import { fetchPrePublishChecks } from "@/services/PublishService";
-import { VERCEL_CHECK_LABEL } from "@buildrik/shared/schemas/publish";
-import { exportPublishPages } from "@/editor/shell/exportPublishPages";
+import { exportPublishPages, type PublishPage } from "@/editor/shell/exportPublishPages";
+import { saveStatusStore } from "@/editor/shell/saveStatusStore";
+import { usePublishPreviewDiff } from "./usePublishPreviewDiff";
+import { Checkbox } from "@/editor/chrome-ui";
 
 /* Board B3-10 (7574:193972) draws the four facts as a two-column table on a
    25 pitch: the KEY in a fixed left column at 12 ink-muted, the VALUE beside
@@ -28,8 +30,8 @@ import { exportPublishPages } from "@/editor/shell/exportPublishPages";
 
    `min-h`, not `h`: two of the four values are sentences (the approval line,
    the Vercel block) and wrap at this width; a fixed pitch would clip them. */
-const ROW = "tw:flex tw:items-start tw:gap-3 tw:min-h-[25px] tw:py-[3px]";
-const KEY = "tw:w-[88px] tw:flex-none tw:text-[12px] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
+const ROW = "tw:flex tw:items-start tw:gap-3 tw:min-h-[41px] tw:py-[10px] tw:border-b tw:border-[var(--bk-border)]";
+const KEY = "tw:w-[120px] tw:flex-none tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
 /* `min-w-0` is the whole fix for ledger row R12 ("the value column runs into
    the right border and clips — 'your connected Vercel projec[t]'"). A flex
    item's min-width defaults to `auto`, which is its CONTENT width, so a long
@@ -67,12 +69,6 @@ function approvalLine(round: CurrentRound | null, loading: boolean): string {
   return `Round ${round.roundNumber} is still open.`;
 }
 
-/* One wording for both publish doors. The wizard band and the topbar confirm
-   used to compose this independently, and only the wizard ever composed it —
-   see `onWarnings`. */
-export const warningsLine = (n: number) =>
-  `⚠ ${n} warning${n === 1 ? "" : "s"} — none block. Client approval is a separate gate.`;
-
 /* The blocker a failed checks request reports — label and detail render in
    the caller's band like any server check. */
 const CHECKS_UNAVAILABLE = {
@@ -105,6 +101,25 @@ export interface PublishConfirmFactsProps {
   /** How many non-blocking checks warned. Same read-here-render-there
       contract as onBlocked, so both publish doors can say the same thing. */
   onWarnings?(count: number): void;
+  /** Advisory rows to acknowledge (B8-PB04 "2 Tips · I’ve seen these"):
+      the server's warnings plus the site's own tips, counted by the caller. */
+  tips?: number;
+  tipsSeen?: boolean;
+  onTipsSeen?(seen: boolean): void;
+  /** The approval is older than the edits (B8-PB05/PB06): the Approval row
+   *  says how much changed since, and carries `staleControl` at its end. */
+  stale?: boolean;
+  staleControl?: React.ReactNode;
+}
+
+/** Pages that differ between what the client approved and what would ship. */
+function changedSince(approved: readonly PublishPage[], current: readonly PublishPage[]): number {
+  const a = new Map(approved.map((p) => [p.path, p.html]));
+  let n = 0;
+  for (const p of current) if (a.get(p.path) !== p.html) n++;
+  const now = new Set(current.map((p) => p.path));
+  for (const path of a.keys()) if (!now.has(path)) n++;
+  return n;
 }
 
 export const PublishConfirmFacts: React.FC<PublishConfirmFactsProps> = ({
@@ -117,7 +132,16 @@ export const PublishConfirmFacts: React.FC<PublishConfirmFactsProps> = ({
   siteId,
   onBlockingChecks,
   onWarnings,
+  tips = 0,
+  tipsSeen = false,
+  onTipsSeen,
+  stale = false,
+  staleControl,
 }) => {
+  const [changes, setChanges] = React.useState<number | null>(null);
+  /* A-33: "3 pages changed · 1 added · CMS 4 records" against the live version. */
+  const preview = usePublishPreviewDiff(composer, siteId ?? null, active);
+  const d = preview?.diff;
   const [pageCount, setPageCount] = React.useState<number | null>(null);
   const [round, setRound] = React.useState<CurrentRound | null>(null);
   const [loadingRound, setLoadingRound] = React.useState(true);
@@ -137,12 +161,14 @@ export const PublishConfirmFacts: React.FC<PublishConfirmFactsProps> = ({
     void (async () => {
       /* The page count is the EXPORT's count, not the page list's: what ships
          is what the exporter produces. */
-      const [pages, r, checks] = await Promise.all([
+      const [pages, r, checks, approved] = await Promise.all([
         composer ? exportPublishPages(composer).catch(() => null) : Promise.resolve(null),
         fetchCurrentRound().catch(() => null),
         siteId ? fetchPrePublishChecks(siteId).catch(() => null) : Promise.resolve(null),
+        stale ? fetchApprovedSnapshot().catch(() => null) : Promise.resolve(null),
       ]);
       if (cancelled) return;
+      setChanges(approved && pages ? changedSince(approved, pages) : null);
       /* A checks call that fails is not a pass (DQ-001). It used to collapse
          into "nothing failed" through `null?.checks ?? []`, which cleared the
          blockers and enabled Publish on any transient error. It now blocks,
@@ -169,52 +195,75 @@ export const PublishConfirmFacts: React.FC<PublishConfirmFactsProps> = ({
     return () => {
       cancelled = true;
     };
-  }, [active, composer, onPageCount, siteId, onBlockingChecks]);
+  }, [active, composer, onPageCount, siteId, onBlockingChecks, stale]);
 
-  const target = publishedUrl
-    ? `Production · ${publishedUrl.replace(/^https?:\/\//, "")}`
-    : blockers.includes(CHECKS_UNAVAILABLE)
-      ? "Vercel connection not checked"
-      : blockers.some((b) => b.label === VERCEL_CHECK_LABEL)
-      /* The row states the fact; the sentence that explains it belongs to the
-         band under the rows, which has the width for it. Both carrying the
-         same sentence printed it twice and ran it to the modal's edge. */
-      ? "No Vercel connection"
-      : "your connected Vercel project";
+  /* Board B8-PB04 `233:1802`: a numbered ledger — the number is the row's
+     place in the publish checklist, so a row that does not apply leaves its
+     number out (3 is the blocking checks, which never reach this dialog —
+     they shut the tray's CTA, OD-1). */
+  const savedAt = saveStatusStore.get()?.savedAt ?? null;
+  const release = [
+    savedAt ? `Saved ${new Date(savedAt).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", hour12: false })}` : null,
+    rollbackTo !== null
+      ? `v${rollbackTo} stays restorable in publish history`
+      : isPublished
+        ? "the current live release stays available to republish"
+        : "the last 20 versions stay restorable",
+  ]
+    .filter(Boolean)
+    .join(" · ");
+  const showApproval = loadingRound || (round !== null && !round.revoked);
 
   return (
-    <div>
+    <div data-testid="publish-facts">
       <div className={ROW}>
-        <span className={KEY} data-testid="publish-fact-key-target">Target</span>
-        <span className={VAL} data-testid="publish-fact-val-target">{target}</span>
-      </div>
-      <div className={ROW}>
-        <span className={KEY} data-testid="publish-fact-key-pages">Pages</span>
+        <span className={KEY} data-testid="publish-fact-key-pages">1 Changes</span>
         <span className={VAL} data-testid="publish-fact-val-pages">
-          {pageCount == null ? "Preparing…" : `${pageCount} page${pageCount === 1 ? "" : "s"}`}
+          {d?.retained
+            ? [
+                `${d.changed} page${d.changed === 1 ? "" : "s"} changed`,
+                `${d.added} added`,
+                d.removed ? `${d.removed} removed` : null,
+                d.cmsRecords ? `CMS ${d.cmsRecords} record${d.cmsRecords === 1 ? "" : "s"}` : null,
+              ]
+                .filter(Boolean)
+                .join(" · ")
+            : pageCount == null
+              ? "Preparing…"
+              : `${pageCount} page${pageCount === 1 ? "" : "s"}`}
         </span>
       </div>
+      {tips > 0 ? (
+        <div className={ROW}>
+          <span className={KEY} data-testid="publish-fact-key-tips">2 Tips</span>
+          <span className={VAL}>{`${tips} advisory check${tips === 1 ? "" : "s"}`}</span>
+          <label className="tw:flex tw:w-[200px] tw:flex-none tw:items-center tw:gap-1.5 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
+            <Checkbox
+              checked={tipsSeen}
+              onChange={(e) => onTipsSeen?.(e.currentTarget.checked)}
+              data-testid="publish-fact-tips-seen"
+            />
+            I’ve seen these
+          </label>
+        </div>
+      ) : null}
+      {showApproval ? (
+        <div className={ROW}>
+          {/* "Approval", the board's word; the value still names who. */}
+          <span className={KEY} data-testid="publish-fact-key-approval">4 Approval</span>
+          <span className={VAL} data-testid="publish-fact-val-approval">
+            {stale && round?.resolvedAt
+              ? `Approved ${new Date(round.resolvedAt).toLocaleDateString(undefined, { day: "numeric", month: "short" })} · edited since${
+                  changes !== null ? ` (${changes} change${changes === 1 ? "" : "s"})` : ""
+                }`
+              : approvalLine(round, loadingRound)}
+          </span>
+          {stale && staleControl ? <span className="tw:w-[200px] tw:flex-none">{staleControl}</span> : null}
+        </div>
+      ) : null}
       <div className={ROW}>
-        {/* "Approval", the newer board's word (B3-10); 914:4507 said "Client
-            approval". The value still names who. */}
-        <span className={KEY} data-testid="publish-fact-key-approval">Approval</span>
-        <span className={VAL} data-testid="publish-fact-val-approval">{approvalLine(round, loadingRound)}</span>
-      </div>
-      <div className={ROW}>
-        <span className={KEY} data-testid="publish-fact-key-rollback">Rollback</span>
-        <span className={VAL} data-testid="publish-fact-val-rollback">
-          {/* "Every version stays restorable" was the first-publish line, and
-              publish history keeps twenty: `runPublishJob` nulls the stored
-              payload on COMPLETED jobs beyond the 20 most recent
-              (PUBLISH_HISTORY_RETAINED), and a job with no payload is not
-              rollbackable. The panel next door already says "the last 20" —
-              this said something the retention cannot keep. */}
-          {rollbackTo !== null
-            ? `v${rollbackTo} stays restorable in publish history`
-            : isPublished
-              ? "The current version stays restorable"
-              : "The last 20 versions stay restorable"}
-        </span>
+        <span className={KEY} data-testid="publish-fact-key-rollback">5 Release</span>
+        <span className={VAL} data-testid="publish-fact-val-rollback">{release}</span>
       </div>
     </div>
   );

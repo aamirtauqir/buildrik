@@ -33,6 +33,24 @@ export interface PanelSearchProps {
   "data-testid"?: string;
 }
 
+/* 2L9 63:6393 (Pages), 147:75914 (Layers) and every drawer's search band: a
+   gray-100 fill with no edge, the glyph 8 in and the text at 32 (board
+   ≈8 / 33) — not the outlined field with its 12 / 40.
+   `colors.gray` replaces the base theme's (white + border) wholesale; the
+   focus ring stays the accent's. */
+const SEARCH_THEME = {
+  field: {
+    icon: { base: "tw:pl-2" },
+    input: {
+      base: "tw:pr-8",
+      withIcon: { on: "tw:pl-8" },
+      colors: {
+        gray: "tw:bg-[var(--bk-gray-100)] tw:rounded-md! tw:border-transparent tw:focus:border-primary-700 tw:focus:ring-primary-700",
+      },
+    },
+  },
+};
+
 /** The marker every panel search input carries. */
 export const PANEL_SEARCH_ATTR = "data-panel-search";
 
@@ -46,9 +64,10 @@ export const PanelSearch = React.forwardRef<HTMLInputElement, PanelSearchProps>(
   ref,
 ) {
   return (
-    /* 4px grid: 16 in from the drawer edges like the header and rows, 8 above
-       and below — a 48 band holding the 32-tall input. */
-    <div className={["tw:relative tw:flex-none tw:px-4 tw:py-2", className].filter(Boolean).join(" ")} data-testid={testId}>
+    /* design-2l9 drawers (63:6393, 147:75914): 12 in from the drawer edges
+       like the header title, 8 above and below — a 48 band holding the
+       32-tall input. REQUESTS A-19. */
+    <div className={["tw:relative tw:flex-none tw:px-3 tw:py-2", className].filter(Boolean).join(" ")} data-testid={testId}>
       <TextInput
         ref={ref}
         type="text"
@@ -65,9 +84,9 @@ export const PanelSearch = React.forwardRef<HTMLInputElement, PanelSearchProps>(
         }}
         {...{ [PANEL_SEARCH_ATTR]: "" }}
         data-testid={`${testId}-input`}
-        theme={{ field: { input: { base: "tw:pr-8" } } }}
+        theme={SEARCH_THEME}
       />
-      <span className="tw:absolute tw:right-5 tw:top-1/2 tw:flex tw:-translate-y-1/2 tw:items-center">
+      <span className="tw:absolute tw:right-4 tw:top-1/2 tw:flex tw:-translate-y-1/2 tw:items-center">
         {value ? (
           <IconButton
             label="Clear search"

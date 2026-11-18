@@ -32,9 +32,18 @@ export interface CommitRowProps {
   /** Offered as the browser's own completion list (a datalist). */
   suggestions?: readonly string[];
   onPaste?: React.ClipboardEventHandler<HTMLInputElement>;
+  /** Label above a full-width field (2L9 F10's "Message"). */
+  stacked?: boolean;
+  /** Every keystroke's draft (a warning that reads what is being typed). */
+  onDraft?: (draft: string) => void;
+  /** The entry was refused: the field reads invalid, its border red, and
+   *  `aria-describedby` names the error line the caller draws under it. */
+  error?: { id: string } | null;
+  /** The real <input> — a repair link elsewhere focuses it (2L9 F09). */
+  inputRef?: React.Ref<HTMLInputElement>;
 }
 
-export function CommitRow({ label, value, onCommit, placeholder, type, testId, clearOnCommit, suggestions, onPaste }: CommitRowProps) {
+export function CommitRow({ label, value, onCommit, placeholder, type, testId, clearOnCommit, suggestions, onPaste, stacked, onDraft, error, inputRef }: CommitRowProps) {
   const { readOnly } = useInspectorField();
   const id = React.useId();
   const listId = `${id}-list`;
@@ -45,20 +54,27 @@ export function CommitRow({ label, value, onCommit, placeholder, type, testId, c
     if (clearOnCommit) setDraft("");
   };
   return (
-    <div className="bdi-row-ctrl" data-testid={testId}>
-      <label className="bdi-lb" htmlFor={id}>
+    <div className={stacked ? "tw:flex tw:flex-col tw:gap-2 tw:py-2" : "bdi-row-ctrl"} data-testid={testId}>
+      {/* Stacked (2L9 156:6055 "Message"): a 13 / muted label over a 36 tall box. */}
+      <label className={stacked ? "tw:text-[13px] tw:leading-4 tw:font-normal tw:text-[var(--bk-ink-muted)]" : "bdi-lb"} htmlFor={id}>
         {label}
       </label>
       <div className="bdi-row-content">
         <TextField
           id={id}
-          className="bdi-text"
+          className={(stacked ? "tw:bg-[var(--bk-bg-subtle)]! tw:rounded-[4px]! tw:border-[var(--bk-border)]!" : "bdi-text") + (error ? " tw:border-[var(--bk-error)]!" : "")}
+          ref={inputRef}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error?.id}
           readOnly={readOnly}
           type={type}
           list={suggestions?.length ? listId : undefined}
           value={draft}
           placeholder={placeholder}
-          onChange={(e) => setDraft(e.target.value)}
+          onChange={(e) => {
+            setDraft(e.target.value);
+            onDraft?.(e.target.value);
+          }}
           onPaste={onPaste}
           onBlur={commit}
           onKeyDown={(e) => {
@@ -161,7 +177,7 @@ export function NoteRow({ children, testId, tone = "muted" }: { children: React.
       data-testid={testId}
       role={tone === "error" ? "alert" : undefined}
       className={
-        "tw:m-0 tw:py-2 tw:text-[11px] tw:leading-4 " +
+        "tw:m-0 tw:py-2 tw:text-[12px] tw:leading-4 " +
         (tone === "error"
           ? "tw:-ml-4 tw:-mr-5 tw:pl-4 tw:pr-5 tw:bg-[var(--bk-error-tint)] tw:text-[var(--bk-error-text)]"
           : "tw:text-[var(--bk-ink-muted)]")

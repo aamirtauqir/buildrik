@@ -6,6 +6,7 @@
 import { renderHook } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useOtherTabNotice } from "../useOtherTabNotice";
+import { BANNER_ID, clearGlobalBanner, useGlobalBanners } from "@/editor/shell/globalBanners";
 
 /* An in-process BroadcastChannel: every channel of a name hears every other
    one, never itself. */
@@ -28,24 +29,28 @@ beforeEach(() => {
   vi.stubGlobal("BroadcastChannel", FakeChannel);
 });
 
+const banners = () => renderHook(() => useGlobalBanners()).result.current;
+
+beforeEach(() => clearGlobalBanner(BANNER_ID.otherTab));
+
+/* F-13 / board 227:12711: the notice is the global banner slot's, not a
+   persistent toast that the next toast replaces. */
 describe("useOtherTabNotice", () => {
-  it("both tabs on one site are told, once each", () => {
-    const first = vi.fn((_t: unknown) => "t1");
-    const second = vi.fn((_t: unknown) => "t2");
-    renderHook(() => useOtherTabNotice("site-1", first));
-    expect(first).not.toHaveBeenCalled();
-    renderHook(() => useOtherTabNotice("site-1", second));
-    expect(first).toHaveBeenCalledTimes(1);
-    expect(second).toHaveBeenCalledTimes(1);
-    expect(second.mock.calls[0][0]).toMatchObject({ title: "This site is open in another tab", tone: "warning" });
+  it("a second tab on one site raises the other-tab banner, once", () => {
+    renderHook(() => useOtherTabNotice("site-1"));
+    expect(banners()).toEqual([]);
+    renderHook(() => useOtherTabNotice("site-1"));
+    const shown = banners().filter((b) => b.id === BANNER_ID.otherTab);
+    expect(shown).toHaveLength(1);
+    expect(shown[0]).toMatchObject({
+      tone: "warning",
+      message: "This site is also open in another tab. Edit in one tab at a time.",
+    });
   });
 
   it("a tab on another site says nothing", () => {
-    const a = vi.fn(() => "a");
-    const b = vi.fn(() => "b");
-    renderHook(() => useOtherTabNotice("site-1", a));
-    renderHook(() => useOtherTabNotice("site-2", b));
-    expect(a).not.toHaveBeenCalled();
-    expect(b).not.toHaveBeenCalled();
+    renderHook(() => useOtherTabNotice("site-1"));
+    renderHook(() => useOtherTabNotice("site-2"));
+    expect(banners()).toEqual([]);
   });
 });

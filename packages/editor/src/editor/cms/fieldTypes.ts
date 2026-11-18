@@ -1,8 +1,7 @@
 /**
  * The field types a person can add, in the Add field dialog's order
- * (4418:164208: Text · Number · Rich text · Image · Boolean · Reference ·
- * Slug, then the two the model also carries), and their prose names — the
- * slug is an identifier, a field list is read.
+ * (2L9 167:3871 — every type the schema stores, CMS_FIELD_TYPES), and their
+ * prose names — the slug is an identifier, a field list is read.
  *
  * Also the ONE field-key rule (CMS-03): the New collection modal, + Add field
  * and the field inspector all derive and check keys here. The setup modal
@@ -14,20 +13,79 @@
 import { CMS_FIELD_KEY_RE, CMS_RESERVED_FIELD_KEYS } from "@buildrik/shared/schemas/cms";
 import type { CMSField, CMSFieldType } from "@/shared/types/cms";
 
-export const FIELD_TYPES = ["text", "number", "richtext", "image", "boolean", "reference", "slug", "textarea", "date", "multiselect"] as const;
+export const FIELD_TYPES = [
+  "text",
+  "textarea",
+  "richtext",
+  "email",
+  "url",
+  "slug",
+  "number",
+  "date",
+  "datetime",
+  "boolean",
+  "select",
+  "multiselect",
+  "image",
+  "file",
+  "reference",
+  "color",
+] as const satisfies readonly CMSFieldType[];
 
-export const FIELD_TYPE_LABEL: Record<string, string> = {
+export const FIELD_TYPE_LABEL: Record<CMSFieldType, string> = {
   text: "Text",
   textarea: "Long text",
   richtext: "Rich text",
-  number: "Number",
-  boolean: "Boolean",
-  image: "Image",
-  date: "Date",
+  email: "Email",
+  url: "URL",
   slug: "Slug",
+  number: "Number",
+  date: "Date",
+  datetime: "Date & time",
+  boolean: "Yes/no",
+  select: "Option",
+  multiselect: "Options",
+  image: "Image",
+  file: "File",
   reference: "Reference",
-  multiselect: "Multi-select",
+  color: "Color",
 };
+
+/** The rules each type can carry (CMSFieldValidation, enforced on publish
+ *  by cmsValueError): numbers take a range, text a length. One list for
+ *  + Add field (167:4135 "Minimum length · Maximum length") and the field
+ *  inspector's VALIDATION. */
+export type FieldRuleKey = "min" | "max" | "minLength" | "maxLength";
+const LENGTH_RULES: ReadonlyArray<{ key: FieldRuleKey; label: string }> = [
+  { key: "minLength", label: "Minimum length" },
+  { key: "maxLength", label: "Maximum length" },
+];
+export const FIELD_RULES: Partial<Record<CMSFieldType, ReadonlyArray<{ key: FieldRuleKey; label: string }>>> = {
+  number: [{ key: "min", label: "Minimum" }, { key: "max", label: "Maximum" }],
+  text: LENGTH_RULES,
+  textarea: LENGTH_RULES,
+  richtext: LENGTH_RULES,
+  slug: LENGTH_RULES,
+  email: LENGTH_RULES,
+  url: LENGTH_RULES,
+};
+
+/** Types a person types a value into — the ones that take a Placeholder and
+ *  a typed Default value (167:4135). */
+export const TYPED_VALUE_TYPES: ReadonlySet<CMSFieldType> = new Set([
+  "text", "textarea", "email", "url", "slug", "number", "date", "datetime", "color",
+]);
+
+/** A typed default as the field stores it: a number field's is a number. */
+export function parseDefault(type: CMSFieldType, raw: string): unknown {
+  const t = raw.trim();
+  if (t === "") return undefined;
+  if (type === "boolean") return t === "true";
+  return type === "number" ? Number(t) : t;
+}
+
+/** Types whose values are chosen from a list the field carries. */
+export const OPTION_TYPES: ReadonlySet<CMSFieldType> = new Set(["select", "multiselect"]);
 
 /** A field's key from its name: "Unit price" → "unit-price". */
 export function fieldKeyFrom(name: string): string {

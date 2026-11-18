@@ -7,11 +7,15 @@
  *
  * @license BSD-3-Clause
  */
-import { render, screen, fireEvent, cleanup } from "@testing-library/react";
+import { render as rtlRender, screen, fireEvent, cleanup } from "@testing-library/react";
+import { ToastProvider } from "@/editor/chrome-ui";
 import { afterEach, describe, expect, it } from "vitest";
 import { TypeBlockSection } from "../TypeBlockSection";
 import { AttributesSection } from "@/editor/inspector/sections/attributes/AttributesSection";
 import { makeMockElement, makeMockComposer } from "@/editor/inspector/__tests__/harness";
+
+/* The Field block's Type change answers with a receipt toast (2L9 F30). */
+const render = (ui: React.ReactElement) => rtlRender(ui, { wrapper: ToastProvider });
 
 function setup(type: string, attrs: Record<string, string> = {}) {
   const el = makeMockElement({ id: "e1", type, attrs });
@@ -59,6 +63,7 @@ describe("boolean attribute checkboxes (P-11b)", () => {
   it("clicking the label toggles its own checkbox", () => {
     const { el } = setup("input");
     fireEvent.click(screen.getByText("Required"));
-    expect(el.setAttribute).toHaveBeenCalledWith("required", "true");
+    /* The Field block writes a boolean as HTML does: present and empty. */
+    expect(el.setAttribute).toHaveBeenCalledWith("required", "");
   });
 });

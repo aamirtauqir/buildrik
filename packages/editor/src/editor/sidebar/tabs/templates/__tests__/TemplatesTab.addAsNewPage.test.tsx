@@ -48,8 +48,15 @@ function makeComposer() {
         }),
         recordAppliedTemplate: vi.fn(),
         getElement: vi.fn(() => null),
+        getAllElements: vi.fn(() => [] as Array<{ getId: () => string; getAttribute: (n: string) => string | null }>),
+        removeElement: vi.fn(),
+        deletePage: vi.fn((id: string) => {
+          calls.push(`deletePage:${id}`);
+          return true;
+        }),
       },
       styles: { clear: vi.fn() },
+      history: { captureUndo: vi.fn(() => vi.fn()) },
       on: vi.fn(),
       off: vi.fn(),
       emit: vi.fn(),
@@ -80,5 +87,26 @@ describe("Templates — add as new page", () => {
     expect(calls).toEqual(["createPage", "setActivePage:page-new", "import"]);
     // The import must never run while the old page is still the active one.
     expect(calls.indexOf("setActivePage:page-new")).toBeLessThan(calls.indexOf("import"));
+  });
+
+  /* 2L9 222:47163 — "Nothing was changed. No empty page was left behind.":
+     an import that fails takes the page it was made for back out, with the
+     nav link it was given, and returns to the page the person was on. */
+  it("a failed import removes the page it made, and its nav link", async () => {
+    const { calls, composer } = makeComposer();
+    const link = { getId: () => "nav-link", getAttribute: (n: string) => (n === "href" ? "#page:page-new" : null) };
+    composer.elements.getAllElements.mockReturnValue([link]);
+    composer.elements.importHTMLToActivePage.mockImplementation(() => {
+      calls.push("import");
+      throw new Error("bad markup");
+    });
+    render(<TemplatesTab composer={composer as never} />);
+    fireEvent.click(await screen.findByTestId(`tpl-ws-item-${SITE_TEMPLATES[0].id}`));
+    fireEvent.click(await screen.findByText("Create page"));
+    fireEvent.click(within(await screen.findByTestId("tpl-create-confirm")).getByRole("button", { name: "Create page" }));
+    await waitFor(() => expect(calls).toContain("deletePage:page-new"), { timeout: 5000 });
+    expect(composer.elements.removeElement).toHaveBeenCalledWith("nav-link");
+    expect(calls.slice(-1)).toEqual(["setActivePage:page-1"]);
+    expect(await screen.findByText("Nothing was changed. No empty page was left behind.")).toBeInTheDocument();
   });
 });

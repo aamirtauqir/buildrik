@@ -50,6 +50,12 @@ export function makeFakeComposer(designTokens: unknown[] = [], { readOnly = fals
     designSystem: {
       readOnly,
       readOnlyReason,
+      /* The Brand preview slot (starters, logo/URL, Dark Auto preview into it). */
+      preview: null as unknown,
+      setPreview(p: unknown) {
+        this.preview = p;
+        emit("brand:preview-changed");
+      },
       setTokens: vi.fn((next: unknown[], _label: string) => {
         if (readOnly || !validateTokens(next).ok) return false;
         Object.assign(settings, { designTokens: next, designTokensSchemaVersion: 6 });
@@ -103,13 +109,21 @@ export function renderWorkspace(
   return render(wrap(<BrandWorkspace composer={composer} {...props} />, composer));
 }
 
-/** Click a nav row. The eleven other kinds are Spacing's header kind switch. */
+/** Click a nav row. The eleven other kinds are rows on the Other kinds index (B6-B23). */
 export function openPage(utils: ReturnType<typeof render>, id: BrandPageId) {
   if (id.startsWith("kind-")) {
-    const row = utils.container.querySelector<HTMLButtonElement>('[data-section-id="spacing"]');
-    if (!row) throw new Error("Spacing row not found");
+    const row = utils.container.querySelector<HTMLButtonElement>('[data-section-id="other-kinds"]');
+    if (!row) throw new Error("Other kinds row not found");
     fireEvent.click(row);
-    fireEvent.change(utils.getByTestId("brand-kind-switch"), { target: { value: id } });
+    fireEvent.click(utils.getByTestId(`brand-kind-row-${id.slice("kind-".length)}`));
+    return;
+  }
+  if (id === "presets") {
+    /* A drill-in of Type styles · Presets (B6-B26): a preset row opens it. */
+    openPage(utils, "styles");
+    const preset = utils.container.querySelector<HTMLElement>('[data-style-row="preset"]');
+    if (!preset) throw new Error("no preset row on Type styles · Presets");
+    fireEvent.click(preset);
     return;
   }
   const row = utils.container.querySelector<HTMLButtonElement>(`[data-section-id="${id}"]`);

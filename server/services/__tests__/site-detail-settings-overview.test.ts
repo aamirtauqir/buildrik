@@ -56,7 +56,7 @@ type Site = {
 
 type Delivery = { status: string; event: string; httpStatus: number | null; error: string | null; createdAt: Date };
 
-type PageRow = { id: string; name: string; slug: string; isHomePage: boolean; slugHistory: unknown; translations: unknown };
+type PageRow = { id: string; name: string; slug: string; isHomePage: boolean; slugHistory: unknown; translations: unknown; seoDescription?: string | null; meta?: unknown };
 
 type Rows = {
   pages?: PageRow[];
@@ -123,11 +123,11 @@ const page = (slug: string, over: Partial<PageRow> = {}): PageRow => ({
 
 const seededRows: Rows = {
   pages: [
-    page("home", { isHomePage: true }),
+    page("home", { isHomePage: true, seoDescription: "Family trattoria in the old town." }),
     // S3: two renamed pages no redirect covers — the Overview's "2 suggestions".
     page("menu", { slugHistory: [{ slug: "lunch-menu", changedAt: "2026-09-10T09:00:00.000Z" }] }),
     page("about", { slugHistory: [{ slug: "our-story", changedAt: "2026-09-11T09:00:00.000Z" }] }),
-    page("contact"),
+    page("contact", { meta: { description: "Find us and book a table." } }),
     page("book"),
     page("gallery"),
   ],
@@ -176,8 +176,9 @@ describe("getSettingsOverview — the seeded site", () => {
     expect(overview).toEqual({
       site: { name: "Bella Cucina", defaultLocale: "en", plan: "PRO", archived: false, workspaceDeletionAt: null },
       general: { siteName: "Bella Cucina", language: "en" },
-      localization: { locales: 2, notStarted: ["ar"] },
-      seo: { allowIndexing: true, robotsTxtSet: true },
+      localization: { locales: 2, notStarted: ["ar"], codes: ["en", "ar"] },
+      // home (seoDescription) and contact (meta.description) have one; menu, about, book, gallery do not.
+      seo: { allowIndexing: true, robotsTxtSet: true, pagesWithoutDescription: 4 },
       domains: { primary: "bellacucina.example", pendingDns: 1 },
       redirects: { rules: 3, suggestions: 2 },
       analytics: { providers: ["googleAnalytics"], receiving: true },
@@ -187,7 +188,7 @@ describe("getSettingsOverview — the seeded site", () => {
       access: { passwordSet: true, shareLinks: 2 },
       webhooks: { endpoints: 1, lastDelivery: "failed" },
       members: { used: 3, seats: 5 },
-      billing: { plan: "PRO", priceMonthly: 29 },
+      billing: { plan: "PRO", priceMonthly: 29, pagesPerSite: 30 },
       attention: [
         {
           kind: "locale-not-started",
@@ -225,7 +226,7 @@ describe("getSettingsOverview — the seeded site", () => {
     expect(db.page.findMany).toHaveBeenCalledWith({
       where: { siteId: "s1" },
       orderBy: { position: "asc" },
-      select: { id: true, name: true, slug: true, isHomePage: true, slugHistory: true, translations: true },
+      select: { id: true, name: true, slug: true, isHomePage: true, slugHistory: true, translations: true, seoDescription: true, meta: true },
     });
     expect(db.workspaceMember.count).toHaveBeenCalledWith({ where: { workspaceId: "ws1", status: "ACTIVE" } });
   });
@@ -241,8 +242,8 @@ describe("getSettingsOverview — the empty site", () => {
     expect(overview).toEqual({
       site: { name: "scratch-ver", defaultLocale: "en", plan: "FREE", archived: false, workspaceDeletionAt: null },
       general: { siteName: "scratch-ver", language: "en" },
-      localization: { locales: 1, notStarted: [] },
-      seo: { allowIndexing: true, robotsTxtSet: false },
+      localization: { locales: 1, notStarted: [], codes: ["en"] },
+      seo: { allowIndexing: true, robotsTxtSet: false, pagesWithoutDescription: 0 },
       domains: { primary: null, pendingDns: 0 },
       redirects: { rules: 0, suggestions: 0 },
       analytics: { providers: [], receiving: false },
@@ -252,7 +253,7 @@ describe("getSettingsOverview — the empty site", () => {
       access: { passwordSet: false, shareLinks: 0 },
       webhooks: { endpoints: 0, lastDelivery: null },
       members: { used: 0, seats: 1 },
-      billing: { plan: "FREE", priceMonthly: 0 },
+      billing: { plan: "FREE", priceMonthly: 0, pagesPerSite: 10 },
       attention: [],
     });
   });
@@ -302,7 +303,7 @@ describe("localization — not started", () => {
       pages: [page("home", { translations: { fr: { blocks: [] } } }), page("menu", { translations: {} }), page("about")],
     });
     const overview = await getSettingsOverview("s1");
-    expect(overview.localization).toEqual({ locales: 3, notStarted: ["de"] });
+    expect(overview.localization).toEqual({ locales: 3, notStarted: ["de"], codes: ["en", "fr", "de"] });
     expect(overview.attention[0].detail).toBe("0 of 3 pages · not started");
   });
 
@@ -445,13 +446,13 @@ describe("billing and members", () => {
   it("reports a yearly subscription as its monthly equivalent", async () => {
     setup({ ...emptySite, workspace: { plan: "PRO", deletionScheduledAt: null, subscription: { plan: "PRO", price: 27600, interval: "YEARLY" } } });
     const overview = await getSettingsOverview("s1");
-    expect(overview.billing).toEqual({ plan: "PRO", priceMonthly: 23 });
+    expect(overview.billing).toEqual({ plan: "PRO", priceMonthly: 23, pagesPerSite: 30 });
   });
 
   it("reads Stripe's own interval spelling", async () => {
     setup({ ...emptySite, workspace: { plan: "BUSINESS", deletionScheduledAt: null, subscription: { plan: "BUSINESS", price: 7900, interval: "month" } } });
     const overview = await getSettingsOverview("s1");
-    expect(overview.billing).toEqual({ plan: "BUSINESS", priceMonthly: 79 });
+    expect(overview.billing).toEqual({ plan: "BUSINESS", priceMonthly: 79, pagesPerSite: 50 });
     expect(overview.members.seats).toBe(25);
   });
 
@@ -459,7 +460,7 @@ describe("billing and members", () => {
     // customer.subscription.deleted leaves the row (CANCELLED, plan PRO) and drops the workspace to FREE.
     setup({ ...emptySite, workspace: { plan: "FREE", deletionScheduledAt: null, subscription: { plan: "PRO", price: 2900, interval: "MONTHLY" } } });
     const overview = await getSettingsOverview("s1");
-    expect(overview.billing).toEqual({ plan: "FREE", priceMonthly: 0 });
+    expect(overview.billing).toEqual({ plan: "FREE", priceMonthly: 0, pagesPerSite: 10 });
   });
 
   it("falls back to the plan's list price on an interval it cannot read", async () => {

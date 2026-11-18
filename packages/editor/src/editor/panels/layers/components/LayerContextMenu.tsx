@@ -28,6 +28,8 @@ interface LayerContextMenuProps {
   inSelection: boolean;
   /** composer.clipboard holds an element — enables Paste. */
   hasClipboard: boolean;
+  /** The clicked row is a component instance (2L9 B6-K22). */
+  isInstance?: boolean;
   onAction: (action: LayerAction, id: string) => void;
   onClose: () => void;
 }
@@ -50,6 +52,7 @@ export function LayerContextMenu({
   selectedCount,
   inSelection,
   hasClipboard,
+  isInstance = false,
   onAction,
   onClose,
 }: LayerContextMenuProps) {
@@ -82,6 +85,19 @@ export function LayerContextMenu({
           Delete | Rename · Group | Move to page… · Copy link. Plain 28h rows,
           no kbd hints, no icons. Hide/Lock live on the row's own eye/lock;
           reordering is drag. */}
+      {/* 2L9 217:42918 (B6-K22): an instance row leads with the link to its
+          main component and Detach instance — one row only, a link opens one. */}
+      {isInstance && !multi ? (
+        <>
+          <MenuItem className={ITEM} data-testid="layer-menu-go-to-main" onClick={() => act("goToMain")}>
+            Go to main component ›
+          </MenuItem>
+          <MenuItem className={ITEM} data-testid="layer-menu-detach-instance" onClick={() => act("detachInstance")}>
+            Detach instance
+          </MenuItem>
+          <div className="bdc-menu-sep" role="separator" />
+        </>
+      ) : null}
       <MenuItem className={ITEM} data-testid="layer-menu-cut"
         onClick={() => act("cut")}>
         Cut{suffix}

@@ -241,23 +241,29 @@
   color: var(--bk-accent);
 }
 
-/* Board 4418:73791 — a 44-tall, full-bleed Session row: "label · author"
-   12/18 ink at x16 y6, the time 11/16 mono muted at x(W-60) y7, one line,
-   nothing under it. (It carried a second meta line — relative time, author
-   chip, Current / Checkpoint / N-changes badges — and date bands above.) */
+/* 2L9 B7-H01 230:12999 — a 44-tall, full-bleed Session row of two lines:
+   the step (12/18 ink), then "time · you" (11/16 mono muted). "Restore to
+   here" sits at the right of the row the pointer or j/k is on. */
+/* 2L9 H01 (230:12999): rows are inset 12 with the text 8 further in; the row
+   the pointer or j/k is on is tinted and carries "Restore to here" under its
+   time line. */
 .entry-row {
   position: relative;
-  padding: 6px var(--bk-space-16) 0;
-  min-height: 44px;
+  margin: 0 var(--bk-space-12);
+  padding: var(--bk-space-8);
+  min-height: 50px;
+  border-radius: var(--bk-radius-sm);
   cursor: pointer;
   transition: background 150ms ease-out;
   outline: none;
 }
 
-.entry-row:hover,
-.entry-row.focused,
 .entry-row.expanded {
   background: var(--bk-bg-subtle);
+}
+
+.entry-row.focused {
+  background: var(--bk-accent-tint);
 }
 
 .entry-row:focus-visible {
@@ -265,27 +271,20 @@
 }
 
 .entry-label {
-  font-size: var(--bk-text-12);
+  font-size: var(--bk-text-13);
   font-weight: 400;
   color: var(--bk-ink);
   line-height: 18px;
-  /* stops 8 short of the time, which starts 60 from the row's right edge */
-  max-width: calc(100% - 52px);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.entry-row .entry-time-btn {
-  position: absolute;
-  left: calc(100% - 60px);
-  top: 7px;
-}
-
+/* 2L9 H01: "10:42 · you" is one muted sans line — the time is not set apart
+   in mono. */
 .entry-time {
-  font-family: var(--bk-font-mono);
-  font-size: 11px;
-  font-weight: 500;
+  font-size: var(--bk-text-12);
+  font-weight: 400;
   line-height: 16px;
   color: var(--bk-ink-muted);
   font-variant-numeric: tabular-nums;
@@ -402,8 +401,8 @@
 
 .version-row {
   position: relative;
-  padding: 10px var(--bk-space-12);
-  margin: 2px var(--bk-space-8);
+  padding: var(--bk-space-8);
+  margin: 0 var(--bk-space-12);
   border-radius: var(--bk-radius-sm);
   cursor: pointer;
   border: 1px solid transparent;
@@ -419,11 +418,6 @@
   border-color: var(--bk-border);
 }
 
-.version-row.delete-confirm {
-  background: var(--bk-error-tint);
-  border-color: rgba(239, 68, 68, 0.3);
-}
-
 .version-row-wrapper {
   display: block;
 }
@@ -434,9 +428,9 @@
 
 .version-name {
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 400;
   color: var(--bk-ink);
-  line-height: 1.3;
+  line-height: 18px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -451,13 +445,12 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-top: var(--bk-space-4);
   flex-wrap: wrap;
 }
 
 .version-time {
-  font-family: var(--bk-font-mono);
-  font-size: 11px;
+  font-size: var(--bk-text-12);
+  line-height: 16px;
   color: var(--bk-ink-muted);
 }
 
@@ -481,8 +474,7 @@
 
 .version-row:hover .version-actions,
 .version-row:focus-within .version-actions,
-.version-row.expanded .version-actions,
-.version-row.delete-confirm .version-actions {
+.version-row.expanded .version-actions {
   opacity: 1;
   pointer-events: auto;
 }

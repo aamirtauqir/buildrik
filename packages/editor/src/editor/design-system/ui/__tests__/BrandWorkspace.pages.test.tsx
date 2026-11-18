@@ -38,51 +38,27 @@ const COLOR_PAYLOAD = (id: string, name: string, value: string) =>
   ]);
 
 /* D4 rewrite: drop-zone primary, paste textarea collapsed. Expand paste →
-   Parse → "Apply N valid only". */
+   Parse → "Apply N valid". */
 async function importViaPaste(utils: ReturnType<typeof renderWorkspace>, payload: string) {
   fireEvent.click(utils.getByText(/or paste JSON/i));
   fireEvent.change(utils.getByLabelText(/Paste JSON/i), { target: { value: payload } });
   fireEvent.click(utils.getByText(/^Parse$/i));
-  await utils.findByText(/Apply 1 valid only/i);
-  fireEvent.click(utils.getByText(/Apply 1 valid only/i));
+  await utils.findByText(/^Apply 1 valid$/);
+  fireEvent.click(utils.getByText(/^Apply 1 valid$/));
 }
 
 describe("BrandWorkspace › Import / export", () => {
-  it("4418:168885: a panel with its own title and ✕ — no page header, no preview column", async () => {
+  it("B6-B15: an ordinary page — header, strap, preview column — with Import | Export tabs", async () => {
     const utils = renderWorkspace(makeFakeComposer());
     openPage(utils, "export");
-    const card = await waitFor(() => utils.getByTestId("brand-io-card"));
-    expect(card.contains(utils.getByTestId("brand-page-title"))).toBe(true);
-    expect(utils.queryByTestId("brand-preview-column")).toBeNull();
-    expect(utils.getByTestId("import-drop-zone").textContent).toContain("Drop tokens.json — JSON only");
-    fireEvent.click(utils.getByTestId("brand-io-close"));
-    expect(utils.getByTestId("brand-page-title").textContent).toBe("Colours");
-  });
-
-  it("4418:168885: Dark strategy, EXPORT and IMPORT share one panel, above the preview", async () => {
-    const utils = renderWorkspace(makeFakeComposer());
-    openPage(utils, "export");
-    const card = await waitFor(() => utils.getByTestId("brand-io-card"));
-    expect(card.contains(utils.getByTestId("brand-export-dark-row"))).toBe(true);
-    expect(card.contains(utils.getByTestId("brand-export-head"))).toBe(true);
-    expect(card.contains(utils.getByTestId("brand-import-head"))).toBe(true);
-    const preview = utils.getByTestId("export-preview");
-    // 4418:168885: the Preview sits inside the panel, after IMPORT.
-    expect(card.contains(preview)).toBe(true);
-    expect(utils.getByTestId("brand-import-head").compareDocumentPosition(preview) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-  });
-
-  it("shows the import card + export preview", async () => {
-    const composer = makeFakeComposer();
-    const utils = renderWorkspace(composer);
-    openPage(utils, "export");
-
-    await waitFor(() => {
-      expect(utils.getByTestId("export-preview")).toBeTruthy();
-    });
-    // Board 153:120 heads the block "IMPORT", a caps section header matching EXPORT.
-    expect(utils.getAllByText("IMPORT").length).toBeGreaterThan(0);
-    expect(utils.getByText(/Custom properties/i)).toBeTruthy();
+    await waitFor(() => utils.getByTestId("brand-io-card"));
+    expect(utils.getByTestId("brand-page-title").textContent).toBe("Import / export");
+    expect(utils.getByTestId("brand-page-strap")).toBeTruthy();
+    expect(utils.getByTestId("brand-preview-column")).toBeTruthy();
+    expect(utils.getByTestId("brand-import-head").textContent).toBe("Import tokens");
+    expect(utils.getByTestId("import-drop-zone").textContent).toContain("Choose JSON file");
+    fireEvent.click(utils.getByTestId("brand-io-tab-export"));
+    expect(utils.getByTestId("export-preview")).toBeTruthy();
   });
 
   it("import writes a modified colour token to the site at once — one write, no draft", async () => {
@@ -94,7 +70,7 @@ describe("BrandWorkspace › Import / export", () => {
     await importViaPaste(utils, COLOR_PAYLOAD("color-primary", "Primary", "#FF00AA"));
 
     // G3-123: no status pill band — the import toast says it.
-    expect(await utils.findByText(/^Imported · /)).toBeTruthy();
+    expect(await utils.findByText(/^Imported \d+ tokens?\. One Undo reverts the import\./)).toBeTruthy();
     expect(utils.queryByTestId("brand-section-status-imported")).toBeNull();
     expect(utils.queryByTestId("brand-section-status")).toBeNull();
     expect(composer.designSystem.setTokens).toHaveBeenCalledTimes(1);
@@ -117,16 +93,11 @@ describe("BrandWorkspace › Import / export", () => {
   /* C5 G3-149: the greyed "Figma Variables JSON — Coming soon" row is gone
      (4418:168885 omits it); the three live formats each keep a Download. */
   it("offers three formats and no Figma row", async () => {
-    const composer = makeFakeComposer();
-    const utils = renderWorkspace(composer);
+    const utils = renderWorkspace(makeFakeComposer());
     openPage(utils, "export");
-
-    await waitFor(() => expect(utils.getByTestId("format-row-css")).toBeTruthy());
+    fireEvent.click(await waitFor(() => utils.getByTestId("brand-io-tab-export")));
     expect(utils.container.textContent).not.toMatch(/Figma Variables JSON|Coming soon/);
-    expect(utils.container.querySelector('[data-download-format="figma"]')).toBeNull();
-    for (const id of ["css", "json", "tailwind"]) {
-      expect(utils.container.querySelector(`[data-download-format="${id}"]`)).toBeTruthy();
-    }
+    for (const id of ["css", "json", "tailwind"]) expect(utils.getByTestId(`format-row-${id}`)).toBeTruthy();
   });
 });
 
@@ -162,67 +133,15 @@ describe("BrandWorkspace › Presets (StylesSection drill-in)", () => {
   });
 });
 
-describe("BrandWorkspace › Component styles — AI assist entry", () => {
-  function makeAiComposer() {
-    const composer = makeFakeComposer();
-    const events = new EventEmitter();
-    Object.assign(composer, {
-      colorMode: { get: vi.fn(() => "light"), set: vi.fn(), resolved: vi.fn(() => "light") },
-      aiAssistService: new AIAssistService(events, { generate: vi.fn() }),
-    });
-    return composer;
-  }
-
-  function openComponents(utils: ReturnType<typeof renderWorkspace>) {
+// re-baseline: Brand › Type styles · Presets — "✦ Generate with AI" removed (no AI entry points, owner 2026-10-17).
+describe("BrandWorkspace › Type styles · Presets — no AI entry", () => {
+  it("offers no Generate with AI", () => {
+    const utils = renderWorkspace(makeFakeComposer());
     act(() => {
-      openPage(utils, "component-styles");
+      openPage(utils, "styles");
     });
-    return utils.container.querySelector<HTMLButtonElement>("[data-open-ai-assist]")!;
-  }
-
-  it("the page offers the AI entry as its header action (7316:82755)", () => {
-    const utils = renderWorkspace(makeAiComposer());
-    const btn = openComponents(utils);
-    expect(btn).toBeTruthy();
-    expect(btn.textContent).toContain("Generate with AI");
-    expect(btn.getAttribute("data-testid")).toBe("brand-page-action");
-    expect(utils.getByTestId("brand-page-body").contains(btn)).toBe(false);
-  });
-
-  it("clicking the button opens AIPromptModal with the composer's service", () => {
-    const utils = renderWorkspace(makeAiComposer());
-    expect(utils.queryByText("Generate component with AI")).toBeNull();
-
-    const btn = openComponents(utils);
-    act(() => {
-      fireEvent.click(btn);
-    });
-
-    expect(utils.getByText("Generate component with AI")).toBeTruthy();
-    expect(utils.getByLabelText("Component description")).toBeTruthy();
-    expect(utils.getByText("Generate")).toBeTruthy();
-  });
-
-  it("flag off: the entry is blocked and cannot open the modal", () => {
-    vi.mocked(isFeatureEnabled).mockReturnValue(false);
-    const utils = renderWorkspace(makeAiComposer());
-    const btn = openComponents(utils);
-
-    expect(btn.getAttribute("aria-disabled")).toBe("true");
-    act(() => {
-      fireEvent.click(btn);
-    });
-    expect(utils.queryByText("Generate component with AI")).toBeNull();
-  });
-
-  /* L5-019: the flag is a build-wide switch, not a workspace setting, so the
-     tooltip blamed the workspace for something no one in it can change. */
-  it("flag off: the reason says it is coming, not that the workspace is off", () => {
-    vi.mocked(isFeatureEnabled).mockReturnValue(false);
-    const utils = renderWorkspace(makeAiComposer());
-    openComponents(utils);
-    expect(utils.queryByText(/switched on for this workspace/)).toBeNull();
-    expect(utils.getByText(/Coming soon/)).toBeTruthy();
+    expect(utils.container.querySelector("[data-open-ai-assist]")).toBeNull();
+    expect(utils.queryByText(/Generate with AI/)).toBeNull();
   });
 });
 
@@ -308,14 +227,13 @@ describe("BrandWorkspace › the Light / Dark switch is preview-only (L4-021, BR
   });
 });
 
-describe("BrandWorkspace › Component styles — a section row hands off to Add › Blocks", () => {
+describe("BrandWorkspace › Type styles · Presets — Browse section blocks in Add › (B6-B26)", () => {
   it("clean: closes Brand, switches to Add and asks for BLOCKS", () => {
     const composer = makeFakeComposer();
     const onClose = vi.fn();
     const utils = renderWorkspace(composer, { onClose });
-    act(() => openPage(utils, "component-styles"));
-    const row = utils.container.querySelector<HTMLElement>("[data-section-row]")!;
-    fireEvent.click(row);
+    act(() => openPage(utils, "styles"));
+    fireEvent.click(utils.getByTestId("brand-browse-blocks"));
     expect(onClose).toHaveBeenCalledTimes(1);
     expect(composer.emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "add" });
     expect(composer.emit).toHaveBeenCalledWith("ui:insert-open-group", { group: "blocks" });
@@ -327,8 +245,8 @@ describe("BrandWorkspace › Component styles — a section row hands off to Add
     const utils = await renderOnRadius(composer, { onClose });
     fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
     fireEvent.blur(utils.radiusInput);
-    act(() => openPage(utils, "component-styles"));
-    fireEvent.click(utils.container.querySelector<HTMLElement>("[data-section-row]")!);
+    act(() => openPage(utils, "styles"));
+    fireEvent.click(utils.getByTestId("brand-browse-blocks"));
     expect(onClose).toHaveBeenCalledTimes(1);
     expect(composer.emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "add" });
   });
@@ -345,16 +263,16 @@ describe("BrandWorkspace — opens on a requested token", () => {
     // Read once: a second mount lands on the default page.
     utils.unmount();
     const again = renderWorkspace(composer);
-    expect(again.getByTestId("brand-page-title").textContent).toBe("Colours");
+    expect(again.getByTestId("brand-page-title").textContent).toMatch(/^Colors · \d+$/);
   });
 });
 
-describe("BrandWorkspace › Brand from logo or website (BRP1-M11)", () => {
+describe("BrandWorkspace › From logo or URL (BRP1-M11, behind dsAi — authority code:dsai-flag)", () => {
   it("Starters opens it behind dsAi; the Starters row stays current and the guide card sits in the preview column", async () => {
     const utils = renderWorkspace(makeFakeComposer());
     openPage(utils, "starters");
     fireEvent.click(await waitFor(() => utils.getByTestId("starter-row-from-source")));
-    expect(utils.getByTestId("brand-page-title").textContent).toBe("Brand from logo or website");
+    expect(utils.getByTestId("brand-page-title").textContent).toBe("From logo or URL");
     expect(utils.getByTestId("brand-row-starters").getAttribute("aria-current")).toBe("page");
     expect(utils.getByTestId("brand-from-source")).toBeTruthy();
     expect(utils.getByTestId("brand-from-source-guide")).toBeTruthy();
@@ -366,17 +284,11 @@ describe("BrandWorkspace › Brand from logo or website (BRP1-M11)", () => {
     openPage(utils, "starters");
     await waitFor(() => utils.getByTestId("starter-list"));
     expect(utils.queryByTestId("starter-row-from-source")).toBeNull();
-    openPage(utils, "colours");
-    expect(utils.queryByTestId("brand-colours-from-source")).toBeNull();
   });
 
-  it("Colours' actions row offers it as 'From logo or URL' (8222:232627)", () => {
+  it("Colors draws only the board's two actions — the door is Starters' (B6-B01, B6-B07)", () => {
     const utils = renderWorkspace(makeFakeComposer());
-    const action = utils.getByTestId("brand-colours-from-source");
-    expect(action.textContent).toBe("From logo or URL");
-    expect(utils.getByTestId("brand-colours-actions").lastElementChild).toBe(action);
-    fireEvent.click(action);
-    expect(utils.getByTestId("brand-page-title").textContent).toBe("Brand from logo or website");
-    expect(utils.getByTestId("brand-from-source")).toBeTruthy();
+    const actions = utils.getByTestId("brand-page-actions");
+    expect([...actions.querySelectorAll("button")].map((b) => b.textContent)).toEqual(["+ Add color", "Generate scale"]);
   });
 });

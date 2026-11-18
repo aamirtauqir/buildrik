@@ -15,8 +15,10 @@ import { describe, it, expect, vi } from "vitest";
 import { render, fireEvent } from "@testing-library/react";
 import { LayerTreeItem, type LayerTreeItemProps } from "../LayerTreeItem";
 
-/** Board 4418:81300, chevron x (relative to the drawer) by depth. */
-const BOARD_CHEVRON_X = [16, 32, 48];
+/** design-2l9 147:75914 (re-baseline from 4418:81300's 16/32/48): the page
+ *  row heads the tree, so depth 0's chevron box starts at 20 (centred at 28,
+ *  re-baseline: Layers rows, 2L9 152:78614), then 16 a level. */
+const BOARD_CHEVRON_X = [20, 36, 52];
 
 const noop = () => {};
 function rowFor(depth: number, extra: Partial<LayerTreeItemProps> = {}) {
@@ -44,7 +46,7 @@ function rowFor(depth: number, extra: Partial<LayerTreeItemProps> = {}) {
   return container.querySelector('[role="treeitem"]') as HTMLElement;
 }
 
-describe("Layers indent ladder — board 4418:81300", () => {
+describe("Layers indent ladder — board 147:75914", () => {
   it("puts every depth's chevron where the board puts it", () => {
     expect(BOARD_CHEVRON_X.map((_, d) => rowFor(d).style.paddingLeft)).toEqual(BOARD_CHEVRON_X.map((x) => `${x}px`));
   });
@@ -63,7 +65,7 @@ describe("Layers indent ladder — board 4418:81300", () => {
     expect(box).not.toBeNull();
     expect(box.getAttribute("aria-label")).toBe("Select Container");
     expect(box.checked).toBe(false);
-    expect(row.style.paddingLeft).toBe("16px");
+    expect(row.style.paddingLeft).toBe("20px");
   });
 
   it("in selection mode a selected row is ticked — even a lone one", () => {
@@ -81,5 +83,17 @@ describe("Layers indent ladder — board 4418:81300", () => {
     fireEvent.click(row.querySelector('input[type="checkbox"]') as HTMLInputElement);
     expect(onSelect).toHaveBeenLastCalledWith("l0", { meta: true });
     expect(onSelect).toHaveBeenCalledTimes(3);
+  });
+});
+
+/* design-2l9 board 147:77189: a search result names where it sits. */
+describe("search result path", () => {
+  it("draws the ancestors after the name, and nothing outside search", () => {
+    const withPath = rowFor(0, {
+      layer: { id: "t1", type: "text", tagName: "p", depth: 0, children: [], searchPath: "Services › Card 1" },
+    } as Partial<LayerTreeItemProps>);
+    expect(withPath.querySelector('[data-testid="layer-search-path-t1"]')?.textContent).toBe("Services › Card 1");
+    const plain = rowFor(1);
+    expect(plain.querySelector('[data-testid^="layer-search-path-"]')).toBeNull();
   });
 });

@@ -6,6 +6,7 @@ import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import type {
   FormSubmissionInput,
   ListSubmissionsInput,
+  ExportSubmissionsInput,
   UpdateFormBlockInput,
 } from "@buildrik/shared/schemas/forms";
 import { isAbsoluteHttpUrl, isSitePath } from "@buildrik/shared/schemas/element-markup";
@@ -385,13 +386,21 @@ export async function recordPublishedForms(
 
 export async function exportSubmissions(
   siteId: string,
-  // null/undefined exports every form on the site (the overview "Export CSV"
-  // button) rather than a single form block — the full dataset, not one page.
+  // null/undefined exports every form on the site (the dashboard's "Export
+  // CSV") rather than a single form block — the full dataset, not one page.
   formBlockId: string | null | undefined,
   format: "csv" | "json",
+  // The editor's current view (2L9 GAP-FM-Export-*). An omitted flag means
+  // either state, so the dashboard's whole-site export is unchanged.
+  view: Pick<ExportSubmissionsInput, "isSpam" | "isArchived"> = {},
 ): Promise<string> {
   const submissions = await prisma.formSubmission.findMany({
-    where: { siteId, ...(formBlockId ? { formBlockId } : {}) },
+    where: {
+      siteId,
+      ...(formBlockId ? { formBlockId } : {}),
+      ...(view.isSpam !== undefined && { isSpam: view.isSpam }),
+      ...(view.isArchived !== undefined && { isArchived: view.isArchived }),
+    },
     orderBy: { createdAt: "desc" },
     include: { formBlock: { select: { name: true } } },
   });

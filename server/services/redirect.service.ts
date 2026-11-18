@@ -35,7 +35,7 @@ async function assertFromPathFree(siteId: string, fromPath: string, exceptId?: s
  */
 async function assertFromPathNotAPage(siteId: string, fromPath: string) {
   const path = fromPath.toLowerCase().replace(/\/+$/, "").replace(/\.html$/, "").replace(/^\//, "");
-  const pages = await prisma.page.findMany({ where: { siteId }, select: { name: true, slug: true, isHomePage: true } });
+  const pages = await prisma.page.findMany({ where: { siteId, deletedAt: null }, select: { name: true, slug: true, isHomePage: true } });
   /* The home page answers on `/` (index.html), not on its slug. */
   const shadowed = pages.find((p) =>
     p.isHomePage ? path === "" || path === "index" : p.slug.toLowerCase() === path,

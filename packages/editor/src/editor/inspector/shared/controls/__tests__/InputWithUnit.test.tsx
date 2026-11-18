@@ -7,10 +7,10 @@
  * @license BSD-3-Clause
  */
 
-import { render, screen, fireEvent } from "@testing-library/react";
+import { act, cleanup, render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import * as React from "react";
-import { InputWithUnit, NUMBER_ERROR, parseEntry } from "../InputControls";
+import { InputWithUnit, parseEntry } from "../InputControls";
 import { Section } from "../Section";
 import { InspectorFieldContext, type InspectorFieldContextValue } from "../InspectorFieldContext";
 
@@ -102,8 +102,8 @@ describe("InputWithUnit — board 34: an entry it cannot read", () => {
     expect(input).toHaveAttribute("aria-invalid", "true");
     expect(input).toHaveValue("24..");
     const line = document.getElementById(input.getAttribute("aria-describedby") ?? "");
-    expect(line).toHaveTextContent(NUMBER_ERROR);
-    expect(NUMBER_ERROR).toBe("Enter a valid number. Choose the unit separately.");
+    /* 2L9 I03: what it takes, then what the element still carries. */
+    expect(line).toHaveTextContent("Enter a number and a supported unit. Last applied: 10 px.");
     expect(input.closest(".bdi-fld")).toHaveClass("invalid");
   });
 
@@ -125,7 +125,7 @@ describe("InputWithUnit — board 34: an entry it cannot read", () => {
     expect(screen.queryByTestId("inspector-field-error")).toBeNull();
   });
 
-  it("inside a section the message lands in the section's polite band, under its rows", () => {
+  it("inside a section the message sits directly under its own field (2L9 I03), in a polite region", () => {
     render(
       <Section title="Size" defaultOpen>
         <InputWithUnit label="Width" value="10px" onChange={vi.fn()} />
@@ -136,12 +136,13 @@ describe("InputWithUnit — board 34: an entry it cannot read", () => {
     fireEvent.change(input, { target: { value: "24.." } });
     fireEvent.keyDown(input, { key: "Enter" });
     const line = screen.getByTestId("inspector-field-error");
-    expect(line).toHaveTextContent(NUMBER_ERROR);
+    expect(line).toHaveTextContent("Enter a number and a supported unit. Last applied: 10 px.");
     expect(line.id).toBe(input.getAttribute("aria-describedby"));
     expect(line.parentElement).toHaveAttribute("aria-live", "polite");
-    /* After the last row, not between Width and Height (board 34). */
+    /* Between Width and Height — under the field it is about, not in a band after the last row. */
     const height = screen.getByRole("textbox", { name: /^Height/ });
-    expect(height.compareDocumentPosition(line) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(line.compareDocumentPosition(height) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.getByTestId("inspector-row-width")).toContainElement(line);
   });
 });
 
@@ -232,5 +233,126 @@ describe("InputWithUnit — field context", () => {
       </InspectorFieldContext.Provider>,
     );
     expect(screen.queryByRole("button", { name: "Overridden on Tablet" })).toBeNull();
+  });
+});
+
+describe("InputWithUnit — 2L9 precision (I03, I08)", () => {
+  it("I03: a property CSS keeps non-negative says so, refuses a negative, and keeps the draft", () => {
+    const { onChange, input } = renderInput({ label: "Font size", value: "24px", property: "font-size" });
+    fireEvent.change(input, { target: { value: "24pxx" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+    expect(screen.getByTestId("inspector-field-error")).toHaveTextContent(
+      "Enter a non-negative number and a supported unit. Last applied: 24 px.",
+    );
+    expect(input).toHaveValue("24pxx");
+    onChange.mockClear();
+    fireEvent.change(input, { target: { value: "-4px" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+    expect(onChange).not.toHaveBeenCalledWith("-4px");
+    expect(input).toHaveAttribute("aria-invalid", "true");
+  });
+
+  it("I08: a calc() is shown as authored, labelled a custom value, and not rewritten by a blur", () => {
+    const { onChange, input } = renderInput({ value: "calc(100% - 2rem)", property: "width" });
+    expect(input).toHaveValue("calc(100% - 2rem)");
+    expect(screen.getByText("Width · Custom value")).toBeInTheDocument();
+    expect(screen.getByTestId("inspector-field-custom")).toHaveTextContent("Preserved as authored. Enter an explicit supported value to replace it.");
+    expect(screen.queryByRole("combobox", { name: /unit/ })).toBeNull();
+    fireEvent.focus(input);
+    fireEvent.blur(input);
+    expect(onChange).not.toHaveBeenCalled();
+    fireEvent.change(input, { target: { value: "320px" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+    expect(onChange).toHaveBeenCalledWith("320px");
+  });
+});
+
+describe("InputWithUnit — 2L9 I07 unit conversion", () => {
+  it("px → rem keeps the size the canvas shows: 24px becomes 1.5rem", () => {
+    const { onChange } = renderInput({ label: "Font size", value: "24px", units: ["px", "rem", "em", "%"] });
+    fireEvent.change(screen.getByRole("combobox", { name: "Font size unit" }), { target: { value: "rem" } });
+    expect(onChange).toHaveBeenCalledWith("1.5rem");
+  });
+
+  it("rem → px converts back; px → % keeps the number (no fixed ratio)", () => {
+    const { onChange } = renderInput({ label: "Font size", value: "1.5rem", units: ["px", "rem", "%"] });
+    fireEvent.change(screen.getByRole("combobox", { name: "Font size unit" }), { target: { value: "px" } });
+    expect(onChange).toHaveBeenCalledWith("24px");
+    cleanup();
+    const second = renderInput({ value: "10px", units: ["px", "%"] });
+    fireEvent.change(screen.getByRole("combobox", { name: "Width unit" }), { target: { value: "%" } });
+    expect(second.onChange).toHaveBeenCalledWith("10%");
+  });
+});
+
+describe("InputWithUnit — a unit change that converts (2L9 I07)", () => {
+  it("24px → rem writes 1.5rem as its own step and says how, once", () => {
+    const onChange = vi.fn();
+    const order: string[] = [];
+    const announce = vi.fn((m: string) => order.push(`announce:${m}`));
+    render(
+      <InspectorFieldContext.Provider
+        value={ctx({ runDiscrete: (a) => { order.push("discrete"); a(); }, announce })}
+      >
+        <InputWithUnit label="Font size" value="24px" onChange={onChange} units={["px", "rem", "em"]} />
+      </InspectorFieldContext.Provider>,
+    );
+    fireEvent.change(screen.getByRole("combobox", { name: "Font size unit" }), { target: { value: "rem" } });
+    expect(onChange).toHaveBeenCalledWith("1.5rem");
+    expect(order).toEqual(["discrete", "announce:Converted using root font 16px"]);
+  });
+
+  it("a unit with no conversion (% from %) says nothing", () => {
+    const announce = vi.fn();
+    render(
+      <InspectorFieldContext.Provider value={ctx({ announce })}>
+        <InputWithUnit label="Width" value="50%" onChange={vi.fn()} units={["%", "vw"]} />
+      </InspectorFieldContext.Provider>,
+    );
+    fireEvent.change(screen.getByRole("combobox", { name: "Width unit" }), { target: { value: "vw" } });
+    expect(announce).not.toHaveBeenCalled();
+  });
+});
+
+describe("InputWithUnit — an unreadable entry is held for the tab guard (2L9 I05)", () => {
+  it("registers while invalid with label, draft and applied value; revert restores; clears once fixed", async () => {
+    const { getUnappliedDraft } = await import("../unappliedDraft");
+    render(<InputWithUnit label="Font size" value="24px" onChange={vi.fn()} />);
+    const input = screen.getByRole("textbox", { name: /^Font size/ });
+    fireEvent.change(input, { target: { value: "24pxx" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+    const held = getUnappliedDraft();
+    expect(held).toMatchObject({ label: "Font size", draft: "24pxx", applied: "24px" });
+    act(() => held!.revert());
+    expect(input).toHaveValue("24");
+    expect(getUnappliedDraft()).toBeNull();
+  });
+});
+
+/* 2L9 I06 (161:11006): Font size's units as a card beside the column —
+   "Font size unit", the property's units, Cancel. Only the field that asks. */
+describe("InputWithUnit — unit card (I06)", () => {
+  it("opens the titled card, writes the chosen unit, and Cancel changes nothing", () => {
+    cleanup();
+    const onChange = vi.fn();
+    render(<InputWithUnit label="Font size" value="24px" onChange={onChange} units={["px", "em", "rem", "%", "vw"]} unitCardTitle="Font size unit" />);
+    expect(screen.queryByRole("combobox")).toBeNull();
+    fireEvent.click(screen.getByTestId("unit-card-trigger"));
+    expect(screen.getByText("Font size unit")).toBeInTheDocument();
+    expect(screen.getAllByRole("menuitem").map((b) => b.textContent)).toEqual(["px", "em", "rem", "%", "vw"]);
+    expect(screen.getByRole("menuitem", { name: "px" })).toHaveAttribute("aria-current", "true");
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(onChange).not.toHaveBeenCalled();
+    expect(screen.queryByText("Font size unit")).toBeNull();
+    fireEvent.click(screen.getByTestId("unit-card-trigger"));
+    fireEvent.click(screen.getByRole("menuitem", { name: "em" }));
+    expect(onChange).toHaveBeenCalledWith("1.5em");
+  });
+
+  it("without the title the field keeps its inline unit select", () => {
+    cleanup();
+    render(<InputWithUnit label="Width" value="10px" onChange={vi.fn()} />);
+    expect(screen.queryByTestId("unit-card-trigger")).toBeNull();
+    expect(screen.getByRole("combobox", { name: /unit/ })).toBeInTheDocument();
   });
 });

@@ -48,7 +48,10 @@ describe("board 26 — component instance", () => {
     expect(section("layout"), "a plain container keeps Layout").not.toBeNull();
     expect(section("text-inside"), "a plain container keeps Text inside").not.toBeNull();
     await show(id);
-    for (const s of ["component", "size", "spacing", "fill", "border"]) expect(section(s), s).not.toBeNull();
+    /* 2L9 IC01: the instance block sits above the tabs, before the strip. */
+    const block = screen.getByTestId("component-row");
+    expect(block.compareDocumentPosition(screen.getByTestId("inspector-tab-strip")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    for (const s of ["size", "spacing", "fill", "border"]) expect(section(s), s).not.toBeNull();
     expect(section("layout")).toBeNull();
     expect(section("text-inside")).toBeNull();
   });
@@ -61,12 +64,10 @@ describe("board 26 — component instance", () => {
     expect(section("text-inside")).toBeNull();
   });
 
-  it("the status mark is its own row between the header and the tabs", async () => {
+  it("the instance is named once — by its block, in the accent, with no duplicate status mark (2L9 IC01)", async () => {
     const { id, show } = await setup();
     await show(id);
-    const marks = screen.getByTestId("inspector-status-marks");
-    expect(screen.getByTestId("inspector-header").contains(marks)).toBe(false);
-    expect(marks.previousElementSibling).toBe(screen.getByTestId("inspector-header"));
-    expect(screen.getByTestId("inspector-mark-component")).toHaveTextContent("Component: Reservation banner");
+    expect(screen.queryByTestId("inspector-mark-component")).toBeNull();
+    expect(screen.getByTestId("component-identity")).toHaveTextContent("Reservation banner · instance");
   });
 });

@@ -55,7 +55,7 @@ describe("PermissionsHost", () => {
     expect(screen.queryByTestId("permissions-delete-site")).toBeNull();
   });
 
-  it("Delete site arms only on DELETE, sends the site's name, and closes the editor on the deleted screen", async () => {
+  it("Delete site arms only on the site's name, sends it, and closes the editor on the deleted screen", async () => {
     deleteSite.mockResolvedValue(undefined);
     const c = composer();
     render(<PermissionsHost composer={c as never} siteId="s1" siteName="Bella Cucina" />);
@@ -63,14 +63,14 @@ describe("PermissionsHost", () => {
     fireEvent.click(screen.getByTestId("permissions-delete-site"));
     expect(screen.getByRole("heading", { name: "Delete Bella Cucina?" })).toBeInTheDocument();
     expect(screen.getByTestId("delete-site-line")).toHaveTextContent(
-      "This takes the site offline now. You can restore it from Recently deleted for 30 days.",
+      "The site goes offline and moves to Recently deleted. You can restore it for 30 days.",
     );
     const confirm = screen.getByTestId("delete-site-confirm");
-    // 8137:217905 → 8137:218168: the first press asks for DELETE, it does not delete.
+    // 2L9 B8-S17: disabled until the site's name is typed.
     fireEvent.click(confirm);
     expect(deleteSite).not.toHaveBeenCalled();
     expect(confirm).toBeDisabled();
-    fireEvent.change(screen.getByLabelText("Type DELETE to confirm"), { target: { value: "DELETE" } });
+    fireEvent.change(screen.getByLabelText("Type Bella Cucina to confirm"), { target: { value: "Bella Cucina" } });
     expect(confirm).toBeEnabled();
     fireEvent.click(confirm);
     await waitFor(() => expect(deleteSite).toHaveBeenCalledWith("s1", "Bella Cucina"));
@@ -83,8 +83,7 @@ describe("PermissionsHost", () => {
     render(<PermissionsHost composer={c as never} siteId="s1" siteName="Bella Cucina" />);
     c.fire(EVENTS.UI_OPEN_PERMISSIONS);
     fireEvent.click(screen.getByTestId("permissions-delete-site"));
-    fireEvent.click(screen.getByTestId("delete-site-confirm"));
-    fireEvent.change(screen.getByLabelText("Type DELETE to confirm"), { target: { value: "DELETE" } });
+    fireEvent.change(screen.getByLabelText("Type Bella Cucina to confirm"), { target: { value: "Bella Cucina" } });
     fireEvent.click(screen.getByTestId("delete-site-confirm"));
     expect(await screen.findByRole("alert")).toHaveTextContent("Site name does not match.");
     expect(screen.queryByTestId("site-deleted")).toBeNull();

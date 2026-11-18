@@ -11,13 +11,16 @@ import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { mergeProjectTokens } from "@/engine/designSystem/projectTokens";
 import { restoredTokens } from "@/engine/designSystem/restorePoint";
+import type { CreateBrandRestorePointInput } from "@buildrik/shared/schemas/theme";
+
+type BrandRestorePointReason = CreateBrandRestorePointInput["reason"];
 
 const client = () => getBuildrikClient(DASHBOARD_URL);
 
 export async function takeRestorePoint(
   composer: Composer,
   siteId: string,
-  reason: "generator" | "dark-auto" | "logo",
+  reason: BrandRestorePointReason,
 ): Promise<boolean> {
   const s = composer.getProjectSettings();
   try {

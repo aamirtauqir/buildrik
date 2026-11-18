@@ -28,7 +28,7 @@ describe("BrandWorkspace mount + useResetAllPresets identity stability", () => {
   it("mounts over saved tokens without a render loop", () => {
     const composer = makeFakeComposer([...DEFAULT_TOKENS]);
     const utils = renderWorkspace(composer);
-    expect(utils.getByTestId("brand-page-title").textContent).toBe("Colours");
+    expect(utils.getByTestId("brand-page-title").textContent).toMatch(/^Colors · \d+$/);
   });
 
   it("useResetAllPresets returns a stable callable across re-renders", () => {

@@ -17,6 +17,8 @@
  */
 
 import type { Composer } from "@/engine";
+import type { ToastInput } from "@/editor/chrome-ui";
+import type { ComponentDefinition } from "@/shared/types/components";
 
 export type InstantiateResult = "ok" | "no-parent" | "error";
 
@@ -42,5 +44,54 @@ export async function instantiateComponentAtSelection(
     return "error";
   } finally {
     composer.endTransaction();
+  }
+}
+
+export const LIBRARY_TOASTS = {
+  gone: { description: "That component is no longer in the library.", tone: "warning" },
+  /* A damaged library copy fails the same way every time — retrying won't help. */
+  damaged: { description: "This library component is damaged and can't be added.", tone: "error" },
+} as const;
+
+type InsertToast = { description: string; tone: "success" | "warning" | "error" };
+
+/**
+ * Bring a workspace library master onto this site under its shared id
+ * (ComponentManager.adoptLibraryComponent — mirrored as this site's copy,
+ * which is what "linked" means), then insert it like a saved one. This site's
+ * copy is reused when it already has one. The one path behind Add's FROM
+ * LIBRARY rows and the Components area's "Insert on this site" (2L9 215:44300).
+ */
+export async function insertLibraryComponent(
+  composer: Composer,
+  componentId: string,
+  fetchDefinition: (componentId: string) => Promise<ComponentDefinition | null>,
+): Promise<InsertToast> {
+  try {
+    const existing = composer.components.getComponent(componentId);
+    const definition = existing ?? (await fetchDefinition(componentId));
+    if (!definition) return LIBRARY_TOASTS.gone;
+    const adopted = existing ?? (await composer.components.adoptLibraryComponent(definition));
+    return INSTANTIATE_TOASTS[await instantiateComponentAtSelection(composer, adopted.id)];
+  } catch (err) {
+    const damaged = err instanceof Error && err.message === "LIBRARY_MASTER_MALFORMED";
+    return damaged ? LIBRARY_TOASTS.damaged : INSTANTIATE_TOASTS.error;
+  }
+}
+
+/** Detach one instance — the Inspector's Detach and Layers' "Detach instance"
+ *  (2L9 B6-K22) — with the one receipt: "{name} detached" + Undo. */
+export async function detachInstanceWithUndo(
+  composer: Composer,
+  instanceId: string,
+  name: string,
+): Promise<{ ok: boolean; toast: ToastInput }> {
+  try {
+    if (await composer.components.detachInstance(instanceId)) {
+      return { ok: true, toast: { description: `${name} detached`, tone: "info", action: { label: "Undo", onClick: composer.history.captureUndo() } } };
+    }
+    return { ok: false, toast: { description: "Couldn't detach this instance. It may already be detached.", tone: "error" } };
+  } catch {
+    return { ok: false, toast: { description: "Couldn't detach this instance. Try again.", tone: "error" } };
   }
 }

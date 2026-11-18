@@ -32,10 +32,10 @@
  */
 
 import * as React from "react";
-import { Button, ToggleSwitch } from "@/editor/chrome-ui";
+import { Button, Checkbox } from "@/editor/chrome-ui";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { updateSiteColumns } from "@/services/BuildrikSyncProvider";
-import { Input, LoadCard, SET_BTN, SET_CARD, SET_ROW_LABEL, SCREEN_FIELD_ERROR, SaveErrorBanner, Screen } from "../shared";
+import { Input, LoadCard, SET_BTN, SET_CARD, SCREEN_FIELD_ERROR, SaveErrorBanner, Screen } from "../shared";
 import { useServerLoad } from "../hooks/useServerLoad";
 import type { ScreenProps } from "../types";
 
@@ -43,16 +43,14 @@ import type { ScreenProps } from "../types";
 const PASSWORD_PATH = "publishing.publishedPassword";
 const NEED_PASSWORD = "Enter a password to turn protection on";
 const BLANK_PASSWORD = "A password can't be only spaces";
-const PURPOSE =
-  "Visitors must enter a password before they can see the published site. Useful for client previews and staging.";
 const QUIET_BTN = `${SET_BTN} tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]`;
 
-/* 8136:216089: the card — 24 in, 16 between its rows, title 16/600. */
-const CARD = `${SET_CARD} tw:flex tw:flex-col tw:items-start tw:gap-4 tw:p-6`;
-const TITLE =
-  "tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:leading-6 tw:tracking-[-0.16px] tw:text-[var(--bk-ink)]";
-const NOTE_12 = "tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
-const LABEL_11 = "tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink)]";
+/* 2L9 B8-S11 238:13017: a 720 card, 16 in, the 14/600 title, the checkbox
+   "Ask visitors for a password", the Password field, the plan line in accent. */
+const CARD = `${SET_CARD} tw:flex tw:w-full tw:max-w-180 tw:flex-col tw:items-start tw:gap-2.5 tw:p-4`;
+const TITLE = "tw:m-0 tw:text-[length:var(--bk-text-14)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]";
+const PLAN_12 = "tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-5 tw:text-[var(--bk-accent)]";
+const LABEL_13 = "tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]";
 const DOOR_LINK =
   "tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:text-[var(--bk-accent)] tw:no-underline tw:hover:underline " +
   "tw:focus-visible:[box-shadow:var(--bk-shadow-focus)] tw:outline-none";
@@ -80,7 +78,7 @@ export const AccessScreen: React.FC<ScreenProps> = ({
   React.useEffect(() => {
     if (!focusSwitchRef.current || enabled) return;
     focusSwitchRef.current = false;
-    switchRowRef.current?.querySelector<HTMLElement>('[role="switch"]')?.focus();
+    switchRowRef.current?.querySelector<HTMLElement>('input[type="checkbox"]')?.focus();
   }, [enabled]);
 
   const load = useServerLoad<{ hasPublishedPassword?: boolean }>(
@@ -181,8 +179,7 @@ export const AccessScreen: React.FC<ScreenProps> = ({
     return (
       <Screen>
         <LoadCard
-          title="Password protection"
-          line="Keep the published site private behind a password."
+          title="Access"
           state={load.state}
           errorLine="Couldn't load your access settings. Check your connection, then try again."
           onRetry={load.retry}
@@ -198,25 +195,21 @@ export const AccessScreen: React.FC<ScreenProps> = ({
       {saveError ? <SaveErrorBanner message={saveError} /> : null}
 
       <section className={CARD} data-testid="set-card-password-protection">
-        <h3 className={TITLE}>Password protection · Pro</h3>
-        <p className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="set-access-purpose">
-          {PURPOSE}
-        </p>
-        <div ref={switchRowRef} className="tw:flex tw:min-h-8 tw:items-center tw:gap-4">
-          <span id="access-password-toggle-label" className={SET_ROW_LABEL}>
-            Password protection
-          </span>
-          <ToggleSwitch
-            checked={enabled}
-            onChange={(next) => {
-              setEnabled(next);
-              setChanging(false);
-              if (!next) setPassword("");
-            }}
-            aria-labelledby="access-password-toggle-label"
-            sizing="md"
-            data-testid="set-access-toggle"
-          />
+        <h3 className={TITLE}>Password protection</h3>
+        <div ref={switchRowRef} className="tw:flex tw:min-h-5 tw:items-center">
+          <label className={`${LABEL_13} tw:flex tw:items-center tw:gap-2`}>
+            <Checkbox
+              checked={enabled}
+              onChange={(e) => {
+                const next = e.target.checked;
+                setEnabled(next);
+                setChanging(false);
+                if (!next) setPassword("");
+              }}
+              data-testid="set-access-toggle"
+            />
+            Ask visitors for a password
+          </label>
         </div>
 
         {enabled && hasPassword ? (
@@ -229,7 +222,7 @@ export const AccessScreen: React.FC<ScreenProps> = ({
             so autoFocus never steals focus on open. */}
         {enabled && (!hasPassword || changing) ? (
           <div className="tw:flex tw:w-full tw:flex-col tw:gap-1" data-testid="set-field-access-password">
-            <label htmlFor="access-password" className={LABEL_11}>
+            <label htmlFor="access-password" className={LABEL_13}>
               {hasPassword ? "New password" : "Password"}
             </label>
             <Input
@@ -304,7 +297,10 @@ export const AccessScreen: React.FC<ScreenProps> = ({
           </p>
         ) : null}
 
-        <p className={NOTE_12}>Applies on next publish</p>
+        {/* The board's "Pro · included in your trial": no trial exists (code:no-trial). */}
+        <p className={PLAN_12} data-testid="set-access-plan">
+          Pro · included in your plan
+        </p>
       </section>
 
       {shareLinks}

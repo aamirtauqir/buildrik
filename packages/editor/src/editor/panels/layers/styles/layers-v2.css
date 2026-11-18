@@ -36,19 +36,19 @@
 
 .bdc-lr.bdc-canvas-hover { background: var(--bk-bg-subtle); }
 
-/* Board 244:1598 selected: accent tint + a 2px accent bar, label stays ink. */
+/* design-2l9 152:79448 / 147:75914 selected: an accent-tint pill inset 12
+   from the drawer edges, radius 6, no bar; the label stays ink. */
 .bdc-lr.bdc-sel {
-  background: var(--bk-accent-tint);
+  isolation: isolate;
 }
 
 .bdc-lr.bdc-sel::before {
   content: "";
   position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: var(--bk-accent);
+  inset: 0 var(--bk-space-12);
+  z-index: -1;
+  border-radius: var(--bk-radius-md);
+  background: var(--bk-accent-tint);
 }
 
 /* Board 1082:4610 (Layers · renaming): the row being renamed drops the
@@ -78,7 +78,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--bk-gray-500); font: 400 12px/16px var(--bk-font-ui);
+  color: var(--bk-ink); font: 400 12px/16px var(--bk-font-ui);
   transition: transform 120ms;
   background: transparent;
   border: none;
@@ -288,8 +288,9 @@
      with the row's own gutters doing the insetting. The 10 here inset every
      row inside the panel, so the trailing eye/lock cluster sat ~10 short of
      where every Layers board puts it. The top pad went with the gap: the first
-     row starts at 80 = header 44 + toolbar 36, with nothing between. */
-  padding: 0 0 10px;
+     row starts at 80 = header 44 + toolbar 36, with nothing between. 2L9
+     (152:79448, measured) puts 8 between the search band and the page row. */
+  padding: var(--bk-space-8) 0 10px;
   overflow-y: auto;
   flex: 1;
   min-height: 0;
@@ -307,7 +308,7 @@
 /* "Compact rows" off (C4 #18): the standard 32. Both heights were 28, so the
    display option toggled a class that changed nothing (QA 2026-09-24). */
 .bdc-layers-tree:not(.bdc-layers-tree-compact) .bdc-lr {
-  height: var(--bk-size-row);
+  height: var(--bk-size-row); gap: var(--bk-space-8); /* 2L9 152:78614: chevron · glyph · name 8 apart */
 }
 
 /* ==========================================================================
@@ -422,8 +423,8 @@
   height: var(--bk-size-row);
   display: flex;
   align-items: center;
-  /* v3 4418:81300: count text at x16, 11/16 ink-muted; ⓘ ends 16 in. */
-  padding: 0 var(--bk-space-12) 0 var(--bk-space-16);
+  /* design-2l9 147:75914 / 152:78614: a gray band, count text 12 in. */
+  padding: 0 var(--bk-space-12); background: var(--bk-gray-100);
   font: 400 var(--bk-text-11)/16px var(--bk-font-ui);
   color: var(--bk-ink-muted);
 }

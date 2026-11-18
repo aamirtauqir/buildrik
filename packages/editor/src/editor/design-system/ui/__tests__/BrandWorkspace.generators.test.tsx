@@ -17,7 +17,7 @@ describe("BrandWorkspace › Colour scale generator (BRP1-M9)", () => {
     const composer = makeFakeComposer(DEFAULT_TOKENS);
     const u = renderWorkspace(composer);
     act(() => { fireEvent.click(u.getByTestId("brand-generate-scale")); });
-    expect(u.getByTestId("brand-page-title").textContent).toBe("Colour scale generator");
+    expect(u.getByTestId("brand-page-title").textContent).toMatch(/^Colors · \d+$/);
     expect(u.getByTestId("brand-row-colours").getAttribute("aria-current")).toBe("page");
     expect((u.getByTestId("brand-scale-input") as HTMLInputElement).value.toUpperCase()).toBe("#1A56DB");
   });
@@ -30,22 +30,24 @@ describe("BrandWorkspace › Colour scale generator (BRP1-M9)", () => {
     act(() => { fireEvent.click(success); });
     act(() => { fireEvent.click(u.getByTestId("brand-token-menu")); });
     act(() => { fireEvent.click(u.getByTestId("brand-token-action-scale")); });
-    expect(u.getByTestId("brand-page-title").textContent).toBe("Colour scale generator");
+    expect(u.getByTestId("brand-page-title").textContent).toMatch(/^Colors · \d+$/);
     expect((u.getByTestId("brand-scale-input") as HTMLInputElement).value).toBe(resolveTokenLiteral(DEFAULT_TOKENS, "color-success", "light"));
   });
 });
 
-describe("BrandWorkspace › Restore points (BRP1-M10)", () => {
-  it("the header's 'Restore points' opens the list on any page, after Review changes", () => {
+describe("BrandWorkspace › Restore points ▾ (2L9 B6-B39)", () => {
+  it("the header's 'Restore points ▾' opens the list in a popover, on any page, without leaving it", () => {
     const composer = makeFakeComposer(DEFAULT_TOKENS);
     const u = renderWorkspace(composer);
     const header = u.getByTestId("brand-header");
     const action = u.getByTestId("brand-restore-points-action");
     expect(header.contains(action)).toBe(true);
+    expect(action.textContent).toBe("Restore points ▾");
     act(() => { fireEvent.click(action); });
-    expect(u.getByTestId("brand-page-title").textContent).toBe("Restore points");
-    expect(u.getByTestId("brand-restore-points")).toBeTruthy();
-    expect(u.getByTestId("brand-restore-guide").textContent).toContain("Changes apply instantly");
-    expect(u.container.querySelector('[aria-current="page"][data-section-id]')).toBeNull();
+    expect(action.getAttribute("aria-expanded")).toBe("true");
+    expect(u.getByTestId("brand-restore-points").textContent).toContain(
+      "Restoring replaces Brand values with the saved checkpoint. It is one step you can undo.",
+    );
+    expect(u.getByTestId("brand-page-title").textContent).toMatch(/^Colors · \d+$/);
   });
 });

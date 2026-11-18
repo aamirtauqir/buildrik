@@ -50,7 +50,6 @@ describe("refuseForbiddenSave — the switch to view mode bypasses the unload gu
     refuseForbiddenSave({
       siteId: "S2",
       composer: { exportProject: () => ({}) } as never,
-      addToast: () => "t",
       setIsDirty: () => {},
       setSaveState: () => {},
       navigate: (url) => seen.push({ url, bypassed: isUnloadGuardBypassed() }),

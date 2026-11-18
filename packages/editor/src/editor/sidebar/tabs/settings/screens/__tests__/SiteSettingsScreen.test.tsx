@@ -30,7 +30,7 @@ vi.mock("@/services/BuildrikSyncProvider", async (importOriginal) => ({
   saveSiteSettings: sync.saveSiteSettings,
 }));
 
-import { SiteSettingsScreen, SLUG_FORMAT_ERROR, SLUG_TAKEN_ERROR } from "../SiteSettingsScreen";
+import { SiteSettingsScreen, SLUG_FORMAT_ERROR, SLUG_TAKEN_ERROR, fileNameOf } from "../SiteSettingsScreen";
 import { SiteColumnsLockedContext } from "@/editor/sidebar/tabs/settings/shared";
 import { SettingsSaveCancelled } from "@/services/BuildrikSyncProvider";
 import type { SettingsFlush, SettingsFlushResult } from "@/editor/sidebar/tabs/settings/types";
@@ -97,7 +97,7 @@ function setup(opts: { projectId?: string | null; saveError?: string | null; sit
   return { composer: extra, props, ...utils };
 }
 
-const loaded = () => waitFor(() => expect(screen.getByTestId("set-card-site-identity")).toBeInTheDocument());
+const loaded = () => waitFor(() => expect(screen.getByTestId("set-card-site")).toBeInTheDocument());
 const input = (id: string) => document.getElementById(id) as HTMLInputElement;
 const lastHandler = <T,>(fn: { mock: { calls: unknown[][] } }) => {
   const calls = fn.mock.calls.filter((c) => c[0] !== null);
@@ -105,33 +105,37 @@ const lastHandler = <T,>(fn: { mock: { calls: unknown[][] } }) => {
 };
 const openAdvanced = () => fireEvent.click(screen.getByTestId("set-card-toggle-advanced"));
 
-describe("General · 8135:212718 — Site identity from the Site row", () => {
-  it("draws name, author, favicon + touch icon uploads, favicon URL and the Languages link; no social or language fields", async () => {
+describe("General · 2L9 B8-S02 238:10283 — Site and Icons cards from the Site row", () => {
+  it("draws Site (name, author) and Icons (favicon, touch icon rows); favicon URL and the Languages link sit in Advanced; no social or language fields", async () => {
     setup();
     await loaded();
-    expect(screen.getByTestId("set-card-title-site-identity")).toHaveTextContent("Site identity");
+    const titles = Array.from(document.querySelectorAll('[data-testid^="set-card-title-"]')).map((h) => h.textContent);
+    expect(titles[0]).toBe("Site");
+    expect(titles[1]).toBe("Icons");
+    expect(titles[2]).toContain("Advanced");
     expect(input("site-name").value).toBe("Acme Site");
     expect(input("site-author").value).toBe("Ada");
+    expect(screen.getByTestId("set-favicon-file-line")).toHaveTextContent("favicon.ico");
+    expect(screen.getByTestId("set-favicon-upload")).toHaveTextContent("Replace…");
+    expect(screen.getByTestId("set-touch-icon-file-line")).toHaveTextContent("Not set");
+    expect(screen.getByTestId("set-touch-icon-upload")).toHaveTextContent("Upload…");
+    openAdvanced();
     expect(input("favicon-url").value).toBe("https://acme.test/favicon.ico");
-    expect(screen.getByTestId("set-favicon-upload")).toHaveTextContent("Upload favicon");
-    expect(screen.getByTestId("set-touch-icon-upload")).toHaveTextContent("Upload touch icon");
-    expect(screen.getByTestId("set-field-touch-icon")).toHaveTextContent("PNG · 180×180 recommended");
     expect(screen.getByTestId("set-general-language")).toHaveTextContent("French (fr) · Manage in Languages ›");
     expect(screen.queryByLabelText("Twitter")).toBeNull();
     expect(screen.queryByLabelText("Site Language")).toBeNull();
     expect(getMock).toHaveBeenCalledWith({ siteId: "s1" });
   });
 
-  it("previews the favicon image, and the site's initials where there is none", async () => {
-    setup();
-    await loaded();
-    expect(screen.getByTestId("set-favicon-preview").querySelector("img")).toHaveAttribute("src", "https://acme.test/favicon.ico");
-    expect(screen.getByTestId("set-touch-icon-preview")).toHaveTextContent("AS");
+  it("fileNameOf takes the URL's last path segment, without query or hash", () => {
+    expect(fileNameOf("https://blob.test/sites/a/favicon%20v2.png?x=1#y")).toBe("favicon v2.png");
+    expect(fileNameOf("/favicon.ico")).toBe("favicon.ico");
   });
 
   it("the Languages link asks the shell to open Languages (guarded like a nav click), never ui:settings-open", async () => {
     const { composer, props } = setup();
     await loaded();
+    openAdvanced();
     fireEvent.click(screen.getByTestId("set-general-language"));
     expect(props.onOpenScreen).toHaveBeenCalledWith("localization");
     expect(composer.emit).not.toHaveBeenCalledWith(EVENTS.UI_SETTINGS_OPEN, expect.anything());
@@ -147,7 +151,7 @@ describe("General · 8135:212718 — Site identity from the Site row", () => {
     getMock.mockRejectedValueOnce(new Error("network"));
     setup();
     await waitFor(() => expect(screen.getByTestId("set-load-retry")).toBeInTheDocument());
-    expect(screen.getByTestId("set-load-title")).toHaveTextContent("Site identity");
+    expect(screen.getByTestId("set-load-title")).toHaveTextContent("Couldn’t load General");
     getMock.mockResolvedValueOnce(serverRow());
     fireEvent.click(screen.getByTestId("set-load-retry"));
     await loaded();
@@ -163,6 +167,7 @@ describe("General · 8135:212718 — Site identity from the Site row", () => {
     setup({ siteColumnsLocked: true });
     await loaded();
     expect(input("site-name").matches(":disabled")).toBe(true);
+    openAdvanced();
     expect(input("favicon-url").matches(":disabled")).toBe(true);
     expect(input("site-author").matches(":disabled")).toBe(false);
   });
@@ -175,6 +180,7 @@ describe("General — read-only (role below ADMIN)", () => {
     await loaded();
     expect(screen.getByTestId("set-favicon-upload").matches(":disabled")).toBe(true);
     expect(screen.getByTestId("set-touch-icon-upload").matches(":disabled")).toBe(true);
+    openAdvanced();
     const link = screen.getByTestId("set-general-language");
     expect(link.tagName).toBe("A");
     expect(link.matches(":disabled")).toBe(false);
@@ -337,7 +343,7 @@ describe("General — icon upload", () => {
       fireEvent.change(screen.getByTestId("set-touch-icon-file"), { target: { files: [file] } });
     });
     await waitFor(() =>
-      expect(screen.getByTestId("set-touch-icon-preview").querySelector("img")).toHaveAttribute("src", "https://blob.test/touch.png"),
+      expect(screen.getByTestId("set-touch-icon-file-line")).toHaveTextContent("touch.png"),
     );
     expect(api.upload.presign.mutate).toHaveBeenCalledWith({ fileName: "touch.png", fileType: "image/png", context: "touch_icon", siteId: "s1" });
     expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("/api/upload/f1"), expect.objectContaining({ method: "PUT" }));

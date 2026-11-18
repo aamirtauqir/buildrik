@@ -459,6 +459,9 @@ model CmsCollection {
   pageSlugPattern    String?
   pageSeoTitle       String?
   pageSeoDescription String?
+  // The slug of the image field whose value is each generated page's
+  // og:image (A-27, board 165:3693 "Social image").
+  pageSocialImage    String?
   // The publish-payload path of the page that templates each entry (e.g.
   // "blog/_template/index.html"). The publish step renders it per entry.
   pageTemplatePath   String?
@@ -618,10 +621,19 @@ model Page {
   translations    Json?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  // Page trash (design-2l9 A-21): a trashed page keeps its row for 30 days.
+  // `slug` then holds `<slug>~deleted~<id>` (frees @@unique) and the URL it
+  // had is in `trashedSlug`. Every read of live pages filters deletedAt: null.
+  deletedAt       DateTime?
+  deletedById     String?
+  trashedSlug     String?  @db.VarChar(100)
+  // Set by a restore: a save whose base predates it does not re-trash the page.
+  restoredAt      DateTime?
 
   site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
 
   @@unique([siteId, slug])
+  @@index([siteId, deletedAt])
   @@map("pages")
 }
 
@@ -1227,11 +1239,16 @@ model UserTemplate {
   createdBy   String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  /// Saved-template trash (design-2l9 B6-T24…T33): set = in Recently deleted
+  /// for USER_TEMPLATE_TRASH_RETENTION_DAYS, then purged. Same row, same
+  /// templateId — a restore keeps the template's identity.
+  deletedAt   DateTime?
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   @@unique([workspaceId, templateId])
   @@index([workspaceId, updatedAt])
+  @@index([workspaceId, deletedAt])
   @@map("user_templates")
 }
 

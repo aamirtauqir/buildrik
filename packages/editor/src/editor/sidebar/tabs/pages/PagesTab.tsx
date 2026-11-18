@@ -23,29 +23,71 @@ import {
   IconButton,
   Menu,
   MenuItem,
-  MenuSeparator,
   PanelFrame,
   PanelSearch,
   Popover,
+  Tabs,
+  useToast,
 } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
-import { listNames } from "@shared/utils/helpers/string";
-import type { DrawerTab, PageSettingsOpenRequest } from "./types";
+import { listNames, slugify } from "@shared/utils/helpers/string";
+import type { PageSettingsOpenRequest } from "./types";
 import { PageContextMenu } from "./components/PageContextMenu";
+import { MovePagesDialog, TOP_LEVEL } from "./components/MovePagesDialog";
 import { PageList } from "./components/PageList";
 import { SiteStructureTree } from "./components/SiteStructureTree";
+import { AddPageButton } from "./components/AddPageButton";
+import { LiveUrlConfirm, type LiveUrlChange } from "./components/LiveUrlConfirm";
+import { usePagesNotice } from "./usePagesNotice";
 import { SearchListingsTable } from "./components/SearchListingsTable";
 import { PageSettingsDrawer } from "./page-settings/PageSettingsDrawer";
 import { useDirtyPages } from "@/editor/shared/useDirtyPages";
 import { SettingsErrorBoundary } from "./page-settings/SettingsErrorBoundary";
 import { usePages } from "./usePages";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
+import { useSiteOrigin } from "@/editor/shared/useSiteOrigin";
 import { useFolders } from "./useFolders";
+import { cmsWorkspace } from "@/editor/cms/cmsWorkspaceStore";
+import { movePagesWithHistory, useFolderMoves } from "./folderHistory";
+import { pageRoute } from "./utils/slug";
 import { useBulkSelect } from "./useBulkSelect";
+import { useBulkDelete } from "./useBulkDelete";
+import { BulkDeleteResult } from "./components/BulkDeleteResult";
 import { useDynamicPagesSummary } from "./useDynamicPagesSummary";
 import { pageFileNames } from "@/engine/export";
+import { RecentlyDeletedView } from "./components/RecentlyDeletedView";
+import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
+import { roleAtLeast } from "@/services/RoleService";
 import "./PagesTab.css";
+
+type PageView = "pages" | "listings" | "structure";
+const PAGE_VIEWS: ReadonlyArray<{ id: PageView; label: string }> = [
+  { id: "pages", label: "Pages" },
+  { id: "listings", label: "Listings" },
+  { id: "structure", label: "Structure" },
+];
+
+/**
+ * One place up or down among the top-level pages, as the engine's "put it
+ * after <id>" (null = first). Moving up lands after whatever precedes the
+ * previous top-level page in SITE order, so folder members keep their
+ * places. Null at either end.
+ */
+export function rootMove(
+  siteOrder: readonly string[],
+  rootIds: readonly string[],
+  pageId: string,
+  direction: -1 | 1,
+): { afterId: string | null; position: number } | null {
+  const i = rootIds.indexOf(pageId);
+  const j = i + direction;
+  if (i < 0 || j < 0 || j >= rootIds.length) return null;
+  if (direction === 1) return { afterId: rootIds[j], position: j + 1 };
+  const order = siteOrder.filter((id) => id !== pageId);
+  const at = order.indexOf(rootIds[j]);
+  return { afterId: at > 0 ? order[at - 1] : null, position: j + 1 };
+}
 
 export interface PagesTabProps {
   composer: Composer | null;
@@ -73,7 +115,12 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   onRequestTemplates,
   openSettingsRequest,
 }) => {
-  const p = usePages(composer);
+  /* A-21: "Recently deleted" replaces the panel's body until ‹ Back to Pages. */
+  const [trashOpen, setTrashOpen] = React.useState(false);
+  const openTrash = React.useCallback(() => setTrashOpen(true), []);
+  const canPurge = roleAtLeast(useEditorRole(), "ADMIN") !== false;
+  const p = usePages(composer, { onOpenTrash: openTrash });
+  const { notice, setNotice } = usePagesNotice(p.pages);
 
   // Folders — sidebar-only, localStorage-persisted
   /* This read was `(composer as { id?: string })?.id`, and Composer has no
@@ -81,12 +128,16 @@ export const PagesTab: React.FC<PagesTabProps> = ({
      every site shared one folder blob. The site is the thing folders belong
      to, and the URL is where the editor already gets it. */
   const folderScopeId = getSiteIdFromUrl();
+  /* The Structure view's root (board 63:21939): the published host. */
+  const getSiteOrigin = useSiteOrigin(composer, folderScopeId);
+  const siteOrigin = getSiteOrigin();
+  const siteHost = siteOrigin ? siteOrigin.replace(/^https?:\/\//, "").replace(/\/$/, "") : null;
   const livePageIds = React.useMemo(
     () => new Set(p.pages.map((pg) => pg.id)),
     [p.pages]
   );
   const f = useFolders(folderScopeId, livePageIds);
-  const [newFolderId, setNewFolderId] = React.useState<string | null>(null);
+  const [draftingFolder, setDraftingFolder] = React.useState(false);
   const bulk = useBulkSelect();
 
   /* FC-1 (fix-all 2026-09-25): pages a page-generating CMS collection
@@ -94,10 +145,10 @@ export const PagesTab: React.FC<PagesTabProps> = ({
      Read-only hint row only — opening a collection's own Dynamic pages tab
      is still where the pattern/template are edited. */
   const dynamicPages = useDynamicPagesSummary(composer);
-  const openDynamicPages = React.useCallback(() => {
-    if (!dynamicPages.collectionId) return;
-    composer?.emit(EVENTS.UI_CMS_OPEN, { collectionId: dynamicPages.collectionId, tab: "dynamic-pages" });
-  }, [composer, dynamicPages.collectionId]);
+  const manageCollection = React.useCallback(
+    (collectionId: string) => composer?.emit(EVENTS.UI_CMS_OPEN, { collectionId, tab: "dynamic-pages" }),
+    [composer],
+  );
 
   // Prune stale folder references when pages are deleted
   React.useEffect(() => {
@@ -109,7 +160,6 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   /* Board 183:2 confirms a BULK delete by name before it happens — "Delete 3
      pages?" over the list of them. The single-page path has always asked;
      selecting three and pressing Delete removed all three on the spot. */
-  const [bulkDeleteIds, setBulkDeleteIds] = React.useState<string[] | null>(null);
   const deleteTarget = p.pages.find((pg) => pg.id === deleteTargetId);
   /* EDT-057 (board E3): deleting a collection's template page stops its
      record pages publishing — the confirm names the collection and how many. */
@@ -133,7 +183,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   const [nameError, setNameError] = React.useState<string | null>(null);
 
   /* v3 FC-2 (2026-09-25): the panel's ⌘K rows (New page · Go to <page>) now
-     register from the SHELL (usePageJumpList + usePageCommands, called once
+     register from the SHELL (usePageSummaries + usePageCommands, called once
      in StudioPanels) so they're in the palette whether or not this panel is
      mounted — like Layers/Assets/Records/Templates. The panel-local palette
      and its own ⌘K listener are still gone — decision #38, TODOS.md:393. */
@@ -151,7 +201,25 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   // Redesign P4 (50-pages): the panel has two views — the page tree ("Pages")
   // and the whole-site search-listings table ("Search listings"). Default to the
   // tree; the table is the SEO-at-a-glance view that scales past a few pages.
-  const [view, setView] = React.useState<"pages" | "listings" | "structure">("pages");
+  const [view, setView] = React.useState<PageView>("pages");
+  /* Board 63:21262 draws Listings in the wide drawer, Pages and Structure in
+     the narrow one. Only a CHANGE of view moves the width, and the drawer
+     narrows again only if Listings widened it — "Narrow panel" / "Widen
+     panel" in ⋯ still win while a view is showing. */
+  const viewRef = React.useRef(view);
+  const widenedForListings = React.useRef(false);
+  React.useEffect(() => {
+    if (viewRef.current === view) return;
+    viewRef.current = view;
+    if (!onExpandToggle) return;
+    if (view === "listings" && !isExpanded) {
+      widenedForListings.current = true;
+      onExpandToggle();
+    } else if (view !== "listings" && isExpanded && widenedForListings.current) {
+      widenedForListings.current = false;
+      onExpandToggle();
+    }
+  }, [view, isExpanded, onExpandToggle]);
 
   /* Board 7069:79383 "Pages · Panel menu (⋯)": Select pages… · Show structure ·
      Reload, plus the Listings row (EP-11, 7576:197553). Listings and Structure
@@ -182,12 +250,12 @@ export const PagesTab: React.FC<PagesTabProps> = ({
      already closed. The handler is stable on purpose: the prop stays held for
      the whole visit, and an effect that re-ran on every page re-sync would
      reopen a drawer the user had just closed. */
-  const [doorTab, setDoorTab] = React.useState<DrawerTab | undefined>(undefined);
+  const [door, setDoor] = React.useState<Omit<PageSettingsOpenRequest, "pageId"> | undefined>(undefined);
   const { openSettings, closeSettings: closePageSettings } = p;
   const onOpen = React.useCallback(
-    ({ pageId, tab }: PageSettingsOpenRequest) => {
+    ({ pageId, tab, redirectSaved }: PageSettingsOpenRequest) => {
       openSettings(pageId);
-      setDoorTab(tab);
+      setDoor({ tab, redirectSaved });
     },
     [openSettings],
   );
@@ -203,13 +271,17 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   }, [composer, onOpen]);
 
   const closeSettings = React.useCallback(() => {
-    setDoorTab(undefined);
+    setDoor(undefined);
     closePageSettings();
   }, [closePageSettings]);
 
   const [movedFrom, setMovedFrom] = React.useState<{ pageId: string; slug: string } | null>(null);
+  /* design-2l9 63:15255: "Update URL" on a LIVE page asks first. Live is
+     real state: the site has been published (project metadata's
+     publishedUrl) and the page is not hidden from publish. */
+  const [liveUrlChange, setLiveUrlChange] = React.useState<LiveUrlChange | null>(null);
   const handleRenameCommit = React.useCallback(
-    (pageId: string, name: string, updateUrl?: boolean) => {
+    (pageId: string, name: string, updateUrl?: boolean, confirmed = false) => {
       const trimmed = name.trim();
       if (trimmed) {
         const exists = p.pages.some(
@@ -221,8 +293,18 @@ export const PagesTab: React.FC<PagesTabProps> = ({
         }
       }
       setNameError(null);
-      const before = p.pages.find((pg) => pg.id === pageId)?.slug;
+      const page = p.pages.find((pg) => pg.id === pageId);
+      const before = page?.slug;
+      const siteLive = Boolean(composer?.getProjectMetadata?.()?.publishedUrl);
+      if (updateUrl && !confirmed && page && !page.isHome && siteLive && page.status !== "hidden") {
+        setLiveUrlChange({ pageId, current: page.name, name: trimmed, from: pageRoute(page), to: `/${slugify(trimmed)}` });
+        p.cancelRename();
+        return;
+      }
       p.commitRename(pageId, name, updateUrl);
+      if (!updateUrl && page && !page.isHome && trimmed && trimmed !== page.name) {
+        setNotice({ text: `Page renamed. URL kept at ${pageRoute(page)}.` });
+      }
       /* Boards 6887:75724 / 75760 / 79128: "Update URL" lands in Page settings
          with the redirect offer for the URL it just moved off. */
       if (updateUrl && before) {
@@ -230,7 +312,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
         p.openSettings(pageId);
       }
     },
-    [p]
+    [p, composer]
   );
 
   const handleDeleteRequest = (pageId: string) => {
@@ -284,67 +366,136 @@ export const PagesTab: React.FC<PagesTabProps> = ({
 
   // Bulk actions
   const handleBulkDuplicate = React.useCallback(() => {
-    bulk.selectedIds.forEach((id) => p.duplicatePage(id));
+    p.duplicatePages([...bulk.selectedIds]);
     bulk.clearSelection();
-  }, [bulk.selectedIds, p.duplicatePage, bulk.clearSelection]);
+  }, [bulk.selectedIds, p.duplicatePages, bulk.clearSelection]);
 
-  /** Resolve what a bulk delete would actually remove, applying the same
-   *  guards as the per-page path: never the home page, never the last one. */
-  const resolveBulkDeletable = React.useCallback((): string[] => {
-    const selected = [...bulk.selectedIds];
-    // The home page is never bulk-deletable (matches the per-page guard).
-    let deletable = selected.filter((id) => {
-      const pg = p.pages.find((x) => x.id === id);
-      return pg && !pg.isHome;
-    });
-    // A site always needs ≥1 page. If the selection would wipe every page
-    // (e.g. no page is flagged home), spare the first one in tree order so
-    // the action isn't a silent no-op.
-    if (deletable.length >= p.pages.length && orderedPageIds.length > 0) {
-      const spareId = orderedPageIds[0];
-      deletable = deletable.filter((id) => id !== spareId);
-    }
-    if (deletable.length === 0) {
-      // Nothing bulk-deletable (only the home/last page was selected) —
-      // route through the guarded single-delete so the user still gets the
-      // explanatory toast instead of nothing happening.
-      if (selected.length > 0) p.deletePage(selected[0]);
-      bulk.clearSelection();
-      return [];
-    }
-    return deletable;
-  }, [bulk.selectedIds, p.pages, p.deletePage, orderedPageIds, bulk.clearSelection]);
+  /* design-2l9 122:43815 / 122:44151: over an open CMS record, opening a page
+     leaves the CMS through the record's guard ("You asked to open About"). */
+  const openPage = React.useCallback((id: string) => {
+    if (!cmsWorkspace.get().overPages) return p.selectPage(id);
+    const name = p.pages.find((pg) => pg.id === id)?.name ?? "this page";
+    cmsWorkspace.exit(
+      () => { cmsWorkspace.setOverPages(false); p.selectPage(id); },
+      {
+        name,
+        exists: () => Boolean(composer?.elements.getPage?.(id)),
+        isCurrent: composer?.elements.getActivePage?.()?.id === id,
+      },
+    );
+  }, [p.selectPage, p.pages, composer]);
+  const bulkDelete = useBulkDelete({ pages: p.pages, orderedPageIds, bulk, deletePage: p.deletePage, deletePages: p.deletePages });
 
-  const handleBulkDelete = React.useCallback(() => {
-    const deletable = resolveBulkDeletable();
-    if (deletable.length > 0) setBulkDeleteIds(deletable);
-  }, [resolveBulkDeletable]);
-
-  /* The dialog is NOT closed here. Board 183:60 keeps it up long enough to
-     report what happened ("3 pages deleted." / "Closing…") and then closes
-     itself — the panel used to drop the modal on the same tick and leave the
-     result to whatever toast deletePage happened to raise, which is a report
-     from a different surface about a different unit of work. */
-  const confirmBulkDelete = React.useCallback(() => {
-    p.deletePages(bulkDeleteIds ?? []);
-    bulk.clearSelection();
-  }, [bulkDeleteIds, p.deletePages, bulk.clearSelection]);
+  const { addToast } = useToast();
+  const moveFolders = useFolderMoves(composer, f);
 
   const handleBulkMoveToFolder = React.useCallback(
     (folderId: string) => {
-      bulk.selectedIds.forEach((id) => f.movePageToFolder(id, folderId));
+      const name = f.folders.find((fd) => fd.id === folderId)?.name ?? "folder";
+      moveFolders([...bulk.selectedIds], folderId, `${bulk.selectedIds.size} pages moved to ${name} · URLs unchanged`);
       bulk.clearSelection();
     },
-    [bulk.selectedIds, f.movePageToFolder, bulk.clearSelection]
+    [bulk.selectedIds, f.folders, moveFolders, bulk.clearSelection]
   );
 
   const handleBulkRemoveFromFolders = React.useCallback(() => {
-    bulk.selectedIds.forEach((id) => f.removePageFromFolder(id));
+    moveFolders([...bulk.selectedIds], TOP_LEVEL, `${bulk.selectedIds.size} pages moved to the top level · URLs unchanged`);
     bulk.clearSelection();
-  }, [bulk.selectedIds, f.removePageFromFolder, bulk.clearSelection]);
+  }, [bulk.selectedIds, moveFolders, bulk.clearSelection]);
+
+  /* Boards 137:53911 / 137:59625: one place up or down among the TOP-LEVEL
+     pages (folder members are not ordered). The engine orders the whole site
+     ("after <id>"), so moving above the previous top-level page lands after
+     whatever precedes it in site order. Page order is not in the composer's
+     history, so the receipt's Undo puts the page back after its old
+     neighbour itself. */
+  const rootIds = React.useMemo(
+    () => p.pages.filter((pg) => !f.pageToFolder.has(pg.id)).map((pg) => pg.id),
+    [p.pages, f.pageToFolder],
+  );
+  const movePage = React.useCallback(
+    (pageId: string, direction: -1 | 1) => {
+      const page = p.pages.find((pg) => pg.id === pageId);
+      const order = p.pages.map((pg) => pg.id);
+      const move = rootMove(order, rootIds, pageId, direction);
+      if (!composer || !page || !move) return;
+      /* Where it sat, so Undo can put it back (boards 137:53911 / 137:59625). */
+      const at = order.indexOf(pageId);
+      const wasAfter = at > 0 ? order[at - 1] : null;
+      if (!composer.elements.reorderPage(pageId, move.afterId)) return;
+      addToast({
+        description: `${page.name} moved to position ${move.position}${page.isHome ? " · Still the homepage" : ""}`,
+        tone: "info",
+        action: { label: "Undo", onClick: () => { composer.elements.reorderPage(pageId, wasAfter); } },
+      });
+    },
+    [composer, p.pages, rootIds, addToast],
+  );
+
+  /* Board 131:41791 "Move to folder…" — the one-page Move dialog. */
+  const [movingPageId, setMovingPageId] = React.useState<string | null>(null);
+  const movingPage = p.pages.find((pg) => pg.id === movingPageId);
+  const moveToTarget = React.useCallback(
+    (target: string) => {
+      const page = movingPage;
+      setMovingPageId(null);
+      if (!page) return;
+      const from = f.folders.find((fd) => fd.id === f.pageToFolder.get(page.id));
+      const to = f.folders.find((fd) => fd.id === target);
+      /* Boards 127:38819 / 131:41086 / 127:40244. */
+      moveFolders([page.id], target, to
+        ? `${page.name} moved to ${to.name} · ${pageRoute(page)} unchanged`
+        : `${page.name} removed from ${from?.name ?? "its folder"} · Page kept`);
+    },
+    [movingPage, f, moveFolders],
+  );
+
+  /* Board 137:58206: "{Folder} deleted · About kept at top level" — its
+     pages stay, at the top level. No Undo: folders are outside composer
+     history (A-13). */
+  const deleteFolder = React.useCallback(
+    (folderId: string) => {
+      const folder = f.folders.find((fd) => fd.id === folderId);
+      f.deleteFolder(folderId);
+      if (!folder) return;
+      const kept = folder.pageIds.map((id) => p.pages.find((pg) => pg.id === id)?.name).filter((n): n is string => !!n);
+      addToast({
+        description: kept.length
+          ? `${folder.name} deleted · ${listNames(kept)} kept at top level`
+          : `${folder.name} deleted`,
+        tone: "info",
+      });
+    },
+    [f, p.pages, addToast],
+  );
+
+  /* Board 63:13820 "Save as template…": the save-template modal saves the
+     ACTIVE page, so the row's page goes active first. */
+  const saveAsTemplate = React.useCallback(
+    (pageId: string) => {
+      p.selectPage(pageId);
+      composer?.emit(EVENTS.TEMPLATE_SAVE_REQUESTED, {});
+    },
+    [p, composer],
+  );
 
   const menuFolderId = p.contextMenu ? f.pageToFolder.get(p.contextMenu.pageId) : undefined;
+  const menuRootIndex = p.contextMenu ? rootIds.indexOf(p.contextMenu.pageId) : -1;
   const menuFolderName = f.folders.find((fd) => fd.id === menuFolderId)?.name;
+
+  if (trashOpen) {
+    return (
+      <RecentlyDeletedView
+        composer={composer}
+        siteId={folderScopeId}
+        canPurge={canPurge}
+        onRestored={f.reload}
+        onBack={() => setTrashOpen(false)}
+        onClose={onClose}
+        onHelpClick={onHelpClick}
+      />
+    );
+  }
 
   return (
     // `bd-pg-panel` is the DS V2 root class — new PagesTab.css uses it as the
@@ -357,12 +508,15 @@ export const PagesTab: React.FC<PagesTabProps> = ({
       {/* v3 4418:90494 header: the ⋯ panel menu rides in the header's
           `actions` slot. No ⌘K keycap — the topbar field is the ⌘K door. */}
       <PanelFrame.Header
-        title="Pages"
+        title={`Pages · ${p.pages.length}`}
         onHelpClick={onHelpClick}
         onClose={onClose}
         actions={
           <>
-            {bulkMode ? (
+            {/* Board 139:47668: with pages ticked the header keeps ⋯ and the
+                bulk band's Clear ends the selection; Done is select mode
+                with nothing ticked yet. */}
+            {bulkMode && !bulk.hasSelection ? (
               /* v3 7069:78984: select mode swaps the ⋯ for "Done". */
               <Button
                 color="light"
@@ -378,6 +532,9 @@ export const PagesTab: React.FC<PagesTabProps> = ({
               open={menuOpen}
               onClose={() => setMenuOpen(false)}
               placement="bottom-end"
+              /* End-aligned on ⋯ it would start 42px into the rail; the board
+                 starts it at the drawer's left edge. */
+              className="tw:-mr-[42px]"
               label="Pages options"
               trigger={
                 <IconButton
@@ -391,11 +548,12 @@ export const PagesTab: React.FC<PagesTabProps> = ({
                 </IconButton>
               }
             >
-              {/* v3 7069:79383: Select pages… · Listings · Show structure, a
-                  rule, Reload. The board's ⌘R hint is not drawn — ⌘R is the
-                  browser's reload and nothing here binds it. "Widen panel"
-                  is the header's old expand button, as in Layers. */}
-              <Menu label="Pages options" className="tw:w-56">
+              {/* design-2l9 board 65:17148: Select pages… · Listings · Show
+                  structure · Reload, no rule, 280 wide from the drawer's left
+                  edge. Listings widens the drawer by itself, so the old
+                  "Widen panel" row is gone. "Recently deleted" is the page
+                  trash (A-21). */}
+              <Menu label="Pages options" className="tw:-mx-2 tw:w-[276px]">
                 <MenuItem data-testid="pages-menu-select" onClick={runMenu(() => setSelectMode(true))}>
                   Select pages…
                 </MenuItem>
@@ -405,32 +563,58 @@ export const PagesTab: React.FC<PagesTabProps> = ({
                 <MenuItem data-testid="pages-open-structure" onClick={runMenu(() => setView("structure"))}>
                   Show structure
                 </MenuItem>
-                <MenuSeparator />
                 <MenuItem data-testid="pages-menu-reload" onClick={runMenu(p.retrySync)}>
                   Reload
                 </MenuItem>
-                {onExpandToggle && (
-                  <MenuItem data-testid="pages-wide-view" onClick={runMenu(onExpandToggle)}>
-                    {isExpanded ? "Narrow panel" : "Widen panel"}
-                  </MenuItem>
-                )}
+                <MenuItem data-testid="pages-menu-trash" onClick={runMenu(openTrash)}>
+                  Recently deleted
+                </MenuItem>
               </Menu>
             </Popover>
             )}
           </>
         }
       />
-      {/* Only over the page list it filters — the listings and structure
-          views take no query, and a dead field over them would be a lie. */}
-      {(p.loadError || view === "pages") && (
-        <PanelSearch placeholder="Search pages…" value={search} onChange={setSearch} data-testid="pages-search" />
+      {/* Over all three views (boards 63:6393 / 63:21262 / 63:21939): it
+          filters names and URLs in each. */}
+      <PanelSearch placeholder="Search pages…" value={search} onChange={setSearch} data-testid="pages-search" />
+      {/* Board 63:6393: the three views as tabs under the search (they were
+          ⋯ rows only; the ⋯ keeps them too, as board 65:17148 draws). */}
+      {!p.loadError && (
+        <Tabs
+          label="Pages view"
+          tabs={PAGE_VIEWS}
+          value={view}
+          onChange={(id) => setView(id as PageView)}
+          data-testid="pages-view-tabs"
+          /* Board 63:6393: a gray well, the chosen view on a white chip. */
+          className="tw:mx-3 tw:my-2 tw:gap-0 tw:rounded-md tw:bg-[var(--bk-gray-100)] tw:p-0.5"
+          tabClassName="tw:h-7 tw:flex-1 tw:px-0 tw:text-[13px] tw:text-[var(--bk-ink-soft)] tw:aria-selected:bg-[var(--bk-bg-card)] tw:aria-selected:text-[var(--bk-ink)] tw:aria-selected:hover:bg-[var(--bk-bg-card)] tw:aria-selected:[box-shadow:var(--bk-shadow-raised)]"
+        />
       )}
       {/* Board 141:165 keeps the search band and the Add-page footer either
           side of the error, so the error is a BODY state inside PageList — not
           a replacement for the whole panel body. */}
       <PanelFrame.Body noScroll>
           {view === "structure" && !p.loadError ? (
-            <SiteStructureTree pages={p.pages} onSelectPage={(id) => { p.selectPage(id); }} onBack={() => setView("pages")} />
+            <div className="tw:flex tw:h-full tw:min-h-0 tw:flex-col">
+              <SiteStructureTree
+                pages={p.pages}
+                onSelectPage={openPage}
+                onRowMenu={p.openContextMenu}
+                host={siteHost}
+                collections={dynamicPages.collections}
+                search={search}
+              />
+              {/* Board 63:21939 keeps the Pages footer under the tree too. */}
+              <div className="bd-pg-footer" data-testid="pages-footer">
+                <AddPageButton
+                  onAddBlank={requestNewPage}
+                  onFromTemplate={onRequestTemplates}
+                  onAddFolder={() => { setView("pages"); setDraftingFolder(true); }}
+                />
+              </div>
+            </div>
           ) : view === "listings" && !p.loadError ? (
             /* PanelFrame.Body is `flex-1 min-h-0 overflow-hidden` — flex-1 as a
                CHILD, but it is not itself display:flex, so these two stack as
@@ -442,20 +626,21 @@ export const PagesTab: React.FC<PagesTabProps> = ({
                inert for the same reason — written for a flex parent it never
                had. */
             <div className="tw:flex tw:h-full tw:min-h-0 tw:flex-col">
-              <Button
-                color="light"
-                size="xs"
-                className="bd-pg-listings-back"
-                data-testid="pages-listings-back"
-                onClick={() => setView("pages")}
-              >
-                {"\u2039"} Pages
-              </Button>
-              <SearchListingsTable pages={p.pages} onEditPage={p.openSettings} onOpenFull={onExpandToggle} />
+              <SearchListingsTable pages={p.pages} onEditPage={p.openSettings} onRowMenu={p.openContextMenu} search={search} />
+              {/* Board 63:21262 keeps the Pages footer under the listing. A new
+                  folder only shows in the Pages view, so it goes there. */}
+              <div className="bd-pg-footer" data-testid="pages-footer">
+                <AddPageButton
+                  onAddBlank={requestNewPage}
+                  onFromTemplate={onRequestTemplates}
+                  onAddFolder={() => { setView("pages"); setDraftingFolder(true); }}
+                />
+              </div>
             </div>
           ) : (
           <PageList
             pages={p.pages}
+            notice={notice}
             renamingPageId={p.renamingPageId}
             nameError={nameError}
             loadError={p.loadError}
@@ -467,18 +652,24 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             pageToFolder={f.pageToFolder}
             selectedIds={bulk.selectedIds}
             search={search}
-            onSearchEverywhere={composer ? (query) => composer.emit(EVENTS.UI_TOGGLE_COMMAND_PALETTE, { query }) : undefined}
             onAddPage={requestNewPage}
-            onAddFolder={() => setNewFolderId(f.createFolder("New Folder"))}
-            newFolderId={newFolderId}
-            onSelectPage={p.selectPage}
+            onAddFolder={() => setDraftingFolder(true)}
+            draftingFolder={draftingFolder}
+            onCreateFolder={(name) => { f.createFolder(name); setDraftingFolder(false); addToast({ description: `${name} created · Only visible to you`, tone: "info" }); /* 127:37393 */ }}
+            onCancelFolderDraft={() => setDraftingFolder(false)}
+            onSelectPage={(id) => {
+              setNotice(null);
+              openPage(id);
+            }}
             onToggleSelect={handleToggleSelect}
             onBulkDuplicate={handleBulkDuplicate}
             onBulkMoveToFolder={handleBulkMoveToFolder}
             onBulkRemoveFromFolders={handleBulkRemoveFromFolders}
-            onBulkDelete={handleBulkDelete}
+            onBulkDelete={bulkDelete.request}
+            bulkResult={bulkDelete.report && <BulkDeleteResult report={bulkDelete.report} onRetry={bulkDelete.retry} />}
             onClearSelection={leaveSelectMode}
             onContextMenu={p.openContextMenu}
+            onMovePage={movePage}
             dirtyPages={dirtyPages}
             onRenameStart={p.startRename}
             onRenameCommit={handleRenameCommit}
@@ -486,11 +677,13 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             onRequestTemplates={onRequestTemplates}
             onFolderToggle={f.toggleCollapse}
             onFolderRename={f.renameFolder}
-            onFolderDelete={f.deleteFolder}
-            onMovePageToFolder={f.movePageToFolder}
-            onRemovePageFromFolder={f.removePageFromFolder}
-            dynamicPagesCount={dynamicPages.count}
-            onOpenDynamicPages={openDynamicPages}
+            onFolderDelete={deleteFolder}
+            onMovePageToFolder={(id, to) => movePagesWithHistory(composer, f, [id], to, "Page moved to folder")}
+            onRemovePageFromFolder={(id) => movePagesWithHistory(composer, f, [id], TOP_LEVEL, "Page removed from folder")}
+            collectionPages={dynamicPages.collections}
+            onOpenTemplatePage={p.selectPage}
+            onManageCollection={manageCollection}
+            onClearSearch={() => setSearch("")}
           />
           )}
       </PanelFrame.Body>
@@ -510,10 +703,32 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           onCopyLink={p.copyPageLink}
           onSettings={p.openSettings}
           folderName={menuFolderName}
-          onRemoveFromFolder={f.removePageFromFolder}
+          onRemoveFromFolder={(id) => moveFolders([id], TOP_LEVEL, `${p.pages.find((pg) => pg.id === id)?.name ?? "Page"} removed from ${menuFolderName ?? "its folder"} · Page and URL kept`) /* 137:52464 */}
+          onSaveAsTemplate={saveAsTemplate}
+          onMoveToFolder={setMovingPageId}
+          onMove={movePage}
+          rootPosition={menuRootIndex >= 0 ? { index: menuRootIndex, count: rootIds.length } : null}
         />
       )}
+      <MovePagesDialog
+        open={!!movingPage}
+        pageNames={movingPage ? [movingPage.name] : []}
+        folders={f.folders}
+        current={movingPage ? { target: f.pageToFolder.get(movingPage.id) ?? TOP_LEVEL, url: pageRoute(movingPage) } : undefined}
+        onMove={moveToTarget}
+        onClose={() => setMovingPageId(null)}
+      />
       {/* Delete confirmation dialog */}
+      {liveUrlChange && (
+        <LiveUrlConfirm
+          change={liveUrlChange}
+          onCancel={() => setLiveUrlChange(null)}
+          onConfirm={() => {
+            setLiveUrlChange(null);
+            handleRenameCommit(liveUrlChange.pageId, liveUrlChange.name, true, true);
+          }}
+        />
+      )}
       <ConfirmDialog
         open={!!deleteTargetId}
         onClose={() => setDeleteTargetId(null)}
@@ -533,10 +748,10 @@ export const PagesTab: React.FC<PagesTabProps> = ({
       />
       {/* Board 183:2 — the bulk confirm names what goes. */}
       <ConfirmDialog
-        open={!!bulkDeleteIds}
-        onClose={() => setBulkDeleteIds(null)}
-        onConfirm={confirmBulkDelete}
-        title={`Delete ${bulkDeleteIds?.length ?? 0} page${(bulkDeleteIds?.length ?? 0) === 1 ? "" : "s"}?`}
+        open={!!bulkDelete.confirmIds}
+        onClose={bulkDelete.closeConfirm}
+        onConfirm={bulkDelete.confirm}
+        title={`Delete ${bulkDelete.confirmIds?.length ?? 0} page${(bulkDelete.confirmIds?.length ?? 0) === 1 ? "" : "s"}?`}
         /* Said "This cannot be undone." Bulk delete is the SAME deletePage
            call in a loop, and the loop lands in one history entry: selected
            two pages in the running editor, deleted them, and a single ⌘Z
@@ -547,14 +762,14 @@ export const PagesTab: React.FC<PagesTabProps> = ({
            the way back. The board's "Undo is available for 30 seconds" is
            not how undo works here: ⌘Z has no clock. */
         message={`${listNames(
-          (bulkDeleteIds ?? []).map((id) => p.pages.find((pg) => pg.id === id)?.name ?? id),
+          (bulkDelete.confirmIds ?? []).map((id) => p.pages.find((pg) => pg.id === id)?.name ?? id),
         )} — and everything on them — are removed. Inbound links to these pages will break. One undo (⌘Z) brings them all back.`}
-        confirmLabel={`Delete ${bulkDeleteIds?.length ?? 0} page${(bulkDeleteIds?.length ?? 0) === 1 ? "" : "s"}`}
+        confirmLabel={`Delete ${bulkDelete.confirmIds?.length ?? 0} page${(bulkDelete.confirmIds?.length ?? 0) === 1 ? "" : "s"}`}
         tone="destructive"
         testId="pages-bulk-delete"
         success={{
           title: "Deleted",
-          message: `${bulkDeleteIds?.length ?? 0} page${(bulkDeleteIds?.length ?? 0) === 1 ? "" : "s"} deleted.`,
+          message: `${bulkDelete.deletedCount} page${bulkDelete.deletedCount === 1 ? "" : "s"} deleted.`,
         }}
       />
 
@@ -571,7 +786,8 @@ export const PagesTab: React.FC<PagesTabProps> = ({
               setMovedFrom(null);
               closeSettings();
             }}
-            initialTab={doorTab}
+            initialTab={door?.tab}
+            redirectSaved={door?.redirectSaved}
             previousSlug={movedFrom?.pageId === settingsPage.id ? movedFrom.slug : undefined}
           />
         </SettingsErrorBoundary>

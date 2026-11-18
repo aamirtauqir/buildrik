@@ -1,6 +1,14 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { VERCEL_CHECK_LABEL, type PrePublishChecksResult, type PublishPage } from "@buildrik/shared/schemas/publish";
+import {
+  PASSWORD_CHECK_LABEL,
+  PLAN_LIMIT_CHECK_LABEL,
+  VERCEL_CHECK_LABEL,
+  buildPublishSteps,
+  type PrePublishChecksResult,
+  type PublishPage,
+} from "@buildrik/shared/schemas/publish";
+import { getPlanLimit, type PlanName } from "@/lib/constants/plan-limits";
 import { asContentRoot, CONTENT_CHECK_LABELS, detectContentIssues } from "@buildrik/shared/content/contentIssues";
 import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
 import { appendDynamicPagesToPublish, findEmptyBindings, findStaleTemplateBindings, findUnboundLists } from "@/server/services/cms.service";
@@ -22,6 +30,47 @@ import {
 
 const CMS_EMPTY_BINDINGS_LABEL = "CMS bindings";
 
+const PLAN_LABEL: Record<PlanName, string> = { FREE: "Free", PRO: "Pro", BUSINESS: "Business" };
+const planNameOf = (raw: string | null | undefined): PlanName => (raw === "PRO" || raw === "BUSINESS" ? raw : "FREE");
+
+/**
+ * The plan's own refusals, as pre-publish failures:
+ *  - A-34 (B8-PB22): a workspace keeps its sites past a downgrade; the ones
+ *    beyond the plan's limit (oldest first keep their place) cannot publish.
+ *  - A-36 (B8-PB16): a site that kept a password after its workspace lost
+ *    password protection (Pro+) would otherwise ship open — the Vercel
+ *    protection call is skipped on plans without it.
+ */
+async function planChecks(
+  siteId: string,
+  site: { workspaceId: string; createdAt: Date; publishedPassword: string | null; workspace: { plan: string } | null },
+): Promise<PrePublishChecksResult["checks"]> {
+  const plan = planNameOf(site.workspace?.plan);
+  const out: PrePublishChecksResult["checks"] = [];
+  const limit = getPlanLimit(plan, "sites");
+  if (typeof limit === "number" && limit >= 0) {
+    const ahead = await prisma.site.count({
+      where: {
+        workspaceId: site.workspaceId,
+        deletedAt: null,
+        id: { not: siteId },
+        OR: [{ createdAt: { lt: site.createdAt } }, { createdAt: site.createdAt, id: { lt: siteId } }],
+      },
+    });
+    if (ahead >= limit) {
+      out.push({ label: PLAN_LIMIT_CHECK_LABEL, status: "fail", detail: `Over the ${PLAN_LABEL[plan]} limit — Upgrade to publish` });
+    }
+  }
+  if (site.publishedPassword && plan === "FREE") {
+    out.push({
+      label: PASSWORD_CHECK_LABEL,
+      status: "fail",
+      detail: `This site is password protected. On ${PLAN_LABEL[plan]} the protection is removed and the site becomes public.`,
+    });
+  }
+  return out;
+}
+
 export async function runPrePublishChecks(siteId: string): Promise<PrePublishChecksResult> {
   const [allPages, site, domain] = await Promise.all([
     /* Every page WITH its visibility, because these checks describe the
@@ -32,12 +81,22 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
        Filtered here rather than in SQL: `settings` is a JSON column and a
        null-safe path filter is more fragile than reading a handful of rows. */
     prisma.page.findMany({
-      where: { siteId },
+      where: { siteId, deletedAt: null },
       select: { id: true, name: true, blocks: true, settings: true, slug: true, isHomePage: true },
     }),
     prisma.site.findUnique({
       where: { id: siteId },
-      select: { metaTitleTemplate: true, favicon: true, touchIcon: true, deletedAt: true, workspaceId: true, projectCmsBindings: true },
+      select: {
+        metaTitleTemplate: true,
+        favicon: true,
+        touchIcon: true,
+        deletedAt: true,
+        workspaceId: true,
+        projectCmsBindings: true,
+        createdAt: true,
+        publishedPassword: true,
+        workspace: { select: { plan: true } },
+      },
     }),
     prisma.domain.findFirst({
       where: { siteId, status: "VERIFIED" },
@@ -60,6 +119,9 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
   });
 
   const checks: PrePublishChecksResult["checks"] = [];
+
+  // A-34 / A-36 — what the workspace's plan allows this site.
+  if (site) checks.push(...(await planChecks(siteId, site)));
 
   // Vercel connected. This is the only check that can be a hard fail besides
   // "Pages ready": sites deploy into the workspace's OWN Vercel account, so
@@ -513,7 +575,8 @@ export async function startPublish(
         workspaceId: site.workspaceId,
         status: "QUEUED",
         progress: 0,
-        steps: [],
+        /* The queued job already names the steps it will run (2L9 B8-PB08). */
+        steps: buildPublishSteps(-1),
         log: finalPages ? { pages: finalPages } : undefined,
         ...(opts?.rolledBackFrom ? { rolledBackFrom: opts.rolledBackFrom } : {}),
       },
@@ -721,27 +784,71 @@ export async function getPublishDiff(siteId: string, fromJobId: string, toJobId:
   const from = jobs.find((j) => j.id === fromJobId);
   const to = jobs.find((j) => j.id === toJobId);
   if (!from || !to) throw new Error("PUBLISH_DIFF_NOT_FOUND: both versions must be completed publishes of this site");
-  const pagesOf = (log: unknown): Map<string, number> | null => {
-    const p = (log as RetainedPayload)?.pages;
-    if (!Array.isArray(p)) return null;
-    const m = new Map<string, number>();
-    for (const pg of p) if (pg?.path) m.set(pg.path, Buffer.byteLength(pg.html ?? "", "utf8"));
-    return m;
-  };
-  const a = pagesOf(from.log);
-  const b = pagesOf(to.log);
-  if (!a || !b) return { retained: false, pages: [], added: 0, removed: 0, changed: 0 };
+  const a = (from.log as RetainedPayload)?.pages;
+  const b = (to.log as RetainedPayload)?.pages;
+  if (!Array.isArray(a) || !Array.isArray(b)) return { retained: false, pages: [], added: 0, removed: 0, changed: 0 };
+  return diffPages(a, b);
+}
 
-  const fromHtml = new Map(((from.log as RetainedPayload)?.pages ?? []).map((p) => [p.path ?? "", p.html ?? ""]));
-  const toHtml = new Map(((to.log as RetainedPayload)?.pages ?? []).map((p) => [p.path ?? "", p.html ?? ""]));
-  const paths = [...new Set([...a.keys(), ...b.keys()])].sort();
+/** Page-by-page change between two payloads; one rule for version↔version and
+ *  draft↔live. */
+function diffPages(
+  fromPages: ReadonlyArray<{ path?: string; html?: string }>,
+  toPages: ReadonlyArray<{ path?: string; html?: string }>,
+): PublishDiff {
+  const fromHtml = new Map(fromPages.map((p) => [p.path ?? "", p.html ?? ""]));
+  const toHtml = new Map(toPages.map((p) => [p.path ?? "", p.html ?? ""]));
+  const paths = [...new Set([...fromHtml.keys(), ...toHtml.keys()])].filter(Boolean).sort();
   const pages: PublishDiffPage[] = paths.map((path) => {
-    const inA = a.has(path), inB = b.has(path);
+    const inA = fromHtml.has(path), inB = toHtml.has(path);
     const change: PublishPageChange = !inA ? "added" : !inB ? "removed" : fromHtml.get(path) === toHtml.get(path) ? "same" : "changed";
-    return { path, change, fromBytes: inA ? a.get(path)! : null, toBytes: inB ? b.get(path)! : null };
+    const bytes = (m: Map<string, string>) => (m.has(path) ? Buffer.byteLength(m.get(path) ?? "", "utf8") : null);
+    return { path, change, fromBytes: bytes(fromHtml), toBytes: bytes(toHtml) };
   });
   const count = (c: PublishPageChange) => pages.filter((p) => p.change === c).length;
   return { retained: true, pages, added: count("added"), removed: count("removed"), changed: count("changed") };
+}
+
+export interface PublishPreviewDiff extends PublishDiff {
+  /** The live version compared against; null on a site never published. */
+  liveVersion: number | null;
+  /** Published CMS records written since the site last went live. */
+  cmsRecords: number;
+}
+
+/**
+ * What a publish now would change (A-33, 2L9 B8-PB01–PB03): the export the
+ * editor would send against the LIVE job's retained payload. A first publish
+ * is every page added; a live payload pruned past the retained window reads
+ * `retained: false` (nothing honest to compare). CMS counts published records
+ * changed since `site.lastPublishedAt`.
+ */
+export async function getPublishPreviewDiff(
+  siteId: string,
+  pages: ReadonlyArray<{ path: string; html: string }>,
+): Promise<PublishPreviewDiff> {
+  const site = await prisma.site.findUnique({ where: { id: siteId }, select: { publishedUrl: true, lastPublishedAt: true } });
+  if (!site) throw new Error("SITE_NOT_FOUND");
+  const jobs = await prisma.publishBuildJob.findMany({
+    where: { siteId, status: "COMPLETED" },
+    orderBy: { completedAt: "desc" },
+    take: PUBLISH_HISTORY_RETAINED,
+    select: { id: true, log: true },
+  });
+  const cmsRecords = await prisma.cmsEntry.count({
+    where: {
+      collection: { siteId },
+      status: "PUBLISHED",
+      deletedAt: null,
+      ...(site.lastPublishedAt ? { updatedAt: { gt: site.lastPublishedAt } } : {}),
+    },
+  });
+  if (!site.publishedUrl || jobs.length === 0) {
+    return { ...diffPages([], pages), liveVersion: null, cmsRecords };
+  }
+  const live = (jobs[0].log as RetainedPayload)?.pages;
+  if (!Array.isArray(live)) return { retained: false, pages: [], added: 0, removed: 0, changed: 0, liveVersion: jobs.length, cmsRecords };
+  return { ...diffPages(live, pages), liveVersion: jobs.length, cmsRecords };
 }
 
 /**

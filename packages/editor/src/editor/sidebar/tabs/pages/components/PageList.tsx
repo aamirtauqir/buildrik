@@ -13,16 +13,28 @@
 
 import * as React from "react";
 import { EmptyState, EmptyStateActions, EmptyStateDesc, EmptyStateTitle, Button } from "@/editor/chrome-ui";
-import { PanelLoadError, PanelLoadingSkeleton, PanelNoResults } from "@/editor/shared/PanelStates";
+import { PanelLoadError, PanelLoadingSkeleton } from "@/editor/shared/PanelStates";
 import type { Composer } from "@/engine";
 import type { FolderItem, PageItem } from "../types";
+import type { CollectionPagesRow } from "../useDynamicPagesSummary";
 import { AddPageButton } from "./AddPageButton";
 import { BulkToolbar } from "./BulkToolbar";
+import { NewFolderDraft } from "./NewFolderDraft";
 import { PageFolder } from "./PageFolder";
-import { PageRow } from "./PageRow";
+import { PageRow, ROW_SUB, ROW_TAG } from "./PageRow";
+
+/* Board 63:6393's two-part section headings ("My folders · Only visible to
+   you", "Collection pages"). */
+const SECTION_HEAD = "tw:flex tw:flex-col tw:px-3 tw:pt-3 tw:pb-1";
+const SECTION_TITLE = "tw:text-[13px] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)]";
+const SECTION_SUB = "tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+const LEGEND = "tw:m-0 tw:px-3 tw:pt-1 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 
 interface Props {
   pages: PageItem[];
+  /** The note under the list — a page brought back by ⌘Z (63:20585, with
+   *  its way in) or a rename that kept its URL (63:23182). */
+  notice?: { text: string; open?: { id: string; label: string } } | null;
   renamingPageId: string | null;
   nameError: string | null;
   openContextMenuPageId?: string | null;
@@ -32,8 +44,8 @@ interface Props {
   selectedIds: Set<string>;
   /** The topbar filter (v3 4418:92256) — empty when not searching. */
   search?: string;
-  /** "Search everywhere" on the no-results block hands the query to ⌘K. */
-  onSearchEverywhere?: (query: string) => void;
+  /** Board 63:22616's "Clear search". */
+  onClearSearch?: () => void;
   /** Pages with unsaved edits — board 140:21's dirty ●. */
   dirtyPages?: ReadonlySet<string>;
   /** Sync failed — board 141:203 replaces the tree, the frame stays. */
@@ -43,8 +55,12 @@ interface Props {
   onRetry: () => void;
   onAddPage: () => void;
   onAddFolder: () => void;
-  /** The folder "New folder" just made — it opens in rename (L3-012). */
-  newFolderId?: string | null;
+  /** The result card of a partial bulk delete (139:48427), above the rows. */
+  bulkResult?: React.ReactNode;
+  /** 127:36696 — "New folder" asks for the name in a card under My folders. */
+  draftingFolder?: boolean;
+  onCreateFolder: (name: string) => void;
+  onCancelFolderDraft: () => void;
   onSelectPage: (id: string) => void;
   onToggleSelect: (id: string, e: React.MouseEvent | React.KeyboardEvent) => void;
   onBulkDuplicate: () => void;
@@ -53,6 +69,8 @@ interface Props {
   onBulkDelete: () => void;
   onClearSelection: () => void;
   onContextMenu: (id: string, x: number, y: number) => void;
+  /** ⌥↑ / ⌥↓ on a top-level row. */
+  onMovePage?: (id: string, direction: -1 | 1) => void;
   onRenameStart: (id: string) => void;
   onRenameCommit: (id: string, name: string, updateUrl?: boolean) => void;
   onRenameCancel: () => void;
@@ -62,14 +80,16 @@ interface Props {
   onFolderDelete: (folderId: string) => void;
   onMovePageToFolder: (pageId: string, folderId: string) => void;
   onRemovePageFromFolder: (pageId: string) => void;
-  /** FC-1 (fix-all 2026-09-25): published pages a CMS collection generates,
-   *  which have no Page row of their own. 0 → the row is not rendered. */
-  dynamicPagesCount?: number;
-  onOpenDynamicPages?: () => void;
+  /** design-2l9 board 63:6393 "Collection pages": the pages CMS collections
+   *  publish, which have no Page row of their own (FC-1). Empty → no block. */
+  collectionPages?: readonly CollectionPagesRow[];
+  onOpenTemplatePage?: (pageId: string) => void;
+  onManageCollection?: (collectionId: string) => void;
 }
 
 export const PageList: React.FC<Props> = ({
   pages,
+  notice,
   renamingPageId,
   nameError,
   openContextMenuPageId = null,
@@ -78,14 +98,17 @@ export const PageList: React.FC<Props> = ({
   pageToFolder,
   selectedIds,
   search = "",
-  onSearchEverywhere,
+  onClearSearch,
   dirtyPages,
   loadError,
   loading,
   onRetry,
   onAddPage,
   onAddFolder,
-  newFolderId = null,
+  bulkResult = null,
+  draftingFolder = false,
+  onCreateFolder,
+  onCancelFolderDraft,
   onSelectPage,
   onToggleSelect,
   onBulkDuplicate,
@@ -94,6 +117,7 @@ export const PageList: React.FC<Props> = ({
   onBulkDelete,
   onClearSelection,
   onContextMenu,
+  onMovePage,
   onRenameStart,
   onRenameCommit,
   onRenameCancel,
@@ -103,8 +127,9 @@ export const PageList: React.FC<Props> = ({
   onFolderDelete,
   onMovePageToFolder,
   onRemovePageFromFolder,
-  dynamicPagesCount = 0,
-  onOpenDynamicPages,
+  collectionPages = [],
+  onOpenTemplatePage,
+  onManageCollection,
 }) => {
   /* A drop lands BEFORE or AFTER the row it is on. The engine only knows
      "after <id>", so before-X is after X's predecessor in site order (or
@@ -171,43 +196,34 @@ export const PageList: React.FC<Props> = ({
     );
   }
 
-  const showSelectAll = selectedIds.size > 0;
-  const allSelected = selectedIds.size === pages.length && pages.length > 0;
+  /* Board 139:47668 draws no "Select all" band; ⌘A / Ctrl+A in the list
+     still ticks every page once a selection has started. */
+  const selectAll = (e: React.KeyboardEvent) => {
+    if (selectedIds.size === 0 || !(e.metaKey || e.ctrlKey) || e.key.toLowerCase() !== "a") return;
+    if ((e.target as HTMLElement).closest("input, textarea, [contenteditable='true']")) return;
+    e.preventDefault();
+    pages.forEach((p) => {
+      if (!selectedIds.has(p.id)) onToggleSelect(p.id, {} as React.MouseEvent);
+    });
+  };
 
   return (
-    <div className="bd-pg-list-shell">
-      {showSelectAll && (
-        <div
-          className="bd-pg-selectall"
-          role="button"
-          tabIndex={0}
-          aria-label={`Select all ${pages.length} pages`}
-          onClick={() => {
-            if (allSelected) {
-              onClearSelection();
-            } else {
-              pages.forEach((p) => {
-                if (!selectedIds.has(p.id)) onToggleSelect(p.id, {} as React.MouseEvent);
-              });
-            }
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") (e.currentTarget as HTMLElement).click();
-          }}
-        >
-          <span
-            className={`bd-pg-selectall-checkbox${allSelected ? " on" : ""}`}
-            aria-hidden="true"
-          >
-            {allSelected ? (
-              <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
-                <polyline points="4 12 10 18 20 6" />
-              </svg>
-            ) : null}
-          </span>
-          <span>Select all ({pages.length} page{pages.length !== 1 ? "s" : ""})</span>
-        </div>
+    <div className="bd-pg-list-shell" onKeyDown={selectAll}>
+      {selectedIds.size >= 1 && (
+        <BulkToolbar
+          selectedCount={selectedIds.size}
+          selectedNames={pages.filter((p) => selectedIds.has(p.id)).map((p) => p.name)}
+          folders={folders}
+          anyInFolder={[...selectedIds].some((id) => pageToFolder.has(id))}
+          homeSelected={pages.find((p) => p.isHome && selectedIds.has(p.id))?.name ?? null}
+          onDuplicate={onBulkDuplicate}
+          onMoveToFolder={onBulkMoveToFolder}
+          onRemoveFromFolders={onBulkRemoveFromFolders}
+          onDelete={onBulkDelete}
+          onClear={onClearSelection}
+        />
       )}
+      {bulkResult}
       {/* Board 141:203 draws the error as a full-width band between the search
           row and the Add-page foot — a SIBLING of the tree, not a child of it.
           Nested inside `.bd-pg-list` it inherited that container's 6px gutter,
@@ -224,14 +240,20 @@ export const PageList: React.FC<Props> = ({
       ) : (
       <div className="bd-pg-list">
         {visible.length === 0 && search ? (
-          <PanelNoResults
-            search={search}
-            message="No pages match your search."
-            testId="pages-no-results"
-            everywhereTestId="pages-search-everywhere"
-            actionOffset="tw:mt-6"
-            onSearchEverywhere={onSearchEverywhere}
-          />
+          /* design-2l9 board 63:22616: the failed query as a heading and an
+             outlined Clear search, left-aligned — no icon, no ⌘K hand-off. */
+          <div className="tw:flex tw:flex-col tw:items-start tw:gap-3 tw:px-3 tw:pt-2" role="status" data-testid="pages-no-results">
+            <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)]">{`No pages match “${search}”`}</p>
+            <Button
+              color="light"
+              size="xs"
+              className="tw:h-8 tw:min-h-0 tw:px-3 tw:text-[13px] tw:font-normal tw:text-[var(--bk-ink)] tw:focus:ring-0"
+              data-testid="pages-no-results-clear"
+              onClick={onClearSearch}
+            >
+              Clear search
+            </Button>
+          </div>
         ) : (
           <>
             {/* Only treeitems inside the tree. The one-page note below carries
@@ -239,38 +261,6 @@ export const PageList: React.FC<Props> = ({
                 tree's child — the scroll container, not the tree, is what those
                 blocks belong to. */}
             <div className="bd-pg-tree" role="tree" aria-label="Pages">
-            {!search && folders.map((folder, index) => {
-              const folderPages = folder.pageIds
-                .map((id) => pages.find((p) => p.id === id))
-                .filter((p): p is PageItem => !!p);
-              return (
-                <PageFolder
-                  key={folder.id}
-                  folder={folder}
-                  explainFolders={index === 0}
-                  pages={folderPages}
-                  allPages={pages}
-                  composer={composer}
-                  renamingPageId={renamingPageId}
-                  nameError={nameError}
-                  openContextMenuPageId={openContextMenuPageId}
-                  selectedIds={selectedIds}
-                  dirtyPages={dirtyPages}
-                  onToggleSelect={onToggleSelect}
-                  onToggle={() => onFolderToggle(folder.id)}
-                  onFolderRename={(name) => onFolderRename(folder.id, name)}
-                  startRenaming={folder.id === newFolderId}
-                  onFolderDelete={() => onFolderDelete(folder.id)}
-                  onSelectPage={onSelectPage}
-                  onContextMenu={onContextMenu}
-                  onRenameStart={onRenameStart}
-                  onRenameCommit={onRenameCommit}
-                  onRenameCancel={onRenameCancel}
-                  onDrop={(pageId) => onMovePageToFolder(pageId, folder.id)}
-                />
-              );
-            })}
-
             {visible
               // Board 141:40: search results are FLAT — folder members show
               // too, tagged "in {Folder}". Outside search, folder members
@@ -295,6 +285,7 @@ export const PageList: React.FC<Props> = ({
                   onRenameCommit={(name, updateUrl) => onRenameCommit(page.id, name, updateUrl)}
                   onRenameCancel={onRenameCancel}
                   onContextMenu={(x, y) => onContextMenu(page.id, x, y)}
+                  onMove={!search && onMovePage ? (d) => onMovePage(page.id, d) : undefined}
                   searchContext={
                     search
                       ? folders.find((f) => f.id === pageToFolder.get(page.id))?.name
@@ -303,6 +294,106 @@ export const PageList: React.FC<Props> = ({
                 />
               ))}
             </div>
+            {/* Board 63:6393's legend sits under the page rows; a search puts
+                its match count there instead (4418:92256). */}
+            {!loadError && (
+              <p className={LEGEND} data-testid="pages-legend">
+                {search
+                  ? `${visible.length} of ${pages.length} pages match “${search}”`
+                  : "● marks a page with unsaved changes"}
+              </p>
+            )}
+            {/* Board 63:6393: root pages first, then the personal folders under
+                their own heading — a second tree, since a tree owns only
+                treeitems and the heading is not one. */}
+            {!search && (folders.length > 0 || draftingFolder) && (
+              <>
+              <div className={SECTION_HEAD} data-testid="pages-folders-head">
+                <span className={SECTION_TITLE} id="pages-folders-title">My folders</span>
+                <span className={SECTION_SUB}>Only visible to you</span>
+              </div>
+              <div className="bd-pg-tree" role="tree" aria-labelledby="pages-folders-title">
+            {folders.map((folder) => {
+              const folderPages = folder.pageIds
+                .map((id) => pages.find((p) => p.id === id))
+                .filter((p): p is PageItem => !!p);
+              return (
+                <PageFolder
+                  key={folder.id}
+                  folder={folder}
+                  pages={folderPages}
+                  allPages={pages}
+                  composer={composer}
+                  renamingPageId={renamingPageId}
+                  nameError={nameError}
+                  openContextMenuPageId={openContextMenuPageId}
+                  selectedIds={selectedIds}
+                  dirtyPages={dirtyPages}
+                  onToggleSelect={onToggleSelect}
+                  onToggle={() => onFolderToggle(folder.id)}
+                  onFolderRename={(name) => onFolderRename(folder.id, name)}
+                  onFolderDelete={() => onFolderDelete(folder.id)}
+                  onSelectPage={onSelectPage}
+                  onContextMenu={onContextMenu}
+                  onRenameStart={onRenameStart}
+                  onRenameCommit={onRenameCommit}
+                  onRenameCancel={onRenameCancel}
+                  onDrop={(pageId) => onMovePageToFolder(pageId, folder.id)}
+                />
+              );
+            })}
+              </div>
+              {draftingFolder && <NewFolderDraft onCreate={onCreateFolder} onCancel={onCancelFolderDraft} />}
+              </>
+            )}
+            {!search && collectionPages.length > 0 && (
+              <section aria-label="Collection pages" data-testid="pages-collections">
+                <div className={SECTION_HEAD}>
+                  <span className={SECTION_TITLE}>Collection pages</span>
+                </div>
+                {/* Board 63:6393: a gray card per collection — a white row
+                    (glyph, name over pattern, page count) and its two doors. */}
+                {collectionPages.map((c) => (
+                  <div key={c.id} className="tw:mx-3 tw:flex tw:flex-col tw:gap-1 tw:rounded-md tw:bg-[var(--bk-gray-100)] tw:p-2" data-testid={`pages-collection-${c.id}`}>
+                    <div className="tw:flex tw:items-center tw:gap-2 tw:rounded-md tw:bg-[var(--bk-bg-card)] tw:px-2 tw:py-1">
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="tw:flex-none tw:text-[var(--bk-ink-soft)]">
+                        <path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9z" />
+                        <path d="M14 3v6h6" />
+                      </svg>
+                      <span className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
+                        <span className="tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">{c.name}</span>
+                        <span className={ROW_SUB}>{c.pattern}</span>
+                      </span>
+                      <span className={`${ROW_TAG} tw:tabular-nums`}>{`${c.count} page${c.count === 1 ? "" : "s"}`}</span>
+                    </div>
+                    <div className="tw:flex">
+                      {c.templatePageId && onOpenTemplatePage && (
+                        <Button
+                          variant="link"
+                          size="xs"
+                          className="tw:flex-1 tw:justify-center"
+                          data-testid={`pages-collection-open-${c.id}`}
+                          onClick={() => onOpenTemplatePage(c.templatePageId!)}
+                        >
+                          Open page
+                        </Button>
+                      )}
+                      {onManageCollection && (
+                        <Button
+                          variant="link"
+                          size="xs"
+                          className="tw:flex-1 tw:justify-center"
+                          data-testid={`pages-collection-manage-${c.id}`}
+                          onClick={() => onManageCollection(c.id)}
+                        >
+                          Manage in CMS
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </section>
+            )}
             {/* Board 141:124: with exactly one page the list carries the
                 one-page note under the row. The board also draws a second
                 "+ Add page" in the note (141:164); owner call 2026-10-03: two
@@ -313,6 +404,23 @@ export const PageList: React.FC<Props> = ({
                 <p data-testid="pages-onepage-text">This site has one page.</p>
               </div>
             )}
+            {/* Boards 63:20585 / 63:23182: what just happened, under the list
+                — with the way into the page when there is one. */}
+            {!search && notice && (
+              <div className="tw:flex tw:flex-col tw:items-start tw:gap-3 tw:px-3 tw:pt-3" role="status" data-testid="pages-notice">
+                <p className="tw:m-0 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]">{notice.text}</p>
+                {notice.open && (
+                  <Button
+                    variant="link"
+                    className="tw:h-7 tw:min-h-0 tw:px-3 tw:text-[13px] tw:font-medium tw:text-[var(--bk-accent-text)]"
+                    data-testid="pages-notice-open"
+                    onClick={() => onSelectPage(notice.open!.id)}
+                  >
+                    {notice.open.label}
+                  </Button>
+                )}
+              </div>
+            )}
           </>
         )}
 
@@ -320,55 +428,10 @@ export const PageList: React.FC<Props> = ({
         <div className="bd-pg-drop-indicator" aria-hidden="true" />
       </div>
       )}
-      {/* Board 141:78: the band appears with ANY checkbox selection —
-          it replaces the Add-page footer. */}
-      {selectedIds.size >= 1 && (
-        <BulkToolbar
-          selectedCount={selectedIds.size}
-          selectedNames={pages.filter((p) => selectedIds.has(p.id)).map((p) => p.name)}
-          folders={folders}
-          onDuplicate={onBulkDuplicate}
-          onMoveToFolder={onBulkMoveToFolder}
-          onRemoveFromFolders={onBulkRemoveFromFolders}
-          onDelete={onBulkDelete}
-        />
-      )}
-      {/* Board 140:38 footer vs board 141:78: when a bulk selection is
-          active the bottom band IS the bulk bar — otherwise "+  Add page". */}
-      {selectedIds.size === 0 && (
-        <div className="bd-pg-footer" data-testid="pages-footer">
-          {/* FC-1 (fix-all 2026-09-25): a page-generating CMS collection
-              produces published pages that have no Page row here at all — this
-              is the only hint they exist. Read-only: it opens the collection's
-              Dynamic pages tab, where the pattern/template live. It is part of
-              the footer band: the footer is absolutely positioned over the
-              shell's bottom edge, so as a sibling after the list it rendered
-              UNDER the footer — unreachable (X-6, measured y 870 vs footer
-              824–900). */}
-          {!loadError && dynamicPagesCount > 0 && (
-            <Button
-              type="button"
-              variant="link"
-              size="xs"
-              className="tw:w-full tw:justify-start tw:px-3 tw:py-1.5 tw:text-[length:var(--bk-text-12)]"
-              data-testid="pages-dynamic-pages-row"
-              onClick={onOpenDynamicPages}
-            >
-              {`+${dynamicPagesCount} from collections`} {"›"}
-            </Button>
-          )}
-          {/* v3 4418:90494 legend over the Add band; a search puts its match
-              count there instead (4418:92256). */}
-          {!loadError && (
-            <p className="bd-pg-legend" data-testid="pages-legend">
-              {search
-                ? `${visible.length} of ${pages.length} pages match “${search}”`
-                : "⌂ homepage · ● unpublished changes · ⠿ drag to reorder · ⋯ page menu"}
-            </p>
-          )}
-          <AddPageButton onAddBlank={onAddPage} onFromTemplate={onRequestTemplates} onAddFolder={onAddFolder} />
-        </div>
-      )}
+      {/* Board 139:47668: the footer stays while pages are ticked. */}
+      <div className="bd-pg-footer" data-testid="pages-footer">
+        <AddPageButton onAddBlank={onAddPage} onFromTemplate={onRequestTemplates} onAddFolder={onAddFolder} />
+      </div>
     </div>
   );
 };

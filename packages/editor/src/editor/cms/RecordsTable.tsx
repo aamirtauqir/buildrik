@@ -1,25 +1,23 @@
 /**
- * RecordsTable — a collection's records as a table (board 4428:143182).
+ * RecordsTable — a collection's records (2L9 board 165:2 "Blog records at
+ * scale").
  *
- * Columns come off the collection's own fields: the display field first, then
- * the next short fields in the user's order, then a fixed "Updated". Long-form
- * and media fields (description, rich text, photo) and the slug are left to
- * the record sheet — the board draws Name · Price · Category · Available ·
- * Updated from a collection that also holds Description, Slug and Photo.
- *
- * Sort: click a column head (asc → desc). Search: the topbar field (board
- * 6819:59209 "Search Menu items…"), passed in as `query`. Pagination: 50 rows
- * a page; the pager only draws when there is more than one page, since no
- * board draws one (every board's collection fits in a page).
+ * Toolbar: Search {collection}…, a status filter ("All statuses"), a sort
+ * ("Updated · Newest" first) and Columns, which picks the field columns.
+ * Columns: Title (the display field), Status, Updated, then the chosen field
+ * columns — by default the first short fields; long text, media and the slug
+ * stay in the record sheet unless chosen. A column head still sorts on click.
+ * Footer: "1–50 of N records" with Previous / Next, 50 rows a page.
  *
  * @license BSD-3-Clause
  */
 import * as React from "react";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
-import { Button, IconButton } from "@/editor/chrome-ui";
+import { Badge, Button, Checkbox, Menu, Popover, Select, TextInput } from "@/editor/chrome-ui";
 import { formatRelativeTime } from "@/shared/utils/relativeTime";
-import { cmsRecordLabel } from "@buildrik/shared/schemas/cms";
-import { ChevronLeft, ChevronRight, TriangleAlert } from "lucide-react";
+import { cmsRecordLabel, type CmsRecordStatus } from "@buildrik/shared/schemas/cms";
+import type { ColorToken } from "@/themes/tokens.generated";
+import { TriangleAlert } from "lucide-react";
 
 export const PAGE_SIZE = 50;
 
@@ -32,31 +30,79 @@ const SHEET_ONLY: ReadonlySet<CMSField["type"]> = new Set([
   "multiselect",
 ]);
 
-/* 4428:143479… — NAME 240, then 120 · 140 · 110, UPDATED 150. */
-const FIELD_WIDTHS = ["tw:w-[120px]", "tw:w-[140px]", "tw:w-[110px]"] as const;
-const MAX_EXTRA_COLUMNS = FIELD_WIDTHS.length;
+/* 165:2 at 1440: Title takes the rest; Status 216, Updated 176, each
+   chosen field 176. */
+const DEFAULT_EXTRA_COLUMNS = 1;
+const W_STATUS = "tw:w-[216px]";
+const W_UPDATED = "tw:w-[176px]";
+const W_FIELD = "tw:w-[176px]";
 
+/* 165:2 — a 40-tall tinted head in sentence case, 13/20 medium. */
 const HEAD_ROW =
-  "tw:flex tw:h-9 tw:flex-none tw:items-center tw:px-4 tw:bg-[var(--bk-gray-50)] tw:border-b tw:border-[var(--bk-border)]";
-const HEAD_CELL =
-  "tw:flex tw:h-9 tw:flex-none tw:items-center tw:overflow-hidden tw:text-[11px] tw:leading-4 tw:font-medium " +
-  "tw:tracking-[0.88px] tw:uppercase tw:text-[var(--bk-gray-500)]";
+  "tw:flex tw:h-10 tw:flex-none tw:items-center tw:pl-6 tw:bg-[var(--bk-bg-subtle)]";
+const HEAD_CELL = "tw:flex tw:h-10 tw:items-center tw:overflow-hidden tw:pr-3 tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink-soft)]";
 /* Flowbite's Button, flattened to the head's own text: same-property
    utilities so twMerge displaces the xs size's height, padding and type. */
 const HEAD_BTN =
-  "tw:h-auto tw:min-h-0 tw:gap-1 tw:rounded-none tw:border-0 tw:bg-transparent tw:p-0 tw:text-[11px] tw:leading-4 " +
-  "tw:font-medium tw:tracking-[0.88px] tw:uppercase tw:text-[var(--bk-gray-500)] tw:shadow-none " +
+  "tw:h-auto tw:min-h-0 tw:gap-1 tw:rounded-none tw:border-0 tw:bg-transparent tw:p-0 tw:text-[13px] tw:leading-5 " +
+  "tw:font-medium tw:text-[var(--bk-ink-soft)] tw:shadow-none " +
   "tw:enabled:hover:bg-transparent tw:enabled:hover:text-[var(--bk-ink)] tw:focus:ring-0";
 const ROW =
-  "tw:flex tw:h-10 tw:w-full tw:flex-none tw:items-center tw:px-4 tw:bg-[var(--bk-bg-panel)] tw:border-b tw:border-[var(--bk-border)] " +
+  "tw:flex tw:h-10 tw:w-full tw:flex-none tw:items-center tw:pl-6 tw:bg-[var(--bk-bg-panel)] " +
   "tw:cursor-pointer tw:hover:bg-[var(--bk-gray-50)] tw:focus-visible:outline-none tw:focus-visible:[box-shadow:inset_var(--bk-shadow-focus)]";
-const CELL = "tw:flex tw:h-10 tw:flex-none tw:items-center tw:gap-1.5 tw:overflow-hidden tw:pr-3 tw:text-[13px] tw:leading-5 tw:whitespace-nowrap";
+const CELL = "tw:flex tw:h-10 tw:items-center tw:gap-1.5 tw:overflow-hidden tw:pr-3 tw:text-[13px] tw:leading-5 tw:whitespace-nowrap";
 const CELL_SOFT = `${CELL} tw:text-[var(--bk-ink-soft)]`;
+/* 165:2 toolbar: 32-tall controls on the page's 24 gutter. */
+/* 165:2 draws the toolbar's fields filled (bg-subtle) on a hairline, no
+   search glyph. */
+const TOOL_SELECT =
+  "tw:[&_select]:h-8 tw:[&_select]:py-0 tw:[&_select]:pl-2.5 tw:[&_select]:text-[13px] tw:[&_select]:rounded-[6px] " +
+  "tw:[&_select]:bg-[var(--bk-bg-subtle)] tw:[&_select]:border-[var(--bk-border)]";
+const TOOL_INPUT =
+  "tw:[&_input]:h-8 tw:[&_input]:py-0 tw:[&_input]:pl-2.5 tw:[&_input]:text-[13px] tw:[&_input]:rounded-[6px] " +
+  "tw:[&_input]:bg-[var(--bk-bg-subtle)] tw:[&_input]:border-[var(--bk-border)]";
+const PAGER_BTN = "tw:h-8 tw:w-[112px] tw:px-3 tw:text-[13px] tw:leading-5 tw:font-medium tw:rounded-[6px]";
+
+/* StatusBadge (2L9 500:342149): 20 tall, a tinted pill whose text always
+   names the state, so it never rests on colour alone. Each tone names its
+   token pair once; the class string spells the same tokens literally,
+   because Tailwind only compiles class names it can read in source. */
+export type StatusTone = "neutral" | "success" | "warning";
+const BADGE =
+  "tw:h-5 tw:rounded-[var(--bk-radius-sm)] tw:px-2 tw:py-0 tw:text-[length:var(--bk-text-12)] tw:font-medium tw:leading-4 tw:whitespace-nowrap";
+export const STATUS_TONES: Record<StatusTone, { fg: ColorToken; bg: ColorToken; className: string }> = {
+  neutral: { fg: "ink-soft", bg: "bg-subtle", className: "tw:text-[var(--bk-ink-soft)] tw:bg-[var(--bk-bg-subtle)]" },
+  success: { fg: "success-text", bg: "success-tint", className: "tw:text-[var(--bk-success-text)] tw:bg-[var(--bk-success-tint)]" },
+  warning: { fg: "warning-text", bg: "warning-tint", className: "tw:text-[var(--bk-warning-text)] tw:bg-[var(--bk-warning-tint)]" },
+};
+
+/** One badge per status in the CMS record schema (CMS_RECORD_STATUSES). */
+const STATUS_BADGES: Record<CmsRecordStatus, { label: string; tone: StatusTone }> = {
+  draft: { label: "Draft", tone: "neutral" },
+  published: { label: "Published", tone: "success" },
+  archived: { label: "Archived", tone: "neutral" },
+};
+
+/** A record's status badge. "Changed since publish" is a published record
+ *  edited after its publish stamp; server rows carry no stamp, so they read
+ *  Published. A status the schema does not know shows its raw label. */
+export function recordStatusBadge(record: CMSContentItem): { label: string; tone: StatusTone } {
+  const status: string = record.status;
+  if (
+    status === "published" &&
+    record.publishedAt &&
+    Date.parse(record.updatedAt) > Date.parse(record.publishedAt)
+  ) {
+    return { label: "Changed since publish", tone: "warning" };
+  }
+  return Object.prototype.hasOwnProperty.call(STATUS_BADGES, status)
+    ? STATUS_BADGES[record.status]
+    : { label: status, tone: "neutral" };
+}
 
 export interface RecordsTableProps {
   collection: CMSCollection;
   records: CMSContentItem[];
-  query: string;
   onOpenRecord: (id: string) => void;
   /** A Reference cell's record name (by field key, then record id); absent
    *  until the referenced records are read. */
@@ -64,6 +110,18 @@ export interface RecordsTableProps {
 }
 
 type SortKey = { key: string; dir: "asc" | "desc" };
+
+/** The toolbar's named orders (165:2 "Updated · Newest"); a click on any
+ *  other column head reads as that column in the select. */
+const NAMED_SORTS: ReadonlyArray<{ id: string; label: string; sort: SortKey }> = [
+  { id: "updated-desc", label: "Updated · Newest", sort: { key: "__updated", dir: "desc" } },
+  { id: "updated-asc", label: "Updated · Oldest", sort: { key: "__updated", dir: "asc" } },
+  { id: "title-asc", label: "Title · A–Z", sort: { key: "__title", dir: "asc" } },
+  { id: "title-desc", label: "Title · Z–A", sort: { key: "__title", dir: "desc" } },
+];
+
+/** The status filter's choices: the schema's statuses plus the edited-after-publish state. */
+const STATUS_FILTERS = ["Draft", "Published", "Changed since publish", "Archived"] as const;
 
 /** The field whose value names a record. */
 function displayFieldOf(collection: CMSCollection): CMSField | undefined {
@@ -87,7 +145,7 @@ function isEmpty(value: unknown): boolean {
   return value === undefined || value === null || (typeof value === "string" && value.trim() === "");
 }
 
-export function RecordsTable({ collection, records, query, onOpenRecord, referenceLabels }: RecordsTableProps) {
+export function RecordsTable({ collection, records, onOpenRecord, referenceLabels }: RecordsTableProps) {
   /* A reference cell names its record — "Deleted record" for a target that
      is gone — never the raw id (UI-05). */
   const cell = (f: CMSField, v: unknown): string => {
@@ -95,28 +153,40 @@ export function RecordsTable({ collection, records, query, onOpenRecord, referen
     const labels = referenceLabels?.get(f.slug);
     return labels ? labels.get(v) ?? "Deleted record" : "";
   };
-  const [sort, setSort] = React.useState<SortKey | null>(null);
+  const [query, setQuery] = React.useState("");
+  const [status, setStatus] = React.useState("");
+  const [sort, setSort] = React.useState<SortKey>(NAMED_SORTS[0].sort);
   const [page, setPage] = React.useState(0);
+  const [columnsOpen, setColumnsOpen] = React.useState(false);
 
   const nameField = displayFieldOf(collection);
-  const extra = React.useMemo(
-    () =>
-      collection.fields
-        .filter((f) => f !== nameField && f.slug !== "slug" && f.type !== "slug" && !SHEET_ONLY.has(f.type))
-        .slice(0, MAX_EXTRA_COLUMNS),
-    [collection, nameField],
-  );
+  /* Columns: the field columns the person chose; until they choose, the first
+     short field (165:2 draws one, Author). */
+  const candidates = collection.fields.filter((f) => f !== nameField);
+  /* A choice field (an author, a category) reads best in a narrow column;
+     free text comes after. */
+  const rank = (f: CMSField) => (["select", "reference", "boolean", "number", "date", "datetime"].includes(f.type) ? 0 : 1);
+  const defaults = candidates
+    .filter((f) => f.type !== "slug" && !SHEET_ONLY.has(f.type))
+    .sort((a, b) => rank(a) - rank(b) || a.order - b.order)
+    .slice(0, DEFAULT_EXTRA_COLUMNS)
+    .map((f) => f.slug);
+  const [chosen, setChosen] = React.useState<string[] | null>(null);
+  const shownSlugs = chosen ?? defaults;
+  const extra = candidates.filter((f) => shownSlugs.includes(f.slug));
 
   const rows = React.useMemo(() => {
     const q = query.trim().toLowerCase();
-    const matched = q
+    let matched = q
       ? records.filter((r) =>
           collection.fields.some((f) => cell(f, r.data[f.slug]).toLowerCase().includes(q)),
         )
       : records;
-    const sortField = sort ? collection.fields.find((f) => f.slug === sort.key) : undefined;
-    if (!sort || (sort.key !== "__updated" && !sortField)) return matched;
+    if (status) matched = matched.filter((r) => recordStatusBadge(r).label === status);
+    const sortField = collection.fields.find((f) => f.slug === sort.key);
     const read = (r: CMSContentItem): string | number => {
+      if (sort.key === "__status") return recordStatusBadge(r).label.toLowerCase();
+      if (sort.key === "__title") return recordTitle(collection, r).toLowerCase();
       if (sort.key === "__updated" || !sortField) return Date.parse(r.updatedAt) || 0;
       const v = r.data[sort.key];
       return typeof v === "number" ? v : cell(sortField, v).toLowerCase();
@@ -127,115 +197,215 @@ export function RecordsTable({ collection, records, query, onOpenRecord, referen
       const y = read(b);
       return x < y ? -dir : x > y ? dir : 0;
     });
-  }, [records, query, sort, collection, referenceLabels]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [records, query, status, sort, collection, referenceLabels]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  React.useEffect(() => setPage(0), [query, collection.id]);
+  React.useEffect(() => setPage(0), [query, status, collection.id]);
   const pages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
   const current = Math.min(page, pages - 1);
   const visible = rows.slice(current * PAGE_SIZE, (current + 1) * PAGE_SIZE);
 
-  /* `sort?.key === key` was true for NO sort when `key` was undefined — a
-     stored field without a `slug` (the verify seed's `{ id, name, type }`) —
-     and `sort.dir` then read null and took the CMS panel down. Compare only
-     against a real sort. */
   const toggleSort = (key: string) =>
-    setSort((s) => (s === null || s.key !== key ? { key, dir: "asc" } : s.dir === "asc" ? { key, dir: "desc" } : null));
+    setSort((s) => (s.key !== key ? { key, dir: "asc" } : { key, dir: s.dir === "asc" ? "desc" : "asc" }));
+  const named = NAMED_SORTS.find((n) => n.sort.key === sort.key && n.sort.dir === sort.dir);
+  const headLabel = (key: string) =>
+    key === "__status" ? "Status" : collection.fields.find((f) => f.slug === key)?.name ?? key;
 
   const head = (key: string, label: string, width: string) => {
-    const dir = sort !== null && sort.key === key ? sort.dir : null;
+    const sortKey = key === nameField?.slug ? "__title" : key;
+    const dir = sort.key === sortKey ? sort.dir : null;
+    /* The select names a toolbar order; only a head-chosen order marks its head. */
+    const arrow = dir !== null && !named;
     return (
       <div
+        key={key}
         className={`${HEAD_CELL} ${width}`}
         role="columnheader"
         aria-sort={dir === null ? "none" : dir === "asc" ? "ascending" : "descending"}
       >
-        <Button type="button" size="xs" color="light" className={HEAD_BTN} data-testid={`cms-th-${key}`} onClick={() => toggleSort(key)}>
+        <Button type="button" size="xs" color="light" className={HEAD_BTN} data-testid={`cms-th-${key}`} onClick={() => toggleSort(sortKey)}>
           {label}
-          {dir === null ? null : <span aria-hidden="true">{dir === "asc" ? "↑" : "↓"}</span>}
+          {arrow ? <span aria-hidden="true">{dir === "asc" ? "↑" : "↓"}</span> : null}
         </Button>
       </div>
     );
   };
 
+  const statusBadge = (r: CMSContentItem) => {
+    const { label, tone } = recordStatusBadge(r);
+    return (
+      <Badge className={`${BADGE} ${STATUS_TONES[tone].className}`} data-tone={tone} data-testid={`cms-row-status-${r.id}`}>
+        {label}
+      </Badge>
+    );
+  };
+
+  const first = rows.length === 0 ? 0 : current * PAGE_SIZE + 1;
+  const last = Math.min(rows.length, (current + 1) * PAGE_SIZE);
+
   return (
-    <div className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col" role="table" aria-label={`${collection.name} records`} data-testid="cms-table">
-      <div className={HEAD_ROW} role="row">
-        {nameField ? head(nameField.slug, nameField.name, "tw:w-[240px]") : null}
-        {extra.map((f, i) => head(f.slug, f.name, FIELD_WIDTHS[i]))}
-        {head("__updated", "Updated", "tw:w-[150px]")}
-      </div>
-      <div className="tw:min-h-0 tw:flex-1 tw:overflow-y-auto">
-        {visible.map((r) => (
-          <div
-            key={r.id}
-            role="row"
-            tabIndex={0}
-            className={ROW}
-            data-testid={`cms-row-${r.id}`}
-            onClick={() => onOpenRecord(r.id)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                onOpenRecord(r.id);
-              }
-            }}
-          >
-            <div role="cell" className={`${CELL} tw:w-[240px] tw:font-medium tw:text-[var(--bk-ink)]`}>
-              {recordTitle(collection, r)}
-              {r.status === "draft" ? (
-                <span className="tw:text-[12px] tw:font-normal tw:text-[var(--bk-ink-muted)]" data-testid={`cms-row-draft-${r.id}`}>
-                  · Draft
-                </span>
-              ) : null}
-            </div>
-            {extra.map((f, i) => (
-              <div key={f.id} role="cell" className={`${CELL_SOFT} ${FIELD_WIDTHS[i]}`}>
-                {/* 4428:143182 Tiramisu — a required value that is missing says
-                    so in its own cell, so the table shows why a record is not
-                    eligible for publishing. */}
-                {f.validation?.required && isEmpty(r.data[f.slug]) ? (
-                  <>
-                    <TriangleAlert size={12} aria-hidden="true" />
-                    {f.name} required
-                  </>
-                ) : (
-                  cell(f, r.data[f.slug])
-                )}
-              </div>
-            ))}
-            <div role="cell" className={`${CELL_SOFT} tw:w-[150px]`}>
-              {r.updatedAt ? formatRelativeTime(Date.parse(r.updatedAt), { fallback: "weeks" }) : ""}
-            </div>
-          </div>
-        ))}
-        {query.trim() && rows.length === 0 ? (
-          <div className="tw:flex tw:flex-col tw:items-center tw:gap-1 tw:pt-16 tw:text-center" data-testid="cms-no-results">
-            <p className="tw:m-0 tw:text-[13px] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]">
-              No {collection.name} match “{query.trim()}”
-            </p>
-            <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">
-              Search looks at every field of every record in this collection.
-            </p>
-          </div>
-        ) : null}
-      </div>
-      {pages > 1 ? (
-        <div
-          className="tw:flex tw:h-10 tw:flex-none tw:items-center tw:justify-end tw:gap-2 tw:border-t tw:border-[var(--bk-border)] tw:px-4 tw:text-[12px] tw:text-[var(--bk-ink-muted)]"
-          data-testid="cms-pager"
+    <div className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col" data-testid="cms-records">
+      {/* 165:2 — Search · All statuses · Updated · Newest · Columns. */}
+      <div className="tw:flex tw:h-12 tw:flex-none tw:items-center tw:gap-3 tw:pl-6 tw:pr-[67px]" data-testid="cms-records-toolbar">
+        <TextInput
+          type="search"
+          sizing="sm"
+          aria-label={`Search ${collection.name}`}
+          placeholder={`Search ${collection.name}…`}
+          className={`${TOOL_INPUT} tw:w-[520px] tw:flex-none`}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Escape" && query) {
+              e.stopPropagation();
+              setQuery("");
+            }
+          }}
+          data-testid="cms-ws-search"
+        />
+        <Select
+          sizing="sm"
+          aria-label="Status"
+          className={`${TOOL_SELECT} tw:w-[180px]`}
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+          data-testid="cms-records-status-filter"
         >
-          <span data-testid="cms-pager-range">
-            {current * PAGE_SIZE + 1}–{Math.min(rows.length, (current + 1) * PAGE_SIZE)} of {rows.length}
-          </span>
-          <IconButton label="Previous page" size="sm" disabled={current === 0} onClick={() => setPage(current - 1)} data-testid="cms-pager-prev">
-            <ChevronLeft size={14} />
-          </IconButton>
-          <IconButton label="Next page" size="sm" disabled={current >= pages - 1} onClick={() => setPage(current + 1)} data-testid="cms-pager-next">
-            <ChevronRight size={14} />
-          </IconButton>
+          <option value="">All statuses</option>
+          {STATUS_FILTERS.map((s) => (
+            <option key={s} value={s}>
+              {s}
+            </option>
+          ))}
+        </Select>
+        <Select
+          sizing="sm"
+          aria-label="Sort"
+          className={`${TOOL_SELECT} tw:w-[192px]`}
+          value={named?.id ?? "column"}
+          onChange={(e) => {
+            const next = NAMED_SORTS.find((n) => n.id === e.target.value);
+            if (next) setSort(next.sort);
+          }}
+          data-testid="cms-records-sort"
+        >
+          {NAMED_SORTS.map((n) => (
+            <option key={n.id} value={n.id}>
+              {n.label}
+            </option>
+          ))}
+          {named ? null : (
+            <option value="column">
+              {headLabel(sort.key)} · {sort.dir === "asc" ? "Ascending" : "Descending"}
+            </option>
+          )}
+        </Select>
+        <span className="tw:flex-1" />
+        <Popover
+          open={columnsOpen}
+          onClose={() => setColumnsOpen(false)}
+          label="Columns"
+          placement="bottom-end"
+          trigger={
+            <Button size="xs" variant="ghost" className="tw:h-8 tw:px-3 tw:text-[13px] tw:font-medium" onClick={() => setColumnsOpen((o) => !o)} data-testid="cms-records-columns">
+              Columns
+            </Button>
+          }
+        >
+          <Menu label="Columns">
+            <div className="tw:flex tw:flex-col tw:gap-1 tw:p-2" data-testid="cms-records-columns-menu">
+              {candidates.map((f) => (
+                <label key={f.id} className="tw:flex tw:h-7 tw:items-center tw:gap-2 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
+                  <Checkbox
+                    checked={shownSlugs.includes(f.slug)}
+                    onChange={(e) =>
+                      setChosen(e.target.checked ? [...shownSlugs, f.slug] : shownSlugs.filter((s) => s !== f.slug))
+                    }
+                    data-testid={`cms-records-column-${f.slug}`}
+                  />
+                  {f.name}
+                </label>
+              ))}
+            </div>
+          </Menu>
+        </Popover>
+      </div>
+      <div className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col" role="table" aria-label={`${collection.name} records`} data-testid="cms-table">
+        <div className={HEAD_ROW} role="row">
+          {nameField ? head(nameField.slug, "Title", "tw:min-w-0 tw:flex-1") : null}
+          {head("__status", "Status", W_STATUS)}
+          {head("__updated", "Updated", W_UPDATED)}
+          {extra.map((f) => head(f.slug, f.name, W_FIELD))}
         </div>
-      ) : null}
+        <div className="tw:min-h-0 tw:flex-1 tw:overflow-y-auto">
+          {visible.map((r) => (
+            <div
+              key={r.id}
+              role="row"
+              tabIndex={0}
+              className={ROW}
+              data-testid={`cms-row-${r.id}`}
+              onClick={() => onOpenRecord(r.id)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  onOpenRecord(r.id);
+                }
+              }}
+            >
+              <div role="cell" className={`${CELL} tw:min-w-0 tw:flex-1 tw:text-[var(--bk-ink)]`}>
+                <span className="tw:truncate">{recordTitle(collection, r)}</span>
+              </div>
+              <div role="cell" className={`${CELL} ${W_STATUS}`}>
+                {statusBadge(r)}
+              </div>
+              <div role="cell" className={`${CELL_SOFT} ${W_UPDATED}`}>
+                <span className="tw:truncate">{r.updatedAt ? formatRelativeTime(Date.parse(r.updatedAt), { fallback: "weeks" }) : ""}</span>
+              </div>
+              {extra.map((f) => (
+                <div key={f.id} role="cell" className={`${CELL_SOFT} ${W_FIELD}`}>
+                  {/* 4428:143182 Tiramisu — a required value that is missing says
+                      so in its own cell, so the table shows why a record is not
+                      eligible for publishing. */}
+                  {f.validation?.required && isEmpty(r.data[f.slug]) ? (
+                    <>
+                      <TriangleAlert size={12} aria-hidden="true" />
+                      <span className="tw:truncate">{f.name} required</span>
+                    </>
+                  ) : (
+                    /* Long values end in an ellipsis inside their column — an
+                       excerpt ran on into Updated (165:2 live walk). */
+                    <span className="tw:truncate" title={cell(f, r.data[f.slug])}>
+                      {cell(f, r.data[f.slug])}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          ))}
+          {(query.trim() || status) && rows.length === 0 ? (
+            <div className="tw:flex tw:flex-col tw:items-center tw:gap-1 tw:pt-16 tw:text-center" data-testid="cms-no-results">
+              <p className="tw:m-0 tw:text-[13px] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]">
+                {query.trim() ? `No ${collection.name} match “${query.trim()}”` : `No ${status} records`}
+              </p>
+              <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">
+                Search looks at every field of every record in this collection.
+              </p>
+            </div>
+          ) : null}
+        </div>
+      </div>
+      {/* 165:2 — "1–50 of 1,000 records", Previous · Next. */}
+      <div className="tw:flex tw:h-14 tw:flex-none tw:items-center tw:gap-3 tw:pl-6 tw:pr-[52px]" data-testid="cms-pager">
+        <span className="tw:flex-1 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]" data-testid="cms-pager-range">
+          {first}–{last} of {rows.length.toLocaleString("en-US")} record{rows.length === 1 ? "" : "s"}
+        </span>
+        <Button size="xs" variant="secondary" className={PAGER_BTN} disabled={current === 0} onClick={() => setPage(current - 1)} data-testid="cms-pager-prev">
+          Previous
+        </Button>
+        <Button size="xs" variant="secondary" className={PAGER_BTN} disabled={current >= pages - 1} onClick={() => setPage(current + 1)} data-testid="cms-pager-next">
+          Next
+        </Button>
+      </div>
     </div>
   );
 }
-

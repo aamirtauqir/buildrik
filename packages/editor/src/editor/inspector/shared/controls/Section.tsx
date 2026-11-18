@@ -20,7 +20,7 @@
  * @license BSD-3-Clause
  */
 
-import { ChevronDown, ChevronRight, Plus } from "lucide-react";
+import { ChevronRight, Plus } from "lucide-react";
 import * as React from "react";
 import { IconButton } from "@/editor/chrome-ui";
 import { useInspectorField } from "./InspectorFieldContext";
@@ -54,46 +54,36 @@ export interface SectionFrame {
   headerDot?: React.ReactNode;
   /** Bottom line of an open section ("● Overridden on Tablet"). */
   note?: React.ReactNode;
+  /** After the title: "· 2 overrides" (2L9 IC05). */
+  titleNote?: string | null;
+  /** Rows heading an open section's body: its breakpoint overrides (IC05). */
+  lead?: React.ReactNode;
 }
 
 export const SectionFrameContext = React.createContext<SectionFrame | null>(null);
 
 // ============================================================================
-// FIELD ERRORS (board 34, DD-19)
+// FIELD ERRORS (2L9 I03, DD-19)
 // ============================================================================
 
-/** Where a field reports the entry it could not read. */
-type FieldErrorSink = (id: string, message: string | null) => void;
-
-const FieldErrorContext = React.createContext<FieldErrorSink | null>(null);
-
-const ERROR_LINE = "tw:m-0 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-error-text)]";
+const ERROR_LINE = "tw:col-span-full tw:m-0 tw:pb-1 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-error-text)]";
 
 /**
- * A field's error line. Inside a Section the line is drawn in the section's
- * error band, under its last row (board 34), which is also the section's
- * polite live region; outside one, `ErrorLine` draws it in place. Returns the
- * id for the field's `aria-describedby`.
+ * A field's error line, directly under the field it is about (2L9 I03: "Enter
+ * a non-negative number … Last applied: 24 px." under Font size). It used to
+ * be collected into a band under the section's last row (board 34). The
+ * polite live region is mounted with the field, so the message is announced
+ * when it lands.
  */
-export function useFieldError(message: string | null): string {
-  const id = React.useId();
-  const sink = React.useContext(FieldErrorContext);
-  React.useEffect(() => {
-    if (!sink) return;
-    sink(id, message);
-    return () => sink(id, null);
-  }, [sink, id, message]);
-  return id;
-}
-
-/** The error line for a field rendered outside any Section. */
 export function ErrorLine({ id, message }: { id: string; message: string | null }) {
-  const sink = React.useContext(FieldErrorContext);
-  if (sink || !message) return null;
   return (
-    <p id={id} role="status" className={ERROR_LINE} data-testid="inspector-field-error">
-      {message}
-    </p>
+    <div aria-live="polite" className="tw:col-span-full">
+      {message ? (
+        <p id={id} className={ERROR_LINE} data-testid="inspector-field-error">
+          {message}
+        </p>
+      ) : null}
+    </div>
   );
 }
 
@@ -110,6 +100,13 @@ export interface SectionProps {
   action?: React.ReactNode;
   /** Retained for the section files that still pass it; draws nothing. */
   tier?: SectionTier;
+  /** Draw no header row — a section showing a screen that heads itself
+   *  (2L9 I14: the add-interaction screen's "‹ Back to Interactions"). */
+  hideHeader?: boolean;
+  /** The section's own state names it instead of the registry title — a
+   *  repair or receipt state of the same section (2L9 C02 "Unlinked
+   *  content", C11 "Missing dialog"). */
+  stateTitle?: string;
   children: React.ReactNode;
 }
 
@@ -117,15 +114,18 @@ export interface SectionProps {
 // COMPONENT
 // ============================================================================
 
+/* 2L9 page 04: a section is headed by its plain title — 13/semibold ink,
+   no chevron, no rule above; a closed section's one-line summary sits at the
+   row's right ("Advanced attributes  0 set"). The title still toggles. */
 const HEADER_CLASS =
-  "bdi-sec-h tw:flex tw:items-center tw:gap-2 tw:h-8 tw:px-3 tw:cursor-pointer tw:select-none";
+  "bdi-sec-h tw:flex tw:items-center tw:gap-2 tw:h-10 tw:px-3 tw:cursor-pointer tw:select-none";
 const TOGGLE_CLASS =
   "tw:flex-1 tw:min-w-0 tw:flex tw:items-center tw:gap-2 tw:h-7 tw:rounded-[4px] tw:cursor-pointer tw:text-left " +
   "tw:focus-visible:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 const NAME_CLASS =
-  "bdi-sec-name tw:min-w-0 tw:truncate tw:text-[12px] tw:leading-4 tw:font-medium tw:text-[var(--bk-ink-soft)]";
+  "bdi-sec-name tw:min-w-0 tw:truncate tw:text-[13px] tw:leading-4 tw:font-semibold tw:text-[var(--bk-ink)]";
 const SUMMARY_CLASS =
-  "tw:m-0 tw:px-4 tw:pb-2 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)] tw:truncate";
+  "tw:m-0 tw:ml-auto tw:shrink-0 tw:pl-2 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)] tw:truncate tw:max-w-[50%]";
 
 export const Section: React.FC<SectionProps> = ({
   title: ownTitle,
@@ -135,6 +135,8 @@ export const Section: React.FC<SectionProps> = ({
   id: ownId,
   preview,
   action,
+  hideHeader = false,
+  stateTitle,
   children,
 }) => {
   const frame = React.useContext(SectionFrameContext);
@@ -142,16 +144,6 @@ export const Section: React.FC<SectionProps> = ({
      dims a locked element's controls; board 29's conflict does not). */
   const { readOnlyReason } = useInspectorField();
   const [internalIsOpen, setInternalIsOpen] = React.useState(defaultOpen);
-  const [errors, setErrors] = React.useState<ReadonlyMap<string, string>>(() => new Map());
-  const reportError = React.useCallback<FieldErrorSink>((fieldId, message) => {
-    setErrors((prev) => {
-      if ((prev.get(fieldId) ?? null) === message) return prev;
-      const next = new Map(prev);
-      if (message === null) next.delete(fieldId);
-      else next.set(fieldId, message);
-      return next;
-    });
-  }, []);
 
   const isControlled = controlledIsOpen !== undefined;
   const standaloneOpen = isControlled ? controlledIsOpen : internalIsOpen;
@@ -162,7 +154,7 @@ export const Section: React.FC<SectionProps> = ({
 
   const mode: SectionDisplayMode = frame ? frame.displayMode : standaloneOpen ? "open" : "summary";
   const isOpen = mode === "open";
-  const title = frame?.title ?? ownTitle;
+  const title = stateTitle ?? frame?.title ?? ownTitle;
   const id = frame ? `inspector-section-${frame.sectionId}` : ownId;
 
   const toggle = (e?: React.MouseEvent | React.KeyboardEvent) => {
@@ -182,7 +174,6 @@ export const Section: React.FC<SectionProps> = ({
   const slug = title.toLowerCase().replace(/\s+/g, "-");
   const contentId = `section-content-${slug}`;
   const summary = mode === "summary" ? (frame?.summary ?? preview ?? null) : null;
-  const Chevron = isOpen ? ChevronDown : ChevronRight;
 
   return (
     <div
@@ -195,7 +186,8 @@ export const Section: React.FC<SectionProps> = ({
       {/* The row is a container; the toggle carries the button role and any
           action is its SIBLING, never its child (axe nested-interactive).
           Gate 24 keeps raw <button> out of chrome, so the role sits on a span. */}
-      <div className={HEADER_CLASS} data-testid={`inspector-sechead-${slug}`}>
+      {/* `hidden` alone loses to the row's `tw:flex`; the class hides it. */}
+      <div className={hideHeader ? `${HEADER_CLASS} tw:hidden` : HEADER_CLASS} data-testid={`inspector-sechead-${slug}`} hidden={hideHeader || undefined}>
         <span
           role="button"
           tabIndex={0}
@@ -211,17 +203,18 @@ export const Section: React.FC<SectionProps> = ({
           aria-controls={contentId}
           aria-label={`${title} section, ${isOpen ? "expanded" : "collapsed"}`}
         >
-          {/* An empty "+" row has nothing to disclose: no chevron, the title
-              stays in the chevron's column (boards 1, 3). */}
-          {mode === "empty" ? (
-            <span aria-hidden="true" className="tw:w-3 tw:shrink-0" />
-          ) : (
-            <Chevron size={12} aria-hidden="true" className="bdi-chev tw:shrink-0 tw:text-[var(--bk-ink-muted)]" />
-          )}
+          {/* 2L9: a closed section shows › before its title; an open one none. */}
+          {mode === "summary" ? <ChevronRight size={14} aria-hidden="true" className="bdi-chev tw:shrink-0 tw:text-[var(--bk-ink)]" /> : null}
           <span className={NAME_CLASS} data-testid={`inspector-secname-${slug}`}>
             {title}
+            {frame?.titleNote ? <span data-testid="inspector-section-title-note"> · {frame.titleNote}</span> : null}
           </span>
           {frame?.headerDot}
+          {summary ? (
+            <span className={SUMMARY_CLASS} data-testid={`inspector-summary-${frame?.sectionId ?? slug}`}>
+              {summary}
+            </span>
+          ) : null}
         </span>
         {mode === "empty" ? (
           <IconButton
@@ -237,33 +230,18 @@ export const Section: React.FC<SectionProps> = ({
           <span className="tw:inline-flex tw:items-center tw:shrink-0">{action}</span>
         ) : null}
       </div>
-      {summary ? (
-        <p className={SUMMARY_CLASS} data-testid={`inspector-summary-${frame?.sectionId ?? slug}`}>
-          {summary}
-        </p>
-      ) : null}
       {isOpen && (
         <div id={contentId} className="bdi-sec-body">
           {/* A Section nested in this body is its own, unframed disclosure. */}
+          {frame?.lead}
           <SectionFrameContext.Provider value={null}>
-            <FieldErrorContext.Provider value={reportError}>{children}</FieldErrorContext.Provider>
+            {children}
           </SectionFrameContext.Provider>
           {frame?.note ? (
             <p className="tw:m-0 tw:pt-1 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-accent-text)]">{frame.note}</p>
           ) : null}
         </div>
       )}
-      {/* Board 34: the band under the section's rows. Mounted while the
-          section is open so it is a live region before a message lands. */}
-      {isOpen ? (
-        <div aria-live="polite" className={errors.size ? "bdi-sec-errors" : undefined}>
-          {[...errors].map(([fieldId, message]) => (
-            <p key={fieldId} id={fieldId} className={ERROR_LINE} data-testid="inspector-field-error">
-              {message}
-            </p>
-          ))}
-        </div>
-      ) : null}
     </div>
   );
 };

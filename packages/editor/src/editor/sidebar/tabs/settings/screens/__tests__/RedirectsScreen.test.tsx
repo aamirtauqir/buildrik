@@ -116,7 +116,7 @@ function setup(opts: SetupOpts = {}) {
 }
 
 const loaded = () => waitFor(() => expect(screen.getByTestId("set-card-redirect-rules")).toBeInTheDocument());
-const cell = (id: string) => within(screen.getByTestId(`set-rd-row-${id}`)).getAllByRole("cell").map((c) => c.textContent);
+const rowText = (id: string) => screen.getByTestId(`set-rd-row-${id}`).textContent;
 const dialog = () => screen.getByTestId("set-rd-dialog");
 
 /** The node the screen hands the shell's header slot, mounted where a test can click it.
@@ -145,9 +145,7 @@ describe("RedirectsScreen — gating + the load states (3397:33479 / 3397:33573)
 
     const card = screen.getByTestId("set-load-card");
     expect(card).toHaveAttribute("data-state", "loading");
-    expect(screen.getByTestId("set-load-title")).toHaveTextContent("Redirects");
-    expect(screen.getByTestId("set-load-line")).toHaveTextContent("Old URLs sent to new ones, and the 404 suggester.");
-    expect(screen.getByTestId("set-load-state")).toHaveTextContent("Loading…");
+    expect(screen.getByTestId("set-load-title")).toHaveTextContent("Loading Redirects…");
     expect(onLoadStateChange).toHaveBeenLastCalledWith("loading");
 
     await act(async () => releaseList(SEEDED));
@@ -179,16 +177,16 @@ describe("RedirectsScreen — gating + the load states (3397:33479 / 3397:33573)
 });
 
 describe("8136:214826 — the Redirect rules card and the 404 suggester", () => {
-  it("draws the table FROM · TO · TYPE with Edit · Delete per row, and the suggester", async () => {
+  it("draws B8-S10's card — 'Redirects · n', ruled rows 'from → to · 301 · permanent · Delete', + Add redirect — and the suggester", async () => {
     setup();
     await loaded();
     expect(screen.queryByTestId("set-rd-restore")).toBeNull();
-    expect(screen.getByTestId("set-card-title-redirect-rules")).toHaveTextContent("Redirect rules");
+    expect(screen.getByTestId("set-card-title-redirect-rules")).toHaveTextContent(`Redirects · ${SEEDED.length}`);
     const table = screen.getByTestId("set-rd-table");
     expect(table).toHaveAttribute("id", "rd-rules");
-    expect(within(table).getAllByRole("columnheader").map((h) => h.textContent)).toEqual(["From", "To", "Type", "Actions"]);
-    expect(cell("r1")).toEqual(["/menu-old", "/menu", "301", "Edit·Delete"]);
-    expect(cell("r3")).toEqual(["/promo-eid", "https://bellacucina.com/offers", "302", "Edit·Delete"]);
+    expect(rowText("r1")).toBe("/menu-old → /menu301 · permanentDelete");
+    expect(rowText("r3")).toBe("/promo-eid → https://bellacucina.com/offers302 · temporaryDelete");
+    expect(screen.getByTestId("set-rd-add").textContent).toBe("+ Add redirect");
     expect(screen.queryByTestId("set-rd-empty")).toBeNull();
 
     expect(screen.getByTestId("set-card-title-404-suggester")).toHaveTextContent("404 suggester");
@@ -209,7 +207,7 @@ describe("8136:214826 — the Redirect rules card and the 404 suggester", () => 
     const empty = screen.getByTestId("set-rd-empty");
     expect(empty).toHaveTextContent("No redirects yet. Add one to send an old URL to a new one, or import a CSV.");
     expect(screen.queryByTestId("set-rd-table")).toBeNull();
-    fireEvent.click(within(empty).getByTestId("set-rd-add"));
+    fireEvent.click(screen.getByTestId("set-rd-add"));
     expect(dialog()).toHaveAttribute("data-mode", "add");
     cleanup();
     r.list.query.mockResolvedValue([]);
@@ -276,32 +274,16 @@ describe("the suggester switch — applies at once (SA-16)", () => {
   });
 });
 
-describe("Delete → confirm → the undo toast (8136:215838)", () => {
-  it("owner 2026-10-04: a row's Delete asks first, and Cancel deletes nothing", async () => {
-    setup();
-    await loaded();
-    fireEvent.click(screen.getByTestId("set-rd-delete-r1"));
-    expect(screen.getByTestId("set-rd-confirm")).toHaveTextContent("Delete redirect /menu-old → /menu?");
-    fireEvent.click(within(screen.getByTestId("modal-foot-set-rd-confirm")).getByText("Cancel"));
-    await waitFor(() => expect(screen.queryByTestId("set-rd-confirm")).toBeNull());
-    expect(r.delete.mutate).not.toHaveBeenCalled();
-    expect(screen.getByTestId("set-rd-row-r1")).toBeInTheDocument();
-  });
-
-  it("once confirmed, deletes, the row leaves, and the toast names the rule with Undo", async () => {
+describe("Delete at once → the undo toast (B8-S10, owner 2026-10-26)", () => {
+  it("a row's Delete deletes at once, the row leaves, and the toast says 'Redirect deleted' with Undo", async () => {
     setup();
     await loaded();
     r.list.query.mockResolvedValue(SEEDED.filter((x) => x.id !== "r1"));
     fireEvent.click(screen.getByTestId("set-rd-delete-r1"));
-    fireEvent.click(screen.getByTestId("set-rd-confirm-confirm"));
     await waitFor(() => expect(r.delete.mutate).toHaveBeenCalledWith({ id: "r1" }));
     await waitFor(() => expect(screen.queryByTestId("set-rd-row-r1")).toBeNull());
     expect(addToast).toHaveBeenCalledWith(
-      expect.objectContaining({
-        title: "Redirect /menu-old → /menu deleted",
-        description: "You can undo this deletion.",
-        action: expect.objectContaining({ label: "Undo" }),
-      }),
+      expect.objectContaining({ description: "Redirect deleted", action: expect.objectContaining({ label: "Undo" }) }),
     );
   });
 
@@ -309,7 +291,6 @@ describe("Delete → confirm → the undo toast (8136:215838)", () => {
     setup();
     await loaded();
     fireEvent.click(screen.getByTestId("set-rd-delete-r1"));
-    fireEvent.click(screen.getByTestId("set-rd-confirm-confirm"));
     await waitFor(() => expect(addToast).toHaveBeenCalled());
     r.list.query.mockResolvedValue(SEEDED);
     await act(async () => addToast.mock.calls[0][0].action.onClick());
@@ -326,14 +307,10 @@ describe("Delete → confirm → the undo toast (8136:215838)", () => {
     await waitFor(() => expect(screen.getByTestId("set-rd-row-r1")).toBeInTheDocument());
   });
 
-  /* QA 2026-10-05: the toast stayed up after Undo (a focused toast never times
-     out), and a second Undo posted the rule again — a 409 and the "not saved"
-     banner over a rule that was back. Undo runs once and takes its toast down. */
   it("Undo runs once and dismisses its toast", async () => {
     setup();
     await loaded();
     fireEvent.click(screen.getByTestId("set-rd-delete-r1"));
-    fireEvent.click(screen.getByTestId("set-rd-confirm-confirm"));
     await waitFor(() => expect(addToast).toHaveBeenCalled());
     const undo = addToast.mock.calls[0][0].action.onClick;
     await act(async () => undo());
@@ -348,7 +325,6 @@ describe("Delete → confirm → the undo toast (8136:215838)", () => {
     setup();
     await loaded();
     fireEvent.click(screen.getByTestId("set-rd-delete-r2"));
-    fireEvent.click(screen.getByTestId("set-rd-confirm-confirm"));
     await waitFor(() => expect(screen.getByTestId("set-save-error")).toBeInTheDocument());
     expect(screen.getByTestId("set-rd-row-r2")).toBeInTheDocument();
     expect(addToast).not.toHaveBeenCalled();
@@ -449,13 +425,13 @@ describe("CSV — Import (8136:215047 / 215307 / 215568) and Export", () => {
 });
 
 describe("the header's Add redirect → 4254:75736 → redirects.create → re-list", () => {
-  it("registers Import CSV · Export CSV · Add redirect once loaded with rows, and clears them on unmount", async () => {
+  it("registers Import CSV · Export CSV once loaded with rows (Add redirect is the card's), and clears them on unmount", async () => {
     const registerHeaderAction = vi.fn();
     const { unmount } = setup({ registerHeaderAction });
     await loaded();
     await mountHeader(registerHeaderAction);
     const slot = screen.getByTestId("header-slot");
-    expect(within(slot).getAllByRole("button").map((b) => b.textContent)).toEqual(["Import CSV", "Export CSV", "Add redirect"]);
+    expect(within(slot).getAllByRole("button").map((b) => b.textContent)).toEqual(["Import CSV", "Export CSV"]);
     expect(within(slot).getByTestId("set-rd-import")).toHaveAttribute("id", "rd-import-csv");
     expect(within(slot).getByTestId("set-rd-export")).toHaveAttribute("id", "rd-export-csv");
     unmount();
@@ -544,7 +520,7 @@ describe("a row's Edit → 4254:75747 → redirects.update / delete → re-list"
     await waitFor(() => expect(screen.queryByTestId("set-rd-row-r2")).toBeNull());
     expect(screen.getByTestId("set-rd-row-r1")).toBeInTheDocument();
     expect(addToast).toHaveBeenCalledWith(
-      expect.objectContaining({ title: expect.stringMatching(/^Redirect .* deleted$/), action: expect.objectContaining({ label: "Undo" }) }),
+      expect.objectContaining({ description: "Redirect deleted", action: expect.objectContaining({ label: "Undo" }) }),
     );
   });
 
@@ -648,7 +624,10 @@ describe("the Pages door — URL repair draft (3519:19920) → saved (3519:20096
     await waitFor(() => expect(screen.getByTestId("set-rd-repair-saved")).toBeInTheDocument());
     fireEvent.click(screen.getByTestId("set-rd-repair-back"));
     const emits = (composer.emit as ReturnType<typeof vi.fn>).mock.calls.filter(([e]) => String(e).startsWith("ui:"));
-    expect(emits).toEqual([[EVENTS.UI_PAGES_OPEN_SETTINGS, { pageId: "p-about", tab: "seo" }]]);
+    /* 67:11341: the SEO tab is told which redirect was saved. */
+    expect(emits).toEqual([
+      [EVENTS.UI_PAGES_OPEN_SETTINGS, { pageId: "p-about", tab: "seo", redirectSaved: { from: "/about", to: "/about-us" } }],
+    ]);
     expect(screen.queryByTestId("set-rd-repair-saved")).toBeNull();
   });
 

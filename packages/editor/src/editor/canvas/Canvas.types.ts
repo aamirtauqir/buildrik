@@ -13,13 +13,14 @@ export interface CanvasProps {
   composer: Composer | null;
   device: DeviceType;
   zoom: number;
-  onAIRequest?: (payload: { elementId: string; elementType?: string }) => void;
   showSpacing?: boolean;
   showBadges?: boolean;
   showGuides?: boolean;
   showGrid?: boolean;
   showRulers?: boolean;
   showXRay?: boolean;
+  /** Element outlines without X-Ray's wireframe — the shell's "Show outlines" preference. */
+  showOutlines?: boolean;
   /** Show the canvas footer toolbar with overlays and zoom controls */
   showFooterToolbar?: boolean;
   /**
@@ -36,10 +37,6 @@ export interface CanvasProps {
   onOverlayChange?: (overlay: keyof CanvasOverlayState, enabled: boolean) => void;
   /** Change the active device/breakpoint (from the footer toolbar's switcher). */
   onDeviceChange?: (device: DeviceType) => void;
-  /** Whether an undo step is available (drives the footer toolbar's Undo). */
-  canUndo?: boolean;
-  /** Whether a redo step is available (drives the footer toolbar's Redo). */
-  canRedo?: boolean;
   /** Open the image editor for a media element on the canvas (consumed by CanvasOverlayGroup) */
   onOpenImageEditor?: (item: { key: string; src: string; name: string }) => void;
 }

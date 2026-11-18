@@ -349,8 +349,10 @@ export const settingsOverviewSchema = z.object({
     workspaceDeletionAt: z.string().datetime().nullable(),
   }),
   general: z.object({ siteName: z.string(), language: z.string() }),            // "English (en-US)" label built client-side from defaultLocale
-  localization: z.object({ locales: z.number(), notStarted: z.array(z.string()) }),
-  seo: z.object({ allowIndexing: z.boolean(), robotsTxtSet: z.boolean() }),
+  /** `codes`: the enabled locales, default first (2L9 B8-S01 "English (default), Deutsch"). */
+  localization: z.object({ locales: z.number(), notStarted: z.array(z.string()), codes: z.array(z.string()) }),
+  /** `pagesWithoutDescription`: pages whose meta description is empty (B8-S01 "2 pages without a description"). */
+  seo: z.object({ allowIndexing: z.boolean(), robotsTxtSet: z.boolean(), pagesWithoutDescription: z.number().int().nonnegative() }),
   domains: z.object({ primary: z.string().nullable(), pendingDns: z.number() }),
   redirects: z.object({ rules: z.number(), suggestions: z.number() }),
   analytics: z.object({ providers: z.array(z.string()), receiving: z.boolean() }),
@@ -360,7 +362,7 @@ export const settingsOverviewSchema = z.object({
   access: z.object({ passwordSet: z.boolean(), shareLinks: z.number() }),           // active share links
   webhooks: z.object({ endpoints: z.number(), lastDelivery: z.enum(["ok", "failed"]).nullable() }),
   members: z.object({ used: z.number(), seats: z.number() }),
-  billing: z.object({ plan: z.string(), priceMonthly: z.number() }),
+  billing: z.object({ plan: z.string(), priceMonthly: z.number(), pagesPerSite: z.number() }),   // pagesPerSite -1 = unlimited
   attention: z.array(z.object({
     kind: z.enum(["locale-not-started", "dns-pending", "webhook-failed"]),
     title: z.string(), detail: z.string(), section: z.string(),               // section = the nav id to open

@@ -8,7 +8,7 @@
  */
 import * as React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent, cleanup, waitFor, within } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup, waitFor, within, act } from "@testing-library/react";
 import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 import { EVENTS } from "@/shared/constants";
 import { ToastProvider } from "@/editor/chrome-ui";
@@ -80,7 +80,9 @@ describe("CmsWorkspace · root (4428:140486)", () => {
 });
 
 describe("CmsWorkspace · records table (4428:143182)", () => {
-  it("draws the display field, the short fields and Updated — long text and media stay in the sheet", async () => {
+  /* 2L9 165:2 — Title · Status · Updated, then one field column (a choice
+     field first); Columns adds the rest. */
+  it("draws Title, Status, Updated and one field column; Columns picks more", async () => {
     const { composer } = makeEngine({
       collections: [FULL],
       items: [rec("r1", { name: "Margherita", price: "$12", category: "Pizza", available: true, description: "Tomato" })],
@@ -89,14 +91,16 @@ describe("CmsWorkspace · records table (4428:143182)", () => {
     render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
     const table = await screen.findByTestId("cms-table");
     const heads = within(table).getAllByRole("columnheader").map((h) => h.textContent);
-    expect(heads).toEqual(["Name", "Price", "Category", "Available", "Updated"]);
+    expect(heads).toEqual(["Title", "Status", "Updated", "Available"]);
     const row = await screen.findByTestId("cms-row-r1");
     expect(row).toHaveTextContent("Margherita");
     expect(row).toHaveTextContent("Yes");
     expect(row).not.toHaveTextContent("Tomato");
     expect(row).toHaveTextContent("2h ago");
-    expect(screen.getByTestId("cms-ws-title")).toHaveTextContent("Menu items");
-    expect(screen.getByTestId("cms-ws-meta")).toHaveTextContent("· 1 record");
+    expect(screen.getByTestId("cms-ws-title")).toHaveTextContent("Menu items · 1 record");
+    fireEvent.click(screen.getByTestId("cms-records-columns"));
+    fireEvent.click(screen.getByTestId("cms-records-column-price"));
+    expect(within(table).getAllByRole("columnheader").map((h) => h.textContent)).toEqual(["Title", "Status", "Updated", "Price", "Available"]);
     // a full-width table: no hint column
     expect(screen.queryByTestId("cms-ws-hint")).toBeNull();
   });
@@ -105,7 +109,10 @@ describe("CmsWorkspace · records table (4428:143182)", () => {
     const { composer } = makeEngine({ collections: [FULL], items: [rec("r1", { name: "Tiramisu", category: "Dessert" })] });
     cmsWorkspace.openCollection("col-1");
     render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
-    expect(await screen.findByTestId("cms-row-r1")).toHaveTextContent("Price required");
+    await screen.findByTestId("cms-row-r1");
+    fireEvent.click(screen.getByTestId("cms-records-columns"));
+    fireEvent.click(screen.getByTestId("cms-records-column-price"));
+    expect(screen.getByTestId("cms-row-r1")).toHaveTextContent("Price required");
   });
 
   it("sorts on a column head, ascending then descending", async () => {
@@ -161,8 +168,8 @@ describe("CmsWorkspace · records table (4428:143182)", () => {
     render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
     fireEvent.click(await screen.findByTestId("cms-row-r1"));
     expect(cmsWorkspace.get().recordId).toBe("r1");
-    cmsWorkspace.openRecord(null);
-    fireEvent.click(screen.getByTestId("cms-ws-add-record"));
+    act(() => cmsWorkspace.openRecord(null));
+    fireEvent.click(await screen.findByTestId("cms-ws-add-record"));
     expect(cmsWorkspace.get().recordId).toBe("new");
   });
 });
@@ -175,21 +182,21 @@ describe("CmsWorkspace · Back to canvas (§13)", () => {
     cmsWorkspace.openCollection("col-1");
     const onBack = vi.fn();
     render(<ToastProvider><CmsWorkspace composer={composer as never} onBackToCanvas={onBack} /></ToastProvider>);
-    const back = await screen.findByRole("button", { name: "‹ Back to canvas" });
+    const back = await screen.findByRole("button", { name: /^‹ Back to Editor/ });
     const header = screen.getByTestId("cms-ws-header");
     expect(header.firstElementChild).toBe(back);
     fireEvent.click(back);
     expect(onBack).toHaveBeenCalledTimes(1);
   });
 
-  it("Open record: the sheet carries ‹ Back to canvas — one step closes it and goes back", async () => {
+  it("Open record: the header's ‹ Back to canvas closes the record and goes back in one step", async () => {
     const { composer } = makeEngine({ collections: [FULL], items: [rec("r1", { name: "Margherita" })] });
     cmsWorkspace.openCollection("col-1");
     cmsWorkspace.openRecord("r1");
     const onBack = vi.fn();
     render(<ToastProvider><CmsWorkspace composer={composer as never} onBackToCanvas={onBack} /></ToastProvider>);
-    const sheet = await screen.findByTestId("cms-sheet");
-    fireEvent.click(within(sheet).getByRole("button", { name: "‹ Back to canvas" }));
+    await screen.findByTestId("cms-sheet");
+    fireEvent.click(screen.getByRole("button", { name: /^‹ Back to Editor/ }));
     expect(onBack).toHaveBeenCalledTimes(1);
     expect(cmsWorkspace.get().recordId).toBeNull();
   });
@@ -200,7 +207,7 @@ describe("CmsWorkspace · Back to canvas (§13)", () => {
     cmsWorkspace.openRecord("r1");
     render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
     const sheet = await screen.findByTestId("cms-sheet");
-    expect(within(sheet).queryByRole("button", { name: "‹ Back to canvas" })).toBeNull();
+    expect(within(sheet).queryByRole("button", { name: /^‹ Back to Editor/ })).toBeNull();
   });
 
   it("no back action without one (the rail's own visit)", async () => {
@@ -208,7 +215,7 @@ describe("CmsWorkspace · Back to canvas (§13)", () => {
     cmsWorkspace.openCollection("col-1");
     render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
     await screen.findByTestId("cms-ws-header");
-    expect(screen.queryByRole("button", { name: "‹ Back to canvas" })).toBeNull();
+    expect(screen.queryByRole("button", { name: /^‹ Back to Editor/ })).toBeNull();
   });
 });
 
@@ -218,7 +225,8 @@ describe("CmsWorkspace · empty collection (4428:148905)", () => {
     cmsWorkspace.openCollection("col-1");
     render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
     expect(await screen.findByTestId("cms-ws-no-records")).toHaveTextContent("No records yet");
-    expect(screen.getByTestId("cms-ws-empty-import")).toHaveTextContent("Import JSON");
+    expect(screen.getByTestId("cms-ws-empty-import")).toHaveTextContent("Import JSON…");
+    expect(screen.getByTestId("cms-ws-no-records")).toHaveTextContent("Add your first record or import existing records.");
     expect(screen.getByTestId("cms-ws-hint")).toHaveTextContent("Add your first record");
   });
 
@@ -244,7 +252,8 @@ describe("CmsWorkspace · tabs and the collection ⋯ (7096:76270)", () => {
     render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
     fireEvent.click(await screen.findByRole("tab", { name: "Fields" }));
     expect(await screen.findByText("Published?")).toBeInTheDocument();
-    expect(screen.getByTestId("cms-ws-meta")).toHaveTextContent(`· ${MENU.fields.length} field`);
+    /* 165:2917 — the header keeps the record count on every tab. */
+    expect(screen.getByTestId("cms-ws-meta")).toHaveTextContent("· 0 records");
     fireEvent.click(screen.getByTestId("cms-ws-add-field"));
     fireEvent.click(screen.getByTestId("cms-add-field-type-text"));
     fireEvent.change(screen.getByTestId("cms-add-field-name"), { target: { value: "Photo URL" } });
@@ -257,17 +266,72 @@ describe("CmsWorkspace · tabs and the collection ⋯ (7096:76270)", () => {
     );
   });
 
-  it("⋯ opens Dynamic pages and Settings, and offers Import JSON", async () => {
+  /* 2L9 165:2 — the four tabs are named in the row; ⋯ keeps the imports and
+     the planned connectors (254:82143). */
+  it("names Records · Fields · Dynamic pages · Collection settings, and ⋯ holds the imports", async () => {
     const { composer } = makeEngine({ collections: [MENU], items: [ITEM] });
     cmsWorkspace.openCollection("col-1");
     render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
-    fireEvent.click(await screen.findByTestId("cms-ws-more"));
-    expect(screen.getByTestId("cms-ws-menu-import")).toHaveTextContent("Import JSON…");
-    fireEvent.click(screen.getByTestId("cms-ws-menu-dynamic"));
+    const tabs = await screen.findAllByRole("tab");
+    expect(tabs.map((t) => t.textContent)).toEqual(["Records", "Fields", "Dynamic pages", "Collection settings"]);
+    fireEvent.click(screen.getByRole("tab", { name: "Dynamic pages" }));
     expect(cmsWorkspace.get().tab).toBe("dynamic-pages");
     expect(await screen.findByTestId("cms-ws-hint")).toHaveTextContent("Select a page");
-    fireEvent.click(screen.getByTestId("cms-ws-more"));
-    fireEvent.click(screen.getByTestId("cms-ws-menu-settings"));
+    fireEvent.click(screen.getByRole("tab", { name: "Collection settings" }));
     expect(cmsWorkspace.get().tab).toBe("settings");
+    fireEvent.click(screen.getByTestId("cms-ws-more"));
+    expect(screen.getByTestId("cms-ws-menu-import-csv")).toHaveTextContent("Import CSV…");
+    expect(screen.getByTestId("cms-ws-menu-import")).toHaveTextContent("Import JSON…");
+    expect(screen.getByTestId("cms-ws-menu-import-sheets")).toHaveTextContent("Planned");
+    expect(screen.queryByTestId("cms-ws-menu-dynamic")).toBeNull();
+  });
+
+  /* 2L9 257:53846 / 259:95932 — Set a default fills the published records
+     that leave the field empty, keeps the others, then turns Required on. */
+  it("Required with a default fills only the empty published records", async () => {
+    const col = { ...MENU, fields: [...MENU.fields, { id: "fs", name: "Subtitle", slug: "subtitle", type: "text", order: 9 }] } as CMSCollection;
+    const items = [
+      { ...ITEM, id: "a", status: "published" as const, data: { ...ITEM.data, subtitle: "" } },
+      { ...ITEM, id: "b", status: "published" as const, data: { ...ITEM.data, subtitle: "Kept" } },
+      { ...ITEM, id: "c", status: "draft" as const, data: { ...ITEM.data, subtitle: "" } },
+    ];
+    const { composer } = makeEngine({ collections: [col], items });
+    cmsWorkspace.openCollection("col-1", "fields");
+    render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
+    fireEvent.click(await screen.findByTestId("cms-field-fs"));
+    fireEvent.click(screen.getByTestId("cms-fi-required"));
+    fireEvent.click(screen.getByTestId("cms-fi-save"));
+    expect(screen.getByTestId("cms-required-impact-body")).toHaveTextContent("1 published record has no Subtitle value.");
+    fireEvent.click(screen.getByTestId("cms-required-set-default"));
+    fireEvent.change(screen.getByTestId("cms-required-default-input"), { target: { value: "Latest" } });
+    fireEvent.click(screen.getByTestId("cms-required-default-save"));
+    await waitFor(() =>
+      expect(composer.cms.collections.updateField).toHaveBeenLastCalledWith("col-1", "fs", {
+        defaultValue: "Latest",
+        validation: { required: true },
+      }),
+    );
+    const writes = composer.cms.collections.updateContentItem.mock.calls.map((c) => c[0]);
+    expect(writes).toEqual(["a"]);
+    expect(await screen.findByText(/Default saved to 1 previously empty published record\. Existing values were kept\./)).toBeInTheDocument();
+  });
+
+  /* 2L9 257:51318 → 257:52278 — the type moves, then each value is written converted. */
+  it("Convert moves the type and writes each value converted", async () => {
+    const items = [
+      { ...ITEM, id: "a", data: { ...ITEM.data, price: "12" } },
+      { ...ITEM, id: "b", status: "draft" as const, data: { ...ITEM.data, price: "7" } },
+    ];
+    const { composer } = makeEngine({ collections: [MENU], items });
+    cmsWorkspace.openCollection("col-1", "fields");
+    render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
+    fireEvent.click(await screen.findByTestId("cms-field-f2"));
+    fireEvent.change(screen.getByTestId("cms-fi-type"), { target: { value: "number" } });
+    fireEvent.click(await screen.findByTestId("cms-type-change-convert"));
+    await waitFor(() => expect(composer.cms.collections.updateField).toHaveBeenCalledWith("col-1", "f2", { type: "number" }));
+    await waitFor(() => expect(composer.cms.collections.updateContentItem).toHaveBeenCalledTimes(2));
+    const written = composer.cms.collections.updateContentItem.mock.calls.map((c) => [c[0], (c[1] as { data: Record<string, unknown> }).data.price]);
+    expect(written).toEqual([["a", 12], ["b", 7]]);
+    expect(await screen.findByText("2 values converted and saved.")).toBeInTheDocument();
   });
 });

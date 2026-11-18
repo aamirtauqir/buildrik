@@ -211,6 +211,27 @@ export interface PageData {
   slugHistory?: SlugChange[];
 }
 
+/**
+ * One row of the bottom bar's page switcher, derived from the composer's page
+ * list (the same list the Pages panel reads). `kind: "template"` marks a CMS
+ * collection template page — the page a collection's `pageTemplatePath`
+ * points at; its `slug` is then the collection's slug pattern.
+ */
+export interface PageSummary {
+  id: string;
+  name: string;
+  /** Display path: "/" for the home page, else "/" + the page slug. */
+  slug: string;
+  kind: "static" | "template";
+  collectionId?: string;
+  collectionName?: string;
+  isHome: boolean;
+  /** The page carries unsaved edits (useDirtyPages). */
+  dirty: boolean;
+  /** Nesting by slug path: "/about" is 0, "/services/web" is 1. */
+  depth: number;
+}
+
 /** One slug change event for redirect generation */
 export interface SlugChange {
   /** Prior slug (the value being redirected FROM) */

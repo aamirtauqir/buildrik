@@ -25,6 +25,10 @@ const baseProps = {
   onCopyLink: vi.fn(),
   onSettings: vi.fn(),
   onRemoveFromFolder: vi.fn(),
+  onSaveAsTemplate: vi.fn(),
+  onMoveToFolder: vi.fn(),
+  onMove: vi.fn(),
+  rootPosition: { index: 1, count: 3 } as { index: number; count: number } | null,
 };
 
 describe("PageContextMenu", () => {
@@ -181,8 +185,72 @@ describe("PageContextMenu — 6883:69130", () => {
     expect(screen.queryByTestId("pages-menu-delete-reason")).toBeNull();
   });
 
-  it("is 224 wide", () => {
+  it("is 280 wide (design-2l9 63:13820)", () => {
     render(<PageContextMenu {...baseProps} pageId="p2" />);
-    expect(screen.getByTestId("pages-context-menu").className).toContain("tw:w-56");
+    expect(screen.getByTestId("pages-context-menu").className).toContain("tw:w-70");
+  });
+
+  /* design-2l9 boards 63:13820 / 131:41791 / 137:55343. Re-baseline: page row
+     menu (was Rename… → Page settings… with no move or template rows). */
+  // re-baseline: page row menu — 131:41791 (owner: wins over 63:13820): titled, ruled into four groups, red Delete, Close menu; ⌥↑ / ⌥↓ per A-17.
+  it("draws 131:41791: the page as a title, four ruled groups, red Delete, Close menu", () => {
+    render(<PageContextMenu pageId="p2" {...baseProps} />);
+    expect(screen.getByTestId("pages-menu-title")).toHaveTextContent("About");
+    const rows = screen.getAllByRole("menuitem").map((r) => r.textContent?.trim());
+    expect(rows).toEqual([
+      "Rename…", "Duplicate", "Set as homepage", "Replace layout with template…", "Save as template…",
+      "Move to folder…", "Move up⌥↑", "Move down⌥↓", "Copy link", "Page settings", "Delete page", "Close menu",
+    ]);
+    expect(screen.getAllByRole("separator")).toHaveLength(3);
+    fireEvent.click(screen.getByTestId("pages-menu-close"));
+    expect(baseProps.onClose).toHaveBeenCalled();
+  });
+
+  it("Move up / down call the move with a direction; Save as template and Move to folder pass the page", () => {
+    const onMove = vi.fn();
+    const onSaveAsTemplate = vi.fn();
+    const onMoveToFolder = vi.fn();
+    render(<PageContextMenu pageId="p2" {...baseProps} onMove={onMove} onSaveAsTemplate={onSaveAsTemplate} onMoveToFolder={onMoveToFolder} />);
+    fireEvent.click(screen.getByTestId("pages-menu-move-down"));
+    expect(onMove).toHaveBeenCalledWith("p2", 1);
+    cleanup();
+    render(<PageContextMenu pageId="p2" {...baseProps} onSaveAsTemplate={onSaveAsTemplate} />);
+    fireEvent.click(screen.getByTestId("pages-menu-save-template"));
+    expect(onSaveAsTemplate).toHaveBeenCalledWith("p2");
+    cleanup();
+    render(<PageContextMenu pageId="p2" {...baseProps} onMoveToFolder={onMoveToFolder} />);
+    fireEvent.click(screen.getByTestId("pages-menu-move-folder"));
+    expect(onMoveToFolder).toHaveBeenCalledWith("p2");
+  });
+
+  it("says why a move cannot happen — first, last, or inside a folder", () => {
+    const { rerender } = render(<PageContextMenu pageId="p1" {...baseProps} rootPosition={{ index: 0, count: 3 }} />);
+    expect(screen.getByTestId("pages-menu-move-up")).toHaveAttribute("aria-disabled", "true");
+    expect(screen.getByTestId("pages-menu-move-reason").textContent).toBe("Home is the first top-level page.");
+    rerender(<PageContextMenu pageId="p2" {...baseProps} rootPosition={{ index: 2, count: 3 }} />);
+    expect(screen.getByTestId("pages-menu-move-down")).toHaveAttribute("aria-disabled", "true");
+    expect(screen.getByTestId("pages-menu-move-reason").textContent).toBe("About is the last top-level page.");
+    rerender(<PageContextMenu pageId="p2" {...baseProps} rootPosition={null} folderName="Studio" />);
+    expect(screen.getByTestId("pages-menu-move-reason").textContent).toBe("Pages in a folder can’t be reordered.");
+  });
+
+  it("a folder member's menu names its folder; the reason follows the pair, then Remove (127:39528 / 134:44345)", () => {
+    const follows = (a: Element, b: Element) => !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+    render(<PageContextMenu pageId="p2" {...baseProps} rootPosition={null} folderName="Client projects" />);
+    expect(screen.getByTestId("pages-menu-title").textContent).toBe("About · In Client projects");
+    const reason = screen.getByTestId("pages-menu-move-reason");
+    expect(follows(screen.getByTestId("pages-menu-move-down"), reason)).toBe(true);
+    expect(follows(reason, screen.getByTestId("pages-menu-remove-folder"))).toBe(true);
+  });
+
+  it("puts the reason under the move it blocks (137:56781 first · 137:56060 last)", () => {
+    const follows = (a: Element, b: Element) => !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+    const { rerender } = render(<PageContextMenu pageId="p1" {...baseProps} rootPosition={{ index: 0, count: 3 }} />);
+    let reason = screen.getByTestId("pages-menu-move-reason");
+    expect(follows(screen.getByTestId("pages-menu-move-up"), reason)).toBe(true);
+    expect(follows(reason, screen.getByTestId("pages-menu-move-down"))).toBe(true);
+    rerender(<PageContextMenu pageId="p2" {...baseProps} rootPosition={{ index: 2, count: 3 }} />);
+    reason = screen.getByTestId("pages-menu-move-reason");
+    expect(follows(screen.getByTestId("pages-menu-move-down"), reason)).toBe(true);
   });
 });

@@ -6,6 +6,7 @@ import {
   getAncestors,
   countDescendants,
   getDisplayName,
+  getLayerPreview,
 } from "./layerUtils";
 
 const makeNode = (id: string, children: LayerItem[] = [], depth = 0): LayerItem => ({
@@ -93,5 +94,18 @@ describe("getDisplayName", () => {
     const result = getDisplayName("x", "custom-widget", new Map());
     expect(typeof result).toBe("string");
     expect(result.length).toBeGreaterThan(0);
+  });
+});
+
+describe("getLayerPreview", () => {
+  const text = (content: string) => ({ getType: () => "heading", getContent: () => content });
+
+  it("decodes HTML entities once, so the readout prints the typed text (REQUESTS #9)", () => {
+    expect(getLayerPreview(text("Tom &amp; Jerry"))).toBe("Tom & Jerry");
+    expect(getLayerPreview(text("&lt;b&gt; is &quot;bold&quot;"))).toBe('<b> is "bold"');
+  });
+
+  it("keeps words apart across stripped tags", () => {
+    expect(getLayerPreview(text("<p>One</p><p>Two&nbsp;three</p>"))).toBe("One Two three");
   });
 });

@@ -10,6 +10,7 @@ import { devError } from "@/shared/utils/devLogger";
 import { EVENTS } from "@/shared/constants/events";
 import { CURRENT_ITEM_ATTR, followsContextRecord, RepeaterRenderer, richtextKeys, writeBoundValue } from "@/engine/cms/RepeaterRenderer";
 import { isSafeCmsBoundValue } from "@buildrik/shared/schemas/sites";
+import { applyPageConditions } from "@/engine/cms/conditionRender";
 
 interface UseCMSPreviewOptions {
   composer: Composer | null;
@@ -35,8 +36,9 @@ export function useCMSPreview({ composer, content }: UseCMSPreviewOptions): UseC
     const hasElementBindings = composer?.cms.bindings?.hasAny() ?? false;
     const hasCollectionBindings =
       (composer?.cms.bindings?.getAllCollectionBindings().length ?? 0) > 0;
+    const hasConditions = composer?.cms.bindings?.hasConditions?.() ?? false;
 
-    if (!content || !composer?.cms.bindings || (!hasElementBindings && !hasCollectionBindings)) {
+    if (!content || !composer?.cms.bindings || (!hasElementBindings && !hasCollectionBindings && !hasConditions)) {
       // D-7: no bindings and no collection-list repeaters — nothing to
       // resolve, so skip the DOMParser pass entirely instead of parsing and
       // re-serializing content that will come out byte-identical.
@@ -80,7 +82,7 @@ export function useCMSPreview({ composer, content }: UseCMSPreviewOptions): UseC
           el.setAttribute("data-cms-bound", "true");
           bindings.forEach((binding) => {
             if (followsContextRecord(binding) && currentItemOf === binding.collectionId) return;
-            const promise = composer.cms.bindings.resolveBinding(binding).then((value) => {
+            const promise = composer.cms.bindings.resolveBinding(binding, { preview: true }).then((value) => {
               /* Rendered into the app origin (Canvas innerHTML): stored
                  property names and CMS entry values are data — only the
                  shared allowlist, and never a dangerous src/href URL. */
@@ -98,6 +100,9 @@ export function useCMSPreview({ composer, content }: UseCMSPreviewOptions): UseC
         });
 
         await Promise.all(resolvePromises);
+        /* B-11: the page's conditions against the preview record — a failing
+           element stays, drawn as a ghost (data-bk-condition="hidden"). */
+        await applyPageConditions(doc, composer, { canvas: true });
         if (cancelled) return;
         setResolvedContent(doc.body.innerHTML);
       } catch (error) {
@@ -142,6 +147,10 @@ export function useCMSPreview({ composer, content }: UseCMSPreviewOptions): UseC
        the old text and never drew the bound marker. */
     composer.on(EVENTS.BINDING_CREATED, handleContentChange);
     composer.on(EVENTS.BINDING_REMOVED, handleContentChange);
+    /* The record bar (173:12022) picked another record, or drafts on/off. */
+    composer.on(EVENTS.CMS_PREVIEW_RECORD_CHANGED, handleContentChange);
+    composer.on(EVENTS.CMS_CONDITION_CHANGED, handleContentChange);
+    composer.on(EVENTS.CMS_LIST_QUERY_CHANGED, handleContentChange);
 
     return () => {
       composer.cms.collections.off("content:updated", handleContentChange);
@@ -154,6 +163,9 @@ export function useCMSPreview({ composer, content }: UseCMSPreviewOptions): UseC
       composer.off(EVENTS.CMS_COLLECTION_UNBOUND, handleContentChange);
       composer.off(EVENTS.BINDING_CREATED, handleContentChange);
       composer.off(EVENTS.BINDING_REMOVED, handleContentChange);
+      composer.off(EVENTS.CMS_PREVIEW_RECORD_CHANGED, handleContentChange);
+      composer.off(EVENTS.CMS_CONDITION_CHANGED, handleContentChange);
+      composer.off(EVENTS.CMS_LIST_QUERY_CHANGED, handleContentChange);
     };
   }, [composer]);
 

@@ -133,7 +133,7 @@ describe("deriveLifecycleState — off the happy path", () => {
     const move = deriveLifecycleState(
       at({ reviewsEnabled: null, editsRequireApproval: null, reviewStatusFailed: true, offline: true }),
     );
-    expect(move?.blockedReason).toBe("Can't publish while offline");
+    expect(move?.blockedReason).toBe("Needs a connection");
   });
 
   it("a server too old to send the flags does not block publishing forever", () => {
@@ -170,19 +170,19 @@ describe("deriveLifecycleState — off the happy path", () => {
     // Viewer/offline/flag-off do not depend on the review flags — those answers
     // are final at first paint and must not be replaced by "checking…".
     expect(deriveLifecycleState(at({ reviewsEnabled: null, offline: true }))?.blockedReason).toBe(
-      "Can't publish while offline",
+      "Needs a connection",
     );
   });
 
   it("a blocked publish is shown with its reason, never withheld", () => {
     const cases: Array<[Partial<LifecycleInput>, string]> = [
-      [{ publishEnabled: false }, "Publishing isn't switched on for this workspace yet"],
-      [{ isViewer: true }, "Viewers can't publish — ask an editor"],
+      [{ publishEnabled: false }, "Publishing isn’t switched on for this workspace yet"],
+      [{ isViewer: true }, "Publishing needs Editor access"],
       [{ saveConflict: true }, "Resolve the sync conflict before publishing"],
       /* L5-060: publish exports the live canvas, so after a failed save it
          would ship edits no stored project or version holds. */
       [{ saveFailed: true }, "Save your changes before publishing — the last save failed"],
-      [{ offline: true }, "Can't publish while offline"],
+      [{ offline: true }, "Needs a connection"],
     ];
     for (const [over, reason] of cases) {
       const move = deriveLifecycleState(at({ reviewState: "approved", ...over }));
@@ -208,16 +208,21 @@ describe("deriveLifecycleState — off the happy path", () => {
     );
   });
 
-  it("site errors re-label publish, they do not block it", () => {
+  /* OD-1 (design 2L9, board B8-PB01): a blocking issue blocks. It used to
+     re-label the CTA "Publish anyway". */
+  it("site errors block publish and say how many to fix", () => {
     const move = deriveLifecycleState(at({ reviewState: "approved", errorCount: 2 }));
-    expect(move?.label).toBe("Publish anyway");
-    expect(move?.blockedReason).toBeNull();
+    expect(move?.label).toBe("Publish");
+    expect(move?.blockedReason).toBe("Fix 2 blocking issues to publish");
+    expect(deriveLifecycleState(at({ reviewState: "approved", errorCount: 1 }))?.blockedReason).toBe(
+      "Fix 1 blocking issue to publish",
+    );
   });
 
-  it("a real block outranks the error re-label — one refusal, not two", () => {
+  it("a real block outranks the blocking-issues line — one refusal, not two", () => {
     const move = deriveLifecycleState(at({ reviewState: "approved", errorCount: 2, offline: true }));
     expect(move?.label).toBe("Publish");
-    expect(move?.blockedReason).toBe("Can't publish while offline");
+    expect(move?.blockedReason).toBe("Needs a connection");
   });
 
   it("a blocked publish still says what is waiting to ship", () => {
@@ -310,16 +315,16 @@ describe("deriveLifecycleState — the publish gate", () => {
       expect(gateOf({ reviewState: "changes-requested", errorCount: 2 })).toBe("changes-requested");
     });
 
-    it("open errors beat a stale approval — the errors confirm opens first", () => {
+    it("open errors beat a stale approval — the door is shut on the issues first", () => {
       const move = deriveLifecycleState(at({ reviewState: "approved-edited-since", errorCount: 1 }));
       expect(move?.gate).toBe("open-errors");
-      expect(move?.gateReason).toBe("1 open error will go live exactly as it is.");
+      expect(move?.gateReason).toBe("Fix 1 blocking issue to publish");
     });
 
     it("open errors beat the plain confirm", () => {
       expect(gateOf({ reviewState: "approved", errorCount: 3 })).toBe("open-errors");
       expect(deriveLifecycleState(at({ reviewState: "approved", errorCount: 3 }))?.gateReason).toBe(
-        "3 open errors will go live exactly as they are.",
+        "Fix 3 blocking issues to publish",
       );
     });
 

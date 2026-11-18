@@ -5,12 +5,12 @@
  * `SECTION_REGISTRY`. The entries live in one file per Inspector v4 lane
  * (build plan §1.2), so parallel lanes never edit the same registry file:
  *   - `_shared.tsx`    — types, defineSection, adapters (W1)
- *   - `type.tsx`       — the type block (W1)
- *   - `component.tsx`  — the component row (W1 → L2-D2)
+ *   - `type.tsx`       — the type block, Content or Style by body (W1)
+ *   - `content.tsx`    — the Content tab (2L9 lane L-B)
  *   - `text.tsx`       — Typography, Text inside (L2-A)
  *   - `box.tsx`        — Layout, Size, Spacing, Fill, Border (L2-C)
  *   - `effects.tsx`    — the Effects tab (L2-C)
- *   - `behaviour.tsx`  — the Behaviour tab (L2-D1)
+ *   - `behaviour.tsx`  — the Behavior tab (L2-D1)
  *
  * WHERE a section renders is `config/sectionOrder.ts` (one order per tab);
  * WHETHER it renders is its `capability` (the element's type) and
@@ -21,8 +21,8 @@
 
 import type { AnySectionEntry, SectionId, ShouldRenderContext } from "./_shared";
 import { BEHAVIOUR_SECTIONS } from "./behaviour";
+import { CONTENT_SECTIONS } from "./content";
 import { BOX_SECTIONS } from "./box";
-import { COMPONENT_SECTIONS } from "./component";
 import { EFFECTS_SECTIONS } from "./effects";
 import { TEXT_SECTIONS } from "./text";
 import { TYPE_SECTIONS } from "./type";
@@ -44,8 +44,8 @@ export { adaptBaseStyleProps, adaptElementProps, defineSection, EMPTY_MIXED_KEYS
 // ============================================================================
 
 export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
-  ...COMPONENT_SECTIONS,
   ...TYPE_SECTIONS,
+  ...CONTENT_SECTIONS,
   ...TEXT_SECTIONS,
   ...BOX_SECTIONS,
   ...BEHAVIOUR_SECTIONS,

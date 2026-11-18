@@ -2,6 +2,7 @@ import { type NextRequest } from "next/server";
 import { Prisma } from "@prisma/client";
 import { deliverWebhook } from "@/server/services/webhook.service";
 import { prisma } from "@lib/prisma";
+import { PUBLISH_STEPS, buildPublishSteps } from "@buildrik/shared/schemas/publish";
 import { resolveVercelProjectName, type VercelFile } from "@lib/vercel";
 import { resolveSiteOrigin } from "@lib/publish-urls";
 import { buildDeployFiles, verifiedPrimaryDomain } from "@lib/publish-files";
@@ -20,38 +21,12 @@ import { checkWorkerAuth } from "@/lib/cron-auth";
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
-// Exported for unit testing. Next only treats HTTP-method exports (GET/POST/…)
-// as route handlers; these named helper exports are ignored by the router.
-export const STEPS = [
-  "Generating pages",
-  "Optimizing images",
-  "Deploying to CDN",
-  "Verifying SSL",
-  "Performance check",
-] as const;
-
-// Steps that are NOT actually run in the MVP. They must report "skipped", never
-// "done" — a green checkmark for work that didn't happen is a false signal
-// (image optimization and the Lighthouse performance check both come later).
-// Keep this in sync with the STEPS indices above.
-export const SKIPPED_STEPS: ReadonlySet<number> = new Set([
-  1, // Optimizing images
-  4, // Performance check (Lighthouse)
-]);
-
+/* The step model lives with the publish schema (`buildPublishSteps`): the
+   service writes the queued job's list, this worker every later one. */
 function stepProgress(stepIndex: number): number {
-  return Math.round(((stepIndex + 1) / STEPS.length) * 100);
+  return Math.round(((stepIndex + 1) / PUBLISH_STEPS.length) * 100);
 }
 
-export function buildSteps(activeIndex: number, failed = false) {
-  return STEPS.map((name, i) => {
-    if (i === activeIndex) return { name, status: failed ? "failed" : "active" };
-    if (i > activeIndex) return { name, status: "pending" };
-    // i < activeIndex — the pipeline has passed this step: it either genuinely
-    // ran ("done") or was never run ("skipped"). Never claim "done" for a skip.
-    return { name, status: SKIPPED_STEPS.has(i) ? "skipped" : "done" };
-  });
-}
 
 export async function POST(
   req: NextRequest,
@@ -116,7 +91,7 @@ export async function POST(
         status: "BUILDING",
         startedAt: new Date(),
         progress: 0,
-        steps: buildSteps(0),
+        steps: buildPublishSteps(0),
       },
     });
     if (claimed.count === 0) {
@@ -134,7 +109,7 @@ export async function POST(
        for. Step 2 is "Deploying to CDN", so the progress row moves with it. */
     await prisma.publishBuildJob.update({
       where: { id: jobId },
-      data: { status: "DEPLOYING", progress: stepProgress(2), steps: buildSteps(2) },
+      data: { status: "DEPLOYING", progress: stepProgress(2), steps: buildPublishSteps(2) },
     });
 
     const publicUrl = useVercel
@@ -146,7 +121,7 @@ export async function POST(
     // nulling `log` here, which made every real publish NOT_ROLLBACKABLE
     // despite the service and the UI already shipping rollback (PD-41: keep
     // the payload, bounded by completePublish's own 20-version prune).
-    await completePublish(jobId, publicUrl, { progress: 100, steps: buildSteps(STEPS.length) });
+    await completePublish(jobId, publicUrl, { progress: 100, steps: buildPublishSteps(PUBLISH_STEPS.length) });
 
     // P6 workspace webhook — best-effort, never blocks the publish result.
     void deliverWebhook(job.workspaceId, "site.publish", {
@@ -205,7 +180,7 @@ export async function POST(
     await prisma.$transaction([
       prisma.publishBuildJob.update({
         where: { id: jobId },
-        data: { status: "FAILED", error: message, steps: buildSteps(0, true), log: Prisma.DbNull },
+        data: { status: "FAILED", error: message, steps: buildPublishSteps(0, true), log: Prisma.DbNull },
       }),
       prisma.site.update({
         where: { id: job.siteId },
@@ -265,7 +240,7 @@ async function setStep(jobId: string, stepIndex: number): Promise<void> {
     where: { id: jobId },
     data: {
       progress: stepProgress(stepIndex),
-      steps: buildSteps(stepIndex + 1),
+      steps: buildPublishSteps(stepIndex + 1),
     },
   });
 }
@@ -392,7 +367,7 @@ async function runVercelDeployJob(
   await setStep(jobId, 0);
 
   // Step 1 — Optimizing images: not run in MVP. Reports "skipped" (see
-  // SKIPPED_STEPS), never "done".
+  // SKIPPED_PUBLISH_STEPS), never "done".
   await checkCancelled(jobId);
   await setStep(jobId, 1);
 
@@ -424,7 +399,7 @@ async function runVercelDeployJob(
   await setStep(jobId, 3);
 
   // Step 4 — Performance check (Lighthouse): not run in MVP. Reports "skipped"
-  // (see SKIPPED_STEPS), never "done"; lighthouseScore stays null.
+  // (see SKIPPED_PUBLISH_STEPS), never "done"; lighthouseScore stays null.
   await setStep(jobId, 4);
 
   // Prefer custom verified domain if configured, else Vercel-provided URL.
@@ -440,13 +415,13 @@ async function runVercelDeployJob(
  * payload was sent. Preserves existing dev-without-credentials behavior.
  */
 async function runSimulation(jobId: string, siteId: string): Promise<string> {
-  for (let i = 0; i < STEPS.length; i++) {
+  for (let i = 0; i < PUBLISH_STEPS.length; i++) {
     await checkCancelled(jobId);
     await prisma.publishBuildJob.update({
       where: { id: jobId },
       data: {
-        progress: Math.round((i / STEPS.length) * 100),
-        steps: buildSteps(i),
+        progress: Math.round((i / PUBLISH_STEPS.length) * 100),
+        steps: buildPublishSteps(i),
       },
     });
     await delay(2000);

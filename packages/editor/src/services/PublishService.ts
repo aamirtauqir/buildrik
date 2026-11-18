@@ -54,6 +54,9 @@ export interface PublishStatus {
    * select in publish.service.ts).
    */
   steps?: PublishStep[];
+  /** When the job began — the worker's start, else the row's creation (a
+   *  queued job). The tray's "Elapsed" counts from it (2L9 B8-PB07, A-32). */
+  startedAt?: string | null;
 }
 
 /**
@@ -120,6 +123,8 @@ export async function fetchPublishStatus(jobId: string): Promise<PublishStatus> 
     error: string | null;
     siteId: string;
     steps: unknown;
+    startedAt?: string | Date | null;
+    createdAt?: string | Date | null;
   };
 
   // Resolve publishedUrl by reading the site after job completes.
@@ -139,8 +144,12 @@ export async function fetchPublishStatus(jobId: string): Promise<PublishStatus> 
     error: job.error,
     deploymentId: job.deploymentId,
     steps: parseSteps(job.steps),
+    startedAt: toIso(job.startedAt ?? job.createdAt ?? null),
   };
 }
+
+const toIso = (at: string | Date | null): string | null =>
+  at === null ? null : at instanceof Date ? at.toISOString() : at;
 
 /** `steps` is a jsonb column, so it arrives as `unknown` and is narrowed here
     rather than cast — a malformed row must render no log, not crash the panel
@@ -195,6 +204,8 @@ export interface SitePublishState {
    * max(lastEditedAt, cmsEditedAt), null when neither was ever set.
    */
   lastEditedAt: string | null;
+  /** When the site's workspace is scheduled for deletion (ISO), else null. */
+  workspaceDeletionAt?: string | null;
 }
 
 /**
@@ -212,7 +223,9 @@ export async function fetchSitePublishState(siteId: string): Promise<SitePublish
     lastPublishedAt?: string | Date | null;
     lastEditedAt?: string | Date | null;
     cmsEditedAt?: string | Date | null;
+    workspace?: { deletionScheduledAt?: string | Date | null } | null;
   };
+  const deletionAt = site.workspace?.deletionScheduledAt ? new Date(site.workspace.deletionScheduledAt) : null;
   const publishedAt = site.lastPublishedAt ? new Date(site.lastPublishedAt) : null;
   const editedAtRaw = site.lastEditedAt ? new Date(site.lastEditedAt) : null;
   const cmsEditedAt = site.cmsEditedAt ? new Date(site.cmsEditedAt) : null;
@@ -223,6 +236,7 @@ export async function fetchSitePublishState(siteId: string): Promise<SitePublish
     hasUnpublishedChanges: publishedAt && editedAt ? editedAt.getTime() > publishedAt.getTime() : null,
     lastPublishedAt: publishedAt ? publishedAt.toISOString() : null,
     lastEditedAt: editedAt ? editedAt.toISOString() : null,
+    workspaceDeletionAt: deletionAt ? deletionAt.toISOString() : null,
   };
 }
 
@@ -311,6 +325,17 @@ export interface PublishDiff {
  *  fetch error — same rule as fetchPublishHistory. */
 export async function fetchPublishDiff(siteId: string, fromJobId: string, toJobId: string): Promise<PublishDiff> {
   return getClient().sites.publishDiff.query({ siteId, fromJobId, toJobId });
+}
+
+/** What a publish now would change against the live version (A-33). */
+export interface PublishPreviewDiff extends PublishDiff {
+  liveVersion: number | null;
+  cmsRecords: number;
+}
+
+/** Posts the export a publish would send; THROWS on a fetch error. */
+export async function fetchPublishPreviewDiff(siteId: string, pages: PublishPagePayload[]): Promise<PublishPreviewDiff> {
+  return getClient().sites.publishPreviewDiff.mutate({ siteId, pages });
 }
 
 /** The pages one published version shipped — a Compare side (B8). `null` =

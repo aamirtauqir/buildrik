@@ -112,7 +112,23 @@ describe("useHistoryState", () => {
     expect(composer.history.clear).toHaveBeenCalledTimes(1);
   });
 
-  it("unsubscribes all four events on unmount", () => {
+  /* importProject emits only project:loaded; a version restore adds
+     version:restored. Neither is a history:* event (design-2l9 Task 1.2). */
+  it.each([EVENTS.HISTORY_CHANGED, EVENTS.HISTORY_UNRECORDED, EVENTS.PROJECT_LOADED, EVENTS.VERSION_RESTORED])(
+    "re-reads canUndo/canRedo on %s",
+    (event) => {
+      const composer = createMockComposer();
+      const { result } = renderHook(() => useHistoryState(asComposer(composer)));
+      expect(result.current.canUndo).toBe(false);
+      composer.history.canUndo.mockReturnValue(true);
+      composer.history.canRedo.mockReturnValue(true);
+      act(() => composer.emit(event));
+      expect(result.current.canUndo).toBe(true);
+      expect(result.current.canRedo).toBe(true);
+    },
+  );
+
+  it("unsubscribes every event on unmount", () => {
     const composer = createMockComposer();
     const { unmount } = renderHook(() => useHistoryState(asComposer(composer)));
 
@@ -123,6 +139,10 @@ describe("useHistoryState", () => {
       EVENTS.HISTORY_UNDO,
       EVENTS.HISTORY_REDO,
       EVENTS.HISTORY_CLEARED,
+      EVENTS.HISTORY_CHANGED,
+      EVENTS.HISTORY_UNRECORDED,
+      EVENTS.PROJECT_LOADED,
+      EVENTS.VERSION_RESTORED,
     ]) {
       expect(composer.listenerCount(event)).toBe(0);
     }

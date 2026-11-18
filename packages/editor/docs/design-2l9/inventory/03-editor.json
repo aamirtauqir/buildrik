@@ -1,0 +1,1974 @@
+{
+ "7:18654": {
+  "status": "drift",
+  "note": "Footer board: 'Home / Hero · 1440 px · 52% · View'; code: Undo/Redo·View▾·100%▾·readout. Undo removal is phase1",
+  "archetype": "Base editor · Layers + canvas + inspector"
+ },
+ "7:18981": {
+  "status": "drift",
+  "note": "Board: Elements|Blocks|Components tabs, 'Insert into Hero · At end' target, 'Text added to Hero' receipt; code: collapsible groups + AI row",
+  "archetype": "Add panel · Insert into target"
+ },
+ "7:19448": {
+  "status": "drift",
+  "note": "Board: Elements|Blocks|Components tabs, 'Insert into Hero · At end' target, 'Text added to Hero' receipt; code: collapsible groups + AI row",
+  "archetype": "Add panel · Insert into target"
+ },
+ "7:19791": {
+  "status": "drift",
+  "note": "Footer board: 'Home / Hero · 1440 px · 52% · View'; code: Undo/Redo·View▾·100%▾·readout. Undo removal is phase1",
+  "archetype": "Base editor · Layers + canvas + inspector",
+  "inheritsFrom": "7:18654"
+ },
+ "7:20283": {
+  "status": "drift",
+  "note": "Inspector body belongs to L-B (04); canvas/Layers context matches base editor archetype",
+  "archetype": "Edit/style selected text (inspector)"
+ },
+ "7:20634": {
+  "status": "drift",
+  "note": "Inspector body belongs to L-B (04); canvas/Layers context matches base editor archetype",
+  "archetype": "Edit/style selected text (inspector)",
+  "inheritsFrom": "7:20283"
+ },
+ "8:1282": {
+  "status": "drift",
+  "note": "Board copy 'Font size · 24px · inherited from Desktop' / 'Remove Tablet override' absent; code shows OverrideDot only (L-B)",
+  "archetype": "Breakpoint inheritance / override row"
+ },
+ "8:1705": {
+  "status": "drift",
+  "note": "Board copy 'Font size · 24px · inherited from Desktop' / 'Remove Tablet override' absent; code shows OverrideDot only (L-B)",
+  "archetype": "Breakpoint inheritance / override row"
+ },
+ "8:2272": {
+  "status": "drift",
+  "note": "Board copy 'Font size · 24px · inherited from Desktop' / 'Remove Tablet override' absent; code shows OverrideDot only (L-B)",
+  "archetype": "Breakpoint inheritance / override row"
+ },
+ "8:2695": {
+  "status": "drift",
+  "note": "Board copy 'Font size · 24px · inherited from Desktop' / 'Remove Tablet override' absent; code shows OverrideDot only (L-B)",
+  "archetype": "Breakpoint inheritance / override row"
+ },
+ "8:3262": {
+  "status": "drift",
+  "note": "Board: 'Back to editor · Home · Draft preview · Tablet · 768px' + fidelity notice; code: '‹ Back to canvas', opens at Desktop",
+  "archetype": "Preview · current breakpoint"
+ },
+ "8:3298": {
+  "status": "drift",
+  "note": "Board copy 'Font size · 24px · inherited from Desktop' / 'Remove Tablet override' absent; code shows OverrideDot only (L-B)",
+  "archetype": "Breakpoint inheritance / override row"
+ },
+ "63:6393": {
+  "status": "drift",
+  "note": "No Pages|Listings|Structure switch (views in ⋯ menu); folders render before root pages; no 'Collection pages' block (Open page/Manage in CMS",
+  "archetype": "Pages manager · default list"
+ },
+ "63:13820": {
+  "status": "drift",
+  "note": "Code lacks Save as template…, Move to folder…, Move up/Move down; board order differs",
+  "archetype": "Page actions menu"
+ },
+ "63:14567": {
+  "status": "match",
+  "note": "URL: /old → /new? · Keep URL · Update URL · Cancel rename",
+  "archetype": "Rename · URL choice"
+ },
+ "63:15255": {
+  "status": "missing",
+  "note": "No 'Change this live page’s URL?' consequence dialog before Update URL on a live page",
+  "archetype": "Live URL change confirm"
+ },
+ "63:15939": {
+  "status": "drift",
+  "note": "Board 720×700 modal 'About · Page settings' + 'Home stays open' subtitle; code drawer 'Page settings — About'; SeoTab ✦ AI suggest (pr33)",
+  "archetype": "Page settings · SEO"
+ },
+ "63:16507": {
+  "status": "drift",
+  "note": "Modal vs drawer; board adds explainer + Social image URL field",
+  "archetype": "Page settings · Social"
+ },
+ "63:17061": {
+  "status": "drift",
+  "note": "Board: Publish visibility Live, 'Search indexing: Indexed · Change in SEO', Head code · Pro; code has own indexing switch",
+  "archetype": "Page settings · Advanced"
+ },
+ "63:17617": {
+  "status": "drift",
+  "note": "Copy matches; container (modal) and 'Later' vs 'Not now' differ",
+  "archetype": "URL changed · redirect offer"
+ },
+ "63:18189": {
+  "status": "missing",
+  "note": "No 'Couldn’t save page settings. Your changes are still here.' + Retry save",
+  "archetype": "Settings save failed"
+ },
+ "63:18758": {
+  "status": "drift",
+  "note": "Code Keep editing/Discard; board 'Leave without saving?' + Save and leave (+offline/invalid variants)",
+  "archetype": "Unsaved close guard"
+ },
+ "63:19334": {
+  "status": "drift",
+  "note": "Undo toast exists; board receipt adds 'Recently deleted' door (trash not built)",
+  "archetype": "Delete page · Undo receipt"
+ },
+ "63:20001": {
+  "status": "missing",
+  "note": "No page trash; delete is composer-local undo only. Server work needed (full tRPC chain)",
+  "archetype": "Recently deleted list"
+ },
+ "63:20585": {
+  "status": "drift",
+  "note": "No Pages|Listings|Structure switch (views in ⋯ menu); folders render before root pages; no 'Collection pages' block (Open page/Manage in CMS",
+  "archetype": "Pages manager · default list",
+  "inheritsFrom": "63:6393"
+ },
+ "63:21262": {
+  "status": "drift",
+  "note": "Code columns PAGE/TITLE/DESC; board 'Page and URL · SEO score · Visibility' at 720 wide",
+  "archetype": "Listings view"
+ },
+ "63:21939": {
+  "status": "drift",
+  "note": "Route tree exists; board header 'URL structure · fieldwork.studio · Site root' + footnote absent",
+  "archetype": "Structure view"
+ },
+ "63:22616": {
+  "status": "drift",
+  "note": "Code 'No pages match your search.'; board 'No pages match “q”' + Clear search",
+  "archetype": "Pages search no results"
+ },
+ "63:23182": {
+  "status": "drift",
+  "note": "Undo toast exists; board receipt copy 'Our story renamed · URL kept' + inline 'Page renamed. URL kept at /about.' differs",
+  "archetype": "Rename / URL receipts"
+ },
+ "64:10927": {
+  "status": "drift",
+  "note": "Undo toast exists; board receipt copy 'Our story renamed · URL kept' + inline 'Page renamed. URL kept at /about.' differs",
+  "archetype": "Rename / URL receipts"
+ },
+ "64:18356": {
+  "status": "match",
+  "note": "'Page settings saved' toast; exact-return to manager",
+  "archetype": "Settings saved receipt"
+ },
+ "65:17148": {
+  "status": "drift",
+  "note": "Code: Select pages·Listings·Show structure·Reload·Widen panel; board adds 'Recently deleted'. Widen panel = code-ahead",
+  "archetype": "Pages panel ⋯ menu"
+ },
+ "65:17860": {
+  "status": "drift",
+  "note": "Code 4 checks (+30/+40 pts); board 6-row /100 breakdown dialog",
+  "archetype": "SEO score breakdown"
+ },
+ "65:18435": {
+  "status": "match",
+  "note": "'Redirect for <Page>' / 'Redirect saved' card exists (L-E owns); verify live",
+  "archetype": "Redirect repair (Site settings)"
+ },
+ "65:18981": {
+  "status": "match",
+  "note": "'Redirect for <Page>' / 'Redirect saved' card exists (L-E owns); verify live",
+  "archetype": "Redirect repair (Site settings)"
+ },
+ "67:11341": {
+  "status": "missing",
+  "note": "No return receipt 'Redirect saved · /a → /b · Applies on next publish' inside SEO",
+  "archetype": "Redirect saved · SEO return"
+ },
+ "67:11915": {
+  "status": "drift",
+  "note": "Base editor after manager closes; inherits base-editor footer drift",
+  "archetype": "Manager closed · origin retained"
+ },
+ "67:12583": {
+  "status": "drift",
+  "note": "Base editor after manager closes; inherits base-editor footer drift",
+  "archetype": "Manager closed · origin retained",
+  "inheritsFrom": "67:11915"
+ },
+ "69:19044": {
+  "status": "drift",
+  "note": "Base editor after manager closes; inherits base-editor footer drift",
+  "archetype": "Manager closed · origin retained",
+  "inheritsFrom": "67:11915"
+ },
+ "94:12846": {
+  "status": "drift",
+  "note": "Board 'About · Page · Page appearance … SEO & social'; code PagePanel has ✦ AI chip (pr33) and different section copy",
+  "archetype": "Other page opened · page inspector"
+ },
+ "94:13447": {
+  "status": "drift",
+  "note": "No Pages|Listings|Structure switch (views in ⋯ menu); folders render before root pages; no 'Collection pages' block (Open page/Manage in CMS",
+  "archetype": "Pages manager · default list",
+  "inheritsFrom": "63:6393"
+ },
+ "94:14750": {
+  "status": "missing",
+  "note": "No 'Needs a connection · Loaded pages can still be opened.' band",
+  "archetype": "Pages offline"
+ },
+ "94:15445": {
+  "status": "drift",
+  "note": "Board 'About · Page · Page appearance … SEO & social'; code PagePanel has ✦ AI chip (pr33) and different section copy",
+  "archetype": "Other page opened · page inspector",
+  "inheritsFrom": "94:12846"
+ },
+ "94:15802": {
+  "status": "drift",
+  "note": "No Pages|Listings|Structure switch (views in ⋯ menu); folders render before root pages; no 'Collection pages' block (Open page/Manage in CMS",
+  "archetype": "Pages manager · default list",
+  "inheritsFrom": "63:6393"
+ },
+ "94:18181": {
+  "status": "drift",
+  "note": "No Pages|Listings|Structure switch (views in ⋯ menu); folders render before root pages; no 'Collection pages' block (Open page/Manage in CMS",
+  "archetype": "Pages manager · default list",
+  "inheritsFrom": "63:6393"
+ },
+ "94:20973": {
+  "status": "drift",
+  "note": "Role notice exists (L-F); 'Managing pages needs Editor access' panel copy missing",
+  "archetype": "Viewer · pages read-only"
+ },
+ "94:21526": {
+  "status": "drift",
+  "note": "Board 'About · Page · Page appearance … SEO & social'; code PagePanel has ✦ AI chip (pr33) and different section copy",
+  "archetype": "Other page opened · page inspector",
+  "inheritsFrom": "94:12846"
+ },
+ "94:28891": {
+  "status": "missing",
+  "note": "Menu has no offline-disabled state",
+  "archetype": "Pages offline actions"
+ },
+ "94:29621": {
+  "status": "drift",
+  "note": "Board 720×700 modal 'About · Page settings' + 'Home stays open' subtitle; code drawer 'Page settings — About'; SeoTab ✦ AI suggest (pr33)",
+  "archetype": "Page settings · SEO",
+  "inheritsFrom": "63:15939"
+ },
+ "94:30029": {
+  "status": "missing",
+  "note": "No 'Needs a connection to save page settings' state",
+  "archetype": "Settings offline save unavailable"
+ },
+ "94:30772": {
+  "status": "drift",
+  "note": "Base editor after manager closes; inherits base-editor footer drift",
+  "archetype": "Manager closed · origin retained",
+  "inheritsFrom": "67:11915"
+ },
+ "94:31301": {
+  "status": "drift",
+  "note": "Base editor after manager closes; inherits base-editor footer drift",
+  "archetype": "Manager closed · origin retained",
+  "inheritsFrom": "67:11915"
+ },
+ "94:33551": {
+  "status": "drift",
+  "note": "Base editor after manager closes; inherits base-editor footer drift",
+  "archetype": "Manager closed · origin retained",
+  "inheritsFrom": "67:11915"
+ },
+ "94:35825": {
+  "status": "missing",
+  "note": "No 'Needs a connection · Loaded pages can still be opened.' band",
+  "archetype": "Pages offline"
+ },
+ "95:20851": {
+  "status": "drift",
+  "note": "Board 720×700 modal 'About · Page settings' + 'Home stays open' subtitle; code drawer 'Page settings — About'; SeoTab ✦ AI suggest (pr33)",
+  "archetype": "Page settings · SEO",
+  "inheritsFrom": "63:15939"
+ },
+ "101:22426": {
+  "status": "missing",
+  "note": "No navigation-pending/saving/offline/invalid-slug draft states",
+  "archetype": "Draft retained / return pending"
+ },
+ "101:23017": {
+  "status": "missing",
+  "note": "No navigation-pending/saving/offline/invalid-slug draft states",
+  "archetype": "Draft retained / return pending"
+ },
+ "101:23620": {
+  "status": "missing",
+  "note": "No 'Couldn’t save page settings. Your changes are still here.' + Retry save",
+  "archetype": "Settings save failed"
+ },
+ "101:24231": {
+  "status": "drift",
+  "note": "Code Keep editing/Discard; board 'Leave without saving?' + Save and leave (+offline/invalid variants)",
+  "archetype": "Unsaved close guard"
+ },
+ "101:24836": {
+  "status": "missing",
+  "note": "No navigation-pending/saving/offline/invalid-slug draft states",
+  "archetype": "Draft retained / return pending"
+ },
+ "101:25436": {
+  "status": "missing",
+  "note": "No navigation-pending/saving/offline/invalid-slug draft states",
+  "archetype": "Draft retained / return pending"
+ },
+ "101:27566": {
+  "status": "missing",
+  "note": "No navigation-pending/saving/offline/invalid-slug draft states",
+  "archetype": "Draft retained / return pending"
+ },
+ "101:28183": {
+  "status": "missing",
+  "note": "No navigation-pending/saving/offline/invalid-slug draft states",
+  "archetype": "Draft retained / return pending"
+ },
+ "101:28780": {
+  "status": "drift",
+  "note": "Board 720×700 modal 'About · Page settings' + 'Home stays open' subtitle; code drawer 'Page settings — About'; SeoTab ✦ AI suggest (pr33)",
+  "archetype": "Page settings · SEO",
+  "inheritsFrom": "63:15939"
+ },
+ "101:29372": {
+  "status": "drift",
+  "note": "Code Keep editing/Discard; board 'Leave without saving?' + Save and leave (+offline/invalid variants)",
+  "archetype": "Unsaved close guard"
+ },
+ "101:29978": {
+  "status": "drift",
+  "note": "Code Blank/From template cards; board 'Fieldwork Studio · Create a page', source select, 'Choose template', '6 of 10 pages on Free'",
+  "archetype": "New page dialog"
+ },
+ "101:36828": {
+  "status": "drift",
+  "note": "Code Blank/From template cards; board 'Fieldwork Studio · Create a page', source select, 'Choose template', '6 of 10 pages on Free'",
+  "archetype": "New page dialog",
+  "inheritsFrom": "101:29978"
+ },
+ "101:37542": {
+  "status": "drift",
+  "note": "Validation copy 'Name the page' differs",
+  "archetype": "New page · missing name"
+ },
+ "101:38257": {
+  "status": "missing",
+  "note": "No plan page-capacity readout/limit in editor",
+  "archetype": "New page · capacity reached"
+ },
+ "101:38980": {
+  "status": "missing",
+  "note": "No capacity check state",
+  "archetype": "New page · checking capacity"
+ },
+ "101:39695": {
+  "status": "missing",
+  "note": "No capacity error + Retry check",
+  "archetype": "New page · capacity unavailable"
+ },
+ "101:40412": {
+  "status": "drift",
+  "note": "Code 'Couldn't add page right now. Try again.'; board 'Couldn’t create Services. Nothing was changed.'",
+  "archetype": "New page · creation rejected"
+ },
+ "101:41127": {
+  "status": "missing",
+  "note": "No offline state",
+  "archetype": "New page · offline"
+ },
+ "101:41858": {
+  "status": "missing",
+  "note": "No in-dialog 'Creating…' progress; code closes + 'Page created' toast",
+  "archetype": "New page · creating"
+ },
+ "101:42581": {
+  "status": "drift",
+  "note": "Board 'Your page is ready · Use Add to insert…' + 'Services created · Added to site navigation'",
+  "archetype": "Page created · empty page receipt"
+ },
+ "104:28892": {
+  "status": "drift",
+  "note": "Board '‹ Back to New page', 'Creating “Services”' strip; code back reads ‹ Back to canvas/Pages (L-C)",
+  "archetype": "Template gallery for new page"
+ },
+ "105:29094": {
+  "status": "drift",
+  "note": "Preview exists; board adds Desktop/Tablet/Mobile + 'Uses your brand colors' (L-C)",
+  "archetype": "Template preview for new page"
+ },
+ "106:29182": {
+  "status": "missing",
+  "note": "No confirm/progress/slow/partial/unconfirmed operation dialog (L-C)",
+  "archetype": "Template create operation dialog"
+ },
+ "106:37032": {
+  "status": "missing",
+  "note": "No confirm/progress/slow/partial/unconfirmed operation dialog (L-C)",
+  "archetype": "Template create operation dialog"
+ },
+ "106:37213": {
+  "status": "missing",
+  "note": "No confirm/progress/slow/partial/unconfirmed operation dialog (L-C)",
+  "archetype": "Template create operation dialog"
+ },
+ "106:37394": {
+  "status": "missing",
+  "note": "No confirm/progress/slow/partial/unconfirmed operation dialog (L-C)",
+  "archetype": "Template create operation dialog"
+ },
+ "106:37579": {
+  "status": "missing",
+  "note": "No 'Services created from SaaS Landing' receipt / unconfirmed inspection (L-C)",
+  "archetype": "Template created receipt"
+ },
+ "107:29742": {
+  "status": "drift",
+  "note": "Board 720×700 modal 'About · Page settings' + 'Home stays open' subtitle; code drawer 'Page settings — About'; SeoTab ✦ AI suggest (pr33)",
+  "archetype": "Page settings · SEO",
+  "inheritsFrom": "63:15939"
+ },
+ "107:30125": {
+  "status": "missing",
+  "note": "No post-failure cleanup receipt / restore",
+  "archetype": "Empty page deleted / restored"
+ },
+ "107:30807": {
+  "status": "drift",
+  "note": "Board 'Your page is ready · Use Add to insert…' + 'Services created · Added to site navigation'",
+  "archetype": "Page created · empty page receipt"
+ },
+ "107:31110": {
+  "status": "missing",
+  "note": "No confirm/progress/slow/partial/unconfirmed operation dialog (L-C)",
+  "archetype": "Template create operation dialog"
+ },
+ "107:31291": {
+  "status": "missing",
+  "note": "No confirm/progress/slow/partial/unconfirmed operation dialog (L-C)",
+  "archetype": "Template create operation dialog"
+ },
+ "107:39139": {
+  "status": "missing",
+  "note": "No confirm/progress/slow/partial/unconfirmed operation dialog (L-C)",
+  "archetype": "Template create operation dialog"
+ },
+ "109:30868": {
+  "status": "drift",
+  "note": "No Pages|Listings|Structure switch (views in ⋯ menu); folders render before root pages; no 'Collection pages' block (Open page/Manage in CMS",
+  "archetype": "Pages manager · default list",
+  "inheritsFrom": "63:6393"
+ },
+ "109:31658": {
+  "status": "missing",
+  "note": "No navigation-pending/saving/offline/invalid-slug draft states",
+  "archetype": "Draft retained / return pending"
+ },
+ "109:32246": {
+  "status": "drift",
+  "note": "Code Keep editing/Discard; board 'Leave without saving?' + Save and leave (+offline/invalid variants)",
+  "archetype": "Unsaved close guard"
+ },
+ "109:32916": {
+  "status": "drift",
+  "note": "Code Blank/From template cards; board 'Fieldwork Studio · Create a page', source select, 'Choose template', '6 of 10 pages on Free'",
+  "archetype": "New page dialog",
+  "inheritsFrom": "101:29978"
+ },
+ "109:42059": {
+  "status": "missing",
+  "note": "No post-failure cleanup receipt / restore",
+  "archetype": "Empty page deleted / restored"
+ },
+ "109:44109": {
+  "status": "missing",
+  "note": "No navigation-pending/saving/offline/invalid-slug draft states",
+  "archetype": "Draft retained / return pending"
+ },
+ "109:44764": {
+  "status": "missing",
+  "note": "No 'Needs a connection · Loaded pages can still be opened.' band",
+  "archetype": "Pages offline"
+ },
+ "118:33757": {
+  "status": "missing",
+  "note": "No server reconciliation states (L-C; needs tRPC chain)",
+  "archetype": "Creation reconciliation"
+ },
+ "118:33946": {
+  "status": "missing",
+  "note": "No server reconciliation states (L-C; needs tRPC chain)",
+  "archetype": "Creation reconciliation"
+ },
+ "118:34132": {
+  "status": "missing",
+  "note": "No server reconciliation states (L-C; needs tRPC chain)",
+  "archetype": "Creation reconciliation"
+ },
+ "118:34321": {
+  "status": "missing",
+  "note": "No server reconciliation states (L-C; needs tRPC chain)",
+  "archetype": "Creation reconciliation"
+ },
+ "122:34115": {
+  "status": "missing",
+  "note": "No 'Services created from SaaS Landing' receipt / unconfirmed inspection (L-C)",
+  "archetype": "Template created receipt"
+ },
+ "122:34465": {
+  "status": "missing",
+  "note": "No server reconciliation states (L-C; needs tRPC chain)",
+  "archetype": "Creation reconciliation"
+ },
+ "122:34651": {
+  "status": "missing",
+  "note": "No server reconciliation states (L-C; needs tRPC chain)",
+  "archetype": "Creation reconciliation"
+ },
+ "122:43331": {
+  "status": "drift",
+  "note": "CMS record editor exists (L-C); opening Pages manager over a dirty record not drawn this way",
+  "archetype": "CMS record draft with Pages"
+ },
+ "122:43815": {
+  "status": "drift",
+  "note": "CMS record editor exists (L-C); opening Pages manager over a dirty record not drawn this way",
+  "archetype": "CMS record draft with Pages"
+ },
+ "122:44151": {
+  "status": "missing",
+  "note": "No record-draft guard when opening a page (save/queued/failed/removed states) (L-C)",
+  "archetype": "CMS leave guard on page navigation"
+ },
+ "122:44343": {
+  "status": "missing",
+  "note": "No record-draft guard when opening a page (save/queued/failed/removed states) (L-C)",
+  "archetype": "CMS leave guard on page navigation"
+ },
+ "125:35023": {
+  "status": "missing",
+  "note": "No record-draft guard when opening a page (save/queued/failed/removed states) (L-C)",
+  "archetype": "CMS leave guard on page navigation"
+ },
+ "125:35215": {
+  "status": "missing",
+  "note": "No record-draft guard when opening a page (save/queued/failed/removed states) (L-C)",
+  "archetype": "CMS leave guard on page navigation"
+ },
+ "125:35409": {
+  "status": "missing",
+  "note": "No record-draft guard when opening a page (save/queued/failed/removed states) (L-C)",
+  "archetype": "CMS leave guard on page navigation"
+ },
+ "125:35603": {
+  "status": "missing",
+  "note": "No record-draft guard when opening a page (save/queued/failed/removed states) (L-C)",
+  "archetype": "CMS leave guard on page navigation"
+ },
+ "125:35799": {
+  "status": "drift",
+  "note": "Board 'About · Page · Page appearance … SEO & social'; code PagePanel has ✦ AI chip (pr33) and different section copy",
+  "archetype": "Other page opened · page inspector",
+  "inheritsFrom": "94:12846"
+ },
+ "125:36161": {
+  "status": "missing",
+  "note": "No record-draft guard when opening a page (save/queued/failed/removed states) (L-C)",
+  "archetype": "CMS leave guard on page navigation"
+ },
+ "126:35760": {
+  "status": "missing",
+  "note": "No record-draft guard when opening a page (save/queued/failed/removed states) (L-C)",
+  "archetype": "CMS leave guard on page navigation"
+ },
+ "126:35945": {
+  "status": "missing",
+  "note": "No record-draft guard when opening a page (save/queued/failed/removed states) (L-C)",
+  "archetype": "CMS leave guard on page navigation"
+ },
+ "126:36130": {
+  "status": "missing",
+  "note": "No record-draft guard when opening a page (save/queued/failed/removed states) (L-C)",
+  "archetype": "CMS leave guard on page navigation"
+ },
+ "126:36340": {
+  "status": "drift",
+  "note": "Board 'About · Page · Page appearance … SEO & social'; code PagePanel has ✦ AI chip (pr33) and different section copy",
+  "archetype": "Other page opened · page inspector",
+  "inheritsFrom": "94:12846"
+ },
+ "126:36751": {
+  "status": "missing",
+  "note": "No record-draft guard when opening a page (save/queued/failed/removed states) (L-C)",
+  "archetype": "CMS leave guard on page navigation"
+ },
+ "126:36945": {
+  "status": "missing",
+  "note": "No record-draft guard when opening a page (save/queued/failed/removed states) (L-C)",
+  "archetype": "CMS leave guard on page navigation"
+ },
+ "126:37142": {
+  "status": "missing",
+  "note": "No record-draft guard when opening a page (save/queued/failed/removed states) (L-C)",
+  "archetype": "CMS leave guard on page navigation"
+ },
+ "126:37330": {
+  "status": "missing",
+  "note": "No record-draft guard when opening a page (save/queued/failed/removed states) (L-C)",
+  "archetype": "CMS leave guard on page navigation"
+ },
+ "127:36696": {
+  "status": "drift",
+  "note": "Folders are personal (tip copy); board inline name + 'Create folder' and receipt",
+  "archetype": "Private folder create"
+ },
+ "127:37393": {
+  "status": "drift",
+  "note": "Folders are personal (tip copy); board inline name + 'Create folder' and receipt",
+  "archetype": "Private folder create"
+ },
+ "127:38098": {
+  "status": "drift",
+  "note": "Bulk dialog only; no per-page 'Move About to…' from row menu; 'already at top level' note missing",
+  "archetype": "Move page to folder dialog"
+ },
+ "127:38819": {
+  "status": "missing",
+  "note": "No organization receipts ('About moved to Studio · /about unchanged')",
+  "archetype": "Folder move receipts"
+ },
+ "127:39528": {
+  "status": "missing",
+  "note": "Only 'Remove from folder'; no disabled Move up/down with reason",
+  "archetype": "In-folder member actions"
+ },
+ "127:40244": {
+  "status": "missing",
+  "note": "No organization receipts ('About moved to Studio · /about unchanged')",
+  "archetype": "Folder move receipts"
+ },
+ "128:39389": {
+  "status": "missing",
+  "note": "No record-draft guard when opening a page (save/queued/failed/removed states) (L-C)",
+  "archetype": "CMS leave guard on page navigation"
+ },
+ "128:39584": {
+  "status": "missing",
+  "note": "No record-draft guard when opening a page (save/queued/failed/removed states) (L-C)",
+  "archetype": "CMS leave guard on page navigation"
+ },
+ "131:39598": {
+  "status": "drift",
+  "note": "Bulk dialog only; no per-page 'Move About to…' from row menu; 'already at top level' note missing",
+  "archetype": "Move page to folder dialog"
+ },
+ "131:40341": {
+  "status": "drift",
+  "note": "Bulk dialog only; no per-page 'Move About to…' from row menu; 'already at top level' note missing",
+  "archetype": "Move page to folder dialog"
+ },
+ "131:41086": {
+  "status": "missing",
+  "note": "No organization receipts ('About moved to Studio · /about unchanged')",
+  "archetype": "Folder move receipts"
+ },
+ "131:41791": {
+  "status": "drift",
+  "note": "Code lacks Save as template…, Move to folder…, Move up/Move down; board order differs",
+  "archetype": "Page actions menu",
+  "inheritsFrom": "63:13820"
+ },
+ "134:41466": {
+  "status": "drift",
+  "note": "Base editor after manager closes; inherits base-editor footer drift",
+  "archetype": "Manager closed · origin retained",
+  "inheritsFrom": "67:11915"
+ },
+ "134:42185": {
+  "status": "drift",
+  "note": "Base editor after manager closes; inherits base-editor footer drift",
+  "archetype": "Manager closed · origin retained",
+  "inheritsFrom": "67:11915"
+ },
+ "134:42905": {
+  "status": "drift",
+  "note": "Base editor after manager closes; inherits base-editor footer drift",
+  "archetype": "Manager closed · origin retained",
+  "inheritsFrom": "67:11915"
+ },
+ "134:43625": {
+  "status": "drift",
+  "note": "Base editor after manager closes; inherits base-editor footer drift",
+  "archetype": "Manager closed · origin retained",
+  "inheritsFrom": "67:11915"
+ },
+ "134:44345": {
+  "status": "missing",
+  "note": "Only 'Remove from folder'; no disabled Move up/down with reason",
+  "archetype": "In-folder member actions"
+ },
+ "137:52464": {
+  "status": "missing",
+  "note": "No organization receipts ('About moved to Studio · /about unchanged')",
+  "archetype": "Folder move receipts"
+ },
+ "137:53190": {
+  "status": "drift",
+  "note": "Base editor after manager closes; inherits base-editor footer drift",
+  "archetype": "Manager closed · origin retained",
+  "inheritsFrom": "67:11915"
+ },
+ "137:53911": {
+  "status": "missing",
+  "note": "No Move up ⌥↑ / Move down ⌥↓ commands, boundaries or position receipts (drag only)",
+  "archetype": "Reorder via menu"
+ },
+ "137:54622": {
+  "status": "drift",
+  "note": "Base editor after manager closes; inherits base-editor footer drift",
+  "archetype": "Manager closed · origin retained",
+  "inheritsFrom": "67:11915"
+ },
+ "137:55343": {
+  "status": "missing",
+  "note": "No Move up ⌥↑ / Move down ⌥↓ commands, boundaries or position receipts (drag only)",
+  "archetype": "Reorder via menu"
+ },
+ "137:56060": {
+  "status": "missing",
+  "note": "No Move up ⌥↑ / Move down ⌥↓ commands, boundaries or position receipts (drag only)",
+  "archetype": "Reorder via menu"
+ },
+ "137:56781": {
+  "status": "missing",
+  "note": "No Move up ⌥↑ / Move down ⌥↓ commands, boundaries or position receipts (drag only)",
+  "archetype": "Reorder via menu"
+ },
+ "137:57493": {
+  "status": "drift",
+  "note": "Code icon button 'Delete folder (pages kept)'; board menu 'Delete folder · keep page'",
+  "archetype": "Folder actions menu"
+ },
+ "137:58206": {
+  "status": "missing",
+  "note": "No organization receipts ('About moved to Studio · /about unchanged')",
+  "archetype": "Folder move receipts"
+ },
+ "137:58919": {
+  "status": "drift",
+  "note": "Base editor after manager closes; inherits base-editor footer drift",
+  "archetype": "Manager closed · origin retained",
+  "inheritsFrom": "67:11915"
+ },
+ "137:59625": {
+  "status": "missing",
+  "note": "No Move up ⌥↑ / Move down ⌥↓ commands, boundaries or position receipts (drag only)",
+  "archetype": "Reorder via menu"
+ },
+ "139:47668": {
+  "status": "drift",
+  "note": "Board adds 'Clear' to the bar; code relies on header Done",
+  "archetype": "Bulk selection bar"
+ },
+ "139:48427": {
+  "status": "missing",
+  "note": "Bulk delete is all-or-undo; no per-page result, retry or partial undo",
+  "archetype": "Bulk delete partial / retry"
+ },
+ "139:49184": {
+  "status": "missing",
+  "note": "Bulk delete is all-or-undo; no per-page result, retry or partial undo",
+  "archetype": "Bulk delete partial / retry"
+ },
+ "139:49899": {
+  "status": "missing",
+  "note": "Bulk delete is all-or-undo; no per-page result, retry or partial undo",
+  "archetype": "Bulk delete partial / retry"
+ },
+ "139:50620": {
+  "status": "drift",
+  "note": "Board '3 pages duplicated · Originals kept'",
+  "archetype": "Bulk duplicated receipt"
+ },
+ "139:51389": {
+  "status": "drift",
+  "note": "Board body names pages + URL-unchanged note; button 'Move 3 pages'",
+  "archetype": "Bulk move dialog"
+ },
+ "139:52176": {
+  "status": "missing",
+  "note": "No organization receipts ('About moved to Studio · /about unchanged')",
+  "archetype": "Folder move receipts"
+ },
+ "139:52895": {
+  "status": "missing",
+  "note": "No 'Home is the homepage' disabled reason in bulk bar",
+  "archetype": "Homepage in bulk delete"
+ },
+ "139:53653": {
+  "status": "drift",
+  "note": "Board adds 'Clear' to the bar; code relies on header Done",
+  "archetype": "Bulk selection bar",
+  "inheritsFrom": "139:47668"
+ },
+ "142:51838": {
+  "status": "missing",
+  "note": "Bulk delete is all-or-undo; no per-page result, retry or partial undo",
+  "archetype": "Bulk delete partial / retry"
+ },
+ "142:52543": {
+  "status": "missing",
+  "note": "Bulk delete is all-or-undo; no per-page result, retry or partial undo",
+  "archetype": "Bulk delete partial / retry"
+ },
+ "142:53229": {
+  "status": "missing",
+  "note": "No page trash; delete is composer-local undo only. Server work needed (full tRPC chain)",
+  "archetype": "Recently deleted list",
+  "inheritsFrom": "63:20001"
+ },
+ "142:53954": {
+  "status": "missing",
+  "note": "No restore-with-new-slug flow",
+  "archetype": "Restore slug collision"
+ },
+ "142:54521": {
+  "status": "missing",
+  "note": "No restore-with-new-slug flow",
+  "archetype": "Restore slug collision"
+ },
+ "142:55231": {
+  "status": "missing",
+  "note": "No page trash",
+  "archetype": "Recently deleted · offline"
+ },
+ "142:55781": {
+  "status": "missing",
+  "note": "No permanent delete (Admin)",
+  "archetype": "Permanent delete typed confirm"
+ },
+ "142:56347": {
+  "status": "missing",
+  "note": "No permanent delete (Admin)",
+  "archetype": "Permanent delete typed confirm"
+ },
+ "142:56910": {
+  "status": "missing",
+  "note": "No page trash",
+  "archetype": "Recently deleted · empty"
+ },
+ "142:57466": {
+  "status": "missing",
+  "note": "No page trash",
+  "archetype": "Recently deleted · restore failed"
+ },
+ "142:58015": {
+  "status": "missing",
+  "note": "No page trash",
+  "archetype": "Recently deleted · loading"
+ },
+ "142:58571": {
+  "status": "missing",
+  "note": "No plan-limit/view-only restore or plan options dialog",
+  "archetype": "Restore over plan limit"
+ },
+ "142:59267": {
+  "status": "drift",
+  "note": "No Pages|Listings|Structure switch (views in ⋯ menu); folders render before root pages; no 'Collection pages' block (Open page/Manage in CMS",
+  "archetype": "Pages manager · default list",
+  "inheritsFrom": "63:6393"
+ },
+ "142:59972": {
+  "status": "missing",
+  "note": "No restore receipt",
+  "archetype": "Restore receipt"
+ },
+ "142:60682": {
+  "status": "drift",
+  "note": "Board 'About · Page · Page appearance … SEO & social'; code PagePanel has ✦ AI chip (pr33) and different section copy",
+  "archetype": "Other page opened · page inspector",
+  "inheritsFrom": "94:12846"
+ },
+ "142:61042": {
+  "status": "drift",
+  "note": "Board 'About · Page · Page appearance … SEO & social'; code PagePanel has ✦ AI chip (pr33) and different section copy",
+  "archetype": "Other page opened · page inspector",
+  "inheritsFrom": "94:12846"
+ },
+ "142:61405": {
+  "status": "missing",
+  "note": "No view-only state for a page above plan limit",
+  "archetype": "Restored page view only"
+ },
+ "142:61796": {
+  "status": "missing",
+  "note": "No page trash; delete is composer-local undo only. Server work needed (full tRPC chain)",
+  "archetype": "Recently deleted list",
+  "inheritsFrom": "63:20001"
+ },
+ "142:62396": {
+  "status": "missing",
+  "note": "Return frames of the trash flow; origin restore depends on trash",
+  "archetype": "Return · Pages recovery states"
+ },
+ "142:63098": {
+  "status": "missing",
+  "note": "Return frames of the trash flow; origin restore depends on trash",
+  "archetype": "Return · Pages recovery states",
+  "inheritsFrom": "142:62396"
+ },
+ "142:63798": {
+  "status": "missing",
+  "note": "Return frames of the trash flow; origin restore depends on trash",
+  "archetype": "Return · Pages recovery states",
+  "inheritsFrom": "142:62396"
+ },
+ "142:64362": {
+  "status": "missing",
+  "note": "Return frames of the trash flow; origin restore depends on trash",
+  "archetype": "Return · Pages recovery states",
+  "inheritsFrom": "142:62396"
+ },
+ "142:65068": {
+  "status": "missing",
+  "note": "Return frames of the trash flow; origin restore depends on trash",
+  "archetype": "Return · Pages recovery states",
+  "inheritsFrom": "142:62396"
+ },
+ "142:65629": {
+  "status": "missing",
+  "note": "Return frames of the trash flow; origin restore depends on trash",
+  "archetype": "Return · Pages recovery states",
+  "inheritsFrom": "142:62396"
+ },
+ "142:66187": {
+  "status": "missing",
+  "note": "Return frames of the trash flow; origin restore depends on trash",
+  "archetype": "Return · Pages recovery states",
+  "inheritsFrom": "142:62396"
+ },
+ "142:66751": {
+  "status": "missing",
+  "note": "Return frames of the trash flow; origin restore depends on trash",
+  "archetype": "Return · Pages recovery states",
+  "inheritsFrom": "142:62396"
+ },
+ "142:67309": {
+  "status": "missing",
+  "note": "Return frames of the trash flow; origin restore depends on trash",
+  "archetype": "Return · Pages recovery states",
+  "inheritsFrom": "142:62396"
+ },
+ "142:68015": {
+  "status": "missing",
+  "note": "Return frames of the trash flow; origin restore depends on trash",
+  "archetype": "Return · Pages recovery states",
+  "inheritsFrom": "142:62396"
+ },
+ "142:68730": {
+  "status": "missing",
+  "note": "Return frames of the trash flow; origin restore depends on trash",
+  "archetype": "Return · Pages recovery states",
+  "inheritsFrom": "142:62396"
+ },
+ "144:64089": {
+  "status": "missing",
+  "note": "No restore-with-new-slug flow",
+  "archetype": "Restore slug collision"
+ },
+ "144:64795": {
+  "status": "missing",
+  "note": "No page trash; delete is composer-local undo only. Server work needed (full tRPC chain)",
+  "archetype": "Recently deleted list",
+  "inheritsFrom": "63:20001"
+ },
+ "144:65617": {
+  "status": "missing",
+  "note": "No plan-limit/view-only restore or plan options dialog",
+  "archetype": "Restore over plan limit"
+ },
+ "145:64586": {
+  "status": "drift",
+  "note": "Code toggles Snap guides·Spacing·Grid·Rulers·Badges·X-Ray; board Grid · 7 px ›, Rulers and guides…, Snap guides, Show outlines, Focus mode",
+  "archetype": "Canvas view menu"
+ },
+ "145:65011": {
+  "status": "drift",
+  "note": "Code grid submenu 4/8/16 + custom; board dialog with 'Show grid and snap' toggle + Apply",
+  "archetype": "Grid and snapping dialog"
+ },
+ "145:65448": {
+  "status": "drift",
+  "note": "No 'Enter a whole number from 1 to 100 px' validation copy",
+  "archetype": "Grid invalid draft"
+ },
+ "145:65889": {
+  "status": "drift",
+  "note": "Code grid submenu 4/8/16 + custom; board dialog with 'Show grid and snap' toggle + Apply",
+  "archetype": "Grid and snapping dialog",
+  "inheritsFrom": "145:65011"
+ },
+ "145:66698": {
+  "status": "missing",
+  "note": "Guides are drag-only, unpersisted (GuideManager add/remove). No shared-site list, lock, undo removal",
+  "archetype": "Rulers and guides list"
+ },
+ "145:67134": {
+  "status": "missing",
+  "note": "No numeric add-guide form",
+  "archetype": "Add guide numeric"
+ },
+ "145:67569": {
+  "status": "missing",
+  "note": "No guide detail panel, lock, apply, sync/conflict states",
+  "archetype": "Guide detail edit/lock/remove"
+ },
+ "145:67997": {
+  "status": "missing",
+  "note": "No guide detail panel, lock, apply, sync/conflict states",
+  "archetype": "Guide detail edit/lock/remove",
+  "inheritsFrom": "145:67569"
+ },
+ "145:68426": {
+  "status": "missing",
+  "note": "No guide detail panel, lock, apply, sync/conflict states",
+  "archetype": "Guide detail edit/lock/remove",
+  "inheritsFrom": "145:67569"
+ },
+ "145:68858": {
+  "status": "missing",
+  "note": "Guides are drag-only, unpersisted (GuideManager add/remove). No shared-site list, lock, undo removal",
+  "archetype": "Rulers and guides list",
+  "inheritsFrom": "145:66698"
+ },
+ "145:69294": {
+  "status": "missing",
+  "note": "Guides are drag-only, unpersisted (GuideManager add/remove). No shared-site list, lock, undo removal",
+  "archetype": "Rulers and guides list",
+  "inheritsFrom": "145:66698"
+ },
+ "145:69735": {
+  "status": "missing",
+  "note": "Guides are drag-only, unpersisted (GuideManager add/remove). No shared-site list, lock, undo removal",
+  "archetype": "Rulers and guides list",
+  "inheritsFrom": "145:66698"
+ },
+ "145:70156": {
+  "status": "missing",
+  "note": "No guide detail panel, lock, apply, sync/conflict states",
+  "archetype": "Guide detail edit/lock/remove",
+  "inheritsFrom": "145:67569"
+ },
+ "145:70590": {
+  "status": "missing",
+  "note": "Guides are drag-only, unpersisted (GuideManager add/remove). No shared-site list, lock, undo removal",
+  "archetype": "Rulers and guides list",
+  "inheritsFrom": "145:66698"
+ },
+ "145:71013": {
+  "status": "drift",
+  "note": "Range 240–2560 matches; board popover with preset list vs code modal from breakpoint menu",
+  "archetype": "Page width presets"
+ },
+ "145:71444": {
+  "status": "drift",
+  "note": "Validation copy 'The page stays at 1440 px' differs",
+  "archetype": "Custom width invalid"
+ },
+ "145:71878": {
+  "status": "missing",
+  "note": "No read-only guide inspection",
+  "archetype": "Viewer inspects guides"
+ },
+ "145:72343": {
+  "status": "drift",
+  "note": "Origin after closing view/grid/width; base footer drift",
+  "archetype": "Return · canvas view state"
+ },
+ "145:72772": {
+  "status": "drift",
+  "note": "Origin after closing view/grid/width; base footer drift",
+  "archetype": "Return · canvas view state",
+  "inheritsFrom": "145:72343"
+ },
+ "145:73215": {
+  "status": "drift",
+  "note": "Origin after closing view/grid/width; base footer drift",
+  "archetype": "Return · canvas view state",
+  "inheritsFrom": "145:72343"
+ },
+ "145:73657": {
+  "status": "drift",
+  "note": "Origin after closing view/grid/width; base footer drift",
+  "archetype": "Return · canvas view state",
+  "inheritsFrom": "145:72343"
+ },
+ "145:74465": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides"
+ },
+ "145:74905": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "145:75344": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "145:75774": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "145:76210": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "145:76644": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "145:77080": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "145:77521": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "145:77943": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "145:78378": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "145:78804": {
+  "status": "drift",
+  "note": "Origin after closing view/grid/width; base footer drift",
+  "archetype": "Return · canvas view state",
+  "inheritsFrom": "145:72343"
+ },
+ "145:79239": {
+  "status": "drift",
+  "note": "Origin after closing view/grid/width; base footer drift",
+  "archetype": "Return · canvas view state",
+  "inheritsFrom": "145:72343"
+ },
+ "145:79674": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "145:80116": {
+  "status": "missing",
+  "note": "No plan-limit/view-only restore or plan options dialog",
+  "archetype": "Restore over plan limit"
+ },
+ "146:71776": {
+  "status": "missing",
+  "note": "Guides are drag-only, unpersisted (GuideManager add/remove). No shared-site list, lock, undo removal",
+  "archetype": "Rulers and guides list",
+  "inheritsFrom": "145:66698"
+ },
+ "146:72215": {
+  "status": "missing",
+  "note": "No guide detail panel, lock, apply, sync/conflict states",
+  "archetype": "Guide detail edit/lock/remove",
+  "inheritsFrom": "145:67569"
+ },
+ "146:72655": {
+  "status": "missing",
+  "note": "Guides are drag-only, unpersisted (GuideManager add/remove). No shared-site list, lock, undo removal",
+  "archetype": "Rulers and guides list",
+  "inheritsFrom": "145:66698"
+ },
+ "146:73094": {
+  "status": "missing",
+  "note": "Guides are not synced; no failure/offline states",
+  "archetype": "Guide sync failed / offline"
+ },
+ "146:73535": {
+  "status": "missing",
+  "note": "No guide detail panel, lock, apply, sync/conflict states",
+  "archetype": "Guide detail edit/lock/remove",
+  "inheritsFrom": "145:67569"
+ },
+ "146:73969": {
+  "status": "missing",
+  "note": "Guides are not synced; no failure/offline states",
+  "archetype": "Guide sync failed / offline"
+ },
+ "146:74407": {
+  "status": "missing",
+  "note": "Guides are drag-only, unpersisted (GuideManager add/remove). No shared-site list, lock, undo removal",
+  "archetype": "Rulers and guides list",
+  "inheritsFrom": "145:66698"
+ },
+ "146:74844": {
+  "status": "missing",
+  "note": "No read-only guide inspection",
+  "archetype": "Viewer inspects guides"
+ },
+ "146:75275": {
+  "status": "missing",
+  "note": "No guide detail panel, lock, apply, sync/conflict states",
+  "archetype": "Guide detail edit/lock/remove",
+  "inheritsFrom": "145:67569"
+ },
+ "146:75710": {
+  "status": "missing",
+  "note": "No guide detail panel, lock, apply, sync/conflict states",
+  "archetype": "Guide detail edit/lock/remove",
+  "inheritsFrom": "145:67569"
+ },
+ "146:77066": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "146:77535": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "146:78004": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "146:78477": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "146:78944": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "146:79413": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "146:79881": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "146:80257": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "146:80723": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "147:75914": {
+  "status": "drift",
+  "note": "Code footer 'N layers'/'N selected of M'; board 'N layers · 1 selected' (+ 'inside Hero')",
+  "archetype": "Layers base with selection footer"
+ },
+ "147:76329": {
+  "status": "drift",
+  "note": "Five toggles match; footnote 'Personal editor view. Live-site visibility is edited in the Inspector.' missing",
+  "archetype": "Layer display preferences"
+ },
+ "147:76773": {
+  "status": "drift",
+  "note": "Density exists; footer '8 layers · Compact rows' missing",
+  "archetype": "Compact rows"
+ },
+ "147:77189": {
+  "status": "drift",
+  "note": "Code filtered tree w/ ancestors; board flat results 'Services › Card 1', '12 matches in 5,000 layers'",
+  "archetype": "Search results with parent paths"
+ },
+ "147:77668": {
+  "status": "missing",
+  "note": "Lock exists; no 'Locked by Hero' inheritance, reveal or unlock banner",
+  "archetype": "Locked by ancestor"
+ },
+ "147:78110": {
+  "status": "missing",
+  "note": "Lock exists; no 'Locked by Hero' inheritance, reveal or unlock banner",
+  "archetype": "Locked by ancestor"
+ },
+ "147:78484": {
+  "status": "missing",
+  "note": "Lock exists; no 'Locked by Hero' inheritance, reveal or unlock banner",
+  "archetype": "Locked by ancestor"
+ },
+ "147:78900": {
+  "status": "missing",
+  "note": "Dimmed exists; no 'Dimmed in editor only · Show normally · Hide on live site…' banner",
+  "archetype": "Dimmed in editor only"
+ },
+ "147:79328": {
+  "status": "drift",
+  "note": "Board 'No layers match “q”' + hint + Clear search",
+  "archetype": "Layers no matches"
+ },
+ "147:79728": {
+  "status": "drift",
+  "note": "Code filtered tree w/ ancestors; board flat results 'Services › Card 1', '12 matches in 5,000 layers'",
+  "archetype": "Search results with parent paths",
+  "inheritsFrom": "147:77189"
+ },
+ "152:78185": {
+  "status": "drift",
+  "note": "Code Expand/Collapse all·Display settings·Widen; board adds Collapse to selection, Select mode",
+  "archetype": "Layers tree commands"
+ },
+ "152:78614": {
+  "status": "drift",
+  "note": "Code footer 'N layers'/'N selected of M'; board 'N layers · 1 selected' (+ 'inside Hero')",
+  "archetype": "Layers base with selection footer",
+  "inheritsFrom": "147:75914"
+ },
+ "152:79032": {
+  "status": "drift",
+  "note": "Code footer 'N layers'/'N selected of M'; board 'N layers · 1 selected' (+ 'inside Hero')",
+  "archetype": "Layers base with selection footer",
+  "inheritsFrom": "147:75914"
+ },
+ "152:79448": {
+  "status": "drift",
+  "note": "Code footer 'N layers'/'N selected of M'; board 'N layers · 1 selected' (+ 'inside Hero')",
+  "archetype": "Layers base with selection footer",
+  "inheritsFrom": "147:75914"
+ },
+ "152:79864": {
+  "status": "drift",
+  "note": "Five toggles match; footnote 'Personal editor view. Live-site visibility is edited in the Inspector.' missing",
+  "archetype": "Layer display preferences",
+  "inheritsFrom": "147:76329"
+ },
+ "153:79518": {
+  "status": "missing",
+  "note": "No guide detail panel, lock, apply, sync/conflict states",
+  "archetype": "Guide detail edit/lock/remove",
+  "inheritsFrom": "145:67569"
+ },
+ "153:80019": {
+  "status": "missing",
+  "note": "No guide detail panel, lock, apply, sync/conflict states",
+  "archetype": "Guide detail edit/lock/remove",
+  "inheritsFrom": "145:67569"
+ },
+ "153:80516": {
+  "status": "missing",
+  "note": "No guide detail panel, lock, apply, sync/conflict states",
+  "archetype": "Guide detail edit/lock/remove",
+  "inheritsFrom": "145:67569"
+ },
+ "153:81012": {
+  "status": "missing",
+  "note": "No guide detail panel, lock, apply, sync/conflict states",
+  "archetype": "Guide detail edit/lock/remove",
+  "inheritsFrom": "145:67569"
+ },
+ "153:81506": {
+  "status": "missing",
+  "note": "No guide detail panel, lock, apply, sync/conflict states",
+  "archetype": "Guide detail edit/lock/remove",
+  "inheritsFrom": "145:67569"
+ },
+ "153:82009": {
+  "status": "missing",
+  "note": "No guide detail panel, lock, apply, sync/conflict states",
+  "archetype": "Guide detail edit/lock/remove",
+  "inheritsFrom": "145:67569"
+ },
+ "153:82477": {
+  "status": "missing",
+  "note": "No guide detail panel, lock, apply, sync/conflict states",
+  "archetype": "Guide detail edit/lock/remove",
+  "inheritsFrom": "145:67569"
+ },
+ "153:82970": {
+  "status": "missing",
+  "note": "No numeric add-guide form",
+  "archetype": "Add guide numeric",
+  "inheritsFrom": "145:67134"
+ },
+ "153:83468": {
+  "status": "missing",
+  "note": "No numeric add-guide form",
+  "archetype": "Add guide numeric",
+  "inheritsFrom": "145:67134"
+ },
+ "153:83943": {
+  "status": "missing",
+  "note": "No numeric add-guide form",
+  "archetype": "Add guide numeric",
+  "inheritsFrom": "145:67134"
+ },
+ "153:84447": {
+  "status": "missing",
+  "note": "No numeric add-guide form",
+  "archetype": "Add guide numeric",
+  "inheritsFrom": "145:67134"
+ },
+ "155:82271": {
+  "status": "missing",
+  "note": "No guide detail panel, lock, apply, sync/conflict states",
+  "archetype": "Guide detail edit/lock/remove",
+  "inheritsFrom": "145:67569"
+ },
+ "155:82724": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "155:83177": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "155:83650": {
+  "status": "missing",
+  "note": "No guide detail panel, lock, apply, sync/conflict states",
+  "archetype": "Guide detail edit/lock/remove",
+  "inheritsFrom": "145:67569"
+ },
+ "155:84124": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "155:84592": {
+  "status": "missing",
+  "note": "No guide detail panel, lock, apply, sync/conflict states",
+  "archetype": "Guide detail edit/lock/remove",
+  "inheritsFrom": "145:67569"
+ },
+ "155:85065": {
+  "status": "missing",
+  "note": "No guide detail panel, lock, apply, sync/conflict states",
+  "archetype": "Guide detail edit/lock/remove",
+  "inheritsFrom": "145:67569"
+ },
+ "155:85542": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "155:86012": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "155:86480": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "155:86949": {
+  "status": "missing",
+  "note": "No guide detail panel, lock, apply, sync/conflict states",
+  "archetype": "Guide detail edit/lock/remove",
+  "inheritsFrom": "145:67569"
+ },
+ "155:87420": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "155:87889": {
+  "status": "missing",
+  "note": "No guide detail panel, lock, apply, sync/conflict states",
+  "archetype": "Guide detail edit/lock/remove",
+  "inheritsFrom": "145:67569"
+ },
+ "155:88359": {
+  "status": "missing",
+  "note": "No guide detail panel, lock, apply, sync/conflict states",
+  "archetype": "Guide detail edit/lock/remove",
+  "inheritsFrom": "145:67569"
+ },
+ "155:88833": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "155:89304": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "155:89773": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "155:90241": {
+  "status": "missing",
+  "note": "No guide detail panel, lock, apply, sync/conflict states",
+  "archetype": "Guide detail edit/lock/remove",
+  "inheritsFrom": "145:67569"
+ },
+ "155:90710": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "155:91178": {
+  "status": "missing",
+  "note": "No guide detail panel, lock, apply, sync/conflict states",
+  "archetype": "Guide detail edit/lock/remove",
+  "inheritsFrom": "145:67569"
+ },
+ "155:91646": {
+  "status": "missing",
+  "note": "No guide detail panel, lock, apply, sync/conflict states",
+  "archetype": "Guide detail edit/lock/remove",
+  "inheritsFrom": "145:67569"
+ },
+ "155:92118": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "155:92588": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "155:93056": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "155:93531": {
+  "status": "missing",
+  "note": "No guide detail panel, lock, apply, sync/conflict states",
+  "archetype": "Guide detail edit/lock/remove",
+  "inheritsFrom": "145:67569"
+ },
+ "155:94007": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "155:94482": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "155:94957": {
+  "status": "missing",
+  "note": "No guide detail panel, lock, apply, sync/conflict states",
+  "archetype": "Guide detail edit/lock/remove",
+  "inheritsFrom": "145:67569"
+ },
+ "155:95433": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "155:95908": {
+  "status": "missing",
+  "note": "No guide detail panel, lock, apply, sync/conflict states",
+  "archetype": "Guide detail edit/lock/remove",
+  "inheritsFrom": "145:67569"
+ },
+ "155:96383": {
+  "status": "missing",
+  "note": "No guide detail panel, lock, apply, sync/conflict states",
+  "archetype": "Guide detail edit/lock/remove",
+  "inheritsFrom": "145:67569"
+ },
+ "155:96862": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "155:97334": {
+  "status": "missing",
+  "note": "Origin shows retained shared guides; guide model missing",
+  "archetype": "Return · canvas with shared guides",
+  "inheritsFrom": "145:74465"
+ },
+ "263:249222": {
+  "status": "drift",
+  "note": "Base editor as command origin",
+  "archetype": "Editor origin (base)"
+ },
+ "263:249638": {
+  "status": "drift",
+  "note": "Board: Search ⌘K row, Pro plan, This site (4 rows), Help & tools; code-ahead: Duplicate, Issues, Activity, Copy live URL, Collaborate",
+  "archetype": "Site menu"
+ },
+ "263:250083": {
+  "status": "drift",
+  "note": "Placeholder/bands differ; no nested 'Go to page ›' scope or footer key legend; AI command row :239 (pr33)",
+  "archetype": "Command palette"
+ },
+ "263:250542": {
+  "status": "drift",
+  "note": "Placeholder/bands differ; no nested 'Go to page ›' scope or footer key legend; AI command row :239 (pr33)",
+  "archetype": "Command palette",
+  "inheritsFrom": "263:250083"
+ },
+ "263:250988": {
+  "status": "drift",
+  "note": "Placeholder/bands differ; no nested 'Go to page ›' scope or footer key legend; AI command row :239 (pr33)",
+  "archetype": "Command palette",
+  "inheritsFrom": "263:250083"
+ },
+ "263:251434": {
+  "status": "drift",
+  "note": "Board 'About · Page · Page appearance … SEO & social'; code PagePanel has ✦ AI chip (pr33) and different section copy",
+  "archetype": "Other page opened · page inspector",
+  "inheritsFrom": "94:12846"
+ },
+ "263:251794": {
+  "status": "drift",
+  "note": "Placeholder/bands differ; no nested 'Go to page ›' scope or footer key legend; AI command row :239 (pr33)",
+  "archetype": "Command palette",
+  "inheritsFrom": "263:250083"
+ },
+ "263:252230": {
+  "status": "drift",
+  "note": "Assets full view is L-C; palette origin only",
+  "archetype": "Assets origin"
+ },
+ "263:252510": {
+  "status": "missing",
+  "note": "No scope chip / scoped-no-results states",
+  "archetype": "Palette scoped to Assets"
+ },
+ "263:252811": {
+  "status": "missing",
+  "note": "No scope chip / scoped-no-results states",
+  "archetype": "Palette scoped to Assets"
+ },
+ "263:253111": {
+  "status": "missing",
+  "note": "No scope chip / scoped-no-results states",
+  "archetype": "Palette scoped to Assets"
+ },
+ "263:253409": {
+  "status": "missing",
+  "note": "No components loading band",
+  "archetype": "Palette components loading"
+ },
+ "263:253840": {
+  "status": "missing",
+  "note": "No 'Couldn’t load components · Retry'",
+  "archetype": "Palette components failed"
+ },
+ "263:254275": {
+  "status": "drift",
+  "note": "View mode exists; board read-only palette capabilities differ",
+  "archetype": "View mode origin / palette"
+ },
+ "263:254659": {
+  "status": "drift",
+  "note": "View mode exists; board read-only palette capabilities differ",
+  "archetype": "View mode origin / palette"
+ },
+ "263:255084": {
+  "status": "missing",
+  "note": "No rail Help menu (Keyboard shortcuts · Getting started live in site menu)",
+  "archetype": "Help menu"
+ },
+ "263:255509": {
+  "status": "missing",
+  "note": "No rail Help menu (Keyboard shortcuts · Getting started live in site menu)",
+  "archetype": "Help menu"
+ },
+ "263:255899": {
+  "status": "drift",
+  "note": "Search exists; no macOS/Windows key toggle or single-key preference",
+  "archetype": "Keyboard shortcuts sheet"
+ },
+ "263:256463": {
+  "status": "drift",
+  "note": "Search exists; no macOS/Windows key toggle or single-key preference",
+  "archetype": "Keyboard shortcuts sheet",
+  "inheritsFrom": "263:255899"
+ },
+ "263:257027": {
+  "status": "drift",
+  "note": "Search exists; no macOS/Windows key toggle or single-key preference",
+  "archetype": "Keyboard shortcuts sheet",
+  "inheritsFrom": "263:255899"
+ },
+ "263:257591": {
+  "status": "drift",
+  "note": "Search exists; no macOS/Windows key toggle or single-key preference",
+  "archetype": "Keyboard shortcuts sheet",
+  "inheritsFrom": "263:255899"
+ },
+ "263:258033": {
+  "status": "drift",
+  "note": "Board 'No shortcuts match “q”.'",
+  "archetype": "Shortcuts no match"
+ },
+ "263:258914": {
+  "status": "drift",
+  "note": "Base editor as command origin",
+  "archetype": "Editor origin (base)",
+  "inheritsFrom": "263:249222"
+ },
+ "263:259330": {
+  "status": "drift",
+  "note": "'‹ Back to canvas' vs '‹ Back to Editor'; no page picker, fidelity notice or building state",
+  "archetype": "Preview overlay"
+ },
+ "263:259379": {
+  "status": "drift",
+  "note": "'‹ Back to canvas' vs '‹ Back to Editor'; no page picker, fidelity notice or building state",
+  "archetype": "Preview overlay",
+  "inheritsFrom": "263:259330"
+ },
+ "263:259428": {
+  "status": "missing",
+  "note": "No 'Couldn’t build the preview · Try again'",
+  "archetype": "Preview build failed"
+ },
+ "263:259482": {
+  "status": "match",
+  "note": "Title, explainer, Getting the link…, Open ↗, Copy link, Done, Link copied",
+  "archetype": "Share preview dialog"
+ },
+ "263:259540": {
+  "status": "match",
+  "note": "Title, explainer, Getting the link…, Open ↗, Copy link, Done, Link copied",
+  "archetype": "Share preview dialog",
+  "inheritsFrom": "263:259482"
+ },
+ "263:259601": {
+  "status": "match",
+  "note": "Title, explainer, Getting the link…, Open ↗, Copy link, Done, Link copied",
+  "archetype": "Share preview dialog",
+  "inheritsFrom": "263:259482"
+ },
+ "263:259663": {
+  "status": "drift",
+  "note": "Verify copy-failure keeps selectable URL",
+  "archetype": "Share preview copy failed"
+ },
+ "263:259725": {
+  "status": "drift",
+  "note": "Verify link-service error state",
+  "archetype": "Share preview service error"
+ },
+ "263:259792": {
+  "status": "match",
+  "note": "Title, explainer, Getting the link…, Open ↗, Copy link, Done, Link copied",
+  "archetype": "Share preview dialog",
+  "inheritsFrom": "263:259482"
+ },
+ "263:260229": {
+  "status": "match",
+  "note": "Title, explainer, Getting the link…, Open ↗, Copy link, Done, Link copied",
+  "archetype": "Share preview dialog",
+  "inheritsFrom": "263:259482"
+ },
+ "263:260669": {
+  "status": "match",
+  "note": "Title, explainer, Getting the link…, Open ↗, Copy link, Done, Link copied",
+  "archetype": "Share preview dialog",
+  "inheritsFrom": "263:259482"
+ },
+ "263:261113": {
+  "status": "match",
+  "note": "Copy matches all three reasons (dashboard route)",
+  "archetype": "Public preview unavailable"
+ },
+ "263:261535": {
+  "status": "match",
+  "note": "Copy matches all three reasons (dashboard route)",
+  "archetype": "Public preview unavailable"
+ },
+ "263:261957": {
+  "status": "match",
+  "note": "Copy matches all three reasons (dashboard route)",
+  "archetype": "Public preview unavailable"
+ },
+ "263:262420": {
+  "status": "drift",
+  "note": "Search exists; no macOS/Windows key toggle or single-key preference",
+  "archetype": "Keyboard shortcuts sheet",
+  "inheritsFrom": "263:255899"
+ },
+ "263:262956": {
+  "status": "drift",
+  "note": "Placeholder/bands differ; no nested 'Go to page ›' scope or footer key legend; AI command row :239 (pr33)",
+  "archetype": "Command palette",
+  "inheritsFrom": "263:250083"
+ },
+ "263:263259": {
+  "status": "drift",
+  "note": "Search exists; no macOS/Windows key toggle or single-key preference",
+  "archetype": "Keyboard shortcuts sheet",
+  "inheritsFrom": "263:255899"
+ },
+ "265:119612": {
+  "status": "drift",
+  "note": "Header 'Draft preview · the last saved design…' vs board 'Buildrick · Site · Home · Saved preview' + fidelity band",
+  "archetype": "Public saved preview"
+ },
+ "265:119657": {
+  "status": "drift",
+  "note": "Header 'Draft preview · the last saved design…' vs board 'Buildrick · Site · Home · Saved preview' + fidelity band",
+  "archetype": "Public saved preview",
+  "inheritsFrom": "265:119612"
+ },
+ "265:119746": {
+  "status": "blocked:review-only-fixture",
+  "note": "Designer index/outcome board, not a product surface; no live state to compare",
+  "archetype": "Review-only hub / outcome fixture"
+ },
+ "423:96903": {
+  "status": "drift",
+  "note": "Inspector 'Edit text' + explainer copy absent (L-B); breadcrumb readout",
+  "archetype": "Text selected · Enter edits"
+ },
+ "423:97218": {
+  "status": "drift",
+  "note": "Code full toolbar (sizes, align set, colours); board compact 'Heading ▾ B I U Lists Align Color Link … Done'",
+  "archetype": "Inline text toolbar"
+ },
+ "423:97552": {
+  "status": "drift",
+  "note": "phase1 (Task 1.2 one history step on commit); board receipt copy",
+  "archetype": "Text commit / undo"
+ },
+ "423:97866": {
+  "status": "drift",
+  "note": "phase1 (Task 1.2 one history step on commit); board receipt copy",
+  "archetype": "Text commit / undo",
+  "inheritsFrom": "423:97552"
+ },
+ "423:98182": {
+  "status": "drift",
+  "note": "Overflow menu 'Strikethrough · Indent · Outdent · Text highlight · Clear formatting' not a menu in code",
+  "archetype": "More formatting menu"
+ },
+ "423:98532": {
+  "status": "drift",
+  "note": "Link popover exists; board dialog 'Link selected text' + Apply link",
+  "archetype": "Inline link"
+ },
+ "423:98884": {
+  "status": "drift",
+  "note": "Link popover exists; board dialog 'Link selected text' + Apply link",
+  "archetype": "Inline link"
+ },
+ "423:99224": {
+  "status": "drift",
+  "note": "Link popover exists; board dialog 'Link selected text' + Apply link",
+  "archetype": "Inline link"
+ },
+ "423:99545": {
+  "status": "missing",
+  "note": "No 'Retry site save' inline state",
+  "archetype": "Text save failed"
+ },
+ "423:99859": {
+  "status": "missing",
+  "note": "No 'Locked — unlock … Enter and double-click do not start an edit' notice",
+  "archetype": "Locked text"
+ },
+ "423:100171": {
+  "status": "drift",
+  "note": "Code full toolbar (sizes, align set, colours); board compact 'Heading ▾ B I U Lists Align Color Link … Done'",
+  "archetype": "Inline text toolbar",
+  "inheritsFrom": "423:97218"
+ },
+ "423:100464": {
+  "status": "blocked:review-only-fixture",
+  "note": "Designer index/outcome board, not a product surface; no live state to compare",
+  "archetype": "Review-only hub / outcome fixture"
+ },
+ "425:98763": {
+  "status": "missing",
+  "note": "No 'Home has no H1 · Make this H1' non-blocking inspector guidance",
+  "archetype": "No H1 guidance"
+ },
+ "425:99052": {
+  "status": "missing",
+  "note": "No 'Home has no H1 · Make this H1' non-blocking inspector guidance",
+  "archetype": "No H1 guidance"
+ },
+ "425:99342": {
+  "status": "missing",
+  "note": "No form inspector note; verify new Form block inserts visible labels",
+  "archetype": "New form visible labels"
+ },
+ "558:448976": {
+  "status": "missing",
+  "note": "phase1 (Task 1.3): Shell/PageSwitcherMenu not built; PageTabBar tabs today. ⌘P copy → code:shortcut-cmd-p-is-preview",
+  "archetype": "Page switcher overlay"
+ },
+ "558:449032": {
+  "status": "missing",
+  "note": "phase1 (Task 1.3): Shell/PageSwitcherMenu not built; PageTabBar tabs today. ⌘P copy → code:shortcut-cmd-p-is-preview",
+  "archetype": "Page switcher overlay",
+  "inheritsFrom": "558:448976"
+ },
+ "558:449088": {
+  "status": "missing",
+  "note": "phase1 (Task 1.3): Shell/PageSwitcherMenu not built; PageTabBar tabs today. ⌘P copy → code:shortcut-cmd-p-is-preview",
+  "archetype": "Page switcher overlay",
+  "inheritsFrom": "558:448976"
+ }
+}

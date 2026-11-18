@@ -69,9 +69,10 @@ describe("ComponentDetailScreen — Delete master", () => {
     const onBack = vi.fn();
     render(
       <ToastProvider>
-        <ComponentDetailScreen component={component} composer={composer} onBack={onBack} selectedElementId={null} />
+        <ComponentDetailScreen component={component} composer={composer} onBack={onBack} />
       </ToastProvider>,
     );
+    fireEvent.click(screen.getByTestId("component-more"));
     fireEvent.click(screen.getByTestId("component-delete"));
     fireEvent.click(screen.getByRole("button", { name: "Delete" }));
     await waitFor(() => expect(screen.getByText("Menu card deleted · 18 instances detached")).toBeInTheDocument());

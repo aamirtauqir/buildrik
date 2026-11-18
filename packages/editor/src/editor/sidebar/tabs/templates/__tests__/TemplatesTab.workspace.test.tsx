@@ -23,6 +23,11 @@ vi.mock("@/editor/chrome-ui", async () => {
   };
 });
 
+const capacity = vi.hoisted(() => ({ value: { state: "none" } as { state: string; plan?: string; limit?: number } }));
+vi.mock("@/editor/sidebar/tabs/pages/usePageCapacity", () => ({
+  usePageCapacity: () => ({ capacity: capacity.value, retry: vi.fn() }),
+}));
+
 import { TemplatesTab } from "../TemplatesTab";
 import { SITE_TEMPLATES } from "../templatesData";
 import { getTabMode } from "@/editor/rail/tabsConfig";
@@ -80,7 +85,7 @@ describe("Templates — full-canvas view (decision #24)", () => {
     fireEvent.click(screen.getByTestId(`tpl-ws-item-${t.id}`));
     const preview = screen.getByTestId("tpl-ws-preview");
     expect(preview).toHaveTextContent(t.name);
-    expect(preview).toHaveTextContent("Page template");
+    expect(preview).toHaveTextContent("your Brand is not changed");
     expect(within(preview).getByRole("button", { name: "Create page" })).toBeInTheDocument();
     expect(within(preview).getByRole("button", { name: "Replace page…" })).toBeInTheDocument();
     expect(screen.queryByRole("dialog")).toBeNull();
@@ -146,6 +151,33 @@ describe("Templates — full-canvas view (decision #24)", () => {
     expect(composer.elements.addPageToNavigation).toHaveBeenCalledWith("page-new");
   });
 
+  /* design-2l9 104:28892: a visit from the New page dialog says what it is
+     creating, and both "‹ Back to New page" and Change return to that dialog
+     with its name and navigation choice. */
+  it("names the page it is creating and goes back to New page with it", () => {
+    const composer = makeComposer();
+    const onClose = vi.fn();
+    render(<TemplatesTab composer={composer as never} onClose={onClose} request={{ newPageName: "Services", addToNavigation: true }} />);
+    expect(screen.getByTestId("tpl-creating-banner")).toHaveTextContent("Creating “Services”Add to site navigation");
+    expect(screen.getByTestId("tpl-ws-back")).toHaveTextContent("‹ Back to New page");
+    fireEvent.click(screen.getByTestId("tpl-creating-change"));
+    expect(onClose).toHaveBeenCalled();
+    expect(composer.emit).toHaveBeenCalledWith("ui:new-page-requested", { name: "Services", addToNavigation: true });
+  });
+
+  // design-2l9 104:28892: the strip carries the real capacity — or nothing when it is unknown or unlimited.
+  it("adds 'n of N pages on Plan' from the real count and limit, and hides it when unlimited", () => {
+    capacity.value = { state: "known", plan: "Free", limit: 10 };
+    const composer = makeComposer();
+    const { unmount } = render(<TemplatesTab composer={composer as never} onClose={vi.fn()} request={{ newPageName: "Services", addToNavigation: true }} />);
+    expect(screen.getByTestId("tpl-creating-banner")).toHaveTextContent("Add to site navigation · 1 of 10 pages on Free");
+    unmount();
+    capacity.value = { state: "known", plan: "Pro", limit: -1 };
+    render(<TemplatesTab composer={composer as never} onClose={vi.fn()} request={{ newPageName: "Services", addToNavigation: true }} />);
+    expect(screen.getByTestId("tpl-creating-banner")).not.toHaveTextContent("pages on");
+    capacity.value = { state: "none" };
+  });
+
   /* QA 2026-09-24: Escape did not close the view. From the catalogue it goes
      back to the canvas; from a preview it goes back to the catalogue first. */
   it("Escape leaves the view from the catalogue, and a preview first", () => {
@@ -189,22 +221,23 @@ describe("Templates — full-canvas view (decision #24)", () => {
     expect(screen.getByTestId("tpl-ws-preview")).toBeInTheDocument();
   });
 
-  /* Walked live: the apply called onTemplateUsed (→ Add) for a new page too,
-     which unmounted the view before "Page created" could show. */
-  it("Create page ends on Page created; the view is left only from its Done", async () => {
+  /* design-2l9 106:37579: a created page lands in the editor with a receipt
+     ("{Page} created from {Template} · Page settings"), not a dialog over the
+     Templates view — so the view is left as the run ends. */
+  it("Create page ends in the editor with the receipt", async () => {
     const composer = makeComposer();
     const onTemplateUsed = vi.fn();
+    addToast.mockClear();
     render(<TemplatesTab composer={composer as never} onClose={vi.fn()} onTemplateUsed={onTemplateUsed} />);
     const t = PAGE_TEMPLATES.find((x) => x.status !== "premium")!;
     fireEvent.click(screen.getByTestId(`tpl-ws-item-${t.id}`));
     fireEvent.click(screen.getByRole("button", { name: "Create page" }));
     fireEvent.click(within(screen.getByTestId("tpl-create-confirm")).getByRole("button", { name: "Create page" }));
-    await waitFor(() => expect(screen.getByTestId("tpl-create-success")).toBeInTheDocument(), { timeout: 5000 });
-    /* It names the page it made, not the placeholder "Template". */
-    expect(screen.getByTestId("tpl-create-success").textContent).not.toContain("‘Template’");
-    await new Promise((r) => requestAnimationFrame(() => r(null)));
-    expect(onTemplateUsed).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole("button", { name: "Done" }));
-    expect(onTemplateUsed).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(onTemplateUsed).toHaveBeenCalledTimes(1), { timeout: 5000 });
+    const receipt = addToast.mock.calls.map((c) => c[0]).find((x) => / created from /.test(x.description ?? ""));
+    /* The page the run made (the mock's createPage names it "New"). */
+    expect(receipt?.description).toBe(`New created from ${t.name}`);
+    expect(receipt?.action?.label).toBe("Page settings");
+    expect(screen.queryByTestId("tpl-create-success")).toBeNull();
   });
 });

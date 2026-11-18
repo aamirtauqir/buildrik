@@ -20,6 +20,9 @@ export type DrawerTab = "seo" | "social" | "advanced";
 export interface PageSettingsOpenRequest {
   pageId: string;
   tab?: DrawerTab;
+  /** 67:11341: Settings › Redirects saved the URL repair and sent you back —
+   *  the SEO tab says what was saved. */
+  redirectSaved?: { from: string; to: string };
 }
 
 /** A sidebar-only folder that groups pages. Stored in localStorage, not the engine. */

@@ -33,7 +33,7 @@ interface GroupSectionProps {
   /** MINE (board 1069:4970): the user's own components as plain rows. */
   mine?: ComponentDefinition[];
   /** FROM LIBRARY (board 4418:99857): the workspace's shared masters, listed
-   *  under SAVED COMPONENTS before "Manage components ›". */
+   *  under "Saved components · This site" before "Components ›". */
   library?: ReadonlyArray<{ componentId: string; name: string }>;
   onLibraryInsert?: (componentId: string) => void;
   onDragStart: DragStartFn;
@@ -42,7 +42,7 @@ interface GroupSectionProps {
   onElClick: ElClickFn;
   onBlockInsert?: (block: BlockDefinition) => void;
   onMineInsert?: (component: ComponentDefinition) => void;
-  /** "Manage components ›" at the end of SAVED COMPONENTS (4418:99857). */
+  /** "Components ›" at the end of the saved group (4418:99857; copy 2L9 215:43547). */
   onManageComponents?: () => void;
   /** ★ on element rows (G2-115): which names are favourites, and the toggle. */
   favs?: Set<string>;
@@ -69,22 +69,23 @@ const HeaderRow: React.FC<{ group: InsertGroup; isOpen: boolean; onToggle: () =>
   <Button
     type="button"
     color="light"
-    className="bld-group-header tw:flex tw:items-center tw:justify-start tw:w-full tw:h-[var(--bk-size-row)] tw:py-0 tw:pl-[var(--bk-space-16)] tw:pr-[var(--bk-space-16)] tw:gap-0 tw:bg-transparent tw:border-0 tw:rounded-none tw:cursor-pointer tw:text-left tw:shadow-none tw:focus:ring-0 tw:focus:bg-transparent tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]"
+    className="bld-group-header tw:flex tw:items-center tw:justify-start tw:w-full tw:h-5 tw:py-0 tw:pl-3 tw:pr-4 tw:gap-0 tw:bg-transparent tw:border-0 tw:rounded-none tw:cursor-pointer tw:text-left tw:shadow-none tw:focus:ring-0 tw:focus:bg-transparent tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]"
     aria-expanded={isOpen}
     data-testid={`insert-group-${group.id}`}
     onClick={onToggle}
   >
-    {/* Board 4418:103353 group header: 32 tall (interactive section header),
-        chevron 12/18 at 16, label 11/500 tracking .88 at 32, mono count. */}
-    <span className="tw:w-4 tw:shrink-0 tw:text-[12px] tw:leading-[18px] tw:font-normal tw:text-[var(--bk-ink-muted)]" aria-hidden="true">
-      {isOpen ? "▾" : "▸"}
-    </span>
+    {/* Board 7:18981: the open group's header is its name alone — 12/600 ink
+        at the rows' 12px inset, 20 tall. A closed group keeps a ▸ at the end
+        so it still reads as collapsed. */}
     <span
       data-testid={`insert-group-label-${group.id}`}
-      className="tw:flex-1 tw:text-[11px] tw:leading-[16px] tw:font-medium tw:tracking-[0.88px] tw:text-[var(--bk-ink-muted)]"
+      className="tw:flex-1 tw:text-[12px] tw:leading-4 tw:font-semibold tw:text-[var(--bk-ink)]"
     >
       {group.label}
     </span>
+    {!isOpen && (
+      <span className="tw:ml-2 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" aria-hidden="true">▸</span>
+    )}
     {group.count != null && (
       <span
         data-testid={`insert-group-count-${group.id}`}
@@ -96,8 +97,8 @@ const HeaderRow: React.FC<{ group: InsertGroup; isOpen: boolean; onToggle: () =>
   </Button>
 );
 
-/** Board 1069:4999 list row: dense · rounded-4 · 14 icon · 13/400 label,
- *  indented past the group chevron. `pinned` switches to board 1069:5011's
+/** Board 7:18981 list row: 32 tall, inset 12 with a 6px-round hover fill,
+ *  icon at 24 · 13/400 label. `pinned` switches to board 1069:5011's
  *  ⌥ Paste HTML… band, which is a full-height row at the panel inset with
  *  12/400 soft-ink text and no icon slot. Exported for BuildTab.
  *
@@ -144,10 +145,10 @@ export const Row: React.FC<{
       tabIndex={disabled ? -1 : 0}
       aria-disabled={disabled || undefined}
       draggable={disabled ? false : draggable}
-      className={`tw:group tw:flex tw:items-center tw:gap-[8px] tw:rounded-[4px] tw:select-none ${
+      className={`tw:group tw:flex tw:items-center tw:gap-[8px] tw:select-none ${
         pinned
-          ? "tw:h-[var(--bk-size-row)] tw:px-[var(--bk-space-16)]"
-          : "tw:h-[var(--bk-size-row-dense)] tw:pl-[var(--bk-space-28)] tw:pr-[var(--bk-space-16)]"
+          ? "tw:h-[var(--bk-size-row)] tw:rounded-[4px] tw:px-[var(--bk-space-16)]"
+          : "tw:mx-3 tw:h-8 tw:rounded-md tw:px-3"
       } ${
         disabled
           ? "tw:cursor-not-allowed"
@@ -329,7 +330,9 @@ const ElementRows: React.FC<{
 /** Groups that list element rows. Their test ids are literal templates on
  *  the declaring lines so the conformance anchor check can see them. */
 type ElementRowGroup = "favourites" | "recent" | "elements";
-const isElementRowGroup = (id: InsertGroup["id"]): id is ElementRowGroup => id === "favourites" || id === "recent" || id === "elements";
+/* An Elements-tab category group ("cat-basic") lists element rows as ELEMENTS does. */
+const elementRowGroup = (id: InsertGroup["id"]): ElementRowGroup | null =>
+  id === "favourites" || id === "recent" || id === "elements" ? id : id.startsWith("cat-") ? "elements" : null;
 const elRowTestId = (g: ElementRowGroup, n: string) => (g === "favourites" ? `insert-fav-${n}` : g === "recent" ? `insert-recent-${n}` : `insert-el-${n}`);
 const elFavTestId = (g: ElementRowGroup, n: string) => (g === "favourites" ? `insert-fav-fav-${n}` : g === "recent" ? `insert-recent-fav-${n}` : `insert-el-fav-${n}`);
 
@@ -432,9 +435,9 @@ export const GroupSection: React.FC<GroupSectionProps> = ({
 }) => (
   <div data-testid={`insert-section-${group.id}`}>
     <HeaderRow group={group} isOpen={isOpen} onToggle={onToggle} />
-    {isOpen && isElementRowGroup(group.id) && elements && (
+    {isOpen && elementRowGroup(group.id) && elements && (
       <ElementRows
-        group={group.id}
+        group={elementRowGroup(group.id) ?? "elements"}
         elements={elements}
         favs={favs}
         onToggleFav={onToggleFav}
@@ -513,13 +516,16 @@ export const GroupSection: React.FC<GroupSectionProps> = ({
             role="button"
             tabIndex={0}
             data-testid="insert-mine-manage"
-            className="tw:flex tw:items-center tw:h-[var(--bk-size-row-dense)] tw:pl-[var(--bk-space-28)] tw:pr-[var(--bk-space-16)] tw:rounded-[4px] tw:cursor-pointer tw:text-[13px] tw:leading-[20px] tw:text-[var(--bk-ink)] hover:tw:bg-[var(--bk-bg-subtle)]"
+            className="tw:flex tw:items-center tw:h-[var(--bk-size-row-dense)] tw:pl-[var(--bk-space-28)] tw:pr-[var(--bk-space-16)] tw:rounded-[4px] tw:cursor-pointer tw:text-[13px] tw:leading-[20px] tw:font-medium tw:text-[var(--bk-accent)] hover:tw:bg-[var(--bk-bg-subtle)]"
             onClick={onManageComponents}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onManageComponents(); }
             }}
           >
-            Manage components ›
+            {/* 215:43547 (B6-K01): the door is a 13/500 accent link, "Components ›".
+                It stays at the end of the group because the Add tabs and ⋯ of
+                7:18981 / 302:3965 hold the header (owner, 2026-11-13). */}
+            Components ›
           </div>
         )}
       </>

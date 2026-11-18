@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { isDangerousUrl, isSafeElementId } from "./element-markup";
+import { cmsConditionSchema, cmsListSortKeySchema, CMS_LIST_SORT_MAX_KEYS } from "./cmsConditions";
 
 export const createSiteSchema = z.object({
   name: z.string().min(2).max(100),
@@ -220,6 +221,16 @@ const cmsCollectionBindingSchema = z.object({
   limit: z.number().int().min(0).max(CMS_COLLECTION_LIMIT_MAX).optional(),
   status: z.enum(["published", "draft", "all"]).optional(),
   repeat: z.enum(["self", "children"]).optional(),
+  /* C-14 (engine-list-query.md): the list's query. */
+  filter: cmsConditionSchema.optional(),
+  sort: z.array(cmsListSortKeySchema).max(CMS_LIST_SORT_MAX_KEYS).optional(),
+  skip: z.number().int().min(0).max(CMS_COLLECTION_LIMIT_MAX).optional(),
+  /* B-27: "Exclude this page's record" (a related list on a template page). */
+  excludeCurrent: z.boolean().optional(),
+  /* B-30 (2L9 B5-D80): "Split into pages" — Show is the page size; absent = "Show first N only". */
+  pages: z.literal("split").optional(),
+  /* B-30 (B5-D78): "Hide list" when nothing matches; absent = the editable No items block. */
+  whenEmpty: z.literal("hide").optional(),
 });
 
 const boundedRecord = <T extends z.ZodTypeAny>(value: T) =>
@@ -230,6 +241,8 @@ const boundedRecord = <T extends z.ZodTypeAny>(value: T) =>
 const cmsBindingsShape = z.object({
   field: boundedRecord(z.array(cmsFieldBindingSchema).max(MAX_BINDINGS_PER_ELEMENT)).optional(),
   collection: boundedRecord(cmsCollectionBindingSchema).optional(),
+  /* B-11 (engine-conditions.md): element id → its visibility condition. */
+  conditions: boundedRecord(cmsConditionSchema).optional(),
 });
 export type CmsBindingsInput = z.infer<typeof cmsBindingsShape>;
 
@@ -276,9 +289,14 @@ export function filterCmsBindings(raw: unknown): CmsBindingsInput | undefined {
     const parsed = cmsCollectionBindingSchema.safeParse(b);
     return parsed.success ? parsed.data : null;
   });
+  const conditions = keepEntries(raw.conditions, (c) => {
+    const parsed = cmsConditionSchema.safeParse(c);
+    return parsed.success ? parsed.data : null;
+  });
   return {
     ...(field ? { field } : {}),
     ...(collection ? { collection } : {}),
+    ...(conditions ? { conditions } : {}),
   };
 }
 

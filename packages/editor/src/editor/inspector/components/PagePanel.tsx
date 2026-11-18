@@ -2,47 +2,53 @@
  * PagePanel — what the Inspector shows when nothing is selected, or the page
  * root is (DD-13, board 21):
  *
- *   Home                                   ← the path: the page alone
- *   Home · Page                ✦ AI  ⋯  ✕
- *   Fill        Background
+ *   Home · Page                      ⋯  ✕     (no AI entry point — owner, no AI this version)
+ *   Home · Page                            ← the path (2L9 S06)
+ *   Editing Desktop · Page appearance
+ *   Background  Color
  *   Size        Max width
  *   Typography  Font · Text colour
  *   Spacing     the margin / padding box
- *                                SEO & social ↗
- *   Your place here is kept
+ *   Page settings  [ SEO and social ]
+ *                  Opens Home’s Page settings. Appearance stays here.
  *
  * No tabs, no context row, no Link / CMS / Visibility / Interactions. The
  * four sections are the registry's `page: true` entries rendered with
  * `ctx.variant = "page"` (each draws its own page subset), in the board's
  * order; every edit goes to the active page's root through useStyleHandlers,
  * so it is one undo step and passes the lock gate like any element edit.
- * "SEO & social" opens the page's settings on SEO; the Inspector stays
+ * "SEO and social" opens the page's settings on SEO; the Inspector stays
  * mounted, so closing them lands back here.
  *
- * The one-time "Template applied!" banner (a template was just applied)
+ * The one-time "Template applied" notice (a template was just applied)
  * sits on top.
  *
  * @license BSD-3-Clause
  */
 
-import { ExternalLink, MoreHorizontal, X } from "lucide-react";
+import { UnsavedLinkNotice } from "./UnsavedLinkNotice";
+import { RecordPageReturnRow } from "./RecordPageReturnRow";
+import { MoreHorizontal, X } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "@/engine";
 import { Breadcrumb, Button, IconButton, Menu, MenuItem, Popover } from "@/editor/chrome-ui";
 import { capabilitiesFor } from "@/shared/constants/elementCapabilities";
 import { EVENTS } from "@/shared/constants/events";
-import { isValidBreakpoint } from "@/shared/constants/breakpoints";
+import { BREAKPOINTS, isValidBreakpoint } from "@/shared/constants/breakpoints";
 import type { BreakpointId } from "@/shared/types/breakpoints";
 import { useSaveConflict } from "@/editor/shell/hooks/useSaveConflict";
 import { computeEffectiveStyles, deriveCssContext, getPropertyStates } from "../config/cssContext";
 import { useFieldOverrides } from "../hooks/useFieldOverrides";
 import { resolveDisplayMode, useInspectorSections } from "../hooks/useInspectorSections";
 import { useStyleHandlers } from "../hooks/useStyleHandlers";
-import { ActionRow, NoteRow } from "../sections/behaviourRows";
+import { NoteRow } from "../sections/behaviourRows";
 import { EMPTY_MIXED_KEYS, SECTION_REGISTRY, type SectionContext, type SectionId } from "../sections/registry";
 import { InspectorFieldContext, type InspectorFieldContextValue } from "../shared/controls/InspectorFieldContext";
 import { sectionOverrideMarks } from "../shared/controls/OverrideDot";
-import { SectionFrameContext, type SectionFrame } from "../shared/controls/Section";
+import { Section, SectionFrameContext, type SectionFrame } from "../shared/controls/Section";
+import { WIDE_BUTTON } from "../shared/controls/controlClasses";
+import { ChooseFont } from "../sections/typography/ChooseFont";
+import { closeSubview, useSubview } from "../tabs/subviewStore";
 
 export interface PagePanelProps {
   composer: Composer | null | undefined;
@@ -75,9 +81,10 @@ function usePageAndBreakpoint(composer: Composer | null | undefined): Breakpoint
   return device && isValidBreakpoint(device) ? device : "desktop";
 }
 
-/** The template just applied, for 30 minutes after (read once). */
-function useAppliedTemplate(): string | null {
-  const [name] = React.useState<string | null>(() => {
+/** The template just applied, for 30 minutes after (read once), and the
+ *  board's "Dismiss notice" (S07), which forgets it. */
+function useAppliedTemplate(): [string | null, () => void] {
+  const [name, setName] = React.useState<string | null>(() => {
     try {
       const stored = localStorage.getItem(TEMPLATE_KEY);
       if (!stored) return null;
@@ -95,7 +102,15 @@ function useAppliedTemplate(): string | null {
     }
     return null;
   });
-  return name;
+  const dismiss = React.useCallback(() => {
+    setName(null);
+    try {
+      localStorage.removeItem(TEMPLATE_KEY);
+    } catch {
+      /* storage unavailable — hidden for this mount */
+    }
+  }, []);
+  return [name, dismiss];
 }
 
 export function PagePanel({ composer }: PagePanelProps) {
@@ -108,7 +123,7 @@ export function PagePanel({ composer }: PagePanelProps) {
   );
 
   const conflict = useSaveConflict();
-  const { styles, handleStyleChange, handleBatchStyleChange, overriddenProperties } = useStyleHandlers(
+  const { styles, handleStyleChange, handleBatchStyleChange, overriddenProperties, runDiscrete } = useStyleHandlers(
     root,
     composer,
     breakpoint,
@@ -118,7 +133,10 @@ export function PagePanel({ composer }: PagePanelProps) {
   );
   const overrides = useFieldOverrides(composer, root?.id, breakpoint);
   const { choices, setChoices } = useInspectorSections();
-  const appliedTemplate = useAppliedTemplate();
+  const [appliedTemplate, dismissTemplate] = useAppliedTemplate();
+  const subview = useSubview();
+  /* More settings per section, for this panel's life (Spacing's sides). */
+  const [advanced, setAdvanced] = React.useState<Readonly<Record<string, boolean>>>({});
 
   const locked = Boolean(rootEl?.isLocked?.());
   const readOnly = locked || conflict.pending;
@@ -130,8 +148,9 @@ export function PagePanel({ composer }: PagePanelProps) {
       overrides: overrides.overrides,
       overrideLabels: overrides.labels,
       resetOverride: overrides.resetOverride,
+      runDiscrete,
     }),
-    [readOnly, conflict.pending, locked, overrides]
+    [readOnly, conflict.pending, locked, overrides, runDiscrete]
   );
 
   if (!composer || !page || !root) return null;
@@ -152,9 +171,22 @@ export function PagePanel({ composer }: PagePanelProps) {
   return (
     <InspectorFieldContext.Provider value={fieldContext}>
       <div className="bdi-panel" data-testid="inspector-page-panel" data-readonly={readOnly || undefined}>
-        {appliedTemplate ? <TemplateAppliedBanner composer={composer} name={appliedTemplate} /> : null}
-        <PageHeader composer={composer} pageName={page.name} pageId={page.id} />
+        <PageHeader composer={composer} pageName={page.name} pageId={page.id} breakpoint={breakpoint} />
+        {appliedTemplate ? <TemplateAppliedBanner name={appliedTemplate} pageName={page.name} onDismiss={dismissTemplate} /> : null}
+        {/* A-26 (187:22071): a collection page whose link the server has not confirmed. */}
+        <UnsavedLinkNotice composer={composer} pageId={page.id} />
+        {/* B5-D98 (195:29753): back to the Card whose Link row made this page. */}
+        <RecordPageReturnRow composer={composer} pageId={page.id} />
         <div className="bdi-panel-scroll">
+          {subview?.kind === "font-picker" && subview.elementId === root.id ? (
+            <ChooseFont
+              composer={composer}
+              elementId={root.id}
+              value={authoredStyles["font-family"] ?? ""}
+              onChange={(v) => handleStyleChange("font-family", v)}
+              onClose={() => closeSubview("font-picker")}
+            />
+          ) : (
           <div className="bdi-body">
             {PAGE_SECTIONS.map((id, i) => {
               const entry = SECTION_REGISTRY[id];
@@ -177,8 +209,8 @@ export function PagePanel({ composer }: PagePanelProps) {
                 isOpen: displayMode === "open",
                 onToggle,
                 displayMode,
-                advancedExpanded: false,
-                onAdvancedToggle: NO_OP,
+                advancedExpanded: Boolean(advanced[id]),
+                onAdvancedToggle: () => setAdvanced((a) => ({ ...a, [id]: !a[id] })),
                 tabId: "style",
                 mixedKeys: EMPTY_MIXED_KEYS,
                 isMultiSelect: false,
@@ -198,48 +230,35 @@ export function PagePanel({ composer }: PagePanelProps) {
                 </SectionFrameContext.Provider>
               );
             })}
-            <div className="tw:border-t tw:border-[var(--bk-border)] tw:px-3">
-              <ActionRow
-                testId="inspector-page-seo"
-                onClick={openSeo}
-                icon={<ExternalLink size={12} aria-hidden="true" className="tw:shrink-0" />}
-              >
-                SEO &amp; social
-              </ActionRow>
-            </div>
-            <div className="tw:px-4">
-              <NoteRow testId="inspector-page-note">Your place here is kept</NoteRow>
-            </div>
+            {/* 2L9 S06: its own "Page settings" group — a full-width
+                button, and the note under it. */}
+            <Section title="Page settings" isOpen onToggle={NO_OP} id="inspector-section-page-settings">
+              <Button color="light" size="xs" className={WIDE_BUTTON} onClick={openSeo} data-testid="inspector-page-seo">
+                SEO and social
+              </Button>
+              <NoteRow testId="inspector-page-note">Opens {page.name}’s Page settings. Appearance stays here.</NoteRow>
+            </Section>
           </div>
+          )}
         </div>
       </div>
     </InspectorFieldContext.Provider>
   );
 }
 
-/** Board 21's header: the path is the page alone; the name reads "Home · Page". */
-function PageHeader({ composer, pageName, pageId }: { composer: Composer; pageName: string; pageId: string }) {
+/** 2L9 S06's header: "Home · Page", the path under it, then what is being
+ *  edited ("Editing Desktop · Page appearance"). */
+function PageHeader({ composer, pageName, pageId, breakpoint }: { composer: Composer; pageName: string; pageId: string; breakpoint: BreakpointId }) {
   const [menuOpen, setMenuOpen] = React.useState(false);
   return (
     <div className="tw:flex tw:flex-col tw:gap-1 tw:p-3" data-testid="inspector-header">
-      <Breadcrumb label="Element path" items={[{ id: "page", label: pageName }]} data-testid="inspector-breadcrumb" />
       <div className="tw:flex tw:items-center tw:gap-1">
         <span
-          className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-[13px] tw:font-semibold tw:leading-4 tw:text-[var(--bk-ink-soft)]"
+          className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-[13px] tw:font-semibold tw:leading-4 tw:text-[var(--bk-ink)]"
           data-testid="inspector-element-name"
         >
           {pageName} · Page
         </span>
-        <Button
-          type="button"
-          className="tw:h-6 tw:w-10 tw:shrink-0 tw:justify-center tw:rounded-[6px] tw:bg-[var(--bk-accent-tint)] tw:px-2 tw:text-[11px] tw:font-medium tw:text-[var(--bk-accent-text)] tw:whitespace-nowrap"
-          title="Ask AI about this page"
-          aria-label="Ask AI about this page"
-          data-testid="inspector-ai-chip"
-          onClick={() => composer.emit("ui:switch-tab", { tab: "ai" })}
-        >
-          ✦ AI
-        </Button>
         <Popover
           open={menuOpen}
           onClose={() => setMenuOpen(false)}
@@ -281,28 +300,26 @@ function PageHeader({ composer, pageName, pageId }: { composer: Composer; pageNa
           <X size={16} aria-hidden="true" />
         </IconButton>
       </div>
+      <Breadcrumb label="Element path" items={[{ id: "page", label: `${pageName} · Page` }]} data-testid="inspector-breadcrumb" />
+      <p className="tw:m-0 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="inspector-page-editing">
+        Editing {BREAKPOINTS[breakpoint].name} · Page appearance
+      </p>
     </div>
   );
 }
 
-/** Board 1175:4841 — shown for 30 minutes after a template is applied. */
-function TemplateAppliedBanner({ composer, name }: { composer: Composer; name: string }) {
+/** 2L9 S07 — under the page's header for 30 minutes after a template is
+ *  applied, until dismissed: a titled group with a full-width Dismiss. */
+function TemplateAppliedBanner({ name, pageName, onDismiss }: { name: string; pageName: string; onDismiss: () => void }) {
   return (
-    <div role="status" aria-live="polite" className="tw:px-3 tw:pt-3" data-testid="inspector-template-applied">
-      <div className="tw:flex tw:w-full tw:flex-col tw:items-start tw:gap-1.5 tw:rounded-lg tw:bg-[var(--bk-success-tint)] tw:px-3 tw:py-2.5 tw:text-left">
-        <h3 className="tw:m-0 tw:text-[12px] tw:font-semibold tw:text-[var(--bk-success-text)]">Template applied!</h3>
-        <p className="tw:m-0 tw:text-[11px] tw:leading-normal tw:text-[var(--bk-ink-soft)]">{name}</p>
-        {/* `h-auto` beats flowbite's own `h-8` (same twMerge group), so the
-            padding sizes it to the board's 27. */}
-        <Button
-          size="xs"
-          onClick={() => composer.emit(EVENTS.UI_OPEN_DESIGN_PANEL, {})}
-          className="tw:inline-block tw:h-auto tw:min-h-6 tw:rounded-md tw:border-transparent tw:bg-[var(--bk-accent)] tw:px-3 tw:py-[7px] tw:text-center tw:text-[11px] tw:font-medium tw:text-white"
-          aria-label="Set brand colors in Global Styles"
-        >
-          Set Brand Colors
-        </Button>
-      </div>
+    <div role="status" aria-live="polite" className="tw:flex tw:flex-col tw:gap-2 tw:px-3 tw:pb-2 tw:pt-3" data-testid="inspector-template-applied">
+      <h3 className="tw:m-0 tw:text-[13px] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]">Template applied</h3>
+      <p className="tw:m-0 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]">
+        The {name} template was applied to {pageName}.
+      </p>
+      <Button color="light" size="xs" onClick={onDismiss} data-testid="inspector-template-dismiss" className={WIDE_BUTTON}>
+        Dismiss notice
+      </Button>
     </div>
   );
 }

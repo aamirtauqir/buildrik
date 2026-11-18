@@ -2,10 +2,10 @@
  * PagePanel — nothing selected, or the page root selected (DD-13, board 21).
  *
  * "Home · Page"; Fill (Background), Size (Max width), Typography (Font, Text
- * colour), Spacing, in that order; "SEO & social" → the page's settings on
- * SEO; "Your place here is kept"; no tabs, no context row, no Link / CMS /
+ * colour), Spacing, in that order; "SEO and social" → the page's settings on
+ * SEO; "Opens {page}’s Page settings. Appearance stays here."; no tabs, no context row, no Link / CMS /
  * Visibility / Interactions. Edits land on the page root in one undo step.
- * The "Template applied!" banner (board 1175:4841) moved in from the old
+ * The "Template applied" notice (board 1175:4841, 2L9 S07) moved in from the old
  * empty state and sits on top for 30 minutes after a template is applied.
  *
  * Real Composer.
@@ -46,38 +46,43 @@ afterEach(() => {
 });
 
 describe("PagePanel — board 21", () => {
-  it("names the page: path 'Home', then 'Home · Page' with ✦ AI, ⋯ and ✕", () => {
+  it("names the page: 'Home · Page' with ⋯ and ✕, the path and 'Editing Desktop · Page appearance' under it — no AI entry point (owner: no AI in the UI)", () => {
     setup();
-    expect(screen.getByTestId("inspector-breadcrumb")).toHaveTextContent("Home");
     expect(screen.getByTestId("inspector-element-name")).toHaveTextContent("Home · Page");
-    expect(screen.getByTestId("inspector-ai-chip")).toBeInTheDocument();
+    expect(screen.getByTestId("inspector-breadcrumb")).toHaveTextContent("Home · Page");
+    /* 2L9 S06: the path sits under the name, then what is being edited. */
+    expect(screen.getByTestId("inspector-element-name").compareDocumentPosition(screen.getByTestId("inspector-breadcrumb")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.getByTestId("inspector-page-editing")).toHaveTextContent("Editing Desktop · Page appearance");
+    expect(screen.queryByTestId("inspector-ai-chip")).toBeNull();
+    expect(screen.queryByRole("button", { name: /Ask AI/ })).toBeNull();
     expect(screen.getByTestId("inspector-page-menu")).toBeInTheDocument();
     expect(screen.getByTestId("inspector-hide")).toBeInTheDocument();
   });
 
-  it("Fill, Size, Typography, Spacing — in the board's order, and nothing else", () => {
+  it("Background, Size, Typography, Spacing, then Page settings — in the board's order (2L9 S06), and nothing else", () => {
     setup();
     const panel = screen.getByTestId("inspector-page-panel");
     const ids = Array.from(panel.querySelectorAll('[data-testid^="inspector-section-"]'))
       .map((n) => n.getAttribute("data-testid"))
       .filter((id): id is string => /^inspector-section-[a-z-]+$/.test(id ?? ""));
     expect([...new Set(ids)]).toEqual([
-      "inspector-section-fill",
+      "inspector-section-background",
       "inspector-section-size",
       "inspector-section-typography",
       "inspector-section-spacing",
+      "inspector-section-page-settings",
     ]);
   });
 
-  it("each section shows the page's subset (Background · Max width · Font + Text colour)", () => {
+  it("each section shows the page's subset (Background › Color · Max width · Font + Text color — 2L9 S06)", () => {
     setup();
-    expect(within(screen.getByTestId("inspector-section-fill")).getByText("Background")).toBeInTheDocument();
+    expect(within(screen.getByTestId("inspector-section-background")).getByText("Color")).toBeInTheDocument();
     const size = screen.getByTestId("inspector-section-size");
     expect(within(size).getByText("Max width")).toBeInTheDocument();
     expect(within(size).queryByText("Width")).toBeNull();
     const type = screen.getByTestId("inspector-section-typography");
     expect(within(type).getByText("Font")).toBeInTheDocument();
-    expect(within(type).getByText("Text colour")).toBeInTheDocument();
+    expect(within(type).getByText("Text color")).toBeInTheDocument();
     expect(within(type).queryByText("Weight")).toBeNull();
   });
 
@@ -108,7 +113,7 @@ describe("PagePanel — board 21", () => {
 
   it("Fill is the one Background row — no More settings; Max width has no '0' placeholder", () => {
     setup();
-    const fill = screen.getByTestId("inspector-section-fill");
+    const fill = screen.getByTestId("inspector-section-background");
     expect(within(fill).queryByText(/More settings/)).toBeNull();
     const maxWidth = within(screen.getByTestId("inspector-section-size")).getByRole("textbox", { name: /max width/i });
     expect(maxWidth.getAttribute("placeholder") ?? "").toBe("");
@@ -123,13 +128,13 @@ describe("PagePanel — board 21", () => {
     }
   });
 
-  it("SEO & social opens the page's settings on SEO; the note says your place is kept", () => {
+  it("SEO and social opens the page's settings on SEO; the note says Appearance stays here (2L9 S06)", () => {
     const { composer, page } = setup();
     const emit = vi.spyOn(composer, "emit");
     fireEvent.click(screen.getByTestId("inspector-page-seo"));
     expect(emit).toHaveBeenCalledWith(EVENTS.UI_PAGES_OPEN_SETTINGS, { pageId: page.id, tab: "seo" });
-    expect(screen.getByTestId("inspector-page-seo")).toHaveTextContent("SEO & social");
-    expect(screen.getByTestId("inspector-page-note")).toHaveTextContent("Your place here is kept");
+    expect(screen.getByTestId("inspector-page-seo")).toHaveTextContent("SEO and social");
+    expect(screen.getByTestId("inspector-page-note")).toHaveTextContent("Opens Home’s Page settings. Appearance stays here.");
   });
 
   it("an edit writes the page root, one undo step", () => {
@@ -159,33 +164,33 @@ describe("PagePanel — board 21", () => {
 describe("PagePanel — template applied (board 1175:4841)", () => {
   const seed = (name: string, ts = Date.now()) => localStorage.setItem(KEY, JSON.stringify({ name, ts }));
 
-  it("shows the applied template's name over the page panel", () => {
+  it("2L9 S07: 'Template applied · The {name} template was applied to {page}.' over the page panel", () => {
     seed("Bistro Landing");
     setup();
-    expect(screen.getByText("Template applied!")).toBeInTheDocument();
-    expect(screen.getByText("Bistro Landing")).toBeInTheDocument();
+    expect(screen.getByText("Template applied")).toBeInTheDocument();
+    expect(screen.getByText("The Bistro Landing template was applied to Home.")).toBeInTheDocument();
     expect(screen.getByTestId("inspector-element-name")).toHaveTextContent("Home · Page");
   });
 
-  it("offers Set Brand Colors, routed to the design panel", () => {
+  it("Dismiss notice hides it and forgets it", () => {
     seed("Bistro Landing");
-    const { composer } = setup();
-    const emit = vi.spyOn(composer, "emit");
-    fireEvent.click(screen.getByRole("button", { name: /set brand colors/i }));
-    expect(emit).toHaveBeenCalledWith("ui:open-design-panel", {});
+    setup();
+    fireEvent.click(screen.getByTestId("inspector-template-dismiss"));
+    expect(screen.queryByTestId("inspector-template-applied")).toBeNull();
+    expect(localStorage.getItem(KEY)).toBeNull();
   });
 
   it("is gone once 30 minutes have passed, and the stale key is dropped", () => {
     seed("Bistro Landing", Date.now() - 31 * 60 * 1000);
     setup();
-    expect(screen.queryByText("Template applied!")).toBeNull();
+    expect(screen.queryByText("Template applied")).toBeNull();
     expect(localStorage.getItem(KEY)).toBeNull();
   });
 
   it("ignores a malformed stored value instead of throwing", () => {
     localStorage.setItem(KEY, "{not json");
     setup();
-    expect(screen.queryByText("Template applied!")).toBeNull();
+    expect(screen.queryByText("Template applied")).toBeNull();
     expect(localStorage.getItem(KEY)).toBeNull();
   });
 });

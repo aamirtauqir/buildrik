@@ -20,7 +20,6 @@ import type { Composer } from "@/engine";
 import { fetchReviewStatus, type ReviewStatus } from "@/services/ReviewService";
 import { EVENTS } from "@/shared/constants/events";
 import { Button } from "@/editor/chrome-ui";
-import type { HistoryView } from "../types";
 
 /* Board 162:2 draws the approval band as a full-bleed strip with a 3px success
    rail on its left, weight 400 — not a rounded tinted card with a bold title. */
@@ -158,34 +157,19 @@ export const SavesApproval: React.FC<{ composer: Composer | null }> = ({ compose
 };
 
 /**
- * The retention rule, under the list.
- *
- * TWO rules, because the two tabs retain different things and the note sat
- * under both saying only the first. Saves lists saved versions, which
- * survive a reload and prune oldest-first; Session lists the UNDO stack,
- * which is capped at `maxHistory` and is gone the moment the page reloads.
- * Board 163:2 — the session list — spells that out: "This session only — the
- * last 100 steps, cleared when you reload. Save a version to keep a point."
- * The panel printed the versions sentence there instead, which is not merely
- * off-board: it promises durability for a list that has none.
- *
- * Both caps are read off their manager rather than written into the copy, so
- * neither can go on claiming a number the config has moved past — and nothing
- * is said at all when no cap can be read, because a number invented here is a
- * claim about retention that nothing backs.
+ * The retention rule, under the Saves list: saved versions survive a reload
+ * and prune oldest-first. The cap is read off the version manager rather than
+ * written into the copy, and nothing is said when it cannot be read — a number
+ * invented here is a retention claim nothing backs. (Session drew its own
+ * undo-stack rule here until 2L9 H01, which gives that list no footer.)
  */
-export const SavesPruneNote: React.FC<{ composer: Composer | null; view: Extract<HistoryView, "session" | "saves"> }> = ({
-  composer,
-  view,
-}) => {
-  const cap = view === "session" ? composer?.history?.maxHistory : composer?.versions?.maxVersions;
+export const SavesPruneNote: React.FC<{ composer: Composer | null }> = ({ composer }) => {
+  const cap = composer?.versions?.maxVersions;
   if (typeof cap !== "number") return null;
   return (
     <div className={PRUNE_NOTE} data-testid="history-prune-note">
       <p className={PRUNE_NOTE_TEXT} data-testid="history-prune-note-text">
-        {view === "session"
-          ? `This session only — the last ${cap} steps, cleared when you reload. Save a version to keep a point.`
-          : `${cap} versions kept. Auto-saves prune oldest first; named ones never prune.`}
+        {`${cap} versions kept. Auto-saves prune oldest first; named ones never prune.`}
       </p>
     </div>
   );

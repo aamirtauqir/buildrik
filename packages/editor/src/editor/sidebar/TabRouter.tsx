@@ -43,7 +43,6 @@ function historyView(sub: string | undefined): "published" | "session" | undefin
 const BuildTab = React.lazy(() => import("./tabs/build").then((m) => ({ default: m.BuildTab })));
 const LayersTab = React.lazy(() => import("./tabs/layers/LayersTab"));
 const PagesTab = React.lazy(() => import("./tabs/pages/PagesTab"));
-const ComponentsTab = React.lazy(() => import("./tabs/ComponentsTab"));
 const MediaTab = React.lazy(() =>
   import("./tabs/media/MediaTab").then((m) => ({ default: m.MediaTab }))
 );
@@ -73,9 +72,6 @@ export interface TabRouterProps {
    *  mounted sidebar owns, consumed once by the tab it was meant for. */
   unpublishIntent?: boolean;
   onUnpublishIntentConsumed?: () => void;
-  /** Omitted where Components is never hosted (the inspector column): the
-   *  tab then hides its Create rows rather than offering a dead button. */
-  onCreateComponent?: () => void;
   projectId?: string | null;
   publishJob?: UsePublishJobResult;
   /** The site's ONE next move + the ONE publish door (B4) — see StudioPanels. */
@@ -126,7 +122,6 @@ export const TabRouter: React.FC<TabRouterProps> = ({
   onSwitchToTemplates,
   unpublishIntent,
   onUnpublishIntentConsumed,
-  onCreateComponent,
   projectId,
   publishJob,
   nextMove,
@@ -162,17 +157,6 @@ export const TabRouter: React.FC<TabRouterProps> = ({
           onRequestTemplates={onSwitchToTemplates}
           openSettingsRequest={pagesOpen}
         />
-      );
-
-    case "components":
-      /* One panel, both paths. There were two: ComponentsPanelV2 behind
-         VITE_FEATURE_COMPONENTS_V2, and this one when the flag was off. Only
-         the NEXT_PUBLIC_ half of a flag reaches production, and nothing ever
-         set it — so the port-5050 demo rendered V2 while every real user got
-         this, and only this one was ever built to board 641:2546. V2 and the
-         flag are deleted. */
-      return (
-        <ComponentsTab composer={composer} onCreateNew={onCreateComponent} {...commonTabProps} />
       );
 
     case "assets":

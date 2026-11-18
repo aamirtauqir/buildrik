@@ -8,7 +8,7 @@
 import { render, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import * as React from "react";
-import { LintSection, brandChecksCaption, contrastFixFor } from "../LintSection";
+import { LintSection, contrastFixFor } from "../LintSection";
 import { calcContrastRatio } from "@/engine/designSystem/colorMath";
 import type { LintIssue } from "@/engine/designSystem/linter";
 import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
@@ -38,19 +38,18 @@ describe("LintSection", () => {
     const { container, getByText } = render(<LintSection issues={[warn, err]} />);
     expect(container.querySelectorAll("li")).toHaveLength(2);
     expect(getByText("Banned hue — purple, violet or indigo")).toBeTruthy();
-    expect(getByText("brand/violet")).toBeTruthy();
-    // The engine's full sentence stays reachable on the row.
-    expect(container.querySelector('[title="Banned hue #7C3AED"]')).toBeTruthy();
+    // B6-B18: the row says what the finding says, under its label.
+    expect(container.querySelector('[title="Banned hue #7C3AED"]')?.textContent).toContain("Banned hue #7C3AED");
   });
 
   it("sorts errors above warnings", () => {
     const { container } = render(<LintSection issues={[warn, err]} />);
     const rows = Array.from(container.querySelectorAll("li"));
     expect(rows[0].textContent).toContain("Banned hue");
-    expect(rows[1].textContent).toContain("No dark variant");
+    expect(rows[1].textContent).toContain("Missing dark value");
   });
 
-  it("offers Fix only where the finding carries a hint, Open everywhere else", () => {
+  it("offers Fix only where the finding carries a hint; Open on every row", () => {
     const contrast: LintIssue = {
       rule: "contrast",
       severity: "warning",
@@ -72,11 +71,26 @@ describe("LintSection", () => {
     expect(document.body.textContent).not.toMatch(/Auto-fix isn't available yet/);
   });
 
-  it("captions the page with the count, and says when auto-fix is available", () => {
-    expect(brandChecksCaption([warn, err])).toBe("2 issues");
-    expect(brandChecksCaption([{ ...warn, autoFixHint: "contrast:#FFFFFF" }])).toBe("1 issue · auto-fix available");
-    // G3-123: ignored checks ride the caption (no "Warnings suppressed" pill).
-    expect(brandChecksCaption([warn], 3)).toBe("1 issue · 3 ignored");
+  it("Ignore hides a token's findings; 'Show ignored · N' lists them with Restore (B6-B18)", () => {
+    const onIgnore = vi.fn();
+    const onRestore = vi.fn();
+    const { getByTestId, queryByTestId } = render(
+      <LintSection
+        issues={[warn]}
+        onIgnore={onIgnore}
+        onRestore={onRestore}
+        ignored={[{ tokenId: "color-x", rule: "missing-dark", message: "Color token x has no dark value." }]}
+      />,
+    );
+    fireEvent.click(getByTestId("brand-check-ignore-brand/accent-soft"));
+    expect(onIgnore).toHaveBeenCalledWith("brand/accent-soft");
+    expect(queryByTestId("brand-checks-ignored-list")).toBeNull();
+    const toggle = getByTestId("brand-checks-show-ignored");
+    expect(toggle.textContent).toBe("Show ignored · 1");
+    fireEvent.click(toggle);
+    expect(getByTestId("brand-checks-ignored-list").textContent).toContain("Color token x has no dark value.");
+    fireEvent.click(getByTestId("brand-check-restore-color-x"));
+    expect(onRestore).toHaveBeenCalledWith("color-x");
   });
 
   it("keys rows by rule AND token so one token can hold two findings", () => {

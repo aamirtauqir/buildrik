@@ -14,12 +14,27 @@ import type { Composer } from "@/engine";
 import { Button, Tooltip, useToast } from "@/editor/chrome-ui";
 import { SaveVersionModal } from "./SaveVersionModal";
 
+const FooterWrap: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div className="fab-container" data-testid="saves-footer">
+    {children}
+  </div>
+);
+
 export const SaveVersionFooter: React.FC<{
   composer: Composer | null;
   /** FC-9 (fix-all 2026-09-25): set for a viewer — the footer disables and
    *  explains rather than disappearing. */
   disabledReason?: string;
-}> = ({ composer, disabledReason }) => {
+  /** "header": the button in the Saves filter row (2L9 B7-H04), labelled
+   *  "Save a version"; the footer (Session) keeps "+ Save a version". */
+  placement?: "footer" | "header";
+}> = ({ composer, disabledReason, placement = "footer" }) => {
+  const label = placement === "header" ? "Save a version" : "+ Save a version";
+  const buttonClass =
+    placement === "header"
+      ? "tw:h-6 tw:min-h-0 tw:px-2 tw:text-[12px] tw:leading-[18px] tw:font-normal"
+      : "tw:h-8 tw:min-h-0 tw:border-transparent tw:bg-transparent tw:px-1 tw:text-[13px] tw:leading-5 tw:font-normal tw:text-[var(--bk-accent-text)]";
+  const Wrap = placement === "header" ? React.Fragment : FooterWrap;
   const [open, setOpen] = React.useState(false);
   const { addToast, removeToast } = useToast();
 
@@ -43,7 +58,7 @@ export const SaveVersionFooter: React.FC<{
 
   return (
     <>
-      <div className="fab-container" data-testid="saves-footer">
+      <Wrap>
         {/* Board 162:2 writes this as a labelled link at the foot of the
             panel — "+ Save a version". It was a floating "+" circle with the
             label only in a tooltip, so the one action that creates a NAMED
@@ -58,9 +73,11 @@ export const SaveVersionFooter: React.FC<{
               aria-disabled="true"
               onClick={() => {}}
               data-testid="saves-save-version"
-              className="tw:h-8 tw:min-h-0 tw:border-transparent tw:bg-transparent tw:px-1 tw:text-[13px] tw:leading-5 tw:font-normal tw:text-[var(--bk-accent-text)]"
+              /* 2L9 H15: the unavailable action reads unavailable — grey
+                 fill, muted label — while keeping its reason on hover. */
+              className={`${buttonClass} tw:cursor-not-allowed tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-muted)] tw:hover:bg-[var(--bk-bg-subtle)]`}
             >
-              + Save a version
+              {label}
             </Button>
           </Tooltip>
         ) : (
@@ -70,12 +87,12 @@ export const SaveVersionFooter: React.FC<{
           size="xs"
           onClick={() => setOpen(true)}
           data-testid="saves-save-version"
-          className="tw:h-8 tw:min-h-0 tw:border-transparent tw:bg-transparent tw:px-1 tw:text-[13px] tw:leading-5 tw:font-normal tw:text-[var(--bk-accent-text)]"
+          className={buttonClass}
         >
-          + Save a version
+          {label}
         </Button>
         )}
-      </div>
+      </Wrap>
       <SaveVersionModal
         open={open}
         siteName={composer?.getProjectMetadata?.()?.name || "Untitled site"}

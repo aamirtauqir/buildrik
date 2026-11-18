@@ -245,7 +245,7 @@ describe("VersionHistoryPanel — restore flow", () => {
 });
 
 describe("VersionHistoryPanel — delete flow", () => {
-  it("clicking Delete opens row-inline confirm, confirming calls deleteVersion", async () => {
+  it("clicking Delete… opens the confirm (2L9 H07), confirming calls deleteVersion", async () => {
     mocks.state.versions = [makeVersion({ id: "v9", name: "To delete" })];
     mocks.deleteVersion.mockResolvedValue(undefined);
     const Panel = await loadPanel();
@@ -253,7 +253,9 @@ describe("VersionHistoryPanel — delete flow", () => {
 
     openSaveMenu("To delete");
     fireEvent.click(screen.getByLabelText('Delete "To delete"'));
-    const confirmBtn = await screen.findByLabelText("Confirm delete");
+    const confirmBtn = await screen.findByRole("button", { name: "Delete version" });
+    expect(screen.getByText("Delete “To delete”?")).toBeInTheDocument();
+    expect(screen.getByText("This version can’t be restored after it’s deleted.")).toBeInTheDocument();
     fireEvent.click(confirmBtn);
 
     await waitFor(() => {
@@ -292,7 +294,7 @@ describe("VersionHistoryPanel — save flow", () => {
     render(<Panel composer={makeComposer()} />);
 
     // FAB / save button has aria-label "Save version".
-    fireEvent.click(screen.getByRole("button", { name: "+ Save a version" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save a version" }));
 
     // The Save a version modal (board 4418:165661) opens with its name field.
     const input = await screen.findByLabelText("Version name");
@@ -475,5 +477,22 @@ describe("VersionHistoryPanel — FC-9 (fix-all 2026-09-25): readOnly disables w
 
     fireEvent.doubleClick(screen.getByText("Save A"));
     expect(screen.getByRole("textbox", { name: 'Rename "Save A"' })).toBeInTheDocument();
+  });
+});
+
+describe("VersionHistoryPanel — offline (2L9 B7-H15)", () => {
+  it("keeps the list, says server actions need a connection and when it was loaded, and disables Save a version", async () => {
+    Object.defineProperty(window.navigator, "onLine", { configurable: true, get: () => false });
+    try {
+      mocks.state.versions = [makeVersion({ id: "v1", name: "Before launch" })];
+      const Panel = await loadPanel();
+      render(<Panel composer={makeComposer()} />);
+      const note = await screen.findByTestId("saves-offline-note");
+      expect(note.textContent).toMatch(/^Needs a connection to save, restore or delete versions\. This list was loaded at \d{1,2}:\d{2}/);
+      expect(screen.getByText("Before launch")).toBeInTheDocument();
+      expect(screen.getByTestId("saves-save-version")).toHaveAttribute("aria-disabled", "true");
+    } finally {
+      Object.defineProperty(window.navigator, "onLine", { configurable: true, get: () => true });
+    }
   });
 });

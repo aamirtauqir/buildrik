@@ -17,6 +17,9 @@
  *     links; x3's own detectors)
  *   - non-passing pre-publish checks (`fetchPrePublishChecks`, verbatim
  *     server list — Publish panel's own SSOT, never re-implemented here)
+ *   - collection lists with no source (`unsourcedListIssues`) — read from
+ *     `composer.cms.bindings`, which the shared content detector cannot see
+ *     (Play F4.01 `303:32296`, REQUESTS A-35)
  *
  * `scanState`/`rescan` surface the content scanner's states only — DS-lint is
  * synchronous (an event, not a fetch) and the check list fails open (a fetch
@@ -32,6 +35,8 @@ import { CONTENT_CHECK_LABELS } from "@buildrik/shared/content/contentIssues";
 import { fetchPrePublishChecks } from "@/services/PublishService";
 import { EVENTS } from "@/shared/constants/events";
 import { useRefetchOnFocus } from "@/shared/hooks";
+import { isPageLive } from "@/engine/export";
+import type { ElementData } from "@/shared/types";
 import { useContentIssueScanner } from "./useContentIssueScanner";
 import type { Issue } from "./useStudioState";
 
@@ -60,6 +65,53 @@ export interface IssuesFeedTriggers {
   /** The Issues panel is open — opening it must never show a stale list. */
   panelOpen?: boolean;
 }
+
+/** Issue-id prefix of a collection list with no source; the rest is its element id. */
+const UNSOURCED_LIST_ISSUE = "cms:list-no-source:";
+
+/**
+ * Severity of a list with no source. The board (F4.01) draws it as a
+ * publishing blocker; whether a publish should refuse it is an open owner
+ * question (REQUESTS A-35) — an unsourced list exports empty today and the
+ * server does not refuse. Until that is answered it advises, so this hook
+ * does not shut a publish door the server keeps open.
+ */
+const UNSOURCED_LIST_SEVERITY: Issue["type"] = "warning";
+
+const kindLabel = (el: ElementData): string => {
+  const t = el.type && el.type !== "container" ? el.type : el.tagName?.toLowerCase() || "element";
+  return (el.content?.trim().slice(0, 40) || t.charAt(0).toUpperCase() + t.slice(1).replace(/-/g, " "));
+};
+
+/** Every `collection-list` on a live page with no collection bound to it. */
+function unsourcedListIssues(composer: Composer): Issue[] {
+  const out: Issue[] = [];
+  const walk = (el: ElementData | undefined, parent: ElementData | null, pageId: string, pageName: string) => {
+    if (!el) return;
+    if (el.type === "collection-list" && !composer.cms.bindings.hasCollectionBinding(el.id)) {
+      out.push({
+        id: `${UNSOURCED_LIST_ISSUE}${el.id}`,
+        type: UNSOURCED_LIST_SEVERITY,
+        message: "Collection list has no source",
+        location: parent ? `${pageName} › ${kindLabel(parent)}` : pageName,
+        elementId: el.id,
+        pageId,
+      });
+    }
+    el.children?.forEach((c) => walk(c, el, pageId, pageName));
+  };
+  for (const page of composer.elements.exportPages().filter(isPageLive)) walk(page.root, null, page.id, page.name);
+  return out;
+}
+
+const LIST_DEBOUNCE_MS = 300;
+const LIST_EVENTS = [
+  EVENTS.PROJECT_LOADED,
+  EVENTS.PROJECT_CHANGED,
+  EVENTS.ELEMENT_UPDATED,
+  EVENTS.CMS_COLLECTION_BOUND,
+  EVENTS.CMS_COLLECTION_UNBOUND,
+] as const;
 
 export function useIssuesFeed(
   composer: Composer | null,
@@ -92,6 +144,33 @@ export function useIssuesFeed(
     lint.on("lint:changed", sync);
     return () => {
       lint.off("lint:changed", sync);
+    };
+  }, [composer]);
+
+  const [listIssues, setListIssues] = React.useState<Issue[]>([]);
+  React.useEffect(() => {
+    if (!composer?.cms?.bindings) {
+      setListIssues([]);
+      return;
+    }
+    const sync = () => {
+      try {
+        setListIssues(unsourcedListIssues(composer));
+      } catch (e) {
+        console.error("[issues] collection-list scan failed", e);
+      }
+    };
+    sync();
+    /* Edits arrive per keystroke; one walk per burst, as the content scanner. */
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const later = () => {
+      clearTimeout(timer);
+      timer = setTimeout(sync, LIST_DEBOUNCE_MS);
+    };
+    LIST_EVENTS.forEach((e) => composer.on(e, later));
+    return () => {
+      clearTimeout(timer);
+      LIST_EVENTS.forEach((e) => composer.off(e, later));
     };
   }, [composer]);
 
@@ -159,8 +238,8 @@ export function useIssuesFeed(
   useRefetchOnFocus(refetchChecks);
 
   React.useEffect(() => {
-    setIssues([...lintIssues, ...content.issues, ...checkIssues]);
-  }, [lintIssues, content.issues, checkIssues, setIssues]);
+    setIssues([...lintIssues, ...content.issues, ...listIssues, ...checkIssues]);
+  }, [lintIssues, content.issues, listIssues, checkIssues, setIssues]);
 
   const rescan = React.useCallback(() => {
     content.rescan();

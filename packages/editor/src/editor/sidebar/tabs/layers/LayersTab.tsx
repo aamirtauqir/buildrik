@@ -8,7 +8,7 @@
  */
 
 import * as React from "react";
-import { Button, IconButton, Menu, MenuItem, MenuSeparator, PanelFrame, PanelSearch, Popover, Tooltip, isPanelSearchInput } from "@/editor/chrome-ui";
+import { Button, IconButton, Menu, MenuItem, MenuSeparator, PanelFrame, PanelSearch, Popover, isPanelSearchInput } from "@/editor/chrome-ui";
 import { useComposerSelection } from "@/editor/canvas/hooks/useComposerSelection";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
@@ -68,26 +68,39 @@ export interface LayersTabProps {
   isOpen?: boolean;
 }
 
-const LAYERS_SEARCH_PLACEHOLDER = "Search layers…";
-const DIM_SCOPE_TIP =
-  "Dimming fades a layer in the editor only — it still publishes. To hide it on the site, use Visibility in the inspector.";
-/* The footer's ⓘ: a 20 square ghost at the right edge of the 32 band. */
-const DIM_INFO_BTN = "tw:size-5 tw:min-h-0 tw:p-0 tw:text-[var(--bk-ink-muted)]";
-/* Select · Select all · Deselect all · Done — text actions in the 32 band,
+/* design-2l9 147:75914 / 152:79448 draw no ellipsis. */
+const LAYERS_SEARCH_PLACEHOLDER = "Search layers";
+
+const count = (n: number) => n.toLocaleString("en-US");
+
+/** The count band — boards 147:75914 ("8 layers · 1 selected"), 152:78614
+ *  ("… · 1 selected inside Hero"), 147:77189 ("5,000 layers · 12 matches"),
+ *  147:79328 ("5,000 layers · No matches") and the selected layer's state,
+ *  147:77668 / 147:78900 ("… · Locked by Hero", "… · Dimmed"). Selection mode keeps its
+ *  own "N selected" (it shares the band with Select all · Done). */
+export function layersFooterText(
+  stats: { total: number; selected: number; matches: number | null; hiddenIn?: string | null; selectionState?: string | null },
+  search: string,
+  selecting: boolean,
+): string {
+  const layers = `${count(stats.total)} layer${stats.total === 1 ? "" : "s"}`;
+  if (stats.matches !== null && search) {
+    return `${layers} · ${stats.matches === 0 ? "No matches" : `${count(stats.matches)} match${stats.matches === 1 ? "" : "es"}`}`;
+  }
+  if (selecting && stats.selected > 0) return `${count(stats.selected)} selected`;
+  return `${layers} · ${count(stats.selected)} selected${stats.hiddenIn ? ` inside ${stats.hiddenIn}` : ""}${
+    stats.selectionState ? ` · ${stats.selectionState}` : ""
+  }`;
+}
+/* Select all · Deselect all · Done — text actions in the 32 band,
    12px so they sit one step above the 11px count they qualify. */
 const SELECT_BTN = "tw:min-h-0 tw:h-6 tw:p-0 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:font-medium";
 
 /* Escape deselects, then closes the drawer (owner ruling 2026-09-24) — but a key meant for
    something else is not ours: a rename field or any other text field, an
-   open menu or dialog, or focus on the canvas (where Escape deselects).
-   Inspector "Pick on canvas" is also not ours: cancelling it should leave the
-   selection you started from alone. Live walk (2026-09-25) confirmed this is
-   a window-CAPTURE listener that races Canvas.tsx's own document-bubble pick
-   handler and always wins, so without this check a single Escape both
-   cancelled the pick AND cleared the selection out from under it. */
+   open menu or dialog, or focus on the canvas (where Escape deselects). */
 function escapeIsOurs(e: KeyboardEvent): boolean {
   if (document.querySelector('[role="menu"], [role="dialog"], [role="alertdialog"]')) return false;
-  if (document.querySelector('[data-bk-pick="true"]')) return false;
   const t = e.target instanceof HTMLElement ? e.target : null;
   if (!t || t === document.body) return true;
   /* The panel's own filter: the first Escape empties it, the next closes. */
@@ -148,19 +161,27 @@ export const LayersTab: React.FC<LayersTabProps> = ({
   /* Raised by the tree boundary so the count footer, which is its sibling,
      can stand down with it. */
   const [treeFailed, setTreeFailed] = React.useState(false);
-  const [stats, setStats] = React.useState<{ total: number; selected: number; matches: number | null }>({
+  const [stats, setStats] = React.useState<{ total: number; selected: number; matches: number | null; hiddenIn?: string | null; selectionState?: string | null }>({
     total: 0,
     selected: 0,
     matches: null,
   });
 
-  // Subscribe to stats event from LayersPanel
-  React.useEffect(() => {
+  /* Empty only once the tree has reported a count of 0 (101:42581) — before
+     its first report the count is unknown, not zero. */
+  const [pageEmpty, setPageEmpty] = React.useState(false);
+
+  /* Subscribe to stats event from LayersPanel — in a LAYOUT effect: the panel
+     is a child and emits from its own passive effect on mount, which runs
+     before this component's passive effects, so a plain useEffect missed the
+     first count (an empty page then never reported its 0). */
+  React.useLayoutEffect(() => {
     if (!composer) return;
     const onStats = (data: unknown) => {
-      const d = data as { total: number; selected: number; matches?: number | null };
+      const d = data as { total: number; selected: number; matches?: number | null; hiddenIn?: string | null; selectionState?: string | null };
       if (typeof d?.total === "number" && typeof d?.selected === "number") {
-        setStats({ total: d.total, selected: d.selected, matches: d.matches ?? null });
+        setStats({ total: d.total, selected: d.selected, matches: d.matches ?? null, hiddenIn: d.hiddenIn ?? null, selectionState: d.selectionState ?? null });
+        setPageEmpty(d.total === 0);
       }
     };
     composer.on("layers:stats-change", onStats);
@@ -218,10 +239,11 @@ export const LayersTab: React.FC<LayersTabProps> = ({
       {/* Board 142:2 — header is the bare 16:6 Panel header; the ⋯ panel menu
           (7059:78962) rides in its actions slot — `actions`, not children,
           which PanelHeader drops. The count lives in the footer. */}
+      {/* Every 2L9 Layers board (147:75914, 152:78185, 7:19791…) heads the
+          panel with the ⋯ alone — no ✕. The rail icon and Escape close it. */}
       <PanelFrame.Header
         title="Layers"
         onHelpClick={onHelpClick}
-        onClose={onClose}
         actions={
           <Popover
             open={menuOpen}
@@ -240,30 +262,66 @@ export const LayersTab: React.FC<LayersTabProps> = ({
               </IconButton>
             }
           >
-            <Menu label="Layers options">
+            {/* 152:78185 draws the menu the panel's width (268 inside it). */}
+            <Menu label="Layers options" className="tw:w-[252px]">
               <MenuItem data-testid="layers-expand-all" onClick={runMenu(() => composer?.emit("layers:expand-all", {}))}>
                 Expand all
               </MenuItem>
               <MenuItem data-testid="layers-collapse-all" onClick={runMenu(() => composer?.emit("layers:collapse-all", {}))}>
                 Collapse all
               </MenuItem>
-              <MenuSeparator />
+              {/* Board 152:78185: fold everything but the selection's path,
+                  and the door into selection mode. */}
               <MenuItem
-                data-testid="layers-display-settings-toggle"
-                onClick={runMenu(() => setDisplaySettingsOpen((v) => !v))}
+                data-testid="layers-collapse-to-selection"
+                disabled={stats.selected === 0}
+                onClick={runMenu(() => composer?.emit(EVENTS.LAYERS_COLLAPSE_TO_SELECTION, {}))}
               >
-                Display settings…
+                Collapse to selection
+              </MenuItem>
+              <MenuItem data-testid="layers-menu-select-mode" onClick={runMenu(() => setSelecting(true))}>
+                Select mode
               </MenuItem>
               {onExpandToggle && (
-                <MenuItem data-testid="layers-wide-view" onClick={runMenu(onExpandToggle)}>
-                  {isExpanded ? "Narrow panel" : "Widen panel"}
-                </MenuItem>
+                <>
+                  <MenuSeparator />
+                  <MenuItem data-testid="layers-wide-view" onClick={runMenu(onExpandToggle)}>
+                    {isExpanded ? "Narrow panel" : "Widen panel"}
+                  </MenuItem>
+                </>
               )}
+              {/* 152:78185 ends the menu with "Close menu". */}
+              <MenuItem data-testid="layers-menu-close" onClick={() => setMenuOpen(false)}>
+                Close menu
+              </MenuItem>
             </Menu>
           </Popover>
         }
       />
-      <PanelSearch placeholder={LAYERS_SEARCH_PLACEHOLDER} value={search} onChange={setSearch} data-testid="layers-search" />
+      {/* design-2l9 147:75914 / 147:76329: the search, and "View" beside it
+          opening the personal display settings. */}
+      <div className="tw:flex tw:items-center tw:pr-2">
+        <div className="tw:min-w-0 tw:flex-1">
+          <PanelSearch placeholder={LAYERS_SEARCH_PLACEHOLDER} value={search} onChange={setSearch} data-testid="layers-search" />
+        </div>
+        {/* 101:42581: an empty page has nothing to display — no View. */}
+        {!pageEmpty && (
+        <Button
+          type="button"
+          color="light"
+          size="xs"
+          aria-expanded={displaySettingsOpen}
+          data-testid="layers-view-toggle"
+          /* The panel closes on an outside mousedown; this control toggles it
+             itself, so its own mousedown must not count as outside. */
+          onMouseDown={(e) => e.stopPropagation()}
+          className="tw:h-8 tw:flex-none tw:border-transparent tw:bg-transparent tw:px-2 tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink)] tw:focus:ring-0"
+          onClick={() => setDisplaySettingsOpen((v) => !v)}
+        >
+          View
+        </Button>
+        )}
+      </div>
       <div className="bdc-pbody bdc-pbody-scroll">
         {/* `composer` alone is not "ready": useComposerInit sets it
             synchronously in the effect body, before the site fetch even
@@ -293,24 +351,17 @@ export const LayersTab: React.FC<LayersTabProps> = ({
       {/* Board 142:58 Count footer — the node count lives here, not in the
           header subtitle; the header stays a bare label. Gone when the tree
           failed (781:4217), because a count of a list that did not load is
-          not a fact. */}
-      {!treeFailed && (
+          not a fact — nor on an empty page (101:42581 draws none). */}
+      {!treeFailed && !pageEmpty && (
         <div className="bdc-lcount" data-testid="layers-count" aria-live="polite">
           {/* The span is the board's own second node (142:59 inside 142:58):
               the band carries the height, the run carries the type. */}
           <span data-testid="layers-count-text" className="tw:min-w-0 tw:truncate">
-            {stats.matches !== null && search
-              ? `${stats.matches} of ${stats.total} layers match “${search}”`
-              : selecting && stats.selected > 0
-                ? `${stats.selected} selected`
-                : stats.selected >= 2
-                  ? `${stats.selected} selected of ${stats.total}`
-                  : `${stats.total} layer${stats.total === 1 ? "" : "s"}`}
+            {layersFooterText(stats, search, selecting)}
           </span>
-          {/* Select (owner decision 2026-10-03): the door into selection mode,
-              beside the count it changes. In the mode: Select all while any
-              row is unticked, Deselect all while any is ticked (both when
-              some are), and Done to leave. */}
+          {/* Selection mode (entered from ⋯ › Select mode — design-2l9
+              147:75914 draws the count alone): Select all while any row is
+              unticked, Deselect all while any is ticked, Done to leave. */}
           <span className="tw:ml-3 tw:flex tw:flex-none tw:items-center tw:gap-3">
             {selecting ? (
               <>
@@ -340,35 +391,8 @@ export const LayersTab: React.FC<LayersTabProps> = ({
                   Done
                 </Button>
               </>
-            ) : (
-              <Button
-                variant="link"
-                size="xs"
-                className={SELECT_BTN}
-                data-testid="layers-select-mode"
-                onClick={() => setSelecting(true)}
-              >
-                Select
-              </Button>
-            )}
+            ) : null}
           </span>
-          {/* 4418:79546 "ⓘ · dim scope": what the row eye does — the canvas
-              dims the element for you; the published site still shows it.
-              Stood down in selection mode, where the band needs its width
-              for "N selected · Select all · Deselect all · Done" (measured
-              live: Done ended flush against it, 0px apart) and dimming is not the subject. */}
-          {!selecting && (
-            <span className="tw:ml-auto tw:flex">
-              <Tooltip content={DIM_SCOPE_TIP} placement="top" arrow={false} className="tw:max-w-60 tw:whitespace-normal">
-                <IconButton label="About dimmed layers" data-testid="layers-dim-info" className={DIM_INFO_BTN}>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M12 16v-4M12 8h.01" />
-                  </svg>
-                </IconButton>
-              </Tooltip>
-            </span>
-          )}
         </div>
       )}
     </PanelFrame>

@@ -13,7 +13,8 @@ import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
 import type { SiteVariable } from "@/shared/types/project";
-import type { ConditionBinding, ConditionExpression, DataSource } from "@/shared/types/data";
+import type { DataSource } from "@/shared/types/data";
+import { CMS_CONDITION_OP_LABEL, OPS_WITH_VALUE, type CmsCondition } from "@buildrik/shared/schemas/cmsConditions";
 import {
   consumeDirectSync,
   isCmsConflictPending,
@@ -29,14 +30,18 @@ import {
 
 export type ContentView =
   | { kind: "root" }
-  | { kind: "sources" }
-  | { kind: "variables" }
-  | { kind: "conditions" };
+  | { kind: "sources" };
 
+/** One element condition in the site-wide index (176:21830): where it is,
+ *  and whether it is active or a legacy rule waiting for review. */
 export interface ConditionRow {
   elementId: string;
+  pageId: string | null;
+  /** "Blog post › Heading" */
   label: string;
-  binding: ConditionBinding;
+  state: "active" | "legacy";
+  /** Active: the rule ("opening_hours.sunday is set"). */
+  summary: string;
 }
 
 export interface SaveRecordResult {
@@ -68,8 +73,6 @@ export interface UseContentPanelReturn {
   addField: (collectionId: string, field: Omit<CMSField, "id" | "order">) => Promise<void>;
   deleteField: (collectionId: string, fieldId: string) => Promise<void>;
   setVariables: (vars: SiteVariable[]) => void;
-  removeCondition: (elementId: string) => void;
-  addCondition: (elementId: string, expr: ConditionExpression) => void;
 }
 
 /** Board 151:87 names the row after the element itself — "Happy hour banner",
@@ -78,11 +81,28 @@ export interface UseContentPanelReturn {
  *  about the thing being hidden, and it pushed the words that identify it
  *  towards the truncation. The type is still the whole label when the element
  *  carries no text of its own, which is the case the prefix was there for. */
-function elementLabel(composer: Composer, id: string): string {
-  const el = composer.elements.getElement(id);
-  if (!el) return id;
-  const content = (el.getContent?.() ?? "").replace(/<[^>]*>/g, "").trim().slice(0, 24);
-  return content || el.getType?.() || "element";
+/** The page that holds an element: walk up to a page root. */
+function pageOf(composer: Composer, id: string): { id: string; name: string } | null {
+  const roots = new Map(composer.elements.getAllPages().map((p) => [p.root.id, p]));
+  let el = composer.elements.getElement(id);
+  while (el) {
+    const page = roots.get(el.getId());
+    if (page) return { id: page.id, name: page.name };
+    el = el.getParent?.() ?? undefined;
+  }
+  return null;
+}
+
+/** The element as the board names it: its kind ("Heading"), not its text. */
+function elementKind(composer: Composer, id: string): string {
+  const type = composer.elements.getElement(id)?.getType?.() ?? "element";
+  return type.charAt(0).toUpperCase() + type.slice(1);
+}
+
+function cmsConditionSummary(condition: CmsCondition): string {
+  return condition.rules
+    .map((r) => [r.field, CMS_CONDITION_OP_LABEL[r.op], OPS_WITH_VALUE.has(r.op) ? r.value : ""].filter(Boolean).join(" "))
+    .join(condition.match === "all" ? " and " : " or ");
 }
 
 export function useContentPanel(composer: Composer | null): UseContentPanelReturn {
@@ -116,21 +136,25 @@ export function useContentPanel(composer: Composer | null): UseContentPanelRetur
     [composer],
   );
 
+  /* Every element condition on the site (176:21830): the element's own
+     condition (Inspector › Content › Conditions), else a legacy condition
+     binding that is inactive until reviewed there. */
   const scanConditions = React.useCallback((): ConditionRow[] => {
     if (!composer) return [];
     const rows: ConditionRow[] = [];
     for (const el of composer.elements.getAllElements()) {
-      const bindings = el.getDataBindings?.();
-      if (!bindings) continue;
-      for (const binding of Object.values(bindings)) {
-        if (binding?.type === "condition") {
-          rows.push({
-            elementId: el.getId(),
-            label: elementLabel(composer, el.getId()),
-            binding: binding as ConditionBinding,
-          });
-        }
-      }
+      const id = el.getId();
+      const condition = composer.cms?.bindings?.getCondition?.(id) ?? null;
+      const legacy = Object.values(el.getDataBindings?.() ?? {}).some((b) => b?.type === "condition");
+      if (!condition && !legacy) continue;
+      const page = pageOf(composer, id);
+      rows.push({
+        elementId: id,
+        pageId: page?.id ?? null,
+        label: `${page?.name ?? "Page"} › ${elementKind(composer, id)}`,
+        state: condition ? "active" : "legacy",
+        summary: condition ? cmsConditionSummary(condition) : "",
+      });
     }
     return rows;
   }, [composer]);
@@ -291,6 +315,31 @@ export function useContentPanel(composer: Composer | null): UseContentPanelRetur
     [composer, reload],
   );
 
+  /* Two readers hold this hook (the drawer and the CMS workspace's Site
+     variables page, B5-V01); a write through either lands in the project,
+     so each re-reads it there. */
+  React.useEffect(() => {
+    if (!composer) return;
+    const sync = () => {
+      const vars = composer.getProjectSettings()?.siteVariables;
+      if (vars) setVariablesState((prev) => (prev === vars ? prev : vars));
+    };
+    composer.on(EVENTS.PROJECT_CHANGED, sync);
+    return () => {
+      composer.off(EVENTS.PROJECT_CHANGED, sync);
+    };
+  }, [composer]);
+
+  /* The conditions index follows edits made in the Inspector. */
+  React.useEffect(() => {
+    if (!composer) return;
+    const rescan = () => setConditions(scanConditions());
+    composer.on(EVENTS.CMS_CONDITION_CHANGED, rescan);
+    return () => {
+      composer.off(EVENTS.CMS_CONDITION_CHANGED, rescan);
+    };
+  }, [composer, scanConditions]);
+
   const setVariables = React.useCallback(
     (vars: SiteVariable[]) => {
       setVariablesState(vars);
@@ -301,30 +350,6 @@ export function useContentPanel(composer: Composer | null): UseContentPanelRetur
     [composer, registerSiteSource],
   );
 
-  const removeCondition = React.useCallback(
-    (elementId: string) => {
-      if (!composer) return;
-      const el = composer.elements.getElement(elementId);
-      if (!el) return;
-      const bindings = el.getDataBindings?.() ?? {};
-      for (const [prop, binding] of Object.entries(bindings)) {
-        if (binding?.type === "condition") el.removeDataBinding(prop);
-      }
-      setConditions(scanConditions());
-    },
-    [composer, scanConditions],
-  );
-
-  const addCondition = React.useCallback(
-    (elementId: string, expr: ConditionExpression) => {
-      if (!composer) return;
-      const el = composer.elements.getElement(elementId);
-      if (!el) return;
-      composer.data.bindCondition(el, expr);
-      setConditions(scanConditions());
-    },
-    [composer, scanConditions],
-  );
 
   return {
     view,
@@ -342,7 +367,5 @@ export function useContentPanel(composer: Composer | null): UseContentPanelRetur
     addField,
     deleteField,
     setVariables,
-    removeCondition,
-    addCondition,
   };
 }

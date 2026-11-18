@@ -10,11 +10,12 @@
 import * as React from "react";
 import { Section, SelectRow, TextInputRow } from "@/editor/inspector/shared/controls";
 import type { BaseStyleSectionProps } from "../registry/_shared";
+import { GROUP_TITLE } from "@/editor/inspector/shared/controls/controlClasses";
 
 const CURSORS = [
   { value: "auto", label: "Auto" },
   { value: "default", label: "Default" },
-  { value: "pointer", label: "Pointer (hand)" },
+  { value: "pointer", label: "Pointer" },
   { value: "move", label: "Move" },
   { value: "text", label: "Text" },
   { value: "wait", label: "Wait" },
@@ -40,19 +41,15 @@ const BLENDS = [
   { value: "exclusion", label: "Exclusion" },
 ];
 
-const WILL_CHANGE = [
-  { value: "auto", label: "Auto" },
-  { value: "transform", label: "Transform" },
-  { value: "opacity", label: "Opacity" },
-  { value: "scroll-position", label: "Scroll" },
-  { value: "contents", label: "Contents" },
-];
-
+/* 2L9 A09 247:25554: Cursor · Blend mode · Will change (as written, a list
+   like "transform, opacity"), then Text shadow as its exact authored CSS. */
 export const EffectsAdvancedSection: React.FC<BaseStyleSectionProps> = ({ styles, onChange, isOpen, onToggle }) => (
-  <Section title="Advanced" isOpen={isOpen} onToggle={onToggle} id="inspector-section-effects-advanced">
+  <Section title="Advanced effects" isOpen={isOpen} onToggle={onToggle} id="inspector-section-effects-advanced">
     <SelectRow label="Cursor" property="cursor" value={styles.cursor || ""} options={CURSORS} onChange={(v) => onChange("cursor", v)} />
-    <SelectRow label="Blend" property="mix-blend-mode" value={styles["mix-blend-mode"] || ""} options={BLENDS} onChange={(v) => onChange("mix-blend-mode", v)} />
-    <TextInputRow label="Text shadow" placeholder="2px 2px 4px rgba(0,0,0,0.3)" value={styles["text-shadow"] || ""} onChange={(v) => onChange("text-shadow", v)} />
-    <SelectRow label="Will change" property="will-change" value={styles["will-change"] || ""} options={WILL_CHANGE} onChange={(v) => onChange("will-change", v)} />
+    <SelectRow label="Blend mode" property="mix-blend-mode" value={styles["mix-blend-mode"] || ""} options={BLENDS} onChange={(v) => onChange("mix-blend-mode", v)} />
+    <TextInputRow label="Will change" property="will-change" placeholder="auto" value={styles["will-change"] || ""} onChange={(v) => onChange("will-change", v)} />
+    <div className={GROUP_TITLE}>Text shadow</div>
+    <TextInputRow label="Custom CSS" property="text-shadow" placeholder="0 1px 2px rgb(0 0 0 / 12%)" value={styles["text-shadow"] || ""} onChange={(v) => onChange("text-shadow", v)} />
+    <p className="tw:m-0 tw:py-2 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]">Exact authored expression is preserved.</p>
   </Section>
 );

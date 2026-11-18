@@ -1,7 +1,6 @@
 /**
- * SizeSection — Width / Height as Fixed · Fill · Hug with readouts (board 1:
- * "Width · Fill [640 px]", "Height [Hug · Auto]"), no object-fit (→ Image
- * block), the item controls under a flex / grid parent, and the Page panel's
+ * SizeSection — "Width mode" / "Height mode" (Fixed · Fill · Hug · Auto) and
+ * the value while Fixed (2L9 161:8940), an image's Fit (2L9 36:2), the item controls under a flex / grid parent, and the Page panel's
  * one Max width row (board 21).
  *
  * @license BSD-3-Clause
@@ -36,37 +35,41 @@ describe("constraint helpers", () => {
   });
 });
 
-describe("SizeSection — board 1's readouts", () => {
-  it("unset: Width · Fill with the measured px, Height reads Hug · Auto", () => {
-    const node = document.createElement("div");
-    node.setAttribute("data-buildrick-id", "el-1");
-    Object.defineProperty(node, "offsetWidth", { value: 640 });
-    Object.defineProperty(node, "offsetHeight", { value: 40 });
-    document.body.appendChild(node);
-    renderSize({ elementId: "el-1" });
-    expect(within(row("width")).getByRole("button", { name: "Width sizing: Fill" })).toHaveTextContent("Width · Fill");
-    expect(within(row("width")).getByLabelText("Width")).toHaveValue("640");
-    expect(within(row("height")).getByRole("button", { name: "Height sizing: Hug" })).toHaveTextContent(/^Height$/);
-    expect(within(row("height")).getByLabelText("Height sizing", { selector: "select" })).toHaveDisplayValue("Hug · Auto");
+describe("SizeSection — 2L9 161:8940: '{Axis} mode', then the value while Fixed", () => {
+  const mode = (axis: "width" | "height") => within(row(axis)).getByLabelText(axis === "width" ? "Width mode" : "Height mode") as HTMLSelectElement;
+
+  it("unset: Width mode Fill, Height mode Hug · Auto, no number rows", () => {
+    renderSize({});
+    expect(mode("width").selectedOptions[0].textContent).toBe("Fill");
+    expect(mode("height").selectedOptions[0].textContent).toBe("Hug · Auto");
+    expect(within(row("width")).queryByLabelText("Width")).toBeNull();
   });
 
-  it("Fill's number is a readout: leaving it untouched writes nothing, typing makes it Fixed", () => {
-    const node = document.createElement("div");
-    node.setAttribute("data-buildrick-id", "el-1");
-    Object.defineProperty(node, "offsetWidth", { value: 640 });
-    document.body.appendChild(node);
-    const { onChange } = renderSize({ elementId: "el-1", styles: { width: "100%" } });
-    const input = within(row("width")).getByLabelText("Width");
-    fireEvent.blur(input);
-    expect(onChange).not.toHaveBeenCalled();
-    fireEvent.change(input, { target: { value: "480" } });
-    expect(onChange).toHaveBeenCalledWith("width", "480px");
+  it("a fixed width reads Width mode Fixed and Width with its value", () => {
+    renderSize({ styles: { width: "320px" } });
+    expect(mode("width").value).toBe("fixed");
+    expect(within(row("width")).getByLabelText("Width")).toHaveValue("320");
   });
 
-  // Regression: the canvas re-creates the node on the first selection after
-  // load; the readout stayed on the detached node, Fill read "100 %" and a
-  // typed 700 was written as 700% (QA 2026-10-02).
-  it("follows the canvas node when it is replaced, so Fill keeps its px readout", async () => {
+  it("the mode select switches Fixed · Fill · Hug", () => {
+    const { onChange } = renderSize({ styles: { width: "320px" } });
+    fireEvent.change(mode("width"), { target: { value: "fill" } });
+    expect(onChange).toHaveBeenCalledWith("width", "100%");
+  });
+
+  it("switching to Fixed starts at the measured size", () => {
+    const node = document.createElement("div");
+    node.setAttribute("data-buildrick-id", "el-1");
+    Object.defineProperty(node, "offsetHeight", { value: 48 });
+    document.body.appendChild(node);
+    const { onChange } = renderSize({ elementId: "el-1" });
+    fireEvent.change(mode("height"), { target: { value: "fixed" } });
+    expect(onChange).toHaveBeenCalledWith("height", "48px");
+  });
+
+  // Regression (QA 2026-10-02): the canvas re-creates the node on the first
+  // selection after load — the measurement follows the new node.
+  it("follows the canvas node when it is replaced, so Fixed starts at its size", async () => {
     const make = (w: number) => {
       const n = document.createElement("div");
       n.setAttribute("data-buildrick-id", "el-1");
@@ -81,40 +84,22 @@ describe("SizeSection — board 1's readouts", () => {
       first.replaceWith(second);
       await new Promise((r) => setTimeout(r, 0));
     });
-    const input = within(row("width")).getByLabelText("Width");
-    expect(input).toHaveValue("920");
-    fireEvent.change(input, { target: { value: "700" } });
-    expect(onChange).toHaveBeenCalledWith("width", "700px");
-  });
-
-  it("a fixed width reads Width · Fixed with its value", () => {
-    renderSize({ styles: { width: "320px" } });
-    expect(within(row("width")).getByRole("button", { name: "Width sizing: Fixed" })).toBeInTheDocument();
-    expect(within(row("width")).getByLabelText("Width")).toHaveValue("320");
-  });
-
-  it("the mode menu switches Fixed · Fill · Hug", () => {
-    const { onChange } = renderSize({ styles: { width: "320px" } });
-    fireEvent.click(within(row("width")).getByRole("button", { name: "Width sizing: Fixed" }));
-    fireEvent.click(screen.getByTestId("inspector-size-width-mode-fill"));
-    expect(onChange).toHaveBeenCalledWith("width", "100%");
-  });
-
-  it("the Hug select switches the height to Fixed at the measured size", () => {
-    const node = document.createElement("div");
-    node.setAttribute("data-buildrick-id", "el-1");
-    Object.defineProperty(node, "offsetHeight", { value: 48 });
-    document.body.appendChild(node);
-    const { onChange } = renderSize({ elementId: "el-1" });
-    fireEvent.change(within(row("height")).getByLabelText("Height sizing", { selector: "select" }), { target: { value: "fixed" } });
-    expect(onChange).toHaveBeenCalledWith("height", "48px");
+    fireEvent.change(mode("width"), { target: { value: "fixed" } });
+    expect(onChange).toHaveBeenCalledWith("width", "920px");
   });
 });
 
 describe("SizeSection — what moved in and out", () => {
-  it("has no object-fit (the Image block owns it)", () => {
+  it("no Fit row unless the element is an image", () => {
     renderSize({ styles: { "object-fit": "cover" }, advancedExpanded: true, onAdvancedToggle: vi.fn() });
-    expect(screen.queryByLabelText(/object fit/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole("radio", { name: "Cover" })).not.toBeInTheDocument();
+  });
+
+  it("an image's Fit (2L9 36:2: fit and dimensions are in Style) writes object-fit through the style path", () => {
+    const { onChange } = renderSize({ styles: { "object-fit": "cover" }, fit: true });
+    expect(screen.getByRole("radio", { name: "Cover" })).toHaveAttribute("aria-checked", "true");
+    fireEvent.click(screen.getByRole("radio", { name: "Contain" }));
+    expect(onChange).toHaveBeenCalledWith("object-fit", "contain");
   });
 
   it("min / max wait behind More settings", () => {
@@ -135,13 +120,7 @@ describe("SizeSection — what moved in and out", () => {
     expect(screen.getByLabelText("Max width")).toHaveValue("100");
   });
 
-  it("under a flex parent it carries Grow and Align self", () => {
-    renderSize({ parentLayout: "flex" });
-    expect(screen.getByLabelText("Grow")).toBeInTheDocument();
-    expect(screen.getByLabelText("Align self")).toBeInTheDocument();
-  });
-
-  it("with no flex / grid parent, no item controls", () => {
+  it("carries no item controls — a flex / grid child has its own section (2L9 247:22853)", () => {
     renderSize();
     expect(screen.queryByLabelText("Grow")).not.toBeInTheDocument();
     expect(screen.queryByLabelText("Column span")).not.toBeInTheDocument();

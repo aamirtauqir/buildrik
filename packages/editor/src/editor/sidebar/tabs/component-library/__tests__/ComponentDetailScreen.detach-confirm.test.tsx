@@ -61,6 +61,8 @@ function makeComposer() {
       getInstancesOfComponent: () => [{ elementId: "e1" }, { elementId: "e2" }, { elementId: "e3" }],
       detachInstance,
       updateComponent,
+      snapshotComponent: () => ({ component: { id: "c1" }, instances: [{ elementId: "e1" }, { elementId: "e2" }, { elementId: "e3" }] }),
+      relinkInstances: vi.fn(() => 3),
     },
   } as unknown as Composer;
   return { composer, detachInstance, updateComponent, setActivePage, select };
@@ -74,44 +76,36 @@ const renderMaster = (composer: Composer) =>
   );
 
 describe("ComponentDetailScreen — master screen (4418:142876)", () => {
-  it("draws the scope block with the real instance count and site name", () => {
+  /* 2L9 215:47035 — the summary pane: name 16/600, scope chip, "Used in … ›",
+     then Insert, Update from selection… and More actions ⋯. */
+  it("draws the summary pane with the real instance count", () => {
     renderMaster(makeComposer().composer);
-    expect(screen.getByText(/^Master component ·/).textContent).toBe("Master component · Menu card");
-    expect(screen.getByTestId("component-linked").textContent).toBe(
-      "3 linked instances on Bella Cucina. Updating this master affects those instances. Inserting adds one instance.",
-    );
-    expect(screen.getByTestId("component-insert").textContent).toBe("Insert from saved components");
+    expect(screen.getByTestId("component-name").textContent).toBe("Menu card");
+    expect(screen.getByTestId("component-name").className).toContain("tw:text-[16px]");
+    expect(screen.getByTestId("component-scope").textContent).toBe("This site");
+    expect(screen.getByTestId("component-usedon-toggle").textContent).toMatch(/^Used in 3 places on \d pages? ›$/);
+    expect(screen.getByTestId("component-insert").textContent).toBe("Insert");
     expect(screen.getByTestId("component-update").textContent).toBe("Update from selection…");
-    expect(screen.getByTestId("component-delete").textContent).toBe("Delete Menu card master");
+    expect(screen.getByTestId("component-more").textContent).toBe("More actions ⋯");
+    fireEvent.click(screen.getByTestId("component-more"));
+    expect(screen.getByTestId("component-delete").textContent).toBe("Delete");
     expect(screen.queryByText("Type")).toBeNull();
     expect(screen.queryByText("Tags")).toBeNull();
   });
 
-  it("Detach all confirms, then detaches every instance", () => {
+  /* 2L9 217:41451 (B6-K17): no dialog — Detach all detaches every instance,
+     says how many on how many pages, and Undo relinks them. */
+  it("Detach all detaches every instance at once and offers Undo", async () => {
     const { composer, detachInstance } = makeComposer();
     renderMaster(composer);
+    fireEvent.click(screen.getByTestId("component-more"));
     fireEvent.click(screen.getByTestId("component-detach-all"));
-    expect(detachInstance).not.toHaveBeenCalled();
-    expect(screen.getByText("Detach all 3 instances of Menu card?")).toBeTruthy();
-    fireEvent.click(screen.getByTestId("component-detach-all-confirm-confirm"));
-    expect(detachInstance.mock.calls.map((c) => c[0])).toEqual(["e1", "e2", "e3"]);
-  });
-
-  /* Board 4418:143126: the list reports it ("18 instances detached"), so the
-     screen hands the count up and goes back instead of toasting. */
-  it("Detach all hands the count to onDetachedAll and goes back", async () => {
-    const { composer } = makeComposer();
-    const onDetachedAll = vi.fn();
-    const onBack = vi.fn();
-    render(
-      <ToastProvider>
-        <ComponentDetailScreen component={makeComponent()} composer={composer} onBack={onBack} onDetachedAll={onDetachedAll} />
-      </ToastProvider>,
-    );
-    fireEvent.click(screen.getByTestId("component-detach-all"));
-    fireEvent.click(screen.getByTestId("component-detach-all-confirm-confirm"));
-    await waitFor(() => expect(onDetachedAll).toHaveBeenCalledWith(3));
-    expect(onBack).toHaveBeenCalled();
+    expect(screen.queryByTestId("component-detach-all-confirm")).toBeNull();
+    await waitFor(() => expect(detachInstance.mock.calls.map((c) => c[0])).toEqual(["e1", "e2", "e3"]));
+    expect(await screen.findByText("Detached 3 instances on 2 pages from Menu card")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+    const relink = (composer as unknown as { components: { relinkInstances: ReturnType<typeof vi.fn> } }).components.relinkInstances;
+    expect(relink).toHaveBeenCalledWith([{ elementId: "e1" }, { elementId: "e2" }, { elementId: "e3" }]);
   });
 
   /* Flow-check (2026-09-25): a used-on row click used to ONLY switch page —
@@ -119,29 +113,15 @@ describe("ComponentDetailScreen — master screen (4418:142876)", () => {
      as nothing happening at all: no selection, no scroll. It now also
      selects one of the page's actual instances (`locateOnCanvas`, the same
      page-switch/select/scroll seam Review's "Locate ›" row uses). */
-  it("STRUCTURE lists the master's parts; USED ON the pages with instances, which jump to an instance on click", () => {
-    const { composer, setActivePage, select } = makeComposer();
+  it("STRUCTURE lists the master's parts; Used in counts places and pages", () => {
+    const { composer } = makeComposer();
     renderMaster(composer);
+    fireEvent.click(screen.getByTestId("component-structure-header"));
     expect(screen.getByTestId("component-structure-header").textContent).toContain("3");
     const rows = screen.getAllByTestId("component-structure-row").map((r) => r.textContent);
     expect(rows).toEqual(["Imageimage", "Titleheading", "Texttext · CMS bound"]);
-    expect(screen.getByTestId("component-usedon-home").textContent).toBe("Home2 instances");
-    expect(screen.getByTestId("component-usedon-menu").textContent).toBe("Menu1 instance");
-    expect(screen.queryByTestId("component-usedon-about")).toBeNull();
-
-    // Menu isn't the active page ("home" is) — switches, then selects e3.
-    fireEvent.click(screen.getByTestId("component-usedon-menu"));
-    expect(setActivePage).toHaveBeenCalledWith("menu");
-    expect(select).toHaveBeenCalledWith(expect.objectContaining({ getId: expect.any(Function) }));
-    expect((select.mock.calls[0][0] as { getId: () => string }).getId()).toBe("e3");
-
-    // Home IS already active — no page switch, but still selects an instance
-    // (e1, the first of its two) instead of doing nothing.
-    setActivePage.mockClear();
-    select.mockClear();
-    fireEvent.click(screen.getByTestId("component-usedon-home"));
-    expect(setActivePage).not.toHaveBeenCalled();
-    expect((select.mock.calls[0][0] as { getId: () => string }).getId()).toBe("e1");
+    /* 2L9 217:42647 — "Used in … ›" opens the places view (UsedOnView.test). */
+    expect(screen.getByTestId("component-usedon-toggle").textContent).toBe("Used in 3 places on 2 pages ›");
   });
 
   it("the name renames inline (G2-124)", async () => {
@@ -180,19 +160,6 @@ describe("ComponentDetailScreen — master screen (4418:142876)", () => {
       );
       fireEvent.click(screen.getByTestId("component-name"));
       fireEvent.keyDown(screen.getByTestId("component-rename-input"), { key: "Escape" });
-      expect(onBack).not.toHaveBeenCalled();
-    });
-
-    it("does not back out while Detach all's confirm is open", () => {
-      const { composer } = makeComposer();
-      const onBack = vi.fn();
-      render(
-        <ToastProvider>
-          <ComponentDetailScreen component={makeComponent()} composer={composer} onBack={onBack} />
-        </ToastProvider>,
-      );
-      fireEvent.click(screen.getByTestId("component-detach-all"));
-      fireEvent.keyDown(document, { key: "Escape" });
       expect(onBack).not.toHaveBeenCalled();
     });
   });

@@ -12,6 +12,7 @@ import type { CMSCollection } from "@/shared/types/cms";
 import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 import { findItemFieldRefs } from "@/engine/cms/CMSBindingManager";
+import { pageFileNames } from "@/engine/export";
 
 export interface FieldUse {
   label: string;
@@ -22,11 +23,34 @@ export interface FieldUse {
 /** The element's name as Layers shows it — its custom layer name, else its
  *  type. Not its text: a bound element's text IS the field's value, so the
  *  column would read "Margherita" for a heading bound to Name. */
-function usedByLabel(composer: Composer, elementId: string): string {
+function layerLabel(composer: Composer, elementId: string): string {
   const el = composer.elements.getElement(elementId);
   if (!el) return elementId;
   const type = el.getType?.() ?? "element";
   return getLayerName(el) ?? elementTypeLabel(type);
+}
+
+/* 165:3173 — an exact usage: "{page} · {parent} / {element}" ("Blog post ·
+   Heading / Text"), the parent left out when the element sits at the page
+   root. */
+function usedByLabel(composer: Composer, elementId: string): string {
+  const el = composer.elements.getElement(elementId);
+  const own = layerLabel(composer, elementId);
+  if (!el) return own;
+  let top = el;
+  while (top.getParent?.()) top = top.getParent!()!;
+  const page = composer.elements.getAllPages?.().find((p) => p.root?.id === top.getId());
+  const parent = el.getParent?.();
+  const path = parent && parent.getId() !== top.getId() ? `${layerLabel(composer, parent.getId())} / ${own}` : own;
+  return page ? `${page.name} · ${path}` : path;
+}
+
+/** The collection page's name, for "{page} · SEO title pattern". */
+function templateName(composer: Composer | null, collection: CMSCollection): string {
+  if (!composer || !collection.pageTemplatePath) return "Dynamic pages";
+  const pages = composer.elements.getAllPages?.() ?? [];
+  const id = [...pageFileNames(pages).entries()].find(([, file]) => file === collection.pageTemplatePath)?.[0];
+  return pages.find((p) => p.id === id)?.name ?? "Dynamic pages";
 }
 
 export function fieldUsage(composer: Composer | null, collection: CMSCollection): Map<string, FieldUse[]> {
@@ -63,8 +87,18 @@ export function fieldUsage(composer: Composer | null, collection: CMSCollection)
       }
     }
   }
-  for (const m of (collection.pageSlugPattern ?? "").matchAll(/\{([a-zA-Z0-9_-]+)\}/g)) {
-    add(m[1], { label: "Dynamic pages" });
+  /* The collection's own patterns name fields as {slug} too: the URL and
+     each generated page's <title> / description (and og: tags from them). */
+  const page = templateName(composer, collection);
+  const patterns: Array<[string | undefined, string]> = [
+    [collection.pageSlugPattern, "URL pattern"],
+    [collection.pageSeoTitle, "SEO title pattern"],
+    [collection.pageSeoDescription, "SEO description pattern"],
+  ];
+  for (const [pattern, what] of patterns) {
+    for (const m of (pattern ?? "").matchAll(/\{([a-zA-Z0-9_-]+)\}/g)) {
+      if (collection.fields.some((f) => f.slug === m[1])) add(m[1], { label: `${page} · ${what}` });
+    }
   }
   return uses;
 }

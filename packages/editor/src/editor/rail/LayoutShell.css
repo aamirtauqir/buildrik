@@ -42,10 +42,10 @@
   grid-template-rows:
     var(--layout-topbar-height, 56px)
     1fr
-    /* auto, not a fixed 32: the app never fills the Footer slot (its status
-       bar sits outside the grid), and a fixed track left a 32px dead band
-       under the rail, drawer and inspector (parity V1 #2, board 4418:123573).
-       An empty track is 0; a filled one sizes to .layout-shell__footer. */
+    /* auto, not a fixed 32: an empty track is 0, a filled one sizes to
+       .layout-shell__footer. A fixed track once left a 32px dead band under
+       the rail, drawer and inspector while nothing filled the slot (parity V1
+       #2). The 2L9 bottom bar (StudioPanels → BottomBar) fills it now. */
     auto;
   grid-template-areas:
     "topbar topbar topbar topbar"
@@ -193,15 +193,15 @@ html.bk-read-only-view.bk-viewer-chrome { --layout-rail-width: var(--bk-size-rai
 }
 
 /* Fullpage mode with sidebar — sidebar shrinks to rail-only, fullpage fills rest.
-   Single-row areas because no TopBar slot is rendered (--no-topbar is active). */
+   No topbar row (--no-topbar); the footer row holds the bottom bar's way back. */
 .layout-shell--has-sidebar.layout-shell--fullpage {
   grid-template-columns:
     auto
     1fr
     0px
     0px;
-  grid-template-rows: 1fr;
-  grid-template-areas: "sidebar fullpage fullpage fullpage";
+  grid-template-rows: 1fr auto;
+  grid-template-areas: "sidebar fullpage fullpage fullpage" "footer footer footer footer";
 }
 
 /* Constrain sidebar to column 1 only so it doesn't overlap fullpage content */
@@ -297,8 +297,8 @@ html.bk-read-only-view.bk-viewer-chrome { --layout-rail-width: var(--bk-size-rai
     1fr
     0px
     0px;
-  grid-template-rows: 1fr;
-  grid-template-areas: "rail fullpage fullpage fullpage";
+  grid-template-rows: 1fr auto;
+  grid-template-areas: "rail fullpage fullpage fullpage" "footer footer footer footer";
 }
 
 .layout-shell__fullpage {

@@ -4,7 +4,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import * as React from "react";
-import { ReusableStylesSection, presetLine, reusableStylesCount } from "../ReusableStylesSection";
+import { ReusableStylesSection, presetLine } from "../ReusableStylesSection";
 import { DEFAULT_PRESETS } from "@/editor/design-system/constants";
 import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
@@ -34,6 +34,5 @@ describe("Brand › Styles (7316:82153)", () => {
     expect(onSelectToken).toHaveBeenCalledWith("font-size-4xl");
     fireEvent.click(rows[1]);
     expect(onOpenPresets).toHaveBeenCalled();
-    expect(reusableStylesCount(TYPE, [primary])).toBe(2);
   });
 });

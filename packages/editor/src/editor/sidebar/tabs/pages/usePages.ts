@@ -30,6 +30,7 @@ import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 import { pageFileNames } from "@/engine/export/pageFiles";
 import { pageCanonicalUrl } from "@buildrik/shared/seo/urls";
 import { useActivePageId } from "@/editor/shared/useActivePageId";
+import { pageSlug } from "@/editor/shell/usePageSummaries";
 
 /** A page's stored visibility → its panel status. Unset is "live" (what the
  *  deploy does with it). C4 #26: a "password" stored before Password pages
@@ -70,9 +71,11 @@ export interface UsePagesReturn {
   // Actions (all guard-checked)
   selectPage: (pageId: string) => void;
   duplicatePage: (pageId: string) => void;
+  duplicatePages: (pageIds: readonly string[]) => void;
   deletePage: (pageId: string) => void;
-  /** Bulk delete with one report (v3 4418:96537). Guards are the caller's. */
-  deletePages: (pageIds: string[]) => void;
+  /** Bulk delete with one report (v3 4418:96537). Guards are the caller's.
+   *  Returns what really happened — a page the engine refused stays (139:48427). */
+  deletePages: (pageIds: string[], opts?: DeletePagesOptions) => DeletePagesResult;
   setHomepage: (pageId: string) => void;
   copyPageLink: (pageId: string) => void;
 
@@ -87,8 +90,30 @@ export interface UsePagesReturn {
   loading: boolean;
 }
 
-export function usePages(composer: Composer | null): UsePagesReturn {
+export interface DeletePagesResult {
+  deleted: string[];
+  /** The engine refused these (deletePage → false); still present ones are kept. */
+  failed: string[];
+}
+
+export interface DeletePagesOptions {
+  /** The receipt's text when the default ("n pages deleted · names") is not it. */
+  describe?: (result: DeletePagesResult) => string;
+  /** Called after the receipt's Undo actually reverted the deletion. */
+  onUndone?: () => void;
+}
+
+export interface UsePagesOptions {
+  /** The delete receipts' "Recently deleted" (board 139:48427, A-21). */
+  onOpenTrash?: () => void;
+}
+
+export function usePages(composer: Composer | null, { onOpenTrash }: UsePagesOptions = {}): UsePagesReturn {
   const { addToast } = useToast();
+  const trashAction = React.useMemo(
+    () => (onOpenTrash ? { secondaryAction: { label: "Recently deleted", onClick: onOpenTrash } } : {}),
+    [onOpenTrash],
+  );
   const [pageRows, setPages] = React.useState<PageItem[]>([]);
   /* `isActive` is derived from the one active-page source, not set inside
      the list sync — the list and the active id used to come from separate
@@ -127,7 +152,7 @@ export function usePages(composer: Composer | null): UsePagesReturn {
           raw.map((p) => ({
             id: p.id,
             name: p.name,
-            slug: p.slug ?? (p.name ? slugify(p.name) : undefined) ?? p.id,
+            slug: pageSlug(p),
             route: (
               composer as { router?: { getPath?: (id: string) => string | undefined } }
             ).router?.getPath?.(p.id),
@@ -171,7 +196,8 @@ export function usePages(composer: Composer | null): UsePagesReturn {
        "This site has one page". Closing and reopening the panel showed both
        pages, which is how it was caught. The delete dialog promises "You can
        undo immediately after", so the stale list reads as the undo failing.
-       PageTabBar and useLayerTree already listen to both for the same reason.
+       The shell's usePageSummaries and useLayerTree listen to both for the
+       same reason.
        `syncOnLoad` ignores the payload: an import has no page:* type to
        filter on, and every import can change the whole list. */
     const syncOnLoad = () => {
@@ -226,7 +252,8 @@ export function usePages(composer: Composer | null): UsePagesReturn {
         if (!updateUrl && before && before.name !== trimmed) {
           const undoRename = composer.history?.captureUndo?.();
           addToast({
-            description: before.isHome ? `Renamed to ${trimmed}` : `Renamed to ${trimmed} · URL /${before.slug} kept`,
+            /* design-2l9 board 63:23182: "Our story renamed · URL kept". */
+            description: before.isHome ? `${trimmed} renamed` : `${trimmed} renamed · URL kept`,
             tone: "info",
             duration: 8000,
             action: { label: "Undo", onClick: () => undoRename?.() },
@@ -279,6 +306,42 @@ export function usePages(composer: Composer | null): UsePagesReturn {
     [composer, pages, addToast]
   );
 
+  /* design-2l9 board 139:50620: a bulk duplicate reports once — "3 pages
+     duplicated · Originals kept" — instead of one per-page toast each
+     replacing the last. */
+  const duplicatePages = React.useCallback(
+    (pageIds: readonly string[]) => {
+      if (!composer) return;
+      if (pageIds.length === 1) {
+        duplicatePage(pageIds[0]);
+        return;
+      }
+      let made = 0;
+      /* design-2l9 139:50620: the copies are one undo step, and the receipt's
+         Undo is bound to it. */
+      composer.beginTransaction("Duplicate pages");
+      try {
+        for (const id of pageIds) {
+          try {
+            if (composer.elements.duplicatePage(id)) made += 1;
+          } catch (err) {
+            console.error("[pages] duplicatePage failed", err);
+          }
+        }
+      } finally {
+        composer.endTransaction();
+      }
+      const undo = made > 0 ? composer.history?.captureUndo?.() : undefined;
+      const action = undo ? { action: { label: "Undo", onClick: () => { undo(); } } } : {};
+      addToast(
+        made === pageIds.length
+          ? { description: `${made} pages duplicated · Originals kept`, tone: "info", duration: 8000, ...action }
+          : { description: `${made} of ${pageIds.length} pages duplicated · Originals kept`, tone: "warning", duration: 8000, ...action },
+      );
+    },
+    [composer, duplicatePage, addToast]
+  );
+
   const deletePage = React.useCallback(
     (pageId: string) => {
       if (!composer) return;
@@ -315,28 +378,35 @@ export function usePages(composer: Composer | null): UsePagesReturn {
             undoDelete?.();
           },
         },
+        ...trashAction,
       });
     },
-    [composer, pages, addToast]
+    [composer, pages, addToast, trashAction]
   );
 
   /** v3 4418:96537 "one toast per action": a bulk delete reports once —
    *  "3 pages deleted · Menu, Contact, About · Undo" — and one undo brings
    *  them all back. The caller has already applied the home/last guards. */
   const deletePages = React.useCallback(
-    (pageIds: string[]) => {
-      if (!composer || pageIds.length === 0) return;
-      const names = pageIds.map((id) => pages.find((p) => p.id === id)?.name).filter((n): n is string => !!n);
-      pageIds.forEach((id) => composer.elements.deletePage(id));
+    (pageIds: string[], opts: DeletePagesOptions = {}): DeletePagesResult => {
+      const result: DeletePagesResult = { deleted: [], failed: [] };
+      if (!composer || pageIds.length === 0) return result;
+      for (const id of pageIds) (composer.elements.deletePage(id) ? result.deleted : result.failed).push(id);
+      if (result.deleted.length === 0) return result;
+      const names = result.deleted.map((id) => pages.find((p) => p.id === id)?.name).filter((n): n is string => !!n);
       const undoDelete = composer.history?.captureUndo?.();
       addToast({
-        description: `${pageIds.length} page${pageIds.length === 1 ? "" : "s"} deleted · ${names.join(", ")}`,
+        description:
+          opts.describe?.(result) ??
+          `${result.deleted.length} page${result.deleted.length === 1 ? "" : "s"} deleted · ${names.join(", ")}`,
         tone: "info",
         duration: 8000,
-        action: { label: "Undo", onClick: () => undoDelete?.() },
+        action: { label: "Undo", onClick: () => { if (undoDelete?.()) opts.onUndone?.(); } },
+        ...trashAction,
       });
+      return result;
     },
-    [composer, pages, addToast]
+    [composer, pages, addToast, trashAction]
   );
 
   const setHomepage = React.useCallback(
@@ -448,6 +518,7 @@ export function usePages(composer: Composer | null): UsePagesReturn {
     closeSettings,
     selectPage,
     duplicatePage,
+    duplicatePages,
     deletePage,
     deletePages,
     setHomepage,

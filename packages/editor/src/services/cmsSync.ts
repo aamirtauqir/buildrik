@@ -196,6 +196,18 @@ function outstandingCmsChanges(): number {
 
 registerPendingSource("cms", outstandingCmsChanges);
 
+/** This record's own save is still owed to the server — queued, in flight,
+ *  conflicted, or in the outbox. A record sheet holding a queued revision
+ *  (design-2l9 126:35760) stays locked until this turns false. */
+export function isCmsEntrySaveOwed(id: string): boolean {
+  return outstandingCmsKeys().has(`entryUpsert:${id}`);
+}
+
+/** The same for a collection's own write (its link to a page, 187:21035). */
+export function isCmsCollectionSaveOwed(id: string): boolean {
+  return outstandingCmsKeys().has(`collectionUpsert:${id}`);
+}
+
 /* C0a (Task 5): CONFLICT and GONE are answers, not failures. CONFLICT must
    not loop forever against a row that has moved on since; GONE means the
    server already removed the row, so retrying would resurrect it. Both are
@@ -203,10 +215,17 @@ registerPendingSource("cms", outstandingCmsChanges);
 export interface CmsConflict {
   kind: "collection" | "entry";
   id: string;
-  /** Overwrite the server with this device's copy; true when it landed. */
-  keepMine(): Promise<boolean>;
+  /** Overwrite the server with this device's copy; true when it landed.
+   *  Entries take `data` — a merged copy (165:2414: your changed fields over
+   *  the latest saved record) — which is written here first, then sent. */
+  keepMine(data?: Record<string, unknown>): Promise<boolean>;
   /** Replace this device's copy with the server's. */
   useTheirs(): Promise<void>;
+  /** Entries: the field values this device tried to save. */
+  mine?: Record<string, unknown>;
+  /** Entries: the server's current field values (read, not applied), or null
+   *  when the server no longer has the row. */
+  theirs?: () => Promise<Record<string, unknown> | null>;
 }
 const conflictListeners = new Set<(c: CmsConflict) => void>();
 export function onCmsConflict(cb: (c: CmsConflict) => void): () => void {
@@ -504,6 +523,36 @@ export function retryCmsSync(): Promise<void> {
   return queue.retry();
 }
 
+/** The CMS mirror that is failing, for the publish tray's stuck state
+ *  (design-2l9 Task 1.7): the server's reason, how long and how often it has
+ *  failed, and where Open CMS should land — the record's collection, plus the
+ *  record itself for an entry. `null` while nothing is failing. */
+export interface CmsSyncFailure {
+  reason: string;
+  attempts: number;
+  since: number;
+  open: { collectionId: string; recordId?: string } | null;
+}
+
+export function cmsSyncFailure(): CmsSyncFailure | null {
+  const key = queue.failedRecordId;
+  const reason = queue.lastError;
+  const since = queue.failingSince;
+  if (!key || reason === null || since === null) return null;
+  const sep = key.indexOf(":");
+  const op = key.slice(0, sep);
+  const id = key.slice(sep + 1);
+  const siteId = getSiteIdFromUrl();
+  const queued = siteId ? readOutbox()[siteId]?.find((o) => o.key === key) : undefined;
+  const open =
+    op.startsWith("collection")
+      ? { collectionId: id }
+      : queued?.op === "entryUpsert"
+        ? { collectionId: queued.item.collectionId, recordId: id }
+        : null;
+  return { reason, attempts: queue.failedAttempts, since, open };
+}
+
 /**
  * Cross-device load (E7 / C-4, PD-36): pull server collections + entries into
  * the engine's IndexedDB on editor open. SERVER-FIRST, on the server's clock:
@@ -604,7 +653,7 @@ export async function hydrateCmsFromServer(): Promise<void> {
     const remote = (await client().cms.collections.list.query({ siteId })) as Array<{
       id: string; name: string; slug: string; description: string | null; icon: string | null;
       displayField: string | null; fields: unknown; createdAt: Date | string; updatedAt: Date | string;
-      pageSlugPattern: string | null; pageSeoTitle: string | null; pageSeoDescription: string | null; pageTemplatePath: string | null;
+      pageSlugPattern: string | null; pageSeoTitle: string | null; pageSeoDescription: string | null; pageSocialImage?: string | null; pageTemplatePath: string | null;
     }>;
     const migrationScope = `cms:${siteId}`;
     const firstPass = stampMigrationDue(migrationScope);
@@ -648,6 +697,7 @@ export async function hydrateCmsFromServer(): Promise<void> {
           pageSlugPattern: rc.pageSlugPattern ?? undefined,
           pageSeoTitle: rc.pageSeoTitle ?? undefined,
           pageSeoDescription: rc.pageSeoDescription ?? undefined,
+          pageSocialImage: rc.pageSocialImage ?? undefined,
           pageTemplatePath: rc.pageTemplatePath ?? undefined,
           createdAt: iso(rc.createdAt), updatedAt: iso(rc.updatedAt),
         };
@@ -774,6 +824,7 @@ export async function syncCollectionUpsert(c: CMSCollection): Promise<boolean> {
         pageSlugPattern: c.pageSlugPattern ?? null,
         pageSeoTitle: c.pageSeoTitle ?? null,
         pageSeoDescription: c.pageSeoDescription ?? null,
+        pageSocialImage: c.pageSocialImage ?? null,
         pageTemplatePath: c.pageTemplatePath ?? null,
         expectedUpdatedAt: base,
       }).then((row) => {
@@ -929,11 +980,20 @@ export async function syncEntryUpsert(item: CMSContentItem): Promise<boolean> {
         raiseConflict({
           kind: "entry",
           id: item.id,
-          keepMine: async () => {
+          keepMine: async (data) => {
             rebaseOnConflict(stampKey, e);
-            return syncEntryUpsert(item);
+            if (!data) return syncEntryUpsert(item);
+            const merged: CMSContentItem = { ...item, data, updatedAt: new Date().toISOString() };
+            await Storage.saveContentItem(merged);
+            await engine?.refreshFromStorage();
+            return syncEntryUpsert(merged);
           },
           useTheirs: () => takeServerCopy(siteId, "entry", item.id),
+          mine: item.data,
+          theirs: async () => {
+            const rows = (await client().cms.entries.list.query({ siteId, collectionId: item.collectionId })) as Array<{ id: string; data: Record<string, unknown> }>;
+            return rows.find((r) => r.id === item.id)?.data ?? null;
+          },
         }),
       /* Refused as published: a record the server already holds goes back
          to the server's copy; one it never held is kept here as a draft (and

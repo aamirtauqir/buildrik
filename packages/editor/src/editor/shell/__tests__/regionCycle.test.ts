@@ -12,7 +12,7 @@ function buildShell({ drawerClosed = false, pageTabs = true, inspector = true } 
     <div role="banner"><button id="topbar-btn">t</button></div>
     <div class="ls-rail"><button id="rail-btn">r</button></div>
     <div class="ls-panel${drawerClosed ? " ls-panel--closed" : ""}"><button id="drawer-btn">d</button></div>
-    ${pageTabs ? '<div role="tablist" aria-label="Site pages"><button id="tab-btn">p</button></div>' : ""}
+    ${pageTabs ? '<button data-region="page-switcher" id="tab-btn">p</button>' : ""}
     <div id="layout-canvas"></div>
     ${inspector ? '<div class="bdi-panel"><button id="insp-btn">i</button></div>' : ""}
     <div role="contentinfo"><button id="footer-btn">f</button></div>
@@ -126,5 +126,37 @@ describe("regionCycle — hidden regions drop out", () => {
     const cls = visibleRegions(root).map((e) => e.className || e.tagName.toLowerCase());
     expect(cls).toContain("layout-shell__fullpage");
     expect(cls.some((c) => c === "layout-canvas")).toBe(false);
+  });
+});
+
+/* 2L9 bottom bar: the page switcher (region 4) lives inside the footer
+   (region 7). Listing both visited the same control twice per lap. */
+describe("regionCycle — page switcher in the bottom bar", () => {
+  function shell(html: string) {
+    document.body.innerHTML = html;
+    for (const el of document.body.querySelectorAll<HTMLElement>("*")) {
+      Object.defineProperty(el, "offsetParent", { get: () => document.body, configurable: true });
+    }
+  }
+
+  it("visits the switcher once and does not list the footer that holds it", () => {
+    shell(`
+      <header role="banner"><button id="top">t</button></header>
+      <div id="layout-canvas"></div>
+      <footer role="contentinfo"><button data-region="page-switcher" id="switch">Home</button></footer>
+    `);
+    expect(visibleRegions().map((e) => e.id || e.tagName.toLowerCase())).toEqual(["header", "switch", "layout-canvas"]);
+    cycleRegion(1); // topbar
+    cycleRegion(1); // switcher
+    expect(document.activeElement?.id).toBe("switch");
+    expect(document.getElementById("switch")?.hasAttribute("tabindex")).toBe(false);
+  });
+
+  it("falls back to the footer in a resource area, where the switcher is absent", () => {
+    shell(`
+      <header role="banner">a</header>
+      <footer role="contentinfo"><button id="back">‹ Back to Editor</button></footer>
+    `);
+    expect(visibleRegions().map((e) => e.tagName.toLowerCase())).toEqual(["header", "footer"]);
   });
 });

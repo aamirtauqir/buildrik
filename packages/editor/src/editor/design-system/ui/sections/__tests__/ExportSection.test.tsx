@@ -25,160 +25,80 @@ beforeEach(() => {
   }
 });
 
-describe("ExportSection", () => {
-  /* Board 153:120 lists four formats under EXPORT — three live, Figma greyed
-     — as plain rows. The radios that used to lead each row are gone with the
-     selection they expressed. */
-  it("lists every format the board draws", () => {
-    const { container } = render(wrap(<ExportSection />));
-    /* Scoped to the EXPORT card: the preview's own format select repeats
-       three of these names in its options. */
-    /* The class half of this selector chased a raw Tailwind border that
-       became a token on 2026-08-29; testids are the durable half. */
-    const rows = Array.from(container.querySelectorAll("[data-testid^='format-row-']"));
-    const text = container.textContent ?? "";
-    for (const label of ["CSS", "JSON", "Tailwind"]) {
-      expect(text.includes(label), label).toBe(true);
-    }
-    // C5 G3-149: the Figma "Coming soon" row is gone.
-    expect(text).not.toMatch(/Figma Variables JSON/);
-    expect(rows.length).toBe(3);
+/** Opens the Export tab and picks a format. */
+function exportTab(u: ReturnType<typeof render>, format?: "css" | "json" | "tailwind") {
+  fireEvent.click(u.getByTestId("brand-io-tab-export"));
+  if (format) fireEvent.click(u.getByTestId(`format-row-${format}`));
+}
+
+describe("ExportSection — Import | Export (2L9 B6-B15 / B6-B48)", () => {
+  it("opens on Import; the tabs switch", () => {
+    const u = render(wrap(<ExportSection />));
+    expect(u.getByTestId("brand-io-tab-import").getAttribute("aria-selected")).toBe("true");
+    expect(u.getByTestId("brand-import")).toBeTruthy();
+    exportTab(u);
+    expect(u.getByTestId("brand-export")).toBeTruthy();
+    expect(u.queryByTestId("brand-import")).toBeNull();
   });
 
-  /* Board 153:120 draws no chips on rows — title + muted desc, actions right.
-     The chip assertion pinned a decoration the board does not have; lossy
-     info (N dropped) now rides the Tailwind desc line. */
-  it("puts the description on its own muted line, chipless", () => {
-    const { queryByTestId, getByText } = render(wrap(<ExportSection />));
-    expect(queryByTestId("format-chip-css")).toBeNull();
-    expect(getByText("Custom properties")).toBeTruthy();
+  it("Format offers CSS variables, JSON and Tailwind config — no Figma row", () => {
+    const u = render(wrap(<ExportSection />));
+    exportTab(u);
+    expect(["css", "json", "tailwind"].map((id) => u.getByTestId(`format-row-${id}`).textContent)).toEqual([
+      "CSS variables", "JSON tokens", "Tailwind config",
+    ]);
+    expect(u.container.textContent).not.toMatch(/Figma Variables JSON/);
   });
 
-  it("stats line shows kinds · tokens · alias edges · dark variants", () => {
-    const { getByTestId } = render(wrap(<ExportSection />));
-    const stats = getByTestId("export-stats").textContent ?? "";
-    expect(stats).toMatch(/14 kinds/);
-    expect(stats).toMatch(/\d+ tokens/);
-    expect(stats).toMatch(/\d+ alias edges/);
-    expect(stats).toMatch(/\d+ dark variants/);
+  it("CSS shows the :root block with its dark block, and '{n} tokens · includes dark values.'", () => {
+    const u = render(wrap(<ExportSection />));
+    exportTab(u);
+    const preview = u.getByTestId("export-preview").textContent ?? "";
+    expect(preview).toContain(":root");
+    expect(preview).toContain("@media (prefers-color-scheme: dark)");
+    expect(u.getByTestId("export-stats").textContent).toMatch(/^\d+ tokens · includes dark values\.$/);
   });
 
-  /* The format rows carry no selection any more (board 153:120 gives each its
-     own Copy and Download), so the thing that has a format is the preview. */
-  function chooseFormat(getByLabelText: (t: RegExp | string) => HTMLElement, value: string) {
-    fireEvent.change(getByLabelText(/preview format/i), { target: { value } });
-  }
-
-  it("Tailwind warning callout visible when Tailwind is previewed", () => {
-    const { getByLabelText, getByTestId } = render(wrap(<ExportSection />));
-    chooseFormat(getByLabelText, "tailwind");
-    expect(getByTestId("tailwind-warning")).toBeTruthy();
-    expect(getByTestId("tailwind-warning").textContent).toMatch(/Tailwind warning/i);
+  it("JSON is an array, Tailwind a JS module that says it drops dark values", () => {
+    const u = render(wrap(<ExportSection />));
+    exportTab(u, "json");
+    expect(u.getByTestId("export-preview").textContent?.trim().startsWith("[")).toBe(true);
+    fireEvent.click(u.getByTestId("format-row-tailwind"));
+    expect(u.getByTestId("export-preview").textContent).toContain("module.exports");
+    expect(u.getByTestId("export-stats").textContent).toMatch(/Tailwind config can’t carry dark values; \d+ (is|are) left out\./);
   });
 
-  it("Tailwind warning hidden for any other format", () => {
-    const { getByLabelText, queryByTestId } = render(wrap(<ExportSection />));
-    // Default is CSS — no warning.
-    expect(queryByTestId("tailwind-warning")).toBeNull();
-    chooseFormat(getByLabelText, "json");
-    expect(queryByTestId("tailwind-warning")).toBeNull();
-    // Figma is disabled now; selecting JSON above is the real assertion here.
+  it("dark strategy is a menu on CSS: a pick swaps @media for :root[data-theme]", () => {
+    const u = render(wrap(<ExportSection />));
+    exportTab(u);
+    expect(u.getByTestId("brand-export-dark-value").textContent).toBe("media-query");
+    fireEvent.click(u.getByTestId("brand-export-dark-trigger"));
+    fireEvent.click(u.getByTestId("brand-export-dark-option-data-attr"));
+    expect(u.getByTestId("brand-export-dark-value").textContent).toBe("data-attr");
+    const preview = u.getByTestId("export-preview").textContent ?? "";
+    expect(preview).toContain(':root[data-theme="dark"]');
+    expect(preview).not.toContain("@media (prefers-color-scheme: dark)");
+    fireEvent.click(u.getByTestId("format-row-json"));
+    expect(u.queryByTestId("brand-export-dark-row")).toBeNull();
   });
 
-  /* G3-123 · 6881:71312: a download reports "Export ready" as a toast. */
-  it("Download raises the Export ready toast with the kinds · tokens count", async () => {
-    const { getByTestId, findByText } = render(wrap(<ExportSection />));
-    fireEvent.click(getByTestId("brand-format-download-css"));
-    expect(await findByText("Export ready")).toBeTruthy();
-    expect(await findByText(/^\d+ kinds · \d+ tokens exported\. Download ready\.$/)).toBeTruthy();
-  });
-
-  it("preview pane shows :root block by default (CSS format)", () => {
-    const { getByTestId } = render(wrap(<ExportSection />));
-    const preview = getByTestId("export-preview");
-    expect(preview.textContent).toContain(":root");
-    expect(preview.textContent).toContain("--buildrick-design-");
-  });
-
-  it("switching to JSON re-renders preview as JSON array", () => {
-    const { getByLabelText, getByTestId } = render(wrap(<ExportSection />));
-    chooseFormat(getByLabelText, "json");
-    const preview = getByTestId("export-preview");
-    expect(preview.textContent?.trim().startsWith("[")).toBe(true);
-  });
-
-  it("switching to Tailwind re-renders preview as JS module", () => {
-    const { getByLabelText, getByTestId } = render(wrap(<ExportSection />));
-    chooseFormat(getByLabelText, "tailwind");
-    const preview = getByTestId("export-preview");
-    expect(preview.textContent).toContain("module.exports");
-  });
-
-  it("CSS format includes dark mode block via CSSBundler", () => {
-    // Default tokens shipped via migration0002 carry darkValue on 9 colors.
-    const { getByTestId } = render(wrap(<ExportSection />));
-    const preview = getByTestId("export-preview");
-    expect(preview.textContent).toContain("@media (prefers-color-scheme: dark)");
-  });
-
-  /* Board 153:120 leads with one "Dark strategy" row and its value at the
-     right, not three radios buried under the CSS format — where a JSON
-     exporter would never see the choice they are exporting under. */
-  /* Walk FAIL (4418:168885 "Dark-strategy menu"): the label was dead text
-     over a native <select>. "Dark strategy ▾" is the menu's trigger now. */
-  it("dark strategy is a menu: the ▾ label opens it, a pick swaps @media for :root[data-theme]", () => {
-    const { getByTestId, getByRole, queryByRole } = render(wrap(<ExportSection />));
-    expect(document.querySelector("select[aria-label='Dark mode strategy']")).toBeNull();
-    expect(getByTestId("brand-export-dark-value").textContent).toBe("media-query");
-    fireEvent.click(getByTestId("brand-export-dark-trigger"));
-    const menu = getByRole("menu", { name: "Dark strategy" });
-    expect(Array.from(menu.querySelectorAll('[role="menuitemradio"]')).map((i) => i.getAttribute("aria-checked"))).toEqual(["true", "false", "false"]);
-    fireEvent.click(getByTestId("brand-export-dark-option-data-attr"));
-    expect(queryByRole("menu", { name: "Dark strategy" })).toBeNull();
-    expect(getByTestId("brand-export-dark-value").textContent).toBe("data-attr");
-    const preview = getByTestId("export-preview");
-    expect(preview.textContent).toContain(':root[data-theme="dark"]');
-    expect(preview.textContent).not.toContain("@media (prefers-color-scheme: dark)");
-  });
-
-  /* Board 153:120 gives every LIVE row its own Copy and Download and leaves the
-     greyed Figma line with neither — the board refusing to hand over a file it
-     cannot make. This replaces an assertion on a single button whose LABEL
-     changed with the selection; that button is gone. */
-  it("gives every format its own Download", () => {
-    const { container } = render(wrap(<ExportSection />));
-    for (const id of ["css", "json", "tailwind"]) {
-      expect(container.querySelector(`[data-download-format="${id}"]`)).toBeTruthy();
-    }
-    expect(container.querySelector('[data-download-format="figma"]')).toBeNull();
-  });
-
-  it("the preview offers only the three real formats", () => {
-    const { container, getByLabelText, getByTestId } = render(wrap(<ExportSection />));
-    const options = Array.from(
-      (getByLabelText(/preview format/i) as HTMLSelectElement).options,
-    ).map((o) => o.value);
-    expect(options).not.toContain("figma");
-    expect(container.querySelector('[data-download-format="figma"]')).toBeNull();
-    expect(getByTestId("export-preview").textContent).toContain(":root");
-  });
-
-  it("download button triggers exportUtils.downloadFile-style anchor click", () => {
+  it("Download names the file type and downloads it, with the Export ready toast", async () => {
     const clickSpy = vi.fn();
     const originalCreate = document.createElement.bind(document);
     const createSpy = vi.spyOn(document, "createElement").mockImplementation((tag: string) => {
       const el = originalCreate(tag);
-      if (tag === "a") {
-        Object.defineProperty(el, "click", { value: clickSpy, configurable: true });
-      }
+      if (tag === "a") Object.defineProperty(el, "click", { value: clickSpy, configurable: true });
       return el;
     });
-
-    /* Every format row carries its own Download now (board 153:120), so the
-       old bare name match is ambiguous — target one row. */
-    const { container } = render(wrap(<ExportSection />));
-    fireEvent.click(container.querySelector<HTMLButtonElement>('[data-download-format="css"]')!);
+    const u = render(wrap(<ExportSection />));
+    exportTab(u);
+    const download = u.getByTestId("brand-format-download-css");
+    expect(download.textContent).toBe("Download .css");
+    fireEvent.click(download);
     expect(clickSpy).toHaveBeenCalled();
+    expect(await u.findByText("Export ready")).toBeTruthy();
     createSpy.mockRestore();
+    fireEvent.click(u.getByTestId("format-row-tailwind"));
+    expect(u.getByTestId("brand-format-download-tailwind").textContent).toBe("Download .js");
   });
 });

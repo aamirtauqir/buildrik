@@ -1,5 +1,5 @@
 /**
- * "‹ Activity" — the way back after an Activity row opened its subject in the
+ * "‹ Back to Activity" (2L9 B7-H14) — the way back after an Activity row opened its subject in the
  * editor (Review, Published or Session). One row, drawn under the panel
  * header, in both places a row can land.
  *
@@ -21,7 +21,7 @@ export const BackToActivityRow: React.FC<{ onBack: () => void }> = ({ onBack }) 
       onClick={onBack}
       className="tw:h-6 tw:border-transparent tw:bg-transparent tw:px-1 tw:text-[12px] tw:font-normal tw:text-[var(--bk-accent)]"
     >
-      ‹ Activity
+      ‹ Back to Activity
     </Button>
   </div>
 );

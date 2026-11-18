@@ -21,6 +21,7 @@ const ALL_OFF = {
   rulers: false,
   badges: false,
   xray: false,
+  outlines: false,
 };
 
 function renderToolbar(props: Partial<React.ComponentProps<typeof CanvasFooterToolbar>> = {}) {
@@ -56,149 +57,100 @@ beforeAll(() => {
   }
 });
 
-describe("CanvasFooterToolbar — the View menu (board 5930:44801)", () => {
+/* design-2l9 board 145:64586 (Canvas view). Re-baseline: canvas View menu —
+   was 5930:44801's six check rows + Breakpoint ▸ / Zoom ▸. */
+describe("CanvasFooterToolbar — the View menu (board 145:64586)", () => {
   const openMenu = () => fireEvent.click(screen.getByTestId("canvas-view-menu-trigger"));
 
-  it("replaces the six words with one View trigger; the rows live in the menu", () => {
-    renderToolbar();
-    for (const name of ["Snap guides", "Spacing", "Grid", "Rulers", "Badges", "X-Ray"]) {
-      expect(screen.queryByRole("button", { name })).toBeNull();
-    }
+  it("the board's rows first — Grid · n px ›, Rulers, Snap guides — then the code's overlays under a rule", () => {
+    renderToolbar({ gridSize: 7, onGridSizeChange: vi.fn() });
     expect(screen.queryByRole("menu")).toBeNull();
     openMenu();
-    const rows = screen.getAllByRole("menuitemcheckbox").map((r) => r.textContent?.replace(/⌘.*$/, "").trim());
-    expect(rows).toEqual(["Snap guides", "Spacing", "Grid", "Rulers", "Badges", "X-Ray"]);
+    expect(screen.getByText("Canvas view")).toBeTruthy();
+    const rows = screen.getAllByRole("menuitemcheckbox").map((r) => r.textContent?.replace(/(⌘.*|›|✓)$/, "").trim());
+    /* "Show hidden elements" (176:19089) is on by default, so it carries its ✓. */
+    expect(rows).toEqual(["Grid · 7 px", "Rulers and guides", "Snap guides", "Show outlines", "Show hidden elements", "Spacing", "Badges", "X-Ray"]);
+    expect(screen.queryByTestId("canvas-view-breakpoint")).toBeNull();
+    expect(screen.queryByTestId("canvas-view-zoom")).toBeNull();
   });
 
-  it("reflects active overlay state as a checked row, and counts it on the trigger", () => {
-    renderToolbar({ overlays: { ...ALL_OFF, grid: true } });
-    const trigger = screen.getByTestId("canvas-view-menu-trigger");
-    expect(trigger.textContent).toContain("View · 1");
-    // The board draws the trigger plain whether overlays are on or off.
-    expect(trigger.className).not.toContain("--bk-bg-subtle");
-    expect(trigger.className).not.toContain("font-semibold");
+  it("the trigger reads View, plain; an active overlay is a checked row", () => {
+    renderToolbar({ overlays: { ...ALL_OFF, rulers: true } });
+    expect(screen.getByTestId("canvas-view-menu-trigger").textContent).toBe("View");
     openMenu();
-    expect(screen.getByTestId("canvas-view-grid").getAttribute("aria-checked")).toBe("true");
+    expect(screen.getByTestId("canvas-view-rulers").getAttribute("aria-checked")).toBe("true");
     expect(screen.getByTestId("canvas-view-spacing").getAttribute("aria-checked")).toBe("false");
   });
 
   it("a row toggles its overlay (negates the current value) and closes the menu", () => {
-    const { onOverlayChange } = renderToolbar();
-    openMenu();
-    fireEvent.click(screen.getByTestId("canvas-view-grid"));
-    expect(onOverlayChange).toHaveBeenCalledWith("grid", true);
-    expect(screen.queryByRole("menu")).toBeNull();
-  });
-
-  it("toggles an on overlay OFF", () => {
     const { onOverlayChange } = renderToolbar({ overlays: { ...ALL_OFF, xray: true } });
     openMenu();
     fireEvent.click(screen.getByTestId("canvas-view-xray"));
     expect(onOverlayChange).toHaveBeenCalledWith("xray", false);
+    expect(screen.queryByRole("menu")).toBeNull();
   });
 
-  it("prints each row's chord, so the menu is where the chords are documented", () => {
+  /* A-12: "Show outlines" — element outlines without X-Ray's wireframe — is a
+     board row (145:64586), toggled like the others. */
+  it("Show outlines toggles the outlines preference", () => {
+    const { onOverlayChange } = renderToolbar();
+    openMenu();
+    expect(screen.getByTestId("canvas-view-outlines").getAttribute("aria-checked")).toBe("false");
+    fireEvent.click(screen.getByTestId("canvas-view-outlines"));
+    expect(onOverlayChange).toHaveBeenCalledWith("outlines", true);
+  });
+
+  it("prints each row's chord", () => {
     renderToolbar();
     openMenu();
     expect(screen.getByTestId("canvas-view-rulers").textContent).toContain("⌘R");
     expect(screen.getByTestId("canvas-view-xray").textContent).toContain("⌘⇧X");
   });
 
-  /* Board 817:4649 prints ⌘R against Rulers. The chord was the one on that
-     board never bound — it is the browser's reload. Only the PLAIN chord is
-     taken; ⌘⇧R must still reach the browser. The chords survive the move
-     into a menu (CV-85). */
   it("⌘R toggles rulers with the menu closed, and ⌘⇧R is left to the browser", () => {
     const { onOverlayChange } = renderToolbar();
     fireEvent.keyDown(window, { key: "r", metaKey: true });
     expect(onOverlayChange).toHaveBeenCalledWith("rulers", true);
-
     onOverlayChange.mockClear();
     fireEvent.keyDown(window, { key: "r", metaKey: true, shiftKey: true });
     expect(onOverlayChange).not.toHaveBeenCalled();
   });
 
-  it("no Inspector toggle in the bar — it is a ⌘K row and the inspector's ✕ now", () => {
-    renderToolbar();
-    expect(screen.queryByRole("button", { name: "Inspector" })).toBeNull();
+  it("without a grid-size setter, Grid toggles the overlay directly", () => {
+    const { onOverlayChange } = renderToolbar();
+    openMenu();
+    fireEvent.click(screen.getByTestId("canvas-view-grid"));
+    expect(onOverlayChange).toHaveBeenCalledWith("grid", true);
   });
 });
 
-/* Board 5936:44788: ↶ ↷ · View ▾ · 100% ▾ · readout — no W/D/T/M, no ?. */
-describe("CanvasFooterToolbar — the bar (5936:44788)", () => {
-  it("draws no breakpoint buttons and no help button; the readout sits at the right", () => {
-    renderToolbar({ device: "desktop", onDeviceChange: vi.fn(), readout: "Section · Hero · 680 × 250" });
+/* Board 7:18654: "Hero / Text · 1440 px · 52% · View". */
+describe("CanvasFooterToolbar — the bar (board 7:18654)", () => {
+  it("the path reads on the left with the type and size in its tooltip; no breakpoint or help buttons", () => {
+    renderToolbar({ device: "desktop", onDeviceChange: vi.fn(), readout: "Hero / Text", readoutTitle: "Text · 680 × 40" });
+    const readout = screen.getByTestId("canvas-bar-readout");
+    expect(readout.textContent).toBe("Hero / Text");
+    expect(readout.getAttribute("title")).toBe("Text · 680 × 40");
     expect(screen.queryByTestId("breakpoint-switcher")).toBeNull();
     expect(screen.queryByRole("button", { name: /keyboard shortcuts/i })).toBeNull();
-    expect(screen.getByTestId("canvas-bar-readout").textContent).toBe("Section · Hero · 680 × 250");
-  });
-});
-
-/* Board 5930:44801 ends the View menu with "Breakpoint · Desktop ▸" and
-   "Zoom · 100% ▸"; they open 5930:44781 (Desktop · Tablet 768px · Mobile
-   375px) and 7048:78112 (Fit to screen · 50% · 75% · 100% · 150% · 200%). */
-describe("CanvasFooterToolbar — View › Breakpoint / Zoom (5930:44801)", () => {
-  it("shows the current breakpoint and zoom as submenu rows", () => {
-    renderToolbar({ device: "desktop", onDeviceChange: vi.fn(), zoom: 75 });
-    fireEvent.click(screen.getByTestId("canvas-view-menu-trigger"));
-    expect(screen.getByTestId("canvas-view-breakpoint")).toHaveTextContent(/Breakpoint.*Desktop ▸/);
-    expect(screen.getByTestId("canvas-view-zoom")).toHaveTextContent(/Zoom.*75% ▸/);
   });
 
-  it("Breakpoint ▸ lists the devices and picking one switches and closes", () => {
+  /* Board 7:18654: device toggles centred, then width chip, zoom, View.
+     Re-baseline: canvas bar contents (the devices joined it). */
+  it("controls read in board order: devices, width, zoom, View", () => {
     const onDeviceChange = vi.fn();
-    renderToolbar({ device: "desktop", onDeviceChange });
-    fireEvent.click(screen.getByTestId("canvas-view-menu-trigger"));
-    fireEvent.click(screen.getByTestId("canvas-view-breakpoint"));
-    expect(screen.getByRole("menuitemradio", { name: /Tablet/ })).toHaveTextContent("768px");
-    fireEvent.click(screen.getByRole("menuitemradio", { name: /Mobile/ }));
+    renderToolbar({ device: "desktop", onDeviceChange, onCustomWidth: vi.fn(), pageWidth: 1440, zoom: 52 });
+    const labels = screen.getAllByRole("button").map((b) => b.getAttribute("aria-label") ?? b.textContent);
+    expect(labels).toEqual(["Desktop", "Tablet", "Mobile", "Page width 1440 px", "Zoom 52%", "View"]);
+    expect(screen.getByTestId("bp-cell-desktop")).toHaveAttribute("aria-pressed", "true");
+    fireEvent.click(screen.getByTestId("bp-cell-mobile"));
     expect(onDeviceChange).toHaveBeenCalledWith("mobile");
-    expect(screen.queryByTestId("canvas-view-menu")).toBeNull();
   });
 
-  it("Zoom ▸ offers Fit and the presets", () => {
-    const onFitToScreen = vi.fn();
-    const { onZoomChange } = renderToolbar({ onFitToScreen });
-    fireEvent.click(screen.getByTestId("canvas-view-menu-trigger"));
-    fireEvent.click(screen.getByTestId("canvas-view-zoom"));
-    const labels = screen.getAllByRole("menuitemradio").map((e) => (e.textContent ?? "").replace("✓", ""));
-    expect(labels).toEqual(["Fit to screen", "50%", "75%", "100%", "150%", "200%"]);
-    fireEvent.click(screen.getByRole("menuitemradio", { name: "150%" }));
-    expect(onZoomChange).toHaveBeenCalledWith(150);
-  });
-});
-
-/* G2-014 / G2-016: Custom width… (5930:44824) and the bar's own "100% ▾"
-   (7048:78046, board 5936:44788). */
-describe("CanvasFooterToolbar — Custom width and the 100% ▾ zoom", () => {
-  const openBreakpoints = () => {
-    fireEvent.click(screen.getByTestId("canvas-view-menu-trigger"));
-    fireEvent.click(screen.getByTestId("canvas-view-breakpoint"));
-  };
-
-  it("Custom width… opens the modal; Apply hands the width over", () => {
-    const onCustomWidth = vi.fn();
-    renderToolbar({ device: "desktop", onDeviceChange: vi.fn(), onCustomWidth });
-    openBreakpoints();
-    fireEvent.click(screen.getByTestId("canvas-breakpoint-custom"));
-    expect(screen.getByText("Changes the preview width only, not page content.")).toBeTruthy();
-    fireEvent.change(screen.getByLabelText("Preview width"), { target: { value: "600" } });
-    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
-    expect(onCustomWidth).toHaveBeenCalledWith(600);
-  });
-
-  it("an active custom width is what the Breakpoint row shows", () => {
-    renderToolbar({ device: "mobile", onDeviceChange: vi.fn(), onCustomWidth: vi.fn(), customWidth: 600 });
-    fireEvent.click(screen.getByTestId("canvas-view-menu-trigger"));
-    expect(screen.getByTestId("canvas-view-breakpoint").textContent).toContain("600px");
-  });
-
-  it("the bar's 100% ▾ opens the zoom rows with the current one checked", () => {
+  it("the zoom control opens the zoom rows with the current one checked", () => {
     const onFitToScreen = vi.fn();
     const { onZoomChange } = renderToolbar({ zoom: 100, onFitToScreen });
-    const trigger = screen.getByTestId("canvas-zoom-trigger");
-    expect(trigger.textContent).toContain("100%");
-    fireEvent.click(trigger);
+    fireEvent.click(screen.getByTestId("canvas-zoom-trigger"));
     expect(screen.getByTestId("canvas-zoom-100").getAttribute("aria-checked")).toBe("true");
     fireEvent.click(screen.getByTestId("canvas-zoom-150"));
     expect(onZoomChange).toHaveBeenCalledWith(150);
@@ -208,9 +160,42 @@ describe("CanvasFooterToolbar — Custom width and the 100% ▾ zoom", () => {
   });
 });
 
-/* Owner 2026-09-24: the grid-size setting left Settings › General; View ▸ Grid
-   carries it (Show grid · Size 4/8/16 · Custom). */
-describe("CanvasFooterToolbar — View ▸ Grid", () => {
+/* Boards 145:71013 / 145:71444 — Page width. */
+describe("CanvasFooterToolbar — Page width", () => {
+  const open = (props: Partial<React.ComponentProps<typeof CanvasFooterToolbar>> = {}) => {
+    const onDeviceChange = vi.fn();
+    const onCustomWidth = vi.fn();
+    renderToolbar({ device: "desktop", onDeviceChange, onCustomWidth, pageWidth: 1440, ...props });
+    fireEvent.click(screen.getByTestId("canvas-width-trigger"));
+    return { onDeviceChange, onCustomWidth };
+  };
+
+  it("lists the board's presets; Tablet and Mobile switch breakpoint, others preview at that width", () => {
+    const { onDeviceChange, onCustomWidth } = open();
+    const rows = screen.getAllByRole("menuitemradio").map((r) => r.textContent?.replace("✓", "").trim());
+    expect(rows).toEqual(["1920 · Wide", "1440 · Desktop", "1280", "1024", "768 · Tablet", "375 · Mobile"]);
+    fireEvent.click(screen.getByTestId("page-width-preset-768"));
+    expect(onDeviceChange).toHaveBeenCalledWith("tablet");
+    fireEvent.click(screen.getByTestId("canvas-width-trigger"));
+    fireEvent.click(screen.getByTestId("page-width-preset-1280"));
+    expect(onCustomWidth).toHaveBeenCalledWith(1280);
+  });
+
+  it("a custom width applies on Enter; out of range keeps the page and says so", () => {
+    const { onCustomWidth } = open();
+    const input = screen.getByTestId("page-width-input");
+    fireEvent.change(input, { target: { value: "9000" } });
+    expect(screen.getByTestId("page-width-error").textContent).toBe("Enter a number from 240 to 2560. The page stays at 1440 px.");
+    fireEvent.keyDown(input, { key: "Enter" });
+    expect(onCustomWidth).not.toHaveBeenCalled();
+    fireEvent.change(input, { target: { value: "600" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+    expect(onCustomWidth).toHaveBeenCalledWith(600);
+  });
+});
+
+/* Boards 145:65011 / 145:65448 — Grid and snapping. */
+describe("CanvasFooterToolbar — Grid and snapping", () => {
   const openGrid = (props: Partial<React.ComponentProps<typeof CanvasFooterToolbar>>) => {
     const r = renderToolbar(props);
     fireEvent.click(screen.getByTestId("canvas-view-menu-trigger"));
@@ -218,40 +203,53 @@ describe("CanvasFooterToolbar — View ▸ Grid", () => {
     return r;
   };
 
-  it("Grid opens Show grid + sizes with the current one checked", () => {
-    openGrid({ gridSize: 8, onGridSizeChange: vi.fn() });
-    expect(screen.getByTestId("canvas-grid-show")).toBeTruthy();
-    expect(screen.getByTestId("canvas-grid-size-8").getAttribute("aria-checked")).toBe("true");
-  });
-
-  it("Show grid toggles the overlay; a size sets the spacing", () => {
+  it("opens the dialog; nothing changes until Apply", () => {
     const onGridSizeChange = vi.fn();
     const { onOverlayChange } = openGrid({ gridSize: 8, onGridSizeChange });
-    fireEvent.click(screen.getByTestId("canvas-grid-size-16"));
+    expect(screen.getByText("Personal editor view. Existing element values stay unchanged.")).toBeTruthy();
+    fireEvent.click(screen.getByTestId("grid-snap-preset-16"));
+    fireEvent.click(screen.getByRole("switch", { name: "Show grid and snap" }));
+    expect(onGridSizeChange).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByTestId("grid-snap-apply"));
     expect(onGridSizeChange).toHaveBeenCalledWith(16);
-    fireEvent.click(screen.getByTestId("canvas-view-menu-trigger"));
-    fireEvent.click(screen.getByTestId("canvas-view-grid"));
-    fireEvent.click(screen.getByTestId("canvas-grid-show"));
     expect(onOverlayChange).toHaveBeenCalledWith("grid", true);
   });
 
-  it("Custom takes 1–100 on Enter", () => {
+  /* Board 145:65011: a panel in the View popover's place with Close — not a
+     modal. Re-baseline: Grid and snapping container. */
+  it("opens as a panel in place of the View menu; Close dismisses it", () => {
+    openGrid({ gridSize: 8, onGridSizeChange: vi.fn() });
+    expect(screen.queryByTestId("canvas-view-menu")).toBeNull();
+    expect(screen.queryByRole("dialog", { name: "Grid and snapping" })).toBeTruthy();
+    expect(document.querySelector('[data-testid="modal-grid-snap-dialog"]')).toBeNull();
+    fireEvent.click(screen.getByTestId("grid-snap-close"));
+    expect(screen.queryByTestId("grid-snap-dialog")).toBeNull();
+  });
+
+  it("a fractional size is refused with the board's message; the grid stays", () => {
     const onGridSizeChange = vi.fn();
-    openGrid({ gridSize: 8, onGridSizeChange });
-    const input = screen.getByLabelText("Custom grid size in px");
-    fireEvent.change(input, { target: { value: "12" } });
-    fireEvent.keyDown(input, { key: "Enter" });
-    expect(onGridSizeChange).toHaveBeenCalledWith(12);
+    openGrid({ gridSize: 7, onGridSizeChange });
+    fireEvent.change(screen.getByTestId("grid-snap-size"), { target: { value: "1.5" } });
+    expect(screen.getByTestId("grid-snap-error").textContent).toBe("Enter a whole number from 1 to 100 px. Current grid stays 7 px.");
+    expect(screen.getByTestId("grid-snap-hint").textContent).toBe("Whole number · 1–100 px");
+    expect(screen.getByTestId("grid-snap-apply")).toBeDisabled();
   });
 });
 
-describe("CanvasFooterToolbar — disabled undo/redo (board 4418:103591)", () => {
-  it("a disabled undo draws no fill", () => {
-    renderToolbar({ onUndo: vi.fn(), canUndo: false, onRedo: vi.fn(), canRedo: false });
-    for (const name of ["Undo", "Redo"]) {
-      const cls = screen.getByRole("button", { name }).className;
-      expect(cls).toContain("tw:disabled:bg-transparent");
-      expect(cls).not.toContain("tw:disabled:bg-[var(--bk-bg-subtle)]");
-    }
+/* 2L9 176:19089 / 176:19451: Show hidden elements — a personal view
+   preference; off, the canvas stops drawing condition-hidden ghosts. */
+describe("CanvasFooterToolbar — Show hidden elements", () => {
+  it("toggles the preference from Canvas view", async () => {
+    const { setShowHiddenElements } = await import("../hiddenElementsPref");
+    setShowHiddenElements(true);
+    renderToolbar();
+    fireEvent.click(screen.getByTestId("canvas-view-menu-trigger"));
+    const row = screen.getByTestId("canvas-view-hidden");
+    expect(row).toHaveTextContent("Show hidden elements");
+    fireEvent.click(row);
+    expect(localStorage.getItem("bk-canvas-show-hidden")).toBe("false");
+    fireEvent.click(screen.getByTestId("canvas-view-menu-trigger"));
+    fireEvent.click(screen.getByTestId("canvas-view-hidden"));
+    expect(localStorage.getItem("bk-canvas-show-hidden")).toBe("true");
   });
 });

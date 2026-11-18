@@ -270,6 +270,39 @@ describe("ComponentManager.updateComponentMaster — version bump + autosync", (
   });
 });
 
+/* 2L9 217:40825 (B6-K15): the review before "Update" says what the update
+   would do — instances affected, overrides kept, overrides that no longer
+   apply — without doing it. */
+describe("ComponentManager.previewMasterUpdate", () => {
+  it("counts kept and lost overrides per instance and changes nothing", async () => {
+    const { manager, mgr, page } = makeStack();
+    const card = sourceElement(manager, page.root.id);
+    const comp = (await mgr.createComponent("Card", card.getId()))!;
+    const a = (await mgr.instantiateComponent(comp.id, page.root.id))!;
+    const b = (await mgr.instantiateComponent(comp.id, page.root.id))!;
+    manager.getElement(a)!.getChildren()[0].setStyle("color", "hotpink");
+    manager.getElement(b)!.setStyle("padding", "8px");
+
+    // The source drops the heading: a's override loses its target, b's stays.
+    const source = sourceElement(manager, page.root.id);
+    manager.removeElement(source.getChildren()[0].getId());
+    const version = mgr.getComponent(comp.id)!.version;
+
+    const preview = mgr.previewMasterUpdate(comp.id, source.getId());
+    expect(preview).toEqual({ instances: 2, overridesKept: 1, lost: [{ elementId: a, count: 1 }] });
+    expect(mgr.getComponent(comp.id)!.version).toBe(version);
+    expect(mgr.getInstance(a)!.overrides).toHaveLength(1);
+  });
+
+  it("is null for an unknown master or source", async () => {
+    const { manager, mgr, page } = makeStack();
+    const card = sourceElement(manager, page.root.id);
+    const comp = (await mgr.createComponent("Card", card.getId()))!;
+    expect(mgr.previewMasterUpdate("ghost", card.getId())).toBeNull();
+    expect(mgr.previewMasterUpdate(comp.id, "ghost")).toBeNull();
+  });
+});
+
 describe("ComponentManager.duplicateComponent", () => {
   it("returns null for a missing source", async () => {
     const { mgr } = makeStack();
@@ -476,6 +509,46 @@ describe("ComponentManager — snapshot / restore for toast Undo", () => {
     const created = emitsOf(composer, EVENTS.COMPONENT_CREATED);
     expect(created).toHaveLength(before + 1);
     expect(created.at(-1)?.[1]).toMatchObject({ component: { id: comp.id } });
+  });
+
+  /* 2L9 217:41451 (B6-K17): Detach all's Undo relinks every instance whose
+     element is still on the site, overrides and all. */
+  it("relinkInstances restores detached instances with their overrides", async () => {
+    const { composer, manager, mgr, page } = makeStack();
+    const card = sourceElement(manager, page.root.id);
+    const comp = (await mgr.createComponent("Card", card.getId()))!;
+    const i1 = (await mgr.instantiateComponent(comp.id, page.root.id))!;
+    const i2 = (await mgr.instantiateComponent(comp.id, page.root.id))!;
+    const snap = mgr.snapshotComponent(comp.id)!;
+    const withOverride = snap.instances.find((r) => r.elementId === i1)!;
+    withOverride.overrides = [{ path: "styles.color", value: "red" } as never];
+
+    await mgr.detachInstance(i1);
+    await mgr.detachInstance(i2);
+    expect(mgr.getInstancesOfComponent(comp.id)).toHaveLength(0);
+    const before = emitsOf(composer, EVENTS.COMPONENT_LIST_UPDATED).length;
+
+    expect(mgr.relinkInstances(snap.instances)).toBe(2);
+    expect(mgr.isInstance(i1)).toBe(true);
+    expect(mgr.isInstance(i2)).toBe(true);
+    expect(manager.getElement(i1)!.getData().data?.componentInstance).toMatchObject({
+      componentId: comp.id,
+      isDetached: false,
+      overrides: [{ path: "styles.color", value: "red" }],
+    });
+    expect(emitsOf(composer, EVENTS.COMPONENT_LIST_UPDATED).length).toBe(before + 1);
+  });
+
+  it("relinkInstances skips elements that are gone and masters that are gone", async () => {
+    const { manager, mgr, page } = makeStack();
+    const card = sourceElement(manager, page.root.id);
+    const comp = (await mgr.createComponent("Card", card.getId()))!;
+    const i1 = (await mgr.instantiateComponent(comp.id, page.root.id))!;
+    const snap = mgr.snapshotComponent(comp.id)!;
+    await mgr.detachInstance(i1);
+    expect(mgr.relinkInstances([{ ...snap.instances[0], elementId: "ghost" }])).toBe(0);
+    expect(mgr.relinkInstances([{ ...snap.instances[0], componentId: "ghost" }])).toBe(0);
+    expect(mgr.isInstance(i1)).toBe(false);
   });
 
   it("a snapshot is a copy — detaching does not mark its instance records detached", async () => {

@@ -48,24 +48,8 @@ export function takeReplaceTarget(composer: Composer): string | undefined {
   return id && selected.length === 1 && selected[0] === id ? id : undefined;
 }
 
-/* G2-117: "Generate a block with AI…" (⌘K, the AI panel's CREATE door) opens
-   Add on its Generate screen. Held until the panel mounts, like a group. */
-const pendingGenerate = new WeakSet<Composer>();
-
-export function requestGenerateBlock(composer: Composer): void {
-  pendingGenerate.add(composer);
-  composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "add" });
-  composer.emit(EVENTS.UI_INSERT_OPEN_GENERATE, {});
-}
-
-export function takePendingGenerate(composer: Composer): boolean {
-  const asked = pendingGenerate.has(composer);
-  pendingGenerate.delete(composer);
-  return asked;
-}
-
 /* ⌘⇧V (board 7063:78846): Add opens its Paste HTML dialog. Held until the
-   panel mounts, like Generate. */
+   panel mounts, like a group. */
 const pendingPasteHtml = new WeakSet<Composer>();
 
 export function requestPasteHtml(composer: Composer): void {
@@ -78,4 +62,27 @@ export function takePendingPasteHtml(composer: Composer): boolean {
   const asked = pendingPasteHtml.has(composer);
   pendingPasteHtml.delete(composer);
   return asked;
+}
+
+/* design-2l9 7:19448: an insert's receipt ("Text added to Hero" / "Selected
+   on canvas · Focus stays here") belongs in the Add panel, under its list —
+   not in a toast. The open panel registers where its receipt goes; an insert
+   with no open Add panel (⌘K, the canvas menu) still raises the toast. */
+export interface InsertReceipt {
+  title: string;
+  detail: string;
+}
+const receiptSinks = new WeakMap<Composer, (r: InsertReceipt) => void>();
+
+export function setInsertReceiptSink(composer: Composer, sink: ((r: InsertReceipt) => void) | null): void {
+  if (sink) receiptSinks.set(composer, sink);
+  else receiptSinks.delete(composer);
+}
+
+/** Hands the receipt to the open Add panel; false when none is listening. */
+export function showInsertReceipt(composer: Composer, receipt: InsertReceipt): boolean {
+  const sink = receiptSinks.get(composer);
+  if (!sink) return false;
+  sink(receipt);
+  return true;
 }

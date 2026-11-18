@@ -1,23 +1,14 @@
 /**
- * LintSection — Brand › Brand checks, board 7316:84555 (C1 (ii); was the
- * drawer's Lint destination, 154:2).
+ * LintSection — Brand › Checks, Figma 2L9 B6-B18.
  *
- * One card, a 48px row per finding: what is wrong over the token it is about,
- * ending in `Fix` (red) when the finding carries an auto-fix hint, `Open`
- * (accent) otherwise. Errors sort first — a banned hue is a shipping blocker,
- * a missing dark variant is a gap.
+ * One card, a row per finding: what is wrong over what the finding says,
+ * ending in the board's three actions — Open (the token's page), Fix (when
+ * the finding carries an auto-fix hint; one write, one ⌘Z) and Ignore (the
+ * token's findings are hidden: `lintState.suppress`). "Show ignored · N"
+ * lists what was ignored, each with Restore. Errors sort first.
  *
- * The drawer's note said no rule sets `autoFixHint`. That stopped being true:
- * contrast findings carry a `contrast:<surface>` hint (utils/contrastLint).
- * Fix STAGES the fixed value in the draft, the same as any edit on these
- * pages — the Draft chip lights, the live preview repaints, Save applies it.
- * For contrast the value is `suggestContrastFix`'s — searched to AA against
- * the customer's page, the same algorithm the engine's Auto-fix runs (DQ-010;
- * the old ±22% shift took #EEEEEE to #B6B6B6, still ~2:1).
- * Open goes to the token's own page with its card open.
- *
- * The header's "Run checks" (the workspace's page action) re-runs them now;
- * they also run by themselves on every staged edit (useDSLint, debounced).
+ * Contrast findings carry a `contrast:<surface>` hint; the fixed value is
+ * `suggestContrastFix`'s, searched to AA against the page colour (DQ-010).
  *
  * @license BSD-3-Clause
  */
@@ -38,6 +29,11 @@ export interface LintSectionProps {
   onOpen?: (tokenId: string) => void;
   /** The Connect to tokens check (BRP1-M7) — a page under Brand checks. */
   onConnect?: () => void;
+  /** Hide a token's findings (B6-B18 "Ignore"). */
+  onIgnore?: (tokenId: string) => void;
+  /** The ignored tokens and their findings — "Show ignored · N". */
+  ignored?: ReadonlyArray<{ tokenId: string; rule?: LintRuleId; message?: string }>;
+  onRestore?: (tokenId: string) => void;
 }
 
 /* The door to Connect to tokens: BRP1-M7 draws the check as a page under
@@ -48,8 +44,8 @@ const ConnectDoor: React.FC<{ onConnect?: () => void }> = ({ onConnect }) =>
     <div className="tw:mt-4">
     <BrandCard label="More checks" data-testid="brand-checks-more">
       <BrandRow
-        name="Connect to tokens"
-        sub="Bind raw values that exactly match a token"
+        name="Connect to Brand colors"
+        sub="Use a color token where a page has the same color typed in"
         trailing={<BrandChevron />}
         onSelect={onConnect}
         data-testid="brand-check-connect"
@@ -64,7 +60,7 @@ const RULE_LABEL: Record<LintRuleId, string> = {
   "banned-hue": "Banned hue — purple, violet or indigo",
   "pure-black": "Pure black",
   "empty-value": "Empty value",
-  "missing-dark": "No dark variant",
+  "missing-dark": "Missing dark value",
   "unresolved-binding": "Unresolved binding",
   "alias-depth-exceeded": "Alias chain too deep",
   "semantic-needs-alias": "Semantic token needs an alias",
@@ -95,17 +91,47 @@ export function contrastFixFor(
   return value ? { value } : null;
 }
 
-/** "N issues · auto-fix available" — the page header's caption. */
-export function brandChecksCaption(issues: readonly LintIssue[], ignored = 0): string {
-  const n = issues.length;
-  const base = `${n} issue${n === 1 ? "" : "s"}`;
-  const withFix = issues.some((i) => i.autoFixHint) ? `${base} · auto-fix available` : base;
-  /* G3-123: the "Warnings suppressed" pill became this suffix. */
-  return ignored > 0 ? `${withFix} · ${ignored} ignored` : withFix;
-}
+export const LintSection: React.FC<LintSectionProps> = ({ issues, onFix, onOpen, onConnect, onIgnore, ignored = [], onRestore }) => {
+  const [showIgnored, setShowIgnored] = React.useState(false);
+  const ordered = [...issues].sort((a, b) =>
+    a.severity === b.severity ? 0 : a.severity === "error" ? -1 : 1,
+  );
 
-export const LintSection: React.FC<LintSectionProps> = ({ issues, onFix, onOpen, onConnect }) => {
-  if (issues.length === 0) {
+  const ignoredBlock = ignored.length > 0 && (
+    <div className="tw:mt-4 tw:flex tw:flex-col tw:gap-2">
+      <Button
+        type="button"
+        variant="link"
+        size="xs"
+        aria-expanded={showIgnored}
+        onClick={() => setShowIgnored((v) => !v)}
+        data-testid="brand-checks-show-ignored"
+        className={`${ACTION} tw:self-start tw:text-[var(--bk-accent-text)]`}
+      >
+        {showIgnored ? "Hide ignored" : `Show ignored · ${ignored.length}`}
+      </Button>
+      {showIgnored && (
+        <BrandCard label="Ignored checks" data-testid="brand-checks-ignored-list">
+          {ignored.map(({ tokenId, rule, message }) => (
+            <BrandRow
+              key={tokenId}
+              name={rule ? (RULE_LABEL[rule] ?? rule) : tokenId}
+              sub={message ?? tokenId}
+              trailing={
+                onRestore && (
+                  <Button size="xs" variant="link" onClick={() => onRestore(tokenId)} data-testid={`brand-check-restore-${tokenId}`} className={`${ACTION} tw:text-[var(--bk-accent-text)]`}>
+                    Restore
+                  </Button>
+                )
+              }
+            />
+          ))}
+        </BrandCard>
+      )}
+    </div>
+  );
+
+  if (ordered.length === 0) {
     return (
       <>
       <div className="tw:py-6 tw:text-center" data-testid="brand-checks-empty">
@@ -114,14 +140,11 @@ export const LintSection: React.FC<LintSectionProps> = ({ issues, onFix, onOpen,
           Every token passes the brand rules.
         </div>
       </div>
+      {ignoredBlock}
       <ConnectDoor onConnect={onConnect} />
       </>
     );
   }
-
-  const ordered = [...issues].sort((a, b) =>
-    a.severity === b.severity ? 0 : a.severity === "error" ? -1 : 1,
-  );
 
   return (
     <>
@@ -136,34 +159,31 @@ export const LintSection: React.FC<LintSectionProps> = ({ issues, onFix, onOpen,
             data-severity={issue.severity}
             title={issue.message}
             name={RULE_LABEL[issue.rule] ?? issue.rule}
-            sub={issue.tokenId}
+            sub={issue.message}
             trailing={
-              fixable ? (
-                <Button
-                  size="xs"
-                  variant="link"
-                  onClick={() => onFix?.(issue)}
-                  data-testid={`brand-check-fix-${issue.tokenId}`}
-                  className={`${ACTION} tw:text-[var(--bk-error-text)]`}
-                >
-                  Fix
-                </Button>
-              ) : onOpen ? (
-                <Button
-                  size="xs"
-                  variant="link"
-                  onClick={() => onOpen(issue.tokenId)}
-                  data-testid={`brand-check-open-${issue.tokenId}`}
-                  className={`${ACTION} tw:text-[var(--bk-accent-text)]`}
-                >
-                  Open
-                </Button>
-              ) : undefined
+              <span className="tw:flex tw:flex-none tw:items-center tw:gap-3">
+                {onOpen && (
+                  <Button size="xs" variant="link" onClick={() => onOpen(issue.tokenId)} data-testid={`brand-check-open-${issue.tokenId}`} className={`${ACTION} tw:text-[var(--bk-accent-text)]`}>
+                    Open
+                  </Button>
+                )}
+                {fixable && (
+                  <Button size="xs" variant="link" onClick={() => onFix?.(issue)} data-testid={`brand-check-fix-${issue.tokenId}`} className={`${ACTION} tw:text-[var(--bk-error-text)]`}>
+                    Fix
+                  </Button>
+                )}
+                {onIgnore && (
+                  <Button size="xs" variant="link" onClick={() => onIgnore(issue.tokenId)} data-testid={`brand-check-ignore-${issue.tokenId}`} className={`${ACTION} tw:text-[var(--bk-ink-soft)]`}>
+                    Ignore
+                  </Button>
+                )}
+              </span>
             }
           />
         );
       })}
     </BrandCard>
+    {ignoredBlock}
     <ConnectDoor onConnect={onConnect} />
     </>
   );

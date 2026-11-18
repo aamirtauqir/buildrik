@@ -1,0 +1,11 @@
+# Wave 3 brief — fix every difference to the board (owner, 2026-10-26)
+
+Owner instruction: "fix karoo jo jo bhee frak hein un ko" — fix every difference between the live product and the 2L9 boards. Visuals, layout, sizes, order and copy follow the BOARD. Behaviour still follows the code contract where a board would make the product lie (record `authority: code:<reason>`); otherwise the board wins. Earlier "default, owner may override" decisions on visuals now resolve to the board.
+
+Same rules as `../LANE-BRIEF.md` (worktree, owned paths, no AquibraStudio.tsx, lead-owned files only via REQUESTS.md, tsc + verify:ds per batch, commit often, no push, no `--no-verify`). Differences from wave 1–2:
+
+1. **Your input list:** `wave3/drifts-<x>.json` — every board in your lane that the 2026-10-26 live comparison found different, with the board PNG path (`shots/…`) and the exact difference. Fix all of them first. The live screenshot of each is in `compare/<group>/`.
+2. **Image-driven loop (mandatory):** for each board, render your surface in the probe harness (`e2e/probe/probe.tsx`, add a case if none exists) on your safe probe port via a temporary Playwright config, screenshot at the board's size, open the board PNG and your screenshot side by side (Read both images), and fix until layout, sizes (±4 px, measure with getBoundingClientRect), order, copy and controls agree. Only then set the manifest row `verified: "drift-fixed"` with `verifiedNote: "probe-compared <date>: <what was checked>"`. A row you cannot render in a probe stays `drift-open` with the reason.
+3. **More boards:** after your drift list, take the next "built, not compared" rows of your lane. You may fetch up to 8 extra board screenshots per lane from Figma (`node scripts/baseline/figma-mcp.mjs` client from the repo root, `get_screenshot` with `fileKey 2L9OTGzBrL6kYmU18yA1c7`; the result is a PNG URL — download it into `shots/`). Wait ≥4.2 s between calls (15/min shared). Stop at 8.
+4. **Shared scratchpad:** keep every helper script inside your own subfolder `wave3-<x>/`. Never write another lane's worktree or manifest.
+5. Report (<400 words): boards fixed and probe-compared (count), rows left in your drift list and why, requests filed, test/tsc/verify results.

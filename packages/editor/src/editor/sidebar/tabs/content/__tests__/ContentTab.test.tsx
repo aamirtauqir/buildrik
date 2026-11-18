@@ -10,12 +10,28 @@ import * as React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup, waitFor, act, within } from "@testing-library/react";
 import { ContentTab } from "../ContentTab";
+import { SOURCES_IN_RELEASE } from "../ContentRootView";
 import { cmsWorkspace } from "@/editor/cms/cmsWorkspaceStore";
+import { CmsWorkspace } from "@/editor/cms/CmsWorkspace";
+import { ToastProvider } from "@/editor/chrome-ui";
+
+/* B5-V01 (260:235689): Site variables opens as the CMS workspace's page, so
+   the variables tests mount the drawer beside the workspace, as the shell
+   does. */
+const withWorkspace = (composer: unknown, tab: React.ReactElement) => (
+  <ToastProvider>
+    {tab}
+    <CmsWorkspace composer={composer as never} />
+  </ToastProvider>
+);
 import { makeEngine, MENU, ITEM } from "@/editor/cms/__tests__/fakeCmsEngine";
 import { CMSValidationError } from "@/engine/cms/CollectionManager";
 
 beforeEach(() => localStorage.clear());
-afterEach(() => cleanup());
+afterEach(() => {
+  cleanup();
+  cmsWorkspace.reset();
+});
 
 describe("ContentTab", () => {
   it("empty project shows the board 149:7 empty state with the create CTA", async () => {
@@ -25,12 +41,14 @@ describe("ContentTab", () => {
     expect(screen.getByRole("button", { name: "Create a collection" })).toBeInTheDocument();
   });
 
-  it("A-17/A09-8: the zero state also offers the Sources/Variables/Conditions doors it owns", async () => {
+  it("A-17/A09-8: the zero state also offers the Site variables/Conditions doors it owns; Sources is hidden (BD-39)", async () => {
     const { composer } = makeEngine();
-    render(<ContentTab composer={composer as never} onCreateCollection={vi.fn()} />);
+    render(withWorkspace(composer, <ContentTab composer={composer as never} onCreateCollection={vi.fn()} />));
     await screen.findByTestId("content-empty");
-    fireEvent.click(screen.getByTestId("content-empty-sources"));
-    expect(await screen.findByRole("button", { name: "+ Connect a source" })).toBeInTheDocument();
+    expect(screen.queryByTestId("content-empty-sources")).toBeNull();
+    fireEvent.click(screen.getByTestId("content-empty-variables"));
+    expect(await screen.findByTestId("content-vars-intro")).toHaveTextContent("Use one value across your site");
+    expect(screen.getByTestId("content-vars-empty")).toHaveTextContent("No variables yet. Add a key and value to start.");
   });
 
   it("root lists collections with record counts and the Data rows", async () => {
@@ -38,9 +56,14 @@ describe("ContentTab", () => {
     render(<ContentTab composer={composer as never} />);
     expect(await screen.findByText("Menu items")).toBeInTheDocument();
     await waitFor(() => expect(screen.getAllByText("1").length).toBeGreaterThan(0)); // record count
-    for (const row of ["Sources", "Variables", "Conditions"]) {
+    /* RL01 (424:337006): Site variables · Conditions · Recently deleted
+       (Planned until restore ships); Sources hidden by BD-39. */
+    for (const row of ["Site variables", "Conditions", "Recently deleted"]) {
       expect(screen.getByText(row)).toBeInTheDocument();
     }
+    expect(screen.queryByText("Sources")).toBeNull();
+    expect(screen.getByTestId("content-recently-deleted")).toHaveAttribute("aria-disabled", "true");
+    expect(screen.getByTestId("content-recently-deleted")).toHaveTextContent("Planned");
   });
 
   it("root rows carry the board 148:2 leading glyph, and 'New collection' is a row, not a button", async () => {
@@ -52,7 +75,7 @@ describe("ContentTab", () => {
     // Every List row (collections + the three Data rows) now fills the icon
     // slot board 232:6 calls out — this used to render blank, which read as
     // the label starting 24px further left than its board.
-    for (const label of ["Menu items", "Sources", "Variables", "Conditions"]) {
+    for (const label of ["Menu items", "Site variables", "Conditions"]) {
       const row = screen.getByText(label).closest('[role="button"]');
       expect(row?.querySelector("svg")).toBeTruthy();
     }
@@ -71,13 +94,15 @@ describe("ContentTab", () => {
       JSON.stringify([{ key: "name", value: "Bella Cucina" }]),
     );
     const { composer, sources } = makeEngine();
-    render(<ContentTab composer={composer as never} />);
-    fireEvent.click(await screen.findByText("Variables"));
+    render(withWorkspace(composer, <ContentTab composer={composer as never} />));
+    fireEvent.click(await screen.findByText("Site variables"));
     expect(await screen.findByText("{{site.name}}")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "+ New variable" }));
     fireEvent.change(screen.getByLabelText("Variable key"), { target: { value: "phone" } });
     fireEvent.change(screen.getByLabelText("Variable value"), { target: { value: "+44 20" } });
-    fireEvent.click(screen.getByRole("button", { name: "Add" }));
+    /* 2L9 B5-V03 260:236147 — "Add site variable" is a dialog. */
+    expect(screen.getByText("Start with a letter. Use letters, digits, underscores or dashes.")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Add variable" }));
     expect(await screen.findByText("{{site.phone}}")).toBeInTheDocument();
     expect(sources.get("site")?.data).toEqual({ name: "Bella Cucina", phone: "+44 20" });
     expect(composer.getProjectSettings().siteVariables).toEqual([
@@ -86,57 +111,45 @@ describe("ContentTab", () => {
     ]);
   });
 
-  it("conditions: lists element condition bindings with summaries and removes them", async () => {
-    const { composer, elements } = makeEngine({ collections: [MENU], items: [] });
-    const removeDataBinding = vi.fn();
-    elements.push({
-      getId: () => "el-9",
-      getType: () => "badge",
-      getContent: () => "Sold out",
-      getDataBindings: () => ({
-        condition: {
-          type: "condition",
-          sourceId: "",
-          path: "",
-          condition: { operator: "==", left: "available", right: "false" },
-        },
-      }),
-      removeDataBinding,
+  it("conditions (176:21830): a workspace page, read-only — where, active or legacy; Locate opens the page and selects", async () => {
+    const { composer, elements } = makeEngine({
+      collections: [MENU],
+      items: [],
+      conditions: { "el-1": { match: "all", rules: [{ field: "opening_hours.sunday", op: "set" }] } },
     });
-    render(<ContentTab composer={composer as never} />);
-    fireEvent.click(await screen.findByText("Conditions"));
-    expect(await screen.findByText("when available is false")).toBeInTheDocument();
-    /* Board 151:87 names the row after the element, not after its tag — the
-       label was "badge · Sold out" until 2026-09-08. */
-    expect(screen.getByText("Sold out")).toBeInTheDocument();
-    /* Board 151:87 puts the row actions behind a `⋯`, so removal is two
-       clicks now: open the row menu, then choose. */
-    fireEvent.click(screen.getByRole("button", { name: /Actions for/ }));
-    fireEvent.click(screen.getByRole("menuitem", { name: "Remove condition" }));
-    expect(removeDataBinding).toHaveBeenCalledWith("condition");
-  });
-
-  it("condition create: pick result opens the form and binds through the engine", async () => {
-    const { composer, elements } = makeEngine({ collections: [MENU], items: [] });
-    elements.push({
-      getId: () => "el-5",
-      getType: () => "section",
-      getContent: () => "",
-      getDataBindings: () => ({}),
-      removeDataBinding: vi.fn(),
-    });
-    render(<ContentTab composer={composer as never} />);
-    fireEvent.click(await screen.findByText("Conditions"));
-    fireEvent.click(screen.getByRole("button", { name: "+ New condition" }));
-    act(() => composer.emit("inspector:pick-result", "el-5"));
-    const path = await screen.findByLabelText("Condition path");
-    fireEvent.change(path, { target: { value: "site.open" } });
-    fireEvent.change(screen.getByLabelText("Condition value"), { target: { value: "true" } });
-    fireEvent.click(screen.getByRole("button", { name: "Add condition" }));
-    expect(composer.data.bindCondition).toHaveBeenCalledWith(
-      elements[0],
-      expect.objectContaining({ operator: "==", left: "site.open", right: "true" }),
+    const pageRoot = { getId: () => "root-item", getParent: () => undefined };
+    elements.push(
+      { getId: () => "el-1", getType: () => "heading", getContent: () => "", getDataBindings: () => ({}), removeDataBinding: vi.fn(), getParent: () => pageRoot },
+      {
+        getId: () => "el-2",
+        getType: () => "heading",
+        getContent: () => "",
+        getDataBindings: () => ({ condition: { type: "condition", sourceId: "", path: "", condition: { operator: "==", left: "a", right: "b" } } }),
+        removeDataBinding: vi.fn(),
+        getParent: () => pageRoot,
+      },
     );
+    const onBackToCanvas = vi.fn();
+    render(
+      <ToastProvider>
+        <ContentTab composer={composer as never} />
+        <CmsWorkspace composer={composer as never} onBackToCanvas={onBackToCanvas} />
+      </ToastProvider>,
+    );
+    fireEvent.click(await screen.findByText("Conditions"));
+    expect(cmsWorkspace.get().page).toBe("conditions");
+    expect(await screen.findByText("Conditions across this site")).toBeInTheDocument();
+    expect(screen.getByText("Edit conditions on their selected element in the Inspector.")).toBeInTheDocument();
+    expect(screen.getByTestId("content-cond-label-el-1")).toHaveTextContent("Menu item › Heading");
+    expect(screen.getByTestId("content-cond-summary-el-1")).toHaveTextContent("Active · opening_hours.sunday is set");
+    expect(screen.getByTestId("content-cond-summary-el-2")).toHaveTextContent("Not active — review legacy rule");
+    // Read-only: no create, no remove.
+    expect(screen.queryByText("+ New condition")).toBeNull();
+    expect(screen.queryByRole("button", { name: /Actions for/ })).toBeNull();
+    fireEvent.click(screen.getByTestId("content-cond-locate-el-1"));
+    expect(onBackToCanvas).toHaveBeenCalled();
+    expect(composer.elements.setActivePage).toHaveBeenCalledWith("p-item");
+    expect(composer.selection.select).toHaveBeenCalledWith(elements[0]);
   });
 
   /* Regression. `CollectionView` renders the Dynamic pages row only when
@@ -158,7 +171,9 @@ describe("ContentTab", () => {
     );
   });
 
-  it("says it is watching only when there is a source to watch (board 303:2083)", async () => {
+  /* BD-39: Sources has no door while the release constant is off; these
+     come back with it. */
+  it.skipIf(!SOURCES_IN_RELEASE)("says it is watching only when there is a source to watch (board 303:2083)", async () => {
     const { composer } = makeEngine({ collections: [MENU], items: [] });
     render(<ContentTab composer={composer as never} />);
     fireEvent.click(await screen.findByText("Sources"));
@@ -167,7 +182,9 @@ describe("ContentTab", () => {
     expect(screen.queryByTestId("sources-watching")).toBeNull();
   });
 
-  it("sources: JSON import goes through importSampleData; bad JSON shows the error", async () => {
+  /* BD-39: Sources has no door while the release constant is off; these
+     come back with it. */
+  it.skipIf(!SOURCES_IN_RELEASE)("sources: JSON import goes through importSampleData; bad JSON shows the error", async () => {
     const { composer } = makeEngine({ collections: [MENU], items: [] });
     render(<ContentTab composer={composer as never} />);
     fireEvent.click(await screen.findByText("Sources"));
@@ -196,7 +213,60 @@ describe("ContentTab", () => {
     expect(cmsWorkspace.get()).toMatchObject({ collectionId: "col-1", tab: "records", recordId: null });
     // the drawer stays on its list, with the open collection marked
     await waitFor(() => expect(screen.getByTestId("content-collection-col-1")).toHaveAttribute("aria-current", "true"));
-    expect(screen.getByTestId("content-open-sources")).toBeInTheDocument();
+    expect(screen.getByTestId("content-open-variables")).toBeInTheDocument();
     cmsWorkspace.reset();
+  });
+});
+
+/* 2L9 C8 (260:235689 · 260:238267 · 260:238513 · 260:238886) — each site
+   variable says how many text placeholders read it, lists them, and the
+   rename / delete dialogs name the placeholders they leave behind. */
+describe("Site variables · placeholder usages (2L9 C8)", () => {
+  const mountWithPhone = async () => {
+    localStorage.setItem("buildrick-site-variables-test-proj", JSON.stringify([{ key: "phone", value: "+44 20" }, { key: "empty", value: "" }]));
+    const engine = makeEngine();
+    engine.elements.push(
+      { getId: () => "t1", getType: () => "text", getContent: () => "Call {{site.phone}} or {{ site.phone }}", getDataBindings: () => ({}), getCustomData: () => undefined } as never,
+      { getId: () => "t2", getType: () => "heading", getContent: () => "Phone: {{site.phone}}", getDataBindings: () => ({}), getCustomData: () => undefined } as never,
+    );
+    render(withWorkspace(engine.composer, <ContentTab composer={engine.composer as never} />));
+    fireEvent.click(await screen.findByText("Site variables"));
+    await screen.findByText("{{site.phone}}");
+    return engine;
+  };
+
+  it("counts the elements whose text uses each key", async () => {
+    await mountWithPhone();
+    expect(screen.getByTestId("content-var-count-phone")).toHaveTextContent("2 text placeholders");
+    expect(screen.getByTestId("content-var-count-empty")).toHaveTextContent("0 placeholders");
+    expect(screen.getByTestId("content-var-value-empty")).toHaveTextContent("Empty value");
+  });
+
+  it("Show usages lists them and opens the element", async () => {
+    const { composer } = await mountWithPhone();
+    fireEvent.click(screen.getByRole("button", { name: "Actions for phone" }));
+    fireEvent.click(screen.getByTestId("content-var-usages-phone"));
+    expect(await screen.findByText("phone · 2 text placeholders")).toBeInTheDocument();
+    expect(screen.getByText(/does not rewrite these placeholders/)).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("content-var-use-1"));
+    expect(composer.selection.select).toHaveBeenCalled();
+  });
+
+  it("rename and delete name the placeholders they leave behind", async () => {
+    await mountWithPhone();
+    fireEvent.click(screen.getByRole("button", { name: "Actions for phone" }));
+    fireEvent.click(screen.getByTestId("content-var-rename-phone"));
+    expect(await screen.findByText("Rename phone?")).toBeInTheDocument();
+    expect(screen.getByTestId("content-var-rename-description")).toHaveTextContent(
+      "2 text placeholders still use {{site.phone}}. They will not automatically change to the new key.",
+    );
+    expect(screen.getByTestId("content-var-rename-save")).toHaveTextContent("Rename key");
+    fireEvent.click(screen.getByTestId("content-var-rename-cancel"));
+    fireEvent.click(screen.getByRole("button", { name: "Actions for phone" }));
+    fireEvent.click(screen.getByTestId("content-var-delete-phone"));
+    expect(await screen.findByTestId("content-var-delete-body")).toHaveTextContent(
+      "The variable and its value will be removed. 2 text placeholders still use {{site.phone}}; review those usages before publishing.",
+    );
+    expect(screen.getByTestId("content-var-delete-usages")).toBeInTheDocument();
   });
 });

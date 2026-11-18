@@ -25,6 +25,13 @@ import {
 import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
 import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
 import type { DesignToken } from "@/engine/designSystem/types";
+import { STARTER_DS_REGISTRY } from "@/editor/design-system/starters";
+
+vi.mock("@/editor/design-system/state/useBrandRestorePoints", () => ({
+  takeRestorePoint: async () => true,
+  useBrandRestorePoints: () => ({ rows: [], status: "ready", refresh: () => {}, restore: async () => "failed" }),
+}));
+vi.mock("@/services/BuildrikSyncProvider", () => ({ getSiteIdFromUrl: () => "s1" }));
 
 beforeEach(installDomShims);
 
@@ -35,7 +42,7 @@ describe("BrandWorkspace — pages", () => {
   it("lands on Colours and switches pages directly", async () => {
     const composer = makeFakeComposer();
     const utils = renderWorkspace(composer);
-    expect(utils.getByTestId("brand-page-title").textContent).toBe("Colours");
+    expect(utils.getByTestId("brand-page-title").textContent).toMatch(/^Colors · \d+$/);
     expect(document.getElementById("design-section-colours")).toBeTruthy();
 
     openPage(utils, "presets");
@@ -44,26 +51,35 @@ describe("BrandWorkspace — pages", () => {
       expect(document.getElementById("design-section-colours")).toBeNull();
     });
     expect(utils.getByTestId("brand-page-title").textContent).toBe("Presets");
-    expect(utils.getByTestId("brand-row-presets").getAttribute("aria-current")).toBe("page");
+    // Presets is a drill-in of Type styles · Presets (B6-B26): that row stays current.
+    expect(utils.getByTestId("brand-row-styles").getAttribute("aria-current")).toBe("page");
   });
 
-  it("lists the board's nav in its order, Styles included, the other kinds on Spacing's switch", () => {
+  it("lists the board's nav in three groups (B6-B01); the other kinds sit under Other kinds › (B6-B23)", () => {
     const composer = makeFakeComposer();
     const utils = renderWorkspace(composer);
-    /* The label cell only — Colours carries its palette count beside it. */
-    const labels = Array.from(utils.container.querySelectorAll('[data-testid^="brand-row-label-"]')).map(
-      (r) => r.textContent?.trim(),
-    );
-    expect(labels).toEqual([
-      "Colours", "Colour mode", "Fonts & type styles", "Styles", "Component styles", "Classes",
-      "Presets", "Brand checks", "Starters", "Spacing", "Import / export",
+    const groups = utils.getAllByTestId("brand-nav-group").map((g) => [
+      g.querySelector("p")?.textContent,
+      ...Array.from(g.querySelectorAll('[data-testid^="brand-row-label-"]')).map((r) => r.textContent?.trim()),
+    ]);
+    expect(groups).toEqual([
+      ["Tokens", "Colors", "Typography", "Spacing", "Other kinds ›"],
+      ["Reusable styles", "Type styles · Presets", "Classes"],
+      ["Tools", "Dark mode", "Checks", "Starters", "Import / export"],
     ]);
     expect(utils.container.querySelector('[data-testid="brand-basic-note"]')).toBeNull();
-    fireEvent.click(utils.container.querySelector('[data-section-id="spacing"]')!);
-    fireEvent.change(utils.getByTestId("brand-kind-switch"), { target: { value: "kind-imagery" } });
+    fireEvent.click(utils.container.querySelector('[data-section-id="other-kinds"]')!);
+    expect(utils.getByTestId("brand-page-title").textContent).toBe("Other kinds");
+    const kinds = utils.getByTestId("brand-other-kinds");
+    expect(kinds.children).toHaveLength(11);
+    expect(kinds.textContent).toContain("ImageryImage ratios and treatments");
+    fireEvent.click(utils.getByTestId("brand-kind-row-imagery"));
     expect(utils.getByTestId("brand-page-title").textContent).toBe("Imagery");
-    // Spacing stays the current nav row on a kind page.
-    expect(utils.getByTestId("brand-row-spacing").getAttribute("aria-current")).toBe("page");
+    // Other kinds stays the current nav row on a kind page; its back link returns.
+    expect(utils.getByTestId("brand-row-other-kinds").getAttribute("aria-current")).toBe("page");
+    expect(utils.getByTestId("brand-page-action").textContent).toBe("+ Add imagery");
+    fireEvent.click(utils.getByTestId("brand-back-other-kinds"));
+    expect(utils.getByTestId("brand-page-title").textContent).toBe("Other kinds");
   });
 
   it("the edit survives the trip to another page and back", async () => {
@@ -162,7 +178,7 @@ describe("BrandWorkspace — Review changes (non-blocking, every Brand write thi
     const composer = makeFakeComposer();
     const utils = renderWorkspace(composer);
     // Drawn at 0 too (8222:230854): the empty list says so.
-    expect(utils.getByTestId("brand-session-edits").textContent).toBe("Review changes · 0");
+    expect(utils.getByTestId("brand-session-edits").textContent).toBe("Review changes");
     await openList(utils);
     expect(utils.getByText("No changes to review yet.")).toBeTruthy();
     fireEvent.click(utils.getByTestId("brand-session-close"));
@@ -187,7 +203,7 @@ describe("BrandWorkspace — Review changes (non-blocking, every Brand write thi
     const reverted = composer.settings.designTokens as DesignToken[];
     expect(reverted.map((t) => t.id).sort()).toEqual(seedIds);
     expect(resolveTokenLiteral(reverted, "color-primary", "light")).toBe(resolveTokenLiteral(DEFAULT_TOKENS, "color-primary", "light"));
-    await waitFor(() => expect(utils.getByTestId("brand-session-edits").textContent).toBe("Review changes · 0"));
+    await waitFor(() => expect(utils.getByTestId("brand-session-edits").textContent).toBe("Review changes"));
   });
 
   /* L4-026: ⌘Z put the tokens back, but the list still showed the edit under
@@ -206,7 +222,7 @@ describe("BrandWorkspace — Review changes (non-blocking, every Brand write thi
 
     // ⌘Z — the engine restores the settings snapshot and emits SETTINGS_CHANGE.
     act(() => (composer as unknown as { setProjectSettings: (s: object) => void }).setProjectSettings({ designTokens: before }));
-    await waitFor(() => expect(utils.getByTestId("brand-session-edits").textContent).toBe("Review changes · 0"));
+    await waitFor(() => expect(utils.getByTestId("brand-session-edits").textContent).toBe("Review changes"));
 
     act(() => (composer as unknown as { setProjectSettings: (s: object) => void }).setProjectSettings({ designTokens: edited }));
     await waitFor(() => expect(utils.getByTestId("brand-session-edits").textContent).toBe("Review changes · 1"));
@@ -249,16 +265,18 @@ describe("BrandWorkspace — Review changes (non-blocking, every Brand write thi
   it("a write that changes nothing logs no row (re-applying the starter you are on)", async () => {
     const composer = makeFakeComposer();
     const utils = renderWorkspace(composer);
-    openPage(utils, "starters");
-    const second = () => utils.container.querySelectorAll<HTMLElement>('[role="radio"]')[1];
-    fireEvent.click(second());
-    openPage(utils, "colours");
+    const applySecond = async () => {
+      openPage(utils, "starters");
+      fireEvent.click(utils.getByTestId(`starter-row-${STARTER_DS_REGISTRY[1].id}`));
+      fireEvent.click(utils.getByTestId("starter-apply"));
+      // Applied → back on Colors (B6-B10).
+      await waitFor(() => expect(utils.getByTestId("brand-page-title").textContent).toMatch(/^Colors/));
+    };
+    await applySecond();
     const after1 = utils.getByTestId("brand-session-edits").textContent;
-    openPage(utils, "starters");
-    fireEvent.click(second());
-    openPage(utils, "colours");
+    await applySecond();
     expect(utils.getByTestId("brand-session-edits").textContent).toBe(after1);
-    expect(after1).not.toBe("Review changes · 0");
+    expect(after1).not.toBe("Review changes");
   });
 
   it("an import is a row per token it added", async () => {
@@ -270,7 +288,7 @@ describe("BrandWorkspace — Review changes (non-blocking, every Brand write thi
       target: { value: JSON.stringify([{ id: "color-imported", name: "Imported", value: "#00FF99", category: "colors", cssVar: "--buildrick-design-color-imported", type: "color", kind: "color" }]) },
     });
     fireEvent.click(utils.getByText(/^Parse$/i));
-    fireEvent.click(await utils.findByText(/Apply 1 valid only/i));
+    fireEvent.click(await utils.findByText(/^Apply 1 valid$/));
 
     openPage(utils, "colours");
     await openList(utils);
@@ -326,6 +344,8 @@ describe("BrandWorkspace — Review changes (non-blocking, every Brand write thi
     const seed = DEFAULT_TOKENS.find((t) => t.id === "color-primary")!;
     const edited = setTokenLiteral(DEFAULT_TOKENS, "color-primary", "light", "#C2410C");
     const composer = makeFakeComposer();
+    const undo = vi.fn(() => true);
+    Object.assign(composer, { history: { undo } });
     composer.settings.designTokens = edited;
     composer.settings.designTokensSchemaVersion = 6;
     const utils = renderWorkspace(composer);
@@ -335,14 +355,18 @@ describe("BrandWorkspace — Review changes (non-blocking, every Brand write thi
     fireEvent.click(utils.getByRole("menuitem", { name: "Reset to default" }));
     const saved = composer.settings.designTokens as DesignToken[];
     expect(saved.find((t) => t.id === "color-primary")).toEqual(seed);
-    expect(await utils.findByText(/reset to default · Undo ⌘Z/)).toBeTruthy();
+    // The receipt's Undo is the one undo (composer.history), not a Brand stack.
+    expect(await utils.findByText(/reset to default\.$/)).toBeTruthy();
+    fireEvent.click(utils.getByRole("button", { name: "Undo" }));
+    expect(undo).toHaveBeenCalledTimes(1);
   });
 });
 
 describe("BrandWorkspace — read-only notice by reason", () => {
   it.each([
     ["switch_off", "Brand editing is paused while we upgrade brand tokens."],
-    ["held", "This site's brand was rolled back — editing is paused."],
+    /* D-12 / B6-B46 212:38857: a hold is not a permission problem. */
+    ["held", "Brand update is on hold. Your site keeps its current look. Editing resumes when the update finishes. This is not about your access."],
   ])("%s says its own thing", (readOnlyReason, copy) => {
     const utils = renderWorkspace(makeFakeComposer([], { readOnly: true, readOnlyReason }));
     expect(utils.getByTestId("brand-read-only-banner").textContent).toBe(copy);

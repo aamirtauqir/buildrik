@@ -51,7 +51,7 @@ describe("SECTION_REGISTRY — capability gates", () => {
   });
 
   it("universal sections declare no gate", () => {
-    for (const id of ["size", "spacing", "fill", "border", "visibility", "interactions", "css-classes", "attributes", "opacity"] as const) {
+    for (const id of ["size", "spacing", "fill", "border", "visibility", "interactions", "attributes", "opacity"] as const) {
       expect(SECTION_REGISTRY[id].capability, id).toBeUndefined();
       expect(SECTION_REGISTRY[id].shouldRender, id).toBeUndefined();
     }
@@ -64,10 +64,7 @@ describe("SECTION_REGISTRY — runtime gates", () => {
     expect(Object.keys(SECTION_REGISTRY)).not.toContain("grid");
   });
 
-  it("the component row renders only on an instance", () => {
-    const gate = SECTION_REGISTRY.component.shouldRender!;
-    const composer = (instance: unknown) => ({ components: { getInstanceByElementId: () => instance } });
-    expect(gate(ctx({ composer: composer({ elementId: "e" }), selectedElement: { id: "e" } }))).toBe(true);
-    expect(gate(ctx({ composer: composer(null), selectedElement: { id: "e" } }))).toBe(false);
+  it("the instance block is not a tab section — it sits above the tabs (2L9 IC01)", () => {
+    expect(Object.keys(SECTION_REGISTRY)).not.toContain("component");
   });
 });

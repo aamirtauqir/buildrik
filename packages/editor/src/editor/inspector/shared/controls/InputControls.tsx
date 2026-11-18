@@ -12,14 +12,15 @@
  * @license BSD-3-Clause
  */
 
+import { setUnappliedDraft } from "./unappliedDraft";
 import { isTokenVar, resolveTokenVar } from "../tokenBindingDetection";
 import { ChevronDown, ChevronUp, Info } from "lucide-react";
 import * as React from "react";
 import { fieldTestId, labelTestId, rowTestId } from "./ControlRow";
 import { FieldDot } from "./FieldDot";
 import { useInspectorField, mixedName } from "./InspectorFieldContext";
-import { ErrorLine, useFieldError } from "./Section";
-import { TextField, BK_SELECT_BARE_UNIT_THEME, BK_SELECT_BARE_VALUE_THEME, Select, Textarea, TextInput, Tooltip } from "@/editor/chrome-ui";
+import { ErrorLine } from "./Section";
+import { Button, Menu, MenuItem, Popover, TextField, BK_SELECT_BARE_UNIT_THEME, BK_SELECT_BARE_VALUE_THEME, Select, Textarea, TextInput, Tooltip } from "@/editor/chrome-ui";
 
 // ============================================================================
 // HELPERS
@@ -136,6 +137,13 @@ export interface InputWithUnitProps {
   /** The CSS property this row edits — the field context reads read-only,
    *  "Mixed" and its override dot by it (InspectorFieldContext). */
   property?: string;
+  /** What the cascade resolves when the element sets nothing ("32 px") —
+   *  an empty field shows it as "32 px · inherited" (2L9 S21), full width,
+   *  no stepper or unit until the user types a value of its own. */
+  inherited?: string;
+  /** The selection disagrees on a value the field context does not track
+   *  (an attribute, not a style): reads "Mixed" like a style field does. */
+  mixed?: boolean;
   /** A plain count (grid Columns, board 17): the number and its stepper, no
    *  unit dropdown and no unit words in the name. */
   noUnit?: boolean;
@@ -146,14 +154,55 @@ export interface InputWithUnitProps {
    *  write the value the field held then. Size's Fill field shows a readout,
    *  not the value, so it puts back its own. */
   onRevert?: (atFocus: string) => void;
+  /** The unit choice as a card beside the column, under this title, instead
+   *  of the inline unit select (2L9 I06 161:11006 "Font size unit" — px, em,
+   *  rem, %, vw · Cancel). Only the field that passes it changes. */
+  unitCardTitle?: string;
 }
 
 const NO_UNITS: readonly string[] = [""];
 
-/** Board 34. The one message every number field shows for an entry it cannot read. */
-export const NUMBER_ERROR = "Enter a valid number. Choose the unit separately.";
-
 const KEYWORDS = new Set(["auto", "none", "inherit", "normal", "initial"]);
+
+/** Properties CSS refuses a negative for — the error says so (2L9 I03). */
+const NON_NEGATIVE = new Set([
+  "font-size", "line-height", "width", "height", "min-width", "min-height", "max-width", "max-height",
+  "padding", "padding-top", "padding-right", "padding-bottom", "padding-left",
+  "border-width", "border-radius", "border-top-left-radius", "border-top-right-radius", "border-bottom-right-radius", "border-bottom-left-radius",
+  "gap", "row-gap", "column-gap", "outline-width", "flex-basis",
+]);
+
+/**
+ * The message under an entry the field cannot read (2L9 I03): what it takes,
+ * then what the element still carries — "Enter a non-negative number and a
+ * supported unit. Last applied: 24 px." The entry itself stays in the field.
+ */
+function numberError(property: string | undefined, num: string, unit: string): string {
+  const takes = property && NON_NEGATIVE.has(property) ? "Enter a non-negative number and a supported unit." : "Enter a number and a supported unit.";
+  const last = KEYWORDS.has(unit) ? unit : num !== "" ? `${num}${unit ? ` ${unit}` : ""}` : "";
+  return last ? `${takes} Last applied: ${last}.` : takes;
+}
+
+/** px per rem / em — the root size the editor and export assume. */
+const ROOT_PX = 16;
+
+/**
+ * The same length in another unit (2L9 I07: 24px → 1.5rem), so a unit
+ * change keeps what the canvas shows. Only px ↔ rem / em converts exactly;
+ * between any other pair the number is kept (there is no fixed ratio).
+ */
+function convertUnit(n: number, from: string, to: string): string {
+  const relative = (u: string) => u === "rem" || u === "em";
+  let out = n;
+  if (from === "px" && relative(to)) out = n / ROOT_PX;
+  else if (relative(from) && to === "px") out = n * ROOT_PX;
+  return String(Math.round(out * 1000) / 1000);
+}
+
+/** A value the field cannot take apart — calc(), clamp(), min(), max() — kept
+ *  exactly as authored until an explicit value replaces it (2L9 I08). */
+const isCustomExpression = (value: string) => /^(calc|clamp|min|max)\(/i.test(value.trim());
+
 
 /** What a unit adds to the field's name ("Font size in pixels"). */
 const UNIT_WORDS: Record<string, string> = {
@@ -171,7 +220,7 @@ const UNIT_WORDS: Record<string, string> = {
 };
 
 /** The unit words for a value, or "" when it has none to speak of. */
-export function unitWords(unit: string): string {
+function unitWords(unit: string): string {
   if (KEYWORDS.has(unit)) return "";
   return UNIT_WORDS[unit] ?? `in ${unit}`;
 }
@@ -224,20 +273,28 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   noUnit = false,
   dot = true,
   onRevert,
+  inherited,
+  mixed: mixedProp = false,
+  unitCardTitle,
 }) => {
   const field = useInspectorField(property);
+  const [unitCardOpen, setUnitCardOpen] = React.useState(false);
+  const mixed = field.mixed || mixedProp;
   const units = noUnit ? NO_UNITS : unitsProp;
   /* A plain number is written as it is typed, so by Escape the element
      already carries it: restoring the text alone left 48px on a heading the
      user had backed out of (board 34 / L3-C: Escape restores). */
   const atFocusRef = React.useRef<string | null>(null);
-  const { num, unit } = splitValue(value, units);
+  const custom = isCustomExpression(value);
+  const { num, unit } = custom ? { num: value.trim(), unit: "" } : splitValue(value, units);
   const isKeyword = KEYWORDS.has(unit);
   const shown = isKeyword ? unit : num;
+  const fromCascade = !mixed && value === "" && !!inherited;
 
   const [text, setText] = React.useState(shown);
   const [invalid, setInvalid] = React.useState(false);
-  const errorId = useFieldError(invalid ? NUMBER_ERROR : null);
+  const error = invalid ? numberError(property, custom ? "" : num, unit) : null;
+  const errorId = React.useId();
 
   /* A new value from outside (another element, an undo) replaces whatever
      is in the field, including an entry it could not read. */
@@ -246,6 +303,13 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
     setInvalid(false);
   }, [shown]);
 
+  /* 2L9 I05: while the entry is unreadable, the tab strip asks before
+     leaving it (ProInspector). */
+  const owner = React.useMemo(() => Symbol(label || property || "field"), [label, property]);
+  React.useEffect(() => {
+    setUnappliedDraft(owner, invalid ? { label: label || ariaLabel || "Value", draft: text, applied: value, revert: () => restore() } : null);
+    return () => setUnappliedDraft(owner, null);
+  });
   const restore = () => {
     setText(shown);
     setInvalid(false);
@@ -254,12 +318,14 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   /* Enter / blur: read the entry. Unreadable → red border + the message, the
      entry stays so it can be corrected, the element keeps its old value. */
   const commit = () => {
-    if (field.readOnly || (field.mixed && text === "")) return;
+    if (field.readOnly || (mixed && text === "")) return;
     /* Untouched is not an entry. A token-bound size shows the number it
        resolves to, so reading that back on blur wrote "24px" over the token —
        which is also what undid an Escape the moment focus left. */
     if (text === shown && !invalid) return;
-    const next = parseEntry(text, units, unit);
+    const parsed = parseEntry(text, units, unit);
+    /* A negative where CSS takes none is refused like any other bad entry. */
+    const next = parsed !== null && property && NON_NEGATIVE.has(property) && parsed.startsWith("-") ? null : parsed;
     if (next === null) {
       setInvalid(true);
       return;
@@ -272,7 +338,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   };
 
   const step = (delta: number) => {
-    if (field.readOnly || isKeyword || isTokenVar(value)) return;
+    if (field.readOnly || isKeyword || custom || isTokenVar(value)) return;
     const base = text === "" || invalid ? Number(num || 0) : Number(text);
     if (!Number.isFinite(base)) return;
     const next = String(Math.round((base + delta) * 100) / 100);
@@ -301,7 +367,13 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   const onUnitChange = (next: string) => {
     if (field.readOnly) return;
     if (KEYWORDS.has(next)) onChange(next);
-    else if (num !== "" && NUMBER.test(num)) onChange(`${num}${next}`);
+    else if (num !== "" && NUMBER.test(num)) {
+      const converted = convertUnit(Number(num), unit, next);
+      /* Its own Undo step; a px ↔ rem / em change converts the number, and
+         says so with that step's Undo (2L9 I07). */
+      field.discrete(() => onChange(`${converted}${next}`));
+      if (converted !== num) field.announce(`Converted using root font ${ROOT_PX}px`);
+    }
   };
 
   /* The name is the row's label (or `ariaLabel`) plus the unit or "mixed
@@ -311,17 +383,17 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   const nameId = React.useId();
   const suffixId = React.useId();
   const ownName = ariaLabel || !label;
-  const suffix = field.mixed ? "Mixed values" : isTokenVar(value) || noUnit ? "" : unitWords(unit);
+  const suffix = mixed ? "Mixed values" : isTokenVar(value) || noUnit ? "" : unitWords(unit);
   const name = ariaLabel || label || placeholder;
 
   const control = (
     <div
       data-testid={label ? fieldTestId(label) : undefined}
-      className={`bdi-fld${invalid ? " invalid" : ""}${field.mixed ? " mixed" : ""}`}
+      className={`bdi-fld tw:group/fld${invalid ? " invalid" : ""}${mixed ? " mixed" : ""}`}
     >
       <TextInput
         type="text"
-        value={field.mixed ? "" : text}
+        value={mixed ? "" : text}
         onChange={(e) => {
           const next = e.target.value;
           field.startTyping();
@@ -342,22 +414,27 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
           field.stopTyping();
         }}
         onKeyDown={onKeyDown}
-        placeholder={field.mixed ? "Mixed" : placeholder}
+        placeholder={mixed ? "Mixed" : fromCascade ? `${inherited} · inherited` : placeholder}
         id={inputId}
         aria-labelledby={suffix ? `${nameId} ${suffixId}` : nameId}
         // `.bdi-fld input.auto` keys off a class on the real <input>; flowbite
         // puts `className` on the wrapper, so it goes through `theme`.
-        theme={{ field: { input: { base: isKeyword ? "auto" : "" } } }}
+        theme={{ field: { input: { base: isKeyword ? "auto" : fromCascade && !text ? "auto tw:placeholder:text-[var(--bk-ink-soft)]" : "" } } }}
         readOnly={field.readOnly}
         aria-readonly={field.readOnly || undefined}
         aria-invalid={invalid}
         aria-describedby={invalid ? errorId : undefined}
       />
-      {isKeyword ? null : (
+      {isKeyword || custom || (fromCascade && !text) ? null : (
         <>
           {/* Pointer shortcut for ↑ / ↓ on the field itself (the keyboard
               path, which also takes Shift for 10). Not a separate control. */}
-          <span className="bdi-step" aria-hidden="true">
+          {/* The board draws a number field plain: the stepper shows on hover
+              or while the field has focus. */}
+          <span
+            className="bdi-step tw:invisible tw:group-hover/fld:visible tw:group-focus-within/fld:visible"
+            aria-hidden="true"
+          >
             <span onMouseDown={(e) => e.preventDefault()} onClick={() => step(1)}>
               <ChevronUp size={10} />
             </span>
@@ -365,7 +442,58 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
               <ChevronDown size={10} />
             </span>
           </span>
-          {noUnit ? null : (
+          {noUnit ? null : unitCardTitle ? (
+            <Popover
+              open={unitCardOpen}
+              onClose={() => setUnitCardOpen(false)}
+              beside=".layout-shell__inspector"
+              besideTop='[role="tablist"]'
+              label={unitCardTitle}
+              className="tw:w-[240px] tw:p-3"
+              trigger={
+                <Button
+                  color="light"
+                  size="xs"
+                  className="bdi-unit tw:h-full tw:gap-1 tw:border-0 tw:bg-transparent tw:px-1 tw:text-[12px] tw:font-normal tw:text-[var(--bk-ink-muted)] tw:focus:ring-0"
+                  aria-haspopup="menu"
+                  aria-expanded={unitCardOpen}
+                  aria-label={`${name} unit`}
+                  data-testid="unit-card-trigger"
+                  onClick={() => {
+                    if (!field.readOnly) setUnitCardOpen((v) => !v);
+                  }}
+                >
+                  {unit === "" ? "×" : unit}
+                  <ChevronDown size={12} aria-hidden="true" />
+                </Button>
+              }
+            >
+              <p className="tw:m-0 tw:mb-2 tw:text-[13px] tw:font-semibold tw:leading-4 tw:text-[var(--bk-ink)]">{unitCardTitle}</p>
+              <Menu label={unitCardTitle} className="tw:min-w-0">
+                {units.map((u) => (
+                  <MenuItem
+                    key={u}
+                    aria-current={u === unit ? "true" : undefined}
+                    className="tw:h-10!"
+                    onClick={() => {
+                      setUnitCardOpen(false);
+                      if (u !== unit) onUnitChange(u);
+                    }}
+                  >
+                    {u === "" ? "×" : u}
+                  </MenuItem>
+                ))}
+              </Menu>
+              <Button
+                color="light"
+                size="xs"
+                className="tw:mt-1 tw:h-10 tw:w-full tw:justify-center tw:border-0 tw:bg-transparent tw:text-[13px] tw:font-normal tw:text-[var(--bk-ink)] tw:focus:ring-0"
+                onClick={() => setUnitCardOpen(false)}
+              >
+                Cancel
+              </Button>
+            </Popover>
+          ) : (
           <span className="bdi-unit">
             <Select
               className="bdi-u"
@@ -390,15 +518,17 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   );
 
   /* An unlabelled field takes the whole row (paired fields). Its override
-     dot sits in front of the field — with no label there is nowhere else. */
+     dot sits in front of the field — with no label there is nowhere else.
+     A custom expression stacks (2L9 I08): "Width · Custom value" on its own
+     line, the expression full width under it, then the note. */
   return (
     <div
       data-testid={label ? rowTestId(label) : undefined}
-      className={`bdi-row-ctrl${label ? "" : " bare"}`}
+      className={`bdi-row-ctrl${label ? "" : " bare"}${custom ? " tw:grid-cols-1! tw:gap-y-1" : ""}`}
     >
       {label ? (
         <label className="bdi-lb" data-testid={labelTestId(label)} htmlFor={inputId}>
-          <span id={ownName ? undefined : nameId}>{label}</span>
+          <span id={ownName ? undefined : nameId}>{custom ? `${label} · Custom value` : label}</span>
           <FieldDot field={field} />
         </label>
       ) : null}
@@ -416,7 +546,12 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
         ) : null}
         {control}
       </div>
-      <ErrorLine id={errorId} message={invalid ? NUMBER_ERROR : null} />
+      <ErrorLine id={errorId} message={error} />
+      {custom && !invalid ? (
+        <p className="tw:col-span-full tw:m-0 tw:pb-1 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="inspector-field-custom">
+          Preserved as authored. Enter an explicit supported value to replace it.
+        </p>
+      ) : null}
     </div>
   );
 };

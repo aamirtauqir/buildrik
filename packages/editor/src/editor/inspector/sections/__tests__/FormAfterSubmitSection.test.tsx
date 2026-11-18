@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi, beforeEach, beforeAll, afterEach } from "vitest";
-import { render, screen, fireEvent, cleanup, waitFor } from "@testing-library/react";
+import { render, screen, within, fireEvent, cleanup, waitFor, configure } from "@testing-library/react";
 import { Composer } from "@/engine/Composer";
 import { FormAfterSubmitSection } from "../FormAfterSubmitSection";
 
@@ -52,6 +52,11 @@ const defaults = {
 
 afterEach(cleanup);
 
+/* Every case waits on a mocked server round trip (load → save → status).
+   The 1 s default timed out under a full-suite run's load — a different
+   case each time, each passing alone. */
+configure({ asyncUtilTimeout: 5000 });
+
 describe("Form › AFTER SUBMIT + PROTECTION", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -70,7 +75,7 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
     await waitFor(() => screen.getByLabelText("Then"));
 
     fireEvent.change(screen.getByLabelText("Then"), { target: { value: "REDIRECT" } });
-    await waitFor(() => expect(screen.getByLabelText("Redirect to")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByTestId("form-redirect-to")).toBeInTheDocument());
     // No network call yet — the row would be `REDIRECT` with no target, which
     // the server schema refuses. Sending it anyway (and the UI just showing
     // REDIRECT as if it saved) was exactly I1's silent-failure bug.
@@ -81,10 +86,13 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
     render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
     await waitFor(() => screen.getByLabelText("Then"));
     fireEvent.change(screen.getByLabelText("Then"), { target: { value: "REDIRECT" } });
-    await waitFor(() => screen.getByLabelText("Redirect to"));
+    await waitFor(() => screen.getByTestId("form-redirect-to"));
 
-    fireEvent.change(screen.getByLabelText("Redirect to"), { target: { value: "https://example.com/thanks" } });
-    fireEvent.blur(screen.getByLabelText("Redirect to"));
+    /* 156:11319: the select's "Custom URL…" opens the URL row. */
+    /* F25: the row opens Choose page or URL; an absolute URL goes through Use URL. */
+    fireEvent.click(screen.getByTestId("form-redirect-to"));
+    fireEvent.change(screen.getByLabelText("Or use an absolute URL"), { target: { value: "https://example.com/thanks" } });
+    fireEvent.click(screen.getByRole("button", { name: "Use URL" }));
     await waitFor(() => expect(api.forms.updateBlock.mutate).toHaveBeenCalledWith(
       expect.objectContaining({
         siteId: "s1",
@@ -95,12 +103,39 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
     ));
   });
 
+  it("2L9 F25: an incomplete URL is refused with the board's message, the draft kept, nothing saved", async () => {
+    render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
+    await waitFor(() => screen.getByLabelText("Then"));
+    fireEvent.change(screen.getByLabelText("Then"), { target: { value: "REDIRECT" } });
+    await waitFor(() => screen.getByTestId("form-redirect-to"));
+    fireEvent.click(screen.getByTestId("form-redirect-to"));
+    fireEvent.change(screen.getByLabelText("Or use an absolute URL"), { target: { value: "https:/fieldwork" } });
+    fireEvent.click(screen.getByRole("button", { name: "Use URL" }));
+    expect(screen.getByTestId("form-redirect-url-error")).toHaveTextContent("Enter a complete https:// or http:// URL.");
+    expect(screen.getByLabelText("Or use an absolute URL")).toHaveValue("https:/fieldwork");
+    expect(screen.getByLabelText("Or use an absolute URL")).toHaveAttribute("aria-invalid", "true");
+    expect(api.forms.updateBlock.mutate).not.toHaveBeenCalled();
+  });
+
+  it("2L9 F14: offline, the service settings read only, say they need a connection, and the status says so", async () => {
+    const onLine = vi.spyOn(navigator, "onLine", "get").mockReturnValue(false);
+    render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
+    await waitFor(() => screen.getByLabelText("Then"));
+    expect(screen.getByTestId("form-settings-offline")).toHaveTextContent("Needs a connection. You can still edit form fields.");
+    /* 156:8406: the settings' controls draw shut while offline. */
+    expect(screen.getByTestId("form-settings-controls")).toHaveAttribute("data-offline", "true");
+    expect(screen.getByTestId("form-settings-status")).toHaveTextContent("Needs a connection");
+    fireEvent.change(screen.getByLabelText("Then"), { target: { value: "REDIRECT" } });
+    expect(api.forms.updateBlock.mutate).not.toHaveBeenCalled();
+    onLine.mockRestore();
+  });
+
   it("I1: switching action away from Redirect (with an existing URL) saves immediately, both fields bundled", async () => {
     api.forms.getBlock.query.mockResolvedValue({
       ...defaults, successAction: "REDIRECT", redirectUrl: "https://example.com/thanks",
     });
     render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
-    await waitFor(() => screen.getByLabelText("Redirect to"));
+    await waitFor(() => screen.getByTestId("form-redirect-to"));
 
     fireEvent.change(screen.getByLabelText("Then"), { target: { value: "" } });
     await waitFor(() => expect(api.forms.updateBlock.mutate).toHaveBeenCalledWith(
@@ -118,7 +153,7 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
     fireEvent.blur(screen.getByLabelText("Message"));
     await new Promise((r) => setTimeout(r, 0));
     expect(api.forms.updateBlock.mutate).not.toHaveBeenCalled();
-    expect(screen.queryByText(/Only workspace Admins/)).not.toBeInTheDocument();
+    expect(screen.queryByTestId("form-after-submit-admin-only")).not.toBeInTheDocument();
   });
 
   it("saves the notify email on blur", async () => {
@@ -131,20 +166,23 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
     ));
   });
 
-  it("board 19: Then · Message · Send to, then the note", async () => {
+  it("2L9 F10: Then · Message · Notifications › Send to · Spam protection › Block automated submissions · status · note", async () => {
     const { container } = render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
     await waitFor(() => screen.getByLabelText("Then"));
     expect((screen.getByLabelText("Then") as HTMLSelectElement).selectedOptions[0].textContent).toBe("Show message");
     const text = container.textContent ?? "";
-    const at = ["Then", "Message", "Send to", "Saved to your site straight away — not part of Undo. Changing Send to needs an admin."].map((t) => text.indexOf(t));
+    const at = [
+      "Then", "Message", "Notifications", "Send to", "Spam protection", "Applies on next publish", "Block automated submissions",
+      "Form settings status", "Saved", "Saved separately from page edits; outside document Undo.",
+    ].map((t) => text.indexOf(t));
     expect(at.every((i) => i >= 0)).toBe(true);
     expect([...at].sort((a, b) => a - b)).toEqual(at);
   });
 
   it("toggles spam protection", async () => {
     render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
-    await waitFor(() => screen.getByRole("checkbox", { name: "Spam protection" }));
-    fireEvent.click(screen.getByRole("checkbox", { name: "Spam protection" }));
+    await waitFor(() => screen.getByRole("checkbox", { name: "Block automated submissions" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Block automated submissions" }));
     await waitFor(() => expect(api.forms.updateBlock.mutate).toHaveBeenCalledWith(
       expect.objectContaining({ spamProtection: false }),
     ));
@@ -152,10 +190,10 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
 
   it("M6: the spam protection toggle has an accessible name", async () => {
     render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
-    await waitFor(() => expect(screen.getByRole("checkbox", { name: "Spam protection" })).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByRole("checkbox", { name: "Block automated submissions" })).toBeInTheDocument());
   });
 
-  it("I4: a non-admin's notify-email edit is reverted and explained on FORBIDDEN", async () => {
+  it("I4 / F15: a non-admin's notify-email edit is reverted and Send to reads 'Changing Send to needs Admin access.'", async () => {
     api.forms.updateBlock.mutate.mockRejectedValueOnce(
       Object.assign(new Error("FORBIDDEN"), { data: { code: "FORBIDDEN" } }),
     );
@@ -165,9 +203,11 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
     fireEvent.change(screen.getByLabelText("Send to"), { target: { value: "me@example.com" } });
     fireEvent.blur(screen.getByLabelText("Send to"));
 
-    await waitFor(() => expect(screen.getByText(/Only workspace Admins/)).toBeInTheDocument());
-    // Reverted — the field no longer shows the edit that was never actually saved.
-    expect((screen.getByLabelText("Send to") as HTMLInputElement).value).toBe("");
+    await waitFor(() => expect(screen.getByTestId("form-after-submit-admin-only")).toHaveTextContent("Changing Send to needs Admin access."));
+    // Reverted — nothing shows the edit that was never actually saved.
+    expect(screen.queryByLabelText("Send to")).toBeNull();
+    expect(screen.queryByDisplayValue("me@example.com")).toBeNull();
+    expect(screen.getByTestId("form-settings-status")).toHaveTextContent("Saved");
   });
 
   it("I4: other fields stay editable after a notify-email FORBIDDEN — the gate is per-field", async () => {
@@ -178,10 +218,10 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
     await waitFor(() => screen.getByLabelText("Send to"));
     fireEvent.change(screen.getByLabelText("Send to"), { target: { value: "me@example.com" } });
     fireEvent.blur(screen.getByLabelText("Send to"));
-    await waitFor(() => expect(screen.getByText(/Only workspace Admins/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByTestId("form-after-submit-admin-only")).toBeInTheDocument());
 
     api.forms.updateBlock.mutate.mockResolvedValue({});
-    fireEvent.click(screen.getByRole("checkbox", { name: "Spam protection" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Block automated submissions" }));
     await waitFor(() => expect(api.forms.updateBlock.mutate).toHaveBeenLastCalledWith(
       expect.objectContaining({ spamProtection: false }),
     ));
@@ -201,5 +241,64 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
     fireEvent.blur(screen.getByLabelText("Send to"));
     await waitFor(() => expect(screen.getByText("Enter an email address like you@company.com")).toBeInTheDocument());
     expect(screen.queryByText(/notifyEmail:/)).toBeNull();
+  });
+
+  it("F12: a failed save keeps what was typed, says so, and Retry sends it again", async () => {
+    /* Persistent, not Once: a Once queued by an earlier test that never
+       reached its write would be consumed here instead. */
+    api.forms.updateBlock.mutate.mockReset();
+    api.forms.updateBlock.mutate.mockRejectedValue(new Error("Network down"));
+    render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
+    await waitFor(() => screen.getByLabelText("Message"));
+    fireEvent.change(screen.getByLabelText("Message"), { target: { value: "Thanks!" } });
+    fireEvent.blur(screen.getByLabelText("Message"));
+    await waitFor(() => expect(screen.getByTestId("form-settings-status")).toHaveTextContent("Couldn’t save — your message is still here."), { timeout: 5000 });
+    expect(screen.getByLabelText("Message")).toHaveValue("Thanks!");
+    api.forms.updateBlock.mutate.mockResolvedValue({});
+    fireEvent.click(screen.getByTestId("form-settings-retry"));
+    await waitFor(() => expect(screen.getByTestId("form-settings-status")).toHaveTextContent("Saved"), { timeout: 5000 });
+    expect(api.forms.updateBlock.mutate).toHaveBeenCalledTimes(2);
+    expect(api.forms.updateBlock.mutate).toHaveBeenLastCalledWith(expect.objectContaining({ successMessage: "Thanks!" }));
+  });
+
+  it("F17: Redirect with no destination yet reads 'Choose a destination to save'", async () => {
+    render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
+    await waitFor(() => screen.getByLabelText("Then"));
+    fireEvent.change(screen.getByLabelText("Then"), { target: { value: "REDIRECT" } });
+    expect(screen.getByTestId("form-settings-status")).toHaveTextContent("Choose a destination to save");
+  });
+
+  it("F19/F25: the picker lists the site's pages, and a page writes its served path", async () => {
+    const composer = project();
+    composer.elements.createPage("Thanks");
+    const thanks = composer.elements.getAllPages().find((p) => p.name === "Thanks")!;
+    composer.elements.updatePage?.(thanks.id, { slug: "thanks" } as never);
+    render(<FormAfterSubmitSection elementId="f" composer={composer} isOpen />);
+    await waitFor(() => screen.getByLabelText("Then"));
+    fireEvent.change(screen.getByLabelText("Then"), { target: { value: "REDIRECT" } });
+    /* F25: the picker lists the site's pages as "{name} · {path}". */
+    fireEvent.click(screen.getByTestId("form-redirect-to"));
+    const rows = within(screen.getByRole("list", { name: "Pages" })).getAllByRole("listitem").map((r) => r.textContent);
+    expect(rows).toEqual(expect.arrayContaining(["Home · /", expect.stringMatching(/^Thanks · \/.+\.html$/)]));
+    const thanksRow = rows.find((t) => t?.startsWith("Thanks"))!;
+    const thanksPath = thanksRow.split(" · ")[1];
+    fireEvent.click(within(screen.getByRole("list", { name: "Pages" })).getAllByRole("listitem").find((r) => r.textContent === thanksRow)!);
+    await waitFor(() => expect(api.forms.updateBlock.mutate).toHaveBeenCalledWith(expect.objectContaining({ successAction: "REDIRECT", redirectUrl: thanksPath })));
+    expect(thanksPath).toMatch(/^\/.+\.html$/);
+  });
+
+  it("F19/F25: a loaded outside URL reads as the URL on the row and in the picker's URL field", async () => {
+    api.forms.getBlock.query.mockResolvedValue({ ...defaults, successAction: "REDIRECT", redirectUrl: "https://example.com/thanks" });
+    render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
+    await waitFor(() => screen.getByTestId("form-redirect-to"));
+    expect(screen.getByTestId("form-redirect-to")).toHaveTextContent("https://example.com/thanks");
+    fireEvent.click(screen.getByTestId("form-redirect-to"));
+    expect(screen.getByLabelText("Or use an absolute URL")).toHaveValue("https://example.com/thanks");
+  });
+
+  it("F16: loading reads 'Loading form settings…'", () => {
+    api.forms.getBlock.query.mockReturnValue(new Promise(() => {}));
+    render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
+    expect(screen.getByText("Loading form settings…")).toBeInTheDocument();
   });
 });

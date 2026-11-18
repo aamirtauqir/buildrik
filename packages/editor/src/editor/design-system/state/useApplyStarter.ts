@@ -32,7 +32,7 @@ function markStarterSeen(projectId: string | null | undefined): void {
 }
 
 /** The site's tokens with the starter's values written over them. */
-function withStarter(all: DesignToken[], starter: readonly DesignToken[]): DesignToken[] {
+export function withStarter(all: DesignToken[], starter: readonly DesignToken[]): DesignToken[] {
   return starter.reduce((acc, t) => {
     if (!acc.some((x) => x.id === t.id)) return acc;
     const light = resolveTokenLiteral(starter, t.id, "light");

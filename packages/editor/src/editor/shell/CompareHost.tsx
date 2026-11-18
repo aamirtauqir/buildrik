@@ -21,7 +21,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { AlertCircle, X } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { Button, EmptyState, OverlayMount, Select, Spinner, Toolbar, ToolbarSpacer } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
@@ -150,9 +150,13 @@ export const CompareHost: React.FC<{ composer: Composer | null; siteId: string |
       ))}
     </Select>
   );
+  /* 2L9 B7-H11 230:18582: "‹ Back to History" · "Compare · Before launch → Now". */
+  const back = {
+    label: `Back to ${request.from}`,
+    title: `Compare · ${sourceLabel(left, catalog)} → ${sourceLabel(right, catalog)}`,
+  };
   const sources = (
     <span className="tw:flex tw:items-center tw:gap-2" data-testid="compare-sources">
-      <span className={FROM} data-testid="compare-opened-from">Opened from {request.from}</span>
       {picker(left, setLeftSource, "Compare from")}
       <span aria-hidden="true" className={FROM}>→</span>
       {picker(right, setRightSource, "Compare to")}
@@ -161,12 +165,12 @@ export const CompareHost: React.FC<{ composer: Composer | null; siteId: string |
 
   const bar = (
     <Toolbar className="tw:min-h-12 tw:bg-[var(--bk-bg-card)] tw:border-[var(--bk-gray-100)] tw:px-4">
-      <span className={BAR_TITLE} id="compare-title">Compare</span>
+      <Button color="light" size="xs" onClick={close} className={CLOSE_BTN} data-testid="compare-close">
+        ‹ {back.label}
+      </Button>
+      <span className={BAR_TITLE} id="compare-title">{back.title}</span>
       {sources}
       <ToolbarSpacer />
-      <Button color="light" size="xs" onClick={close} className={CLOSE_BTN} data-testid="compare-close" aria-label="Close compare">
-        <X size={14} aria-hidden="true" />
-      </Button>
     </Toolbar>
   );
 
@@ -219,6 +223,7 @@ export const CompareHost: React.FC<{ composer: Composer | null; siteId: string |
         leftLabel={sourceLabel(left, catalog)}
         rightLabel={sourceLabel(right, catalog)}
         sources={sources}
+        back={back}
         mode={mode}
         onModeChange={setMode}
         onBack={close}

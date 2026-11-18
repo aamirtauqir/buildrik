@@ -43,6 +43,9 @@ export interface LayerItem {
    *  heading is which (designer walk 2026-08-28); the copy is the identity.
    *  Never overrides a custom name. */
   preview?: string;
+  /** Search results only (design-2l9 board 147:77189): the row's ancestors,
+   *  "Services › Card 1", since a flat result list loses the tree. */
+  searchPath?: string;
   /** Whether this layer is a component instance */
   /** Breakpoint-specific visibility overrides */
   breakpointOverrides?: Record<string, { hidden?: boolean }>;
@@ -66,7 +69,7 @@ export interface LayerDisplayPrefs {
   showDimmed: boolean;
   /** Show the lock control on every row. Off → only rows that ARE locked show it (so they can be unlocked). Default: true */
   showLockBadges: boolean;
-  /** Compact row density. Default: "compact" (founder call 2026-08-28; DESIGN.md compact density + board 1082:4527). */
+  /** Row density. Default: "comfortable" — design-2l9 147:76329 draws Compact rows off and 147:75914 / 152:78614 draw 32-tall rows (the 2026-08-28 "compact" default was page 1:3's). */
   treeDensity: "comfortable" | "compact";
   /** Tint rows whose element carries a CMS field or collection binding. Default: false */
   highlightCmsBound: boolean;
@@ -95,4 +98,6 @@ export type LayerAction =
   | "duplicate"
   | "delete"
   | "group"
-  | "moveToPage";
+  | "moveToPage"
+  | "goToMain"
+  | "detachInstance";

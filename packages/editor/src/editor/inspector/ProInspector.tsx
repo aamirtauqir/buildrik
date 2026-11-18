@@ -5,8 +5,11 @@
  *   header       — breadcrumb · icon + name · ✦ AI · ⋯ · ✕ · status marks
  *   status line  — why the panel is read-only (locked / save conflict)
  *   multi bar    — Align / Distribute / Group, when 2+ are selected (DD-12)
- *   tabs         — Style · Behaviour · Effects (DD-1, Q1)
- *   context row  — State / breakpoint, on Style and Effects only (R-DD-14)
+ *   instance     — a component instance's identity block (2L9 IC01)
+ *   tabs         — Content · Style · Behavior · Effects (2L9 page 04)
+ *   context row  — State / breakpoint overrides, on Style and Effects only
+ *                  (R-DD-14): Content and Behavior writes are breakpoint-
+ *                  and state-independent
  *   tab panel    — the tab's sections in their fixed order (InspectorTabContent)
  *
  * Nothing selected, or the page root selected → the Page panel (DD-13).
@@ -21,15 +24,18 @@ import type { Composer, Element } from "@/engine";
 import { isValidBreakpoint, BREAKPOINTS } from "@/shared/constants/breakpoints";
 import { EVENTS } from "@/shared/constants/events";
 import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
-import type { DeviceType, PseudoStateId } from "@/shared/types";
+import type { DeviceType } from "@/shared/types";
 import type { BreakpointId } from "@/shared/types/breakpoints";
 import type { IconConfig, MediaAsset, MediaAssetType } from "@/shared/types/media";
-import { Tabs } from "@/editor/chrome-ui";
+import { ConfirmDialog, Tabs, useToast } from "@/editor/chrome-ui";
+import { getUnappliedDraft, type UnappliedDraft } from "./shared/controls/unappliedDraft";
 import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
 import { useProjectLoading } from "../shell/hooks/useProjectLoading";
 import { useSaveConflict } from "../shell/hooks/useSaveConflict";
-import { ApplyStyleDialog } from "./components/ApplyStyleDialog";
+import { openSubview } from "./tabs/subviewStore";
 import { ContextRow } from "./components/ContextRow";
+import { getLayerName } from "../panels/layers/hooks/layersPersistence";
+import { ComponentRow } from "./sections/ComponentRow";
 import { InspectorErrorBoundary } from "./components/InspectorErrorBoundary";
 import { InspectorHeader } from "./components/InspectorHeader";
 import { InspectorLoading } from "./components/InspectorLoading";
@@ -37,7 +43,15 @@ import { MultiSelectBar } from "./components/MultiSelectBar";
 import { PagePanel } from "./components/PagePanel";
 import { ThemeToggleInspector } from "./components/ThemeToggleInspector";
 import { THEME_TOGGLE_ATTR } from "@/engine/export/themeToggleRuntime";
-import { StatusLine } from "./components/StatusLine";
+import { LoadFailedCard, StatusLine, ViewOnlyLine } from "./components/StatusLine";
+
+/** The locked card's own render: the conflict line is drawn above the tabs. */
+const NO_CONFLICT = { pending: false, resolve: () => undefined };
+import { DimmedNotice } from "./components/DimmedNotice";
+import { LockRefusalNote, useLockRefusal, useWatchPasteRefusal } from "./components/LockRefusal";
+import { useJustDetached, useRecordDetaches } from "./hooks/useJustDetached";
+import { useEditLocks } from "../shared/useEditLocks";
+import { useSiteLoadStatus } from "../shell/siteLoadStatus";
 import { StatusMarks } from "./components/StatusMarks";
 import { useInspectorState, useStyleHandlers, useInspectorSections } from "./hooks";
 import { useAdvancedSettings } from "./hooks/useAdvancedSettings";
@@ -51,15 +65,17 @@ import { computeStatesWithOverrides } from "./config/pseudoOverrides";
 import { detectMixedValues, shownStylesAt } from "./shared/detectMixedValues";
 import { InspectorFieldContext, type InspectorFieldContextValue } from "./shared/controls/InspectorFieldContext";
 import { InspectorTabContent } from "./tabs/InspectorTabContent";
+import { openingTab } from "./config/sectionOrder";
 import "./styles/inspector.css";
 
 /** Three equal 100px tabs, 32 tall, the active one accent with a 2px
  *  underline (board 1), merged over chrome-ui's pill tab via twMerge. */
+/* 2L9 page 04: the active tab is a tinted pill, not an underline; every
+   label reads in ink. */
 const INSPECTOR_TAB_CLASS =
-  "tw:flex-1 tw:h-8 tw:px-0 tw:rounded-none tw:text-[12px] tw:font-normal tw:text-[var(--bk-ink-muted)] tw:bg-transparent " +
-  "tw:border-b-2 tw:border-transparent tw:hover:bg-transparent " +
-  "tw:aria-selected:font-medium tw:aria-selected:text-[var(--bk-accent-text)] " +
-  "tw:aria-selected:bg-transparent tw:aria-selected:hover:bg-transparent tw:aria-selected:border-[var(--bk-accent)]";
+  "tw:flex-1 tw:h-8 tw:px-0 tw:rounded-[6px] tw:border-0 tw:text-[13px] tw:font-normal tw:text-[var(--bk-ink)] tw:bg-transparent " +
+  "tw:hover:bg-[var(--bk-bg-subtle)] " +
+  "tw:aria-selected:bg-[var(--bk-accent-tint)] tw:aria-selected:hover:bg-[var(--bk-accent-tint)]";
 
 
 // ============================================================================
@@ -125,11 +141,13 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     };
   }, [composer]);
 
-  /* ⋯ "Apply style to all … on this page" asks for its confirm (DD-6b). */
-  const [applyStyleFor, setApplyStyleFor] = React.useState<string | null>(null);
+  /* ⋯ "Apply style to all … on this page" reviews first, as the tab's body
+     (2L9 S11 — it was a confirm dialog, DD-6b). */
   React.useEffect(() => {
     if (!composer) return;
-    const onRequest = (p: { elementId?: string }) => setApplyStyleFor(p?.elementId ?? null);
+    const onRequest = (p: { elementId?: string }) => {
+      if (p?.elementId) openSubview({ kind: "apply-style", elementId: p.elementId });
+    };
     composer.on(EVENTS.UI_APPLY_STYLE_REQUESTED, onRequest);
     return () => {
       composer.off(EVENTS.UI_APPLY_STYLE_REQUESTED, onRequest);
@@ -170,11 +188,12 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   const { choices, setChoices } = useInspectorSections();
 
   /* The strip. A new element of the SAME type keeps the tab; a different
-     type starts on Style (DD-20) — its Behaviour tab holds other things. */
-  const [activeTab, setActiveTab] = React.useState<TabId>("style");
+     type starts on its opening tab (DD-20) — Content when it has something
+     defining there, else Style. */
+  const [activeTab, setActiveTab] = React.useState<TabId>(() => (selectedElement?.type ? openingTab(selectedElement.type) : "style"));
   const prevTypeRef = React.useRef(selectedElement?.type);
   React.useEffect(() => {
-    if (selectedElement?.type && selectedElement.type !== prevTypeRef.current) setActiveTab("style");
+    if (selectedElement?.type && selectedElement.type !== prevTypeRef.current) setActiveTab(openingTab(selectedElement.type));
     prevTypeRef.current = selectedElement?.type ?? prevTypeRef.current;
   }, [selectedElement?.type]);
 
@@ -235,43 +254,87 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   const fieldOverrides = useFieldOverrides(composer, selectedElement?.id, currentBreakpoint, currentPseudoState);
   const breakpointName = currentBreakpoint === "desktop" ? null : BREAKPOINTS[currentBreakpoint]?.name ?? currentBreakpoint;
 
-  const readOnly = locked || conflict.pending;
+  /* The engine refuses every write while an edit lock holds (Task 1.6); the
+     fields say so instead of taking input that goes nowhere. */
+  const editLocks = useEditLocks(composer);
+  const notLoaded = editLocks.includes("not-loaded");
+  const { failure: loadFailure, retry: loadRetry } = useSiteLoadStatus();
+  const readOnly = locked || conflict.pending || editLocks.length > 0;
+  const { addToast } = useToast();
+  useWatchPasteRefusal(composer);
+  useRecordDetaches(composer);
+  const detachedFrom = useJustDetached(composer, selectedElement?.id ?? "");
+  /* 2L9 G04 / G22: the refusal card carries the lock and its Unlock. */
+  const pasteRefused = useLockRefusal(composer, selectedElement?.id ?? "", "paste-style");
+  const addRefused = useLockRefusal(composer, selectedElement?.id ?? "", "add-interaction");
   const fieldContext = React.useMemo<InspectorFieldContextValue>(
     () => ({
       readOnly,
-      readOnlyReason: conflict.pending ? "conflict" : locked ? "locked" : null,
+      readOnlyReason: conflict.pending
+        ? "conflict"
+        : locked
+          ? "locked"
+          : notLoaded
+            ? "not-loaded"
+            : editLocks.length > 0
+              ? "view"
+              : null,
       mixedKeys,
+      target: selectedElement
+        ? {
+            name: getLayerName(composer?.elements.getElement(selectedElement.id)) ?? elementTypeLabel(selectedElement.type),
+            editing: `${BREAKPOINTS[currentBreakpoint]?.name ?? currentBreakpoint} · ${
+              currentPseudoState === "normal" ? "Default" : currentPseudoState.charAt(0).toUpperCase() + currentPseudoState.slice(1)
+            } state`,
+          }
+        : undefined,
       overrides: fieldOverrides.overrides,
       overrideLabels: fieldOverrides.labels,
       resetOverride: (property, kind) => runDiscrete(() => fieldOverrides.resetOverride(property, kind)),
+      breakpointEntries: fieldOverrides.counts.breakpoint ? fieldOverrides.entries("breakpoint") : undefined,
       runDiscrete,
+      sourcesOf: (property) => {
+        if (selectedElements.length < 2) return [];
+        const read = shownStylesAt(composer, currentBreakpoint, currentPseudoState);
+        return selectedElements.map((el) => ({
+          id: el.getId(),
+          name: getLayerName(el) ?? elementTypeLabel(el.getType()),
+          value: read(el)[property] ?? "",
+        }));
+      },
+      announce: (message) => {
+        const undo = composer?.history?.captureUndo?.();
+        addToast({ description: message, action: undo ? { label: "Undo", onClick: undo } : undefined });
+      },
     }),
-    [readOnly, conflict.pending, locked, mixedKeys, fieldOverrides, runDiscrete]
+    [readOnly, conflict.pending, locked, notLoaded, editLocks, mixedKeys, fieldOverrides, runDiscrete, composer, addToast, selectedElement, selectedElements, currentBreakpoint, currentPseudoState]
   );
 
-  /* Scroll persistence per element (P-7b). The scroll listener is the only
-     writer: it records the element whose body is on screen, bound in a
-     LAYOUT effect so it is detached before the next element's body renders
+  /* Scroll persistence per element AND tab (P-7b; 2L9 S32 258:37744:
+     "Restored Hero heading → Style scroll position"). The scroll listener is
+     the only writer: it records the element and tab whose body is on screen,
+     bound in a LAYOUT effect so it is detached before the next body renders
      into the same container. A hidden column (full page: 0×0) is not a
      position. */
+  const scrollKey = selectedElement?.id ? `${selectedElement.id}\u0000${activeTab}` : null;
   React.useLayoutEffect(() => {
     const container = contentRef.current;
-    if (!container || !selectedElement?.id) return;
-    const id = selectedElement.id;
+    if (!container || !scrollKey) return;
+    const id = scrollKey;
     const handleScroll = () => {
       if (container.clientHeight === 0) return;
       scrollPositionsRef.current.set(id, container.scrollTop);
     };
     container.addEventListener("scroll", handleScroll, { passive: true });
     return () => container.removeEventListener("scroll", handleScroll);
-  }, [selectedElement?.id]);
+  }, [scrollKey]);
 
   /* The restore: re-applied as the body grows, until it holds, the user takes
      the wheel, or a second has passed. */
   React.useEffect(() => {
     const container = contentRef.current;
-    if (!selectedElement?.id || !container) return;
-    const target = scrollPositionsRef.current.get(selectedElement.id) ?? 0;
+    if (!scrollKey || !container) return;
+    const target = scrollPositionsRef.current.get(scrollKey) ?? 0;
     let settled = false;
     const apply = () => {
       if (settled) return;
@@ -297,7 +360,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
       container.removeEventListener("pointerdown", settle);
       container.removeEventListener("keydown", settle);
     };
-  }, [selectedElement?.id]);
+  }, [scrollKey]);
 
   /* G2-146 — ⌘K "Jump to property" rows + the reveal behind them, the canvas
      menu's "Add interaction" and the header's binding chip. */
@@ -310,10 +373,73 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     advancedState,
   });
 
+  /* 2L9 I05: leaving a tab with an unreadable entry asks first. */
+  const [leaving, setLeaving] = React.useState<{ tab: TabId; draft: UnappliedDraft } | null>(null);
+  const requestTab = (tab: TabId) => {
+    const draft = getUnappliedDraft();
+    if (draft && tab !== activeTab) setLeaving({ tab, draft });
+    else setActiveTab(tab);
+  };
+  const leaveGuard = leaving ? (
+    <ConfirmDialog
+      open
+      onClose={() => setLeaving(null)}
+      onConfirm={() => {
+        leaving.draft.revert();
+        setActiveTab(leaving.tab);
+        setLeaving(null);
+      }}
+      title={`Unapplied ${leaving.draft.label.toLowerCase()}`}
+      message={`${getLayerName(composer?.elements.getElement(selectedElement?.id ?? "")) ?? elementTypeLabel(selectedElement?.type ?? "")} has an invalid ${leaving.draft.label} draft: “${leaving.draft.draft}”. Keep editing it, or revert to the applied ${leaving.draft.applied} before switching tabs.`}
+      cancelLabel="Keep editing"
+      confirmLabel="Revert and switch"
+      testId="inspector-unapplied-guard"
+    />
+  ) : null;
+
   /* Board 159:102 — while the site is still arriving there is nothing to
      select; an empty canvas message would read as "your site is empty". */
-  if (projectLoading && !selectedElement) return <InspectorLoading />;
-  if (!selectedElement) return <PagePanel composer={composer} />;
+  if (projectLoading && !selectedElement)
+    return (
+      <InspectorLoading
+        siteName={composer?.getProjectMetadata?.()?.name}
+        tabs={
+          <Tabs
+            tabs={INSPECTOR_TABS}
+            value={activeTab}
+            onChange={(id) => setActiveTab(id as TabId)}
+            label="Inspector tabs"
+            data-testid="inspector-tab-strip"
+            className="tw:h-10 tw:px-3 tw:py-1 tw:gap-1 tw:border-0"
+            tabClassName={INSPECTOR_TAB_CLASS}
+          />
+        }
+      />
+    );
+
+  /* Above whatever the column shows — the page panel or an element — once the
+     load has given up rather than while it is still on its way. */
+  /* 2L9 S02: a connection failure is the tab body (or tops the page panel). */
+  const connectionFailure = notLoaded && !projectLoading && (loadFailure?.kind === "network" || loadFailure?.kind === "offline");
+  const viewOnly =
+    connectionFailure && !selectedElement ? (
+      <LoadFailedCard retry={loadRetry} />
+    ) : notLoaded && !projectLoading && !connectionFailure ? (
+      <ViewOnlyLine
+        cause={loadFailure?.kind === "missing" ? "missing" : loadFailure?.kind === "forbidden" ? "forbidden" : "other"}
+      />
+    ) : null;
+  const withViewOnly = (node: React.ReactNode) =>
+    viewOnly ? (
+      <div className="tw:flex tw:flex-col tw:h-full tw:min-h-0">
+        {viewOnly}
+        <div className="tw:flex tw:flex-col tw:flex-1 tw:min-h-0">{node}</div>
+      </div>
+    ) : (
+      node
+    );
+
+  if (!selectedElement) return withViewOnly(<PagePanel composer={composer} />);
   /* BRP1-M12: a theme toggle's look and behaviour are the site's Brand and
      Dark mode — its inspector says so instead of offering element styles. */
   if (
@@ -321,31 +447,43 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     targetIds.length <= 1 &&
     composer.elements?.getElement?.(selectedElement.id)?.getAttribute?.(THEME_TOGGLE_ATTR) !== undefined
   ) {
-    return <ThemeToggleInspector composer={composer} />;
+    return withViewOnly(<ThemeToggleInspector composer={composer} />);
   }
 
-  const showContextRow = activeTab !== "behaviour";
+  const showContextRow = activeTab === "style" || activeTab === "effects";
 
-  return (
+  return withViewOnly(
     <InspectorFieldContext.Provider value={fieldContext}>
       <div className="bdi-panel" data-testid="inspector-panel" data-readonly={readOnly || undefined}>
-        <ApplyStyleDialog
-          composer={composer}
-          elementId={applyStyleFor}
-          breakpoint={currentBreakpoint}
-          pseudo={currentPseudoState}
-          onClose={() => setApplyStyleFor(null)}
-        />
         {/* Live region for the selection announcement. */}
         <div role="status" aria-live="polite" aria-atomic="true" className="bdi-sr-only">
           {elementTypeLabel(selectedElement.type)} selected
         </div>
-        <InspectorHeader composer={composer} element={selectedElement} selectedIds={targetIds} />
+        <InspectorHeader
+          composer={composer}
+          element={selectedElement}
+          selectedIds={targetIds}
+          breakpointLabel={BREAKPOINTS[currentBreakpoint]?.name ?? currentBreakpoint}
+          boundTo={targetIds.length <= 1 && binding && !binding.missing ? binding.label : undefined}
+          detachedFrom={targetIds.length <= 1 ? detachedFrom ?? undefined : undefined}
+          activeTab={activeTab}
+          loadFailedLine={connectionFailure ? `Could not load ${composer?.getProjectMetadata?.()?.name || "this site"}` : undefined}
+          state={currentPseudoState}
+          /* The state Select draws only on Style / Effects (B-10), where a
+             state's values are edited. */
+          onStateChange={setCurrentPseudoState}
+          statesWithOverrides={statesWithOverrides}
+        />
         {targetIds.length > 1 ? null : (
-          <StatusMarks composer={composer} elementId={selectedElement.id} binding={binding} locked={locked} />
+          /* The element's own lock is the header's "Read only · … is locked" (S22). */
+          <StatusMarks composer={composer} elementId={selectedElement.id} binding={binding?.missing ? binding : null} locked={false} />
         )}
-        <StatusLine composer={composer} elementId={selectedElement.id} locked={locked} conflict={conflict} />
+        <StatusLine composer={composer} elementId={selectedElement.id} locked={false} conflict={conflict} />
         {targetIds.length > 1 ? <MultiSelectBar composer={composer} selectedIds={targetIds} /> : null}
+        {/* 2L9 IC01: an instance's identity block sits above the tabs. */}
+        {targetIds.length <= 1 && composer?.components?.getInstanceByElementId?.(selectedElement.id) ? (
+          <ComponentRow composer={composer} elementId={selectedElement.id} />
+        ) : null}
         {agentRun.running ? (
           /* AI agent takeover (board 160:512) — the run replaces the
              controls; the selection is kept and restored when it ends. */
@@ -359,23 +497,26 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
             <Tabs
               tabs={INSPECTOR_TABS}
               value={activeTab}
-              onChange={(id) => setActiveTab(id as TabId)}
+              onChange={(id) => requestTab(id as TabId)}
               label="Inspector tabs"
               panelId="inspector-tabpanel"
               data-testid="inspector-tab-strip"
-              className="tw:h-8 tw:p-0 tw:gap-0"
+              className="tw:h-10 tw:px-3 tw:py-1 tw:gap-1 tw:border-0"
               tabClassName={INSPECTOR_TAB_CLASS}
             />
+            {leaveGuard}
+            {/* 2L9 S22: "Editing unavailable" heads the tab body of a locked element. */}
+            <StatusLine composer={composer} elementId={selectedElement.id} locked={locked && !pasteRefused && !addRefused} conflict={NO_CONFLICT} />
             {showContextRow ? (
               <ContextRow
                 state={currentPseudoState}
-                onStateChange={(s: PseudoStateId) => setCurrentPseudoState(s)}
-                statesWithOverrides={statesWithOverrides}
                 stateOverrideCount={fieldOverrides.counts.pseudo}
                 onResetState={() => runDiscrete(fieldOverrides.resetPseudo)}
                 breakpointName={breakpointName}
                 breakpointOverrideCount={fieldOverrides.counts.breakpoint}
                 onRevertBreakpoint={() => runDiscrete(fieldOverrides.revertBreakpoint)}
+                entries={fieldOverrides.entries}
+                elementId={selectedElement.id}
               />
             ) : null}
             <div
@@ -385,28 +526,56 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
               id="inspector-tabpanel"
               aria-labelledby={`inspector-tabpanel-tab-${activeTab}`}
             >
-              <div className="bdi-body">
-                <InspectorErrorBoundary>
-                  <InspectorTabContent
-                    tabId={activeTab}
+              <div
+                className="bdi-body"
+                /* A group, so the disabled state has a role that carries it. */
+                role="group"
+                aria-label="Element properties"
+                aria-disabled={editLocks.length > 0 || undefined}
+              >
+                {targetIds.length <= 1 ? <LockRefusalNote composer={composer} elementId={selectedElement.id} kind="paste-style" /> : null}
+                {/* 2L9 147:78900: dimmed in the editor only — said above every tab's body. */}
+                {targetIds.length <= 1 ? (
+                  <DimmedNotice
                     composer={composer}
-                    selectedElement={selectedElement}
-                    selectedIds={targetIds}
-                    selectedTypes={selectedTypes}
-                    styles={styles_state}
-                    authoredStyles={authoredStyles}
-                    onChange={handleStyleChange}
-                    onBatchChange={handleBatchStyleChange}
-                    cssContext={enrichedContext}
-                    propertyStates={propertyStates}
-                    choices={choices}
-                    onSetChoices={setChoices}
-                    advancedState={advancedState}
-                    onOpenMediaLibrary={onOpenMediaLibrary}
-                    onOpenIconPicker={onOpenIconPicker}
-                    onOpenCreateCollection={onOpenCreateCollection}
+                    elementId={selectedElement.id}
+                    onHideOnLiveSite={() => {
+                      setActiveTab("behaviour");
+                      requestAnimationFrame(() => document.getElementById("inspector-section-visibility")?.scrollIntoView({ block: "nearest" }));
+                    }}
                   />
-                </InspectorErrorBoundary>
+                ) : null}
+                {connectionFailure ? (
+                  <LoadFailedCard retry={loadRetry} />
+                ) : (
+                  <InspectorErrorBoundary
+                    targetName={
+                      getLayerName(composer?.elements.getElement(selectedElement.id)) ?? elementTypeLabel(selectedElement.type)
+                    }
+                  >
+                    <InspectorTabContent
+                      tabId={activeTab}
+                      breakpoint={currentBreakpoint}
+                      pseudoState={currentPseudoState}
+                      composer={composer}
+                      selectedElement={selectedElement}
+                      selectedIds={targetIds}
+                      selectedTypes={selectedTypes}
+                      styles={styles_state}
+                      authoredStyles={authoredStyles}
+                      onChange={handleStyleChange}
+                      onBatchChange={handleBatchStyleChange}
+                      cssContext={enrichedContext}
+                      propertyStates={propertyStates}
+                      choices={choices}
+                      onSetChoices={setChoices}
+                      advancedState={advancedState}
+                      onOpenMediaLibrary={onOpenMediaLibrary}
+                      onOpenIconPicker={onOpenIconPicker}
+                      onOpenCreateCollection={onOpenCreateCollection}
+                    />
+                  </InspectorErrorBoundary>
+                )}
               </div>
             </div>
           </>

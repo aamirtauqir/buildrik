@@ -15,6 +15,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, within, fireEvent } from "@testing-library/react";
 import { BreakpointSwitcher } from "../BreakpointSwitcher";
+import { BREAKPOINTS, DEVICE_PREVIEW_SIZES } from "@/shared/constants/breakpoints";
 
 describe("BreakpointSwitcher", () => {
   it("is a labelled group of three type=button cells, four with includeWide", () => {
@@ -47,34 +48,62 @@ describe("BreakpointSwitcher", () => {
 });
 
 /**
- * Board 807:8069 draws the breakpoints with the width range each one governs.
- * The glyph-only switcher shipped four bare letters — nothing in the editor
- * said what "T" meant in pixels, in any tooltip or label.
- *
- * The numbers are read from BREAKPOINTS, the media queries the exporter
- * writes, NOT from the board (which draws a five-tier 992/480 scale). Those
- * are behaviour, and behaviour follows the CODE contract; only the fact that
- * a range is SHOWN comes from the board.
+ * Board 2L9 (Shell, F1.07 `302:7348`, `502:3834`): the topbar breakpoint
+ * control is a row of device icons with no text. The width each one previews
+ * lives in its tooltip, read from DEVICE_PREVIEW_SIZES (the one device-size
+ * table the canvas frame uses), never from the board's sample numbers. The
+ * board says "Phone"; the code's "Mobile" wins (authority: code:mobile-label).
  */
-describe("BreakpointSwitcher — each cell names the range it governs", () => {
-  it("carries the media-query range in the accessible name", () => {
-    render(<BreakpointSwitcher value="desktop" onChange={() => {}} />);
-    expect(screen.getByRole("button", { name: "Desktop (\u22651024px)" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Tablet (768\u20131023px)" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Mobile (\u2264767px)" })).toBeTruthy();
+describe("BreakpointSwitcher (unlabelled)", () => {
+  const names = () =>
+    within(screen.getByRole("group", { name: "Breakpoint" }))
+      .getAllByRole("button")
+      .map((b) => b.getAttribute("aria-label"));
+
+  it("renders wide (when enabled), desktop, tablet, mobile icon buttons in that order", () => {
+    const { rerender } = render(<BreakpointSwitcher value="desktop" onChange={() => {}} includeWide />);
+    expect(names()).toEqual(["Wide", "Desktop", "Tablet", "Mobile"]);
+    rerender(<BreakpointSwitcher value="desktop" onChange={() => {}} />);
+    expect(names()).toEqual(["Desktop", "Tablet", "Mobile"]);
   });
 
-  it("says wide is a preview width, because its edits land on Desktop", () => {
-    render(<BreakpointSwitcher value="wide" onChange={() => {}} includeWide />);
-    expect(screen.getByRole("button", { name: /^Wide/ }).getAttribute("aria-label")).toBe(
-      "Wide (preview width, uses Desktop styles)",
-    );
+  it("shows an icon and no visible text in each cell", () => {
+    render(<BreakpointSwitcher value="desktop" onChange={() => {}} includeWide />);
+    for (const btn of within(screen.getByRole("group", { name: "Breakpoint" })).getAllByRole("button")) {
+      expect(btn.textContent).toBe("");
+      const icon = btn.querySelector("svg");
+      expect(icon).not.toBeNull();
+      expect(icon?.getAttribute("aria-hidden")).toBe("true");
+    }
   });
 
-  it("repeats the range in a title so a pointer user sees it too", () => {
+  it("marks exactly the active cell aria-pressed=true", () => {
+    render(<BreakpointSwitcher value="mobile" onChange={() => {}} includeWide />);
+    const pressed = within(screen.getByRole("group", { name: "Breakpoint" }))
+      .getAllByRole("button")
+      .map((b) => b.getAttribute("aria-pressed"));
+    expect(pressed).toEqual(["false", "false", "false", "true"]);
+  });
+
+  it.each([
+    ["Tablet", `Tablet \u00b7 ${DEVICE_PREVIEW_SIZES.tablet.width}px`],
+    ["Mobile", `Mobile \u00b7 ${DEVICE_PREVIEW_SIZES.mobile.width}px`],
+    ["Wide", `Wide \u00b7 ${DEVICE_PREVIEW_SIZES.wide.width}px`],
+    /* Desktop fills the canvas column, floored at the desktop breakpoint. */
+    ["Desktop", `Desktop \u00b7 \u2265${BREAKPOINTS.desktop.minWidth}px`],
+  ])("tooltip on %s reads its width from the breakpoint config", (name, text) => {
+    render(<BreakpointSwitcher value="desktop" onChange={() => {}} includeWide />);
+    const btn = screen.getByRole("button", { name });
+    expect(screen.queryByRole("tooltip")).toBeNull();
+    fireEvent.focus(btn);
+    const tip = screen.getByRole("tooltip");
+    expect(tip).toHaveTextContent(text);
+    expect(btn.getAttribute("aria-describedby")).toBe(tip.id);
+  });
+
+  it("pins the tablet tooltip to 768px, the canvas's tablet frame", () => {
     render(<BreakpointSwitcher value="desktop" onChange={() => {}} />);
-    expect(screen.getByRole("button", { name: /^Tablet/ }).getAttribute("title")).toBe(
-      "Tablet \u00b7 768\u20131023px",
-    );
+    fireEvent.focus(screen.getByRole("button", { name: "Tablet" }));
+    expect(screen.getByRole("tooltip")).toHaveTextContent("Tablet \u00b7 768px");
   });
 });

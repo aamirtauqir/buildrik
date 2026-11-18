@@ -11,6 +11,18 @@ import { sanitizeRichtext } from "@/shared/utils/html/sanitization";
 import type { CMSContentItem } from "@/shared/types/cms";
 import type { Composer } from "../Composer";
 import type { CMSCollectionBinding, CMSElementBinding } from "./CMSBindingManager";
+import {
+  applyCmsListQuery,
+  CMS_LIST_EMPTY_ATTR,
+  CMS_LIST_ITEM_ATTR,
+  CMS_LIST_QUERY_ATTR,
+  CMS_LIST_ROW_ATTR,
+  conditionFields,
+  encodeCmsJson,
+  type CmsPageListQuery,
+} from "@buildrik/shared/schemas/cmsConditions";
+import { activePageFile, applyCopyConditions, CONDITION_STATE_ATTR, previewItemOf, templateCollectionFor } from "./conditionRender";
+import { LIST_PAGER_ATTR, LIST_PAGER_PART_ATTR, pageCount } from "./listPages";
 
 /** Elements whose content is raw text, never HTML text. */
 const RAW_TEXT_SELECTOR = "script, style, xmp, iframe, noembed, noframes, noscript, textarea, title";
@@ -65,6 +77,20 @@ export function richtextKeys(fields: ReadonlyArray<{ slug: string; type: string 
  *  records keeps its template. Export renders every record and drops it. */
 export interface CollectionListExpandOptions {
   canvas?: boolean;
+  /** The page being rendered (pageFileNames) — its template collection's
+   *  preview record feeds `@page.*` filter values and conditions. Absent:
+   *  the active page. */
+  pageFile?: string;
+  /** Publish of a template page: what depends on the page's own record is
+   *  left to the server's per-record pass (B-27, applyRecordPass). */
+  perRecordOnServer?: boolean;
+  /** B-30: which page of a split list to render (1-based; default 1). */
+  listPage?: number;
+  /** B-30: the href of page `k` of the page being exported (the pager's
+   *  Previous / Next). Absent (canvas): hrefs are left as they are. */
+  pageHref?: (k: number) => string;
+  /** B-30: filled with each split list's page count, by list id. */
+  pageCounts?: Map<string, number>;
 }
 
 /** A reference field's target records by id (and the target collection, for
@@ -150,19 +176,59 @@ export class RepeaterRenderer {
   private async expandChildren(
     listEl: HTMLElement,
     binding: CMSCollectionBinding,
-    { canvas = false }: CollectionListExpandOptions,
+    { canvas = false, pageFile, perRecordOnServer = false, listPage = 1, pageHref, pageCounts }: CollectionListExpandOptions,
   ): Promise<void> {
     /* The canvas shows drafts too — the author is building the list before
        publishing its records; export ships only what the binding's status allows. */
-    const { items } = await this.composer.cms.collections.queryContent({
+    const queried = binding.filter || binding.sort?.length || binding.skip || binding.excludeCurrent || binding.pages === "split";
+    const { items: all } = await this.composer.cms.collections.queryContent({
       collectionId: binding.collectionId,
       status: canvas || binding.status === "all" ? undefined : binding.status,
       /* No limit is "All" (BD-08): queryContent's own default is 50, so an
-         "All" list silently stopped at 50. */
-      limit: binding.limit || CMS_COLLECTION_LIMIT_MAX,
+         "All" list silently stopped at 50. A query filters / sorts the whole
+         set first, then takes Show. */
+      limit: (!queried && binding.limit) || CMS_COLLECTION_LIMIT_MAX,
     });
+    /* C-14: the list's query; `@page.*` values, "Exclude this page's record"
+       and this list's conditions read the template page's record — its
+       preview record here (engine-list-query.md). */
+    const template = templateCollectionFor(this.composer, pageFile ?? activePageFile(this.composer));
+    const pageItem = template ? await previewItemOf(this.composer, template.id) : null;
+    const pageRecord = pageItem?.data ?? null;
+    const readsPage = Boolean(binding.filter?.rules.some((r) => r.value?.startsWith("@page.")) || binding.excludeCurrent);
+    /* B-27: on a published template page those depend on each generated
+       page's record — sort here, hand the rest to the server's pass. */
+    const deferred = perRecordOnServer && template !== null && readsPage;
+    const excludeId = binding.excludeCurrent && template?.id === binding.collectionId ? (pageItem?.id ?? null) : null;
+    /* B-30: a split list shows page `listPage` of its Show-sized pages. Not
+       on a collection page (each generated page is one record's). */
+    const split = binding.pages === "split" && Boolean(binding.limit) && template === null;
+    const matching = split ? applyCmsListQuery(all, { filter: binding.filter, sort: binding.sort, skip: binding.skip, excludeId }, pageRecord) : [];
+    const pages = split ? pageCount(matching.length, binding.limit!) : 1;
+    if (split) pageCounts?.set(binding.elementId, pages);
+    const items = deferred
+      ? applyCmsListQuery(all, { sort: binding.sort })
+      : split
+        ? matching.slice((listPage - 1) * binding.limit!, listPage * binding.limit!)
+        : queried
+          ? applyCmsListQuery(all, { filter: binding.filter, sort: binding.sort, skip: binding.skip, limit: binding.limit, excludeId }, pageRecord)
+          : all;
+    if (deferred) {
+      const q: CmsPageListQuery = {
+        ...(binding.filter ? { filter: binding.filter } : {}),
+        ...(binding.skip ? { skip: binding.skip } : {}),
+        ...(binding.limit ? { limit: binding.limit } : {}),
+        ...(binding.excludeCurrent && template?.id === binding.collectionId ? { excludeCurrent: true } : {}),
+        ...(binding.whenEmpty === "hide" ? { whenEmpty: "hide" as const } : {}),
+      };
+      listEl.setAttribute(CMS_LIST_QUERY_ATTR, encodeCmsJson(q));
+    }
+    const rowFields = deferred ? conditionFields(binding.filter) : [];
     const refs = await this.referenceTables(binding.collectionId, canvas);
-    const templates = Array.from(listEl.children) as HTMLElement[];
+    /* B-30: the "No items" block is never repeated. */
+    const children = Array.from(listEl.children) as HTMLElement[];
+    const slots = children.filter((c) => c.hasAttribute(CMS_LIST_EMPTY_ATTR));
+    const templates = children.filter((c) => !c.hasAttribute(CMS_LIST_EMPTY_ATTR));
     const pristine = templates.map((t) => t.cloneNode(true) as HTMLElement);
     items.forEach((item, index) => {
       const context: RepeaterContext = {
@@ -177,13 +243,76 @@ export class RepeaterRenderer {
       for (const node of nodes) {
         this.applyContext(node, context, binding, null, refs);
         this.applyCurrentItem(node, listEl, item, binding.collectionId, canvas);
+        /* B-11: conditions in this copy read its record. */
+        applyCopyConditions(node, listEl, item.data, this.composer.cms.bindings, canvas, pageRecord, Boolean(perRecordOnServer && template));
         if (intoTemplate) continue;
+        if (!canvas && node.getAttribute(CONDITION_STATE_ATTR) === "hidden") continue;
+        if (deferred) {
+          node.setAttribute(CMS_LIST_ITEM_ATTR, item.id);
+          node.setAttribute(CMS_LIST_ROW_ATTR, encodeCmsJson(Object.fromEntries(rowFields.map((f) => [f, item.data[f] ?? null]))));
+        }
         if (canvas) node.setAttribute("data-cms-repeater-clone", String(index));
         else this.clearUnresolved(node, binding.itemVar || "item");
         listEl.appendChild(node);
       }
     });
     if (!canvas) templates.forEach((t) => t.remove());
+    this.applyEmptyState(listEl, slots, templates, binding, items.length === 0, { canvas, deferred });
+    if (split) this.fillPager(listEl, binding.elementId, listPage, pages, canvas ? undefined : pageHref);
+    else if (!canvas) listEl.ownerDocument?.querySelector(`[${LIST_PAGER_ATTR}="${binding.elementId}"]`)?.remove();
+  }
+
+  /**
+   * B-30 When empty: with records, the "No items" block goes (hidden on the
+   * canvas, so it stays editable through Layers); with none, it shows — or,
+   * on "Hide list", the list goes from the page (a ghost on the canvas). A
+   * deferred list leaves the call to the server's per-page pass.
+   */
+  private applyEmptyState(
+    listEl: HTMLElement,
+    slots: HTMLElement[],
+    templates: HTMLElement[],
+    binding: CMSCollectionBinding,
+    empty: boolean,
+    { canvas, deferred }: { canvas: boolean; deferred: boolean },
+  ): void {
+    if (deferred) return;
+    if (canvas) {
+      for (const slot of slots) slot.style.display = empty ? "" : "none";
+      if (empty && slots.length > 0 && binding.whenEmpty !== "hide") for (const t of templates) t.style.display = "none";
+      if (empty && binding.whenEmpty === "hide") listEl.setAttribute(CONDITION_STATE_ATTR, "hidden");
+      return;
+    }
+    for (const slot of slots) {
+      if (empty && binding.whenEmpty !== "hide") slot.removeAttribute(CMS_LIST_EMPTY_ATTR);
+      else slot.remove();
+    }
+    if (empty && binding.whenEmpty === "hide") {
+      listEl.ownerDocument?.querySelector(`[${LIST_PAGER_ATTR}="${binding.elementId}"]`)?.remove();
+      listEl.remove();
+    }
+  }
+
+  /** B-30: "Page k of n", and Previous / Next to the neighbouring pages —
+   *  without an href (and aria-disabled) at either end. */
+  private fillPager(listEl: HTMLElement, listId: string, k: number, n: number, pageHref?: (k: number) => string): void {
+    const pager = listEl.ownerDocument?.querySelector(`[${LIST_PAGER_ATTR}="${listId}"]`);
+    if (!pager) return;
+    const part = (name: string) => pager.querySelector<HTMLElement>(`[${LIST_PAGER_PART_ATTR}="${name}"]`);
+    const label = part("label");
+    if (label) label.textContent = `Page ${k} of ${n}`;
+    if (!pageHref) return;
+    for (const [name, to] of [["prev", k - 1], ["next", k + 1]] as const) {
+      const link = part(name);
+      if (!link) continue;
+      if (to >= 1 && to <= n) {
+        link.setAttribute("href", pageHref(to));
+        link.removeAttribute("aria-disabled");
+      } else {
+        link.removeAttribute("href");
+        link.setAttribute("aria-disabled", "true");
+      }
+    }
   }
 
   /**

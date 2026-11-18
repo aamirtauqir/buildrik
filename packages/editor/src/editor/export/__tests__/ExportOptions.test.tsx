@@ -1,6 +1,6 @@
 /**
- * ExportOptions tests — FormatGrid card selector (including the Vue/Next.js
- * coming-soon stubs) and the OptionsPanel toggles/callbacks.
+ * ExportOptions tests — the Format row (three radios) and the OptionsPanel
+ * toggles/callbacks.
  *
  * @license BSD-3-Clause
  */
@@ -17,7 +17,7 @@ describe("FormatGrid", () => {
   // carries the choice is a radio. Queries below use that role.
   it("renders the three available formats as selectable radios in one group", () => {
     render(<FormatGrid selectedFormat="html" onFormatChange={vi.fn()} />);
-    expect(screen.getByRole("radiogroup", { name: "Export format" })).toBeInTheDocument();
+    expect(screen.getByRole("radiogroup", { name: "Format" })).toBeInTheDocument();
     expect(screen.getByRole("radio", { name: /HTML/ })).toBeInTheDocument();
     expect(screen.getByRole("radio", { name: /ZIP/ })).toBeInTheDocument();
     expect(screen.getByRole("radio", { name: /React/ })).toBeInTheDocument();
@@ -33,28 +33,11 @@ describe("FormatGrid", () => {
     expect(onFormatChange).toHaveBeenCalledWith("zip");
   });
 
-  it("pins the Vue/Next.js stubs: non-interactive rows with a Soon badge", () => {
-    // KNOWN pin — Vue and Next.js exports are unimplemented stubs. They must
-    // stay unpickable. Asserted on what actually makes them unpickable now:
-    // no radio at all (so neither a click nor an arrow key can reach them) and
-    // aria-disabled on the row. A disabled radio would still be a radio.
+  it("offers the board's three formats only — no Vue / Next.js stubs (2L9 B8-EX01)", () => {
     render(<FormatGrid selectedFormat="html" onFormatChange={vi.fn()} />);
-
-    expect(screen.getByText("Vue")).toBeInTheDocument();
-    expect(screen.getByText("Next.js")).toBeInTheDocument();
-    expect(screen.getAllByText("Soon")).toHaveLength(2);
-    expect(screen.queryByRole("radio", { name: /Vue/ })).toBeNull();
-    expect(screen.queryByRole("radio", { name: /Next\.js/ })).toBeNull();
-    expect(screen.queryByRole("button", { name: /Vue/ })).toBeNull();
-    expect(screen.queryByRole("button", { name: /Next\.js/ })).toBeNull();
-
-    const vueRow = screen.getByText("Vue").closest("label");
-    expect(vueRow).not.toBeNull();
-    expect(vueRow).toHaveAttribute("aria-disabled", "true");
-    expect(vueRow?.querySelector("input")).toBeNull();
-    // pointer-events:none is what stops the click; it now arrives as the
-    // aria-disabled: variant rather than an inline style.
-    expect(vueRow?.className).toMatch(/aria-disabled:pointer-events-none/);
+    expect(screen.getAllByRole("radio")).toHaveLength(3);
+    expect(screen.queryByText("Vue")).toBeNull();
+    expect(screen.queryByText("Soon")).toBeNull();
   });
 
   it("does not render a JSON card even though the format type includes it", () => {
@@ -65,86 +48,42 @@ describe("FormatGrid", () => {
   });
 });
 
-describe("OptionsPanel", () => {
-  it("edits the page title through onChange", () => {
-    const onChange = vi.fn();
-    render(<OptionsPanel config={DEFAULT_EXPORT_CONFIG} onChange={onChange} />);
-    const input = screen.getByDisplayValue("Buildrick Export");
-    fireEvent.change(input, { target: { value: "My Site" } });
-    expect(onChange).toHaveBeenCalledWith({ pageTitle: "My Site" });
-  });
-
-  it("switches CSS style through onChange", () => {
-    const onChange = vi.fn();
-    render(<OptionsPanel config={DEFAULT_EXPORT_CONFIG} onChange={onChange} />);
-    fireEvent.click(screen.getByRole("button", { name: "external" }));
-    expect(onChange).toHaveBeenCalledWith({ cssStyle: "external" });
-    fireEvent.click(screen.getByRole("button", { name: "inline" }));
-    expect(onChange).toHaveBeenCalledWith({ cssStyle: "inline" });
-  });
-
-  it("renders the four toggles reflecting the config state", () => {
+describe("OptionsPanel (2L9 B8-EX03 label / value rows)", () => {
+  it("draws the board's rows and keeps every option", () => {
     render(<OptionsPanel config={DEFAULT_EXPORT_CONFIG} onChange={vi.fn()} />);
-    expect(screen.getByLabelText("Minify output")).not.toBeChecked();
-    expect(screen.getByLabelText("Include reset CSS")).toBeChecked();
-    expect(screen.getByLabelText("Include meta tags")).toBeChecked();
-    expect(screen.getByLabelText("Include viewport meta")).toBeChecked();
+    for (const label of ["Page title", "CSS", "Minify", "CSS reset", "Meta and viewport"]) {
+      expect(screen.getByLabelText(label)).toBeInTheDocument();
+    }
+    expect(screen.getByLabelText("CSS")).toHaveValue("embedded");
+    expect(screen.getByLabelText("Minify")).toHaveValue("off");
+    expect(screen.getByLabelText("CSS reset")).toHaveValue("include");
+    expect(screen.getByLabelText("Meta and viewport")).toHaveValue("both");
   });
 
-  it("fires onChange with the flipped value for each toggle", () => {
+  it("each row writes its own flags", () => {
     const onChange = vi.fn();
     render(<OptionsPanel config={DEFAULT_EXPORT_CONFIG} onChange={onChange} />);
-
-    fireEvent.click(screen.getByLabelText("Minify output"));
+    fireEvent.change(screen.getByLabelText("CSS"), { target: { value: "external" } });
+    expect(onChange).toHaveBeenLastCalledWith({ cssStyle: "external" });
+    fireEvent.change(screen.getByLabelText("Minify"), { target: { value: "on" } });
     expect(onChange).toHaveBeenLastCalledWith({ minify: true });
-
-    fireEvent.click(screen.getByLabelText("Include reset CSS"));
+    fireEvent.change(screen.getByLabelText("CSS reset"), { target: { value: "leave-out" } });
     expect(onChange).toHaveBeenLastCalledWith({ includeResetCSS: false });
-
-    fireEvent.click(screen.getByLabelText("Include meta tags"));
-    expect(onChange).toHaveBeenLastCalledWith({ includeMeta: false });
-
-    fireEvent.click(screen.getByLabelText("Include viewport meta"));
-    expect(onChange).toHaveBeenLastCalledWith({ includeViewport: false });
+    fireEvent.change(screen.getByLabelText("Meta and viewport"), { target: { value: "viewport" } });
+    expect(onChange).toHaveBeenLastCalledWith({ includeMeta: false, includeViewport: true });
+    fireEvent.change(screen.getByLabelText("Page title"), { target: { value: "Fieldwork" } });
+    expect(onChange).toHaveBeenLastCalledWith({ pageTitle: "Fieldwork" });
   });
 
-  it("hides the CMS section by default", () => {
-    render(<OptionsPanel config={DEFAULT_EXPORT_CONFIG} onChange={vi.fn()} />);
-    expect(screen.queryByText("CMS Content")).toBeNull();
-  });
-
-  it("shows CMS mode buttons when the project has CMS bindings", () => {
+  it("CMS content appears only with bindings; Template adds its syntax row", () => {
     const onCMSChange = vi.fn();
-    render(
-      <OptionsPanel
-        config={DEFAULT_EXPORT_CONFIG}
-        onChange={vi.fn()}
-        hasCMSBindings
-        onCMSChange={onCMSChange}
-      />
+    const { rerender } = render(<OptionsPanel config={DEFAULT_EXPORT_CONFIG} onChange={vi.fn()} />);
+    expect(screen.queryByLabelText("CMS content")).toBeNull();
+    rerender(
+      <OptionsPanel config={DEFAULT_EXPORT_CONFIG} onChange={vi.fn()} hasCMSBindings onCMSChange={onCMSChange} cmsSettings={{ mode: "template", syntax: "liquid" }} />,
     );
-    expect(screen.getByText("CMS Content")).toBeInTheDocument();
-    expect(screen.getByText("CMS bindings will not be resolved in export.")).toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole("button", { name: "Template" }));
-    expect(onCMSChange).toHaveBeenCalledWith({ mode: "template" });
-    fireEvent.click(screen.getByRole("button", { name: "Embed Data" }));
-    expect(onCMSChange).toHaveBeenCalledWith({ mode: "static" });
-  });
-
-  it("shows template syntax options only in template mode", () => {
-    const onCMSChange = vi.fn();
-    render(
-      <OptionsPanel
-        config={DEFAULT_EXPORT_CONFIG}
-        onChange={vi.fn()}
-        hasCMSBindings
-        onCMSChange={onCMSChange}
-        cmsSettings={{ mode: "template", syntax: "handlebars" }}
-      />
-    );
-    expect(screen.getByText("Template Syntax")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "liquid" }));
-    expect(onCMSChange).toHaveBeenCalledWith({ syntax: "liquid" });
+    fireEvent.change(screen.getByLabelText("CMS content"), { target: { value: "static" } });
+    expect(onCMSChange).toHaveBeenLastCalledWith({ mode: "static" });
+    expect(screen.getByLabelText("Template syntax")).toHaveValue("liquid");
   });
 });

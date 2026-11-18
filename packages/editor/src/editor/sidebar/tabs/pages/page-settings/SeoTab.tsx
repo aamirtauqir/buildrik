@@ -9,12 +9,11 @@
  */
 
 import * as React from "react";
-import { generateContent } from "@/shared/utils/openai";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
 import type { PageItem } from "../types";
 import type { UsePageSettingsReturn } from "./usePageSettings";
-import { BK_HELPER_CLASS, BK_HELPER_ERROR_CLASS, BK_LABEL_CLASS, Button, HelperText, Label, Select, Textarea, TextInput } from "@/editor/chrome-ui";
+import { BK_HELPER_CLASS, BK_HELPER_ERROR_CLASS, BK_LABEL_CLASS, Button, HelperText, Label, Modal, Select, Textarea, TextInput } from "@/editor/chrome-ui";
 import { isPlaceholderSlug } from "../utils/seoScore";
 import { resolvePageDescription } from "@/engine/export/SEOInjector";
 import { pageFileNames } from "@/engine/export/pageFiles";
@@ -27,6 +26,8 @@ interface Props {
   composer: Composer | null;
   /** Opened by a rename's "Update URL" (G2-076): the offer measures from here. */
   previousSlug?: string;
+  /** 67:11341 — the redirect Settings › Redirects just saved. */
+  redirectSaved?: { from: string; to: string };
   /** 6887:73809 "Site SEO defaults ›" → Settings › SEO defaults (the drawer
    *  guards unsaved edits first). */
   onOpenSiteDefaults?: () => void;
@@ -38,85 +39,23 @@ function publicPath(page: PageItem, slug: string): string {
   return page.isHome ? "/" : `/${slug}`;
 }
 
-type TitleRange = "short" | "ok" | "ideal" | "long";
-
-function titleRange(title: string): TitleRange {
-  if (title.length < 30) return "short";
-  if (title.length < 50) return "ok";
-  if (title.length <= 60) return "ideal";
-  return "long";
-}
-
-const rangeLabel: Record<TitleRange, string> = {
-  short: " · Too short",
-  ok: "",
-  ideal: " · Ideal",
-  long: " · Too long",
-};
-
 const UI = "tw:[font-family:var(--bk-font-ui)]";
-const MONO = "tw:[font-family:var(--bk-font-mono)]";
-const CARD = "tw:bg-[var(--bk-bg-subtle)] tw:border tw:border-[var(--bk-gray-200)] tw:rounded";
 const BANNER = "tw:bg-[var(--bk-warning-tint)] tw:border tw:border-[var(--bk-warning-text)] tw:rounded tw:text-[var(--bk-warning)]";
 const FIELD = "tw:flex tw:flex-col tw:gap-1.5";
-const FIELD_HEAD = "tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2";
-const COUNTER = `tw:text-[length:var(--bk-text-11)] tw:font-medium ${MONO}`;
-const GHOST_BTN = "tw:border-transparent tw:bg-transparent";
+/* Board 63:15939: 13/600 ink labels; blue text links set in from the edge. */
+const LABEL_TEXT = "tw:text-[13px] tw:font-semibold tw:text-[var(--bk-ink)]";
+const LINK = "tw:self-start tw:h-7 tw:min-h-0 tw:px-6 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:text-[var(--bk-accent-text)] tw:disabled:opacity-40";
 /* Density-32 buttons: flowbite `size="xs"` supplies the h-8, these the rest. */
 const BTN_32 = "tw:rounded-[var(--bk-radius-md)] tw:text-[length:var(--bk-text-13)] tw:font-medium tw:focus:ring-0 tw:focus:[box-shadow:var(--bk-shadow-focus)]";
-const BTN_SECONDARY = `${BTN_32} tw:border-transparent tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-gray-200)]`;
+/* 63:17617: "Add redirect" is an outlined white button. */
+const BTN_SECONDARY = `${BTN_32} tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]`;
 
-/** The first heading and the first run of body copy on a page — what the
- *  page is actually about, for the AI title prompt. */
-function pageCopySample(composer: Composer | null, pageId: string): string[] {
-  const rootId = composer?.elements?.getAllPages?.().find((p) => p.id === pageId)?.root?.id;
-  const root = rootId ? composer?.elements?.getElement?.(rootId) : null;
-  if (!root) return [];
-  let heading: string | undefined;
-  let body: string | undefined;
-  const queue = [...root.getChildren()];
-  while (queue.length > 0 && !(heading && body)) {
-    const el = queue.shift();
-    if (!el) break;
-    const text = String(el.getContent?.() ?? "").replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
-    if (text && !heading && el.getType() === "heading") heading = text.slice(0, 120);
-    else if (text && !body && el.getType() !== "heading" && el.getType() !== "button") body = text.slice(0, 240);
-    queue.push(...el.getChildren());
-  }
-  return [heading, body].filter((t): t is string => Boolean(t));
-}
 
-/** "Write with AI"'s prompt: the site, the page and the page's own copy
- *  (L5-017 — it carried the page name alone, inside a generic "headline"
- *  template, and a local bakery got web-builder marketing back). */
-function seoTitlePrompt(siteName: string | undefined, pageName: string, description: string, copy: string[]): string {
-  const lines = [
-    "Write one SEO page title for a web page. At most 60 characters. Plain text, no quotes.",
-    siteName ? `Website: ${siteName}` : null,
-    `Page: ${pageName}`,
-    description ? `Page description: ${description}` : null,
-    ...copy.map((c) => `On the page: ${c}`),
-    "Describe what this page offers; do not invent claims the page does not make.",
-  ];
-  return lines.filter(Boolean).join("\n");
-}
-
-/** An AI title cut to `max` characters at the last whole word (L5-018: a
- *  hard slice ended "…Website B"). Quotes the model adds are dropped. */
-function trimTitle(raw: string, max = 60): string {
-  const clean = raw.replace(/^["'\s]+|["'\s]+$/g, "").replace(/\s+/g, " ");
-  if (clean.length <= max) return clean;
-  const cut = clean.slice(0, max + 1);
-  const lastSpace = cut.lastIndexOf(" ");
-  return (lastSpace > 0 ? cut.slice(0, lastSpace) : clean.slice(0, max)).replace(/[\s,;:–—-]+$/, "");
-}
-
-export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpenSiteDefaults }) => {
-  const siteName = composer?.getProjectMetadata?.()?.name;
+export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, redirectSaved, onOpenSiteDefaults }) => {
+  const [detailsOpen, setDetailsOpen] = React.useState(false);
   const domain = s.domain ?? "yoursite.com";
   /* An empty field ships the inherited title, so the counter measures that. */
   const countedTitle = s.seoTitle || s.inheritedTitle;
-  const range = titleRange(countedTitle);
   /* The preview shows what ships: the exporter's own precedence, so a page
      with no title or description of its own previews the site defaults it
      inherits (owner decision Q4), not an empty slot. */
@@ -132,8 +71,6 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
   const servedFile =
     pageFileNames(withThis.map((p) => (p.id === page.id ? { ...p, slug: s.slug } : p))).get(page.id) ?? "index.html";
   const previewUrl = (pageCanonicalUrl(domain, servedFile) ?? "").replace(/^https?:\/\//, "");
-  const [aiBusy, setAiBusy] = React.useState(false);
-  const [aiFailed, setAiFailed] = React.useState(false);
 
   /* The redirect offer (Clone 3519:19920's door). `page.slug` is the SAVED
      slug — the row re-syncs from the engine after updatePage — so a change of
@@ -152,7 +89,8 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
      from it would hide that page once published — no offer. */
   const oldPathTaken = sitePages.some((p) => p.id !== page.id && (p.isHome ? "/" : `/${p.slug ?? ""}`) === from);
   const change = opened.slug && page.slug && from !== to && !oldPathTaken ? `${from} → ${to}` : null;
-  const redirectOffer = change !== null && change !== answeredChange;
+  /* Back from Settings › Redirects with the rule saved, the offer is answered. */
+  const redirectOffer = change !== null && change !== answeredChange && !redirectSaved;
   /* Opened by "Update URL": the offer is why the sheet opened, so bring it
      into view (it sits under the slug field, below the fold). */
   const offerRef = React.useRef<HTMLDivElement>(null);
@@ -170,40 +108,87 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
     });
   };
 
-  // Generate an SEO title via the AI service (was a dead TODO handler).
-  const suggestTitle = React.useCallback(async () => {
-    if (aiBusy) return;
-    setAiBusy(true);
-    setAiFailed(false);
-    try {
-      const prompt = seoTitlePrompt(siteName, page.name, s.seoDesc, pageCopySample(composer, page.id));
-      const title = await generateContent(prompt, "headline", "professional", { useEnhancedPrompts: false });
-      const clean = trimTitle(title);
-      if (clean) s.setSeoTitle(clean);
-      else setAiFailed(true);
-    } catch {
-      // The field stays for manual entry; say why nothing arrived.
-      setAiFailed(true);
-    } finally {
-      setAiBusy(false);
-    }
-  }, [aiBusy, page.name, page.id, s, siteName, composer]);
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-4">
+    <div className="tw:flex tw:flex-col tw:gap-2.5">
+      {/* ── 1. GOOGLE PREVIEW — TOP ────────────────────────────────────── */}
+      <div className={`${LABEL_TEXT} ${UI}`} data-testid="seo-preview-label">
+        {`Search preview · SEO score ${s.allowIndex ? s.seoScore : 0}`}
+      </div>
+      {/* Google preview — prototype .gpreview */}
+      <div className="tw:flex tw:flex-col tw:gap-1 tw:rounded-md tw:bg-[var(--bk-gray-100)] tw:px-3 tw:py-3">
+        <div className={`tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-soft)] ${UI}`} data-testid="seo-preview-url">
+          {previewUrl}
+        </div>
+        <div className={`tw:text-[14px] tw:leading-5 tw:font-medium tw:text-[var(--bk-accent-text)] ${UI}`} data-testid="seo-preview-title">
+          {previewTitle}
+        </div>
+        <div
+          className={`tw:text-[length:var(--bk-text-12)] tw:leading-snug ${UI} ${
+            previewDesc ? "tw:text-[var(--bk-ink)]" : "tw:text-[var(--bk-ink-muted)] tw:italic"
+          }`}
+          data-testid="seo-preview-desc"
+        >
+          {previewDesc || "No description — add one below to improve ranking"}
+        </div>
+      </div>
+      {/* ── 3. TITLE ────────────────────────────────────────────────────── */}
+      <div className={FIELD} data-testid="seo-field-title">
+        <Label htmlFor="seo-title" className={BK_LABEL_CLASS} data-testid="seo-label-title">
+          {`SEO title · ${countedTitle.length} / 60 · ${s.seoTitle ? (s.isDirty ? "Unsaved override" : "Page override") : "Site default"}`}
+        </Label>
+        <TextInput
+          id="seo-title"
+          sizing="sm"
+          data-testid="seo-input-title"
+          value={s.seoTitle}
+          onChange={(e) => s.setSeoTitle(e.target.value.slice(0, 60))}
+          maxLength={60}
+          placeholder={s.inheritedTitle}
+          aria-describedby="seo-title-hint"
+        />
+      </div>
+      {/* ── 4. META DESCRIPTION ─────────────────────────────────────────── */}
+      <div className={FIELD} data-testid="seo-field-desc">
+        <Label htmlFor="seo-desc" className={BK_LABEL_CLASS} data-testid="seo-label-desc">Description</Label>
+        <Textarea
+          className="tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700"
+          id="seo-desc"
+          rows={2}
+          value={s.seoDesc}
+          onChange={(e) => s.setSeoDesc(e.target.value.slice(0, 160))}
+          placeholder="One sentence about this page"
+          aria-describedby="seo-desc-hint"
+        />
+        <span
+          className={`tw:text-[length:var(--bk-text-11)] ${UI} ${
+            s.seoDesc.length > 160
+              ? "tw:text-[var(--bk-error)]"
+              : s.seoDesc.length > 50
+                ? "tw:text-[var(--bk-success)]"
+                : "tw:text-[var(--bk-ink-muted)]"
+          }`}
+        >
+          {`${s.seoDesc.length} / 160`}
+        </span>
+      </div>
       {/* ── 5. URL SLUG ─────────────────────────────────────────────────── */}
       <div className={FIELD} data-testid="seo-field-slug">
-        <Label htmlFor="seo-slug" className={BK_LABEL_CLASS} data-testid="seo-label-slug">URL slug</Label>
-        <div className="tw:flex tw:items-stretch">
+        <Label htmlFor="seo-slug" className={BK_LABEL_CLASS} data-testid="seo-label-slug">Page URL</Label>
+        {/* 101:25436 rings the whole "/about" field while it has focus — the
+            input's own ring painted over the "/" beside it. */}
+        <div className="tw:flex tw:items-stretch tw:rounded-md tw:focus-within:outline tw:focus-within:outline-1 tw:focus-within:outline-primary-700">
+          {/* Board 63:15939 reads "/about" in one filled field. */}
           <span
-            className={`tw:inline-flex tw:items-center tw:px-2 tw:border tw:border-r-0 tw:border-[var(--bk-gray-200)] tw:rounded-l tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-soft)] tw:text-[11px] tw:font-medium ${MONO}`}
+            aria-hidden="true"
+            className={`tw:inline-flex tw:items-center tw:pl-2.5 tw:rounded-l-md tw:bg-[var(--bk-gray-100)] tw:text-[var(--bk-ink)] tw:in-disabled:text-[var(--bk-ink-disabled)] tw:text-[13px] ${UI}`}
           >
-            {domain}/
+            /
           </span>
           {/* The input's own border-radius/type face live on theme.field.input,
               which a caller theme would REPLACE leaf-wise (losing the token
               colours) — so reach the real <input> with a descendant variant. */}
-          <div className={`tw:flex-1 tw:min-w-0 tw:[&_input]:rounded-l-none tw:[&_input]:text-[11.5px] tw:[&_input]:[font-family:var(--bk-font-mono)]`}>
+          <div className={`tw:flex-1 tw:min-w-0 tw:[&_input]:rounded-l-none tw:[&_input]:pl-0 tw:[&_input:focus]:ring-0! tw:[&_input:focus]:border-transparent! tw:[&_input:focus]:outline-none!`}>
             <TextInput
               id="seo-slug"
               sizing="sm"
@@ -255,248 +240,124 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
             “{s.slug}” is a numbered URL — a descriptive slug ranks better (+10 pts)
           </HelperText>
         ) : null}
-        {/* Clone 3519:19920 — the saved slug change offers its redirect here,
-            beside the field that made it. One text node for the sentence.
-            `Add redirect` leaves for Settings › Redirects with the draft
-            prefilled; `Not now` answers THIS change and it does not come back
-            for it — a further change is a new offer. */}
-        {redirectOffer && (
-          <div
-            ref={offerRef}
-            role="status"
-            data-testid="page-seo-redirect-offer"
-            className={`tw:mt-1 tw:flex tw:flex-col tw:gap-2 tw:px-3 tw:py-2.5 ${CARD} ${UI}`}
-          >
-            <span className="tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink)]">
-              {`URL changed from ${from} to ${to}. Add a redirect so old links keep working?`}
-            </span>
-            <div className="tw:flex tw:items-center tw:gap-2">
-              <Button
-                type="button"
-                size="xs"
-                variant="secondary"
-                className={BTN_SECONDARY}
-                data-testid="page-seo-redirect-add"
-                onClick={addRedirect}
-              >
-                Add redirect
-              </Button>
-              <Button
-                type="button"
-                size="xs"
-                variant="ghost"
-                className={BTN_32}
-                data-testid="page-seo-redirect-later"
-                onClick={() => setAnsweredChange(change)}
-              >
-                Not now
-              </Button>
-            </div>
-          </div>
-        )}
       </div>
-      {/* ── 3. TITLE ────────────────────────────────────────────────────── */}
-      <div className={FIELD} data-testid="seo-field-title">
-        <div className={FIELD_HEAD}>
-          <Label htmlFor="seo-title" className={BK_LABEL_CLASS} data-testid="seo-label-title">Meta title · page override</Label>
-          <Button
-            color="light"
-            size="xs"
-            type="button"
-            aria-label="Suggest SEO title"
-            disabled={aiBusy}
-            onClick={suggestTitle}
-            aria-busy={aiBusy || undefined}
-            className={`tw:ml-auto tw:inline-flex tw:items-center tw:gap-1 tw:h-auto tw:min-h-0 tw:p-0 tw:border-0 tw:bg-transparent tw:text-[var(--bk-accent-text)] tw:hover:bg-transparent tw:hover:underline tw:text-[length:var(--bk-text-11)] tw:font-medium ${UI}`}
+      {/* Board 63:15939: "Search indexing" with its select on one row (the
+          switch lives here; Advanced reads it out), then the two links and
+          the scope note. */}
+      <div className="tw:flex tw:items-center tw:gap-2" data-testid="seo-field-indexing">
+        <Label htmlFor="seo-indexing" className={`${BK_LABEL_CLASS} tw:w-[172px] tw:flex-none`}>Search indexing</Label>
+        <div className="tw:w-60">
+          <Select
+            id="seo-indexing"
+            sizing="sm"
+            data-testid="seo-input-indexing"
+            value={s.allowIndex ? "index" : "noindex"}
+            onChange={(e) => s.setAllowIndex(e.target.value === "index")}
           >
-            <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-              <path d="M5 3l14 9-14 9V3z" />
-            </svg>
-            {s.seoTitle.length < 10 ? "Write with AI" : "Regenerate"}
-          </Button>
-          <span
-            className={`${COUNTER} ${
-              range === "ok" || range === "ideal"
-                ? "tw:text-[var(--bk-success)]"
-                : range === "short"
-                  ? "tw:text-[var(--bk-warning)]"
-                  : "tw:text-[var(--bk-error)]"
-            }`}
-          >
-            {countedTitle.length}/60{rangeLabel[range]}
-          </span>
+            <option value="index">Indexed</option>
+            <option value="noindex">Hidden</option>
+          </Select>
         </div>
-        <TextInput
-          id="seo-title"
-          sizing="sm"
-          data-testid="seo-input-title"
-          value={s.seoTitle}
-          onChange={(e) => s.setSeoTitle(e.target.value.slice(0, 60))}
-          maxLength={60}
-          placeholder={s.inheritedTitle}
-          aria-describedby="seo-title-hint"
-        />
-        {aiFailed && (
-          <HelperText role="alert" className={BK_HELPER_ERROR_CLASS}>
-            Couldn&rsquo;t write a title just now. Try again, or type one.
-          </HelperText>
-        )}
       </div>
-      {/* ── 4. META DESCRIPTION ─────────────────────────────────────────── */}
-      <div className={FIELD} data-testid="seo-field-desc">
-        <div className={FIELD_HEAD}>
-          {/* label + info icon in a flex row — button must NOT be inside <label> (HTML spec) */}
-          <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-            <Label htmlFor="seo-desc" className={BK_LABEL_CLASS} data-testid="seo-label-desc">Meta description</Label>
-          </div>
-          <span
-            className={`${COUNTER} ${
-              s.seoDesc.length > 160
-                ? "tw:text-[var(--bk-error)]"
-                : s.seoDesc.length > 50
-                  ? "tw:text-[var(--bk-success)]"
-                  : "tw:text-[var(--bk-ink-muted)]"
-            }`}
-          >
-            {s.seoDesc.length}/160
-          </span>
-        </div>
-        <Textarea
-          className="tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700"
-          id="seo-desc"
-          rows={1}
-          value={s.seoDesc}
-          onChange={(e) => s.setSeoDesc(e.target.value.slice(0, 160))}
-          placeholder="One sentence about this page"
-          aria-describedby="seo-desc-hint"
-        />
-      </div>
-      {/* 6887:73809 "Search indexing" — the same switch as Advanced's
-          indexing toggle (one state, two doors). */}
-      <div className={FIELD} data-testid="seo-field-indexing">
-        <Label htmlFor="seo-indexing" className={BK_LABEL_CLASS}>Search indexing</Label>
-        <Select
-          id="seo-indexing"
-          sizing="sm"
-          data-testid="seo-input-indexing"
-          value={s.allowIndex ? "index" : "noindex"}
-          onChange={(e) => s.setAllowIndex(e.target.value === "index")}
-        >
-          <option value="index">Indexed · shown in search</option>
-          <option value="noindex">Hidden · not in search</option>
-        </Select>
-        <p className={`tw:m-0 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-soft)] ${UI}`} data-testid="seo-override-note">
-          {siteName ? `${siteName} · ` : ""}These overrides affect {page.name} only.
-        </p>
-        {onOpenSiteDefaults && (
-          <Button
-            variant="link"
-            data-testid="seo-site-defaults"
-            className={`tw:self-start tw:h-auto tw:min-h-0 tw:p-0 tw:text-[length:var(--bk-text-12)] tw:font-medium tw:text-[var(--bk-accent-text)] ${UI}`}
-            onClick={onOpenSiteDefaults}
-          >
-            Site SEO defaults ›
-          </Button>
-        )}
-      </div>
-      {/* Kept under the board's form (owner: never silently remove a
-          capability — designer notes): the Google preview and the score. */}
-      {/* ── 1. GOOGLE PREVIEW — TOP ────────────────────────────────────── */}
-      <div className={`tw:text-[11px] tw:font-medium tw:text-[var(--bk-ink-muted)] tw:uppercase tw:tracking-[0.04em] ${UI}`}>
-        How your page looks in Google Search
-      </div>
-      {/* Google preview — prototype .gpreview */}
-      <div className={`tw:p-3.5 ${CARD}`}>
-        <div className={`tw:text-[length:var(--bk-text-11)] tw:font-medium tw:text-[var(--bk-ink-soft)] ${MONO}`} data-testid="seo-preview-url">
-          {previewUrl}
-        </div>
-        <div className={`tw:mt-1 tw:mb-0.5 tw:text-base tw:font-medium tw:text-[var(--bk-accent-text)] ${UI}`} data-testid="seo-preview-title">
-          {previewTitle}
-        </div>
+      {/* design-2l9 63:17617 — the saved slug change offers its redirect
+          under Search indexing, as a plain line and two buttons (no card), in
+          the place Site SEO defaults takes otherwise. One text node.
+          `Add redirect` leaves for Settings › Redirects with the draft
+          prefilled; `Not now` answers THIS change and it does not come back
+          for it — a further change is a new offer. */}
+      {redirectOffer && (
         <div
-          className={`tw:text-[length:var(--bk-text-13)] tw:leading-snug ${UI} ${
-            previewDesc ? "tw:text-[var(--bk-ink)]" : "tw:text-[var(--bk-ink-muted)] tw:italic"
-          }`}
-          data-testid="seo-preview-desc"
+          ref={offerRef}
+          role="status"
+          data-testid="page-seo-redirect-offer"
+          className={`tw:flex tw:flex-col tw:gap-2 ${UI}`}
         >
-          {previewDesc || "No description — add one below to improve ranking"}
-        </div>
-      </div>
-      {/* ── 2. SEO SCORE ────────────────────────────────────────────────── */}
-      {!s.allowIndex ? (
-        <div className={`tw:px-3 tw:py-2.5 tw:text-xs ${UI} ${BANNER}`} role="alert">
-          <div>
-            <strong className="tw:text-[var(--bk-ink)]">noIndex is ON</strong> — search engines won&apos;t index this page regardless of your
-            SEO settings.
+          <span className="tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-soft)]">
+            {`URL changed from ${from} to ${to}. Add a redirect so old links keep working?`}
+          </span>
+          <div className="tw:flex tw:items-center tw:gap-2">
             <Button
-              color="light"
-              size="xs"
               type="button"
-              onClick={() => s.setAllowIndex(true)}
-              className={`tw:ml-1.5 tw:text-[length:var(--bk-text-12)] tw:font-medium tw:text-[var(--bk-accent-text)] tw:hover:text-[var(--bk-accent-hover)] ${GHOST_BTN} ${UI}`}
+              size="xs"
+              variant="secondary"
+              className={BTN_SECONDARY}
+              data-testid="page-seo-redirect-add"
+              onClick={addRedirect}
             >
-              Turn indexing on →
+              Add redirect
+            </Button>
+            <Button
+              type="button"
+              size="xs"
+              variant="ghost"
+              className={BTN_32}
+              data-testid="page-seo-redirect-later"
+              onClick={() => setAnsweredChange(change)}
+            >
+              Later
             </Button>
           </div>
         </div>
-      ) : (
-        <>
-          {/* Score row + checks grid — prototype .seo-score-row + .seo-checks */}
-          <div className={`tw:flex tw:items-center tw:gap-3.5 tw:p-3 ${CARD}`}>
-            <div
-              className={`tw:text-[24px] tw:font-medium tw:tabular-nums tw:min-w-12 ${MONO} ${
-                s.seoScore >= 80 ? "tw:text-[var(--bk-success)]" : "tw:text-[var(--bk-warning)]"
-              }`}
-            >
-              {s.seoScore}
-            </div>
-            <div className="tw:flex-1 tw:min-w-0">
-              <div className={`tw:text-[length:var(--bk-text-12)] tw:font-medium tw:text-[var(--bk-ink-soft)] ${UI}`}>
-                {s.seoScore >= 80 ? "Looks good" : "Needs work"}
-              </div>
-              <div className="tw:grid tw:grid-cols-2 tw:gap-x-2.5 tw:gap-y-1 tw:mt-2">
-                {[
-                  // Point labels mirror calculateSeoScore's real max weights:
-                  // title 20 (+10 at ≥30 chars) = 30; slug 20 (+10 non-empty) = 30;
-                  // desc 30 (+10 at ≥100 chars) = 40; indexing is an all-or-nothing
-                  // gate (off → whole score 0), not an additive component.
-                  { label: "Page title", ok: s.seoChecks.titleSet, pts: "+30 pts" },
-                  { label: "Meta description", ok: s.seoChecks.descSet, pts: "+40 pts" },
-                  { label: "Clean URL slug", ok: s.seoChecks.slugClean, pts: "+30 pts" },
-                  { label: "Allow indexing", ok: s.seoChecks.indexingOn, pts: "Required" },
-                ].map((c) => (
-                  <div
-                    key={c.label}
-                    className={`tw:flex tw:items-center tw:gap-1.5 tw:text-[11px] ${UI} ${
-                      c.ok ? "tw:text-[var(--bk-ink)]" : "tw:text-[var(--bk-ink-muted)]"
-                    }`}
-                  >
-                    <span
-                      className={`tw:size-1.5 tw:rounded-full tw:flex-none ${
-                        c.ok ? "tw:bg-[var(--bk-success)]" : "tw:bg-[var(--bk-gray-400)]"
-                      }`}
-                    />
-                    <span>{c.label}</span>
-                    <span className={`tw:ml-auto tw:text-[length:var(--bk-text-11)] tw:font-medium tw:text-[var(--bk-ink-muted)] ${MONO}`}>{c.pts}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Reach 80+ banner — shown when score < 80 and indexing is on.
-              ONE clause. A first version chained the slug reason on with a
-              second em-dash and the box became a two-line run-on sentence in a
-              260px drawer — a wall, not advice. Read it on screen and it was
-              obvious. Per-item guidance belongs beside the control that fixes
-              the item, not stacked here; the slug's lives under the slug
-              field. */}
-          {s.seoScore < 80 && s.allowIndex && (
-            <div className={`tw:px-2.5 tw:py-2 tw:text-[length:var(--bk-text-12)] ${UI} ${BANNER}`} role="note">
-              Reach 80+ before publishing{s.seoChecks.descSet ? "" : " — add a meta description (up to +40 pts)"}
-            </div>
-          )}
-        </>
+      )}
+      {onOpenSiteDefaults && !redirectOffer && (
+        <Button
+          variant="link"
+          data-testid="seo-site-defaults"
+          className={`${LINK} ${UI}`}
+          onClick={onOpenSiteDefaults}
+        >
+          Site SEO defaults
+        </Button>
+      )}
+      {/* design-2l9 63:18189: a refused save is said here, in the form. */}
+      {s.saveState === "error" && (
+        <p role="alert" className={`tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-error-text)] ${UI}`} data-testid="pg-drawer-save-error">
+          Couldn’t save page settings. Your changes are still here.
+        </p>
+      )}
+      <Button
+        variant="link"
+        data-testid="seo-score-details"
+        aria-haspopup="dialog"
+        className={`${LINK} ${UI}`}
+        onClick={() => setDetailsOpen(true)}
+      >
+        SEO score details
+      </Button>
+      {/* design-2l9 board 65:17860: the score's six parts in their own small
+          dialog over Page settings, one "Part: n/max" line each, and "Back to
+          SEO" to return. */}
+      <Modal
+        open={detailsOpen}
+        onClose={() => setDetailsOpen(false)}
+        width="sm"
+        title={`SEO score · ${page.name} · ${s.seoScore}/100`}
+        testId="seo-score-breakdown"
+      >
+        <div className="tw:flex tw:flex-col tw:items-start">
+          {s.seoBreakdown.map((row) => (
+            <span key={row.label} className={`tw:text-[13px] tw:leading-5 tw:tabular-nums tw:text-[var(--bk-ink-soft)] ${UI}`}>
+              {`${row.label}: ${row.earned}/${row.max}`}
+            </span>
+          ))}
+          <Button
+            variant="link"
+            data-testid="seo-score-back"
+            className={`${LINK} ${UI} tw:mt-3`}
+            onClick={() => setDetailsOpen(false)}
+          >
+            Back to SEO
+          </Button>
+        </div>
+      </Modal>
+      <p className={`tw:m-0 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-soft)] ${UI}`} data-testid="seo-override-note">
+        These overrides affect this page only. Clear the title to use site defaults.
+      </p>
+      {redirectSaved && (
+        /* Redirects ship with the publish (settings.redirects → vercel.json). */
+        <p className={`tw:m-0 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-soft)] ${UI}`} data-testid="seo-redirect-saved">
+          {`Redirect saved · ${redirectSaved.from} → ${redirectSaved.to} · Applies on next publish`}
+        </p>
       )}
     </div>
   );

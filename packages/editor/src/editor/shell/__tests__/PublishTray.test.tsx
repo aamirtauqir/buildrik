@@ -1,0 +1,622 @@
+/**
+ * PublishTray — design-2l9 Task 1.7 (boards Publish v2 `499:2656`, B8-PB01
+ * `233:2` and the B8-PB* states). One CTA with its reason under it; the
+ * topbar's Publish is only the toggle.
+ *
+ * @license BSD-3-Clause
+ */
+import * as React from "react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { render, screen, fireEvent, cleanup, act, waitFor } from "@testing-library/react";
+import { ToastProvider } from "@/editor/chrome-ui";
+import { EVENTS } from "@/shared/constants";
+import type { PrePublishChecksResult } from "@buildrik/shared/schemas/publish";
+import { VERCEL_CHECK_LABEL } from "@buildrik/shared/schemas/publish";
+
+const checksState: { checkState: "loading" | "ready" | "error"; checks: PrePublishChecksResult | null } = {
+  checkState: "ready",
+  checks: null,
+};
+vi.mock("@/editor/sidebar/tabs/publish/usePrePublishChecks", () => ({
+  usePrePublishChecks: () => ({ ...checksState, reload: vi.fn() }),
+}));
+vi.mock("@/editor/sidebar/tabs/publish/usePublishSnapshot", async (orig) => ({
+  ...(await orig<typeof import("@/editor/sidebar/tabs/publish/usePublishSnapshot")>()),
+  usePublishSnapshot: () => ({
+    production: { label: "Production", value: "fieldwork.studio" },
+    preview: { label: "Preview", value: null },
+    changes: [],
+    changeCount: 0,
+    pageCount: 2,
+    pageNames: ["Home", "Work"],
+    lastDeploy: { version: 12, when: "2d", rawAt: new Date(Date.now() - 2 * 86_400_000).toISOString(), isLive: true },
+    loading: false,
+    error: false,
+    reload: vi.fn(),
+  }),
+}));
+const previewState: { preview: unknown } = { preview: null };
+vi.mock("@/editor/sidebar/tabs/publish/usePublishPreviewDiff", () => ({ usePublishPreviewDiff: () => previewState.preview }));
+const cms = {
+  blocker: null as string | null,
+  failure: null as null | { reason: string; attempts: number; since: number; open: { collectionId: string; recordId?: string } | null },
+  retry: vi.fn(async () => undefined),
+};
+vi.mock("@/services/cmsSync", () => ({
+  cmsSyncBlocker: () => cms.blocker,
+  cmsSyncFailure: () => cms.failure,
+  onCmsSyncError: () => () => {},
+  retryCmsSync: () => cms.retry(),
+}));
+const updateSiteColumns = vi.fn(async () => ({}));
+vi.mock("@/services/BuildrikSyncProvider", () => ({
+  getSiteIdFromUrl: () => "site-1",
+  updateSiteColumns: (...a: unknown[]) => updateSiteColumns(...(a as [])),
+}));
+const roundState: { round: unknown } = { round: null };
+const roleState = vi.hoisted(() => ({ role: null as string | null }));
+vi.mock("@/editor/shell/hooks/useEditorRole", () => ({ useEditorRole: () => roleState.role }));
+vi.mock("@/services/ReviewService", () => ({ fetchCurrentRound: async () => roundState.round }));
+const locateComment = vi.fn(() => "located");
+vi.mock("@/editor/sidebar/tabs/review/locate", () => ({ locateComment: (...a: unknown[]) => locateComment(...(a as [])) }));
+
+import { PublishTray } from "../PublishTray";
+import { publishTray, usePublishTray } from "../publishTrayStore";
+import { deriveLifecycleState, type LifecycleInput, type NextMove } from "../lifecycle";
+import type { UsePublishJobResult } from "../hooks/usePublishJob";
+import type { Issue } from "../hooks/useStudioState";
+
+function job(over: Partial<UsePublishJobResult> = {}): UsePublishJobResult {
+  return {
+    uiState: "idle",
+    jobId: null,
+    deploymentId: null,
+    progress: 0,
+    publishedUrl: "https://fieldwork.studio",
+    error: null,
+    steps: null,
+    blockedReason: null,
+    publish: vi.fn(),
+    cancel: vi.fn(),
+    track: vi.fn(),
+    reset: vi.fn(),
+    lastPublishedAt: null,
+    hasUnpublishedChanges: null,
+    dismissBlock: vi.fn(),
+    unpublished: vi.fn(),
+    startedAt: null,
+    pollLost: false,
+    ...over,
+  };
+}
+
+const base: LifecycleInput = {
+  reviewState: "none",
+  reviewsEnabled: false,
+  editsRequireApproval: false,
+  isPublished: true,
+  hasUnpublishedChanges: true,
+  isViewer: false,
+  publishEnabled: true,
+  offline: false,
+  errorCount: 0,
+};
+const move = (over: Partial<LifecycleInput> = {}): NextMove | null => deriveLifecycleState({ ...base, ...over });
+
+function makeComposer(zoom = 100) {
+  const handlers = new Map<string, (d?: unknown) => void>();
+  const state = { zoom };
+  const composer = {
+    on: vi.fn((e: string, h: (d?: unknown) => void) => handlers.set(e, h)),
+    off: vi.fn(),
+    emit: vi.fn((e: string, d?: unknown) => handlers.get(e)?.(d)),
+    getState: () => state,
+    setZoom: vi.fn((z: number) => {
+      state.zoom = z;
+    }),
+    getProjectMetadata: () => ({ name: "Fieldwork Studio" }),
+    selection: { select: vi.fn() },
+    elements: { getElement: vi.fn() },
+    designSystem: { tokenUsage: { getBreakdown: () => [] } },
+  };
+  return { composer, state, handlers };
+}
+
+interface Opts {
+  nextMove?: NextMove | null;
+  publishJob?: UsePublishJobResult;
+  issues?: Issue[];
+  onRequestPublish?: (() => void) | null;
+  composer?: ReturnType<typeof makeComposer>["composer"];
+}
+
+function renderTray(o: Opts = {}) {
+  const onRequestPublish = o.onRequestPublish === null ? undefined : (o.onRequestPublish ?? vi.fn());
+  const composer = o.composer ?? makeComposer().composer;
+  const utils = render(
+    <ToastProvider>
+      <PublishTray
+        composer={composer as never}
+        publishJob={o.publishJob ?? job()}
+        nextMove={"nextMove" in o ? (o.nextMove ?? null) : move()}
+        onRequestPublish={onRequestPublish}
+        issues={o.issues ?? []}
+      />
+    </ToastProvider>,
+  );
+  return { ...utils, onRequestPublish, composer };
+}
+
+const cta = () => screen.getByTestId("publish-tray-cta");
+const reason = () => screen.queryByTestId("publish-tray-reason")?.textContent ?? null;
+
+beforeEach(() => {
+  checksState.checkState = "ready";
+  checksState.checks = { ready: true, checks: [] } as unknown as PrePublishChecksResult;
+  cms.blocker = null;
+  cms.failure = null;
+  roundState.round = null;
+  previewState.preview = null;
+  cms.retry.mockClear();
+  locateComment.mockClear();
+});
+afterEach(() => {
+  cleanup();
+  publishTray.close();
+});
+
+describe("PublishTray — one CTA", () => {
+  it("one CTA; reason \"Fix {n} blocking issue(s) to publish\" when n>0", () => {
+    const issues: Issue[] = [
+      { id: "a", type: "error", message: "Collection list “Latest posts” has no source", elementId: "el-1" },
+      { id: "b", type: "error", message: "Broken link", elementId: "el-2" },
+    ];
+    renderTray({ nextMove: move({ errorCount: 2 }), issues });
+    expect(screen.getAllByRole("button", { name: /^Publish/ })).toHaveLength(1);
+    expect(cta()).toBeDisabled();
+    expect(cta().textContent).toBe("Publish changes");
+    expect(reason()).toBe("Fix 2 blocking issues to publish");
+    expect(screen.getByText("2 blocking")).toBeTruthy();
+  });
+
+  it("says issue, singular, for one", () => {
+    renderTray({ nextMove: move({ errorCount: 1 }), issues: [{ id: "a", type: "error", message: "x" }] });
+    expect(reason()).toBe("Fix 1 blocking issue to publish");
+  });
+});
+
+describe("PublishTray — states (B8-PB* copy)", () => {
+  it("nothing to publish: \"Up to date\", disabled, no unpublished changes", () => {
+    renderTray({ nextMove: null });
+    expect(cta().textContent).toBe("Up to date");
+    expect(cta()).toBeDisabled();
+    expect(screen.getByTestId("publish-tray-changes").textContent).toBe("No unpublished changes");
+  });
+
+  it("warnings only: the CTA stays enabled and opens the shell's publish door", () => {
+    const { onRequestPublish } = renderTray({
+      issues: [{ id: "w", type: "warning", message: "2 images have no alt text", elementId: "img" }],
+    });
+    expect(cta()).not.toBeDisabled();
+    expect(screen.getByText("1 tip")).toBeTruthy();
+    fireEvent.click(cta());
+    expect(onRequestPublish).toHaveBeenCalledTimes(1);
+  });
+
+  it("no Vercel connection: the CTA is \"Connect Vercel\" and opens the integrations page", () => {
+    checksState.checks = {
+      ready: false,
+      checks: [{ label: VERCEL_CHECK_LABEL, status: "fail", detail: "No Vercel account connected." }],
+    } as unknown as PrePublishChecksResult;
+    const open = vi.spyOn(window, "open").mockImplementation(() => null);
+    renderTray({ nextMove: move({ errorCount: 1 }) });
+    expect(cta().textContent).toBe("Connect Vercel");
+    fireEvent.click(cta());
+    expect(open).toHaveBeenCalledWith(expect.stringContaining("/dashboard/settings/integrations"), "_blank", "noopener");
+    open.mockRestore();
+  });
+
+  it("first publish vs republish: label and status card follow the site", () => {
+    renderTray({ nextMove: move({ isPublished: false, hasUnpublishedChanges: null }), publishJob: job({ publishedUrl: null }) });
+    expect(cta().textContent).toBe("Publish");
+    expect(screen.getByText("Not live yet")).toBeTruthy();
+    cleanup();
+    renderTray();
+    expect(cta().textContent).toBe("Publish changes");
+    expect(screen.getByText(/Live · fieldwork\.studio/)).toBeTruthy();
+    expect(screen.getByText("Published 2 days ago · v12")).toBeTruthy();
+  });
+
+  it("checks loading: the CTA waits with \"Checking…\"", () => {
+    checksState.checkState = "loading";
+    renderTray();
+    expect(cta()).toBeDisabled();
+    expect(reason()).toBe("Checking…");
+  });
+
+  it("publishing (PB07): the worker's steps, skipped ones neither listed nor counted, no CTA", () => {
+    renderTray({
+      publishJob: job({
+        uiState: "publishing",
+        jobId: "job-1",
+        progress: 40,
+        steps: [
+          { name: "Generating pages", status: "done" },
+          { name: "Optimizing images", status: "skipped" },
+          { name: "Deploying to CDN", status: "active" },
+          { name: "Verifying SSL", status: "pending" },
+        ],
+      }),
+    });
+    const run = screen.getByTestId("publish-tray-run");
+    expect(run.textContent).toContain("Deploying to CDN · step 2 of 3");
+    expect(run.textContent).not.toContain("Optimizing images");
+    expect(screen.queryByTestId("publish-tray-cta")).toBeNull();
+    expect(screen.getByTestId("publish-tray-run-footer").textContent).toBe(
+      "Publishing can't be stopped once deploying. You can keep working or leave.",
+    );
+    expect(screen.getByTestId("publish-tray-status").textContent).toContain("Live · fieldwork.studio");
+  });
+
+  it("A-32: the queued job names its steps (all pending, skipped ones hidden) and the run counts its elapsed time", () => {
+    renderTray({
+      publishJob: job({
+        uiState: "publishing",
+        jobId: "job-1",
+        startedAt: new Date(Date.now() - 42_000).toISOString(),
+        steps: [
+          { name: "Generating pages", status: "pending" },
+          { name: "Optimizing images", status: "skipped" },
+          { name: "Deploying to CDN", status: "pending" },
+          { name: "Verifying SSL", status: "pending" },
+          { name: "Performance check", status: "skipped" },
+        ],
+      }),
+    });
+    const run = screen.getByTestId("publish-tray-run");
+    expect(run.textContent).toContain("Queued — waiting to start");
+    expect(run.textContent).toContain("Verifying SSL");
+    expect(run.textContent).not.toContain("Performance check");
+    expect(screen.getByTestId("publish-tray-elapsed").textContent).toMatch(/^Elapsed 0:4[2-4]$/);
+    expect(screen.getByRole("button", { name: "Cancel (not started)" })).toBeTruthy();
+  });
+
+  it("queued (PB08): no steps yet, and the job can still be cancelled", () => {
+    const queued = job({ uiState: "publishing", jobId: "job-1", steps: null });
+    renderTray({ publishJob: queued });
+    expect(screen.getByTestId("publish-tray-queued").textContent).toContain("Queued — waiting to start");
+    fireEvent.click(screen.getByRole("button", { name: "Cancel (not started)" }));
+    expect(queued.cancel).toHaveBeenCalledTimes(1);
+  });
+
+  it("queued: below Admin the cancel is disabled with the reason (server: ADMIN only)", () => {
+    roleState.role = "EDITOR";
+    try {
+      const queued = job({ uiState: "publishing", jobId: "job-1", steps: null });
+      renderTray({ publishJob: queued });
+      const cancel = screen.getByRole("button", { name: "Cancel (not started)" });
+      expect(cancel).toBeDisabled();
+      expect(screen.getByText("Only an Admin can cancel a publish.")).toBeTruthy();
+    } finally {
+      roleState.role = null;
+    }
+  });
+
+  it("success (PB09): the green sentence names the version, View live and Copy link", () => {
+    renderTray({ nextMove: null, publishJob: job({ uiState: "published", jobId: "job-1" }) });
+    expect(screen.getByTestId("publish-tray-published").textContent).toContain(
+      "Your changes are live on fieldwork.studio. v12 is live.",
+    );
+    expect(screen.getAllByTestId("publish-tray-view-live").map((a) => a.getAttribute("href"))).toContain("https://fieldwork.studio");
+    expect(screen.queryByTestId("publish-tray-cta")).toBeNull();
+  });
+
+  it("simulated success says nothing went live", () => {
+    renderTray({
+      nextMove: null,
+      publishJob: job({ uiState: "published", jobId: "job-1", publishedUrl: "https://site-1.dev-simulated.invalid" }),
+    });
+    expect(screen.getByText("Simulation mode — nothing is deployed")).toBeTruthy();
+    expect(screen.getByText("Simulated publish — nothing went live.")).toBeTruthy();
+  });
+
+  it("CMS sync pending: the CTA is shut with \"Saving CMS changes…\"", () => {
+    cms.blocker = "1 CMS change hasn't reached the server yet.";
+    renderTray();
+    expect(cta()).toBeDisabled();
+    expect(reason()).toBe("Saving CMS changes…");
+  });
+
+  it("CMS sync stuck after 5 failed retries: reason, Retry sync, Open CMS at the failing record", () => {
+    cms.blocker = "1 CMS change hasn't reached the server yet.";
+    cms.failure = { reason: "502 Bad Gateway", attempts: 5, since: Date.now(), open: { collectionId: "c1", recordId: "r1" } };
+    const { composer } = renderTray();
+    expect(reason()).toBe("CMS changes couldn't sync: 502 Bad Gateway");
+    fireEvent.click(screen.getByRole("button", { name: "Retry sync" }));
+    expect(cms.retry).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByRole("button", { name: "Open CMS ›" }));
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_CMS_OPEN, { collectionId: "c1", recordId: "r1" });
+  });
+
+  it("CMS sync stuck after 60 s, even with fewer retries", () => {
+    cms.blocker = "1 CMS change hasn't reached the server yet.";
+    cms.failure = { reason: "offline", attempts: 1, since: Date.now() - 61_000, open: null };
+    renderTray();
+    expect(reason()).toBe("CMS changes couldn't sync: offline");
+    expect(screen.queryByRole("button", { name: "Open CMS ›" })).toBeNull();
+  });
+
+  it("CMS sync failing for less than 60 s and 5 tries is still pending, not stuck", () => {
+    cms.blocker = "1 CMS change hasn't reached the server yet.";
+    cms.failure = { reason: "offline", attempts: 2, since: Date.now() - 5_000, open: null };
+    renderTray();
+    expect(reason()).toBe("Saving CMS changes…");
+  });
+
+  it("A-33: what will change — counts against the live version, a chip per page, CMS records, See all into Compare", () => {
+    previewState.preview = {
+      diff: { retained: true, pages: [], added: 1, removed: 0, changed: 3, liveVersion: 12, cmsRecords: 4 },
+      changes: [
+        { name: "Home", change: "changed" },
+        { name: "Work", change: "changed" },
+        { name: "About", change: "changed" },
+        { name: "Services", change: "added" },
+      ],
+    };
+    const { composer } = renderTray();
+    expect(screen.getByTestId("publish-tray-changes").textContent).toBe("3 pages changed · 1 added · 0 removed");
+    expect(screen.getByTestId("publish-tray-change-chips").textContent).toBe("✎ changed Home✎ changed Work✎ changed About+ added Services");
+    expect(screen.getByTestId("publish-tray-cms-count").textContent).toBe("CMS: 4 records published");
+    fireEvent.click(screen.getByTestId("publish-tray-see-all"));
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_COMPARE_OPEN, expect.objectContaining({ right: { kind: "current" }, from: "Publish" }));
+  });
+
+  it("A-34 / B8-PB22: over the plan's site limit — the plan's sentence under the shut CTA, no checks", () => {
+    checksState.checks = {
+      ready: false,
+      checks: [{ label: "Plan limit", status: "fail", detail: "Over the Free limit — Upgrade to publish" }],
+    } as unknown as PrePublishChecksResult;
+    renderTray({ nextMove: move({ errorCount: 1 }) });
+    expect(cta()).toBeDisabled();
+    expect(reason()).toBe("Over the Free limit — Upgrade to publish");
+    expect(document.querySelector('section[aria-label="Checks"]')).toBeNull();
+  });
+
+  it("A-36 / B8-PB16–17: a password kept on Free — Upgrade, or remove it (asked first) and publish", async () => {
+    checksState.checks = {
+      ready: false,
+      checks: [{ label: "Password protection", status: "fail", detail: "This site is password protected. On Free the protection is removed and the site becomes public." }],
+    } as unknown as PrePublishChecksResult;
+    const { onRequestPublish } = renderTray({ nextMove: move({ errorCount: 1 }) });
+    expect(screen.getByTestId("publish-check-password").textContent).toContain("On Free the protection is removed");
+    expect(screen.getByText("1 blocking")).toBeTruthy();
+    fireEvent.click(screen.getByTestId("publish-check-password-remove"));
+    expect(screen.getByText("Remove password protection and publish?")).toBeTruthy();
+    expect(screen.getByText("fieldwork.studio becomes public. You can add protection again on Pro.")).toBeTruthy();
+    fireEvent.click(screen.getByTestId("publish-remove-protection-confirm"));
+    await waitFor(() => expect(onRequestPublish).toHaveBeenCalledTimes(1));
+    expect(updateSiteColumns).toHaveBeenCalledWith("site-1", { publishedPassword: null });
+  });
+
+  it("checks loading (PB23): placeholders only, nothing actionable", () => {
+    checksState.checkState = "loading";
+    renderTray();
+    expect(screen.getByTestId("publish-tray-skeleton")).toBeTruthy();
+    expect(screen.queryByTestId("publish-tray-status")).toBeNull();
+    expect(reason()).toBe("Checking…");
+  });
+
+  it("changes requested (PB15): who asked and how much, Open Review, no checks; the CTA waits on review", async () => {
+    roundState.round = { status: "CHANGES_REQUESTED", reviewerName: "Lena", invitedEmail: null, revoked: false, openCommentCount: 2, resolvedAt: null };
+    const { composer } = renderTray({
+      nextMove: move({ reviewsEnabled: true, editsRequireApproval: true, reviewState: "changes-requested", reviewerName: "Lena" }),
+    });
+    await waitFor(() =>
+      expect(screen.getByTestId("publish-tray-changes-requested").textContent).toContain(
+        "Lena requested changes on 2 comments. Publishing waits for a fresh approval.",
+      ),
+    );
+    expect(reason()).toBe("Waiting on review");
+    expect(document.querySelector('section[aria-label="Checks"]')).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Open Review ›" }));
+    expect(composer.emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "review" });
+  });
+
+  it("an approved round is named in the Approval section (PB01)", async () => {
+    roundState.round = { status: "APPROVED", reviewerName: "Lena", invitedEmail: null, revoked: false, openCommentCount: 0, resolvedAt: "2026-10-15T10:00:00.000Z" };
+    renderTray({ nextMove: move({ reviewsEnabled: true, editsRequireApproval: true, reviewState: "approved" }) });
+    await waitFor(() => expect(screen.getByTestId("publish-tray-approval").textContent).toContain("✓ Approved by Lena"));
+  });
+
+  it("blockers list first and the count covers every row", () => {
+    checksState.checks = {
+      ready: true,
+      checks: [{ label: "Favicon", status: "warning", detail: "No favicon set." }],
+    } as unknown as PrePublishChecksResult;
+    renderTray({ nextMove: move({ errorCount: 1 }), issues: [{ id: "a", type: "error", message: "No source", elementId: "e" }] });
+    const rows = screen.getByTestId("publish-checks").querySelectorAll("[data-testid^='publish-']");
+    expect(rows[0].textContent).toContain("No source");
+    expect(screen.getByText("1 blocking · 1 tip")).toBeTruthy();
+  });
+
+  it("an outside block (offline) speaks before the issue count", () => {
+    renderTray({ nextMove: move({ offline: true, errorCount: 2 }) });
+    expect(reason()).toBe("Needs a connection");
+  });
+});
+
+describe("PublishTray — outside refusals draw less (B8-PB19/20/21)", () => {
+  const sections = () => Array.from(document.querySelectorAll("section[aria-label]")).map((el) => el.getAttribute("aria-label"));
+
+  it("a workspace that cannot publish shows only the status card (PB20)", () => {
+    renderTray({ onRequestPublish: null });
+    expect(sections()).toEqual(["Site status"]);
+    expect(reason()).toBe("Publishing isn’t switched on for this workspace yet");
+  });
+
+  it("offline (PB21) and a viewer (PB19) see what would change, but no checks and no destination", () => {
+    renderTray({ nextMove: move({ offline: true }) });
+    expect(sections()).toEqual(["Site status", "What will change"]);
+    cleanup();
+    renderTray({ nextMove: move({ isViewer: true }) });
+    expect(sections()).toEqual(["Site status", "What will change"]);
+    expect(reason()).toBe("Publishing needs Editor access");
+  });
+
+  it("an ordinary tray keeps every section", () => {
+    renderTray();
+    expect(sections()).toEqual(["Site status", "What will change", "Checks", "Goes to"]);
+  });
+
+  it("⋯ opens Publish history, and the legal links sit under the CTA", () => {
+    const { composer } = renderTray();
+    fireEvent.click(screen.getByTestId("publish-tray-more"));
+    fireEvent.click(screen.getByTestId("publish-tray-history"));
+    expect(composer.emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "history" });
+    const legal = screen.getByTestId("publish-tray-legal");
+    expect(legal.textContent).toBe("Privacy policyTerms of service");
+  });
+});
+
+describe("PublishTray — deploy failed", () => {
+  it("(PB10) names the live version kept; View log shows the job id and the deployment id", () => {
+    renderTray({
+      publishJob: job({ uiState: "failed", jobId: "job-9", deploymentId: "dpl_123", error: "Vercel timed out." }),
+    });
+    expect(screen.getByTestId("publish-tray-failed").textContent).toContain(
+      "Publish failed — Vercel timed out. The live site still shows v12.",
+    );
+    expect(screen.queryByTestId("publish-tray-job-id")).toBeNull();
+    fireEvent.click(screen.getByTestId("publish-tray-view-log"));
+    expect(screen.getByTestId("publish-tray-job-id").textContent).toBe("job-9");
+    expect(screen.getByTestId("publish-tray-deployment-id").textContent).toBe("dpl_123");
+    expect(cta().textContent).toBe("Try again");
+  });
+
+  it("Try again is idempotent: a second press before the job moves does nothing", () => {
+    const { onRequestPublish } = renderTray({
+      publishJob: job({ uiState: "failed", jobId: "job-9", error: "Vercel timed out." }),
+    });
+    fireEvent.click(cta());
+    fireEvent.click(cta());
+    expect(onRequestPublish).toHaveBeenCalledTimes(1);
+    expect(cta()).toBeDisabled();
+  });
+
+  it("Try again comes back when nothing followed the press (confirm cancelled)", () => {
+    vi.useFakeTimers();
+    try {
+      const { onRequestPublish } = renderTray({
+        publishJob: job({ uiState: "failed", jobId: "job-9", error: "Vercel timed out." }),
+      });
+      fireEvent.click(cta());
+      expect(cta()).toBeDisabled();
+      act(() => {
+        vi.advanceTimersByTime(3000);
+      });
+      expect(cta()).not.toBeDisabled();
+      fireEvent.click(cta());
+      expect(onRequestPublish).toHaveBeenCalledTimes(2);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("a failure after partial upload (deployment id present) asks for a NEW job through the door, never re-tracks the dead one", () => {
+    const failed = job({ uiState: "failed", jobId: "job-9", deploymentId: "dpl_partial", error: "Upload interrupted." });
+    const { onRequestPublish } = renderTray({ publishJob: failed });
+    fireEvent.click(screen.getByTestId("publish-tray-view-log"));
+    expect(screen.getByTestId("publish-tray-deployment-id").textContent).toBe("dpl_partial");
+    fireEvent.click(cta());
+    expect(onRequestPublish).toHaveBeenCalledTimes(1);
+    expect(failed.track).not.toHaveBeenCalled();
+  });
+
+  it("a lost poll resumes the SAME job (Check status), never a second publish", () => {
+    const lost = job({ uiState: "failed", jobId: "job-9", pollLost: true, error: "Failed to poll" });
+    const { onRequestPublish } = renderTray({ publishJob: lost });
+    expect(cta().textContent).toBe("Check status");
+    fireEvent.click(cta());
+    expect(lost.track).toHaveBeenCalledWith("job-9");
+    expect(onRequestPublish).not.toHaveBeenCalled();
+  });
+});
+
+describe("PublishTray — issues, focus, zoom", () => {
+  it("clicking an issue selects its element and keeps the tray open", () => {
+    publishTray.open();
+    renderTray({ issues: [{ id: "w", type: "warning", message: "Image has no alt text", elementId: "img-1", pageId: "p1" }] });
+    fireEvent.click(screen.getByRole("button", { name: "Fix: Image has no alt text" }));
+    expect(locateComment).toHaveBeenCalledWith(expect.anything(), { pageId: "p1", targetSelector: "img-1" });
+    expect(publishTray.get().open).toBe(true);
+    expect(screen.getByTestId("publish-tray")).toBeTruthy();
+  });
+
+  /* The harness the shell is: the topbar's toggle, and the tray mounted only
+     while the store says open. */
+  function Harness() {
+    const { open } = usePublishTray();
+    return (
+      <ToastProvider>
+        <button type="button" data-testid="toggle" onClick={(e) => publishTray.toggle(e.currentTarget)}>
+          Publish
+        </button>
+        {open ? (
+          <PublishTray composer={makeComposer().composer as never} publishJob={job()} nextMove={move()} onRequestPublish={vi.fn()} issues={[]} />
+        ) : null}
+      </ToastProvider>
+    );
+  }
+
+  it("Esc closes the tray and returns focus to the topbar Publish toggle", () => {
+    render(<Harness />);
+    const toggle = screen.getByTestId("toggle");
+    toggle.focus();
+    fireEvent.click(toggle);
+    expect(screen.getByTestId("publish-tray")).toBeTruthy();
+    expect(document.activeElement).not.toBe(toggle);
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.queryByTestId("publish-tray")).toBeNull();
+    expect(document.activeElement).toBe(toggle);
+  });
+
+  it("✕ closes the tray too", () => {
+    render(<Harness />);
+    fireEvent.click(screen.getByTestId("toggle"));
+    fireEvent.click(screen.getByTestId("publish-tray-close"));
+    expect(screen.queryByTestId("publish-tray")).toBeNull();
+  });
+
+  it("focus is trapped inside the tray while open", () => {
+    render(<Harness />);
+    fireEvent.click(screen.getByTestId("toggle"));
+    const tray = screen.getByTestId("publish-tray");
+    expect(tray.contains(document.activeElement)).toBe(true);
+    const focusables = Array.from(tray.querySelectorAll<HTMLElement>("a[href],button:not([disabled])"));
+    focusables[focusables.length - 1].focus();
+    fireEvent.keyDown(document, { key: "Tab" });
+    expect(document.activeElement).toBe(focusables[0]);
+    fireEvent.keyDown(document, { key: "Tab", shiftKey: true });
+    expect(document.activeElement).toBe(focusables[focusables.length - 1]);
+  });
+
+  it("fits the canvas on open; closing restores the user's previous zoom", async () => {
+    const { composer, state, handlers } = makeComposer(100);
+    handlers.set(EVENTS.ZOOM_FIT, () => composer.setZoom(46));
+    const { unmount } = renderTray({ composer });
+    await waitFor(() => expect(composer.emit).toHaveBeenCalledWith(EVENTS.ZOOM_FIT, { widthOnly: true }));
+    expect(state.zoom).toBe(46);
+    unmount();
+    expect(state.zoom).toBe(100);
+  });
+
+  it("closing keeps the zoom when the user changed it while the tray was open", async () => {
+    const { composer, state, handlers } = makeComposer(100);
+    handlers.set(EVENTS.ZOOM_FIT, () => composer.setZoom(46));
+    const { unmount } = renderTray({ composer });
+    await waitFor(() => expect(state.zoom).toBe(46));
+    act(() => composer.setZoom(75));
+    unmount();
+    expect(state.zoom).toBe(75);
+  });
+});

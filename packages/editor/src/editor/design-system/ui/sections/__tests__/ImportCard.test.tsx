@@ -1,5 +1,6 @@
 /**
- * ImportCard tests — covers drop-zone → detail block → conflict resolution → apply.
+ * ImportCard — 2L9 B6-B15/B16/B49: Choose JSON file → dry run (detected ·
+ * valid · unsupported, Added / Modified / Skipped / Unsupported) → Apply n valid.
  *
  * @license BSD-3-Clause
  */
@@ -58,7 +59,7 @@ describe("ImportCard — drop-zone initial state", () => {
 });
 
 describe("ImportCard — file ingestion", () => {
-  it("drops a JSON file → detail block surfaces with Detected/Valid", async () => {
+  it("drops a JSON file → the dry run: summary line, rows, preview-only note", async () => {
     const { getByTestId, findByText, findByTestId } = render(wrap(<ImportCard />));
     const zone = getByTestId("import-drop-zone");
     const file = makeJsonFile([
@@ -74,11 +75,12 @@ describe("ImportCard — file ingestion", () => {
     });
 
     expect(await findByTestId("import-detail-block")).toBeTruthy();
-    expect(await findByText(/Detected/i)).toBeTruthy();
-    expect(await findByText(/Design tokens JSON/i)).toBeTruthy();
+    expect((await findByTestId("import-summary")).textContent).toBe("1 detected · 1 valid · 0 unsupported");
+    expect(await findByText("Preview only · Nothing has been applied")).toBeTruthy();
+    expect((await findByTestId("import-file")).textContent).toBe("tokens.json · Update matching");
   });
 
-  it("zero errors + zero conflicts → Apply + Cancel only, no Resolve box", async () => {
+  it("zero conflicts → Apply 1 valid + Cancel", async () => {
     const { getByTestId, findByText, queryByTestId } = render(wrap(<ImportCard />));
     const zone = getByTestId("import-drop-zone");
     const file = makeJsonFile([
@@ -93,14 +95,14 @@ describe("ImportCard — file ingestion", () => {
       fireEvent.drop(zone, { dataTransfer: { files: [file] } });
     });
 
-    await findByText(/Apply 1 valid only/i);
-    expect(queryByTestId("import-resolve-box")).toBeNull();
+    await findByText(/^Apply 1 valid$/);
+    expect(queryByTestId("import-restore-failed")).toBeNull();
     expect(await findByText(/Cancel/i)).toBeTruthy();
   });
 });
 
 describe("ImportCard — conflict resolution", () => {
-  it("conflicts > 0 → Resolve box + 2 strategy buttons visible", async () => {
+  it("a conflict reads as a matching token; the two modes are offered", async () => {
     // color-primary lives in DEFAULT_TOKENS — drop a payload with the same id
     // but a different value to force a single conflict against the seeded set.
     const { getByTestId, findByText, queryByText, findByTestId } = render(wrap(<ImportCard />));
@@ -117,14 +119,11 @@ describe("ImportCard — conflict resolution", () => {
       fireEvent.drop(getByTestId("import-drop-zone"), { dataTransfer: { files: [file] } });
     });
 
-    expect(await findByTestId("import-resolve-box")).toBeTruthy();
-    expect(await findByText(/^Replace$/i)).toBeTruthy();
-    expect(await findByText(/Merge · keep mine/i)).toBeTruthy();
-    /* There were three buttons and two outcomes: `handleApply` filtered on
-       "keep-mine" and sent everything otherwise, so Replace and
-       "Merge · keep theirs" were the same branch. The third is gone. */
+    expect(await findByTestId("import-detail-block")).toBeTruthy();
+    expect(await findByText("Update matching")).toBeTruthy();
+    expect(await findByText("Add new only")).toBeTruthy();
     expect(queryByText(/Merge · keep theirs/i)).toBeNull();
-    expect(await findByText(/1 ID collisions/i)).toBeTruthy();
+    expect(await findByText("1 matching token")).toBeTruthy();
   });
 });
 
@@ -160,7 +159,7 @@ describe("ImportCard — conflict strategy behavior", () => {
     return { ...utils, colors };
   }
 
-  it("'Replace' (default) overwrites the conflicting token AND adds the new one", async () => {
+  it("'Update matching' (default) overwrites the conflicting token AND adds the new one", async () => {
     const { getByTestId, getByText, findByTestId, colors } = renderWithProbe();
 
     await act(async () => {
@@ -168,10 +167,10 @@ describe("ImportCard — conflict strategy behavior", () => {
         dataTransfer: { files: [makeJsonFile(conflictAndNew)] },
       });
     });
-    await findByTestId("import-resolve-box");
+    await findByTestId("import-detail-block");
 
     // replace = 1 modified + 1 added staged.
-    fireEvent.click(getByText(/Apply 2 valid only/i));
+    fireEvent.click(getByText(/^Apply 2 valid$/));
 
     await waitFor(() => {
       expect(colors.current.find((t) => t.id === "color-primary")?.value).toBe("#222222");
@@ -179,7 +178,7 @@ describe("ImportCard — conflict strategy behavior", () => {
     });
   });
 
-  it("'Merge · keep mine' skips the conflicting id and only adds the new token", async () => {
+  it("'Add new only' skips the conflicting id and only adds the new token", async () => {
     const { getByTestId, getByText, findByTestId, colors } = renderWithProbe();
     const originalPrimary = colors.current.find((t) => t.id === "color-primary")?.value;
     expect(originalPrimary).toBeDefined();
@@ -190,11 +189,11 @@ describe("ImportCard — conflict strategy behavior", () => {
         dataTransfer: { files: [makeJsonFile(conflictAndNew)] },
       });
     });
-    await findByTestId("import-resolve-box");
+    await findByTestId("import-detail-block");
 
-    fireEvent.click(getByText(/Merge · keep mine/i));
+    fireEvent.click(getByText("Add new only"));
     // keep-mine narrows the staged set to NEW ids only → count drops to 1.
-    fireEvent.click(getByText(/Apply 1 valid only/i));
+    fireEvent.click(getByText(/^Apply 1 valid$/));
 
     await waitFor(() => {
       expect(colors.current.find((t) => t.id === "color-strategy-new")?.value).toBe("#00AA55");
@@ -206,7 +205,7 @@ describe("ImportCard — conflict strategy behavior", () => {
   /* Replaces "'Merge · keep theirs' behaves like Replace in v1", which pinned
      the duplicate branch rather than a behaviour. What is worth asserting is
      that the two surviving strategies actually differ. */
-  it("the two strategies differ: Replace overwrites a conflict, keep-mine does not", async () => {
+  it("the two strategies differ: Update matching overwrites a conflict, Add new only does not", async () => {
     const { getByTestId, getByText, findByTestId, colors } = renderWithProbe();
     const originalPrimary = colors.current.find((t) => t.id === "color-primary")?.value;
 
@@ -215,10 +214,10 @@ describe("ImportCard — conflict strategy behavior", () => {
         dataTransfer: { files: [makeJsonFile(conflictAndNew)] },
       });
     });
-    await findByTestId("import-resolve-box");
+    await findByTestId("import-detail-block");
 
     // Replace is the default and takes the incoming value.
-    fireEvent.click(getByText(/Apply 2 valid only/i));
+    fireEvent.click(getByText(/^Apply 2 valid$/));
     await waitFor(() => {
       expect(colors.current.find((t) => t.id === "color-primary")?.value).toBe("#222222");
       expect(colors.current.find((t) => t.id === "color-primary")?.value).not.toBe(originalPrimary);
@@ -277,8 +276,8 @@ describe("ImportCard — cancel + apply", () => {
     await act(async () => {
       fireEvent.drop(getByTestId("import-drop-zone"), { dataTransfer: { files: [file] } });
     });
-    await findByText(/Apply 1 valid only/i);
-    fireEvent.click(getByText(/Apply 1 valid only/i));
+    await findByText(/^Apply 1 valid$/);
+    fireEvent.click(getByText(/^Apply 1 valid$/));
 
     await waitFor(() => expect(lastCount).toBe(initialCount + 1));
     expect(composer.designSystem.setTokens).toHaveBeenCalledTimes(1);
@@ -297,7 +296,7 @@ describe("ImportCard — cancel + apply", () => {
     await act(async () => {
       fireEvent.drop(getByTestId("import-drop-zone"), { dataTransfer: { files: [file] } });
     });
-    fireEvent.click(await findByText(/Apply 1 valid only/i));
+    fireEvent.click(await findByText(/^Apply 1 valid$/));
     expect(await findByText("Import failed")).toBeTruthy();
     expect(getByText(/Nothing was imported — the brand can't be changed right now/)).toBeTruthy();
     expect(composer.settings.designTokens).toEqual([]);

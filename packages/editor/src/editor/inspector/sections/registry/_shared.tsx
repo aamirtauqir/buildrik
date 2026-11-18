@@ -8,6 +8,7 @@
  */
 
 import * as React from "react";
+import { SectionErrorBoundary } from "@/editor/inspector/components/SectionErrorBoundary";
 import type { Composer } from "@/engine";
 import type {
   IconConfig,
@@ -16,7 +17,7 @@ import type {
 } from "@/shared/types/media";
 import type { CssContext, PropertyState } from "@/editor/inspector/config/cssContext";
 import type { SectionDisplayMode } from "@/editor/inspector/shared/controls/Section";
-import type { ElementCapabilities } from "@/shared/constants/elementCapabilities";
+import type { BehaviourSectionId, ElementCapabilities } from "@/shared/constants/elementCapabilities";
 import { masterOverrideProps } from "@/editor/inspector/hooks/useFieldOverrides";
 
 // ============================================================================
@@ -39,13 +40,21 @@ function pickKeys<T extends Record<string, unknown>>(
 // TAB & SECTION IDS
 // ============================================================================
 
-/** Inspector v4 tabs (DD-1, DD-4, Q1): Style · Behaviour · Effects. */
-export type TabId = "style" | "behaviour" | "effects";
+/**
+ * The four tabs of 2L9 page 04 (boards 36:2, 161:8480): Content · Style ·
+ * Behavior · Effects. Content holds what the element says and is (its text,
+ * source, fields, semantics, attributes) — written once for every
+ * breakpoint; Style and Effects hold how it looks at this breakpoint and
+ * state; Behavior how it acts. The id `behaviour` keeps the spelling of the
+ * capability table's `behaviourSections`; only the label is the board's.
+ */
+export type TabId = "content" | "style" | "behaviour" | "effects";
 
-/** The strip's labels, in board order (boards 1, 2, 3). */
+/** The strip's labels, in board order. */
 export const INSPECTOR_TABS: readonly { id: TabId; label: string }[] = [
+  { id: "content", label: "Content" },
   { id: "style", label: "Style" },
-  { id: "behaviour", label: "Behaviour" },
+  { id: "behaviour", label: "Behavior" },
   { id: "effects", label: "Effects" },
 ];
 
@@ -54,28 +63,49 @@ export const INSPECTOR_TABS: readonly { id: TabId; label: string }[] = [
  * order they render in is `config/sectionOrder.ts` (one list per tab).
  */
 export type SectionId =
-  // Style — define → shape → paint (DD-15)
-  | "component"
+  // Content
   | "type"
+  | "form-fields"
+  | "slides"
+  | "collection"
+  | "cms-binding"
+  | "conditions"
+  | "tabs-pairs"
+  | "children"
+  | "commerce"
+  | "tab-panel"
+  | "tabs-behavior"
+  | "modal-relationship"
+  | "dialog-content"
+  | "dialog-behavior"
+  | "validation"
+  | "table-structure"
+  | "table-accessibility"
+  | "table-cell"
+  | "gallery"
+  | "gallery-image"
+  | "binding-status"
+  | "table-wrapper"
+  | "semantics"
+  | "attributes"
+  // Style — define → shape → paint (DD-15)
+  | "type-layout"
   | "layout"
+  | "layout-advanced"
   | "typography"
   | "text-inside"
   | "size"
+  | "flex-item"
+  | "grid-item"
   | "spacing"
   | "fill"
   | "border"
-  // Behaviour
-  | "form-fields"
+  // Behavior
   | "form-settings"
-  | "slides"
   | "slider-settings"
-  | "collection"
   | "link"
-  | "cms-binding"
   | "visibility"
   | "interactions"
-  | "css-classes"
-  | "attributes"
   // Effects
   | "opacity"
   | "shadow"
@@ -86,12 +116,14 @@ export type SectionId =
 /**
  * How a section arrives (DD-11), before the user opens or closes it:
  *   always — open (type block, Size, Spacing);
- *   open   — open (the Behaviour tab's primaries);
+ *   open   — open (the Content and Behavior primaries);
  *   valued — open when the element carries a value for it, else the one-row
  *            "+" header (Fill, Border, the Effects rows);
- *   closed — shut, with a one-line summary (Attributes, Text inside, Advanced).
+ *   closed — shut, with a one-line summary (Attributes, Text inside, Advanced);
+ *   set    — open when the element carries a value for it, else shut with
+ *            its summary (2L9: Semantics opens on an ID, else reads "Form").
  */
-export type SectionOpen = "always" | "open" | "valued" | "closed";
+export type SectionOpen = "always" | "open" | "valued" | "closed" | "set";
 
 // ============================================================================
 // CONTEXT SHAPES
@@ -173,6 +205,10 @@ export function shownOnInstanceRoot(ctx: ShouldRenderContext, keys: readonly str
   return masterOverrideProps(ctx.composer, id).some((p) => keys.includes(p));
 }
 
+/** Capability predicate: the type carries this one of its own sections
+ *  (Fields, Slides, Collection — boards 19, 20). */
+export const ownSection = (id: BehaviourSectionId) => (caps: ElementCapabilities) => caps.behaviourSections.includes(id);
+
 // ============================================================================
 // ENTRY TYPES
 // ============================================================================
@@ -192,8 +228,9 @@ export interface SectionEntry<P extends object = object> {
   title: string;
   /** A header that depends on the element (the type block reads "Heading"). */
   frameTitle?: (ctx: ShouldRenderContext) => string;
-  /** How it arrives (DD-11). */
-  open: SectionOpen;
+  /** How it arrives (DD-11) — fixed, or by the element (Visibility shuts
+   *  under a form's own settings, 2L9 156:11319). */
+  open: SectionOpen | ((ctx: ShouldRenderContext) => SectionOpen);
   /** Presence by what the type IS. Default: always present. */
   capability?: (caps: ElementCapabilities) => boolean;
   /** Presence by runtime state (an instance, a flex container). Runs after `capability`. */
@@ -247,7 +284,7 @@ export interface AnySectionEntry {
   tab: TabId;
   title: string;
   frameTitle?: (ctx: ShouldRenderContext) => string;
-  open: SectionOpen;
+  open: SectionOpen | ((ctx: ShouldRenderContext) => SectionOpen);
   capability?: (caps: ElementCapabilities) => boolean;
   shouldRender?: (ctx: ShouldRenderContext) => boolean;
   hasValue?: (ctx: ShouldRenderContext) => boolean;
@@ -281,7 +318,12 @@ export function defineSection<P extends object>(
           ? { ...ctx, styles: pickKeys(ctx.styles, entry.styleKeys) as Record<string, string> }
           : ctx;
       const props = adaptProps(slicedCtx);
-      return <Component {...props} />;
+      /* 2L9 B4-S05: a section that throws is replaced by its own notice. */
+      return (
+        <SectionErrorBoundary title={meta.title} resetKey={ctx.selectedElement.id}>
+          <Component {...props} />
+        </SectionErrorBoundary>
+      );
     },
   };
 }
@@ -319,7 +361,7 @@ export function adaptBaseStyleProps(ctx: SectionContext): BaseStyleSectionProps 
   };
 }
 
-/** Props every non-style section (Behaviour) takes from the frame. */
+/** Props every non-style section (Content, Behavior) takes from the frame. */
 export function adaptElementProps(ctx: SectionContext): {
   elementId: string;
   composer: Composer | null;
@@ -331,5 +373,18 @@ export function adaptElementProps(ctx: SectionContext): {
     composer: ctx.composer ?? null,
     isOpen: ctx.isOpen,
     onToggle: ctx.onToggle,
+  };
+}
+
+/** "2 set" / "None" — how many of a section's own properties the element
+ *  carries here (2L9 161:8940 draws Spacing, Background and Border shut
+ *  with this; Effects' closed sections too, 161:12525). */
+export function setSummary(keys: readonly string[]) {
+  return (ctx: ShouldRenderContext): string => {
+    const n = keys.filter((k) => {
+      const v = ctx.authoredStyles[k];
+      return v !== undefined && v !== "" && v !== "none" && v !== "0" && v !== "0px";
+    }).length;
+    return n ? `${n} set` : "None";
   };
 }

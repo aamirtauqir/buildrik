@@ -1,0 +1,72 @@
+[
+ {
+  "nodeId": "203:33565",
+  "name": "B6-B01 · Brand / colors",
+  "family": "brand",
+  "shot": "shots/203-33565.png",
+  "note": "Compared live 2026-10-26 (cms-brand): DRIFT — Brand shell differs: back link and title on separate rows; bordered cards, round swatches; preview is a bordered 50%-zoom card, not a full-height grey column; nav Checks has no count. | prior: L-D S1 shell + W1 body: grouped cards (\"{n} semantic colors\", then other groups), name + \"Edit ›\", \"Light #…     Dark #…\", \"Used by n places · through aliases\"; no auto-opened token. Built, not compared."
+ },
+ {
+  "nodeId": "203:34125",
+  "name": "B6-B02 · Semantic primary token / exact edit target",
+  "family": "brand",
+  "shot": "shots/203-34125.png",
+  "note": "Compared live 2026-10-26 (cms-brand): DRIFT — Edit opens a token card (Change/Set/Used by/View) not board's Light/Dark hex fields + Picker, Used by/Aliased by links, Token actions. Reach note absent (0 uses). | prior: L-D W1: card opens the token's edit page in place of the list: \"‹ Colors\", reach note \"This changes n places across the site, including uses through aliases.\", then the token controls (light/dark pickers, used by, aliased by, token actions). Labels inside the controls keep \"Light value\"/\"Dark value\""
+ },
+ {
+  "nodeId": "203:34892",
+  "name": "B6-B04 · Invalid color / retained local field draft",
+  "family": "brand",
+  "shot": "shots/203-34892.png",
+  "note": "Compared live 2026-10-26 (cms-brand): DRIFT — Error copy matches exactly. Shown in a picker popover (not inline field); popover bottom 891px runs under footer (868), Cancel/Apply half-hidden. | prior: L-D S8: \"Enter a valid hex color, such as #1A56DB. The token hasn’t changed.\" (ColorPicker). Drill-in layout open (B02). Built, not compared."
+ },
+ {
+  "nodeId": "203:35106",
+  "name": "B6-B05 · Pending Brand save / leave guard",
+  "family": "brand",
+  "shot": "shots/203-35106.png",
+  "note": "Compared live 2026-10-26 (cms-brand): unreachable live — Authority code:autosave-no-leave-guard: Brand edits autosave, no leave guard is built by decision. | prior: Brand Part 1a spec §4: every Brand edit is a composer write saved by project autosave; leaving Brand is in-app navigation and discards nothing (the board says so). Pending/failed save lives in the bottom-bar status (Phase 1). No guard built."
+ },
+ {
+  "nodeId": "203:35546",
+  "name": "B6-B07 · Brand starters / preview before apply",
+  "family": "brand",
+  "shot": "shots/203-35546.png",
+  "note": "Compared live 2026-10-26 (cms-brand): DRIFT — Heading + strap copy match. Starters are 48px left-aligned rows in one card vs board 32px centered bordered buttons with gaps; 'From logo or URL' hidden (dsAi flag). | prior: L-D S6: \"Choose a starting point\" + \"Preview a palette before applying it to your site.\", › rows, \"From logo or URL ›\" last (dsAi only, authority for that row's gate: code:dsai-flag). Built, not compared."
+ },
+ {
+  "nodeId": "203:36082",
+  "name": "B6-B08 · Starter preview / no writes yet",
+  "family": "brand",
+  "shot": "shots/203-36082.png",
+  "note": "Compared live 2026-10-26 (cms-brand): DRIFT — Copy matches (name, 'Preview only · Your Brand is unchanged', N colors line, Cancel · Apply starter). No 'Previewing {name}' label; buttons 66/98w vs board 111/160w. | prior: L-D S6: row opens a preview through the Brand preview layer (no write): name, \"Preview only · Your Brand is unchanged\", \"{n} colors will change. Typography and spacing stay as they are.\", Cancel · Apply starter. \"Previewing {name}\" label over the preview not drawn. Built, not compared."
+ },
+ {
+  "nodeId": "203:36613",
+  "name": "B6-B09 · Starter apply / creating restore point",
+  "family": "brand",
+  "shot": "shots/203-36613.png",
+  "note": "Compared live 2026-10-26 (cms-brand): DRIFT — 'Preparing…' + restore-point copy match (create held, then aborted; nothing applied). Preparing button 91w vs board 160w; no 'Previewing' label; Brand shell drift. | prior: L-D S6: Apply → \"Preparing…\" + \"Creating “Before {name}” restore point. No Brand changes applied yet.\"; restore reason `starter` added to the shared schema (router test). Built, not compared."
+ },
+ {
+  "nodeId": "203:37214",
+  "name": "B6-B12 · Dark mode / paired values and one owner",
+  "family": "brand",
+  "shot": "shots/203-37214.png",
+  "note": "Compared live 2026-10-26 (cms-brand): DRIFT — 'Mode · Off' is a heading not a select; tokens listed as name/'No dark value'/Set rows, not light+dark hex pairs+Picker; 'Turn on Auto…' secondary at top (board primary at bottom); extra cards. | prior: L-D W3: \"Mode · Off\", \"Website appearance\", \"Auto follows the visitor’s device appearance. Editor controls stay light.\", \"Turn on Auto…\"; per-token paired values are ColourModeSection's list below. Built, not compared."
+ },
+ {
+  "nodeId": "203:38272",
+  "name": "B6-B15 · Brand Import and export",
+  "family": "brand",
+  "shot": "shots/203-38272.png",
+  "note": "Compared live 2026-10-26 (cms-brand): DRIFT — Import | Export tabs vs one page with both sections; dashed dropzone vs button; Update matching/Add new only buttons vs select; extra 'or paste JSON'. | prior: L-D W4: ordinary page (header, strap, preview column) with Import | Export tabs; Import: \"Import tokens\", \"Choose JSON file\", \"Review compatible values and changes before applying.\", Update matching (+ code-ahead Add new only) with \"Matching values update. Tokens absent from the file are kept.\". Bui"
+ },
+ {
+  "nodeId": "207:39217",
+  "name": "B6-B24 · Radius / add, rename and delete",
+  "family": "brand",
+  "shot": "shots/207-39217.png",
+  "note": "Compared live 2026-10-26 (cms-brand): DRIFT — '+ Add radius' secondary inline with '‹ Other kinds' (board: primary on own row); value plain text not input; header band + swatch col + side token card not on board. | prior: L-D S1+W8: \"‹ Other kinds\", \"+ Add radius\", rows name · value · \"Used by n\" · ⋯. Rows sit in the token table (header band kept); the side card stays for the selected token (code-ahead: usage list, checks). Built, not compared."
+ }
+]

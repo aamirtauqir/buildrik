@@ -18,7 +18,14 @@
  *
  * @license BSD-3-Clause
  */
+import { pageFileNames } from "@/engine/export";
+import { recordHistoryCleared, trackHistorySessionMarkers } from "@/shared/utils/historySessionMarkers";
+import { RecordLeaveDialog, type RecordLeavePhase } from "@/editor/cms/RecordLeaveDialog";
+import { RichTextEditor } from "@/editor/panels/RichTextEditor";
+import { CreateComponentModal } from "@/editor/shell/modals/CreateComponentModal";
 import * as React from "react";
+import { BrandWorkspace } from "@/editor/design-system/ui/BrandWorkspace";
+import { TokenRegistryProvider } from "@/editor/design-system/state/TokenRegistryContext";
 import { createRoot } from "react-dom/client";
 // fonts.css before default.css, and imported here rather than from default.css
 // — see the note at the top of themes/default.css. Without it this probe has no
@@ -41,11 +48,33 @@ import "@/editor/chrome-ui/flowbiteStore";
 import "@/themes/fonts.css";
 import "@/themes/default.css";
 
-import { RootView } from "@/editor/sidebar/tabs/content/ContentViews";
+import { RootView } from "@/editor/sidebar/tabs/content/ContentRootView";
 import { OnboardingChecklist } from "@/editor/onboarding/OnboardingChecklist";
 import { AchievementPrompt } from "@/editor/onboarding/AchievementPrompt";
 import { SaveStatus } from "@/editor/chrome-ui";
 import { LoadErrorBanner } from "@/editor/shell/LoadErrorBanner";
+import { GlobalBannerSlot } from "@/editor/shell/GlobalBannerSlot";
+import {
+  NARROW_WINDOW_BANNER,
+  OFFLINE_BANNER,
+  showCantReachBanner,
+  showGlobalBanner,
+  showNewVersionBanner,
+  showReconnectingBanner,
+  showRoleChangedBanner,
+  showSessionExpiredBanner,
+  showWorkspaceDeletionBanner,
+} from "@/editor/shell/globalBanners";
+import { createTabHandoff } from "@/editor/shell/tabHandoff";
+import { PhoneScreen } from "@/editor/shell/SmallScreen";
+import { PanelChunkBoundary } from "@/editor/shell/PanelChunkBoundary";
+import { EditorStoppedBoundary } from "@/editor/shell/EditorStoppedScreen";
+import { registerWorkSnapshot } from "@/editor/shell/workSnapshot";
+import { setKeptWorkOffer } from "@/editor/shell/keptWorkOffer";
+import { RecoveryBanner } from "@/editor/shell/RecoveryBanner";
+import { SaveFailedStrip } from "@/editor/shell/SaveFailedStrip";
+import { FullPageRouter } from "@/editor/sidebar/FullPageRouter";
+import { SessionExpiredModal } from "@/editor/shell/modals/SessionExpiredModal";
 import { DEFAULT_ONBOARDING_STEPS } from "@/shared/constants/onboardingSteps";
 import { CanvasFooterToolbar } from "@/editor/canvas/CanvasFooterToolbar";
 import { PanelFrame } from "@/editor/chrome-ui";
@@ -60,13 +89,26 @@ import { UploadAssetModal } from "@/editor/media/UploadAssetModal";
 import { LibraryManager } from "@/editor/media/LibraryManager";
 import { ImageEditorModal } from "@/editor/media/ImageEditorModal";
 import { ToastProvider, useToast } from "@/editor/chrome-ui";
+import { SiteFontsModal } from "@/editor/media/components/SiteFontsModal";
 import { ContentTab } from "@/editor/sidebar/tabs/content/ContentTab";
 import { CMSCollectionSetupModal } from "@/editor/shell/modals/CMSCollectionSetupModal";
 import { LayersTab } from "@/editor/sidebar/tabs/layers/LayersTab";
+import { InspectorHeader } from "@/editor/inspector/components/InspectorHeader";
+import { ProInspector } from "@/editor/inspector/ProInspector";
+import { ElementAnimationEditor } from "@/editor/inspector/sections/interactions/ElementAnimationRow";
+import { useColorRegistry } from "@/editor/design-system/state/TokenRegistryContext";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
+import { useComposerSelection } from "@/editor/canvas/hooks/useComposerSelection";
+import { getBlockById, insertBlock } from "@/blocks/blockRegistry";
+import { openSubview } from "@/editor/inspector/tabs/subviewStore";
 import { Composer } from "@/engine/Composer";
 import { LayersLoadError, LayersNoResults } from "@/editor/panels/layers/components/LayersStateBlocks";
 import { Row as InsertRow } from "@/editor/sidebar/tabs/build/components/GroupSection";
 import { BuildTab } from "@/editor/sidebar/tabs/build/BuildTab";
+import { LinkSection } from "@/editor/inspector/sections/LinkSection";
+import { CommandPalette } from "@/editor/shell/modals/CommandPalette";
+import { TypeChangeDialog } from "@/editor/cms/TypeChangeDialog";
+import { PagePanel } from "@/editor/inspector/components/PagePanel";
 import type { ComponentDefinition } from "@/shared/types/components";
 import { PanelLoadingSkeleton } from "@/editor/shared/PanelStates";
 /* AgentPlan carries `.bd-ai-*` styles that only AITab imports, so the probe
@@ -79,7 +121,21 @@ import type { ComparePage } from "@/shared/utils/html";
 import { ComponentsTab } from "@/editor/sidebar/tabs/ComponentsTab";
 import { ComponentDetailScreen } from "@/editor/sidebar/tabs/component-library/ComponentDetailScreen";
 import { DSModeProvider } from "@/editor/design-system/state/DSModeContext";
+import { TokenDetailView } from "@/editor/design-system/ui/sections/TokenDetailView";
+import { InspectorErrorBoundary } from "@/editor/inspector/components/InspectorErrorBoundary";
+import { InspectorLoading } from "@/editor/inspector/components/InspectorLoading";
+import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 import { LayerTreeItem } from "@/editor/panels/layers/LayerTreeItem";
+import { renameElement } from "@/editor/panels/layers/hooks/layersPersistence";
+import { useClipboardToasts } from "@/editor/shell/hooks/useClipboardToasts";
+import { setSiteLoadStatus } from "@/editor/shell/siteLoadStatus";
+import { unsavedCollectionLinks } from "@/editor/cms/unsavedCollectionLinks";
+import { PagesTab } from "@/editor/sidebar/tabs/pages/PagesTab";
+import { CanvasEmptyCTA } from "@/editor/canvas/CanvasEmptyCTA";
+import { showInsertReceipt } from "@/editor/sidebar/tabs/build/insertGroupRequest";
+import { LeftSidebar } from "@/editor/sidebar/LeftSidebar";
+import type { GroupedTabId } from "@/editor/rail/tabsConfig";
+import { MovePagesDialog, TOP_LEVEL } from "@/editor/sidebar/tabs/pages/components/MovePagesDialog";
 import type { LayerItem } from "@/editor/panels/layers/types";
 import { HistoryTab } from "@/editor/sidebar/tabs/history/HistoryTab";
 import { MilestoneSuggestionBanner } from "@/editor/sidebar/tabs/history/components/MilestoneSuggestionBanner";
@@ -100,16 +156,33 @@ import { PublishTab } from "@/editor/sidebar/tabs/publish/PublishTab";
 import {
   CreatePageConfirmModal,
   CreatePageErrorModal,
-  CreatePageSuccessModal,
 } from "@/editor/sidebar/tabs/templates/TemplatesTabModals";
 import type { UsePublishJobResult } from "@/editor/shell/hooks/usePublishJob";
 import type { PageItem } from "@/editor/sidebar/tabs/pages/types";
-import { PageTabBar } from "@/editor/shell/PageTabBar";
+import { PageSwitcher } from "@/editor/shell/PageSwitcher";
+import { BottomBar } from "@/editor/shell/BottomBar";
+import { saveStatusStore } from "@/editor/shell/saveStatusStore";
+import { publishTray } from "@/editor/shell/publishTrayStore";
+import { buildPublishSteps } from "@buildrik/shared/schemas/publish";
+import { SettingsTab } from "@/editor/sidebar/tabs/settings/SettingsTab";
+import { UnpublishConfirmModal } from "@/editor/sidebar/tabs/publish/UnpublishConfirmModal";
+import { saveFailedBanner } from "@/editor/shell/globalBanners";
+import type { SaveState } from "@/editor/chrome-ui";
+import { LayoutShell } from "@/editor/rail/LayoutShell";
+import { PublishTray } from "@/editor/shell/PublishTray";
+import { deriveLifecycleState } from "@/editor/shell/lifecycle";
 import { NotificationPanel } from "@/editor/shell/NotificationPanel";
 import { PublishConfirmModal } from "@/editor/shell/modals/PublishConfirmModal";
 import { PageContextMenu } from "@/editor/sidebar/tabs/pages/components/PageContextMenu";
+import { NewPageModal } from "@/editor/sidebar/tabs/pages/components/NewPageModal";
 import { PageSettingsDrawer } from "@/editor/sidebar/tabs/pages/page-settings/PageSettingsDrawer";
-import { Topbar } from "@/editor/chrome-ui";
+import { Topbar, SiteMenuIcon, IconButton, BreakpointSwitcher } from "@/editor/chrome-ui";
+import { RecordsTable } from "@/editor/cms/RecordsTable";
+import { AddFieldDialog } from "@/editor/cms/AddFieldDialog";
+import { CmsWorkspace } from "@/editor/cms/CmsWorkspace";
+import { ReplaceModal } from "@/editor/sidebar/tabs/templates/TemplatesTabModals";
+import { cmsWorkspace } from "@/editor/cms/cmsWorkspaceStore";
+import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 import { SmartGuidesOverlay } from "@/editor/canvas/overlays";
 import type { SnapLine } from "@/editor/canvas/hooks";
 import { DropFeedbackOverlay } from "@/editor/canvas/overlays";
@@ -127,10 +200,12 @@ import {
   FormsScreen,
   LocalizationScreen,
 } from "@/editor/sidebar/tabs/settings/screens";
-import type { PageData } from "@/shared/types";
+import { SettingsPermissionsDialog } from "@/editor/sidebar/tabs/settings/components/SettingsPermissionsDialog";
+import { WorkspaceDoorDialog } from "@/editor/sidebar/tabs/settings/components/WorkspaceDoorDialog";
+import { PublishSettingsGuard } from "@/editor/sidebar/tabs/settings/components/PublishSettingsGuard";
+import type { PageSummary } from "@/shared/types";
 import { ReviewTab } from "@/editor/sidebar/tabs/review/ReviewTab";
 import { PublishGateModal, type PublishGateReason } from "@/editor/shell/modals/PublishGateModal";
-import { StaleApprovalModal } from "@/editor/shell/modals/StaleApprovalModal";
 import { CommentLayer } from "@/editor/canvas/comments/CommentLayer";
 import { EVENTS } from "@/shared/constants/events";
 
@@ -417,6 +492,8 @@ const mgrComposer = (assets: typeof MGR_ASSETS = MGR_ASSETS) =>
       downloadAssets: () => 0,
       getIcons: () => [],
       getFonts: () => [],
+      getSelectedAssets: () => [],
+      selectAssets: () => {},
     },
     mediaOps: {
       getUsages: (src: string) => ({
@@ -766,6 +843,233 @@ const LAYERS_SEED = [
 ];
 
 let _layersComposer: Composer | null = null;
+function listingsComposer(): Composer {
+  const c = new Composer({} as never);
+  for (const [name, slug] of [["Home", ""], ["About", "about"], ["Work", "work"], ["Contact", "contact"], ["Legal", "legal"]]) {
+    const page = c.elements.createPage(name, { slug } as never);
+    if (name === "Home") {
+      c.elements.setHomePage(page.id);
+      c.elements.setActivePage(page.id);
+    }
+  }
+  return c;
+}
+
+function RestoredProbe() {
+  const composer = React.useMemo(() => listingsComposer(), []);
+  React.useEffect(() => {
+    const about = composer.elements.getAllPages().find((p) => p.name === "About");
+    if (!about) return;
+    /* ⌘Z is an importProject of the snapshot before the delete — the same
+       call here, so ids come back as they were. */
+    const before = composer.exportProject();
+    const t1 = setTimeout(() => composer.elements.deletePage(about.id), 300);
+    const t2 = setTimeout(() => composer.importProject(before), 900);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, [composer]);
+  return (
+    <div data-probe="pages-restored" style={{ width: 284, height: 812, display: "flex" }}>
+      <ToastProvider>
+        <PagesTab composer={composer} onClose={() => {}} onRequestTemplates={() => {}} />
+      </ToastProvider>
+    </div>
+  );
+}
+
+function ShellProbe() {
+  const tab = (new URLSearchParams(location.search).get("tab") ?? "pages") as GroupedTabId;
+  const composer = React.useMemo(() => {
+    /* `?pages=100`: the 100-page site of board 498:634 (switcher scale). */
+    const c = new URLSearchParams(location.search).get("pages") === "100" ? hundredComposer() : listingsComposer();
+    /* `?refuse=<page name>`: the engine refuses that page's delete, the one
+       way a real bulk delete partly fails (139:48427). */
+    const refuse = new URLSearchParams(location.search).get("refuse");
+    if (refuse) {
+      const del = c.elements.deletePage.bind(c.elements);
+      /* `&once=1`: refuse only the first try, so Retry can succeed (139:49899). */
+      const once = new URLSearchParams(location.search).get("once") === "1";
+      let refused = false;
+      c.elements.deletePage = (id: string) => {
+        if (c.elements.getPage(id)?.name === refuse && !(once && refused)) {
+          refused = true;
+          return false;
+        }
+        return del(id);
+      };
+    }
+    return c;
+  }, []);
+  return (
+    <div data-probe="pages-shell" style={{ width: "100vw", height: "100vh" }}>
+      <ToastProvider>
+        <LayoutShell drawerOpen inspectorOpen={false}>
+          <LayoutShell.Sidebar>
+            <LeftSidebar composer={composer} activeTab={tab} onTabChange={() => {}} drawerOpen onDrawerToggle={() => {}} />
+          </LayoutShell.Sidebar>
+          <LayoutShell.Canvas>
+            <div style={{ height: "100%", background: "var(--bk-gray-100)" }} data-testid="shell-canvas" />
+          </LayoutShell.Canvas>
+        </LayoutShell>
+      </ToastProvider>
+    </div>
+  );
+}
+
+/* design-2l9 A-21 — the page trash in the real shell. `?trash=` picks the
+   server's answers: list (default, About in the trash), empty, slug (restore
+   answers SLUG_TAKEN about-2), limit (restore refused over the plan), fail
+   (restore errors). The probe URL carries `?siteId=` so the editor has a site. */
+function trashStub(mode: string) {
+  const deletedAt = new Date().toISOString();
+  const list = mode === "empty" ? [] : [{
+    id: "p_about_trash", name: "About", slug: "about", deletedAt,
+    deletedBy: { id: "u1", name: "You", isYou: true }, folderName: mode === "folder" ? "Client projects" : null,
+  }];
+  const fail = (status: number, code: string, message: string) => ({ error: { json: { message, code: -1, data: { code, httpStatus: status } } } });
+  window.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
+    const href = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+    const procs = new URL(href, location.origin).pathname.split("/api/trpc/")[1]?.split(",") ?? [];
+    /* The slug the restore asked for (the "choose a different URL" step). */
+    const asked = /"slug":"([^"]+)"/.exec(typeof init?.body === "string" ? init.body : "")?.[1];
+    const body = procs.map((name) => {
+      if (name === "pages.trash.list") return { result: { data: { json: list } } };
+      if (name === "sites.myRole") return { result: { data: { json: { role: "ADMIN" } } } };
+      if (name === "pages.trash.restore") {
+        if (mode === "slug" && !asked) return fail(409, "CONFLICT", "SLUG_TAKEN:about-2");
+        if (mode === "limit") return fail(412, "PRECONDITION_FAILED", "Delete a page or upgrade to restore.");
+        if (mode === "fail") return fail(500, "INTERNAL_SERVER_ERROR", "boom");
+        const row = { id: "p_about_trash", name: "About", slug: asked ?? "about", isHomePage: false, blocks: [], settings: {} };
+        return { result: { data: { json: row } } };
+      }
+      return { result: { data: { json: null } } };
+    });
+    return new Response(JSON.stringify(body), { status: 200, headers: { "content-type": "application/json" } });
+  }) as typeof fetch;
+}
+
+/* design-2l9 B6-T24…T33 — the saved-template trash with `?siteId=` and
+   `&tplTrash=`: list (Fieldwork home, deleted today), empty, fail (restore
+   refused), hang (restore / purge never answer). */
+let tplTrashStubbed = false;
+function templateTrashStub(mode: string | null) {
+  if (!mode || tplTrashStubbed) return;
+  tplTrashStubbed = true;
+  const row = { templateId: "user-1", name: "Fieldwork home", html: "<section></section>".repeat(7), deletedAt: new Date().toISOString() };
+  window.fetch = (async (input: RequestInfo | URL) => {
+    const href = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+    const procs = new URL(href, location.origin).pathname.split("/api/trpc/")[1]?.split(",") ?? [];
+    if (mode === "hang" && procs.some((p) => p !== "userTemplates.trash.list")) return new Promise<Response>(() => {});
+    const body = procs.map((name) => {
+      if (name === "userTemplates.trash.list") return { result: { data: { json: mode === "empty" ? [] : [row] } } };
+      if (name === "userTemplates.trash.restore" && mode === "fail") return { error: { json: { message: "boom", code: -1, data: { code: "INTERNAL_SERVER_ERROR", httpStatus: 500 } } } };
+      if (name === "userTemplates.trash.restore") return { result: { data: { json: { ...row, category: null, description: null, css: null, thumbnail: null, updatedAt: row.deletedAt } } } };
+      return { result: { data: { json: { success: true } } } };
+    });
+    return new Response(JSON.stringify(body), { status: 200, headers: { "content-type": "application/json" } });
+  }) as typeof fetch;
+}
+
+function TrashProbe() {
+  React.useMemo(() => trashStub(new URLSearchParams(location.search).get("trash") ?? "list"), []);
+  return <ShellProbe />;
+}
+
+function hundredComposer(): Composer {
+  const c = new Composer({} as never);
+  const named: Array<[string, string]> = [
+    ["Home", ""], ["About", "about"], ["Work", "work"], ["Contact", "contact"], ["Legal", "legal"],
+    ["Accessibility and inclusive design", "accessibility-and-inclusive-design"],
+    ["Enterprise partnerships and programs", "enterprise-partnerships-and-programs"],
+  ];
+  for (let i = 1; named.length < 100; i++) {
+    const n = String(i).padStart(2, "0");
+    named.push([`Project ${n} — Design case study`, `project-${n}-design-case-study`]);
+  }
+  for (const [name, slug] of named) {
+    const page = c.elements.createPage(name, { slug } as never);
+    if (name === "Home") {
+      c.elements.setHomePage(page.id);
+      c.elements.setActivePage(page.id);
+    }
+  }
+  return c;
+}
+
+/**
+ * 5,000 layers, shaped like the boards: Navigation · Hero (Eyebrow, Headline,
+ * Text, Explore our work) · Selected work · Footer at the top, twelve layers
+ * named "Text" spread through nested groups, and plain filler to make up the
+ * count. Hero's Text is selected (152:79448).
+ */
+function layers5000Composer(): Composer {
+  const c = new Composer({} as never);
+  const page = c.elements.createPage("Home", { id: "l5-page" } as never);
+  c.elements.setActivePage(page.id);
+  let n = 0;
+  const add = (type: string, name: string, parent: string): string => {
+    const id = `l5-${n++}`;
+    c.elements.addElement(c.elements.createElement(type as never, { id }), parent);
+    renameElement(c, id, name);
+    return id;
+  };
+  const root = page.root.id;
+  add("section", "Navigation", root);
+  const hero = add("section", "Hero", root);
+  add("text", "Eyebrow", hero);
+  add("heading", "Headline", hero);
+  const heroText = add("text", "Text", hero);
+  add("button", "Explore our work", hero);
+  const work = add("section", "Selected work", root);
+  const footer = add("section", "Footer", root);
+  add("text", "Text", add("container", "Newsletter", footer));
+  const groups: Array<[string, string[]]> = [
+    ["Services", ["Card 1", "Card 2", "Card 3"]],
+    ["Work", ["Project intro", "Project outro"]],
+    ["Testimonials", ["Quote 1", "Quote 2", "Quote 3", "Quote 4", "Quote 5"]],
+  ];
+  for (const [g, cards] of groups) {
+    const gid = add("container", g, work);
+    for (const card of cards) add("text", "Text", add("container", card, gid));
+  }
+  for (let g = 1; n < 5000; g++) {
+    const gid = add("container", `Group ${g}`, work);
+    for (let i = 1; i <= 24 && n < 5000; i++) add("container", `Item ${g}.${i}`, gid);
+  }
+  c.selection.select(c.elements.getElement(heroText) ?? null);
+  return c;
+}
+
+function AddReceiptProbe() {
+  const composer = React.useMemo(() => addTargetComposer(), []);
+  React.useEffect(() => {
+    const t = setTimeout(() => showInsertReceipt(composer, { title: "Text added to Hero", detail: "Selected on canvas · Focus stays here" }), 200);
+    return () => clearTimeout(t);
+  }, [composer]);
+  return (
+    <div data-probe="add-panel-receipt">
+      <ToastProvider>
+        <div className="tw:flex tw:h-[812px] tw:w-70 tw:flex-col tw:overflow-hidden tw:bg-white">
+          <BuildTab composer={composer} onExpandToggle={() => {}} onClose={() => {}} />
+        </div>
+      </ToastProvider>
+    </div>
+  );
+}
+
+function addTargetComposer(): Composer {
+  const c = new Composer({} as never);
+  const page = c.elements.createPage("Home", {
+    id: "ax-page",
+    root: { id: "ax-root", type: "container", tagName: "div", classes: ["buildrick-page-root"], children: [] },
+  });
+  c.elements.setActivePage(page.id);
+  const hero = c.elements.createElement("section" as never, { id: "ax-hero" });
+  c.elements.addElement(hero, page.root.id);
+  renameElement(c, "ax-hero", "Hero");
+  c.selection.select(c.elements.getElement("ax-hero") ?? null);
+  return c;
+}
+
 function layersComposer(): Composer {
   if (_layersComposer) return _layersComposer;
   const c = new Composer({} as never);
@@ -780,6 +1084,9 @@ function layersComposer(): Composer {
   });
   c.elements.setActivePage(page.id);
   const rootId = page.root.id;
+  /* `&bound=lx-heading,…`: those rows answer as CMS-bound (173:9757's glyph). */
+  const bound = new Set((new URLSearchParams(location.search).get("bound") ?? "").split(",").filter(Boolean));
+  if (bound.size) c.cms.bindings.hasCollectionBinding = (id: string) => bound.has(id);
   for (const s of LAYERS_SEED) {
     const el = c.elements.createElement(s.type as never, { id: s.id, content: s.name });
     c.elements.addElement(el, s.parent ?? rootId);
@@ -798,13 +1105,112 @@ function layersComposer(): Composer {
  * so that recipe reaches it with a click and a keypress, entirely through the
  * shipped keyboard path.
  */
-function LayersProbe({ select }: { select?: string[] }) {
+/* 2L9 R03 (247:31533): the one Manage site fonts dialog, one font added. */
+function SiteFontsProbe() {
+  const composer = React.useMemo(() => {
+    const handlers = new Map<string, Array<(d: unknown) => void>>();
+    const assets = [{ id: "f1", type: "font", originalName: "Studio-Sans.woff2", src: "data:,", siteFont: true }];
+    return {
+      on: (ev: string, fn: (d: unknown) => void) => void handlers.set(ev, [...(handlers.get(ev) ?? []), fn]),
+      off: () => {},
+      emit: (ev: string, d: unknown) => handlers.get(ev)?.forEach((fn) => fn(d)),
+      getProjectMetadata: () => ({ name: "Fieldwork Studio" }),
+      media: { getAssets: () => assets, on: () => {}, off: () => {}, updateAsset: async () => {} },
+    };
+  }, []);
+  React.useEffect(() => {
+    composer.emit("ui:site-fonts", {});
+  }, [composer]);
+  return <SiteFontsModal composer={composer as never} />;
+}
+
+/* 2L9 B05 (247:30075): two headings, one colour through a token and the
+   same colour as a hex — the first semantic colour token of the registry. */
+function ColorSourcesProbe() {
+  const { tokens } = useColorRegistry();
+  const c = React.useMemo(() => {
+    const comp = new Composer({} as never);
+    const page = comp.elements.createPage("Home");
+    comp.elements.setActivePage(page.id);
+    for (const [id, name] of [["cs-1", "Heading 1"], ["cs-2", "Heading 2"]]) {
+      const h = comp.elements.createElement("heading" as never, { id, content: name } as never);
+      comp.elements.addElement(h, page.root.id);
+      renameElement(comp as never, id, name);
+    }
+    return comp;
+  }, []);
+  const [ready, setReady] = React.useState(false);
+  React.useEffect(() => {
+    const token = tokens.find((t) => t.layer !== "primitive" && resolveTokenLiteral(tokens, t.id, "light"));
+    if (!token) return;
+    c.elements.getElement("cs-1")?.setStyle("color", `var(${token.cssVar})`);
+    c.elements.getElement("cs-2")?.setStyle("color", resolveTokenLiteral(tokens, token.id, "light") ?? "");
+    c.selection.selectMultiple([c.elements.getElement("cs-1")!, c.elements.getElement("cs-2")!]);
+    setReady(true);
+  }, [c, tokens]);
+  const { selectedElement } = useComposerSelection({ composer: c });
+  return (
+    <ToastProvider>
+      <div data-probe="inspector-panel" className="tw:flex tw:h-[812px] tw:w-[300px] tw:flex-col tw:bg-white">
+        {ready && selectedElement ? (
+          <ProInspector composer={c} selectedElement={{ id: selectedElement.getId(), type: selectedElement.getType(), tagName: selectedElement.getTagName() }} />
+        ) : null}
+      </div>
+    </ToastProvider>
+  );
+}
+
+/* 2L9 A10 (247:26063): the CSS animation edit screen — a saved Hover trigger
+   and a conflict with a scroll entrance. */
+function AnimationScreenProbe() {
+  const [animation, setAnimation] = React.useState({
+    type: "fadeIn", duration: 1200, delay: 100, easing: "ease", direction: "alternate" as const, iterations: -1, trigger: "hover" as const, fillMode: "both" as const,
+  });
+  return (
+    <div data-probe="inspector-panel" className="tw:flex tw:w-[300px] tw:flex-col tw:bg-white tw:px-3">
+      <ElementAnimationEditor
+        animation={animation}
+        onChange={(a) => a && setAnimation(a as typeof animation)}
+        onPreview={() => {}}
+        conflicts={[{ id: "i1", label: "Scroll entrance", property: "opacity" }]}
+        onInspect={() => {}}
+      />
+    </div>
+  );
+}
+
+function NewPageProbe() {
+  const composer = React.useMemo(() => {
+    const handlers = new Map<string, Array<(d: unknown) => void>>();
+    return {
+      on: (ev: string, fn: (d: unknown) => void) => handlers.set(ev, [...(handlers.get(ev) ?? []), fn]),
+      off: () => {},
+      emit: (ev: string, d: unknown) => handlers.get(ev)?.forEach((fn) => fn(d)),
+      getProjectMetadata: () => ({ name: "Fieldwork Studio" }),
+      elements: { getAllPages: () => PAGES_FIXTURE },
+    };
+  }, []);
+  React.useEffect(() => {
+    composer.emit(EVENTS.UI_NEW_PAGE_REQUESTED, {});
+  }, [composer]);
+  return (
+    <div data-probe="new-page-dialog" style={{ width: 1440, height: 900 }}>
+      <ToastProvider>
+        <NewPageModal composer={composer as never} />
+      </ToastProvider>
+    </div>
+  );
+}
+
+function LayersProbe({ select, collapse }: { select?: string[]; collapse?: boolean }) {
   const c = layersComposer();
   React.useEffect(() => {
     if (select?.length) {
       c.selection.selectMultiple(select.map((id) => c.elements.getElement(id)!).filter(Boolean));
     }
-  }, [c, select]);
+    /* Board 152:78614: the branches folded with the selection inside one. */
+    if (collapse) setTimeout(() => c.emit("layers:collapse-all", {}), 200);
+  }, [c, select, collapse]);
   return (
     /* ToastProvider is not decoration: useLayerContextActions calls useToast
        at the top of LayersPanel, so without it the tree throws and the tab's
@@ -1096,6 +1502,8 @@ function pagesPanel(over: Partial<React.ComponentProps<typeof PageList>> = {}) {
           onRetry={() => {}}
           onAddPage={() => {}}
           onAddFolder={() => {}}
+          onCreateFolder={() => {}}
+          onCancelFolderDraft={() => {}}
           onSelectPage={() => {}}
           onToggleSelect={() => {}}
           onBulkDuplicate={() => {}}
@@ -1350,44 +1758,83 @@ const reviewHost = (name: string, children: React.ReactNode) => (
     data-probe={name}
     style={{ width: 280, height: 812, display: "flex", flexDirection: "column", background: "#fff" }}
   >
-    {children}
+    <ToastProvider>{children}</ToastProvider>
   </div>
 );
 
 /**
- * Page-tab-bar fixture (board 435:2348).
- *
- * PageTabBar returns null without a composer — the whole bar IS the page list —
- * so a stub answers the two reads it makes and the two events it subscribes to.
- * The dirty dot is deliberately absent: `useDirtyPages` keeps its state in a
- * per-composer store fed by real engine events, and faking one would measure a
- * store this fixture wrote rather than the one the editor keeps.
+ * Page switcher fixture (2L9 Shell/BottomBar 497:99485 + Shell/PageSwitcherMenu
+ * 558:4419): five static pages, one collection template, Home active and
+ * dirty. `?open=1` opens the menu. Rendered in the shell's bottom band
+ * (LayoutShell's footer slot) at the bottom of the viewport, where the menu
+ * opens upward.
  */
-const TAB_PAGE = (id: string, name: string, over: Partial<PageData> = {}): PageData =>
-  ({ id, name, slug: name.toLowerCase(), root: { id: `r-${id}`, type: "container" }, ...over }) as PageData;
+const SWITCHER_PAGE = (id: string, name: string, slug: string, over: Partial<PageSummary> = {}): PageSummary => ({
+  id,
+  name,
+  slug,
+  kind: "static",
+  isHome: false,
+  dirty: false,
+  depth: 0,
+  ...over,
+});
 
-const TAB_PAGES: PageData[] = [
-  TAB_PAGE("home", "Home", { isHome: true }),
-  TAB_PAGE("about", "About"),
-  TAB_PAGE("pricing", "Pricing"),
+const SWITCHER_PAGES: PageSummary[] = [
+  SWITCHER_PAGE("home", "Home", "/", { isHome: true, dirty: true }),
+  SWITCHER_PAGE("about", "About", "/about"),
+  SWITCHER_PAGE("work", "Work", "/work"),
+  SWITCHER_PAGE("contact", "Contact", "/contact"),
+  SWITCHER_PAGE("legal", "Legal", "/legal"),
+  SWITCHER_PAGE("blog-post", "Blog post template", "/blog/:slug", {
+    kind: "template",
+    collectionId: "c-blog",
+    collectionName: "Blog post",
+  }),
 ];
 
-function tabBarStub() {
-  return {
-    on: () => {},
-    off: () => {},
-    emit: () => {},
-    elements: {
-      getAllPages: () => TAB_PAGES,
-      getActivePage: () => TAB_PAGES[0],
-      setActivePage: () => {},
-      createPage: () => {},
-      updatePage: () => {},
-      duplicatePage: () => true,
-      deletePage: () => {},
-      setHomePage: () => {},
-    },
-  } as unknown as Composer;
+function PageSwitcherProbe() {
+  const [open, setOpen] = React.useState(() => new URLSearchParams(location.search).get("open") === "1");
+  const [active, setActive] = React.useState(() => new URLSearchParams(location.search).get("active") ?? "home");
+  return (
+    <div className="tw:fixed tw:inset-x-0 tw:bottom-0">
+      <LayoutShell.Footer>
+        <PageSwitcher
+          pages={SWITCHER_PAGES}
+          activePageId={active}
+          open={open}
+          onOpenChange={setOpen}
+          onSelect={setActive}
+          onManagePages={() => {}}
+          onAddPage={() => {}}
+        />
+      </LayoutShell.Footer>
+    </div>
+  );
+}
+
+/* 2L9 Shell/BottomBar 497:99485 (lead3, wave 3): the bar with the save
+   status the StudioHeader writes. `?state=` picks the save state, `?resource=1`
+   the Resource-area context. */
+function BottomBarProbe() {
+  const q = new URLSearchParams(location.search);
+  const state = (q.get("state") ?? "saved") as SaveState;
+  React.useState(() => {
+    saveStatusStore.set({
+      state,
+      savedAt: Date.now() - 5_000,
+      onClick: state === "error" ? () => {} : undefined,
+      onDetails: () => {},
+    });
+    return null;
+  });
+  return (
+    <div className="tw:fixed tw:inset-x-0 tw:bottom-0">
+      <LayoutShell.Footer>
+        <BottomBar composer={null} pages={SWITCHER_PAGES} resourceArea={q.get("resource") === "1"} onBackToEditor={() => {}} />
+      </LayoutShell.Footer>
+    </div>
+  );
 }
 
 const APPLY_STEPS = [
@@ -1847,6 +2294,7 @@ function contentComposer({
     },
     elements: {
       getAllElements: () => elements.map(contentElement),
+      getAllPages: () => [],
       getElement: (id: string) => {
         const e = elements.find((x) => x.id === id);
         return e ? contentElement(e) : null;
@@ -1859,6 +2307,274 @@ function contentComposer({
   } as unknown as Composer;
 }
 
+/* 2L9 page 05 CMS boards (165:2, 165:520, 165:2184…): the workspace at the
+   board's size — 1145 × 812 is the canvas column of a 1440 × 900 frame
+   (rail 56 + drawer 239 to the left, topbar 56 above, bottom bar 32 below).
+   `?record=<id|new>` opens a record. */
+const CMS_WS_FIELDS = [
+  { id: "f-title", name: "Title", slug: "title", type: "text", order: 0, validation: { required: true } },
+  { id: "f-slug", name: "Slug", slug: "slug", type: "slug", order: 1, validation: { required: true } },
+  { id: "f-excerpt", name: "Excerpt", slug: "excerpt", type: "text", order: 2 },
+  { id: "f-body", name: "Body", slug: "body", type: "richtext", order: 3 },
+  { id: "f-cover", name: "Cover image", slug: "cover", type: "image", order: 4 },
+  { id: "f-author", name: "Author", slug: "author", type: "select", order: 5, options: ["Ali", "Sara"] },
+  { id: "f-category", name: "Category", slug: "category", type: "select", order: 6, options: ["Design", "Studio"] },
+  { id: "f-date", name: "Published on", slug: "published-on", type: "datetime", order: 7 },
+];
+const CMS_WS_COLLECTION = { id: "blog", name: "Blog", slug: "blog", displayField: "title", fields: CMS_WS_FIELDS };
+const CMS_WS_NOW = Date.parse("2026-10-26T12:00:00Z");
+const CMS_WS_RECORDS = Array.from({ length: 64 }, (_, i) => ({
+  id: `post-${i + 1}`,
+  collectionId: "blog",
+  status: i % 5 === 1 || i % 5 === 4 ? "draft" : "published",
+  createdAt: new Date(CMS_WS_NOW - (i + 2) * 3_600_000).toISOString(),
+  updatedAt: new Date(CMS_WS_NOW - (i + 1) * 3_600_000).toISOString(),
+  ...(i === 0 ? { publishedAt: new Date(CMS_WS_NOW - 30 * 3_600_000).toISOString() } : {}),
+  data: {
+    title: i === 0 ? "A note on clear choices" : `Studio note ${i + 1}`,
+    slug: i === 0 ? "a-note-on-clear-choices" : `studio-note-${i + 1}`,
+    excerpt: "Plain choices help people see what matters and move forward with the work.",
+    body: "<p>Clear choices create confident experiences.</p><p>This note shares how a studio brings clarity to complex products.</p>",
+    author: i % 2 ? "Sara" : "Ali",
+    category: "Design",
+  },
+}));
+
+/* design-2l9 187:20406 … 187:22375 on a REAL Composer: the Dynamic pages tab
+   makes a page and binds it, which the stub composer cannot. A Team
+   collection with two published records; `&siteId=` makes the link's server
+   mirror fail (no server behind the probe) for 187:21035. Both records share
+   a Role, so "/team/{role}" collides (165:3693). */
+function CmsDynamicPagesHost() {
+  const [composer, setComposer] = React.useState<Composer | null>(null);
+  React.useEffect(() => {
+    const c = new Composer({} as never);
+    c.elements.setActivePage(c.elements.createPage("Home").id);
+    void (async () => {
+      const col = await c.cms.collections.createCollection("Team", "team", undefined, {
+        displayField: "name",
+        fields: [
+          { id: "f-portrait", name: "Portrait", slug: "portrait", type: "image", order: 0 },
+          { id: "f-name", name: "Name", slug: "name", type: "text", order: 1 },
+          { id: "f-slug", name: "Slug", slug: "slug", type: "slug", order: 2 },
+          { id: "f-role", name: "Role", slug: "role", type: "text", order: 3 },
+          { id: "f-bio", name: "Bio", slug: "bio", type: "richtext", order: 4 },
+        ] as never,
+      });
+      for (const [name, role] of [["Ali Shah", "Designer"], ["Sara Khan", "Designer"]]) {
+        await c.cms.collections.createContentItem(col.id, { name, role, slug: name.toLowerCase().replace(/ /g, "-") }, { status: "published" });
+      }
+      /* `?linked=1`: the collection already has its page (165:3432). */
+      if (new URLSearchParams(location.search).get("linked")) {
+        const page = c.elements.createPage("Team member");
+        const file = pageFileNames(c.elements.getAllPages()).get(page.id) ?? "team-member.html";
+        await c.cms.collections.updateCollection(col.id, { pageSlugPattern: "/team/{slug}", pageTemplatePath: file } as never);
+      }
+      cmsWorkspace.reset();
+      cmsWorkspace.openRequest({ collectionId: col.id, tab: "dynamic-pages" });
+      setComposer(c);
+    })();
+  }, []);
+  return (
+    <ToastProvider>
+      <div data-probe="cms-dynamic-pages" className="tw:relative" style={{ width: 1145, height: 812 }}>
+        {composer ? <CmsWorkspace composer={composer} /> : null}
+      </div>
+    </ToastProvider>
+  );
+}
+
+/* design-2l9 176:21119 / 176:21523 / 189:21741 — the Add panel's CMS rows
+   on a REAL Composer: a Blog collection linked to its "Blog post" template
+   page (Article › Heading selected) and a Team collection. `&home=1` opens
+   Home instead, where only the Collection lists show (189:21741). */
+function AddPanelCmsHost() {
+  const [composer, setComposer] = React.useState<Composer | null>(null);
+  React.useEffect(() => {
+    const c = new Composer({} as never);
+    const home = c.elements.createPage("Home");
+    c.elements.setHomePage(home.id);
+    const tpl = c.elements.createPage("Blog post");
+    void (async () => {
+      const blog = await c.cms.collections.createCollection("Blog", "blog", undefined, {
+        displayField: "title",
+        fields: [
+          { id: "f-title", name: "Title", slug: "title", type: "text", order: 0 },
+          { id: "f-slug", name: "Slug", slug: "slug", type: "slug", order: 1 },
+          { id: "f-excerpt", name: "Excerpt", slug: "excerpt", type: "textarea", order: 2 },
+          { id: "f-body", name: "Body", slug: "body", type: "richtext", order: 3 },
+          { id: "f-cover", name: "Cover image", slug: "cover", type: "image", order: 4 },
+          { id: "f-pub", name: "Published on", slug: "published", type: "date", order: 5 },
+        ] as never,
+      });
+      await c.cms.collections.createCollection("Team", "team", undefined, {
+        displayField: "name",
+        fields: [
+          { id: "t-portrait", name: "Portrait", slug: "portrait", type: "image", order: 0 },
+          { id: "t-name", name: "Name", slug: "name", type: "text", order: 1 },
+          { id: "t-role", name: "Role", slug: "role", type: "text", order: 2 },
+        ] as never,
+      });
+      const file = pageFileNames(c.elements.getAllPages()).get(tpl.id) ?? "blog-post.html";
+      await c.cms.collections.updateCollection(blog.id, { pageSlugPattern: "/blog/{slug}", pageTemplatePath: file } as never);
+      const onHome = new URLSearchParams(location.search).get("home") === "1";
+      const page = onHome ? home : tpl;
+      c.elements.setActivePage(page.id);
+      const article = c.elements.createElement("section" as never, { id: "apc-article" });
+      c.elements.addElement(article, page.root.id);
+      renameElement(c, "apc-article", "Article");
+      const heading = c.elements.createElement("heading" as never, { id: "apc-heading", content: "A clearer point of view" });
+      c.elements.addElement(heading, "apc-article");
+      renameElement(c, "apc-heading", "Heading");
+      c.selection.select(c.elements.getElement("apc-heading") ?? null);
+      setComposer(c);
+    })();
+  }, []);
+  return (
+    <div data-probe="add-panel-cms">
+      <ToastProvider>
+        <div className="tw:flex tw:h-[812px] tw:w-70 tw:flex-col tw:overflow-hidden tw:bg-white">
+          {composer ? <BuildTab composer={composer} onExpandToggle={() => {}} onClose={() => {}} /> : null}
+        </div>
+      </ToastProvider>
+    </div>
+  );
+}
+
+/* design-2l9 193:25921 … 195:29268 — the Link row of a Card inside a Team
+   Collection list, on a REAL Composer, in a 288-wide inspector column. Team
+   has no page per record; the walk picks This record's page and runs Create
+   collection page. `&siteId=` makes the collection link's server save fail
+   (no server behind the probe) for D93; without it the make succeeds (D90). */
+function LinkRowRecordHost() {
+  const [state, setState] = React.useState<{ c: Composer; card: string; home: string } | null>(null);
+  React.useEffect(() => {
+    const c = new Composer({} as never);
+    const home = c.elements.createPage("Home");
+    c.elements.setHomePage(home.id);
+    c.elements.setActivePage(home.id);
+    void (async () => {
+      const team = await c.cms.collections.createCollection("Team", "team", undefined, {
+        displayField: "name",
+        fields: [
+          { id: "f-portrait", name: "Portrait", slug: "portrait", type: "image", order: 0 },
+          { id: "f-name", name: "Name", slug: "name", type: "text", order: 1 },
+          { id: "f-slug", name: "Slug", slug: "slug", type: "slug", order: 2 },
+          { id: "f-role", name: "Role", slug: "role", type: "text", order: 3 },
+          { id: "f-bio", name: "Bio", slug: "bio", type: "richtext", order: 4 },
+        ] as never,
+      });
+      await c.cms.collections.createContentItem(team.id, { name: "Ali Shah", role: "Designer", slug: "ali-shah" }, { status: "published" });
+      const list = c.elements.createElement("collection-list" as never, { id: "lr-list" });
+      c.elements.addElement(list, home.root.id);
+      renameElement(c, "lr-list", "Team");
+      const card = c.elements.createElement("link" as never, { id: "lr-card", tagName: "a" } as never);
+      c.elements.addElement(card, "lr-list");
+      renameElement(c, "lr-card", "Card");
+      c.cms.bindings.bindCollectionList("lr-list", team.id);
+      c.selection.select(c.elements.getElement("lr-card") ?? null);
+      setState({ c, card: "lr-card", home: home.id });
+    })();
+  }, []);
+  /* After "Open page" (D98) the made page is active: the column shows what
+     the Inspector shows there with nothing selected. */
+  const [, bump] = React.useReducer((n: number) => n + 1, 0);
+  React.useEffect(() => {
+    if (!state) return;
+    state.c.on(EVENTS.PAGE_CHANGED, bump);
+    return () => {
+      state.c.off(EVENTS.PAGE_CHANGED, bump);
+    };
+  }, [state]);
+  const onCardPage = state?.c.elements.getActivePage()?.id === state?.home;
+  return (
+    <ToastProvider>
+      <div data-probe="link-row-record" style={{ position: "fixed", right: 0, top: 56, width: 288, bottom: 32, background: "white", borderLeft: "1px solid var(--bk-border)" }}>
+        {state && onCardPage ? (
+          <LinkSection composer={state.c} selectedElement={{ id: state.card, type: "link" }} isOpen tier="primary" />
+        ) : state ? (
+          <PagePanel composer={state.c} />
+        ) : null}
+      </div>
+    </ToastProvider>
+  );
+}
+
+function CmsWorkspaceHost() {
+  const q = new URLSearchParams(location.search);
+  const composer = React.useMemo(
+    () => {
+      const base = contentComposer({ collections: [CMS_WS_COLLECTION], records: [] }) as unknown as Record<string, unknown>;
+      const cms = base.cms as { collections: Record<string, unknown> };
+      cms.collections.getContentItems = async (id: string) => (id === "blog" ? CMS_WS_RECORDS : []);
+      /* `&hang=1` holds a save open, for the saving states (165:797, 168:21620). */
+      /* `&offline=1` returns the written record, so the server mirror runs and,
+         with no server behind the probe, queues (165:1625). */
+      cms.collections.updateContentItem = q.get("fail")
+        ? async () => {
+            throw new Error("500");
+          }
+        : q.get("hang")
+        ? () => new Promise(() => {})
+        : q.get("offline")
+          ? async (id: string, u: Record<string, unknown>) => ({ ...CMS_WS_RECORDS.find((r) => r.id === id), ...u })
+          : async () => null;
+      /* The Title field is bound once, so the field inspector draws its lock (165:2917). */
+      const bound = { "el-hero-title": [{ collectionId: "blog", fieldSlug: "title", property: "content" }] };
+      (base.cms as Record<string, unknown>).bindings = {
+        export: () => bound,
+        getAllCollectionBindings: () => [],
+        /* `&page=conditions` (176:21830): the happy-hour banner has a rule;
+           the sold-out badge keeps its legacy binding only. */
+        getCondition: (id: string) =>
+          id === "el-happy-hour" ? { match: "all", rules: [{ field: "opening_hours.sunday", op: "set" }] } : null,
+      };
+      if (q.get("page") === "conditions") {
+        const els = base.elements as Record<string, unknown>;
+        const all = (els.getAllElements as () => Array<Record<string, unknown>>)();
+        const root = { getId: () => "root-blog-post", getParent: () => undefined };
+        const headed = all.map((e) => ({ ...e, getType: () => "heading", getParent: () => root }));
+        els.getAllElements = () => headed;
+        els.getElement = (id: string) => headed.find((e) => (e as { getId?: () => string }).getId?.() === id) ?? null;
+        els.getAllPages = () => [{ id: "p-blog-post", name: "Blog post", root: { id: "root-blog-post" } }];
+        els.getActivePage = () => ({ id: "p-home", name: "Home" });
+      }
+      return base as unknown as Composer;
+    },
+    [],
+  );
+  React.useState(() => {
+    cmsWorkspace.reset();
+    /* `&page=variables`: Site variables as the workspace's page (B5-V01). */
+    if (q.get("page") === "variables") {
+      cmsWorkspace.openVariables();
+      return null;
+    }
+    if (q.get("page") === "conditions") {
+      cmsWorkspace.openConditions();
+      return null;
+    }
+    cmsWorkspace.openRequest({
+      collectionId: "blog",
+      recordId: q.get("record") ?? undefined,
+      tab: (q.get("tab") as "fields" | null) ?? undefined,
+      origin: q.get("origin") ?? undefined,
+    });
+    /* A page picked in the Pages drawer over the record (122:44151 · 126:35760). */
+    Object.assign(window, {
+      probeExit: (name: string) => cmsWorkspace.exit(() => undefined, { name, exists: () => true }),
+    });
+    return null;
+  });
+  return (
+    <ToastProvider>
+      <div data-probe="cms-workspace" className="tw:relative" style={{ width: 1145, height: 812 }}>
+        <CmsWorkspace composer={composer} onBackToCanvas={q.get("back") || q.get("origin") ? () => {} : undefined} />
+      </div>
+    </ToastProvider>
+  );
+}
+
 /** 812 tall and 280 wide — the drawer this panel ships in, and the board's own
  *  frame. Without a real height `CONTENT_BODY`'s `h-full` collapses and every
  *  `flex-1` region measures its content instead of its column. */
@@ -1867,6 +2583,132 @@ function ContentPanelHost({ probe, composer }: { probe: string; composer: Compos
     <div data-probe={probe} className="tw:flex tw:h-203 tw:w-70 tw:flex-col tw:bg-white">
       <ContentTab composer={composer} hydrationStatus="ready" onCreateCollection={() => {}} onClose={() => {}} />
     </div>
+  );
+}
+
+const CMS_STATUS_COLLECTION: CMSCollection = {
+  id: "probe-blog",
+  name: "Blog",
+  slug: "blog",
+  displayField: "title",
+  fields: [{ id: "title", slug: "title", name: "Title", type: "text", order: 0 }],
+  createdAt: "2026-10-01T00:00:00.000Z",
+  updatedAt: "2026-10-01T00:00:00.000Z",
+};
+/* Stamped at render so the Updated column reads the same relative time on
+   every run; the changed row's publish stamp sits a minute earlier. */
+const CMS_PROBE_NOW = Date.now();
+const cmsProbeRecord = (id: string, title: string, extra: Partial<CMSContentItem>): CMSContentItem => ({
+  id,
+  collectionId: "probe-blog",
+  data: { title },
+  status: "draft",
+  createdAt: new Date(CMS_PROBE_NOW).toISOString(),
+  updatedAt: new Date(CMS_PROBE_NOW).toISOString(),
+  ...extra,
+});
+const CMS_STATUS_RECORDS: CMSContentItem[] = [
+  cmsProbeRecord("r1", "A clearer point of view", {
+    status: "published",
+    publishedAt: new Date(CMS_PROBE_NOW - 60_000).toISOString(),
+  }),
+  cmsProbeRecord("r2", "How we design for trust", { status: "draft" }),
+  cmsProbeRecord("r3", "A studio built around people", {
+    status: "published",
+    publishedAt: new Date(CMS_PROBE_NOW).toISOString(),
+  }),
+];
+
+/* ── Publish tray (design-2l9 Task 1.7) ─────────────────────────────────── */
+const TRAY_LIFE = {
+  reviewState: "none" as const,
+  reviewsEnabled: false,
+  editsRequireApproval: false,
+  isPublished: true,
+  hasUnpublishedChanges: true,
+  isViewer: false,
+  publishEnabled: true,
+  offline: false,
+  errorCount: 0,
+};
+
+const trayComposer = {
+  on: () => {},
+  off: () => {},
+  emit: () => {},
+  getState: () => ({ zoom: 100 }),
+  setZoom: () => {},
+  getProjectMetadata: () => ({ name: "Fieldwork Studio" }),
+  history: { getHistoryStack: () => [] },
+  elements: { getAllPages: () => [], getElement: () => null },
+  selection: { select: () => {} },
+} as unknown as React.ComponentProps<typeof PublishTray>["composer"];
+
+/* With `&siteId=` in the URL the tray asks the server for its history, its
+   readiness checks and the review round; these answer over the tRPC
+   transport (`stubTrpc`'s envelope). `hang` names procedures that never
+   answer — the checks-loading board (B8-PB23). */
+const TRAY_CHECKS = {
+  ready: true,
+  checks: [
+    { label: "Favicon", status: "warning", detail: "No favicon set. Browsers will show a default icon." },
+    { label: "SEO configured", status: "warning", detail: "No meta title template set. Search engines may not index your site properly." },
+  ],
+};
+const TRAY_ROWS = [
+  { id: "j13", version: 13, completedAt: new Date(Date.now() - 60_000).toISOString(), deploymentId: "d13", rollbackable: true, rolledBackFrom: null },
+  { id: "j12", version: 12, completedAt: new Date(Date.now() - 2 * 86_400_000).toISOString(), deploymentId: "d12", rollbackable: true, rolledBackFrom: null },
+];
+function stubTrayServer(answers: Record<string, unknown>, hang: string[] = []) {
+  window.fetch = (async (input: RequestInfo | URL) => {
+    const href = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+    const procs = new URL(href, location.origin).pathname.split("/api/trpc/")[1]?.split(",") ?? [];
+    if (procs.some((p) => hang.includes(p))) return new Promise<Response>(() => {});
+    const body = procs.map((name) => ({ result: { data: { json: answers[name] ?? null } } }));
+    return new Response(JSON.stringify(body), { status: 200, headers: { "content-type": "application/json" } });
+  }) as typeof fetch;
+}
+
+function publishTrayFrame(
+  probe: string,
+  o: {
+    nextMove: ReturnType<typeof deriveLifecycleState>;
+    issues?: Issue[];
+    job?: Partial<UsePublishJobResult>;
+    server?: Record<string, unknown>;
+    hang?: string[];
+  },
+): React.ReactElement {
+  if (o.server || o.hang) stubTrayServer(o.server ?? {}, o.hang);
+  const job: UsePublishJobResult = {
+    uiState: "idle",
+    jobId: null,
+    deploymentId: null,
+    progress: 0,
+    publishedUrl: "https://fieldwork.studio",
+    error: null,
+    steps: null,
+    blockedReason: null,
+    publish: async () => {},
+    cancel: async () => {},
+    track: () => {},
+    reset: () => {},
+    lastPublishedAt: null,
+    hasUnpublishedChanges: true,
+    dismissBlock: () => {},
+    unpublished: () => {},
+    startedAt: null,
+    pollLost: false,
+    ...o.job,
+  };
+  return (
+    <ToastProvider>
+      <div data-probe={probe} className="tw:fixed tw:inset-0 tw:bg-[var(--bk-bg-app)]">
+        <div className="tw:absolute tw:right-0 tw:top-14 tw:bottom-8 tw:w-[var(--bk-size-task-host)]">
+          <PublishTray composer={trayComposer} publishJob={job} nextMove={o.nextMove} onRequestPublish={() => {}} issues={o.issues ?? []} />
+        </div>
+      </div>
+    </ToastProvider>
   );
 }
 
@@ -1936,26 +2778,120 @@ const CASES: Record<string, () => React.ReactElement> = {
   "canvas-breakpoint-bar": () => (
     <div data-probe="canvas-breakpoint-bar" style={{ padding: 24, background: "var(--bk-gray-50)" }}>
       <CanvasFooterToolbar
-        overlays={{ guides: true, spacing: false, grid: false, rulers: false, badges: false, xray: false }}
+        overlays={{ guides: true, spacing: false, grid: false, rulers: false, badges: false, xray: false, outlines: false }}
         zoom={100}
         device="desktop"
         onDeviceChange={() => {}}
         onOverlayChange={() => {}}
         onZoomChange={() => {}}
-        onUndo={() => {}}
-        onRedo={() => {}}
       />
+    </div>
+  ),
+  /* 2L9 F1.07 (302:7348): the topbar breakpoint control, icon-only, Wide
+     enabled, Tablet chosen. */
+  "breakpoint-switcher": () => (
+    <div data-probe="breakpoint-switcher" style={{ padding: 24 }}>
+      <BreakpointSwitcher value="tablet" onChange={() => {}} includeWide />
+    </div>
+  ),
+  /* 2L9 board 165:2: the records table's Status column, one row per tone. */
+  "cms-records-status": () => (
+    <div data-probe="cms-records-status" style={{ display: "flex", height: 240, width: 900 }}>
+      <RecordsTable collection={CMS_STATUS_COLLECTION} records={CMS_STATUS_RECORDS} onOpenRecord={() => {}} />
+    </div>
+  ),
+  "cms-workspace": () => <CmsWorkspaceHost />,
+  "cms-dynamic-pages": () => <CmsDynamicPagesHost />,
+  /* 2L9 223:44891 — the Replace confirm over a built-in template. */
+  "tpl-replace-confirm": () => (
+    <div data-probe="tpl-replace-confirm">
+      <ReplaceModal
+        template={{ id: "saas", name: "SaaS landing", html: "<section style=\"color:#111827\">Hi</section>" } as never}
+        currentPageName="Home"
+        currentPageCount={34}
+        backupCurrentPage
+        onBackupChange={() => {}}
+        onCancel={() => {}}
+        onApply={() => {}}
+      />
+    </div>
+  ),
+  /* design-2l9 board 145:65011 — Grid and snapping, the panel View opens in
+     its own place. The bar sits at the canvas column's top (x342 y56, 798
+     wide, 7:18654) so the panel opens below it; the recipe clicks View,
+     then Grid. */
+  /* design-2l9 board 7:18654 — the canvas bar's contents at the board's
+     ~800 canvas column: path, device toggles, width chip, zoom, View. */
+  /* 176:19089 / 176:19451 — a heading its condition hides on the preview
+     record, under the real Canvas.css rules: a named ghost, or (&hide=1, Show
+     hidden elements off) not drawn at all. */
+  "canvas-hidden-ghost": () => (
+    <div
+      className="buildrick-canvas"
+      data-probe="canvas-hidden-ghost"
+      data-bk-hide-conditional={new URLSearchParams(location.search).get("hide") === "1" ? "true" : undefined}
+      style={{ width: 512, padding: 24, background: "white", fontFamily: "var(--bk-font-ui)" }}
+    >
+      <p style={{ margin: 0, fontSize: 12 }}>JOURNAL / DESIGN</p>
+      <h2 data-bk-condition="hidden" style={{ margin: "24px 0 12px", fontSize: 24, fontWeight: 400 }}>A clearer point of view</h2>
+      <p style={{ margin: 0, fontSize: 12 }}>By Ali · 19 October 2026</p>
+    </div>
+  ),
+  "canvas-bar": () => (
+    <div data-probe="canvas-bar" style={{ width: 800 }}>
+      <CanvasFooterToolbar
+        overlays={{ guides: false, spacing: false, grid: false, rulers: false, badges: false, xray: false, outlines: false }}
+        zoom={52}
+        onOverlayChange={() => {}}
+        onZoomChange={() => {}}
+        device="desktop"
+        onDeviceChange={() => {}}
+        onCustomWidth={() => {}}
+        pageWidth={1440}
+        readout="Home / Hero"
+      />
+    </div>
+  ),
+  "canvas-grid-panel": () => (
+    <div data-probe="canvas-grid-panel" style={{ width: 1440, height: 900, position: "relative" }}>
+      <div style={{ position: "absolute", left: 342, top: 56, width: 798 }}>
+        <CanvasFooterToolbar
+          overlays={{ guides: false, spacing: false, grid: false, rulers: false, badges: false, xray: false, outlines: false }}
+          zoom={52}
+          onOverlayChange={() => {}}
+          onZoomChange={() => {}}
+          gridSize={7}
+          onGridSizeChange={() => {}}
+          device="desktop"
+          onDeviceChange={() => {}}
+          pageWidth={1440}
+          onCustomWidth={() => {}}
+          /* 153:79518's two guides, as the site would hold them; `&guides=locked`
+             is 145:67569's one locked 240 guide. */
+          guides={{
+            list: new URLSearchParams(location.search).get("guides") === "locked"
+              ? [{ id: "g-v", type: "vertical", position: 240, locked: true }]
+              : [
+                  { id: "g-v", type: "vertical", position: 320, locked: false },
+                  { id: "g-h", type: "horizontal", position: 120, locked: false },
+                ],
+            add: () => {},
+            update: () => {},
+            setLocked: () => {},
+            remove: () => {},
+            restore: () => {},
+          }}
+        />
+      </div>
     </div>
   ),
   "canvas-footer-toolbar": () => (
     <div data-probe="canvas-footer-toolbar">
       <CanvasFooterToolbar
-        overlays={{ guides: true, spacing: false, grid: false, rulers: false, badges: false, xray: false }}
+        overlays={{ guides: true, spacing: false, grid: false, rulers: false, badges: false, xray: false, outlines: false }}
         zoom={100}
         onOverlayChange={() => {}}
         onZoomChange={() => {}}
-        onUndo={() => {}}
-        onRedo={() => {}}
       />
     </div>
   ),
@@ -2114,6 +3050,439 @@ const CASES: Record<string, () => React.ReactElement> = {
       <ContentTab composer={null} hydrationStatus="error" onClose={() => {}} />
     </div>
   ),
+  // ── Shell/InspectorHeader (2L9 497:339496, plan Task 1.4) ────────────────
+  // The real header on the real layers composer, in the inspector's 300 column:
+  // "Text"-style target row + "Editing · Desktop · Default state". Home is not
+  // a collection template, so this is the 84 variant (no element path).
+  "inspector-header": () => {
+    const c = layersComposer();
+    const el = c.elements.getElement("lx-heading")!;
+    c.selection.select(el);
+    return (
+      <ToastProvider>
+        <div data-probe="inspector-header" className="tw:w-[300px] tw:bg-white">
+          <InspectorHeader
+            composer={c}
+            element={{ id: el.getId(), type: el.getType() }}
+            selectedIds={[el.getId()]}
+            breakpointLabel="Desktop"
+            activeTab="style"
+            state="normal"
+            onStateChange={() => {}}
+          />
+        </div>
+      </ToastProvider>
+    );
+  },
+  // ── Inspector body (2L9 page 04, lane L-B) ───────────────────────────────
+  // The real ProInspector on a fresh composer in the 300 column, one element
+  // of `?type=` (default heading) on a Home page — or, with `?block=`, that
+  // Insert block (`contact-form` → a form with labelled fields). The panel
+  // follows the composer's selection, so opening a field shows the field.
+  // 2L9 G05 / G06 — the Create component dialog over a "Hero heading" on Home.
+  "create-component": () => {
+    const c = new Composer({} as never);
+    const page = c.elements.createPage("Home");
+    c.elements.setActivePage(page.id);
+    const el = c.elements.createElement("heading" as never, { content: "Thoughtful design." } as never);
+    c.elements.addElement(el, page.root.id);
+    el.setData("layerName", "Hero heading");
+    /* G08–G12: `?used=100` masters already on the site; `?createMode=pending`
+       never answers the create, `fail` refuses it. */
+    const q = new URLSearchParams(location.search);
+    const used = Number(q.get("used") ?? 0);
+    if (used) c.components.getAllComponents = () => Array.from({ length: used }) as never;
+    const createMode = q.get("createMode");
+    if (createMode === "pending") c.components.createComponent = () => new Promise(() => {});
+    if (createMode === "fail") c.components.createComponent = async () => null;
+    return (
+      <ToastProvider>
+        <div data-probe="create-component">
+          <CreateComponentModal isOpen onClose={() => {}} composer={c} elementId={el.getId()} />
+        </div>
+      </ToastProvider>
+    );
+  },
+  /* The whole Brand workspace at 1440 × 812 (B6 boards, L-B round 28):
+     `?page=<id>` lands on that Brand page (as `initialPage`); the composer
+     holds a Home page with a heading and a paragraph for the preview. */
+  "brand-workspace": () => {
+    const q = new URLSearchParams(location.search);
+    const c = new Composer({} as never);
+    const page = c.elements.createPage("Home");
+    c.elements.setActivePage(page.id);
+    c.elements.addElement(c.elements.createElement("heading", { tagName: "h1", content: "Thoughtful work. Lasting impact." }), page.root.id);
+    c.elements.addElement(c.elements.createElement("text", { tagName: "p", content: "We bring clarity to complex ideas through design and careful craft." }), page.root.id);
+    Object.assign(window, { probeComposer: c });
+    return (
+      <ToastProvider>
+        <div data-probe="brand-workspace" className="tw:flex tw:h-[812px] tw:w-[1440px] tw:bg-white">
+          <TokenRegistryProvider composer={c}>
+            <BrandWorkspace composer={c} projectId="probe" initialPage={q.get("page") ?? undefined} onClose={() => undefined} />
+          </TokenRegistryProvider>
+        </div>
+      </ToastProvider>
+    );
+  },
+  /* A Brand font role's card (TokenDetailView) — Change opens Choose font in
+     the token's form (R02, B-19). `?value=Inter`. */
+  "brand-font-token": () => {
+    const q = new URLSearchParams(location.search);
+    const c = new Composer({} as never);
+    const spec = { id: "font-heading", name: "Heading Font", category: "typography", cssVar: "--buildrick-design-font-heading", type: "font-family" } as const;
+    function Host() {
+      const [value, setValue] = React.useState(q.get("value") ?? "Inter");
+      const token = React.useMemo(() => v6Token({ ...spec, value }), [value]);
+      return (
+        <DSModeProvider initialMode="pro">
+          <TokenDetailView token={token} composer={c} onValueChange={(_id, v) => setValue(v)} />
+        </DSModeProvider>
+      );
+    }
+    return (
+      <ToastProvider>
+        <div data-probe="brand-font-token" className="tw:w-[300px] tw:bg-white">
+          <Host />
+        </div>
+      </ToastProvider>
+    );
+  },
+  /* S03 / S01: the Inspector's display error and its loading body, in the
+     300 column. */
+  "inspector-states": () => {
+    const Boom = (): React.ReactElement => {
+      throw new Error("probe display error");
+    };
+    return (
+      <div data-probe="inspector-states" className="tw:flex tw:gap-4">
+        <div className="tw:w-[300px] tw:bg-white" data-testid="probe-s03">
+          <InspectorErrorBoundary targetName="Hero heading">
+            <Boom />
+          </InspectorErrorBoundary>
+        </div>
+        <div className="tw:flex tw:h-[400px] tw:w-[300px] tw:flex-col tw:bg-white" data-testid="probe-s01">
+          <InspectorLoading />
+        </div>
+      </div>
+    );
+  },
+  /* `?action=delete|duplicate|paste-style` — the real command on a heading named "Hero
+     heading", with the shell's receipt hook mounted: S09 (255:86352) /
+     S10 (255:86840). The Inspector sits in the shell's right column. */
+  "element-receipt": () => {
+    const action = new URLSearchParams(location.search).get("action") ?? "delete";
+    const c = new Composer({} as never);
+    const page = c.elements.createPage("Home");
+    c.elements.setActivePage(page.id);
+    const el = c.elements.createElement("heading" as never, { content: "Thoughtful design. Lasting impact." } as never);
+    c.elements.addElement(el, page.root.id);
+    renameElement(c as never, el.getId(), "Hero heading");
+    /* `action=paste-style`: two copied styles waiting (G02 271:124383). */
+    if (action === "paste-style") c.styleClipboard = { "font-size": "32px", "font-weight": "600" };
+    c.selection.select(el);
+    function Host() {
+      const { addToast } = useToast();
+      useClipboardToasts(c, addToast);
+      const { selectedElement } = useComposerSelection({ composer: c });
+      React.useEffect(() => {
+        const t = setTimeout(() => void c.commands.run(action), 50);
+        return () => clearTimeout(t);
+      }, []);
+      return (
+        <ProInspector
+          composer={c}
+          currentBreakpoint="desktop"
+          selectedElement={selectedElement ? { id: selectedElement.getId(), type: selectedElement.getType(), tagName: selectedElement.getTagName() } : null}
+        />
+      );
+    }
+    return (
+      <ToastProvider>
+        <div style={{ position: "fixed", top: 56, right: 0, width: 300, height: 812, borderLeft: "1px solid var(--bk-border)" }}>
+          <div data-probe="element-receipt" className="tw:flex tw:h-[812px] tw:w-[300px] tw:flex-col tw:bg-white">
+            <Host />
+          </div>
+        </div>
+      </ToastProvider>
+    );
+  },
+  "inspector-panel": () => {
+    const q = new URLSearchParams(location.search);
+    const type = q.get("type") ?? "heading";
+    const c = new Composer({} as never);
+    const page = c.elements.createPage("Home");
+    c.elements.setActivePage(page.id);
+    const blockId = q.get("block");
+    const block = blockId ? getBlockById(blockId) : undefined;
+    const id = block ? insertBlock(c, block, page.root.id) : undefined;
+    /* `?ancestors=Main,Hero,Content stack` — the element sits inside named
+       containers (S31's path). */
+    let host = page.root.id;
+    for (const name of (q.get("ancestors") ?? "").split(",").filter(Boolean)) {
+      const box = c.elements.createElement((q.get("ancestorType") ?? "container") as never, {} as never);
+      c.elements.addElement(box, host);
+      renameElement(c as never, box.getId(), name);
+      host = box.getId();
+    }
+    const el = id ? c.elements.getElement(id)! : c.elements.createElement(type as never, { content: "Thoughtful design." } as never);
+    if (!id) c.elements.addElement(el, host);
+    /* `?styles={"display":"flex",…}` — a specimen's authored values. */
+    const styles = q.get("styles");
+    if (styles) el.setStyles(JSON.parse(styles) as Record<string, string>);
+    /* `?siteId=s&formBlock={…}` — the form's server row (Behavior › After submit). */
+    const formBlock = q.get("formBlock");
+    /* `&formMode=pending` never answers the load (F16); `saving` never answers
+       a save (F11); `fail` / `forbidden` refuse every save as a network
+       failure (F12) / FORBIDDEN (F15). */
+    const formMode = q.get("formMode");
+    if (formMode === "pending") window.fetch = () => new Promise<Response>(() => {});
+    else if (formBlock) {
+      trpcStub({ "forms.getBlock": () => JSON.parse(formBlock), ...(formMode ? {} : { "forms.updateBlock": () => JSON.parse(formBlock) }) });
+      if (formMode) {
+        const read = window.fetch;
+        window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+          const href = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+          if (!href.includes("forms.updateBlock")) return read(input, init);
+          if (formMode === "fail") throw new TypeError("Failed to fetch");
+          if (formMode === "saving") return new Promise<Response>(() => {});
+          const error = { json: { message: "FORBIDDEN", code: -32603, data: { code: "FORBIDDEN", httpStatus: 403, path: "forms.updateBlock" } } };
+          return new Response(JSON.stringify([{ error }]), { status: 403, headers: { "content-type": "application/json" } });
+        };
+      }
+    }
+    /* `?attrs={"src":"…","alt":"…"}` — a specimen's attributes. */
+    const attrs = q.get("attrs");
+    if (attrs) for (const [k, v] of Object.entries(JSON.parse(attrs) as Record<string, string>)) el.setAttribute(k, v);
+    /* `?parent={"display":"flex"}` — the page root's, for flex / grid children. */
+    const parentStyles = q.get("parent");
+    if (parentStyles) c.elements.getElement(page.root.id)?.setStyles(JSON.parse(parentStyles) as Record<string, string>);
+    c.selection.select(el);
+    /* `?bp=tablet&bpStyles={…}` — edit at a breakpoint with that layer set (IC05). */
+    const bp = (q.get("bp") ?? "desktop") as "desktop" | "tablet" | "mobile";
+    const bpStyles = q.get("bpStyles");
+    if (bpStyles && bp !== "desktop") c.styles.setBreakpointStyle(el.getId(), bp, JSON.parse(bpStyles) as Record<string, string>);
+    /* `?canvasParent={…}` — a stand-in canvas node for the element inside a
+       parent with these styles, so the Inspector's computed-style reads see a
+       real cascade (S21 "· inherited"). Off-screen, outside React. */
+    const canvasParent = q.get("canvasParent");
+    if (canvasParent) {
+      const host = document.createElement("div");
+      host.style.cssText = "position:absolute;left:-9999px;top:0;";
+      Object.assign(host.style, JSON.parse(canvasParent));
+      const node = document.createElement(el.getTagName());
+      node.setAttribute("data-buildrick-id", el.getId());
+      node.textContent = "Probe";
+      host.appendChild(node);
+      document.body.appendChild(host);
+    }
+    /* `?locked=1` — the element's own lock (147:78110). */
+    if (q.get("locked")) el.setLocked(true);
+    /* `?styleClipboard={…}` — a copied style waiting to paste (G04). */
+    const styleClipboard = q.get("styleClipboard");
+    if (styleClipboard) c.styleClipboard = JSON.parse(styleClipboard) as Record<string, string>;
+    /* The composer and the element, for a script that changes state after
+       mount (G04 / G22: the target locked after a menu or picker opened). */
+    Object.assign(window, { probeComposer: c, probeElementId: el.getId(), probeOpenSubview: openSubview });
+    /* `?layerName=Hero heading` — the element's layer name. */
+    if (q.get("layerName")) renameElement(c as never, el.getId(), q.get("layerName") ?? "");
+    /* `?dimmed=1` — the element dimmed in the editor (the Layers eye): its
+       canvas stand-in carries `data-hidden`, as useCanvasEditorFlags sets it
+       (147:78900). */
+    if (q.get("dimmed")) {
+      const node = document.querySelector(`[data-buildrick-id="${el.getId()}"]`) ?? document.body.appendChild(document.createElement("div"));
+      node.setAttribute("data-buildrick-id", el.getId());
+      node.setAttribute("data-hidden", "true");
+      if (node.parentElement === document.body) (node as HTMLElement).style.cssText = "position:absolute;left:-9999px;";
+      c.on(EVENTS.LAYER_SHOW_NORMALLY_REQUESTED, ({ id }: { id: string }) => {
+        if (id === el.getId()) node.removeAttribute("data-hidden");
+      });
+    }
+    /* `?also=1&alsoAttrs={"progress":{"value":"60"}}` — more of the same
+       block selected with it (a batch, B03); `alsoAttrs` sets attributes on
+       their descendants by tag name. */
+    const alsoCount = Number(q.get("also") ?? 0);
+    if (alsoCount > 0 && block) {
+      const alsoAttrs = JSON.parse(q.get("alsoAttrs") ?? "{}") as Record<string, Record<string, string>>;
+      const more = Array.from({ length: alsoCount }, () => insertBlock(c, block, page.root.id))
+        .map((moreId) => (moreId ? c.elements.getElement(moreId) : undefined))
+        .filter((m): m is NonNullable<typeof m> => !!m);
+      for (const m of more)
+        for (const d of m.getDescendants())
+          for (const [k, v] of Object.entries(alsoAttrs[d.getTagName().toLowerCase()] ?? {})) d.setAttribute(k, v);
+      c.selection.selectMultiple([el, ...more]);
+    }
+    /* `?peers=3&lockedPeers=1` — same-kind elements on the page (S11). */
+    for (let i = 0; i < Number(q.get("peers") ?? 0) + Number(q.get("lockedPeers") ?? 0); i++) {
+      const peer = c.elements.createElement(type as never, { content: `Peer ${i + 1}` } as never);
+      c.elements.addElement(peer, page.root.id);
+      c.elements.getElement(peer.getId())?.setTagName(el.getTagName());
+      if (i >= Number(q.get("peers") ?? 0)) c.elements.getElement(peer.getId())?.setLocked(true);
+    }
+    /* `?hoverStyles={…}` — the element's :hover rule (S13). */
+    const hoverStyles = q.get("hoverStyles");
+    if (hoverStyles) c.styles.setRule(`[data-buildrick-id="${el.getId()}"]`, JSON.parse(hoverStyles) as Record<string, string>, { pseudo: ":hover" });
+    /* `?cms=1` — a "Blog" collection with one record, the element's text
+       bound to its Title (F2.16). The store is the browser's IndexedDB. */
+    if (q.get("cms")) {
+      void (async () => {
+        const col = await c.cms.collections.createCollection("Blog", "blog", "", {
+          fields: [{ id: "f-title", name: "Title", slug: "title", type: "text", required: true }] as never,
+        });
+        const item = await c.cms.collections.createContentItem(col.id, { title: "Article title" }, { status: "published" });
+        /* `?cms=template` — Home is Blog's template page; the binding follows
+           this page's record (B5-D04/D05). `&fields=1` adds Blog's other
+           field types (B5-D03). */
+        if (q.get("cms") === "template" || q.get("templatePage")) await c.cms.collections.updateCollection(col.id, { pageTemplatePath: "index.html" } as never);
+        if (q.get("fields"))
+          await c.cms.collections.updateCollection(col.id, {
+            fields: [
+              { id: "f-title", name: "Title", slug: "title", type: "text", required: true },
+              { id: "f-excerpt", name: "Excerpt", slug: "excerpt", type: "textarea" },
+              { id: "f-body", name: "Body", slug: "body", type: "richtext" },
+              { id: "f-cover", name: "Cover image", slug: "cover", type: "image" },
+              { id: "f-author", name: "Author", slug: "author", type: "reference" },
+            ],
+          } as never);
+        /* `?cms=unbound` — the collection only, nothing bound (F2.02). */
+        /* `?cms=list` — the element's parent is a Collection list of Blog
+           (B5-D99: an element inside a list). */
+        if (q.get("cms") === "list") {
+          const parent = el.getParent?.();
+          if (parent) c.cms.bindings.bindCollectionList(parent.getId(), col.id, { limit: q.get("limit") ? Number(q.get("limit")) : undefined });
+          /* `&query={…}` — the list's filter / sort / skip (C-14); `&selectList=1` selects the list. */
+          if (parent && q.get("query")) c.cms.bindings.setListQuery(parent.getId(), JSON.parse(q.get("query") ?? "{}"));
+          c.selection.select(q.get("selectList") && parent ? parent : el);
+          return;
+        }
+        /* `?condition={…}` — the element's visibility condition (B-11);
+           `?legacyCondition=1` — a pre-CMS "old Conditions" binding instead. */
+        const conditionQ = q.get("condition");
+        if (conditionQ) c.cms.bindings.setCondition(el.getId(), JSON.parse(conditionQ));
+        if (q.get("legacyCondition"))
+          el.setDataBinding("condition", { type: "condition", sourceId: "", path: "", condition: { operator: "exists", left: "opening_hours.sunday" } } as never);
+        /* `&bindState=` — the binding's status lines (B5-D11–D15): `empty`
+           (the record's title blank, fallback "Untitled article"), `loading`
+           (records never arrive), `fail` (the load rejects), `missing` (bound
+           to a field the collection lacks), `incompatible` (title is now an
+           image field). */
+        const bindState = q.get("bindState");
+        if (bindState === "empty" && item) await c.cms.collections.updateContentItem(item.id, { title: "" } as never);
+        if (bindState === "incompatible")
+          await c.cms.collections.updateCollection(col.id, { fields: [{ id: "f-title", name: "Title", slug: "title", type: "image" }] } as never);
+        if (bindState === "loading") c.cms.collections.getContentItems = (() => new Promise(() => undefined)) as never;
+        if (bindState === "fail") c.cms.collections.getContentItems = (() => Promise.reject(new Error("offline"))) as never;
+        if (q.get("cms") !== "unbound" && !q.get("unbound"))
+          c.cms.bindings.bindToField(el.getId(), col.id, q.get("cms") === "template" ? undefined : item?.id, bindState === "missing" ? "gone" : "title", "content" as never, bindState === "empty" ? "Untitled article" : undefined);
+        c.selection.select(el);
+      })();
+    }
+    /* `?instance=Name` — make the element a component and select an instance
+       of it, with `?overrides={…}` written on the instance (IC01–IC06). */
+    const instanceName = q.get("instance");
+    if (instanceName) {
+      void (async () => {
+        const comp = await c.components.createComponent(instanceName, el.getId());
+        const id = comp ? await c.components.instantiateComponent(comp.id, page.root.id) : null;
+        const inst = id ? c.elements.getElement(id) : null;
+        if (!inst) return;
+        const overrides = q.get("overrides");
+        if (overrides) {
+          const styles = JSON.parse(overrides) as Record<string, string>;
+          inst.setStyles(styles);
+          /* Recorded as the instance's overrides too, as an Inspector edit
+             on an instance records them (Reset counts these — IC02). */
+          for (const [prop, value] of Object.entries(styles)) c.components.recordInstanceOverride(inst.getId(), "style", prop, value);
+        }
+        c.selection.select(inst);
+      })();
+    }
+    /* `?child=input&childAttrs={"type":"email"}` — select the block's first
+       descendant with that tag (and those attributes) instead (F03). */
+    const childTag = q.get("child");
+    const childAttrs = JSON.parse(q.get("childAttrs") ?? "{}") as Record<string, string>;
+    const child = childTag
+      ? el.getDescendants().find((d) => d.getTagName().toLowerCase() === childTag && Object.entries(childAttrs).every(([k, v]) => d.getAttribute(k) === v))
+      : undefined;
+    if (child) c.selection.select(child);
+    /* `?interactions=[{"trigger":"scroll-into-view","preset":"fadeIn","enabled":false}]`
+       — the element's interactions (I21, I24). */
+    const interactionsQ = q.get("interactions");
+    if (interactionsQ)
+      el.setInteractions(
+        (JSON.parse(interactionsQ) as Array<{ trigger: string; preset?: string; enabled?: boolean; target?: string }>).map((it, i) => ({
+          id: `probe-interaction-${i}`,
+          trigger: it.trigger,
+          animation: { preset: it.preset ?? "fadeIn", duration: 600, delay: 0, easing: "power2.out", ...(it.target ? { target: it.target } : {}) },
+          enabled: it.enabled !== false,
+        })),
+      );
+    /* `?loading=1&siteName=…` — the project still arriving (S01). */
+    if (q.get("siteName")) c.updateProjectMetadata({ name: q.get("siteName") ?? "" });
+    if (q.get("loading")) c.setProjectLoading(true);
+    /* `?loadFailed=network` — the load gave up for that reason, a retry
+       published that never lands (S02). */
+    const loadFailed = q.get("loadFailed");
+    if (loadFailed) {
+      c.setEditLock("not-loaded", true);
+      setSiteLoadStatus({
+        failure: { kind: loadFailed as "network", status: null, code: null, requestId: null, url: null },
+        retry: () => new Promise<boolean>(() => {}),
+      });
+    }
+    /* `?batch=1` — B01: the element (a heading), a second heading at another
+       size and a locked image, all three selected. */
+    if (q.get("batch")) {
+      el.setStyle("font-size", "48px");
+      const h2 = c.elements.createElement("heading" as never, { content: "Heading 2" } as never);
+      c.elements.addElement(h2, page.root.id);
+      c.elements.getElement(h2.getId())?.setStyle("font-size", "32px");
+      const img = c.elements.createElement("image" as never, {} as never);
+      c.elements.addElement(img, page.root.id);
+      c.elements.getElement(img.getId())?.setLocked(true);
+      c.selection.selectMultiple([el, h2, img].map((e) => c.elements.getElement(e.getId())!).filter(Boolean));
+    }
+    /* `?page=1` — nothing selected: the Inspector's page panel (board 21,
+       P28). `?pageName=About` renames the page. */
+    /* `?template=Studio` — a template applied just now (S07's notice). */
+    const templateQ = q.get("template");
+    if (templateQ) localStorage.setItem("buildrick-last-applied-template", JSON.stringify({ name: templateQ, ts: Date.now() }));
+    const pageOnly = !!q.get("page");
+    /* `&unsavedLink=1` — this page's collection link is not saved (A-26, 187:22071). */
+    if (q.get("unsavedLink"))
+      unsavedCollectionLinks.set({ collectionId: "team", collectionName: "Team", pageId: page.id, name: "Team profile", file: "team-profile.html", pattern: "{slug}" });
+    const pageName = q.get("pageName");
+    if (pageName) c.elements.updatePage(page.id, { name: pageName });
+    function Host() {
+      const { selectedElement } = useComposerSelection({ composer: c });
+      if (pageOnly) return <ProInspector composer={c} currentBreakpoint={bp} selectedElement={null} />;
+      const sel = selectedElement ?? el;
+      /* `?mediaPick={"src":…,"name":…,"mimeType":…}` — the media drawer's pick
+         answers with this asset (S34: an image chosen for an inline SVG). */
+      const mediaPick = q.get("mediaPick");
+      return (
+        <ProInspector
+          composer={c}
+          currentBreakpoint={bp}
+          selectedElement={{ id: sel.getId(), type: sel.getType(), tagName: sel.getTagName() }}
+          onOpenMediaLibrary={mediaPick ? (_types, onSelect) => onSelect(JSON.parse(mediaPick) as never) : undefined}
+        />
+      );
+    }
+    return (
+      <ToastProvider>
+        {/* `?shell=1` — the panel in the shell's right column (`.layout-shell__inspector`
+            at the 1440 frame's right edge), for popovers placed `beside` it (I20). */}
+        <div
+          className={q.get("shell") ? "layout-shell__inspector" : undefined}
+          style={q.get("shell") ? { position: "fixed", top: 0, right: 0, width: 300, height: 860, transform: "none" } : undefined}
+        >
+          <div data-probe="inspector-panel" className="tw:flex tw:h-[860px] tw:w-[300px] tw:flex-col tw:bg-white">
+            <Host />
+          </div>
+        </div>
+      </ToastProvider>
+    );
+  },
   // ── Layers states (boards 775:4130 / 781:4217 / 782:4260) ────────────────
   // Loading is the REAL path (composer null = editor boot), so the case mounts
   // the whole tab. Error/no-results need a throwing tree or a live search —
@@ -2131,7 +3500,7 @@ const CASES: Record<string, () => React.ReactElement> = {
   ),
   "layers-no-results": () => (
     <div data-probe="layers-no-results" style={{ width: 280, background: "#fff" }}>
-      <LayersNoResults search="hero" onSearchEverywhere={() => {}} />
+      <LayersNoResults search="hero" onClear={() => {}} />
     </div>
   ),
   // Insert board 138:198 — disabled row ("Soon" tag + reason tooltip, no
@@ -2151,8 +3520,135 @@ const CASES: Record<string, () => React.ReactElement> = {
   ),
   /* Layers drawer, boards 142:2 / 143:2 / 143:295 / 1082:4589 / 1171:4829.
      One case per state because the state is engine state, not a click. */
+  /* design-2l9 152:79448 / 147:79728 — the 5,000-layer fixture in a
+     1440 × 600 window's drawer (the recipe sets the height; 147:79728 types
+     "Text" into the search). */
+  "layers-5000": () => (
+    <div data-probe="layers-5000">
+      <ToastProvider>
+        <div className="tw:flex tw:w-70 tw:flex-col tw:overflow-hidden tw:bg-white" style={{ height: "100vh" }}>
+          <LayersTab composer={layers5000Composer()} onClose={() => {}} />
+        </div>
+      </ToastProvider>
+    </div>
+  ),
+  /* design-2l9 101:42581 — the empty canvas CTA inside a 760×580 page card
+     (owner 2026-10-30 keeps its cards and actions). */
+  /* A-12 / board 145:64586 — "Show outlines" on the canvas container: the
+     real class and attribute names, three nested elements. */
+  "canvas-outlines": () => (
+    <div data-probe="canvas-outlines" style={{ width: 400, height: 240, background: "#fff" }}>
+      <div className="buildrick-canvas" data-outlines="true" style={{ position: "relative", padding: 24 }}>
+        <section data-buildrick-id="o1" data-testid="outline-section" style={{ padding: 16 }}>
+          <h2 data-buildrick-id="o2" style={{ margin: 0 }}>Thoughtful design.</h2>
+          <p data-buildrick-id="o3" style={{ margin: "8px 0 0" }}>Lasting impact.</p>
+        </section>
+      </div>
+    </div>
+  ),
+  /* design-2l9 TX02 / TX10 (423:97218): the inline text toolbar over a
+     heading being edited. */
+  "canvas-text-toolbar": () => (
+    <div data-probe="canvas-text-toolbar" style={{ width: 760, padding: 24, background: "#fff" }}>
+      <RichTextEditor onCommand={() => {}} blockTag="h1" />
+      <h1 style={{ margin: "16px 0 0", font: "600 32px/1.2 var(--bk-font-ui)" }}>Thoughtful design. Real impact.</h1>
+    </div>
+  ),
+  /* design-2l9 122:44151 … 126:36751 — the leave dialog for a page picked
+     over a CMS record, one phase per `?phase=` (RecordSheet drives it from
+     the real save; here each phase is drawn on its own to compare). */
+  "cms-leave-dialog": () => {
+    const phase = (new URLSearchParams(location.search).get("phase") ?? "ask") as RecordLeavePhase;
+    return (
+      <div data-probe="cms-leave-dialog" style={{ width: 1440, height: 900 }}>
+        <RecordLeaveDialog
+          phase={phase}
+          recordLabel="Blog record “Studio launch”"
+          collectionName="Blog"
+          /* ?to=Dynamic pages: the record → tab guards (168:21848 …). */
+          to={new URLSearchParams(location.search).get("to") ?? "About"}
+          current="Home"
+          canSave
+          onKeepEditing={() => {}}
+          onDiscard={() => {}}
+          onSaveAndLeave={() => {}}
+          onRetry={() => {}}
+        />
+      </div>
+    );
+  },
+  "canvas-empty": () => (
+    <div data-probe="canvas-empty" style={{ position: "relative", width: 760, height: 580, background: "#fff" }}>
+      <CanvasEmptyCTA onBrowseTemplates={() => {}} onAddBlock={() => {}} onStartBlank={() => {}} />
+    </div>
+  ),
+  /* design-2l9 101:42581 — Layers on an empty page ("Services"). */
+  "layers-empty": () => {
+    const c = new Composer({} as never);
+    const page = c.elements.createPage("Services", { slug: "services" } as never);
+    c.elements.setActivePage(page.id);
+    return (
+      <div data-probe="layers-empty">
+        <ToastProvider>
+          <div className="tw:flex tw:h-[812px] tw:w-70 tw:flex-col tw:overflow-hidden tw:bg-white">
+            <LayersTab composer={c} onClose={() => {}} />
+          </div>
+        </ToastProvider>
+      </div>
+    );
+  },
+  /* 2L9 R03 (247:31533): the one Manage site fonts dialog, one font added. */
+  "site-fonts": () => <SiteFontsProbe />,
+  "inspector-color-sources": () => <ColorSourcesProbe />,
+  "animation-screen": () => <AnimationScreenProbe />,
   "layers-tree": () => (
     <div data-probe="layers-tree"><LayersProbe /></div>
+  ),
+  /* 147:78900 end to end: the real Layers tab and the Inspector on one
+     composer, with stand-in canvas nodes for Layers' data-hidden to land on.
+     Dim lx-heading with its eye; the Inspector's "Show normally" un-dims it
+     through Layers (B-20). */
+  "layers-dimmed-inspector": () => {
+    const c = layersComposer();
+    for (const el of c.elements.getAllElements()) {
+      if (document.querySelector(`[data-buildrick-id="${el.getId()}"]`)) continue;
+      const node = document.createElement("div");
+      node.setAttribute("data-buildrick-id", el.getId());
+      node.style.cssText = "position:absolute;left:-9999px;";
+      document.body.appendChild(node);
+    }
+    function Host() {
+      const { selectedElement } = useComposerSelection({ composer: c });
+      React.useEffect(() => {
+        /* `&lock=lx-section&select=lx-heading` — an inherited lock (147:77668). */
+        const q = new URLSearchParams(location.search);
+        const lock = q.get("lock");
+        if (lock) c.elements.getElement(lock)?.setLocked(true);
+        /* `&select=a,b,c` — a multi-selection (B04's Align and distribute). */
+        const picked = (q.get("select") ?? "lx-heading").split(",").map((id) => c.elements.getElement(id)).filter((e): e is NonNullable<typeof e> => Boolean(e));
+        if (picked.length > 1) c.selection.selectMultiple(picked);
+        else if (picked[0]) c.selection.select(picked[0]);
+      }, []);
+      const sel = selectedElement;
+      return sel ? <ProInspector composer={c} selectedElement={{ id: sel.getId(), type: sel.getType(), tagName: sel.getTagName() }} /> : null;
+    }
+    return (
+      <ToastProvider>
+        <div data-probe="layers-dimmed-inspector" className="tw:flex tw:gap-4">
+          <div className="tw:flex tw:h-[812px] tw:w-70 tw:flex-col tw:overflow-hidden tw:bg-white">
+            <LayersTab composer={c} onClose={() => {}} />
+          </div>
+          <div data-probe="inspector-panel" className="tw:flex tw:h-[812px] tw:w-[300px] tw:flex-col tw:bg-white">
+            <Host />
+          </div>
+        </div>
+      </ToastProvider>
+    );
+  },
+  "layers-collapsed-selection": () => (
+    <div data-probe="layers-collapsed-selection">
+      <LayersProbe select={["lx-heading"]} collapse />
+    </div>
   ),
   "layers-multi-select": () => (
     <div data-probe="layers-multi-select">
@@ -2172,20 +3668,30 @@ const CASES: Record<string, () => React.ReactElement> = {
       </ToastProvider>
     </div>
   ),
+  /* design-2l9 7:19448 — the same panel after "Text" landed in Hero: the
+     receipt the insert hook hands an open Add panel. */
+  "add-panel-receipt": () => <AddReceiptProbe />,
+  "add-panel-cms": () => <AddPanelCmsHost />,
+  "link-row-record": () => <LinkRowRecordHost />,
+  /* Add panel with a target, board 7:18981: a real Composer with "Hero"
+     selected, so the insert-target strip reads "Insert into Hero". */
+  "add-panel-target": () => (
+    <div data-probe="add-panel-target">
+      <ToastProvider>
+        <div className="tw:flex tw:h-[812px] tw:w-70 tw:flex-col tw:overflow-hidden tw:bg-white">
+          <BuildTab composer={addTargetComposer()} onExpandToggle={() => {}} onClose={() => {}} />
+        </div>
+      </ToastProvider>
+    </div>
+  ),
   // ── Components · library (board 641:2546) ────────────────────────────────
-  // onExpandToggle + onClose are what put the panel in `isStandaloneMode`, and
-  // therefore what draws the 44h header the board opens with; onHelpClick is
-  // left off because the board's header carries exactly two 16px controls.
+  // 2L9 215:43588: Components is a resource area — beside the 56px rail,
+  // between the 56px topbar and the 32px bottom bar (1384×812).
   "components-library": () => (
     <div data-probe="components-library">
       <ToastProvider>
-        <div className="tw:flex tw:h-203 tw:w-70 tw:flex-col tw:overflow-hidden tw:bg-white">
-          <ComponentsTab
-            composer={COMPONENTS_COMPOSER}
-            onCreateNew={() => {}}
-            onExpandToggle={() => {}}
-            onClose={() => {}}
-          />
+        <div className="tw:flex tw:h-[812px] tw:w-[1384px] tw:flex-col tw:overflow-hidden tw:bg-white">
+          <ComponentsTab composer={COMPONENTS_COMPOSER} onClose={() => {}} />
         </div>
       </ToastProvider>
     </div>
@@ -2199,7 +3705,6 @@ const CASES: Record<string, () => React.ReactElement> = {
               component={DETACH_COMPONENT}
               composer={DETACH_COMPOSER}
               onBack={() => {}}
-              selectedElementId="el-1"
             />
           </AutoOpen>
         </DSModeProvider>,
@@ -2470,6 +3975,72 @@ const CASES: Record<string, () => React.ReactElement> = {
   // and boards.json's 2026-08-31 walk of the sibling board (164:2) confirms
   // 360 against the live app. The filter is internal state cycled by its own
   // control, so the recipe clicks it rather than the fixture pre-setting it.
+  /* 2L9 B5-T01…T19 (167:3871…167:8747) — Add field over a collection. Drive
+     it from the type list (cms-add-field-type-<t>); `&fail=1` makes the save
+     refuse (T19), otherwise the save never settles (T18 "Saving…"). */
+  "cms-add-field": () => {
+    const fail = new URLSearchParams(location.search).get("fail") === "1";
+    return (
+      <div data-probe="cms-add-field" className="tw:fixed tw:inset-0 tw:bg-[var(--bk-bg-app)]">
+        <AddFieldDialog
+          collection={CMS_STATUS_COLLECTION}
+          collections={[CMS_STATUS_COLLECTION]}
+          onClose={() => {}}
+          onAdd={() => (fail ? Promise.reject(new Error("offline")) : new Promise<void>(() => {}))}
+          onOpenMediaLibrary={(_types, onSelect) => onSelect({ src: "https://cdn.example/media/portrait.jpg" } as never)}
+        />
+      </div>
+    );
+  },
+  /* 2L9 B8-IS01 236:9417 / Play F4.01 303:32296 — cards: a blocker (element),
+     an element tip, and two server checks with no element. `?clear=1`: no
+     blocker (F4.05 303:34252, Review and publish). */
+  "issues-cards": () => {
+    const clear = new URLSearchParams(location.search).get("clear") === "1";
+    const rows: Issue[] = [
+      ...(clear ? [] : [{ id: "cms:list-no-source:l1", type: "error" as const, message: "Collection list has no source", location: "Home › Journal section", elementId: "l1", pageId: "home" }]),
+      { id: "content:alt:i1", type: "warning", message: "Image is missing alt text", location: "Home › Hero", elementId: "i1", pageId: "home", contentKind: "missing-alt" },
+      /* Play C02 (353:24569): a second image groups the two into one card. */
+      { id: "content:alt:i2", type: "warning", message: "Image is missing alt text", location: "Home › Team", elementId: "i2", pageId: "home", contentKind: "missing-alt" },
+      { id: "publish-check:Favicon", type: "warning", message: "No favicon set. Browsers will show a default icon." },
+      { id: "publish-check:SEO configured", type: "warning", message: "No meta title template set." },
+    ];
+    return (
+      <div data-probe="issues-cards" className="tw:h-203 tw:w-[300px] tw:bg-white">
+        <IssuesPanel issues={rows} activePageId="home" onClose={() => {}} onSelectElement={() => {}} onFix={async () => null} />
+      </div>
+    );
+  },
+  /* 257:51318 / 257:51906 / 257:52092 / 257:52512 — Change Reading time type
+     over 20 stored numbers. Click Convert / Clear: `&apply=hang` holds the
+     write open (pending), `&apply=fail` refuses it. */
+  "cms-type-change": () => {
+    const apply = new URLSearchParams(location.search).get("apply");
+    const titles = ["Intro to grids", "Design systems", "Client handoff", "Accessible forms", "Responsive layouts"];
+    const records = Array.from({ length: 20 }, (_, i) => ({
+      id: `r${i}`, collectionId: "blog", status: "published", createdAt: "", updatedAt: "",
+      data: { title: titles[i] ?? `Post ${i + 1}`, reading: [5, 8, 4, 10, 6][i] ?? 3 },
+    }));
+    return (
+      <ToastProvider>
+        <TypeChangeDialog
+          collection={{ id: "blog", name: "Blog", slug: "blog", displayField: "title", fields: [{ id: "f-title", name: "Title", slug: "title", type: "text", order: 0 }] } as never}
+          field={{ id: "f-rt", name: "Reading time", slug: "reading", type: "number", order: 1 } as never}
+          to={"text" as never}
+          records={records as never}
+          usedBy={0}
+          onClose={() => {}}
+          onApply={() => (apply === "fail" ? Promise.reject(new Error("refused")) : new Promise(() => {}))}
+        />
+      </ToastProvider>
+    );
+  },
+  /* 263:250083 / 263:250988 — the ⌘K palette over the Layers composer. */
+  "command-palette": () => (
+    <ToastProvider>
+      <CommandPalette composer={layersComposer()} onClose={() => {}} reviewsEnabled />
+    </ToastProvider>
+  ),
   "issues-filtered": () => (
     <div data-probe="issues-filtered" className="tw:h-203 tw:w-90 tw:bg-white">
       <IssuesPanel
@@ -2619,6 +4190,12 @@ const CASES: Record<string, () => React.ReactElement> = {
       {pagesPanel({ pages: [], loadError: "sync failed", onRetry: () => {} })}
     </div>
   ),
+  /* design-2l9 139:53653 — three pages ticked in a 512-tall drawer (1440 × 600). */
+  "pages-bulk-short": () => (
+    <div data-probe="pages-bulk-short" style={{ width: 284, height: "100vh", display: "flex", flexDirection: "column" }}>
+      {pagesPanel({ selectedIds: new Set(["home", "menu", "contact"]) })}
+    </div>
+  ),
   "pages-bulk-select": () => (
     <div data-probe="pages-bulk-select">
       {pagesPanel({ selectedIds: new Set(["home", "menu", "contact"]) })}
@@ -2632,6 +4209,96 @@ const CASES: Record<string, () => React.ReactElement> = {
      measure.mjs refuses. The 812 host is the board's own frame — the
      Add-page foot pins to the bottom, so without a stated height it would be
      measured wherever the content happened to end. */
+  /* design-2l9 board 63:6393 — the manager's list as the board draws it:
+     root pages (Home open, Contact hidden), My folders with Studio › Legal,
+     a Collection pages card, the two-row footer. 284 wide like the board. */
+  "pages-manager": () => (
+    <div data-probe="pages-manager" style={{ width: 284, height: 812 }}>
+      {pagesPanel({
+        pages: [
+          PAGE("home", "Home", { isHome: true, isActive: true }),
+          PAGE("about", "About"),
+          PAGE("work", "Work"),
+          PAGE("contact", "Contact", { status: "hidden" }),
+          PAGE("legal", "Legal"),
+        ],
+        folders: [{ id: "studio", name: "Studio", pageIds: ["legal"], collapsed: false }],
+        pageToFolder: new Map([["legal", "studio"]]),
+        collectionPages: [{ id: "blog", name: "Blog post", pattern: "/blog/{slug}", count: 20, templatePageId: "home" }],
+        onOpenTemplatePage: () => {},
+        onManageCollection: () => {},
+        onRequestTemplates: () => {},
+      })}
+    </div>
+  ),
+  /* design-2l9 board 63:20585 — About deleted, then brought back, after
+     mount, so PagesTab sees the page leave and return. */
+  "pages-restored": () => <RestoredProbe />,
+  /* design-2l9 boards 94:15802 / 94:18181 — the 100-page fixture (long names
+     and URLs truncate); the recipe sets the viewport height. */
+  "pages-hundred": () => (
+    <div data-probe="pages-hundred" style={{ width: 284, height: "100vh", display: "flex" }}>
+      <ToastProvider>
+        <PagesTab composer={hundredComposer()} onClose={() => {}} onRequestTemplates={() => {}} />
+      </ToastProvider>
+    </div>
+  ),
+  /* The editor's shell around one drawer — the real LayoutShell + LeftSidebar
+     at the probe's viewport, `?tab=` picking the drawer (pages, layers,
+     build, media). For drawer header / search / width checks against the
+     boards (REQUESTS A-19), including at 1024. */
+  "pages-shell": () => <ShellProbe />,
+  /* A-21 page trash, opened from ⋯ › Recently deleted (boards 142:53229 …). */
+  "pages-trash": () => <TrashProbe />,
+  /* design-2l9 board 63:6393 — the whole Pages manager (header, search, view
+     tabs, list, footer): the real PagesTab, 284 wide like the board. */
+  "pages-tab": () => (
+    <div data-probe="pages-tab" style={{ width: 284, height: 812, display: "flex" }}>
+      <ToastProvider>
+        <PagesTab composer={listingsComposer()} onClose={() => {}} onRequestTemplates={() => {}} />
+      </ToastProvider>
+    </div>
+  ),
+  /* design-2l9 63:15255 — the manager on a published site (Update URL on a
+     live page asks first). */
+  "pages-live-site": () => {
+    const c = listingsComposer();
+    c.updateProjectMetadata({ publishedUrl: "https://fieldwork.studio" } as never);
+    return (
+      <div data-probe="pages-live-site" style={{ width: 1440, height: 900, display: "flex" }}>
+        <div style={{ width: 284, display: "flex" }}>
+          <ToastProvider>
+            <PagesTab composer={c} onClose={() => {}} onRequestTemplates={() => {}} />
+          </ToastProvider>
+        </div>
+      </div>
+    );
+  },
+  /* design-2l9 94:13447 — the same manager with About open. */
+  "pages-about-active": () => {
+    const c = listingsComposer();
+    const about = c.elements.getAllPages().find((p) => p.name === "About");
+    if (about) c.elements.setActivePage(about.id);
+    return (
+      <div data-probe="pages-about-active" style={{ width: 284, height: 812, display: "flex" }}>
+        <ToastProvider>
+          <PagesTab composer={c} onClose={() => {}} onRequestTemplates={() => {}} />
+        </ToastProvider>
+      </div>
+    );
+  },
+  /* design-2l9 board 63:21262 — the manager's Listings view, 720 wide as the
+     board draws it, on a real Composer (the recipe clicks the Listings tab). */
+  "pages-listings": () => (
+    <div data-probe="pages-listings" style={{ width: 720, height: 812, display: "flex" }}>
+      <ToastProvider>
+        <PagesTab composer={listingsComposer()} onClose={() => {}} />
+      </ToastProvider>
+    </div>
+  ),
+  /* design-2l9 board 101:29978 — New page, From template chosen. The modal
+     opens on UI_NEW_PAGE_REQUESTED; the fixture composer fires it on mount. */
+  "new-page-dialog": () => <NewPageProbe />,
   "pages-panel": () => (
     <div data-probe="pages-panel" style={{ width: 280, height: 812 }}>
       {/* One folder, because board 141:40 draws a result that names its owning
@@ -2674,16 +4341,41 @@ const CASES: Record<string, () => React.ReactElement> = {
         onCancel={() => {}}
         onConfirm={() => {}}
       />
-      <CreatePageSuccessModal pageName="Menu 2" onClose={() => {}} onOpenPageSettings={() => {}} />
       <CreatePageErrorModal onCancel={() => {}} onRetry={() => {}} />
     </div>
   ),
-  // ── Page tab bar (board 435:2348) ────────────────────────────────────────
-  "pages-page-tab-bar": () => (
-    <div data-probe="pages-page-tab-bar">
+  /* C-17 (222:43842 / 223:44891): Templates in the resource area — the real
+     FullPageRouter mount in the slot between the rail (56) and the bottom
+     bar (868), under the topbar (56). */
+  "templates-resource-area": () => (
+    <div data-probe="templates-resource-area" ref={() => templateTrashStub(new URLSearchParams(location.search).get("tplTrash"))}>
       <ToastProvider>
-        <PageTabBar composer={tabBarStub()} />
+        <div style={{ position: "fixed", inset: "0 0 auto 0", height: 56, background: "white", borderBottom: "1px solid var(--bk-border)" }} />
+        <div style={{ position: "fixed", left: 0, top: 56, width: 56, bottom: 32, borderRight: "1px solid var(--bk-border)" }} />
+        <div style={{ position: "fixed", left: 56, top: 56, right: 0, bottom: 32, display: "flex" }}>
+          <React.Suspense fallback={null}>
+            <FullPageRouter
+              activeTab="templates"
+              composer={layersComposer()}
+              commonTabProps={{ onClose: () => {} }}
+              /* ?page= — the visit came from New page (104:28892). */
+              templatesOpen={new URLSearchParams(location.search).get("page") ? { newPageName: new URLSearchParams(location.search).get("page")!, addToNavigation: true } : undefined}
+            />
+          </React.Suspense>
+        </div>
+        <div style={{ position: "fixed", left: 0, right: 0, bottom: 0, height: 32, borderTop: "1px solid var(--bk-border)" }} />
       </ToastProvider>
+    </div>
+  ),
+  // ── Page switcher (2L9 Shell/BottomBar 497:99485, menu 558:4419) ──────────
+  "page-switcher": () => (
+    <div data-probe="page-switcher">
+      <PageSwitcherProbe />
+    </div>
+  ),
+  "bottom-bar": () => (
+    <div data-probe="bottom-bar">
+      <BottomBarProbe />
     </div>
   ),
   // ── Publish states (boards 784:4250 / 781:4489) ──────────────────────────
@@ -2805,9 +4497,6 @@ const CASES: Record<string, () => React.ReactElement> = {
             <Topbar
               siteName="Bella Cucina"
               onExit={() => {}}
-              save="saved"
-              savedAt={Date.now() - 2 * 60_000}
-              onSaveClick={() => {}}
               review={
                 state === "approved"
                   ? { label: "Approved", tone: "success", title: "Approved by Sara Whitfield · 2h ago", onClick: () => {} }
@@ -2819,6 +4508,138 @@ const CASES: Record<string, () => React.ReactElement> = {
         );
       },
     ]),
+  ),
+
+  /* design-2l9 board 497:99433 (Task 1.2): the whole topbar at the page's
+     width, carrying the longest review label and a site name long enough to
+     have to give way. Pinned at 1024 / 1280 / 1440; at 1024 the review
+     control and ⋯ must sit inside the bar with nothing wrapped. */
+  /* design-2l9 Task 1.7 — the publish tray, docked at the right edge of a
+     1440×900 frame the way board 499:2656 draws it (Task host / Publish,
+     360 × 812 under the 56 topbar). States: one blocking issue (B8-PB01),
+     a landed publish (B8-PB09) and a failed deploy with its ids (B8-PB10). */
+  "publish-tray-blocking": () => publishTrayFrame("publish-tray-blocking", {
+    nextMove: deriveLifecycleState({ ...TRAY_LIFE, errorCount: 1 }),
+    issues: [
+      { id: "i1", type: "error", message: "Collection list “Latest posts” has no source", elementId: "el-1" },
+      { id: "i2", type: "warning", message: "2 images have no alt text", elementId: "el-2" },
+    ],
+  }),
+  "publish-tray-success": () => publishTrayFrame("publish-tray-success", {
+    nextMove: null,
+    job: { uiState: "published", jobId: "cmv8job000001" },
+    server: { "sites.publishHistory": TRAY_ROWS },
+  }),
+  /* Round 24 (B8-PB01/02/07/08/12/14/15/19/23). Pair with `&siteId=s1` so
+     the server answers below are read. */
+  "publish-tray-ready": () => publishTrayFrame("publish-tray-ready", {
+    nextMove: deriveLifecycleState({ ...TRAY_LIFE, reviewsEnabled: true, editsRequireApproval: true, reviewState: "approved" }),
+    issues: [{ id: "i2", type: "warning", message: "2 images have no alt text", elementId: "el-2" }],
+    server: {
+      "sites.publishHistory": TRAY_ROWS.slice(1),
+      "sites.prePublishChecks": TRAY_CHECKS,
+      "reviews.currentRound": { id: "r1", status: "APPROVED", invitedEmail: "lena@client.test", reviewerName: "Lena", revoked: false, resolvedAt: "2026-10-15T10:00:00.000Z", createdAt: "2026-10-14T10:00:00.000Z", revision: "x", roundNumber: 1, totalRounds: 1, openCommentCount: 0, token: null },
+    },
+  }),
+  "publish-tray-blocking-server": () => publishTrayFrame("publish-tray-blocking-server", {
+    nextMove: deriveLifecycleState({ ...TRAY_LIFE, errorCount: 1 }),
+    issues: [
+      { id: "i1", type: "error", message: "Collection list “Latest posts” has no source", elementId: "el-1" },
+      { id: "i2", type: "warning", message: "2 images have no alt text", elementId: "el-2" },
+    ],
+    server: { "sites.publishHistory": TRAY_ROWS.slice(1), "sites.prePublishChecks": TRAY_CHECKS },
+  }),
+  "publish-tray-running": () => publishTrayFrame("publish-tray-running", {
+    nextMove: deriveLifecycleState(TRAY_LIFE),
+    server: { "sites.publishHistory": TRAY_ROWS.slice(1) },
+    job: {
+      uiState: "publishing",
+      jobId: "cmv8job000003",
+      progress: 50,
+      steps: buildPublishSteps(2),
+      startedAt: new Date(Date.now() - 42_000).toISOString(),
+    },
+  }),
+  "publish-tray-queued": () => publishTrayFrame("publish-tray-queued", {
+    nextMove: deriveLifecycleState(TRAY_LIFE),
+    server: { "sites.publishHistory": TRAY_ROWS.slice(1) },
+    job: { uiState: "publishing", jobId: "cmv8job000004", progress: 0, steps: buildPublishSteps(-1), startedAt: new Date(Date.now() - 42_000).toISOString() },
+  }),
+  "publish-tray-lost": () => publishTrayFrame("publish-tray-lost", {
+    nextMove: deriveLifecycleState(TRAY_LIFE),
+    server: { "sites.publishHistory": TRAY_ROWS.slice(1) },
+    job: { uiState: "failed", jobId: "cmv8job000005", pollLost: true, error: "Failed to poll publish status" },
+  }),
+  "publish-tray-simulated": () => publishTrayFrame("publish-tray-simulated", {
+    nextMove: null,
+    server: { "sites.publishHistory": TRAY_ROWS.slice(1) },
+    job: { uiState: "published", jobId: "cmv8job000006", publishedUrl: "https://s1.dev-simulated.invalid" },
+  }),
+  "publish-tray-changes-requested": () => publishTrayFrame("publish-tray-changes-requested", {
+    nextMove: deriveLifecycleState({ ...TRAY_LIFE, reviewsEnabled: true, editsRequireApproval: true, reviewState: "changes-requested", reviewerName: "Lena" }),
+    server: {
+      "sites.publishHistory": TRAY_ROWS.slice(1),
+      "reviews.currentRound": { id: "r1", status: "CHANGES_REQUESTED", invitedEmail: "lena@client.test", reviewerName: "Lena", revoked: false, resolvedAt: null, createdAt: "2026-10-14T10:00:00.000Z", revision: "x", roundNumber: 1, totalRounds: 1, openCommentCount: 2, token: null },
+    },
+  }),
+  "publish-tray-viewer": () => publishTrayFrame("publish-tray-viewer", {
+    nextMove: deriveLifecycleState({ ...TRAY_LIFE, isViewer: true }),
+    server: { "sites.publishHistory": TRAY_ROWS.slice(1) },
+  }),
+  /* A-36 B8-PB16 233:8594 / A-34 B8-PB22 233:11934 — the plan's refusals. */
+  "publish-tray-password": () => publishTrayFrame("publish-tray-password", {
+    nextMove: deriveLifecycleState({ ...TRAY_LIFE, errorCount: 1 }),
+    server: {
+      "sites.publishHistory": TRAY_ROWS.slice(1),
+      "sites.prePublishChecks": { ready: false, checks: [{ label: "Password protection", status: "fail", detail: "This site is password protected. On Free the protection is removed and the site becomes public." }] },
+    },
+  }),
+  "publish-tray-plan-limit": () => publishTrayFrame("publish-tray-plan-limit", {
+    nextMove: deriveLifecycleState({ ...TRAY_LIFE, errorCount: 1 }),
+    server: {
+      "sites.publishHistory": TRAY_ROWS.slice(1),
+      "sites.prePublishChecks": { ready: false, checks: [{ label: "Plan limit", status: "fail", detail: "Over the Free limit — Upgrade to publish" }] },
+    },
+  }),
+  "publish-tray-checking": () => publishTrayFrame("publish-tray-checking", {
+    nextMove: deriveLifecycleState(TRAY_LIFE),
+    server: { "sites.publishHistory": TRAY_ROWS.slice(1) },
+    hang: ["sites.prePublishChecks"],
+  }),
+  "publish-tray-failed": () => publishTrayFrame("publish-tray-failed", {
+    nextMove: deriveLifecycleState(TRAY_LIFE),
+    server: { "sites.publishHistory": TRAY_ROWS.slice(1) },
+    job: {
+      uiState: "failed",
+      jobId: "cmv8job000002",
+      deploymentId: "dpl_7Hq2mXc9",
+      error: "Vercel couldn't finish the deployment (timeout).",
+    },
+  }),
+
+  "topbar-shell": () => (
+    <div data-probe="topbar-shell" style={{ width: "100vw" }}>
+      <Topbar
+        siteName="Fieldwork Studio"
+        onOpenSiteSettings={() => {}}
+        onExit={() => {}}
+        history={{ canUndo: true, canRedo: false, onUndo: () => {}, onRedo: () => {}, undoChord: "⌘Z", redoChord: "⇧⌘Z" }}
+        review={{ label: "In review · 2 open", tone: "info", title: "Sent to Sara — waiting on approval", onClick: () => {} }}
+        tools={{ onPreview: () => {}, onToggleComments: () => {}, commentsPressed: false }}
+        unreadCount={0}
+        onOpenNotifications={() => {}}
+        onPublish={() => {}}
+        /* `&publish=failed|running`: B8-PB10's red toggle, B8-PB07's run label. */
+        publish={new URLSearchParams(location.search).get("publish") === "failed" ? "failed" : "ready"}
+        publishExpanded={false}
+        ctaLabel={new URLSearchParams(location.search).get("publish") === "running" ? "Publishing 2/3…" : undefined}
+        menu={
+          <IconButton label="Site menu" data-testid="topbar-site-menu">
+            <SiteMenuIcon />
+          </IconButton>
+        }
+      />
+    </div>
   ),
 
   "notifications-jump-target-deleted": () => {
@@ -2877,12 +4698,23 @@ const CASES: Record<string, () => React.ReactElement> = {
   // state a slow compare actually shows — and the two things this recipe
   // measures, the title and the body gutter, render before and regardless of
   // it. The change rows are NOT measured here; see the recipe's own note.
+  /* B8-PB05 233:2418 / PB06 233:3034 — the numbered confirm in its stale
+     form (StaleApprovalModal is gone, A-31). `&role=ADMIN|EDITOR`; the round
+     was approved, then edited (the approved snapshot differs on one page). */
   "s5-6-approved-edited-since": () => {
-    trpcStub({ "reviews.currentRound": () => REVIEW_ROUND(), "sites.myRole": () => "OWNER" });
+    const role = new URLSearchParams(location.search).get("role") ?? "ADMIN";
+    stubTrayServer({
+      "reviews.currentRound": { id: "r1", status: "APPROVED", invitedEmail: "lena@client.test", reviewerName: "Lena", revoked: false, resolvedAt: "2026-10-15T10:00:00.000Z", createdAt: "2026-10-14T10:00:00.000Z", revision: "x", roundNumber: 1, totalRounds: 1, openCommentCount: 0, token: null },
+      "reviews.approvedSnapshot": [{ path: "index.html", html: "<p>old</p>" }],
+      "sites.prePublishChecks": TRAY_CHECKS,
+      "sites.myRole": { role },
+    });
+    publishTray.setIssues([{ id: "i2", type: "warning", message: "2 images have no alt text", elementId: "el-2" }]);
+    saveStatusStore.set({ state: "saved", savedAt: new Date("2026-10-30T10:42:00").getTime() });
     return (
       <div data-probe="s5-6-approved-edited-since">
         <ToastProvider>
-          <StaleApprovalModal isOpen composer={null} onPublishAnyway={() => {}} onClose={() => {}} />
+          <PublishConfirmModal isOpen stale composer={null} siteId="s1" publishedUrl="https://fieldwork.studio" isPublished onConfirm={() => {}} onClose={() => {}} />
         </ToastProvider>
       </div>
     );
@@ -2920,10 +4752,22 @@ const CASES: Record<string, () => React.ReactElement> = {
   // Neither state is reachable by clicking: both need a round, a client, and
   // comments — and the Detached group additionally needs the orphan
   // announcement only the canvas CommentLayer makes.
+  /* ?status=CHANGES_REQUESTED draws B8-R05's next-round foot. */
   "review-panel-detached-present": () => {
+    const status = new URLSearchParams(location.search).get("status");
+    const link = new URLSearchParams(location.search).get("link");
     trpcStub({
       "comments.list": () => REVIEW_COMMENTS,
-      "reviews.currentRound": () => REVIEW_ROUND(),
+      "reviews.currentRound": () =>
+        REVIEW_ROUND({
+          ...(status ? { status } : {}),
+          /* ?link=expired|live: B8-R02 / R01's link facts (G-10). */
+          ...(link === "expired"
+            ? { linkExpired: true, expiresAt: daysAgo(18), token: null }
+            : link === "live"
+              ? { linkExpired: false, expiresAt: new Date(Date.now() + 74 * 86_400_000).toISOString(), reviewerLastSeenAt: new Date(Date.now() - 2 * 3_600_000).toISOString() }
+              : {}),
+        }),
       "sites.myRole": () => "OWNER",
     });
     return reviewHost(
@@ -2936,6 +4780,8 @@ const CASES: Record<string, () => React.ReactElement> = {
       <ReviewTab
         composer={reviewComposerStub(["d1", "d2"])}
         onResend={async () => ({ inviteEmailSent: true })}
+        /* B8-R06: the ✕ is what asks before an unsent comment is dropped. */
+        onClose={() => undefined}
       />,
     );
   },
@@ -2971,6 +4817,28 @@ const CASES: Record<string, () => React.ReactElement> = {
       />
     </div>
   ),
+  /* B8-PB18 233:9714 — Unpublish, typed domain. */
+  "unpublish-confirm": () => (
+    <div data-probe="unpublish-confirm">
+      <UnpublishConfirmModal open siteName="Fieldwork Studio" domain="fieldwork.studio" onConfirm={() => {}} onClose={() => {}} />
+    </div>
+  ),
+  /* B8-PB04 233:1802 — the confirm with advice to acknowledge: the server's
+     two warnings (stubbed transport, `&siteId=s1`) and the site's own tip,
+     a save stamp, an approved round. Publish waits for the box. */
+  "publish-confirm-tips": () => {
+    stubTrayServer({
+      "sites.prePublishChecks": TRAY_CHECKS,
+      "reviews.currentRound": { id: "r1", status: "APPROVED", invitedEmail: "lena@client.test", reviewerName: "Lena", revoked: false, resolvedAt: "2026-10-15T10:00:00.000Z", createdAt: "2026-10-14T10:00:00.000Z", revision: "x", roundNumber: 1, totalRounds: 1, openCommentCount: 0, token: null },
+    });
+    publishTray.setIssues([{ id: "i2", type: "warning", message: "2 images have no alt text", elementId: "el-2" }]);
+    saveStatusStore.set({ state: "saved", savedAt: new Date("2026-10-30T10:42:00").getTime() });
+    return (
+      <div data-probe="publish-confirm-tips">
+        <PublishConfirmModal isOpen composer={null} siteId="s1" publishedUrl="https://fieldwork.studio" isPublished onConfirm={() => {}} onClose={() => {}} />
+      </div>
+    );
+  },
   /* Board 1171:4713 — the Pages panel with the row context menu open over it.
      PageContextMenu is a portal with a fixed position computed from the
      click, so the probe hands it the coordinates a right-click on the Menu
@@ -2993,6 +4861,38 @@ const CASES: Record<string, () => React.ReactElement> = {
         onCopyLink={() => {}}
         onSettings={() => {}}
         onRemoveFromFolder={() => {}}
+        onSaveAsTemplate={() => {}}
+        onMoveToFolder={() => {}}
+        onMove={() => {}}
+        rootPosition={{ index: 1, count: PAGES_FIXTURE.length }}
+      />
+    </div>
+  ),
+  /* design-2l9 boards 127:39528 / 134:44345 — the menu of a page inside a
+     folder (About in Client projects): no top-level position, so the order
+     pair is off and "Remove from Client projects" is offered. */
+  "pages-folder-menu": () => (
+    <div data-probe="pages-folder-menu" style={{ width: 280, height: 812 }}>
+      {pagesPanel()}
+      <PageContextMenu
+        pageId="about"
+        x={240}
+        y={170}
+        pages={PAGES_FIXTURE}
+        folderName="Client projects"
+        onClose={() => {}}
+        onRename={() => {}}
+        onDuplicate={() => {}}
+        onDelete={() => {}}
+        onSetHomepage={() => {}}
+        onReplaceLayout={() => {}}
+        onCopyLink={() => {}}
+        onSettings={() => {}}
+        onRemoveFromFolder={() => {}}
+        onSaveAsTemplate={() => {}}
+        onMoveToFolder={() => {}}
+        onMove={() => {}}
+        rootPosition={null}
       />
     </div>
   ),
@@ -3031,6 +4931,116 @@ const CASES: Record<string, () => React.ReactElement> = {
       ),
     ]),
   ),
+
+  /* design-2l9 board 127:38098 — the row menu's "Move to folder…" for About. */
+  "pages-move-one": () => (
+    <div data-probe="pages-move-one" style={{ width: 1440, height: 900 }}>
+      <MovePagesDialog
+        open
+        pageNames={["About"]}
+        folders={[
+          { id: "client", name: "Client projects", pageIds: [] } as never,
+          { id: "studio", name: "Studio", pageIds: ["legal"] } as never,
+        ]}
+        current={{ target: TOP_LEVEL, url: "/about" }}
+        onMove={() => {}}
+        onClose={() => {}}
+      />
+    </div>
+  ),
+  /* design-2l9 94:29621 — page settings for the page on the canvas (About). */
+  "pages-settings-active": () => {
+    const about = { ...PAGE_SETTINGS_FIXTURE, id: "about", name: "About", slug: "about", isHome: false, isActive: true };
+    return (
+      <div data-probe="pages-settings-active" style={{ width: 1440, height: 900, background: "var(--bk-gray-900)" }}>
+        <ToastProvider>
+          <PageSettingsDrawer page={about} allPages={[about]} composer={null} onClose={() => {}} />
+        </ToastProvider>
+      </div>
+    );
+  },
+  /* design-2l9 board 63:17617 — About renamed to "Our story" with its URL
+     moved: page settings opened by "Update URL" offer the redirect. */
+  "pages-settings-redirect": () => (
+    <div data-probe="pages-settings-redirect" style={{ width: 1440, height: 900, background: "var(--bk-gray-900)" }}>
+      <ToastProvider>
+        <PageSettingsDrawer
+          page={{ ...PAGE_SETTINGS_FIXTURE, id: "about", name: "Our story", slug: "our-story", isHome: false }}
+          allPages={[PAGE_SETTINGS_FIXTURE, ...PAGES_FIXTURE.slice(1)]}
+          composer={null}
+          previousSlug="about"
+          redirectSaved={new URLSearchParams(location.search).get("saved") ? { from: "/about", to: "/our-story" } : undefined}
+          onClose={() => {}}
+        />
+      </ToastProvider>
+    </div>
+  ),
+  /* design-2l9 board 65:17860 — SEO score details over Page settings (the
+     recipe clicks "SEO score details"). */
+  "pages-settings-score": () => (
+    <div data-probe="pages-settings-score" style={{ width: 1440, height: 900, background: "var(--bk-gray-900)" }}>
+      <ToastProvider>
+        <PageSettingsDrawer
+          page={PAGE_SETTINGS_FIXTURE}
+          allPages={[PAGE_SETTINGS_FIXTURE, ...PAGES_FIXTURE.slice(1)]}
+          composer={null}
+          onClose={() => {}}
+        />
+      </ToastProvider>
+    </div>
+  ),
+  /* design-2l9 board 63:18189 — page settings whose save is refused. The
+     composer stub refuses the one write the save makes; the recipe edits the
+     title and presses Save. */
+  "pages-settings-save-failed": () => (
+    <div data-probe="pages-settings-save-failed" style={{ width: 1440, height: 900, background: "var(--bk-gray-900)" }}>
+      <ToastProvider>
+        <PageSettingsDrawer
+          page={PAGE_SETTINGS_FIXTURE}
+          allPages={[PAGE_SETTINGS_FIXTURE, ...PAGES_FIXTURE.slice(1)]}
+          composer={{
+            on: () => {},
+            off: () => {},
+            emit: () => {},
+            elements: {
+              updatePage: () => Promise.reject(new Error("refused")),
+              getAllPages: () => [],
+            },
+          } as never}
+          onClose={() => {}}
+        />
+      </ToastProvider>
+    </div>
+  ),
+
+  /* design-2l9 101:23017 / 101:23620 / 109:32246 — the return to Pages with
+     unsaved settings, About open while Home stays on the canvas. `?save=`
+     picks what the composer's updatePage does: hang (still saving) or reject. */
+  "pages-settings-leave": () => {
+    const mode = new URLSearchParams(location.search).get("save");
+    const about = { ...PAGE_SETTINGS_FIXTURE, id: "about", name: "About", slug: "about", isHome: false, isActive: false };
+    const homePage = { ...PAGE_SETTINGS_FIXTURE, id: "home", name: "Home", isHome: true, isActive: true };
+    return (
+      <div data-probe="pages-settings-leave" style={{ width: 1440, height: 900, background: "var(--bk-gray-900)" }}>
+        <ToastProvider>
+          <PageSettingsDrawer
+            page={about}
+            allPages={[homePage, about]}
+            composer={{
+              on: () => {},
+              off: () => {},
+              emit: () => {},
+              elements: {
+                updatePage: () => (mode === "reject" ? Promise.reject(new Error("refused")) : new Promise(() => {})),
+                getAllPages: () => [],
+              },
+            } as never}
+            onClose={() => {}}
+          />
+        </ToastProvider>
+      </div>
+    );
+  },
 
   /* Board 815:4608 — the four smart-guide scenarios. A guide only exists
      mid-drag, and `calculateSnapping` reads sibling geometry out of a real
@@ -3131,6 +5141,38 @@ const CASES: Record<string, () => React.ReactElement> = {
      else, so a two-method stub is the whole dependency. It is hosted in the
      board's own pane: `.bd-set-pane-body` supplies the 32/24 insets and the
      bg-app ground, and 824 is 760 (the card) plus those two 32s. */
+  /* The whole Settings task (nav, pane, footer) for the server-load states:
+     `&screen=<id>` and `&load=hang|fail` on `siteDetail.settings.get`
+     (B8-SH12 252:47733 loading, B8-SH13 252:47989 load failed).
+     Case `settings-tab-load` (renamed at merge: L-G owns `settings-tab`). */
+  "settings-tab-load": () => {
+    const q = new URLSearchParams(location.search);
+    const load = q.get("load");
+    window.fetch = (async (input: RequestInfo | URL) => {
+      const href = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+      const procs = new URL(href, location.origin).pathname.split("/api/trpc/")[1]?.split(",") ?? [];
+      if (load === "hang" && procs.includes("siteDetail.settings.get")) return new Promise<Response>(() => {});
+      if (load === "fail" && procs.includes("siteDetail.settings.get")) return new Response("{}", { status: 500 });
+      /* `&save=hang`: the update never answers (B8-SH07 saving). */
+      if (q.get("save") === "hang" && procs.some((p) => p.endsWith(".update"))) return new Promise<Response>(() => {});
+      const ROW = {
+        cspPolicy: "default-src 'self'; img-src 'self' https: data:",
+        hstsMaxAge: 86400,
+        xFrameOptions: "SAMEORIGIN",
+        referrerPolicy: "strict-origin-when-cross-origin",
+        permissionsPolicy: "camera=(), microphone=()",
+      };
+      const body = procs.map((p) => ({ result: { data: { json: p === "siteDetail.settings.get" ? ROW : null } } }));
+      return new Response(JSON.stringify(body), { status: 200, headers: { "content-type": "application/json" } });
+    }) as typeof fetch;
+    return (
+      <ToastProvider>
+        <div data-probe="settings-tab" className="tw:fixed tw:inset-0 tw:flex tw:bg-[var(--bk-bg-app)]">
+          <SettingsTab composer={settingsComposer({}) as never} projectId="probe-site" initialScreen={q.get("screen") ?? "headers"} onClose={() => {}} />
+        </div>
+      </ToastProvider>
+    );
+  },
   "settings-general": () => {
     let settings: Record<string, unknown> = {
       seo: {
@@ -3279,6 +5321,204 @@ const CASES: Record<string, () => React.ReactElement> = {
       <SettingsPane case_="settings-forms">
         <FormsScreen projectId="probe-site" />
       </SettingsPane>
+    );
+  },
+  /* GAP-FM / GAP-FMC action states (272:23206 · 272:23770 · 272:24050 ·
+     272:24592, L-G): the board's Contact inbox, 24 rows behind three, and a
+     fetch that answers the reads but HANGS (`?mode=hang`) or FAILS
+     (`?mode=fail`) or answers (`?mode=ok`) the delete / export / move — the recipe selects two rows
+     and clicks the action. */
+  "settings-forms-actions": () => {
+    const mode = new URLSearchParams(location.search).get("mode") ?? "hang";
+    const sub = (id: string, name: string, message: string) => ({
+      id, formBlockId: "f1", siteId: "probe-site", data: { name, message }, sourceUrl: null,
+      isRead: true, isSpam: false, isArchived: false, createdAt: "2026-10-20T10:00:00.000Z", formBlock: { name: "Contact" },
+    });
+    const answers: Record<string, unknown> = {
+      "forms.listBlocks": [{ id: "f1", name: "Contact", isActive: true, _count: { submissions: 24 } }],
+      "forms.listSubmissions": {
+        total: 24, page: 1, perPage: 20,
+        data: [
+          sub("s1", "Mara Lenz", "We’d like a quote for our new studio."),
+          sub("s2", "Jonas Peters", "Question about your studio"),
+          sub("s3", "A. Okafor", "Question about your studio"),
+        ],
+      },
+    };
+    const ACTIONS = ["forms.deleteSubmission", "forms.exportSubmissions", "forms.updateSubmission"];
+    window.fetch = (async (input: RequestInfo | URL) => {
+      const href = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+      const procs = new URL(href, location.origin).pathname.split("/api/trpc/")[1]?.split(",") ?? [];
+      if (mode !== "ok" && procs.some((p) => ACTIONS.includes(p))) {
+        if (mode === "hang") return new Promise<Response>(() => {});
+        const err = { error: { json: { message: "probe failure", code: -32603, data: { code: "INTERNAL_SERVER_ERROR", httpStatus: 500 } } } };
+        return new Response(JSON.stringify(procs.map(() => err)), { status: 500, headers: { "content-type": "application/json" } });
+      }
+      const body = procs.map((name) => ({ result: { data: { json: answers[name] ?? null } } }));
+      return new Response(JSON.stringify(body), { status: 200, headers: { "content-type": "application/json" } });
+    }) as typeof fetch;
+    return (
+      <SettingsPane case_="settings-forms-actions">
+        <FormsScreen projectId="probe-site" />
+      </SettingsPane>
+    );
+  },
+  /* B8-PM01 245:50300 / PM03 252:49487 (L-G): the settings Permissions
+     dialog. `?siteId=probe-site&role=EDITOR` answers sites.myRole; with no
+     role the lookup answers nothing and the dialog shows its failure. */
+  "settings-permissions": () => {
+    const role = new URLSearchParams(location.search).get("role");
+    stubTrpc({ "sites.myRole": role ? { role } : null });
+    return (
+      <div data-probe="settings-permissions">
+        <SettingsPermissionsDialog open onClose={() => undefined} />
+      </div>
+    );
+  },
+  /* GAP-ST-ORG 277:38019 (L-G): the workspace door's dialog. */
+  "settings-door": () => (
+    <div data-probe="settings-door">
+      <WorkspaceDoorDialog title="Members" onClose={() => undefined} />
+    </div>
+  ),
+  /* GAP-ST-PG 277:41731 / PF 277:42171 (L-G): Publish with unsaved settings. */
+  "settings-publish-guard": () => (
+    <div data-probe="settings-publish-guard">
+      <PublishSettingsGuard
+        phase={new URLSearchParams(location.search).get("phase") === "failed" ? "failed" : "ask"}
+        screenName="Languages"
+        onKeepEditing={() => undefined}
+        onPublishWithout={() => undefined}
+        onSaveAndContinue={() => undefined}
+      />
+    </div>
+  ),
+  /* The whole Site settings tab (L-G round 2) — nav, header, footer and the
+     screen, for the footer / load / role / Analytics states of page 06.
+     ?siteId=probe-site&screen=analytics&role=ADMIN   (role=hang: the lookup never answers)
+       &status=none|receiving|hang|fail|verifyhang|verifyfail  (siteDetail.analyticsStatus)
+       &read=ok|hang|fail                (siteDetail.settings.get)
+       &save=ok|hang|fail                (every mutation)
+       &ga=G-FIELDWORK1&verified=1       (stored Google Analytics id / verifiedAt) */
+  "settings-tab": () => {
+    const q = new URLSearchParams(location.search);
+    const mode = (k: string, d: string) => q.get(k) ?? d;
+    const hang = () => new Promise<Response>(() => {});
+    const fail = (n: number) =>
+      new Response(JSON.stringify(Array.from({ length: n }, () => ({ error: { json: { message: "probe failure", code: -32603, data: { code: "INTERNAL_SERVER_ERROR", httpStatus: 500 } } } }))), {
+        status: 500,
+        headers: { "content-type": "application/json" },
+      });
+    const role = q.get("role");
+    /* verifyhang / verifyfail: the screen's first read answers, Verify's re-read hangs / fails. */
+    let statusReads = 0;
+    const statusMode = () => {
+      const m = mode("status", "none");
+      if (!m.startsWith("verify")) return m;
+      return statusReads++ === 0 ? "ok" : m.slice(6);
+    };
+    const answers: Record<string, unknown> = {
+      "sites.myRole": role ? { role } : null,
+      "siteDetail.analyticsStatus":
+        mode("status", "none") === "receiving"
+          ? { lastEventAt: new Date(Date.now() - 3_600_000).toISOString(), events24h: 128 }
+          : { lastEventAt: null, events24h: 0 },
+      "siteDetail.settings.get": {
+        cspPolicy: "default-src 'self'; img-src 'self' https: data:",
+        hstsMaxAge: 86400,
+        xFrameOptions: "SAMEORIGIN",
+        referrerPolicy: "strict-origin-when-cross-origin",
+        permissionsPolicy: "camera=(), microphone=()",
+        defaultLocale: "en-US",
+        enabledLocales: ["en-US", "de-DE"],
+        autoRedirectLocale: false,
+      },
+      "siteDetail.domains.list": [{ id: "d1", domain: "fieldwork.studio", status: "ACTIVE", isPrimary: true, forceHttps: true, dnsRecords: [] }],
+      /* The Danger zone's read (B8-S17). */
+      "sites.get": { id: "probe-site", name: "Fieldwork Studio", status: "PUBLISHED", publishedUrl: "https://fieldwork-studio.vercel.app", createdBy: null },
+      "siteDetail.locales": {
+        locales: [
+          { code: "en-US", path: "/", translated: 12, total: 12, status: "LIVE", pending: [] },
+          { code: "de-DE", path: "/de-DE", translated: 10, total: 12, status: "PENDING", pending: [] },
+        ],
+        total: 12,
+      },
+    };
+    window.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
+      const href = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+      const procs = new URL(href, location.origin).pathname.split("/api/trpc/")[1]?.split(",") ?? [];
+      const isMutation = (init?.method ?? "GET").toUpperCase() === "POST";
+      const pick = isMutation
+        ? mode("save", "ok")
+        : procs.includes("sites.myRole") && role === "hang"
+          ? "hang"
+          : procs.includes("siteDetail.analyticsStatus")
+          ? statusMode()
+          : procs.includes("siteDetail.settings.get") || procs.includes("siteDetail.locales")
+            ? mode("read", "ok")
+            : "ok";
+      if (pick === "hang") return hang();
+      if (pick === "fail") return fail(procs.length);
+      const body = procs.map((name) => ({ result: { data: { json: answers[name] ?? null } } }));
+      return new Response(JSON.stringify(body), { status: 200, headers: { "content-type": "application/json" } });
+    }) as typeof fetch;
+    let settings: Record<string, unknown> = {
+      seo: { siteName: "Fieldwork Studio" },
+      analytics: {
+        googleAnalytics: { enabled: true, measurementId: q.get("ga") ?? "G-FIELDWORK1", ...(q.get("verified") ? { verifiedAt: "2026-10-20T10:00:00.000Z" } : {}) },
+        googleTagManager: { enabled: true, containerId: "GTM-ABC1234" },
+        facebookPixel: { enabled: false, pixelId: "1234567890123456" },
+        microsoftClarity: { enabled: false, projectId: "abcdefghij" },
+      },
+    };
+    const composer = {
+      getProjectSettings: () => settings,
+      setProjectSettings: (next: Record<string, unknown>) => { settings = next; },
+      adoptSavedProjectSettings: (next: Record<string, unknown>) => { settings = next; },
+      getProjectMetadata: () => ({ name: "Fieldwork Studio" }),
+      updateProjectMetadata: () => undefined,
+      mergeProjectMetadata: () => undefined,
+      saveProject: () => Promise.resolve(),
+      exportProject: () => ({ pages: [] }),
+      markSaved: () => undefined,
+      isDirty: () => false,
+      emit: () => undefined,
+      on: () => undefined,
+      off: () => undefined,
+    };
+    localStorage.removeItem("settings-panel-probe-site");
+    return (
+      <div data-probe="settings-tab" className="tw:flex" style={{ width: 1440, height: 812 }}>
+        <ToastProvider>
+          <SettingsTab composer={composer as never} projectId="probe-site" userPlan="pro" initialScreen={q.get("screen") ?? "analytics"} />
+        </ToastProvider>
+      </div>
+    );
+  },
+  /* B7-H01…H16 (L-G): the History panel on a real Composer with a few undo
+     steps, in the 280-wide drawer. ?view=session|saves|published */
+  "history-tab": () => {
+    const c = new Composer({} as never);
+    const page = c.elements.createPage("Home", {
+      id: "hx-page",
+      root: { id: "hx-root", type: "container", tagName: "div", classes: ["buildrick-page-root"], children: [] },
+    });
+    c.elements.setActivePage(page.id);
+    /* H01's markers: the session log opens on Home, then a user clear —
+       the steps below are made after it. */
+    trackHistorySessionMarkers(c);
+    recordHistoryCleared(c);
+    c.history.clear();
+    for (const [id, type, text] of [["hx-h", "heading", "Thoughtful design."], ["hx-t", "text", "Good design makes room."]] as const) {
+      c.elements.addElement(c.elements.createElement(type as never, { id, content: text }), page.root.id);
+    }
+    const view = new URLSearchParams(location.search).get("view") as "session" | "saves" | "published" | null;
+    return (
+      <div data-probe="history-tab" className="tw:flex tw:h-203 tw:w-70 tw:flex-col tw:bg-white">
+        <ToastProvider>
+          <HistoryTab composer={c} projectId="probe-site" initialView={view ?? "session"} />
+        </ToastProvider>
+      </div>
     );
   },
   // "settings-webhooks" (board 640:3849) removed A-12/A01-6 — webhooks moved
@@ -3534,6 +5774,11 @@ if (name.startsWith("pages-")) {
    its ground and its row rules, and it reaches the app through Topbar, not
    through NotificationPanel. Per-case for the same reason as history.css —
    the file also claims .bk-topbar* and .bk-notif-*. */
+/* Canvas.css carries .bd-canvas-empty-cta; Canvas.tsx imports it, but the
+   canvas-empty case mounts only the CTA. */
+if (name === "canvas-empty" || name === "canvas-outlines" || name === "canvas-hidden-ghost") {
+  await import("@/editor/canvas/Canvas.css");
+}
 if (name.startsWith("notifications-")) {
   await import("@/editor/shell/header.css");
 }
@@ -3542,6 +5787,198 @@ if (name.startsWith("notifications-")) {
    so it is already loaded here. The pane wrapper (`.bd-set-pane-body`) is the
    part that lives in SettingsTab and would otherwise be missing, which is why
    the case mounts it by hand rather than styling a host div. */
+
+/* ── Lane L-F wave 3: page-07 recovery surfaces at the 2L9 boards' geometry.
+   Each case lays out the parts of the 1440×900 board the surface depends on
+   — the 56 px topbar, the canvas column at x342 y100 798×768 (Canvas marks it
+   `data-bk-toast-anchor`) — and mounts the real component. ─────────────── */
+const LF_TOPBAR = <div style={{ height: 56, background: "white", borderBottom: "1px solid var(--bk-border)" }} />;
+const LF_COLUMN = (
+  <div data-bk-toast-anchor="" style={{ position: "fixed", left: 342, top: 100, width: 798, height: 768, background: "var(--bk-bg-subtle)" }} />
+);
+const lfOffer = () =>
+  setKeptWorkOffer({
+    siteId: "s1",
+    at: new Date(Date.now() - 3_600_000).toISOString(),
+    project: { pages: [] } as never,
+    restore: () => {},
+  });
+const lfComposer = (n: number) =>
+  ({ history: { getHistoryStack: () => Array.from({ length: n }, (_, i) => ({ label: `step ${i}`, timestamp: i + 1 })) } }) as never;
+Object.assign(CASES, {
+  "lf-load-failed": () => {
+    registerWorkSnapshot({ project: () => ({ pages: [] }) as never });
+    return (
+      <ToastProvider>
+        <div data-probe="lf-load-failed" style={{ width: "100vw" }}>
+          {LF_TOPBAR}
+          <LoadErrorBanner kind="network" onRetry={() => {}} onSignIn={() => {}} onDismiss={() => {}} />
+        </div>
+      </ToastProvider>
+    );
+  },
+  "lf-session-banner": () => {
+    showSessionExpiredBanner(() => {});
+    return (
+      <ToastProvider>
+        <div data-probe="lf-session-banner" style={{ width: "100vw" }}>
+          {LF_TOPBAR}
+          <GlobalBannerSlot />
+        </div>
+      </ToastProvider>
+    );
+  },
+  /* lead3 wave 3 (owner: one error surface): the failed save is the slot's
+     one bar under the topbar, not a canvas-column strip. */
+  /* C05 10:2199 — the strip 12 in from the canvas column, 12 under its bar
+     (the column starts under the topbar; the bar is 42 tall, 7:18654). */
+  "lf-save-failed": () => {
+    showGlobalBanner(saveFailedBanner({ where: "Fieldwork Studio · Home", retry: () => {} }));
+    return (
+      <div data-probe="lf-save-failed">
+        {LF_TOPBAR}
+        <GlobalBannerSlot />
+        <div data-bk-toast-anchor="" style={{ position: "fixed", left: 342, top: 56, width: 798, height: 812, background: "var(--bk-bg-subtle)" }}>
+          <div data-testid="canvas-bar" style={{ height: 42, background: "var(--bk-bg-card)", borderBottom: "1px solid var(--bk-gray-200)" }} />
+        </div>
+        <SaveFailedStrip />
+      </div>
+    );
+  },
+  "lf-session-dialog": () => (
+    <ToastProvider>
+      <div data-probe="lf-session-dialog">
+        {LF_TOPBAR}
+        {LF_COLUMN}
+        <SessionExpiredModal open composer={lfComposer(12)} lastSavedAt={null} onRetry={async () => "error"} onKeepEditing={() => {}} />
+      </div>
+    </ToastProvider>
+  ),
+  "lf-recovery-older": () => {
+    lfOffer();
+    return (
+      <div data-probe="lf-recovery-older">
+        {LF_TOPBAR}
+        {LF_COLUMN}
+        <RecoveryBanner localDraftShown={false} serverEditedAt={async () => new Date(0).toISOString()} />
+      </div>
+    );
+  },
+  "lf-recovery-newer": () => {
+    lfOffer();
+    return (
+      <div data-probe="lf-recovery-newer">
+        {LF_TOPBAR}
+        {LF_COLUMN}
+        <RecoveryBanner localDraftShown={false} serverEditedAt={async () => new Date(Date.now() + 60_000).toISOString()} />
+      </div>
+    );
+  },
+  "lf-conflict": () => (
+    <div data-probe="lf-conflict">
+      {LF_TOPBAR}
+      <ConflictModal open siteId={null} onReload={() => {}} onSaveBackup={() => {}} onOverwrite={() => {}} onClose={() => {}} />
+    </div>
+  ),
+  "lf-crash": () => {
+    registerWorkSnapshot({ project: () => ({ pages: [] }) as never, unsaved: () => true });
+    const Boom = (): React.ReactElement => {
+      throw new Error("probe: editor stopped");
+    };
+    return (
+      <ToastProvider>
+        <div data-probe="lf-crash">
+          <EditorStoppedBoundary>
+            <Boom />
+          </EditorStoppedBoundary>
+        </div>
+      </ToastProvider>
+    );
+  },
+  /* B7-G11/G12/G13/G18/G20/G21/G32 (L-G): one slot banner per ?kind=. */
+  "lf-banner": () => {
+    const kind = new URLSearchParams(location.search).get("kind");
+    if (kind === "offline") showGlobalBanner(OFFLINE_BANNER);
+    else if (kind === "cant-reach") showCantReachBanner(() => undefined);
+    else if (kind === "reconnecting") showReconnectingBanner(12);
+    else if (kind === "role") showRoleChangedBanner({ download: () => undefined, askAdmin: () => undefined });
+    else if (kind === "deletion-owner") showWorkspaceDeletionBanner(new Date("2026-11-12T00:00:00Z"), () => undefined);
+    else if (kind === "deletion-other") showWorkspaceDeletionBanner(new Date("2026-11-12T00:00:00Z"), null);
+    else if (kind === "narrow") showGlobalBanner(NARROW_WINDOW_BANNER);
+    return (
+      <ToastProvider>
+        <div data-probe="lf-banner" style={{ width: "100vw" }}>
+          {LF_TOPBAR}
+          <GlobalBannerSlot />
+        </div>
+      </ToastProvider>
+    );
+  },
+  /* B7-G33 227:15364 (L-G): the phone screen. */
+  "lf-phone": () => (
+    <div data-probe="lf-phone">
+      <PhoneScreen />
+    </div>
+  ),
+  /* B7-G27 227:12184 (L-G): a panel whose code chunk failed to load, in the
+     280-wide drawer the board draws it in. */
+  "lf-chunk": () => {
+    const Broken: React.FC = () => {
+      const e = new Error("Failed to fetch dynamically imported module: /assets/Panel.js");
+      e.name = "ChunkLoadError";
+      throw e;
+    };
+    return (
+      <div data-probe="lf-chunk" className="tw:h-203 tw:w-70 tw:bg-white">
+        <PanelChunkBoundary>
+          <Broken />
+        </PanelChunkBoundary>
+      </div>
+    );
+  },
+  "lf-more": () => {
+    showSessionExpiredBanner(() => {});
+    showNewVersionBanner(() => {});
+    showGlobalBanner(OFFLINE_BANNER);
+    return (
+      <ToastProvider>
+        <div data-probe="lf-more" style={{ width: "100vw" }}>
+          {LF_TOPBAR}
+          <GlobalBannerSlot />
+        </div>
+      </ToastProvider>
+    );
+  },
+  "lf-handoff-moved": () => {
+    const channel = { postMessage: () => {}, close: () => {}, onmessage: null as ((e: MessageEvent) => void) | null };
+    const locks = new Set<string>();
+    createTabHandoff({
+      siteId: "s1",
+      composer: { editLocks: locks, setEditLock: (r: string, on: boolean) => void (on ? locks.add(r) : locks.delete(r)) } as never,
+      save: async () => "saved",
+      channel: channel as never,
+    });
+    setTimeout(() => channel.onmessage?.({ data: { kind: "claim", from: "other" } } as MessageEvent), 0);
+    return (
+      <ToastProvider>
+        <div data-probe="lf-handoff-moved" style={{ width: "100vw" }}>
+          {LF_TOPBAR}
+          <GlobalBannerSlot />
+        </div>
+      </ToastProvider>
+    );
+  },
+  "lf-recovery-unknown": () => {
+    lfOffer();
+    return (
+      <div data-probe="lf-recovery-unknown">
+        {LF_TOPBAR}
+        {LF_COLUMN}
+        <RecoveryBanner localDraftShown={false} serverEditedAt={async () => null} />
+      </div>
+    );
+  },
+});
 
 const render = CASES[name];
 const el = document.getElementById("probe-root")!;

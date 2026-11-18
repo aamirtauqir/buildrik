@@ -65,13 +65,13 @@ beforeEach(() => {
 describe("useDynamicPagesSummary", () => {
   it("is empty with no composer", () => {
     const { result } = renderHook(() => useDynamicPagesSummary(null));
-    expect(result.current).toEqual({ count: 0, collectionId: null, byCollection: {} });
+    expect(result.current).toEqual({ count: 0, collectionId: null, byCollection: {}, collections: [] });
   });
 
   it("is empty when no collection has a pageSlugPattern", async () => {
     const { composer } = await loaded([{ id: "c1" }, { id: "c2" }]);
     const { result } = renderHook(() => useDynamicPagesSummary(composer as never));
-    await waitFor(() => expect(result.current).toEqual({ count: 0, collectionId: null, byCollection: {} }));
+    await waitFor(() => expect(result.current).toEqual({ count: 0, collectionId: null, byCollection: {}, collections: [] }));
     expect(dynamicPagesQuery).not.toHaveBeenCalled();
   });
 
@@ -93,6 +93,11 @@ describe("useDynamicPagesSummary", () => {
     expect(result.current.collectionId).toBe("blog");
     // EDT-057: each collection's own count, for the template page's delete confirm.
     expect(result.current.byCollection).toEqual({ blog: 2, docs: 1 });
+    // design-2l9 63:6393's "Collection pages" rows: name, rooted pattern, count.
+    expect(result.current.collections).toEqual([
+      { id: "blog", name: "blog", pattern: "/blog/{slug}", count: 2, templatePageId: null },
+      { id: "docs", name: "docs", pattern: "/docs/{slug}", count: 1, templatePageId: null },
+    ]);
   });
 
   it("tolerates one collection's query failing — the others still count", async () => {
@@ -121,7 +126,7 @@ describe("useDynamicPagesSummary", () => {
 
     storedCollections.mockResolvedValue([{ id: "posts", name: "Posts", pageSlugPattern: "/blog/{slug}" }]);
     await act(() => manager.refreshFromStorage());
-    await waitFor(() => expect(result.current).toEqual({ count: 1, collectionId: "posts", byCollection: { posts: 1 } }));
+    await waitFor(() => expect(result.current).toMatchObject({ count: 1, collectionId: "posts", byCollection: { posts: 1 } }));
   });
 
   it("re-fetches when an entry is published or unpublished", async () => {

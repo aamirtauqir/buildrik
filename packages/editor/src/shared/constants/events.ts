@@ -76,6 +76,9 @@ export const EVENTS = {
   LAYER_HOVER: "layer:hover",
   /** Fired after toggling layer visibility — carries undo action */
   LAYER_VISIBILITY_TOGGLED: "layer:visibility-toggled",
+  /** The Inspector's "Show normally" on a layer dimmed in the editor
+   *  (2L9 147:78900): the Layers panel, which owns the dimmed set, un-dims it. */
+  LAYER_SHOW_NORMALLY_REQUESTED: "layer:show-normally-requested",
 
   // ============================================
   // Selection Events
@@ -336,12 +339,16 @@ export const EVENTS = {
   UI_NEW_PAGE_REQUESTED: "ui:new-page-requested",
   /** Rail switches to a named tab. Six emitters, no constant until now. */
   UI_SWITCH_TAB: "ui:switch-tab",
+  /** Close the left panel — the canvas gets the room (2L9 B6-K13: choosing
+   *  a component's source on the canvas). */
+  UI_LEFT_PANEL_CLOSE: "ui:left-panel:close",
+  /** "Update {component} from a selection" moved on (component-library/
+   *  sourcePick.ts): begun, picking on the canvas, source chosen, review, ended. */
+  UI_COMPONENT_SOURCE_PICK: "ui:component-source-pick",
   /** Add panel expands one named group (`{ group: InsertGroupId }`). The
    *  context menu's "Replace with block…" opens Add AND lands on BLOCKS —
    *  switching the tab alone leaves the user at ELEMENTS. */
   UI_INSERT_OPEN_GROUP: "ui:insert-open-group",
-  /** Add opens on its "Generate a block" screen (G2-117). */
-  UI_INSERT_OPEN_GENERATE: "ui:insert-open-generate",
   /** An Add-drawer drag started (`{ label }`) or ended (`{ label: null }`) —
    *  board 4418:100890's drag state (canvas cue, drawer note, readout). */
   UI_INSERT_DRAG: "ui:insert-drag",
@@ -385,6 +392,10 @@ export const EVENTS = {
    *  the retired canvas palette's chord — and the Pages panel's ⌘K keycap
    *  come in through here. */
   UI_TOGGLE_COMMAND_PALETTE: "ui:toggle:command-palette",
+  /** Open or close the bottom bar's page switcher (⇧⌘O / Ctrl+Alt+O,
+   *  useEditorShortcuts; the ⌘K "Switch page…" row). The bottom bar owns the
+   *  open state. */
+  UI_TOGGLE_PAGE_SWITCHER: "ui:toggle:page-switcher",
   /** The site menu asked to take the site down. The Publish panel owns the
    *  one confirm, so the menu opens the panel and asks it rather than
    *  hosting a second dialog. */
@@ -423,7 +434,6 @@ export const EVENTS = {
   UI_TOGGLE_ASSETS: "ui:toggle:assets",
   UI_TOGGLE_CODE: "ui:toggle:code",
   UI_TOGGLE_PREVIEW: "ui:toggle:preview",
-  UI_TOGGLE_AI: "ui:toggle:ai",
   UI_PANEL_RESIZE: "ui:panel:resize",
 
   // ============================================
@@ -646,11 +656,17 @@ export const EVENTS = {
      user to start work has to hear this: the canvas was offering "Start blank"
      over a site whose every save is refused. */
   PROJECT_UNAVAILABLE: "project:unavailable",
+  /* The set of edit locks changed (`Composer.setEditLock`). Fires only when
+     the set actually changes; read `composer.readOnly` for the answer. */
+  EDIT_LOCK_CHANGED: "editlock:changed",
   /* A layer was renamed (or its name cleared). Custom names live in the
      layers panel's own per-page store, so anything else that shows an
      element's identity — the status bar — has no way to hear about a rename
      without this. `name: null` means "back to the type label". */
   ELEMENT_RENAMED: "element:renamed",
+  /* Layers ⋯ › Collapse to selection (design-2l9 board 152:78185): the tree
+     folds to the selection's ancestors. LayersTab asks, the panel folds. */
+  LAYERS_COLLAPSE_TO_SELECTION: "layers:collapse-to-selection",
 
   // ============================================
   // OT Engine Events
@@ -696,8 +712,14 @@ export const EVENTS = {
   // CMS Binding Events
   // ============================================
   CMS_COLLECTION_BOUND: "cms:collection:bound",
+  /** The canvas previews another record, or drafts on/off (design-2l9 173:12022) — a view preference. */
+  CMS_PREVIEW_RECORD_CHANGED: "cms:preview-record-changed",
   CMS_MANAGE_RECORDS: "cms:manage-records",
   CMS_COLLECTION_UNBOUND: "cms:collection:unbound",
+  /** An element's visibility condition was set, changed or removed (B-11). */
+  CMS_CONDITION_CHANGED: "cms:condition:changed",
+  /** A Collection list's query (filter / sort / skip / limit) changed (C-14). */
+  CMS_LIST_QUERY_CHANGED: "cms:list-query:changed",
 
   // ============================================
   // AI Events
@@ -865,7 +887,9 @@ export interface EventPayloads {
   [EVENTS.PROJECT_SAVING]: Record<string, never>;
   [EVENTS.PROJECT_LOAD_STATE]: { loading: boolean };
   [EVENTS.PROJECT_UNAVAILABLE]: { reason: "missing" };
+  [EVENTS.EDIT_LOCK_CHANGED]: { locks: import("../types").EditLockReason[]; readOnly: boolean };
   [EVENTS.ELEMENT_RENAMED]: { id: string; name: string | null };
+  [EVENTS.LAYERS_COLLAPSE_TO_SELECTION]: Record<string, never>;
   [EVENTS.PROJECT_LOADED]:
     | import("../types").ProjectData
     | {
@@ -898,6 +922,7 @@ export interface EventPayloads {
   // Layer Panel Events
   [EVENTS.LAYER_HOVER]: { id: string | null };
   [EVENTS.LAYER_VISIBILITY_TOGGLED]: { id: string; hidden: boolean; undo: () => void };
+  [EVENTS.LAYER_SHOW_NORMALLY_REQUESTED]: { id: string };
 
   // Selection Events
   [EVENTS.SELECTION_CHANGED]: { selected: string[] };
@@ -918,6 +943,7 @@ export interface EventPayloads {
     superseded?: string;
   };
   [EVENTS.HISTORY_UNRECORDED]: { label: string };
+  [EVENTS.CMS_PREVIEW_RECORD_CHANGED]: { collectionId: string | null };
   [EVENTS.HISTORY_RECORDED]: { label?: string };
   [EVENTS.HISTORY_CLEARED]: void;
 

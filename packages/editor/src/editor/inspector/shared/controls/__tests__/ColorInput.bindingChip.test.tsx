@@ -68,7 +68,7 @@ describe("ColorInput · DSBindingChip integration", () => {
     ).toBeNull();
     expect(container.querySelector('[aria-label^="Off-design-system value"]')).toBeNull();
     // The hex is still on screen, inside the field, which is the whole point.
-    expect(screen.getByDisplayValue("FFAA22")).toBeTruthy();
+    expect(screen.getByDisplayValue("#FFAA22")).toBeTruthy();
   });
 
   it("renders no chip when value is empty", () => {
@@ -128,7 +128,7 @@ describe("ColorInput · Custom colour (owner decision 2026-09-28)", () => {
       />
     );
     fireEvent.click(screen.getByRole("button", { name: "Choose Color color" }));
-    fireEvent.click(screen.getByRole("button", { name: "Custom colour" }));
+    fireEvent.click(screen.getByRole("button", { name: "Custom color" }));
     const hex = screen.getByLabelText("Hex color value") as HTMLInputElement;
     expect(hex.value.toUpperCase()).toBe("#2D6DFF");
     fireEvent.change(hex, { target: { value: "#112233" } });

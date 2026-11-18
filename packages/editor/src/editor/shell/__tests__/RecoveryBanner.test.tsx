@@ -1,60 +1,140 @@
 /**
- * RecoveryBanner (C6) — surfaces the previously-dead crash sentinel. On reopen
- * after a crash it tells the user their work was recovered (timestamp + scope)
- * and offers Keep / Discard-and-reload. No crash → nothing renders.
+ * RecoveryBanner — the one surface for unsaved work kept from an earlier
+ * visit (2L9 B7-G07–G10). Two sources speak here in the board's words: the
+ * dashboard site's kept copy (published by the load path as a keptWorkOffer)
+ * and the local draft's crash sentinel. What it offers follows the server's
+ * last edit: older → Discard… / Restore my edits; newer or unknown → Download
+ * my copy only.
+ *
+ * Rewritten 2026-10-26 (L-F S3): the old suite pinned "Recovered your work",
+ * the page-count scope and "Keep changes", none of which the 2L9 board draws.
  */
 import * as React from "react";
-import { render, screen, fireEvent, cleanup, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup, waitFor, act } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { RecoveryBanner } from "../RecoveryBanner";
+import { RecoveryBanner, formatKeptAt } from "../RecoveryBanner";
+import { setKeptWorkOffer } from "../keptWorkOffer";
+
+vi.mock("@/services/unsavedRecovery", () => ({
+  takeOffScreenUnsaved: vi.fn(() => null),
+  clearUnsaved: vi.fn(),
+  readUnsaved: vi.fn(() => null),
+}));
+import { clearUnsaved, takeOffScreenUnsaved } from "@/services/unsavedRecovery";
 
 const SENTINEL = "buildrick:last-crash";
+const OLD_SERVER = async () => new Date(0).toISOString();
 
 function seedCrash(atMsAgo = 30_000) {
-  sessionStorage.setItem(
-    SENTINEL,
-    JSON.stringify({ at: Date.now() - atMsAgo, source: "error", reason: "boom" }),
+  sessionStorage.setItem(SENTINEL, JSON.stringify({ at: Date.now() - atMsAgo, source: "error", reason: "boom" }));
+}
+
+function offer(over: Partial<Parameters<typeof setKeptWorkOffer>[0] & object> = {}) {
+  const restore = vi.fn();
+  act(() =>
+    setKeptWorkOffer({
+      siteId: "site-1",
+      at: "2026-09-28T10:12:00.000Z",
+      project: { pages: [] } as never,
+      restore,
+      ...over,
+    }),
   );
+  return restore;
 }
 
 function renderBanner(props: Parameters<typeof RecoveryBanner>[0] = {}) {
-  return render(
-    <RecoveryBanner pageCount={3} {...props} />,
-  );
+  return render(<RecoveryBanner {...props} />);
 }
 
 beforeEach(() => {
   sessionStorage.clear();
   localStorage.clear();
 });
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  act(() => setKeptWorkOffer(null));
+  vi.clearAllMocks();
+});
 
-describe("RecoveryBanner", () => {
-  it("renders nothing when there was no crash", () => {
+describe("RecoveryBanner — dashboard kept copy (G07–G10)", () => {
+  it("server older: the board's line, Discard… and Restore my edits (G07)", async () => {
+    offer();
+    renderBanner({ localDraftShown: false, serverEditedAt: async () => "2026-09-28T09:00:00.000Z" });
+    expect(await screen.findByText(/^Unsaved edits from your last visit \(.+\) were kept in this browser\. The site hasn’t changed since\.$/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Discard…" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Restore my edits" })).toBeInTheDocument();
+  });
+
+  it("Restore my edits runs the published restore once and the offer goes", async () => {
+    const restore = offer();
+    renderBanner({ localDraftShown: false, serverEditedAt: OLD_SERVER });
+    fireEvent.click(await screen.findByRole("button", { name: "Restore my edits" }));
+    expect(restore).toHaveBeenCalledTimes(1);
+    expect(screen.queryByTestId("recovery-banner")).toBeNull();
+  });
+
+  it("Discard… asks first (G10), Cancel keeps the copy", async () => {
+    offer();
+    renderBanner({ localDraftShown: false, serverEditedAt: OLD_SERVER });
+    fireEvent.click(await screen.findByRole("button", { name: "Discard…" }));
+    expect(await screen.findByText("Delete the kept copy?")).toBeInTheDocument();
+    expect(screen.getByText("This can’t be undone. The site stays as it was last saved.")).toBeInTheDocument();
+    await waitFor(() => expect((document.activeElement as HTMLElement | null)?.textContent).toBe("Cancel"));
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(clearUnsaved).not.toHaveBeenCalled();
+    expect(screen.getByTestId("recovery-banner")).toBeInTheDocument();
+  });
+
+  it("Delete copy hands the copy over and clears it — without latching later saves", async () => {
+    offer();
+    renderBanner({ localDraftShown: false, serverEditedAt: OLD_SERVER });
+    fireEvent.click(await screen.findByRole("button", { name: "Discard…" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Delete copy" }));
+    expect(takeOffScreenUnsaved).toHaveBeenCalledWith("site-1");
+    expect(clearUnsaved).toHaveBeenCalledWith("site-1");
+    await waitFor(() => expect(screen.queryByTestId("recovery-banner")).toBeNull());
+  });
+
+  it("server newer: Download my copy, no restore (G08, RT-10)", async () => {
+    offer();
+    renderBanner({ localDraftShown: false, serverEditedAt: async () => "2026-09-28T10:31:00.000Z" });
+    expect(await screen.findByText(/^Someone saved this site after your copy was kept \(.+\)\. Your copy is still in this browser\.$/)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Restore my edits" })).toBeNull();
+    const createObjectURL = vi.fn(() => "blob:x");
+    Object.assign(URL, { createObjectURL, revokeObjectURL: vi.fn() });
+    fireEvent.click(screen.getByRole("button", { name: "Download my copy" }));
+    expect(createObjectURL).toHaveBeenCalledTimes(1);
+  });
+
+  it("server unknown: its own line and Download my copy only (G09, P0-F)", async () => {
+    offer();
+    renderBanner({ localDraftShown: false, serverEditedAt: async () => null });
+    expect(
+      await screen.findByText("Couldn’t check the server version, so your kept copy can’t be restored safely right now."),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Restore my edits" })).toBeNull();
+    expect(screen.getByRole("button", { name: "Download my copy" })).toBeInTheDocument();
+  });
+});
+
+describe("RecoveryBanner — local draft crash sentinel", () => {
+  it("renders nothing when nothing was kept", () => {
     const { container } = renderBanner();
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("shows a recovery banner after a crash, with scope, and clears the sentinel", async () => {
+  it("shows the G07 line once the server is known older, and consumes the sentinel", async () => {
     seedCrash();
-    /* P0-F (audit 2026-09-30): server state known AND older than the local copy
-       is the only safe way to show the banner. Pass an old server clock so the
-       banner reveals. */
-    renderBanner({ serverEditedAt: async () => new Date(0).toISOString() });
-    await waitFor(() => expect(screen.getByText(/recovered your work/i)).toBeInTheDocument());
-    expect(screen.getByText(/3 pages/i)).toBeInTheDocument();
-    // consuming the sentinel means a re-render / reload won't re-show it
+    renderBanner({ serverEditedAt: OLD_SERVER });
+    expect(await screen.findByText(/^Unsaved edits from your last visit/)).toBeInTheDocument();
     expect(sessionStorage.getItem(SENTINEL)).toBeNull();
   });
 
-  /* L5-074: on a dashboard site the editor loads the SERVER copy; the local
-     draft this banner describes is only loaded when that load fails. Shown over
-     the server copy it said "Recovered your work … Keep changes" beside the
-     toast saying "The version on screen is the server's" — and "Keep changes"
-     kept nothing. */
+  /* L5-074: on a dashboard site the screen is the SERVER copy unless the load failed. */
   it("stays hidden, and leaves the sentinel, while the screen shows the server copy", async () => {
     seedCrash();
-    const { container } = renderBanner({ localDraftShown: false, serverEditedAt: async () => new Date(0).toISOString() });
+    const { container } = renderBanner({ localDraftShown: false, serverEditedAt: OLD_SERVER });
     await new Promise((r) => setTimeout(r, 0));
     expect(container).toBeEmptyDOMElement();
     expect(sessionStorage.getItem(SENTINEL)).not.toBeNull();
@@ -62,59 +142,46 @@ describe("RecoveryBanner", () => {
 
   it("shows once the local draft is what loaded (server load failed)", async () => {
     seedCrash();
-    const { rerender } = renderBanner({ localDraftShown: false, serverEditedAt: async () => new Date(0).toISOString() });
-    rerender(<RecoveryBanner pageCount={3} localDraftShown serverEditedAt={async () => new Date(0).toISOString()} />);
-    await waitFor(() => expect(screen.getByText(/recovered your work/i)).toBeInTheDocument());
+    const { rerender } = renderBanner({ localDraftShown: false, serverEditedAt: OLD_SERVER });
+    rerender(<RecoveryBanner localDraftShown serverEditedAt={OLD_SERVER} />);
+    expect(await screen.findByText(/^Unsaved edits from your last visit/)).toBeInTheDocument();
   });
 
-  it("Keep changes dismisses the banner", async () => {
+  it("Restore my edits keeps the draft that is already on screen", async () => {
     seedCrash();
-    renderBanner({ serverEditedAt: async () => new Date(0).toISOString() });
-    await waitFor(() => screen.getByText(/recovered your work/i));
-    fireEvent.click(screen.getByRole("button", { name: /keep changes/i }));
-    expect(screen.queryByText(/recovered your work/i)).not.toBeInTheDocument();
+    renderBanner({ serverEditedAt: OLD_SERVER });
+    fireEvent.click(await screen.findByRole("button", { name: "Restore my edits" }));
+    expect(screen.queryByTestId("recovery-banner")).toBeNull();
   });
 
-  it("Discard & reload clears the local draft and reloads", async () => {
+  it("Delete copy clears the local draft and reloads", async () => {
     seedCrash();
     localStorage.setItem("buildrick-project", JSON.stringify({ project: {} }));
     const reload = vi.fn();
-    renderBanner({ reloadFn: reload, serverEditedAt: async () => new Date(0).toISOString() });
-    await waitFor(() => screen.getByText(/recovered your work/i));
-    fireEvent.click(screen.getByRole("button", { name: /discard/i }));
+    renderBanner({ reloadFn: reload, serverEditedAt: OLD_SERVER });
+    fireEvent.click(await screen.findByRole("button", { name: "Discard…" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Delete copy" }));
     expect(localStorage.getItem("buildrick-project")).toBeNull();
     expect(reload).toHaveBeenCalled();
   });
 
-  it("stays hidden when the server state is unknown (P0-F safety inversion)", async () => {
-    /* Audit 2026-09-30: previous default flipped on null to `serverNewer=false`,
-       showing the banner on every network failure. Showing "Keep changes" then
-       silently keeps local work over a server we couldn't reach — the inverse
-       of the safe default. The banner must stay hidden until the server is
-       reachable. */
+  /* The local draft is on screen; "can't be restored" would contradict it. */
+  it.each([
+    ["unknown", async () => null],
+    ["newer", async () => new Date(Date.now() + 60_000).toISOString()],
+  ])("stays hidden when the server is %s", async (_label, serverEditedAt) => {
     seedCrash();
-    renderBanner({ serverEditedAt: async () => null });
-    await waitFor(() => expect(screen.queryByRole("status", { name: /recovered work/i })).toBeNull());
+    const { container } = renderBanner({ serverEditedAt });
+    await new Promise((r) => setTimeout(r, 0));
+    expect(container).toBeEmptyDOMElement();
   });
+});
 
-  it("stays hidden when the server holds newer work than the recovered copy (RT-10)", async () => {
-    /* The crash happened at 10:00 UTC, but the server's last edit is 10:16 —
-       offering "Keep changes" would stomp on the server's work. */
-    sessionStorage.setItem(
-      SENTINEL,
-      JSON.stringify({ at: Date.parse("2026-09-28T10:00:00Z"), source: "error", reason: "boom" }),
-    );
-    renderBanner({ serverEditedAt: async () => "2026-09-28T10:16:00.000Z" });
-    await waitFor(() => expect(screen.queryByRole("status", { name: /recovered work/i })).toBeNull());
-  });
-
-  it("still shows when the recovered copy is newer than the server", async () => {
-    /* Sentinel is later than the server's last edit → local is the truth. */
-    sessionStorage.setItem(
-      SENTINEL,
-      JSON.stringify({ at: Date.parse("2026-09-28T10:20:00Z"), source: "error", reason: "boom" }),
-    );
-    renderBanner({ serverEditedAt: async () => "2026-09-28T10:16:00.000Z" });
-    expect(await screen.findByRole("status", { name: /recovered work/i })).toBeInTheDocument();
+describe("formatKeptAt — the board's \"(today 10:12)\"", () => {
+  const now = new Date(2026, 9, 26, 15, 0).getTime();
+  it("today, yesterday, then a date", () => {
+    expect(formatKeptAt(new Date(2026, 9, 26, 10, 12).getTime(), now)).toBe("today 10:12");
+    expect(formatKeptAt(new Date(2026, 9, 25, 18, 40).getTime(), now)).toBe("yesterday 18:40");
+    expect(formatKeptAt(new Date(2026, 10, 12, 9, 5).getTime(), now)).toBe("12 Nov 09:05");
   });
 });

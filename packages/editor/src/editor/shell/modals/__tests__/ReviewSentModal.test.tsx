@@ -66,10 +66,49 @@ describe("ReviewSentModal — board 129:451 · email failed", () => {
   });
 });
 
-describe("ReviewSentModal — board 129:2 · sending", () => {
-  it("is busy and carries the board's one line", () => {
-    render(<ReviewSentModal state="sending" onClose={vi.fn()} />);
-    expect(screen.getByText(/Creating review link…/)).toBeInTheDocument();
+describe("ReviewSentModal — Play F5.03 / F5.05 / F5.42 · preparing and sending", () => {
+  it("preparing says nothing has been sent yet and names the round", () => {
+    render(<ReviewSentModal state="preparing" roundNumber={3} onClose={vi.fn()} />);
+    expect(screen.getByText("Preparing the review preview…")).toBeInTheDocument();
+    expect(screen.getByText("Creating the frozen Round 3 snapshot. Nothing has been sent yet.")).toBeInTheDocument();
+  });
+
+  it("sending names the round and says the preview is ready", () => {
+    render(<ReviewSentModal state="sending" roundNumber={3} onClose={vi.fn()} />);
+    expect(screen.getByText("Sending Round 3…")).toBeInTheDocument();
+    expect(screen.getByText(/The frozen preview is ready\./)).toBeInTheDocument();
+  });
+
+  it("sending without a preview says so", () => {
+    render(<ReviewSentModal state="sending" withPreview={false} onClose={vi.fn()} />);
+    expect(screen.getByText("Sending for review…")).toBeInTheDocument();
+    expect(screen.getByText(/No preview will be included\./)).toBeInTheDocument();
+  });
+});
+
+describe("ReviewSentModal — Play F5.04 · preview failed, nothing sent", () => {
+  it("offers Cancel, Try again and Send without preview", () => {
+    const onClose = vi.fn();
+    const onRetryPreview = vi.fn();
+    const onSendWithoutPreview = vi.fn();
+    render(
+      <ReviewSentModal
+        state="preview-failed"
+        onClose={onClose}
+        onRetryPreview={onRetryPreview}
+        onSendWithoutPreview={onSendWithoutPreview}
+      />,
+    );
+    expect(screen.getByText("We couldn’t render a preview")).toBeInTheDocument();
+    expect(
+      screen.getByText("Your client would see no pages. Nothing was sent. Your email and note are kept."),
+    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+    fireEvent.click(screen.getByRole("button", { name: "Send without preview" }));
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(onRetryPreview).toHaveBeenCalledTimes(1);
+    expect(onSendWithoutPreview).toHaveBeenCalledTimes(1);
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 });
 

@@ -27,7 +27,6 @@ function renderReview(reviewsEnabled: boolean | null | undefined) {
         activeTab="review"
         composer={null}
         commonTabProps={commonTabProps}
-        onCreateComponent={vi.fn()}
         reviewsEnabled={reviewsEnabled}
       />
     </React.Suspense>,
@@ -41,7 +40,6 @@ describe("TabRouter — FB-4 review gate", () => {
         activeTab="review"
         composer={null}
         commonTabProps={commonTabProps}
-        onCreateComponent={vi.fn()}
         reviewsEnabled={false}
       />,
     );
@@ -54,7 +52,6 @@ describe("TabRouter — FB-4 review gate", () => {
         activeTab="review"
         composer={null}
         commonTabProps={commonTabProps}
-        onCreateComponent={vi.fn()}
         reviewsEnabled={null}
       />,
     );
@@ -63,7 +60,7 @@ describe("TabRouter — FB-4 review gate", () => {
 
   it("renders nothing when reviewsEnabled is omitted", () => {
     const { container } = render(
-      <TabRouter activeTab="review" composer={null} commonTabProps={commonTabProps} onCreateComponent={vi.fn()} />,
+      <TabRouter activeTab="review" composer={null} commonTabProps={commonTabProps} />,
     );
     expect(container).toBeEmptyDOMElement();
   });

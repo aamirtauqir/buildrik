@@ -9,13 +9,7 @@ import type { ComponentDefinition } from "@/shared/types/components";
 
 export interface ComponentsTabProps {
   composer: Composer | null;
-  searchQuery?: string;
-  compactMode?: boolean;
-  onCreateNew?: () => void;
   onComponentSelect?: (component: ComponentDefinition | null) => void;
   selectedComponentId?: string | null;
-  isExpanded?: boolean;
-  onExpandToggle?: () => void;
-  onHelpClick?: () => void;
   onClose?: () => void;
 }

@@ -97,6 +97,77 @@ describe("Progress — board 12", () => {
   });
 });
 
+describe("Progress — a batch (2L9 B03)", () => {
+  const bar = (id: string, value: string, max: string) => ({
+    id,
+    type: "progress" as const,
+    tagName: "div",
+    children: [
+      { id: `${id}-bar`, type: "container" as const, tagName: "progress", attributes: { value, max }, children: [] },
+      { id: `${id}-lbl`, type: "container" as const, tagName: "div", classes: ["pb-label"], children: [{ id: `${id}-t`, type: "text" as const, tagName: "span", content: "0%", children: [] }] },
+    ],
+  });
+
+  it("values the bars disagree on read Mixed; ones they share read as the value", () => {
+    renderBlock(bar("a", "30", "100"), { also: [bar("b", "60", "100") as never] });
+    expect(screen.getByLabelText("Value")).toHaveValue("");
+    expect(screen.getByLabelText("Value")).toHaveAttribute("placeholder", "Mixed");
+    expect(screen.getByLabelText("Maximum")).toHaveValue("100");
+  });
+
+  it("a Maximum across the batch keeps each bar's own Value, and says so", () => {
+    const { composer } = renderBlock(bar("a", "30", "100"), { also: [bar("b", "60", "120") as never] });
+    fireEvent.change(screen.getByLabelText("Maximum"), { target: { value: "90" } });
+    expect(composer.elements.getElement("a-bar")!.getAttribute("value")).toBe("30");
+    expect(composer.elements.getElement("b-bar")!.getAttribute("value")).toBe("60");
+    expect(composer.elements.getElement("a-bar")!.getAttribute("max")).toBe("90");
+    expect(composer.elements.getElement("b-bar")!.getAttribute("max")).toBe("90");
+    expect(composer.elements.getElement("a-t")!.getContent()).toBe("33%");
+    expect(composer.elements.getElement("b-t")!.getContent()).toBe("67%");
+    const note = screen.getByTestId("inspector-progress-applied");
+    expect(note).toHaveTextContent("Applied to 2");
+    expect(note).toHaveTextContent("Only Maximum changed. Each Value and derived percentage uses its own pair.");
+  });
+
+  it("B02: a Maximum below a bar's Value refuses the whole batch and keeps the draft; Use maximum {floor} applies", () => {
+    const { composer } = renderBlock(bar("a", "20", "100"), { also: [bar("b", "80", "100") as never] });
+    fireEvent.change(screen.getByLabelText("Maximum"), { target: { value: "50" } });
+    expect(composer.elements.getElement("a-bar")!.getAttribute("max")).toBe("100");
+    expect(composer.elements.getElement("b-bar")!.getAttribute("max")).toBe("100");
+    expect(screen.getByTestId("inspector-progress-refused")).toHaveTextContent("Maximum must be at least 80; lower those values first.");
+    expect(screen.getByTestId("inspector-progress-refused")).toHaveTextContent("Neither bar changed. Their individual values remain 20 and 80.");
+    fireEvent.click(screen.getByTestId("inspector-progress-use-floor"));
+    expect(composer.elements.getElement("a-bar")!.getAttribute("max")).toBe("80");
+    expect(screen.queryByTestId("inspector-progress-refused")).toBeNull();
+  });
+
+  it("B03 → B06: the batch receipt's Undo restores every original maximum and says so", () => {
+    const { composer } = renderBlock(bar("a", "20", "100"), { also: [bar("b", "80", "100") as never] });
+    fireEvent.change(screen.getByLabelText("Maximum"), { target: { value: "90" } });
+    expect(screen.getByText("Maximum set to 90 on 2 bars.")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+    expect(composer.elements.getElement("a-bar")!.getAttribute("max")).toBe("100");
+    expect(composer.elements.getElement("b-bar")!.getAttribute("max")).toBe("100");
+    expect(screen.getByTestId("inspector-progress-applied")).toHaveTextContent("Both original maxima are 100. Each original Value remains 20 and 80.");
+    expect(screen.getByText("Original maxima restored.")).toBeInTheDocument();
+  });
+
+  it("a Value across the batch keeps each bar's own Maximum", () => {
+    const { composer } = renderBlock(bar("a", "30", "100"), { also: [bar("b", "60", "200") as never] });
+    fireEvent.change(screen.getByLabelText("Value"), { target: { value: "50" } });
+    expect(composer.elements.getElement("a-bar")!.getAttribute("max")).toBe("100");
+    expect(composer.elements.getElement("b-bar")!.getAttribute("max")).toBe("200");
+    expect(composer.elements.getElement("b-t")!.getContent()).toBe("25%");
+    expect(screen.getByTestId("inspector-progress-applied")).toHaveTextContent("Only Value changed.");
+  });
+
+  it("one bar edited is no batch — no note", () => {
+    renderBlock(bar("a", "30", "100"));
+    fireEvent.change(screen.getByLabelText("Maximum"), { target: { value: "90" } });
+    expect(screen.queryByTestId("inspector-progress-applied")).toBeNull();
+  });
+});
+
 describe("Accordion — board 13", () => {
   const item = (id: string, title: string, state: string) => ({
     id,

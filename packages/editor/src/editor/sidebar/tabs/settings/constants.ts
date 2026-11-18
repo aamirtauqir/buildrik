@@ -11,7 +11,6 @@
 import type { WorkspaceRole } from "@/services/RoleService";
 import type {
   SettingsNavId,
-  SettingsPaneId,
   SettingsSaveModel,
   SettingsScope,
   SettingsScreenId,
@@ -78,20 +77,19 @@ export type SettingsNavGroupId =
   | "publishing"
   | "visitors"
   | "advanced"
-  | "danger-zone"
   | "workspace";
 
-/** Sentence case — the pane header reads `Site / General`; the sidebar and the
- *  Overview's cards set it uppercase themselves. `workspace` is the footer
- *  group under the separator: rows that leave for the dashboard. */
+/** Sentence case — the sidebar and the Overview's cards set it uppercase
+ *  themselves. `workspace` is the last group (2L9 B8-S01 "ORGANIZATION
+ *  WORKSPACE ↗"): rows that leave for the dashboard. The Danger zone is a row
+ *  under Advanced, not a group of its own (B8-S01). */
 export const SETTINGS_NAV_GROUPS: Record<SettingsNavGroupId, string> = {
   site: "Site",
   "search-sharing": "Search & sharing",
   publishing: "Publishing",
   visitors: "Visitors",
   advanced: "Advanced",
-  "danger-zone": "Danger zone",
-  workspace: "Managed in workspace settings",
+  workspace: "Organization workspace",
 };
 
 /** Sidebar order, top to bottom. */
@@ -101,7 +99,6 @@ export const SETTINGS_NAV_GROUP_ORDER: readonly SettingsNavGroupId[] = [
   "publishing",
   "visitors",
   "advanced",
-  "danger-zone",
   "workspace",
 ];
 
@@ -135,10 +132,10 @@ export const SETTINGS_NAV: SettingsNavDef[] = [
   { id: "forms", title: "Form submissions", subtitle: "What visitors sent through your forms.", group: "visitors", kind: "screen" },
   { id: "custom-code", title: "Custom code", subtitle: "Head, body and CSS injections.", group: "advanced", kind: "screen" },
   { id: "headers", title: "Security headers", subtitle: "CSP, HSTS and security policy.", group: "advanced", kind: "screen" },
-  { id: "danger-zone", title: "Danger zone", subtitle: "Archive, transfer or delete this site.", group: "danger-zone", kind: "screen" },
-  { id: "members", title: "Members", subtitle: "Seats and roles", group: "workspace", kind: "workspace" },
-  { id: "billing", title: "Billing", subtitle: "Plan and invoices", group: "workspace", kind: "workspace" },
-  { id: "webhooks", title: "Integrations & webhooks", subtitle: "Apps, Vercel and webhook deliveries", group: "workspace", kind: "workspace" },
+  { id: "danger-zone", title: "Danger zone", subtitle: "Archive, transfer or delete this site.", group: "advanced", kind: "screen" },
+  { id: "members", title: "Members ↗", subtitle: "Seats and roles", group: "workspace", kind: "workspace" },
+  { id: "billing", title: "Billing ↗", subtitle: "Plan and invoices", group: "workspace", kind: "workspace" },
+  { id: "webhooks", title: "Integrations ↗", subtitle: "Apps, Vercel and webhook deliveries", group: "workspace", kind: "workspace" },
 ];
 
 /** The ids that render in the pane, in sidebar order — what a deep link may name. */
@@ -151,11 +148,6 @@ export function isSettingsScreenId(id: string): id is SettingsScreenId {
   return (SETTINGS_SCREEN_IDS as readonly string[]).includes(id);
 }
 
-const WORKSPACE_DOOR_IDS: readonly SettingsWorkspaceDoorId[] = ["members", "billing", "webhooks"];
-
-export function isSettingsPaneId(id: string): id is SettingsPaneId {
-  return isSettingsScreenId(id) || (WORKSPACE_DOOR_IDS as readonly string[]).includes(id);
-}
 
 /**
  * The role a screen needs to CHANGE anything on it (SA-21, plan M2). Below it
@@ -214,32 +206,15 @@ export const SCREEN_SCOPE: Record<Exclude<SettingsScreenId, "overview">, Setting
   "danger-zone": "lifecycle",
 };
 
-/** M1 (8134:212121 / 8134:212529): the next-publish line names the site; the live one does not;
- *  the lifecycle line is the Overview's and the Danger zone's (8137:216346 / 8137:216600). */
-export function scopeLine(scope: SettingsScope, siteName: string): string {
-  if (scope === "publish") return `${siteName} · all pages · applies on next publish`;
-  if (scope === "lifecycle") return `${siteName} · site lifecycle · changes apply immediately`;
-  return "Live immediately · no publish needed";
-}
-
-/** 8139:217358: a workspace door's line. */
-export const workspaceScopeLine = (workspaceName: string) => `${workspaceName} · all sites · managed in workspace settings`;
-
-/** The door card's two sentences per workspace row (8139:217358's shape). */
-export const WORKSPACE_DOOR_COPY: Record<SettingsWorkspaceDoorId, { what: string; managed: string }> = {
-  members: {
-    what: "Invite people and choose their roles across your workspace.",
-    managed: "Members are managed in workspace settings.",
-  },
-  billing: {
-    what: "See your plan, invoices and payment method.",
-    managed: "Billing is managed in workspace settings.",
-  },
-  webhooks: {
-    what: "Connect apps and manage webhooks for your workspace.",
-    managed: "These connections are managed in workspace settings.",
-  },
+/** The scope chip under each screen's title (2L9 B8-S02 "Applies on next publish",
+ *  B8-S13 "Live immediately · no publish needed"); the lifecycle line is the
+ *  Overview's and the Danger zone's. */
+export const SCOPE_LINE: Record<SettingsScope, string> = {
+  publish: "Applies on next publish",
+  live: "Live immediately · no publish needed",
+  lifecycle: "Site lifecycle · changes apply immediately",
 };
+
 
 /** 3950:26309 / 3951:26319 / 3951:26607 — the banner a screen draws when
  *  its Save fails; the shell sets it after a refused Save, Domains and

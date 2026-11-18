@@ -62,6 +62,15 @@ export interface PopoverProps {
    *  column it was clipped by the column's own scroll container, so the whole
    *  picker was invisible over the canvas (P-4). */
   beside?: string;
+  /** With `beside`: a selector, inside that column, whose top the panel lines
+   *  up with instead of the trigger's — the inspector's Interaction actions
+   *  menu tops out level with the tab strip (2L9 165:17822). Not found, or
+   *  omitted: the trigger's top, as before. */
+  besideTop?: string;
+  /** With `beside`: which side of the column. "left" (default, the
+   *  inspector's pickers) or "right" — a drawer's menu over the canvas, 5px
+   *  clear of the drawer (2L9 142:61796). */
+  besideSide?: "left" | "right";
   /** Mount the panel in the overlay root with fixed coordinates computed from
    *  the trigger and `placement` — for a panel wider than the column its
    *  trigger sits in. The inspector's ⋯ menu is 320 wide over the canvas
@@ -75,7 +84,7 @@ const VIEWPORT_MARGIN = 8;
 
 const FOCUSABLE = 'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
-export function Popover({ open, onClose, trigger, placement = "bottom", children, label, className, block, beside, portal }: PopoverProps) {
+export function Popover({ open, onClose, trigger, placement = "bottom", children, label, className, block, beside, besideTop, besideSide = "left", portal }: PopoverProps) {
   const portalled = Boolean(beside) || Boolean(portal);
   const wrap = React.useRef<HTMLSpanElement | null>(null);
   const panel = React.useRef<HTMLDivElement | null>(null);
@@ -113,8 +122,10 @@ export function Popover({ open, onClose, trigger, placement = "bottom", children
         const column = wrap.current?.closest(beside);
         /* Beside the column: right edge 9px clear of it, top on the trigger.
            No column on the page → under the trigger, like `bottom`. */
-        let left = column ? column.getBoundingClientRect().left - 9 - r.width : anchor.left;
-        let top = column ? anchor.top : anchor.bottom + 4;
+        const box = column?.getBoundingClientRect();
+        let left = box ? (besideSide === "right" ? box.right + 5 : box.left - 9 - r.width) : anchor.left;
+        const topAnchor = column && besideTop ? column.querySelector(besideTop) : null;
+        let top = column ? (topAnchor?.getBoundingClientRect().top ?? anchor.top) : anchor.bottom + 4;
         left = Math.min(Math.max(left, VIEWPORT_MARGIN), Math.max(VIEWPORT_MARGIN, vw - VIEWPORT_MARGIN - r.width));
         top = Math.min(Math.max(top, VIEWPORT_MARGIN), Math.max(VIEWPORT_MARGIN, vh - VIEWPORT_MARGIN - r.height));
         el.style.left = `${Math.round(left)}px`;
@@ -167,7 +178,7 @@ export function Popover({ open, onClose, trigger, placement = "bottom", children
       if (portalled) window.removeEventListener("scroll", place, true);
       ro?.disconnect();
     };
-  }, [open, placement, children, beside, portal, portalled, panelNode]);
+  }, [open, placement, children, beside, besideTop, portal, portalled, panelNode]);
 
   const focusTrigger = React.useCallback(() => {
     const trigger = wrap.current?.firstElementChild;

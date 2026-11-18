@@ -3,7 +3,11 @@
  * @license BSD-3-Clause
  */
 
-import { render, screen, fireEvent, act } from "@testing-library/react";
+import { render as rtlRender, screen, fireEvent, act } from "@testing-library/react";
+import { ToastProvider } from "@/editor/chrome-ui";
+import * as React from "react";
+/* The section raises "Interaction added / deleted · Undo" receipts. */
+const render = (ui: React.ReactElement) => rtlRender(<ToastProvider>{ui}</ToastProvider>);
 import { EVENTS } from "@/shared/constants/events";
 import { describe, it, expect, vi } from "vitest";
 import { InteractionsSection } from "../index";
@@ -30,17 +34,28 @@ describe("InteractionsSection", () => {
     expect(container.firstChild).not.toBeNull();
   });
 
-  it("draws no empty-state paragraph — the board shows only + Add interaction", () => {
-    renderOpen({ interactions: [], onInteractionsChange: vi.fn() });
-    expect(screen.queryByText(/No interactions yet/i)).toBeNull();
+  it("2L9 161:13919: 'Plays on all breakpoints', + Add interaction, then 'No interactions yet.'", () => {
+    const { container } = renderOpen({ interactions: [], onInteractionsChange: vi.fn() });
+    const text = container.textContent ?? "";
+    const at = ["Plays on all breakpoints", "+ Add interaction", "No interactions yet."].map((t) => text.indexOf(t));
+    expect(at.every((i) => i >= 0)).toBe(true);
+    expect([...at].sort((a, b) => a - b)).toEqual(at);
   });
 
-  it("a row reads trigger as the label, the animation as the value (board 2: On click  [Scroll to menu ▾])", () => {
+  it("a row reads 'trigger · animation ›', centred (2L9 165:19449)", () => {
     const interaction = { ...makeInteraction("hover"), animation: { ...DEFAULT_ANIMATION_CONFIG, preset: "scaleUp" } } as Interaction;
     renderOpen({ interactions: [interaction], onInteractionsChange: vi.fn() });
     const row = screen.getByRole("button", { name: /On hover/ });
-    expect(row.querySelector(".bdi-lb")).toHaveTextContent("On hover");
-    expect(row).toHaveTextContent("Scale Up");
+    expect(row).toHaveTextContent("On hover · Scale Up ›");
+  });
+
+  it("a switched-off interaction reads 'Off · …' and the one off offers Enable interaction (2L9 165:18272)", () => {
+    const interaction = { ...makeInteraction("hover"), enabled: false, animation: { ...DEFAULT_ANIMATION_CONFIG, preset: "scaleUp" } } as Interaction;
+    const onInteractionsChange = vi.fn();
+    renderOpen({ interactions: [interaction], onInteractionsChange });
+    expect(screen.getByTestId("interaction-row")).toHaveTextContent("Off · Scale Up on hover");
+    fireEvent.click(screen.getByRole("button", { name: "Enable interaction" }));
+    expect(onInteractionsChange).toHaveBeenCalledWith([{ ...interaction, enabled: true }]);
   });
 
   it("renders Add Interaction button", () => {
@@ -50,25 +65,38 @@ describe("InteractionsSection", () => {
     expect(matches.length).toBeGreaterThan(0);
   });
 
-  it("shows the trigger picker panel when Add Interaction is clicked", () => {
+  it("2L9 I14: + Add interaction opens presets first, in the board's order, then 'Choose a trigger ›'", () => {
     renderOpen({ interactions: [], onInteractionsChange: vi.fn() });
     fireEvent.click(screen.getByText(/\+ Add interaction/));
-    expect(screen.getByText("Choose Trigger")).toBeInTheDocument();
+    expect(screen.getAllByTestId("add-interaction-preset").map((b) => b.textContent)).toEqual([
+      "Fade in on scroll", "Slide up on scroll", "Fade in on page load", "Grow on hover", "Glow on hover", "Pulse on hover", "Press while held",
+    ]);
+    expect(screen.getByTestId("add-interaction-choose-trigger")).toHaveTextContent("Choose a trigger");
+    /* The add screen replaces the list. */
+    expect(screen.queryByText("No interactions yet.")).toBeNull();
   });
 
-  it("hides the picker panel when close button is clicked", () => {
+  it("a preset adds its trigger and animation", () => {
+    const onChange = vi.fn();
+    renderOpen({ interactions: [], onInteractionsChange: onChange });
+    fireEvent.click(screen.getByText(/\+ Add interaction/));
+    fireEvent.click(screen.getByText("Slide up on scroll"));
+    expect(onChange).toHaveBeenCalledWith([expect.objectContaining({ trigger: "scroll-into-view", animation: expect.objectContaining({ preset: "slideUp" }) })]);
+  });
+
+  it("‹ Back to Interactions leaves the add screen", () => {
     renderOpen({ interactions: [], onInteractionsChange: vi.fn() });
     fireEvent.click(screen.getByText(/\+ Add interaction/));
-    // The × close button rendered via &#215;
-    const closeBtn = screen.getByText("×");
-    fireEvent.click(closeBtn);
-    expect(screen.queryByText("Choose Trigger")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("add-interaction-back"));
+    expect(screen.queryByTestId("add-interaction")).not.toBeInTheDocument();
+    expect(screen.getByText("No interactions yet.")).toBeInTheDocument();
   });
 
   it("calls onInteractionsChange when a trigger is selected", () => {
     const onChange = vi.fn();
     renderOpen({ interactions: [], onInteractionsChange: onChange });
     fireEvent.click(screen.getByText(/\+ Add interaction/));
+    fireEvent.click(screen.getByText("Choose a trigger ›"));
     fireEvent.click(screen.getByText("On click"));
     expect(onChange).toHaveBeenCalledOnce();
     const [newList] = onChange.mock.calls[0] as [Interaction[]];
@@ -95,7 +123,8 @@ describe("InteractionsSection", () => {
     });
     // Expand the item to reveal the Delete button
     fireEvent.click(screen.getByText("On hover"));
-    fireEvent.click(screen.getByText("Delete"));
+    fireEvent.click(screen.getByRole("button", { name: "More…" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Delete" }));
     expect(onChange).toHaveBeenCalledWith([]);
   });
 
@@ -107,34 +136,39 @@ describe("InteractionsSection", () => {
       onInteractionsChange: onChange,
     });
     fireEvent.click(screen.getByText("On click"));
-    fireEvent.click(screen.getByText("Disable"));
+    fireEvent.click(screen.getByRole("button", { name: "More…" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Disable" }));
     expect(onChange).toHaveBeenCalledOnce();
     const [updated] = onChange.mock.calls[0] as [Interaction[]];
     expect(updated[0].enabled).toBe(false);
   });
 
   it("shows an interaction the moment the element takes it (live defect: it appeared only after a re-mount)", () => {
-    const handlers = new Map<string, (el: unknown) => void>();
+    /* Every listener of an event hears it, as on the real composer. */
+    const handlers = new Map<string, Set<(el: unknown) => void>>();
     let stored: Interaction[] = [];
     const element = { id: "el-1", getInteractions: () => stored };
     const composer = {
-      on: (e: string, h: (el: unknown) => void) => handlers.set(e, h),
-      off: (e: string) => handlers.delete(e),
+      on: (e: string, h: (el: unknown) => void) => (handlers.get(e) ?? handlers.set(e, new Set()).get(e)!).add(h),
+      off: (e: string, h: (el: unknown) => void) => handlers.get(e)?.delete(h),
       elements: { getElement: () => element },
     };
     renderOpen({
       interactions: [],
       onInteractionsChange: (next) => {
         stored = next;
-        handlers.get(EVENTS.ELEMENT_UPDATED)?.(element);
+        handlers.get(EVENTS.ELEMENT_UPDATED)?.forEach((h) => h(element));
       },
       composer: composer as never,
       elementId: "el-1",
     });
     fireEvent.click(screen.getByText(/\+ Add interaction/));
+    fireEvent.click(screen.getByText("Choose a trigger ›"));
     act(() => {
       fireEvent.click(screen.getByText("On hover"));
     });
+    /* The new interaction opens; back to the list shows its row. */
+    fireEvent.click(screen.getByTestId("interactions-back"));
     expect(screen.getByRole("button", { name: /On hover/ })).toBeInTheDocument();
   });
 });
@@ -174,10 +208,38 @@ describe("InteractionsSection — the element animation row", () => {
     const hover = makeInteraction("hover");
     renderOpen({ interactions: [hover, makeInteraction("click")], onInteractionsChange: vi.fn() });
     fireEvent.click(screen.getByRole("button", { name: /On hover/ }));
-    expect(screen.getByTestId("interactions-back")).toHaveTextContent("‹ On hover");
+    expect(screen.getByTestId("interactions-back")).toHaveTextContent("‹ Back to Interactions");
     expect(screen.queryByRole("button", { name: /On click/ })).toBeNull();
     expect(screen.queryByText("+ Add interaction")).toBeNull();
     fireEvent.click(screen.getByTestId("interactions-back"));
     expect(screen.getByRole("button", { name: /On click/ })).toBeInTheDocument();
+  });
+
+  it("2L9 I20: Duplicate puts a copy after the original and opens it", () => {
+    const interaction = makeInteraction("hover");
+    const onChange = vi.fn();
+    renderOpen({ interactions: [interaction], onInteractionsChange: onChange });
+    fireEvent.click(screen.getByText("On hover"));
+    fireEvent.click(screen.getByRole("button", { name: "More…" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Duplicate" }));
+    const next = onChange.mock.calls[0][0];
+    expect(next).toHaveLength(2);
+    expect(next[1]).toMatchObject({ trigger: "hover", animation: interaction.animation });
+    expect(next[1].id).not.toBe(interaction.id);
+  });
+
+  it("2L9 I15 / I22: a preset adds at 0.6 s Ease out and says 'Interaction added · Undo'; Undo is the document history's", async () => {
+    const onChange = vi.fn();
+    const undo = vi.fn();
+    const composer = { on: vi.fn(), off: vi.fn(), elements: { getElement: () => null }, history: { undo } };
+    renderOpen({ interactions: [], onInteractionsChange: onChange, composer: composer as never, elementId: "el-1" });
+    fireEvent.click(screen.getByText(/\+ Add interaction/));
+    fireEvent.click(screen.getByText("Fade in on scroll"));
+    expect(onChange).toHaveBeenCalledWith([
+      expect.objectContaining({ trigger: "scroll-into-view", animation: expect.objectContaining({ preset: "fadeIn", duration: 600, easing: "power2.out" }) }),
+    ]);
+    expect(await screen.findByText("Interaction added")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+    expect(undo).toHaveBeenCalledTimes(1);
   });
 });

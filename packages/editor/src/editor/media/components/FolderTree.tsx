@@ -371,7 +371,7 @@ export function FolderTree({
         />
         <TreeNode
           icon={<CheckCircle size={14} style={{ color: "var(--bk-success)" }} />}
-          label="In use"
+          label="Used on this site"
           testId="mgr-row-in-use"
           count={inUseCount}
           active={smartFolder === "in-use"}
@@ -382,7 +382,7 @@ export function FolderTree({
         />
         <TreeNode
           icon={<MinusCircle size={14} style={{ color: "var(--bk-ink-disabled)" }} />}
-          label="Unused"
+          label="No known placements"
           testId="mgr-row-unused"
           count={unusedCount}
           active={smartFolder === "unused"}

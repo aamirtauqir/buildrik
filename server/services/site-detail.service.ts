@@ -54,7 +54,7 @@ export async function getSiteOverview(siteId: string): Promise<SiteOverview> {
     sslDomain,
     formBlocks,
   ] = await Promise.all([
-    prisma.page.count({ where: { siteId } }),
+    prisma.page.count({ where: { siteId, deletedAt: null } }),
     prisma.siteAnalytics.aggregate({
       where: { siteId, date: { gte: thirtyDaysAgo } },
       _sum: { visitors: true },
@@ -87,11 +87,11 @@ export async function getSiteOverview(siteId: string): Promise<SiteOverview> {
        every site. Read both and decide in JS; a site's page count is tens, not
        thousands. */
     prisma.page.findMany({
-      where: { siteId },
+      where: { siteId, deletedAt: null },
       select: { seoTitle: true, seoDescription: true, settings: true },
     }),
     prisma.page.count({
-      where: { siteId, NOT: { blocks: { equals: [] } } },
+      where: { siteId, deletedAt: null, NOT: { blocks: { equals: [] } } },
     }),
     prisma.domain.findFirst({ where: { siteId, sslStatus: "ACTIVE" } }),
     prisma.formBlock.findMany({
@@ -239,7 +239,7 @@ export async function getSettingsOverview(siteId: string): Promise<SettingsOverv
     webhook,
     members,
   ] = await Promise.all([
-    prisma.page.findMany({ where: { siteId }, orderBy: { position: "asc" }, select: { ...SUGGESTION_PAGE_SELECT, translations: true } }),
+    prisma.page.findMany({ where: { siteId, deletedAt: null }, orderBy: { position: "asc" }, select: { ...SUGGESTION_PAGE_SELECT, translations: true, seoDescription: true, meta: true } }),
     prisma.domain.findFirst({ where: { siteId, isPrimary: true }, select: { domain: true } }),
     prisma.dnsRecord.findMany({
       where: { verified: false, domain: { siteId } },
@@ -349,8 +349,19 @@ export async function getSettingsOverview(siteId: string): Promise<SettingsOverv
       workspaceDeletionAt: site.workspace.deletionScheduledAt?.toISOString() ?? null,
     },
     general: { siteName: site.name, language: site.defaultLocale },
-    localization: { locales: site.enabledLocales.length, notStarted },
-    seo: { allowIndexing: site.allowIndexing, robotsTxtSet: filled(site.robotsTxt) },
+    localization: {
+      locales: site.enabledLocales.length,
+      notStarted,
+      codes: [site.defaultLocale, ...site.enabledLocales.filter((l) => l !== site.defaultLocale)],
+    },
+    seo: {
+      allowIndexing: site.allowIndexing,
+      robotsTxtSet: filled(site.robotsTxt),
+      // The page's description lives in `seoDescription`; older pages carry it in `meta.description`.
+      pagesWithoutDescription: pages.filter(
+        (p) => !filled(p.seoDescription) && !(isRecord(p.meta) && typeof p.meta.description === "string" && filled(p.meta.description)),
+      ).length,
+    },
     domains: { primary: primaryDomain?.domain ?? null, pendingDns: pendingDns.length },
     redirects: { rules: redirects.length, suggestions },
     analytics: { providers, receiving: analyticsDays > 0 },
@@ -360,7 +371,10 @@ export async function getSettingsOverview(siteId: string): Promise<SettingsOverv
     access: { passwordSet: Boolean(site.publishedPassword), shareLinks },
     webhooks: { endpoints: webhook ? 1 : 0, lastDelivery: lastDeliveryStatus },
     members: { used: members, seats: Number(limits.teamMembers) },
-    billing: { plan, priceMonthly },
+    /* pagesPerSite: the editor's New page names its capacity ("6 of 10 pages
+       on Free", design-2l9 101:29978) from the same limit saveProjectData
+       enforces (sites.service assertPageLimit). -1 = unlimited. */
+    billing: { plan, priceMonthly, pagesPerSite: Number(limits.pagesPerSite) },
     attention,
   };
 }
@@ -382,7 +396,7 @@ export async function getLocales(siteId: string): Promise<LocalesSummary> {
   if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
 
   const pages = await prisma.page.findMany({
-    where: { siteId },
+    where: { siteId, deletedAt: null },
     orderBy: { position: "asc" },
     select: { name: true, translations: true },
   });
@@ -413,7 +427,7 @@ export async function getLocales(siteId: string): Promise<LocalesSummary> {
  */
 export async function getRedirectSuggestions(siteId: string): Promise<RedirectSuggestion[]> {
   const [pages, redirects] = await Promise.all([
-    prisma.page.findMany({ where: { siteId }, orderBy: { position: "asc" }, select: SUGGESTION_PAGE_SELECT }),
+    prisma.page.findMany({ where: { siteId, deletedAt: null }, orderBy: { position: "asc" }, select: SUGGESTION_PAGE_SELECT }),
     prisma.redirect.findMany({ where: { siteId }, select: { fromPath: true } }),
   ]);
   return suggestRedirects(pages, redirects);

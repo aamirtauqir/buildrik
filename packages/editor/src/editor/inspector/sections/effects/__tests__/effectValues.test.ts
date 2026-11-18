@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { composeFilter, composeShadow, composeTransform, extractInnerShadow, extractOuterShadow } from "../effectValues";
+import { composable, composeFilter, composeShadowLayers, composeTransform, FILTER_ORDER, parseShadowLayers } from "../effectValues";
 
 describe("composeTransform", () => {
   it("merges a new function without dropping existing ones", () => {
@@ -50,15 +50,33 @@ describe("composeFilter", () => {
   });
 });
 
-describe("box-shadow layers", () => {
-  it("splits outer and inset layers without breaking rgba()", () => {
-    const v = "0 4px 12px rgba(0,0,0,0.08), inset 0 2px 4px rgba(0,0,0,0.1)";
-    expect(extractOuterShadow(v)).toBe("0 4px 12px rgba(0,0,0,0.08)");
-    expect(extractInnerShadow(v)).toBe("inset 0 2px 4px rgba(0,0,0,0.1)");
+describe("box-shadow layers (2L9 161:12525)", () => {
+  it("reads each layer's parts without breaking rgba(), and writes them back", () => {
+    const v = "0 4px 12px rgba(0,0,0,0.08), inset 0 2px 4px 1px rgba(0, 0, 0, 0.1)";
+    const layers = parseShadowLayers(v)!;
+    expect(layers).toEqual([
+      { inset: false, x: "0px", y: "4px", blur: "12px", spread: "0px", color: "rgba(0,0,0,0.08)" },
+      { inset: true, x: "0px", y: "2px", blur: "4px", spread: "1px", color: "rgba(0, 0, 0, 0.1)" },
+    ]);
+    expect(composeShadowLayers(layers)).toBe("0px 4px 12px 0px rgba(0,0,0,0.08), inset 0px 2px 4px 1px rgba(0, 0, 0, 0.1)");
   });
 
-  it("composes the two back, and none when both are empty", () => {
-    expect(composeShadow("0 1px 2px red", "inset 0 0 1px blue")).toBe("0 1px 2px red, inset 0 0 1px blue");
-    expect(composeShadow("", "")).toBe("none");
+  it("none / empty is no layers; none written back when all are removed", () => {
+    expect(parseShadowLayers("none")).toEqual([]);
+    expect(composeShadowLayers([])).toBe("none");
+  });
+
+  it("a value the rows cannot hold reads as null (kept as written)", () => {
+    expect(parseShadowLayers("var(--elevation)")).toBeNull();
+    expect(parseShadowLayers("0 0 calc(1px + 2px) red")).toBeNull();
+  });
+});
+
+describe("composable (161:12525)", () => {
+  it("is false for an unknown function or one written twice — the sliders would drop it", () => {
+    expect(composable("blur(4px) brightness(120%)", FILTER_ORDER)).toBe(true);
+    expect(composable("blur(4px) saturate(1.2) blur(1px)", FILTER_ORDER)).toBe(false);
+    expect(composable("saturate(1.2)", FILTER_ORDER)).toBe(false);
+    expect(composable(undefined, FILTER_ORDER)).toBe(true);
   });
 });

@@ -64,6 +64,7 @@ function setup(opts: {
   settings?: Record<string, unknown>;
   registerFieldErrors?: (errors: Readonly<Record<string, string>> | null) => void;
   fieldErrors?: Readonly<Record<string, string>>;
+  registerFooterMessage?: (message: string | null) => void;
 } = {}) {
   const composer = createMockComposer({ projectSettings: opts.settings ?? {} });
   const utils = render(
@@ -77,15 +78,16 @@ function setup(opts: {
       saveError={opts.saveError}
       registerFieldErrors={opts.registerFieldErrors}
       fieldErrors={opts.fieldErrors}
+      registerFooterMessage={opts.registerFooterMessage}
     />,
   );
   return { composer, ...utils };
 }
 
-const gaInput = () => screen.getByLabelText("Google Analytics ID") as HTMLInputElement;
-const gtmInput = () => screen.getByLabelText("GTM Container ID") as HTMLInputElement;
+const gaInput = () => screen.getByLabelText("Measurement ID") as HTMLInputElement;
+const gtmInput = () => screen.getByLabelText("Container ID") as HTMLInputElement;
 const pixelInput = () => screen.getByLabelText("Pixel ID") as HTMLInputElement;
-const clarityInput = () => screen.getByLabelText("Clarity Project ID") as HTMLInputElement;
+const clarityInput = () => screen.getByLabelText("Project ID") as HTMLInputElement;
 const gaSwitch = () => screen.getByRole("switch", { name: "Enable Google Analytics" });
 const pixelSwitch = () => screen.getByRole("switch", { name: "Enable Meta Pixel" });
 
@@ -95,7 +97,7 @@ describe("AnalyticsScreen — the frame's cards and rows", () => {
   /* G3-108: 4418:127827 draws four cards. The Cookie Consent switch recorded
      a flag nothing reads (no banner, no export effect) — hidden until wired;
      the stored value is kept on the flush. */
-  it("draws the board's four cards in order, each with its label-left rows — no Consent card", async () => {
+  it("draws the board's four cards in order (B8-AN01), one provider row each — no Consent card", async () => {
     setup();
     await loaded();
     const cards = screen.getAllByRole("heading", { level: 3 }).map((h) => h.textContent);
@@ -103,15 +105,18 @@ describe("AnalyticsScreen — the frame's cards and rows", () => {
     expect(screen.queryByRole("switch", { name: "Cookie Consent" })).toBeNull();
 
     const ga = within(screen.getByTestId("set-card-google-analytics"));
-    expect(ga.getByTestId("set-field-label-enable-google-analytics")).toHaveTextContent("Enable Google Analytics");
-    expect(ga.getByTestId("set-field-label-google-analytics-id")).toHaveTextContent("Google Analytics ID");
-    expect(ga.getByTestId("set-field-label-connection-status")).toHaveTextContent("Connection status");
-    expect(ga.getByTestId("set-field-label-last-received-data")).toHaveTextContent("Last received data");
-    expect(ga.getByTestId("set-an-ga-verify")).toHaveTextContent("Check data is arriving");
+    expect(ga.getByTestId("set-field-label-google-analytics-id")).toHaveTextContent("Measurement ID");
+    expect(ga.getByTestId("set-field-google-analytics-id")).toHaveTextContent("Enabled");
+    expect(ga.getByTestId("set-field-connection-status")).toBeInTheDocument();
+    expect(ga.getByTestId("set-field-last-received-data")).toBeInTheDocument();
+    expect(ga.getByTestId("set-an-ga-verify")).toHaveTextContent("Verify");
+    expect(ga.getByTestId("set-an-ga-disclaimer")).toHaveTextContent(
+      "Buildrick tracker status; this does not confirm Google Analytics delivery.",
+    );
 
-    expect(screen.getByTestId("set-field-label-gtm-container-id")).toHaveTextContent("GTM Container ID");
+    expect(screen.getByTestId("set-field-label-gtm-container-id")).toHaveTextContent("Container ID");
     expect(screen.getByTestId("set-field-label-pixel-id")).toHaveTextContent("Pixel ID");
-    expect(screen.getByTestId("set-field-label-clarity-project-id")).toHaveTextContent("Clarity Project ID");
+    expect(screen.getByTestId("set-field-label-clarity-project-id")).toHaveTextContent("Project ID");
   });
 
   it("gives every control the id Search lands on, and the brief's testids", async () => {
@@ -158,40 +163,37 @@ describe("AnalyticsScreen — the frame's cards and rows", () => {
 });
 
 describe("AnalyticsScreen — Connection status and Last received data", () => {
-  it("RECEIVING DATA (green) with the verified line and the frame's last-received shape", async () => {
+  it("Receiving data with the verified line and the frame's last-received shape", async () => {
     setup({ settings: gaSettings() });
     await loaded();
     expect(statusMock).toHaveBeenCalledWith({ siteId: "s1" });
     const pill = screen.getByTestId("set-an-ga-status");
-    expect(pill).toHaveTextContent("RECEIVING DATA");
-    expect(pill).toHaveClass("tw:bg-[var(--bk-success-tint)]");
-    expect(screen.getByTestId("set-an-ga-verified")).toHaveTextContent("Measurement ID verified on 2 Jul 2025");
-    expect(screen.getByTestId("set-an-ga-last")).toHaveTextContent("2 Jul 2025, 19:38 · 1,284 events in the last 24 hours");
+    expect(pill).toHaveTextContent("Receiving data");
+    // B8-AN04: one detail line under the status word.
+    expect(screen.getByTestId("set-an-ga-last")).toHaveTextContent("Last received 2 Jul 2025, 19:38 · 1,284 events in the last 24 hours");
   });
 
-  it("NO DATA YET (grey) when the id is verified but nothing has arrived", async () => {
+  it("Waiting for data when the id is verified but nothing has arrived", async () => {
     statusMock.mockResolvedValue(silent());
     setup({ settings: gaSettings() });
     await loaded();
     const pill = screen.getByTestId("set-an-ga-status");
-    expect(pill).toHaveTextContent("NO DATA YET");
-    expect(pill).toHaveClass("tw:bg-[var(--bk-bg-subtle)]");
-    expect(screen.getByTestId("set-an-ga-verified")).toBeInTheDocument();
-    expect(screen.getByTestId("set-an-ga-last")).toHaveTextContent(/^No events yet$/);
+    expect(pill).toHaveTextContent("Waiting for data");
+    expect(screen.getByTestId("set-an-ga-verified")).toHaveTextContent("No events received yet · verified on 2 Jul 2025");
   });
 
-  it("NOT VERIFIED (grey), no verified line, when the id was never verified", async () => {
+  it("Not verified, no verified line, when the id was never verified", async () => {
     statusMock.mockResolvedValue(silent());
     setup({ settings: gaSettings({ verifiedAt: undefined }) });
     await loaded();
-    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("NOT VERIFIED");
+    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("Not verified");
     expect(screen.queryByTestId("set-an-ga-verified")).toBeNull();
   });
 
   it("events in the last 24 hours mean RECEIVING DATA even before a Verify — they are the tracker's", async () => {
     setup({ settings: gaSettings({ verifiedAt: undefined }) });
     await loaded();
-    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("RECEIVING DATA");
+    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("Receiving data");
     expect(screen.queryByTestId("set-an-ga-verified")).toBeNull();
   });
 
@@ -199,17 +201,17 @@ describe("AnalyticsScreen — Connection status and Last received data", () => {
     statusMock.mockResolvedValue(silent());
     setup({ settings: gaSettings() });
     await loaded();
-    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("NO DATA YET");
+    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("Waiting for data");
     fireEvent.change(gaInput(), { target: { value: "G-4XQ2P7B1KE" } });
-    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("NOT VERIFIED");
+    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("Not verified");
     expect(screen.queryByTestId("set-an-ga-verified")).toBeNull();
   });
 
   it("without a projectId requests nothing and reports the honest empty state", () => {
     setup({ projectId: null, settings: gaSettings({ verifiedAt: undefined }) });
     expect(statusMock).not.toHaveBeenCalled();
-    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("NOT VERIFIED");
-    expect(screen.getByTestId("set-an-ga-last")).toHaveTextContent(/^No events yet$/);
+    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("Not verified");
+    expect(screen.queryByTestId("set-an-ga-last")).toBeNull();
   });
 });
 
@@ -223,10 +225,10 @@ describe("formatDay / formatDayTime / lastReceivedLine / connectionPill — pure
 
   it("builds the Last received data line, or No events yet", () => {
     expect(lastReceivedLine({ lastEventAt: new Date(2025, 6, 2, 19, 38).toISOString(), events24h: 1284 })).toBe(
-      "2 Jul 2025, 19:38 · 1,284 events in the last 24 hours",
+      "Last received 2 Jul 2025, 19:38 · 1,284 events in the last 24 hours",
     );
     expect(lastReceivedLine({ lastEventAt: new Date(2025, 6, 2, 19, 38).toISOString(), events24h: 1 })).toBe(
-      "2 Jul 2025, 19:38 · 1 event in the last 24 hours",
+      "Last received 2 Jul 2025, 19:38 · 1 event in the last 24 hours",
     );
     expect(lastReceivedLine({ lastEventAt: null, events24h: 0 })).toBe("No events yet");
     expect(lastReceivedLine(null)).toBe("No events yet");
@@ -242,35 +244,29 @@ describe("formatDay / formatDayTime / lastReceivedLine / connectionPill — pure
   });
 });
 
-describe("AnalyticsScreen — Verify and Connection verified (4256:26844)", () => {
+describe("AnalyticsScreen — Verify (B8-AN02/03/04/06)", () => {
   const verify = () => screen.getByTestId("set-an-ga-verify");
 
-  it("re-reads the status, stamps verifiedAt into the draft (dirty, not saved) and opens the dialog", async () => {
+  it("re-reads the status (Checking status… while it runs), stamps verifiedAt into the draft (dirty, not saved), no dialog", async () => {
     statusMock.mockResolvedValueOnce(silent());
     const onDirtyChange = vi.fn();
     const { composer } = setup({ onDirtyChange, settings: gaSettings({ verifiedAt: undefined }) });
     await loaded();
-    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("NOT VERIFIED");
+    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("Not verified");
     expect(onDirtyChange).toHaveBeenLastCalledWith(false);
 
-    statusMock.mockResolvedValueOnce(receiving());
+    let release!: (v: unknown) => void;
+    statusMock.mockImplementationOnce(() => new Promise((r) => (release = r)));
     fireEvent.click(verify());
-    await waitFor(() => expect(screen.getByTestId("set-an-verified")).toBeInTheDocument());
+    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("Checking status…");
+    expect(verify()).toHaveTextContent("Checking…");
+    await act(async () => release(receiving()));
+    await waitFor(() => expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("Receiving data"));
     expect(statusMock).toHaveBeenCalledTimes(2);
-    expect(screen.getByTestId("set-an-verified-line")).toHaveTextContent(
-      "G-4XQ2P7B1KD is receiving data. 1,284 events arrived in the last 24 hours.",
-    );
-    expect(document.activeElement).toBe(screen.getByTestId("set-an-verified-back"));
-
-    // Behind the dialog the rows already show the re-read and the stamp.
-    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("RECEIVING DATA");
-    expect(screen.getByTestId("set-an-ga-verified")).toHaveTextContent(`Measurement ID verified on ${formatDay(new Date())}`);
+    expect(screen.queryByRole("dialog")).toBeNull();
     expect(screen.getByTestId("set-an-ga-last")).toHaveTextContent("1,284 events in the last 24 hours");
     expect(onDirtyChange).toHaveBeenLastCalledWith(true);
     expect(composer.setProjectSettings).not.toHaveBeenCalled();
-
-    fireEvent.click(screen.getByTestId("set-an-verified-back"));
-    expect(screen.queryByTestId("set-an-verified")).toBeNull();
   });
 
   it("the stamp is flushed on the next Save", async () => {
@@ -281,20 +277,19 @@ describe("AnalyticsScreen — Verify and Connection verified (4256:26844)", () =
     });
     await loaded();
     fireEvent.click(verify());
-    await waitFor(() => expect(screen.getByTestId("set-an-verified")).toBeInTheDocument());
+    await waitFor(() => expect(verify()).toHaveTextContent("Verify"));
     const settings = flush!() as { analytics: { googleAnalytics: { verifiedAt?: string } } };
     expect(settings.analytics.googleAnalytics.verifiedAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
     expect(composer.setProjectSettings).not.toHaveBeenCalled();
   });
 
-  it("says verified with nothing arrived when the re-read counts zero", async () => {
+  it("a verified id with nothing arrived says the verification is unsaved (B8-AN03)", async () => {
     statusMock.mockResolvedValue(silent());
     setup({ settings: gaSettings({ verifiedAt: undefined }) });
     await loaded();
     fireEvent.click(verify());
-    await waitFor(() => expect(screen.getByTestId("set-an-verified")).toBeInTheDocument());
-    expect(screen.getByTestId("set-an-verified-line")).toHaveTextContent(/^G-4XQ2P7B1KD has the right format\. No events have arrived yet\.$/);
-    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("NO DATA YET");
+    await waitFor(() => expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("Waiting for data"));
+    expect(screen.getByTestId("set-an-ga-verified")).toHaveTextContent("No events received yet. Verification is an unsaved setting.");
   });
 
   it("a malformed or empty id lands the cursor on the field and opens nothing", async () => {
@@ -306,31 +301,28 @@ describe("AnalyticsScreen — Verify and Connection verified (4256:26844)", () =
     fireEvent.change(gaInput(), { target: { value: "G-ABC" } });
     fireEvent.click(verify());
     expect(screen.getByTestId("set-an-ga-error")).toBeInTheDocument();
-    expect(screen.queryByTestId("set-an-verified")).toBeNull();
     expect(screen.queryByTestId("set-an-ga-verified")).toBeNull();
   });
 
-  it("a failed re-read is the load-error card, not a dialog", async () => {
+  it("a failed re-read says so in the status row (B8-AN06), not a dialog; the values stay", async () => {
     setup({ settings: gaSettings({ verifiedAt: undefined }) });
     await loaded();
     statusMock.mockRejectedValue(new Error("network"));
     fireEvent.click(verify());
-    await waitFor(() => expect(screen.getByTestId("set-load-retry")).toBeInTheDocument());
-    expect(screen.queryByTestId("set-an-verified")).toBeNull();
-    statusMock.mockResolvedValue(silent());
-    fireEvent.click(screen.getByTestId("set-load-retry"));
-    await loaded();
-    // The draft survived the detour; nothing was stamped.
+    await waitFor(() => expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("Couldn’t check status"));
+    expect(screen.getByTestId("set-an-ga-verify-error")).toHaveTextContent("The status service did not respond. Try Verify again.");
+    // Nothing was stamped; the draft is untouched.
     expect(gaInput().value).toBe("G-4XQ2P7B1KD");
-    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("NOT VERIFIED");
+    statusMock.mockResolvedValue(silent());
+    fireEvent.click(verify());
+    await waitFor(() => expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("Waiting for data"));
   });
 
   it("without a projectId verifies the shape alone and reports no events", async () => {
     setup({ projectId: null, settings: gaSettings({ verifiedAt: undefined }) });
     fireEvent.click(verify());
-    await waitFor(() => expect(screen.getByTestId("set-an-verified")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("Waiting for data"));
     expect(statusMock).not.toHaveBeenCalled();
-    expect(screen.getByTestId("set-an-verified-line")).toHaveTextContent("has the right format. No events have arrived yet.");
   });
 });
 
@@ -340,9 +332,8 @@ describe("AnalyticsScreen — loading, load-error and save-error", () => {
     statusMock.mockReturnValue(new Promise((r) => { resolve = r; }));
     const onLoadStateChange = vi.fn();
     setup({ onLoadStateChange });
-    expect(screen.getByTestId("set-load-title")).toHaveTextContent("Analytics");
-    expect(screen.getByTestId("set-load-line")).toHaveTextContent("GA4, GTM, Meta Pixel and Clarity keys.");
-    expect(screen.getByTestId("set-load-state")).toHaveTextContent("Loading…");
+    // 2L9 B8-AN13 252:47222.
+    expect(screen.getByTestId("set-load-title")).toHaveTextContent("Loading Analytics…");
     expect(onLoadStateChange).toHaveBeenLastCalledWith("loading");
     expect(screen.queryByTestId("set-card-google-analytics")).toBeNull();
     await act(async () => { resolve(receiving()); });
@@ -356,7 +347,7 @@ describe("AnalyticsScreen — loading, load-error and save-error", () => {
     setup({ onLoadStateChange });
     await waitFor(() => expect(screen.getByTestId("set-load-retry")).toBeInTheDocument());
     expect(screen.getByTestId("set-load-state")).toHaveTextContent(
-      "Couldn't load your analytics settings. Check your connection, then try again.",
+      "The settings service did not respond. Your existing configuration has not changed.",
     );
     expect(onLoadStateChange).toHaveBeenLastCalledWith("error");
     fireEvent.click(screen.getByTestId("set-load-retry"));
@@ -396,7 +387,7 @@ describe("AnalyticsScreen — id normalisation", () => {
 
 describe("AnalyticsScreen — validation (3397:34148)", () => {
   const GA_SENTENCE =
-    "This doesn't look right. Your Google Analytics ID should start with G- followed by 10 characters, like G-ABCD123456.";
+    "Enter a valid Google Analytics measurement ID.";
 
   it("a malformed Measurement ID flags the field and says the frame's sentence under it; an empty one is not an error", async () => {
     setup();
@@ -420,15 +411,15 @@ describe("AnalyticsScreen — validation (3397:34148)", () => {
     expect(gtmInput()).toHaveAttribute("aria-invalid", "true");
     expect(gtmInput()).toHaveAttribute("aria-describedby", "gtm-error");
     expect(screen.getByTestId("set-an-gtm-error")).toHaveTextContent(
-      "Your GTM Container ID should start with GTM- followed by 6 to 8 characters, like GTM-ABC1234.",
+      "Enter a valid Google Tag Manager container ID.",
     );
     fireEvent.change(pixelInput(), { target: { value: "12345678" } });
     expect(pixelInput()).toHaveAttribute("aria-invalid", "true");
-    expect(screen.getByTestId("set-an-pixel-error")).toHaveTextContent("Your Pixel ID should be 15 or 16 digits, like 1234567890123456.");
+    expect(screen.getByTestId("set-an-pixel-error")).toHaveTextContent("Enter a valid Meta Pixel ID.");
     fireEvent.change(clarityInput(), { target: { value: "abc" } });
     expect(clarityInput()).toHaveAttribute("aria-invalid", "true");
     expect(screen.getByTestId("set-an-clarity-error")).toHaveTextContent(
-      "Your Clarity Project ID should be 10 letters or digits, like abcdefghij.",
+      "Enter a valid Microsoft Clarity project ID.",
     );
     expect(screen.getAllByRole("alert")).toHaveLength(3);
   });
@@ -456,7 +447,7 @@ describe("AnalyticsScreen — validation (3397:34148)", () => {
     const { composer } = setup({ registerFlushHandler: (h) => { flush = h; } });
     await loaded();
     fireEvent.change(pixelInput(), { target: { value: "12345678" } });
-    expect(() => flush!()).toThrow("Your Pixel ID should be 15 or 16 digits");
+    expect(() => flush!()).toThrow("Enter a valid Meta Pixel ID.");
     expect(composer.setProjectSettings).not.toHaveBeenCalled();
     fireEvent.change(pixelInput(), { target: { value: "123456789012345" } });
     expect(flush!()).toMatchObject({ analytics: { facebookPixel: { pixelId: "123456789012345" } } });
@@ -554,10 +545,20 @@ describe("AnalyticsScreen — field errors", () => {
     await loaded();
     fireEvent.change(pixelInput(), { target: { value: "12345678" } });
     expect(registerFieldErrors).toHaveBeenLastCalledWith({
-      "analytics.facebookPixel.pixelId": expect.stringContaining("Your Pixel ID should be 15 or 16 digits"),
+      "analytics.facebookPixel.pixelId": expect.stringContaining("Enter a valid Meta Pixel ID."),
     });
     fireEvent.change(pixelInput(), { target: { value: "123456789012345" } });
     expect(registerFieldErrors).toHaveBeenLastCalledWith(null);
+  });
+
+  it("names the malformed id in the footer (B8-AN05)", async () => {
+    const registerFooterMessage = vi.fn();
+    setup({ registerFooterMessage });
+    await loaded();
+    fireEvent.change(gaInput(), { target: { value: "G-123" } });
+    expect(registerFooterMessage).toHaveBeenLastCalledWith("Fix the measurement ID before saving");
+    fireEvent.change(gaInput(), { target: { value: "G-ABCD123456" } });
+    expect(registerFooterMessage).toHaveBeenLastCalledWith(null);
   });
 
   it("shows the server's refusal under the field it names", async () => {

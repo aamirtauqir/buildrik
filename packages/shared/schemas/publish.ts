@@ -121,6 +121,15 @@ export const publishResultSchema = z.object({
  */
 export const VERCEL_CHECK_LABEL = "Vercel connected";
 
+/** A-34 (2L9 B8-PB22): the site sits beyond its workspace plan's site limit —
+ *  a hard fail whose detail is the CTA's reason. */
+export const PLAN_LIMIT_CHECK_LABEL = "Plan limit";
+
+/** A-36 (2L9 B8-PB16): a site that keeps a password on a plan without
+ *  password protection — a hard fail with two ways out (upgrade, or remove
+ *  the protection and publish). */
+export const PASSWORD_CHECK_LABEL = "Password protection";
+
 /**
  * The four states the approval gate can block a publish in, and the sentence
  * the user is shown for each. Same reason as VERCEL_CHECK_LABEL above: the
@@ -172,7 +181,50 @@ export const publishDiffInput = z.object({
 });
 export type PublishDiffInput = z.infer<typeof publishDiffInput>;
 
+/**
+ * What a publish NOW would change against the live version (2L9 B8-PB01–PB03,
+ * PB21, A-33): the export the editor would send, compared page by page with
+ * the live job's retained payload.
+ */
+export const publishPreviewDiffInput = z.object({
+  siteId: z.string().min(1),
+  pages: z.array(publishPageSchema).max(MAX_PUBLISH_PAGES),
+});
+export type PublishPreviewDiffInput = z.infer<typeof publishPreviewDiffInput>;
+
 /** One COMPLETED publish job of a site whose pages Compare renders. */
 export const publishedSnapshotInput = z.object({ siteId: z.string().min(1), jobId: z.string().min(1) });
 export type PublishedSnapshotInput = z.infer<typeof publishedSnapshotInput>;
 export type RollbackInput = z.infer<typeof rollbackInput>;
+
+/**
+ * The publish worker's steps, in order (workers/publish route). One list for
+ * the job row the service creates and every write the worker makes.
+ */
+export const PUBLISH_STEPS = [
+  "Generating pages",
+  "Optimizing images",
+  "Deploying to CDN",
+  "Verifying SSL",
+  "Performance check",
+] as const;
+
+/**
+ * Steps the MVP never runs (image optimisation and the Lighthouse check come
+ * later). They report "skipped" from the job's first write — never "done", a
+ * green check for work that didn't happen, and never "pending", which made
+ * the editor count them ("step 2 of 4" where three run; 2L9 B8-PB07, A-32).
+ */
+export const SKIPPED_PUBLISH_STEPS: ReadonlySet<number> = new Set([1, 4]);
+
+export type PublishStepStatus = "pending" | "active" | "done" | "skipped" | "failed";
+
+/** Every step's status with `activeIndex` running (-1: none started yet —
+ *  the queued job; past the end: all finished). */
+export function buildPublishSteps(activeIndex: number, failed = false): Array<{ name: string; status: PublishStepStatus }> {
+  return PUBLISH_STEPS.map((name, i) => {
+    if (SKIPPED_PUBLISH_STEPS.has(i)) return { name, status: "skipped" as const };
+    if (i === activeIndex) return { name, status: failed ? ("failed" as const) : ("active" as const) };
+    return { name, status: i > activeIndex ? ("pending" as const) : ("done" as const) };
+  });
+}

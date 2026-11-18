@@ -18,26 +18,126 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import * as React from "react";
+import { render, screen, fireEvent, within, cleanup } from "@testing-library/react";
 import { Topbar, Drawer, RightPanel, Rail, RailItem, Footer } from "../index";
 
 describe("Topbar", () => {
+  /* design-2l9 board 497:99433 · `History / one undo for the whole editor`. */
+  describe("History group", () => {
+    const history = (o: Partial<React.ComponentProps<typeof Topbar>["history"] & object> = {}) => ({
+      canUndo: true,
+      canRedo: true,
+      onUndo: vi.fn(),
+      onRedo: vi.fn(),
+      undoChord: "⌘Z",
+      redoChord: "⇧⌘Z",
+      ...o,
+    });
+
+    it("sits right after the site identity, as a labelled group of two icon buttons", () => {
+      render(<Topbar siteName="x" history={history()} />);
+      const group = screen.getByRole("group", { name: "History" });
+      expect(screen.getByTestId("topbar-site-name").nextElementSibling).toBe(group);
+      expect(within(group).getAllByRole("button").map((b) => b.getAttribute("aria-label"))).toEqual(["Undo", "Redo"]);
+    });
+
+    const tips = () => screen.getAllByRole("tooltip").map((t) => t.textContent);
+
+    it("Undo tooltip \"Undo (⌘Z)\" and Redo \"Redo (⇧⌘Z)\" from the chords it is given", () => {
+      render(<Topbar siteName="x" history={history()} />);
+      expect(tips()).toEqual(expect.arrayContaining(["Undo (⌘Z)", "Redo (⇧⌘Z)"]));
+    });
+
+    it("unavailable: aria-disabled, still focusable, click is a no-op, tooltip says why", () => {
+      const h = history({ canUndo: false, canRedo: false });
+      render(<Topbar siteName="x" history={h} />);
+      const undo = screen.getByRole("button", { name: "Undo" });
+      expect(undo.getAttribute("aria-disabled")).toBe("true");
+      expect(undo).not.toBeDisabled();
+      undo.focus();
+      expect(undo).toHaveFocus();
+      fireEvent.click(undo);
+      expect(h.onUndo).not.toHaveBeenCalled();
+      expect(tips()).toEqual(expect.arrayContaining(["Nothing to undo", "Nothing to redo"]));
+    });
+
+    it("available: clicks run the callbacks", () => {
+      const h = history();
+      render(<Topbar siteName="x" history={h} />);
+      fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+      fireEvent.click(screen.getByRole("button", { name: "Redo" }));
+      expect(h.onUndo).toHaveBeenCalledTimes(1);
+      expect(h.onRedo).toHaveBeenCalledTimes(1);
+    });
+
+    it("Tab order (board 497:99433): Exit → Site settings → History (Undo, Redo) → the rest", () => {
+      render(<Topbar siteName="x" onOpenSiteSettings={() => {}} history={history()} />);
+      const buttons = within(screen.getByRole("banner")).getAllByRole("button");
+      const names = buttons.map((b) => b.getAttribute("aria-label") ?? b.textContent);
+      expect(names.slice(0, 4)).toEqual(["Exit", "Site settings", "Undo", "Redo"]);
+    });
+
+    it("the site name is plain text, not a crumb", () => {
+      render(<Topbar siteName="Fieldwork Studio" />);
+      const name = screen.getByTestId("topbar-site-name");
+      expect(name.tagName).toBe("SPAN");
+      expect(name.textContent).toBe("Fieldwork Studio");
+      expect(screen.queryByTestId("topbar-crumb-site")).toBeNull();
+    });
+
+    it("carries no save status — it lives in the bottom bar (497:99485)", () => {
+      render(<Topbar siteName="x" />);
+      expect(screen.getByRole("banner").querySelector("[data-testid^='save-status-']")).toBeNull();
+    });
+
+    it("no history prop, no group", () => {
+      render(<Topbar siteName="x" />);
+      expect(screen.queryByRole("group", { name: "History" })).toBeNull();
+    });
+  });
+
+  /* Narrow-width rule: the site name is the only column that gives way. */
+  it("the site-name column shrinks to an 80px floor; every other control is flex-none", () => {
+    render(<Topbar siteName="x" review={{ label: "In review · 12 open", tone: "info", onClick: vi.fn() }} onPublish={vi.fn()} tools={{ onPreview: vi.fn() }} />);
+    const name = screen.getByTestId("topbar-site-name");
+    expect(name.className).toContain("tw:shrink");
+    expect(name.className).toContain("tw:min-w-[80px]");
+    for (const el of [screen.getByTestId("topbar-exit"), screen.getByTestId("topbar-review-pill"), screen.getByTestId("topbar-preview"), screen.getByTestId("topbar-publish")]) {
+      expect(el.className).toContain("tw:flex-none");
+    }
+  });
+
+  /* 2L9 B8-PB10 (233:5303): a failed publish turns the toggle red and says so;
+     it stays pressable — it opens the tray with the reason and Try again. */
+  it("failed: 'Publish failed' on the error fill, still a pressable toggle", () => {
+    const onPublish = vi.fn();
+    render(<Topbar siteName="x" publish="failed" ctaLabel="Publish changes" onPublish={onPublish} publishExpanded={false} />);
+    const btn = screen.getByTestId("topbar-publish");
+    expect(btn.textContent).toBe("Publish failed");
+    expect(btn.getAttribute("data-publish-state")).toBe("failed");
+    expect(btn.className).toContain("tw:bg-[var(--bk-error)]");
+    expect(btn).not.toBeDisabled();
+    fireEvent.click(btn);
+    expect(onPublish).toHaveBeenCalledTimes(1);
+  });
+
   it("is a banner carrying the site name", () => {
-    render(<Topbar siteName="Bella Cucina" save="saved" />);
+    render(<Topbar siteName="Bella Cucina" />);
     expect(screen.getByRole("banner")).toBeTruthy();
     expect(screen.getByText("Bella Cucina")).toBeTruthy();
   });
 
   it("long names get a title attribute so the full name stays reachable", () => {
     const long = "Bella Cucina Trattoria & Wood-Fired Pizzeria — Northgate";
-    render(<Topbar siteName={long} save="saved" />);
+    render(<Topbar siteName={long} />);
     expect(screen.getByText(long).getAttribute("title")).toBe(long);
   });
 
   it("publish=disabled blocks the click but stays focusable, with the reason in a tooltip", () => {
     const onPublish = vi.fn();
     render(
-      <Topbar siteName="x" save="saved" publish="disabled" publishBlockedReason="Needs approval" onPublish={onPublish} />,
+      <Topbar siteName="x" publish="disabled" publishBlockedReason="Needs approval" onPublish={onPublish} />,
     );
     const btn = screen.getByRole("button", { name: "Publish" });
     expect(btn.getAttribute("aria-disabled")).toBe("true");
@@ -54,7 +154,7 @@ describe("Topbar", () => {
   it("Enter and Space on a blocked Publish are no-ops", () => {
     const onPublish = vi.fn();
     render(
-      <Topbar siteName="x" save="saved" publish="disabled" publishBlockedReason="Needs approval" onPublish={onPublish} />,
+      <Topbar siteName="x" publish="disabled" publishBlockedReason="Needs approval" onPublish={onPublish} />,
     );
     const btn = screen.getByRole("button", { name: "Publish" });
     // Keyboard activation of a native button routes through click.
@@ -66,11 +166,11 @@ describe("Topbar", () => {
 
   it("publishBusy is truly disabled — a double-publish cannot fire", () => {
     const onPublish = vi.fn();
-    const { rerender } = render(<Topbar siteName="x" save="saved" publish="ready" onPublish={onPublish} />);
+    const { rerender } = render(<Topbar siteName="x" publish="ready" onPublish={onPublish} />);
     const btn = screen.getByRole("button", { name: "Publish" });
     fireEvent.click(btn);
     expect(onPublish).toHaveBeenCalledTimes(1);
-    rerender(<Topbar siteName="x" save="saved" publish="ready" publishBusy onPublish={onPublish} />);
+    rerender(<Topbar siteName="x" publish="ready" publishBusy onPublish={onPublish} />);
     expect(btn).toBeDisabled();
     fireEvent.click(btn);
     fireEvent.click(btn);
@@ -79,63 +179,86 @@ describe("Topbar", () => {
 
   it("blocked + busy keeps native disabled — busy semantics protect", () => {
     render(
-      <Topbar siteName="x" save="saved" publish="disabled" publishBusy publishBlockedReason="Needs approval" />,
+      <Topbar siteName="x" publish="disabled" publishBusy publishBlockedReason="Needs approval" />,
     );
     const btn = screen.getByRole("button", { name: "Publish" });
     expect(btn).toBeDisabled();
     expect(btn.getAttribute("aria-disabled")).toBe("true");
   });
 
-  it("publish=anyway renames the action rather than hiding the block", () => {
-    render(<Topbar siteName="x" save="saved" publish="anyway" />);
-    expect(screen.getByRole("button", { name: "Publish anyway" })).toBeTruthy();
+  /* design-2l9 Task 1.7 — Publish as the publish tray's toggle. ("Publish
+     anyway" is gone with OD-1: blocking issues block, in the tray.) */
+  it("as the tray toggle it carries aria-expanded/aria-controls and stays pressable while busy", () => {
+    const onPublish = vi.fn();
+    const { rerender } = render(
+      <Topbar siteName="x" publishExpanded={false} publishControls="publish-tray" onPublish={onPublish} />,
+    );
+    const btn = screen.getByTestId("topbar-publish");
+    expect(btn.getAttribute("aria-expanded")).toBe("false");
+    expect(btn.getAttribute("aria-controls")).toBeNull();
+    rerender(
+      <Topbar siteName="x" publishExpanded publishControls="publish-tray" publishBusy onPublish={onPublish} />,
+    );
+    expect(btn.getAttribute("aria-expanded")).toBe("true");
+    expect(btn.getAttribute("aria-controls")).toBe("publish-tray");
+    expect(btn).not.toBeDisabled();
+    expect(btn.getAttribute("aria-busy")).toBe("true");
+    fireEvent.click(btn);
+    expect(onPublish).toHaveBeenCalledTimes(1);
+  });
+
+  it("without the toggle props it is a plain button: no aria-expanded, busy disables it", () => {
+    render(<Topbar siteName="x" publishBusy />);
+    const btn = screen.getByTestId("topbar-publish");
+    expect(btn.hasAttribute("aria-expanded")).toBe(false);
+    expect(btn).toBeDisabled();
   });
 
   it("the review pill appears only when a round is in flight", () => {
-    const { rerender } = render(<Topbar siteName="x" save="saved" />);
+    const { rerender } = render(<Topbar siteName="x" />);
     expect(screen.queryByText(/In review/)).toBeNull();
-    rerender(<Topbar siteName="x" save="saved" review={{ label: "In review · 3 open", tone: "info" }} />);
+    rerender(<Topbar siteName="x" review={{ label: "In review · 3 open", tone: "info" }} />);
     expect(screen.getByText("In review · 3 open")).toBeTruthy();
   });
 
   it("the review pill is a button only when it goes somewhere", () => {
     const onClick = vi.fn();
-    const { rerender } = render(<Topbar siteName="x" save="saved" review={{ label: "Approved", tone: "success" }} />);
+    const { rerender } = render(<Topbar siteName="x" review={{ label: "Approved", tone: "success" }} />);
     expect(screen.queryByRole("button", { name: "Approved" })).toBeNull();
     rerender(
-      <Topbar siteName="x" save="saved" review={{ label: "Approved", tone: "success", onClick }} />,
+      <Topbar siteName="x" review={{ label: "Approved", tone: "success", onClick }} />,
     );
     fireEvent.click(screen.getByRole("button", { name: "Approved" }));
     expect(onClick).toHaveBeenCalled();
   });
 
   it("the action slot replaces Publish entirely", () => {
-    render(<Topbar siteName="x" save="saved" action={<button>Send for review</button>} />);
+    render(<Topbar siteName="x" action={<button>Send for review</button>} />);
     expect(screen.getByRole("button", { name: "Send for review" })).toBeTruthy();
     expect(screen.queryByRole("button", { name: "Publish" })).toBeNull();
   });
 
   it("the unread count is in the button name, not only the dot", () => {
-    render(<Topbar siteName="x" save="saved" unreadCount={4} />);
+    render(<Topbar siteName="x" unreadCount={4} />);
     expect(screen.getByRole("button", { name: "Notifications, 4 unread" })).toBeTruthy();
   });
 
   // ── tools cluster (plan §2, eng D12) ──────────────────────────────────────
   it("no tools, no cluster — the bar renders exactly what it receives", () => {
-    render(<Topbar siteName="x" save="saved" />);
+    render(<Topbar siteName="x" />);
     expect(screen.queryByRole("button", { name: "Quick preview" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Comments" })).toBeNull();
   });
 
   it("the container composes the cluster: only passed fields render", () => {
-    render(<Topbar siteName="x" save="saved" tools={{ onToggleComments: vi.fn() }} />);
+    render(<Topbar siteName="x" tools={{ onToggleComments: vi.fn() }} />);
     expect(screen.getByRole("button", { name: "Comments" })).toBeTruthy();
     expect(screen.queryByRole("button", { name: "Quick preview" })).toBeNull();
   });
 
   it("previewBusy is disabled + aria-busy — re-clicks cannot stack exports", () => {
     const onPreview = vi.fn();
-    render(<Topbar siteName="x" save="saved" tools={{ onPreview, previewBusy: true }} />);
+    render(<Topbar siteName="x" tools={{ onPreview, previewBusy: true }} />);
     const btn = screen.getByTestId("topbar-preview");
     expect(btn).toBeDisabled();
     expect(btn.getAttribute("aria-busy")).toBe("true");
@@ -147,7 +270,7 @@ describe("Topbar", () => {
      badge. The board's resting "Search pages, layers, assets…" ⌘K button is
      gone (owner decision 2026-10-03) — ⌘K itself opens the palette. */
   it("draws Preview as text and the unread count, and no ⌘K search button", () => {
-    render(<Topbar siteName="x" save="saved" tools={{ onPreview: vi.fn() }} unreadCount={3} />);
+    render(<Topbar siteName="x" tools={{ onPreview: vi.fn() }} unreadCount={3} />);
     expect(screen.getByTestId("topbar-preview")).toHaveTextContent("Preview");
     expect(screen.getByTestId("topbar-unread-badge")).toHaveTextContent("3");
     expect(screen.queryByTestId("topbar-search")).toBeNull();
@@ -156,18 +279,18 @@ describe("Topbar", () => {
 
   it("Comments carries aria-pressed from the container's mirrored state", () => {
     const { rerender } = render(
-      <Topbar siteName="x" save="saved" tools={{ onToggleComments: vi.fn(), commentsPressed: false }} />,
+      <Topbar siteName="x" tools={{ onToggleComments: vi.fn(), commentsPressed: false }} />,
     );
     expect(screen.getByRole("button", { name: "Comments" }).getAttribute("aria-pressed")).toBe("false");
     rerender(
-      <Topbar siteName="x" save="saved" tools={{ onToggleComments: vi.fn(), commentsPressed: true }} />,
+      <Topbar siteName="x" tools={{ onToggleComments: vi.fn(), commentsPressed: true }} />,
     );
     expect(screen.getByRole("button", { name: "Comments" }).getAttribute("aria-pressed")).toBe("true");
   });
 
   // ── publish=published (plan D10, eng D11) ─────────────────────────────────
   it("published is the 2s success transient — disabled, restyled, honest label", () => {
-    render(<Topbar siteName="x" save="saved" publish="published" />);
+    render(<Topbar siteName="x" publish="published" />);
     const btn = screen.getByRole("button", { name: "✓ Published" });
     expect(btn).toBeDisabled();
     expect(btn.className).toContain("tw:bg-green-100");
@@ -216,7 +339,7 @@ describe("Shell frames", () => {
   it("Topbar and Footer are banner and contentinfo landmarks", () => {
     render(
       <>
-        <Topbar siteName="Bella Cucina" save="saved" />
+        <Topbar siteName="Bella Cucina" />
         <Footer>bottom</Footer>
       </>,
     );
@@ -231,7 +354,7 @@ describe("Topbar — no search field", () => {
   it("renders no text input at all", async () => {
     const { render } = await import("@testing-library/react");
     const { Topbar } = await import("../Topbar");
-    const { container } = render(<Topbar siteName="S" save="saved" tools={{ onPreview: vi.fn() }} />);
+    const { container } = render(<Topbar siteName="S" tools={{ onPreview: vi.fn() }} />);
     expect(container.querySelector("input")).toBeNull();
   });
 });

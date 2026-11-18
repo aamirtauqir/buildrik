@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 /**
  * SeoTab — pure form renderer. Tests field behavior, counters, slug warning,
- * noIndex banner, and the AI "Write with AI" affordance.
+ * noIndex banner, and that no AI entry point is offered (owner, 2026-10-17).
  *
  * Two former defects, now FIXED and asserted here:
  *   - "SEO counter mismatches": the enforced input limits (maxLength/slice)
@@ -11,11 +11,7 @@
  *     an all-or-nothing gate labelled "Required").
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, act } from "@testing-library/react";
-
-vi.mock("@/shared/utils/openai", () => ({
-  generateContent: vi.fn(async () => "AI Suggested Title"),
-}));
+import { render, screen, fireEvent } from "@testing-library/react";
 
 import * as React from "react";
 import { SeoTab } from "../SeoTab";
@@ -42,6 +38,7 @@ function makeSettings(over: Partial<UsePageSettingsReturn> = {}): UsePageSetting
     slugError: null,
     seoScore: 100,
     seoChecks: { titleSet: true, slugClean: true, indexingOn: true, descSet: true },
+    seoBreakdown: [],
     ogTitle: "",
     setOgTitle: vi.fn(),
     ogDesc: "",
@@ -93,13 +90,14 @@ describe("SeoTab title field", () => {
     const input = document.getElementById("seo-title") as HTMLInputElement;
     expect(input.value).toBe("");
     expect(input.placeholder).toBe("Bella Default Title");
-    expect(screen.getByText("19/60 · Too short")).toBeTruthy();
+    /* design-2l9 63:15939: the count rides in the label. Re-baseline. */
+    expect(screen.getByTestId("seo-label-title")).toHaveTextContent("SEO title · 19 / 60 · Site default");
   });
 
-  it("appends the range label to the counter (Ideal at 55 chars)", () => {
+  it("an own title reads as a page override in the label", () => {
     const s = makeSettings({ seoTitle: "a".repeat(55) });
     render(<SeoTab s={s} page={makePage()} composer={null} />);
-    expect(screen.getByText("55/60 · Ideal")).toBeTruthy();
+    expect(screen.getByTestId("seo-label-title")).toHaveTextContent("SEO title · 55 / 60 · Page override");
   });
 
   // FIXED: the title input's maxLength and onChange slice now equal the shown
@@ -109,76 +107,15 @@ describe("SeoTab title field", () => {
     render(<SeoTab s={s} page={makePage()} composer={null} />);
     const input = document.getElementById("seo-title") as HTMLInputElement;
     expect(input.maxLength).toBe(60);
-    expect(screen.getByText(/60\/60/)).toBeTruthy();
+    expect(screen.getByTestId("seo-label-title")).toHaveTextContent("60 / 60");
   });
 
-  it('shows "Write with AI" only when the title is under 10 chars, and it calls the AI service', async () => {
-    const s = makeSettings({ seoTitle: "Hi" });
-    render(<SeoTab s={s} page={makePage()} composer={null} />);
-    const btn = screen.getByRole("button", { name: /suggest seo title/i });
-    await act(async () => {
-      fireEvent.click(btn);
-    });
-    const { generateContent } = await import("@/shared/utils/openai");
-    expect(generateContent).toHaveBeenCalled();
-  });
-
-  /* L5-017: the prompt carried only the page name ("Home") inside a generic
-     "headline" template, so a local-business site got web-builder marketing.
-     It now carries the site name and the page's own copy, unwrapped. */
-  it("grounds the AI title in the site name and the page's own copy", async () => {
-    const heading = { getType: () => "heading", getContent: () => "<b>Fresh</b> bread daily", getChildren: () => [] };
-    const para = { getType: () => "paragraph", getContent: () => "Family bakery in Leeds since 1982.", getChildren: () => [] };
-    const root = { getType: () => "container", getContent: () => "", getChildren: () => [heading, para] };
-    const composer = {
-      getProjectMetadata: () => ({ name: "Rosie's Bakery" }),
-      getProjectSettings: () => ({}),
-      elements: {
-        getAllPages: () => [{ id: "p1", name: "Home", slug: "home", root: { id: "root" } }],
-        getElement: (id: string) => (id === "root" ? root : null),
-      },
-    } as unknown as Composer;
-    render(<SeoTab s={makeSettings({ seoTitle: "" })} page={makePage()} composer={composer} />);
-    await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: /suggest seo title/i }));
-    });
-    const { generateContent } = await import("@/shared/utils/openai");
-    const [prompt, , , options] = vi.mocked(generateContent).mock.calls[0];
-    expect(prompt).toContain("Rosie's Bakery");
-    expect(prompt).toContain("Fresh bread daily");
-    expect(prompt).toContain("Family bakery in Leeds since 1982.");
-    expect(options).toMatchObject({ useEnhancedPrompts: false });
-  });
-
-  /* L5-018: a filled title keeps a way to ask again — the button used to
-     vanish at 10 characters, so a bad result could not be regenerated. */
-  it('offers "Regenerate" once the title reaches 10 chars', () => {
-    const s = makeSettings({ seoTitle: "Long Title Here" });
-    render(<SeoTab s={s} page={makePage()} composer={null} />);
-    expect(screen.getByRole("button", { name: /suggest seo title/i }).textContent).toContain("Regenerate");
-  });
-
-  it("trims a long AI title at a word boundary, never mid-word", async () => {
-    const { generateContent } = await import("@/shared/utils/openai");
-    vi.mocked(generateContent).mockResolvedValueOnce(
-      '"Transform Your Online Presence with Our Innovative Website Builder Today"',
-    );
-    const s = makeSettings({ seoTitle: "" });
-    render(<SeoTab s={s} page={makePage()} composer={null} />);
-    await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: /suggest seo title/i }));
-    });
-    expect(s.setSeoTitle).toHaveBeenCalledWith("Transform Your Online Presence with Our Innovative Website");
-  });
-
-  it("says so when the AI call fails, instead of failing silently", async () => {
-    const { generateContent } = await import("@/shared/utils/openai");
-    vi.mocked(generateContent).mockRejectedValueOnce(new Error("down"));
-    render(<SeoTab s={makeSettings({ seoTitle: "" })} page={makePage()} composer={null} />);
-    await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: /suggest seo title/i }));
-    });
-    expect(screen.getByRole("alert").textContent).toContain("write a title just now");
+  // re-baseline: SEO title — no AI in the editor UI (owner, 2026-10-17); 2L9 63:15939 draws none.
+  it("offers no AI title button, empty or filled", () => {
+    const { rerender } = render(<SeoTab s={makeSettings({ seoTitle: "" })} page={makePage()} composer={null} />);
+    expect(screen.queryByRole("button", { name: /suggest seo title/i })).toBeNull();
+    rerender(<SeoTab s={makeSettings({ seoTitle: "Long Title Here" })} page={makePage()} composer={null} />);
+    expect(screen.queryByText(/Write with AI|Regenerate/)).toBeNull();
   });
 });
 
@@ -198,56 +135,49 @@ describe("SeoTab meta description field", () => {
   it("description counter denominator matches the enforced slice limit (160)", () => {
     const s = makeSettings({ seoDesc: "z".repeat(160) });
     render(<SeoTab s={s} page={makePage()} composer={null} />);
-    expect(screen.getByText("160/160")).toBeTruthy();
+    expect(screen.getByText("160 / 160")).toBeTruthy();
   });
 });
 
 // ── SEO score card ───────────────────────────────────────────────────────────
 
 describe("SeoTab score card", () => {
-  it('shows "Looks good" when score >= 80', () => {
-    const s = makeSettings({ seoScore: 85 });
-    render(<SeoTab s={s} page={makePage()} composer={null} />);
-    expect(screen.getByText("Looks good")).toBeTruthy();
-    expect(screen.getByText("85")).toBeTruthy();
+  /* design-2l9 board 63:15939: the score is part of the preview's label,
+     first in the form. Re-baseline: the score card and its banners. */
+  it("names the score in the preview label, above the title field", () => {
+    render(<SeoTab s={makeSettings({ seoScore: 85 })} page={makePage()} composer={null} />);
+    const label = screen.getByTestId("seo-preview-label");
+    expect(label).toHaveTextContent("Search preview · SEO score 85");
+    expect(label.compareDocumentPosition(screen.getByTestId("seo-label-title")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
-  it('shows "Needs work" and the "Reach 80+" banner when score < 80 and indexing on', () => {
-    const s = makeSettings({
-      seoScore: 40,
-      allowIndex: true,
-      seoChecks: { titleSet: false, slugClean: true, indexingOn: true, descSet: false },
-    });
-    render(<SeoTab s={s} page={makePage()} composer={null} />);
-    expect(screen.getByText("Needs work")).toBeTruthy();
-    expect(screen.getByRole("note")).toHaveTextContent(/Reach 80\+ before publishing/);
-    // descSet false → banner suggests adding a meta description
-    expect(screen.getByRole("note")).toHaveTextContent(/add a meta description/);
+  /* design-2l9 board 65:17860 replaces the four-check grid with the score's
+     own six parts. Re-baseline: SEO score display. */
+  it("SEO score details opens the score's six parts; Back to SEO closes them", () => {
+    const seoBreakdown = [
+      { label: "Title length", earned: 20, max: 20 },
+      { label: "URL format", earned: 20, max: 20 },
+      { label: "Description length", earned: 30, max: 30 },
+      { label: "Descriptive URL", earned: 10, max: 10 },
+      { label: "Title ≥30 characters", earned: 0, max: 10 },
+      { label: "Description ≥100 characters", earned: 0, max: 10 },
+    ];
+    render(<SeoTab s={makeSettings({ seoScore: 80, seoBreakdown })} page={makePage()} composer={null} />);
+    expect(screen.queryByTestId("seo-score-breakdown")).toBeNull();
+    fireEvent.click(screen.getByTestId("seo-score-details"));
+    const box = screen.getByTestId("seo-score-breakdown");
+    expect(box).toHaveTextContent(/SEO score · .+ · 80\/100/);
+    // re-baseline: SEO score details — a small dialog with "Part: n/max" lines (65:17860).
+    expect(box).toHaveTextContent("Title length: 20/20");
+    expect(box).toHaveTextContent("Description ≥100 characters: 0/10");
+    fireEvent.click(screen.getByTestId("seo-score-back"));
+    expect(screen.queryByTestId("seo-score-breakdown")).toBeNull();
   });
 
-  // FIXED: the per-check point annotations now mirror calculateSeoScore's real
-  // max weights — title 20(+10 at ≥30)=30, slug 20(+10)=30, desc 30(+10 at
-  // ≥100)=40 (summing to 100), and indexing is an all-or-nothing gate labelled
-  // "Required", not the fictional "+40 pts".
-  it("check-point annotations reflect calculateSeoScore's real weights", () => {
-    const s = makeSettings({ seoScore: 100 });
-    render(<SeoTab s={s} page={makePage()} composer={null} />);
-    // title +30 and slug +30 both render this label.
-    expect(screen.getAllByText("+30 pts")).toHaveLength(2);
-    expect(screen.getByText("+40 pts")).toBeTruthy(); // Meta description
-    expect(screen.getByText("Required")).toBeTruthy(); // Allow indexing — a gate, not additive
-    // The old fictional labels are gone.
-    expect(screen.queryByText("+20 pts")).toBeNull();
-    expect(screen.queryByText("+10 pts")).toBeNull();
-  });
-
-  it("hides the score card and shows the noIndex alert when allowIndex is false", () => {
-    const s = makeSettings({ allowIndex: false });
-    render(<SeoTab s={s} page={makePage()} composer={null} />);
-    expect(screen.getByRole("alert")).toHaveTextContent(/noIndex is ON/);
-    // Turn-on affordance flips indexing back on
-    fireEvent.click(screen.getByRole("button", { name: /turn indexing on/i }));
-    expect(s.setAllowIndex).toHaveBeenCalledWith(true);
+  it("with indexing off the preview reads score 0 and the select says Hidden", () => {
+    render(<SeoTab s={makeSettings({ allowIndex: false, seoScore: 0 })} page={makePage()} composer={null} />);
+    expect(screen.getByTestId("seo-preview-label")).toHaveTextContent("SEO score 0");
+    expect((screen.getByTestId("seo-input-indexing") as HTMLSelectElement).value).toBe("noindex");
   });
 });
 
@@ -312,16 +242,6 @@ describe("SeoTab — a placeholder slug is explained where it is fixed", () => {
     expect(screen.getByText(/is a numbered URL/).textContent).toMatch(/\+10 pts/);
   });
 
-  /* The banner stays ONE clause. Chaining the slug reason onto it with a
-     second em-dash turned a 260px amber box into a two-line run-on — caught by
-     looking at the rendered panel, not at the JSX. */
-  it("keeps the reason OUT of the reach-80 banner", () => {
-    render(<SeoTab s={settings({ slug: "page-4" })} page={makePage()} composer={null} />);
-    const note = screen.getByRole("note").textContent ?? "";
-    expect(note).not.toMatch(/auto-generated/);
-    expect(note.split("—").length).toBeLessThanOrEqual(2);
-  });
-
   /* 6887:73809 draws the slug field bare: a good slug prints no rule under
      it (the field auto-formats as you type either way). */
   it("prints nothing under a real slug", () => {
@@ -364,7 +284,7 @@ describe("SeoTab — the redirect offer after a saved slug change", () => {
       "URL changed from /about to /about-us. Add a redirect so old links keep working?",
     );
     expect(screen.getByTestId("page-seo-redirect-add")).toHaveTextContent("Add redirect");
-    expect(screen.getByTestId("page-seo-redirect-later")).toHaveTextContent("Not now");
+    expect(screen.getByTestId("page-seo-redirect-later")).toHaveTextContent("Later");
   });
 
   /* One emit, `ui:settings-open`: StudioPanels (always mounted) switches the
@@ -516,5 +436,12 @@ describe("SeoTab Google preview — served URL", () => {
       />,
     );
     expect(screen.getByTestId("seo-preview-url").textContent).toBe("bellacucina.com/menu-2.html");
+  });
+
+  /* design-2l9 67:11341 — back from Settings › Redirects, the SEO tab says
+     what was saved and when it reaches visitors. */
+  it("names the redirect that was just saved", () => {
+    render(<SeoTab s={makeSettings()} page={makePage()} composer={null} redirectSaved={{ from: "/about", to: "/our-story" }} />);
+    expect(screen.getByTestId("seo-redirect-saved")).toHaveTextContent("Redirect saved · /about → /our-story · Applies on next publish");
   });
 });

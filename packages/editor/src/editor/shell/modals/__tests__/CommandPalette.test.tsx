@@ -53,7 +53,12 @@ function makeComposer(
       getSelectedIds: vi.fn(() => selected),
       getSelected: vi.fn(() => (selected.length ? { getType: () => opts.type ?? "heading" } : null)),
     },
-    elements: { removeElement: vi.fn(), getActivePage: () => ({ name: "Home" }) },
+    elements: {
+      removeElement: vi.fn(),
+      getActivePage: () => ({ id: "home", name: "Home" }),
+      getAllPages: () => [{ id: "home", name: "Home" }, { id: "about", name: "About" }],
+      setActivePage: vi.fn(),
+    },
     clipboard: opts.clipboard ?? null,
     commands: { run: vi.fn(), getAll: () => opts.registry ?? [] },
   };
@@ -97,7 +102,7 @@ function renderPalette(
   return { onClose, composer };
 }
 
-const input = () => screen.getByPlaceholderText("Search pages, layers, assets and actions…");
+const input = () => screen.getByPlaceholderText("Search actions, pages, layers, records…");
 const type = (q: string) => fireEvent.change(input(), { target: { value: q } });
 const bands = () => screen.queryAllByTestId(/^cmdk-band-/).map((b) => b.textContent);
 const labels = () => screen.queryAllByTestId(/^cmdk-label-/).map((l) => l.textContent ?? "");
@@ -109,23 +114,24 @@ afterEach(() => {
 beforeEach(() => localStorage.clear());
 
 describe("CommandPalette — board 4418:141220 structure", () => {
-  it("draws the board's input, scope chip, bands and legend", () => {
+  /* 2L9 263:250083: the placeholder, no scope chip unscoped, the key legend and "? Keys". */
+  it("draws the board's input, bands and key legend", () => {
     renderPalette();
     expect(input()).toBeInTheDocument();
-    expect(screen.getByTestId("cmdk-scope")).toHaveTextContent("Scope: everything");
+    expect(screen.queryByTestId("cmdk-scope")).toBeNull();
     expect(bands()).toEqual(["Navigate", "Edit", "View", "Add", "Tools"]);
-    expect(screen.getByTestId("cmdk-legend")).toHaveTextContent(/Click a command\s*Esc Close\s*Current editor/);
+    expect(screen.getByTestId("cmdk-legend")).toHaveTextContent(/↑↓ Move\s*↵ Run\s*→ Open\s*Esc Close\s*\? Keys/);
   });
 
   it("lists the board's rows in its order, and nothing else before you type", () => {
     renderPalette();
     expect(labels()).toEqual([
       "Open Pages", "Open Add", "Open Layers", "Open Assets", "Open Asset library", "Open CMS", "Open Brand",
-      "Open Publish", "Open AI assistant", "Browse Templates", "New page", "Replace layout with template…", "Open Review", "Open Activity", "Open Issues",
-      "Open Site settings", "Open Components", "Keyboard shortcuts",
-      "Undo", "Duplicate · Select an element first", "Replace selected media · Select an element first",
+      "Open Publish", "Browse Templates", "New page", "Replace layout with template…", "Open Review", "Open Activity", "Open Issues",
+      "Open Site settings", "Open Components", "Keyboard shortcuts", "Go to page ›",
+      "Undo", "DuplicateSelect an element first", "Replace selected mediaSelect an element first",
       "Zoom to 50%", "Preview Home page",
-      "Add text", "Add container", "Generate a block with AI…",
+      "Add text", "Add container",
       "Manage CMS records", "Save page as template", "Open History",
       "Search stock photos",
     ]);
@@ -157,7 +163,7 @@ describe("CommandPalette — board 4418:141220 structure", () => {
 
   it("Undo says 'No changes to undo' when there is nothing to undo", () => {
     renderPalette(makeComposer({ registry: BOARD_REGISTRY, canUndo: false }));
-    expect(screen.getByTestId("cmdk-label-edit-undo")).toHaveTextContent("Undo · No changes to undo");
+    expect(screen.getByTestId("cmdk-label-edit-undo")).toHaveTextContent("UndoNo changes to undo");
   });
 
   it("without a composer: only the navigation rows, which close cleanly", () => {
@@ -172,12 +178,10 @@ describe("CommandPalette — doors", () => {
   const doors: Array<[string, string, unknown]> = [
     ["Open Pages", EVENTS.UI_PANEL_OPEN, { panel: "pages" }],
     ["Open Asset library", EVENTS.UI_SWITCH_TAB, { tab: "assets", fullPage: true }],
-    ["Open AI assistant", EVENTS.UI_SWITCH_TAB, { tab: "ai" }],
     ["Browse Templates", EVENTS.UI_PANEL_OPEN, { panel: "templates" }],
     ["Open Activity", EVENTS.UI_PANEL_OPEN, { panel: "activity" }],
     ["Open Issues", EVENTS.UI_OPEN_ISSUES, undefined],
     ["Keyboard shortcuts", EVENTS.UI_TOGGLE_CHEAT_SHEET, {}],
-    ["Generate a block with AI…", EVENTS.UI_INSERT_OPEN_GENERATE, {}],
     ["Replace layout with template…", EVENTS.UI_BROWSE_TEMPLATES, { replace: true }],
     ["Open History", EVENTS.UI_PANEL_OPEN, { panel: "history" }],
     ["Search stock photos", EVENTS.UI_PANEL_OPEN, { panel: "assets", screen: "stock" }],
@@ -219,7 +223,7 @@ describe("CommandPalette — VIEWER hides disallowed nav commands", () => {
   it("a non-viewer sees every nav door", () => {
     mockViewerChrome.mockReturnValue(false);
     renderPalette();
-    for (const label of ["Open Add", "Open Brand", "Open Site settings", "Open CMS", "Open Components", "Open Publish", "Open AI assistant", "Browse Templates", "Open Pages"]) {
+    for (const label of ["Open Add", "Open Brand", "Open Site settings", "Open CMS", "Open Components", "Open Publish", "Browse Templates", "Open Pages"]) {
       expect(screen.getByText(label)).toBeInTheDocument();
     }
   });
@@ -227,7 +231,7 @@ describe("CommandPalette — VIEWER hides disallowed nav commands", () => {
   it("a viewer does not see Add/Brand/Settings/CMS/Components/Publish/AI/Templates/Pages", () => {
     mockViewerChrome.mockReturnValue(true);
     renderPalette();
-    for (const label of ["Open Add", "Open Brand", "Open Site settings", "Open CMS", "Open Components", "Open Publish", "Open AI assistant", "Browse Templates", "Open Pages"]) {
+    for (const label of ["Open Add", "Open Brand", "Open Site settings", "Open CMS", "Open Components", "Open Publish", "Browse Templates", "Open Pages"]) {
       expect(screen.queryByText(label)).toBeNull();
     }
   });
@@ -292,16 +296,16 @@ describe("CommandPalette — search", () => {
   it("guards Copy on the selection and Paste on the clipboard", () => {
     renderPalette(makeComposer({ registry: BOARD_REGISTRY, clipboard: null }));
     type("copy");
-    expect(screen.getByTestId("cmdk-label-cmd-copy")).toHaveTextContent("Copy · Select an element first");
+    expect(screen.getByTestId("cmdk-label-cmd-copy")).toHaveTextContent("CopySelect an element first");
     type("paste");
-    expect(screen.getByTestId("cmdk-label-cmd-paste")).toHaveTextContent("Paste · nothing copied");
+    expect(screen.getByTestId("cmdk-label-cmd-paste")).toHaveTextContent("PasteNothing copied");
   });
 
   it("guards Group until two are selected and Ungroup unless it is a container", () => {
     renderPalette(makeComposer({ registry: BOARD_REGISTRY, selected: ["a"], type: "heading" }));
     type("group");
     expect(screen.getByTestId("cmdk-row-cmd-group")).toHaveAttribute("aria-disabled", "true");
-    expect(screen.getByTestId("cmdk-label-cmd-ungroup")).toHaveTextContent("select a group");
+    expect(screen.getByTestId("cmdk-label-cmd-ungroup")).toHaveTextContent("Select a group");
   });
 
   /* L1-033: ⌘0 worked and the palette's Reset zoom printed no chord. One row,
@@ -364,20 +368,22 @@ describe("CommandPalette — search", () => {
     confirmSpy.mockRestore();
   });
 
-  it("a query that matches nothing offers stock photos for it, and AI", () => {
+  it("a query that matches nothing offers stock photos for it", () => {
     const { composer, onClose } = renderPalette();
     type("zzqq");
-    expect(screen.getByTestId("cmdk-no-results-line")).toHaveTextContent("Nothing matches ‘zzqq’.");
+    expect(screen.getByTestId("cmdk-no-results-line")).toHaveTextContent("No results for “zzqq”");
     fireEvent.click(screen.getByTestId("cmdk-no-results-stock"));
     expect(composer!.emit).toHaveBeenCalledWith(EVENTS.UI_PANEL_OPEN, { panel: "assets", screen: "stock:zzqq" });
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it("Enter on no results asks AI", () => {
+  // re-baseline: ⌘K — no AI entry points (owner, 2026-10-17): no "Ask AI instead", no AI rows; Enter on no results searches stock.
+  it("Enter on no results searches stock photos; nothing offers AI", () => {
     const { composer } = renderPalette();
     type("zzqq");
+    expect(screen.queryByText(/Ask AI/)).toBeNull();
     fireEvent.keyDown(input(), { key: "Enter" });
-    expect(composer!.emit).toHaveBeenCalledWith(EVENTS.UI_SWITCH_TAB, { tab: "ai" });
+    expect(composer!.emit).toHaveBeenCalledWith(EVENTS.UI_PANEL_OPEN, { panel: "assets", screen: "stock:zzqq" });
   });
 
   it("starts with a handed query (G2-059)", () => {
@@ -620,5 +626,19 @@ describe("CommandPalette — CMS record jump rows (ui:cms-open)", () => {
     renderPalette(composer);
     await waitFor(() => expect(composer.cms.collections.getContentItems).toHaveBeenCalled());
     expect(bands()).not.toContain("Records");
+  });
+});
+
+describe("CommandPalette — Go to page (263:250988)", () => {
+  it("opens the nested page list; the current page is inert; ‹ Go to page returns", () => {
+    const composer = makeComposer({ registry: BOARD_REGISTRY });
+    renderPalette(composer);
+    fireEvent.click(screen.getByText("Go to page ›"));
+    expect(screen.getByPlaceholderText("Filter pages…")).toBeInTheDocument();
+    expect(screen.getByTestId("cmdk-row-goto-home")).toHaveAttribute("aria-disabled", "true");
+    expect(screen.getByTestId("cmdk-label-goto-home")).toHaveTextContent("HomeAlready on this page");
+    expect(screen.getByTestId("cmdk-nested-back")).toHaveTextContent("‹ Go to page");
+    fireEvent.click(screen.getByTestId("cmdk-nested-back"));
+    expect(input()).toBeInTheDocument();
   });
 });

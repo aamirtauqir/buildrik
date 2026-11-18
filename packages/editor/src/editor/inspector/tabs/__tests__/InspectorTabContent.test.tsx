@@ -7,7 +7,11 @@
  * @license BSD-3-Clause
  */
 
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render as rtlRender, screen } from "@testing-library/react";
+import { ToastProvider } from "@/editor/chrome-ui";
+import * as React from "react";
+/* Interactions raises receipts through the toast provider. */
+const render = (ui: React.ReactElement) => rtlRender(<ToastProvider>{ui}</ToastProvider>);
 import { describe, expect, it, vi } from "vitest";
 import { InspectorTabContent } from "../InspectorTabContent";
 import type { UseAdvancedSettingsReturn } from "@/editor/inspector/hooks/useAdvancedSettings";
@@ -27,6 +31,9 @@ function makeComposer() {
         getAttribute: vi.fn(() => ""),
         getStyles: vi.fn(() => ({})),
         getClasses: vi.fn(() => []),
+        getTagName: vi.fn(() => "div"),
+        getChildren: vi.fn(() => []),
+        getParent: vi.fn(() => null),
       })),
       // LinkSection queries all pages on mount to populate its page dropdown.
       getAllPages: vi.fn(() => []),
@@ -88,7 +95,7 @@ const NO_OP_ADVANCED: UseAdvancedSettingsReturn = {
 };
 
 function renderTab(opts: {
-  tabId: "style" | "behaviour" | "effects";
+  tabId: "content" | "style" | "behaviour" | "effects";
   elementType: string;
   cssContext?: Partial<CssContext>;
   authored?: Record<string, string>;
@@ -122,73 +129,74 @@ const sectionNames = () =>
   screen.getAllByRole("button", { name: / section, (expanded|collapsed)$/ }).map((b) => b.getAttribute("aria-label")!.replace(/ section, .*/, ""));
 
 describe("InspectorTabContent — one order per tab, presence by capability", () => {
-  it("heading · Style: the type block leads, then Typography, Size, Spacing, Fill, Border (board 1)", () => {
+  it("heading · Content: the type block leads, then Semantics, Advanced attributes (2L9 161:8480)", () => {
+    renderTab({ tabId: "content", elementType: "heading" });
+    expect(sectionNames()).toEqual(["Heading", "Semantics", "Advanced attributes"]);
+  });
+
+  it("heading · Style: Typography, Size, Spacing, Fill, Border — no type block", () => {
     renderTab({ tabId: "style", elementType: "heading" });
-    expect(sectionNames()).toEqual(["Heading", "Typography", "Size", "Spacing", "Fill", "Border"]);
+    expect(sectionNames()).toEqual(["Typography", "Size", "Spacing", "Background", "Border"]);
   });
 
   it("image · Style: no Typography, no Text inside", () => {
     renderTab({ tabId: "style", elementType: "image" });
-    expect(sectionNames()).toEqual(["Image", "Size", "Spacing", "Fill", "Border"]);
+    expect(sectionNames()).toEqual(["Size", "Spacing", "Background", "Border"]);
   });
 
-  it("a container set to flex gets no Flexbox section — Layout carries the flex controls (board 17)", () => {
+  it("a container set to flex gets no Flexbox section — Children layout carries the flex controls (board 17, 247:21216)", () => {
     renderTab({ tabId: "style", elementType: "container", cssContext: { display: "flex", isFlexContainer: true } });
-    expect(sectionNames()[0]).toBe("Layout");
+    expect(sectionNames()[0]).toBe("Children layout");
     expect(sectionNames()).not.toContain("Flexbox");
   });
 
-  it("Behaviour carries Interactions (Q1) and Visibility; Effects carries neither", () => {
+  it("Behavior carries Interactions (Q1) and Visibility; Effects carries neither", () => {
     const { unmount } = renderTab({ tabId: "effects", elementType: "container" });
-    expect(sectionNames()).toEqual(["Opacity", "Shadow", "Filters", "Transform & motion", "Advanced"]);
+    expect(sectionNames()).toEqual(["Opacity", "Shadow", "Filters", "Transform and transition", "Advanced effects"]);
     unmount();
     renderTab({ tabId: "behaviour", elementType: "container" });
-    expect(sectionNames()).toEqual(["Link", "Visibility", "Interactions", "CSS classes", "Attributes"]);
+    expect(sectionNames()).toEqual(["Link", "Visibility", "Interactions"]);
   });
 
-  it("an image shows no Link; a heading shows CMS binding, no Link", () => {
+  it("an image shows no Link; a heading's Behavior has no Link and no CMS binding", () => {
     const { unmount } = renderTab({ tabId: "behaviour", elementType: "image" });
     expect(sectionNames()).not.toContain("Link");
     unmount();
     renderTab({ tabId: "behaviour", elementType: "heading" });
-    expect(sectionNames()).toEqual(["CMS binding", "Visibility", "Interactions", "CSS classes", "Attributes"]);
+    expect(sectionNames()).toEqual(["Visibility", "Interactions"]);
   });
 
   it("a multi-selection shows only the sections every selected type has (DD-12)", () => {
     renderTab({ tabId: "style", elementType: "heading", selectedTypes: ["heading", "image"] });
     /* No shared type block, no Typography (the image has none). */
-    expect(sectionNames()).toEqual(["Size", "Spacing", "Fill", "Border"]);
+    expect(sectionNames()).toEqual(["Size", "Spacing", "Background", "Border"]);
   });
 
   it("an unknown stored type falls back to the container set without crashing", () => {
     renderTab({ tabId: "style", elementType: "nonexistent-widget-xyz" });
-    expect(sectionNames()[0]).toBe("Layout");
+    expect(sectionNames()[0]).toBe("Children layout");
   });
 });
 
 describe("InspectorTabContent — display modes (DD-11)", () => {
-  it("Fill and Border arrive as '+' rows when the element carries no value", () => {
-    renderTab({ tabId: "style", elementType: "heading" });
-    expect(screen.getByTestId("inspector-add-fill")).toBeInTheDocument();
-    expect(screen.getByTestId("inspector-add-border")).toBeInTheDocument();
+  it("2L9 161:8940: Spacing, Background and Border arrive shut, summarised 'None' / 'n set'", () => {
+    renderTab({ tabId: "style", elementType: "heading", authored: { "padding-top": "8px", "padding-bottom": "8px" } });
+    expect(screen.getByTestId("inspector-summary-spacing")).toHaveTextContent("2 set");
+    expect(screen.getByTestId("inspector-summary-fill")).toHaveTextContent("None");
+    expect(screen.getByTestId("inspector-summary-border")).toHaveTextContent("None");
   });
 
-  it("a valued section arrives open", () => {
-    renderTab({ tabId: "style", elementType: "heading", authored: { "background-color": "#ff0000" } });
-    expect(screen.queryByTestId("inspector-add-fill")).toBeNull();
-    expect(screen.getByRole("button", { name: "Fill section, expanded" })).toBeInTheDocument();
-  });
-
-  it("the '+' records an open choice for this element type", () => {
+  it("opening a shut section records an open choice for this element type", () => {
     const onSetChoices = vi.fn();
     renderTab({ tabId: "style", elementType: "heading", onSetChoices });
-    fireEvent.click(screen.getByTestId("inspector-add-border"));
+    fireEvent.click(screen.getByRole("button", { name: "Border section, collapsed" }));
     expect(onSetChoices).toHaveBeenCalledWith("heading", ["border"], "open");
   });
 
-  it("Attributes and Effects › Advanced arrive closed with their one-line summary", () => {
+  it("Effects › Advanced effects and Transform and transition arrive closed with 'n set' / 'None' (2L9 161:12525)", () => {
     renderTab({ tabId: "effects", elementType: "heading" });
-    expect(screen.getByTestId("inspector-summary-effects-advanced")).toHaveTextContent("Cursor: auto · Blend: normal");
+    expect(screen.getByTestId("inspector-summary-effects-advanced")).toHaveTextContent("None");
+    expect(screen.getByTestId("inspector-summary-transform-motion")).toHaveTextContent("None");
   });
 
   it("a user's close wins over 'always'", () => {
@@ -200,6 +208,6 @@ describe("InspectorTabContent — display modes (DD-11)", () => {
     const onSetChoices = vi.fn();
     renderTab({ tabId: "style", elementType: "heading", onSetChoices });
     fireEvent.click(screen.getByRole("button", { name: "Size section, expanded" }), { altKey: true });
-    expect(onSetChoices).toHaveBeenCalledWith("heading", ["type", "typography", "size", "spacing", "fill", "border"], "closed");
+    expect(onSetChoices).toHaveBeenCalledWith("heading", ["typography", "size", "spacing", "fill", "border"], "closed");
   });
 });

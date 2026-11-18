@@ -26,7 +26,7 @@ import {
 } from "@/engine/__tests__/test-utils/realComposer";
 import { ToastProvider } from "@/editor/chrome-ui";
 import { TypeBlockSection } from "../sections/typeBlock/TypeBlockSection";
-import { AttributesSection } from "../sections/attributes/AttributesSection";
+import { SemanticsSection } from "../sections/SemanticsSection";
 import { DataAttributeEditor } from "../sections/attributes/DataAttributeEditor";
 import { FormFieldsSection } from "../sections/FormFieldsSection";
 import { SliderPlaybackSection } from "../sections/SliderPlaybackSection";
@@ -35,9 +35,13 @@ import { LinkSection } from "../sections/LinkSection";
 import { CSSClassesSection } from "../sections/CSSClassesSection";
 import { CollectionListSection } from "../sections/CollectionListSection";
 import { useFieldOverrides } from "../hooks/useFieldOverrides";
-import { CmsBindingSection } from "../sections/CmsBindingSection";
+import { BindingDetail } from "../sections/binding/BindingDetail";
 import { InspectorElementMenu } from "../components/InspectorElementMenu";
+import { ResetStyleReview } from "../components/ResetStyleReview";
 import { useStyleHandlers } from "../hooks/useStyleHandlers";
+import { ToastProvider as __ToastProvider } from "@/editor/chrome-ui";
+/* LinkSection raises toasts (B5-D90): render it under the provider. */
+const renderT = (ui: React.ReactElement, opts?: Parameters<typeof render>[1]) => render(ui, { wrapper: __ToastProvider, ...opts });
 
 beforeAll(installEngineBrowserStubs);
 afterAll(removeEngineBrowserStubs);
@@ -66,7 +70,7 @@ describe("P-1 — attribute writers refuse a locked element", () => {
   it("Type block: editing a defining attribute", () => {
     const img = add("image", { attributes: { alt: "cat" } });
     lock(img);
-    render(
+    renderT(
       <TypeBlockSection element={{ id: img.getId(), type: "image" }} targetIds={[img.getId()]} composer={composer} styles={{}} onChange={() => {}} onBatchChange={() => {}} isOpen onToggle={() => {}} />
     );
     fireEvent.change(screen.getByPlaceholderText("Describe this image"), { target: { value: "a dog" } });
@@ -74,10 +78,10 @@ describe("P-1 — attribute writers refuse a locked element", () => {
     expect(skipped).toHaveBeenCalled();
   });
 
-  it("Attributes: editing the element ID", () => {
+  it("Semantics: editing the element ID", () => {
     const img = add("image");
     lock(img);
-    render(<AttributesSection element={{ id: img.getId(), type: "image" }} targetIds={[img.getId()]} composer={composer} isOpen onToggle={() => {}} />);
+    renderT(<SemanticsSection element={{ id: img.getId(), type: "image" }} targetIds={[img.getId()]} composer={composer} isOpen onToggle={() => {}} />);
     fireEvent.change(screen.getByPlaceholderText("element-id"), { target: { value: "hero" } });
     expect(img.getAttribute("id")).toBeFalsy();
     expect(skipped).toHaveBeenCalled();
@@ -86,7 +90,7 @@ describe("P-1 — attribute writers refuse a locked element", () => {
   it("DataAttributeEditor: adding a data attribute", () => {
     const box = add("container");
     lock(box);
-    render(<DataAttributeEditor elementId={box.getId()} composer={composer} />);
+    renderT(<DataAttributeEditor elementId={box.getId()} composer={composer} />);
     fireEvent.change(screen.getByPlaceholderText("data-*"), { target: { value: "data-x" } });
     fireEvent.change(screen.getByPlaceholderText("value"), { target: { value: "1" } });
     fireEvent.click(screen.getByRole("button", { name: "Add attribute" }));
@@ -97,7 +101,7 @@ describe("P-1 — attribute writers refuse a locked element", () => {
   it("LinkSection: changing the link target", () => {
     const link = add("link", { attributes: { href: "https://a.com" } });
     lock(link);
-    render(<LinkSection selectedElement={{ id: link.getId(), type: "link" }} composer={composer} isOpen />);
+    renderT(<LinkSection selectedElement={{ id: link.getId(), type: "link" }} composer={composer} isOpen />);
     fireEvent.click(screen.getByRole("checkbox", { name: "Open in new tab" }));
     expect(link.getAttribute("target")).toBeUndefined();
     expect(skipped).toHaveBeenCalled();
@@ -106,7 +110,7 @@ describe("P-1 — attribute writers refuse a locked element", () => {
   it("LinkSection: editing Rel", () => {
     const link = add("link", { attributes: { href: "https://a.com", rel: "nofollow" } });
     lock(link);
-    render(<LinkSection selectedElement={{ id: link.getId(), type: "link" }} composer={composer} isOpen />);
+    renderT(<LinkSection selectedElement={{ id: link.getId(), type: "link" }} composer={composer} isOpen />);
     const rel = screen.getByLabelText("Rel");
     fireEvent.change(rel, { target: { value: "sponsored" } });
     fireEvent.keyDown(rel, { key: "Enter" });
@@ -117,7 +121,7 @@ describe("P-1 — attribute writers refuse a locked element", () => {
   it("CSSClassesSection: adding a class", () => {
     const box = add("container");
     lock(box);
-    render(<CSSClassesSection selectedElement={{ id: box.getId(), type: "container" }} composer={composer} isOpen />);
+    renderT(<CSSClassesSection selectedElement={{ id: box.getId(), type: "container" }} composer={composer} isOpen />);
     const input = screen.getByLabelText("Add class");
     fireEvent.change(input, { target: { value: "hero" } });
     fireEvent.keyDown(input, { key: "Enter" });
@@ -129,26 +133,41 @@ describe("P-1 — attribute writers refuse a locked element", () => {
 });
 
 describe("P-1 — structure writers refuse a locked form / slider", () => {
-  it("FormFieldsSection: changing a field's type, Required, and adding a field", () => {
+  it("FormFieldsSection: adding a field and deleting one", () => {
     const form = add("form");
     add("input", { attributes: { type: "text", name: "name", placeholder: "Name" } }, form.getId());
     lock(form);
-    render(<FormFieldsSection elementId={form.getId()} composer={composer} isOpen />);
+    renderT(<FormFieldsSection elementId={form.getId()} composer={composer} isOpen />);
     fireEvent.click(screen.getByRole("button", { name: "+ Add field" }));
-    fireEvent.click(screen.getAllByTestId("form-field-row")[0]);
-    fireEvent.change(screen.getByRole("combobox", { name: "Type" }), { target: { value: "email" } });
+    fireEvent.click(screen.getByTestId("form-add-field-input"));
+    fireEvent.click(screen.getByRole("button", { name: "Name actions" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Delete" }));
+    expect(form.getChildren()).toHaveLength(1);
+    expect(skipped).toHaveBeenCalled();
+  });
+
+  it("Field block: changing a locked field's type and Required", () => {
+    const form = add("form");
+    const field = add("input", { attributes: { type: "text", name: "name" } }, form.getId());
+    lock(field);
+    renderT(
+      <ToastProvider>
+        <TypeBlockSection composer={composer} element={{ id: field.getId(), type: "input" }} targetIds={[field.getId()]} styles={{}} onChange={() => {}} onBatchChange={() => {}} isOpen onToggle={() => {}} />
+      </ToastProvider>,
+    );
+    /* Type is the "Field type" card (2L9 170:121692). */
+    fireEvent.click(screen.getByTestId("form-field-type"));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Email" }));
     fireEvent.click(screen.getByRole("checkbox", { name: "Required" }));
-    const fields = form.getChildren();
-    expect(fields).toHaveLength(1);
-    expect(fields[0].getAttribute("type")).toBe("text");
-    expect(fields[0].getAttribute("required")).toBeUndefined();
+    expect(field.getAttribute("type")).toBe("text");
+    expect(field.getAttribute("required")).toBeUndefined();
     expect(skipped).toHaveBeenCalled();
   });
 
   it("SliderPlaybackSection: toggling autoplay", () => {
     const slider = add("slider", { classes: ["buildrick-slider"] });
     lock(slider);
-    render(<SliderPlaybackSection elementId={slider.getId()} composer={composer} isOpen />);
+    renderT(<SliderPlaybackSection elementId={slider.getId()} composer={composer} isOpen />);
     fireEvent.click(screen.getByRole("switch", { name: "Autoplay" }));
     expect(slider.getAttribute("data-autoplay")).toBeUndefined();
     expect(skipped).toHaveBeenCalled();
@@ -158,7 +177,7 @@ describe("P-1 — structure writers refuse a locked form / slider", () => {
     const slider = add("slider", { classes: ["buildrick-slider"] });
     add("container", { classes: ["buildrick-slide"] }, slider.getId());
     lock(slider);
-    render(<SlidesSection elementId={slider.getId()} composer={composer} isOpen />);
+    renderT(<SlidesSection elementId={slider.getId()} composer={composer} isOpen />);
     act(() => {
       fireEvent.click(screen.getByRole("button", { name: "+ Add slide" }));
     });
@@ -178,16 +197,21 @@ describe("P-1 — style resets refuse a locked element", () => {
     expect(skipped).toHaveBeenCalled();
   });
 
-  it("InspectorElementMenu: Reset style", () => {
+  it("InspectorElementMenu: Reset style (through its review, 2L9 S20)", () => {
     const h = add("heading", { content: "T" });
     h.setStyle("color", "rgb(1, 1, 1)");
     lock(h);
     composer.selection.select(h);
-    render(<InspectorElementMenu composer={composer} selectedElementId={h.getId()} />, {
-      wrapper: ToastProvider,
-    });
+    renderT(
+      <>
+        <InspectorElementMenu composer={composer} selectedElementId={h.getId()} />
+        <ResetStyleReview composer={composer} elementId={h.getId()} onClose={() => {}} />
+      </>,
+      { wrapper: ToastProvider },
+    );
     fireEvent.click(screen.getByRole("button", { name: /element actions/i }));
     fireEvent.click(screen.getByText("Reset style"));
+    fireEvent.click(screen.getByTestId("inspector-reset-remove"));
     expect(h.getStyles().color).toBe("rgb(1, 1, 1)");
     expect(skipped).toHaveBeenCalled();
   });
@@ -249,17 +273,17 @@ describe("P-1 — CMS binding writers refuse a locked element", () => {
 
   it("CollectionListSection: binding a list", () => {
     const { c, bindCollectionList, emit } = cmsComposer(true);
-    render(<CollectionListSection elementId="list" composer={c} isOpen />);
-    fireEvent.change(screen.getByRole("combobox", { name: "Collection" }), { target: { value: "menu" } });
+    renderT(<CollectionListSection elementId="list" composer={c} isOpen />);
+    fireEvent.change(screen.getByRole("combobox", { name: "Source" }), { target: { value: "menu" } });
     expect(bindCollectionList).not.toHaveBeenCalled();
     expect(emit).toHaveBeenCalledWith(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
   });
 
-  it("CmsBindingSection: Unbind", () => {
+  it("BindingDetail: Unbind — keep shown text", () => {
     const { c, unbindAll } = cmsComposer(true);
-    render(<CmsBindingSection composer={c} elementId="list" isOpen />);
-    const unbind = screen.queryByRole("button", { name: "Unbind" });
-    if (!unbind) throw new Error("section did not render the bound state — fixture out of date");
+    renderT(<BindingDetail composer={c} elementId="list" />, { wrapper: ToastProvider });
+    const unbind = screen.queryByRole("button", { name: "Unbind — keep shown text" });
+    if (!unbind) throw new Error("detail did not render the bound state — fixture out of date");
     fireEvent.click(unbind);
     expect(unbindAll).not.toHaveBeenCalled();
   });

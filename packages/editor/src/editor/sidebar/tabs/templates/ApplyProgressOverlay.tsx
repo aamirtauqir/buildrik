@@ -50,6 +50,8 @@ export interface ApplyProgressOverlayProps {
   steps: ApplyStep[];
   /** Offered only while the work can still be called off — see TemplatesTab. */
   onCancel?: () => void;
+  /** design-2l9 106:37032: the page this run is creating ("Creating Services…"). */
+  creating?: string;
 }
 
 /** Board 642:3102-3107 — the state is the suffix, not an icon. */
@@ -63,8 +65,13 @@ export const ApplyProgressOverlay: React.FC<ApplyProgressOverlayProps> = ({
   templateName,
   steps,
   onCancel,
+  creating,
 }) => {
   const done = steps.filter((s) => s.state === "done").length;
+  /* design-2l9 107:31110: before the import starts the create run is only
+     "Preparing {template}…" — and still cancellable; from the import on it
+     is "Creating {page}…" (106:37032). */
+  const preparing = Boolean(creating) && steps[0]?.state === "active";
   const pct = steps.length === 0 ? 0 : Math.round((done / steps.length) * 100);
 
   return (
@@ -73,11 +80,23 @@ export const ApplyProgressOverlay: React.FC<ApplyProgressOverlayProps> = ({
         <div className="tmpl-progress__inner" data-testid="tpl-applying-card">
           <div className="tmpl-progress__head" data-testid="tpl-applying-head">
             <h3 className="tmpl-progress__title" data-testid="tpl-applying-title">
-              Applying {templateName}…
+              {preparing ? `Preparing ${templateName}…` : creating ? `Creating ${creating}…` : `Applying ${templateName}…`}
             </h3>
             <p className="tmpl-progress__sub" data-testid="tpl-applying-sub">
-              Do not close the editor
+              {preparing
+                ? `Preparing the template for ${creating}. You can still cancel before import starts.`
+                : creating
+                  ? "The page is being created and the template layout is being applied."
+                  : "Do not close the editor"}
             </p>
+            {creating && (
+              /* True: one run per window (TemplatesTab's applyRunningRef). */
+              <p className="tmpl-progress__sub" data-testid="tpl-applying-note">
+                {preparing
+                  ? "Your other pages and Brand settings remain unchanged."
+                  : "Keep this task open. Another creation cannot start while this operation is running."}
+              </p>
+            )}
           </div>
           <div className="tmpl-progress__body" data-testid="tpl-applying-body">
             <span
@@ -105,6 +124,15 @@ export const ApplyProgressOverlay: React.FC<ApplyProgressOverlayProps> = ({
               </p>
             ))}
           </div>
+          {creating && !onCancel && (
+            /* 106:37032: past the import the run cannot be called off; the
+               foot says what it is doing instead. */
+            <div className="tmpl-progress__foot" data-testid="tpl-applying-foot">
+              <Button color="light" size="xs" disabled className="tmpl-progress__cancel" data-testid="tpl-applying-status">
+                Applying layout…
+              </Button>
+            </div>
+          )}
           {onCancel && (
             <div className="tmpl-progress__foot" data-testid="tpl-applying-foot">
               <Button

@@ -23,16 +23,17 @@ import { fileURLToPath } from "node:url";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const css = readFileSync(join(HERE, "..", "PagesTab.css"), "utf8");
 
-/** Board 140:2: rows at y 80/112/144/176 → a 32 pitch, every row. */
-const BOARD_ROW_H = 32;
+/** design-2l9 board 63:6393: two-line rows (name over URL), 40 at least —
+ *  re-baselined from board 140:2's single-line 32. */
+const BOARD_ROW_H = 40;
 
 const readVar = (name: string) => {
   const m = css.match(new RegExp(`--${name}:\\s*(\\d+)px`));
   return m ? Number(m[1]) : null;
 };
 
-describe("Pages row height — board 140:2", () => {
-  it("is the board's 32", () => {
+describe("Pages row height — board 63:6393", () => {
+  it("is the board's 40", () => {
     expect(readVar("pg-row-h")).toBe(BOARD_ROW_H);
   });
 

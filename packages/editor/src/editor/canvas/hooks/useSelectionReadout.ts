@@ -1,7 +1,11 @@
 /**
- * useSelectionReadout — the "{Type} · {name}" + "W × H" readout the canvas
- * toolbar prints at its right end (board 5936:44788: "Section · Hero ·
- * 680 × 250"). One source for every surface that prints it.
+ * useSelectionReadout — what the canvas bar says about the selection. One
+ * source for every surface that prints it.
+ * - `path`: design-2l9 board 7:18654's two-level "{Parent} / {Element}"
+ *   ("Home / Hero" for a section on the page, the page alone with nothing
+ *   selected) — the bar's text.
+ * - `label` + `dims`: "{Type} · {name}" and "W × H" (board 5936:44788) — its
+ *   tooltip.
  *
  * @license BSD-3-Clause
  */
@@ -50,7 +54,7 @@ const INSTANCE_EVENTS = [
 export function useSelectionReadout(
   composer: Composer | null,
   selectedElement: { id: string; type: string } | null
-): { label: string; dims: string | null } {
+): { label: string; dims: string | null; path: string } {
   const projectLoading = useProjectLoading(composer);
   const activePage = composer?.elements?.getActivePage?.();
   const pageId = activePage?.id;
@@ -102,7 +106,8 @@ export function useSelectionReadout(
   const insert = useInsertDrag(composer);
   if (insert.label && insert.target) {
     const { path, after } = insert.target;
-    return { label: `Inserting ${insert.label} → ${path}${after ? ` · after ${after}` : ""}`, dims: null };
+    const inserting = `Inserting ${insert.label} → ${path}${after ? ` · after ${after}` : ""}`;
+    return { label: inserting, dims: null, path: inserting };
   }
 
   const label = projectLoading
@@ -116,5 +121,20 @@ export function useSelectionReadout(
         : selectedElement
           ? `${elementTypeLabel(selectedElement.type)}${customName ? ` · ${customName}` : ""}`
         : "Nothing selected";
-  return { label, dims: elementDims(selectedElement?.id) };
+  const isRoot = Boolean(selectedElement && activePage?.root?.id === selectedElement.id);
+  const pageName = activePage?.name ?? "";
+  const selfName = master ? master.name : customName ?? (selectedElement ? elementTypeLabel(selectedElement.type) : "");
+  const parent = selectedElement && !isRoot ? composer?.elements.getElement(selectedElement.id)?.getParent?.() : null;
+  const parentName = !parent
+    ? pageName
+    : parent.getId() === activePage?.root?.id
+      ? pageName
+      : getLayerName(parent) ?? getLayerPreview(parent) ?? elementTypeLabel(parent.getType());
+  const path =
+    projectLoading || selectionCount > 1
+      ? label
+      : !selectedElement || isRoot
+        ? pageName || label
+        : [parentName, selfName].filter(Boolean).join(" / ");
+  return { label, dims: elementDims(selectedElement?.id), path };
 }

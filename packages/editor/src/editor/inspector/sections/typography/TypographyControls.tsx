@@ -1,8 +1,10 @@
 /**
- * TypographyControls — what "More settings" holds for text: everything the
- * section can set that boards 1 and 4 keep off its face (Font, Font size,
- * Line height, Weight, Colour, Align). Nine rows — `ADVANCED_TYPOGRAPHY_COUNT`
- * is the badge the toggle shows.
+ * TypographyControls — the rows past Typography's face: Align, then 2L9
+ * 247:23404's Letter spacing · Word spacing · Transform · Decoration · Font
+ * style · White-space · Word break · Text indent · Vertical align, each a
+ * plain row showing CSS's default when unset. Typography keeps them behind
+ * More settings (`ADVANCED_TYPOGRAPHY_COUNT` is its badge); Text inside
+ * draws them on its face.
  *
  * @module editor/inspector/sections/typography/TypographyControls
  * @license BSD-3-Clause
@@ -17,127 +19,98 @@ interface TextControlsProps {
   isMultiSelect?: boolean;
 }
 
-export const ADVANCED_TYPOGRAPHY_COUNT = 9;
+export const ADVANCED_TYPOGRAPHY_COUNT = 10;
+
+/* 2L9 161:8940 draws no Align in the face; it heads More settings. */
+const ALIGN_OPTIONS = [
+  { value: "left", label: "Left" },
+  { value: "center", label: "Center" },
+  { value: "right", label: "Right" },
+];
+
+const TRANSFORM_OPTIONS = [
+  { value: "none", label: "None" },
+  { value: "uppercase", label: "Uppercase" },
+  { value: "lowercase", label: "Lowercase" },
+  { value: "capitalize", label: "Capitalize" },
+];
+const DECORATION_OPTIONS = [
+  { value: "none", label: "None" },
+  { value: "underline", label: "Underline" },
+  { value: "line-through", label: "Strikethrough" },
+  { value: "overline", label: "Overline" },
+];
+const FONT_STYLE_OPTIONS = [
+  { value: "normal", label: "Normal" },
+  { value: "italic", label: "Italic" },
+];
+const WHITE_SPACE_OPTIONS = [
+  { value: "normal", label: "Normal" },
+  { value: "nowrap", label: "No wrap" },
+  { value: "pre", label: "Pre" },
+  { value: "pre-wrap", label: "Pre wrap" },
+  { value: "pre-line", label: "Pre line" },
+];
+const WORD_BREAK_OPTIONS = [
+  { value: "normal", label: "Normal" },
+  { value: "break-all", label: "Break all" },
+  { value: "keep-all", label: "Keep all" },
+  { value: "break-word", label: "Break word" },
+];
+const VERTICAL_ALIGN_OPTIONS = [
+  { value: "baseline", label: "Baseline" },
+  { value: "top", label: "Top" },
+  { value: "middle", label: "Middle" },
+  { value: "bottom", label: "Bottom" },
+  { value: "sub", label: "Sub" },
+  { value: "super", label: "Super" },
+];
 
 export const TypographyControls: React.FC<TextControlsProps> = ({ styles, onChange }) => {
+  const select = (label: string, property: string, options: ReadonlyArray<{ value: string; label: string }>) => (
+    <SelectRow
+      label={label}
+      property={property}
+      value={styles[property] || options[0].value}
+      onChange={(v) => onChange(property, v)}
+      options={[...options]}
+    />
+  );
   return (
     <>
-      <div className="tw:relative">
-        <ButtonGroup
-          label="Transform"
-          value={styles["text-transform"] || ""}
-          onChange={(v) => onChange("text-transform", v)}
-          property="text-transform"
-          options={[
-            { value: "none", label: "None", icon: "Aa" },
-            { value: "uppercase", label: "Upper", icon: "AA" },
-            { value: "lowercase", label: "Lower", icon: "aa" },
-            { value: "capitalize", label: "Cap", icon: "Aa" },
-          ]}
-        />
-      </div>
-
-      <div className="tw:relative">
-        <ButtonGroup
-          label="Decoration"
-          value={styles["text-decoration"] || ""}
-          onChange={(v) => onChange("text-decoration", v)}
-          property="text-decoration"
-          options={[
-            { value: "none", label: "None", icon: "\u2014" },
-            { value: "underline", label: "Under", icon: "U\u0332" },
-            { value: "line-through", label: "Strike", icon: "S\u0336" },
-            { value: "overline", label: "Over", icon: "O\u0305" },
-          ]}
-        />
-      </div>
-
-      <div className="tw:relative">
-        <InputWithUnit
-          label="Letter"
-          value={styles["letter-spacing"] || ""}
-          onChange={(v) => onChange("letter-spacing", v)}
-          units={["px", "em", "normal"]}
-          property="letter-spacing"
-        />
-      </div>
-
-      <div className="tw:relative">
-        <InputWithUnit
-          label="Word"
-          value={styles["word-spacing"] || ""}
-          onChange={(v) => onChange("word-spacing", v)}
-          units={["px", "em", "normal"]}
-          property="word-spacing"
-        />
-      </div>
-
-      {/* Font Style */}
-      <div className="tw:relative">
-        <ButtonGroup
-          label="Style"
-          value={styles["font-style"] || ""}
-          onChange={(v) => onChange("font-style", v)}
-          property="font-style"
-          options={[
-            { value: "normal", label: "Normal", icon: "N" },
-            { value: "italic", label: "Italic", icon: "I" },
-          ]}
-        />
-      </div>
-
-      {/* White Space */}
-      <SelectRow
-        label="White Space"
-        value={styles["white-space"] || ""}
-        onChange={(v) => onChange("white-space", v)}
-        property="white-space"
-        options={[
-          { value: "normal", label: "Normal" },
-          { value: "nowrap", label: "No Wrap" },
-          { value: "pre", label: "Pre" },
-          { value: "pre-wrap", label: "Pre Wrap" },
-          { value: "pre-line", label: "Pre Line" },
-        ]}
+      <ButtonGroup
+        label="Align"
+        value={styles["text-align"] || ""}
+        onChange={(v) => onChange("text-align", v)}
+        options={ALIGN_OPTIONS}
+        property="text-align"
       />
-
-      {/* Word Break */}
-      <SelectRow
-        label="Word Break"
-        value={styles["word-break"] || ""}
-        onChange={(v) => onChange("word-break", v)}
-        property="word-break"
-        options={[
-          { value: "normal", label: "Normal" },
-          { value: "break-all", label: "Break All" },
-          { value: "keep-all", label: "Keep All" },
-          { value: "break-word", label: "Break Word" },
-        ]}
-      />
-
-      {/* Text Indent */}
       <InputWithUnit
-        label="Text Indent"
+        label="Letter spacing"
+        value={styles["letter-spacing"] || ""}
+        onChange={(v) => onChange("letter-spacing", v)}
+        units={["px", "em", "normal"]}
+        property="letter-spacing"
+      />
+      <InputWithUnit
+        label="Word spacing"
+        value={styles["word-spacing"] || ""}
+        onChange={(v) => onChange("word-spacing", v)}
+        units={["px", "em", "normal"]}
+        property="word-spacing"
+      />
+      {select("Transform", "text-transform", TRANSFORM_OPTIONS)}
+      {select("Decoration", "text-decoration", DECORATION_OPTIONS)}
+      {select("Font style", "font-style", FONT_STYLE_OPTIONS)}
+      {select("White-space", "white-space", WHITE_SPACE_OPTIONS)}
+      {select("Word break", "word-break", WORD_BREAK_OPTIONS)}
+      <InputWithUnit
+        label="Text indent"
         value={styles["text-indent"] || ""}
         onChange={(v) => onChange("text-indent", v)}
         property="text-indent"
       />
-
-      {/* Vertical Align */}
-      <SelectRow
-        label="Vertical Align"
-        value={styles["vertical-align"] || ""}
-        onChange={(v) => onChange("vertical-align", v)}
-        property="vertical-align"
-        options={[
-          { value: "baseline", label: "Baseline" },
-          { value: "top", label: "Top" },
-          { value: "middle", label: "Middle" },
-          { value: "bottom", label: "Bottom" },
-          { value: "sub", label: "Sub" },
-          { value: "super", label: "Super" },
-        ]}
-      />
+      {select("Vertical align", "vertical-align", VERTICAL_ALIGN_OPTIONS)}
     </>
   );
 };

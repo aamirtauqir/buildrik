@@ -4,11 +4,10 @@
  * and never reaches here).
  * Renders inside LayoutShell.FullPage slot: an error boundary + Suspense
  * fallback around FullPageRouter. It does NOT provide a shared header or
- * close action — each fullpage screen portals its own edge-to-edge surface
- * with its own `‹ Back to canvas` and owns its own Escape/dialogs — this is
- * takeover shape 1 of 3 (see the "THE THREE TAKEOVER SHAPES" contract at the
- * top of FullPageRouter.tsx for the other two: the CMS canvas region and the
- * Compare overlay).
+ * close action — each screen draws its own nav with its own way back and
+ * owns its own Escape/dialogs. Assets, Settings and Brand render in this slot
+ * (the resource area); Templates portals edge-to-edge. Takeover shape 1 of 3
+ * (see "THE TAKEOVER SHAPES" at the top of FullPageRouter.tsx).
  *
  * @license BSD-3-Clause
  */
@@ -21,6 +20,7 @@ import type { GroupedTabId } from "../rail/tabsConfig";
 import type { IconConfig } from "@/shared/types/media";
 import { InspectorErrorBoundary } from "../inspector/components/InspectorErrorBoundary";
 import { PanelSkeleton, SidebarErrorFallback } from "./SidebarFallbacks";
+import { PanelChunkBoundary } from "@/editor/shell/PanelChunkBoundary";
 import { FullPageRouter } from "./FullPageRouter";
 import type { SettingsOpenRequest } from "./tabs/settings/types";
 import type { TemplatesOpenRequest } from "./tabs/templates/TemplatesTab";
@@ -80,6 +80,7 @@ export const FullPageView: React.FC<FullPageViewProps> = ({
           <SidebarErrorFallback onRetry={() => setErrorKey((k) => k + 1)} />
         }
       >
+        <PanelChunkBoundary>
         <React.Suspense fallback={<PanelSkeleton />}>
           <FullPageRouter
             activeTab={activeTab}
@@ -94,6 +95,7 @@ export const FullPageView: React.FC<FullPageViewProps> = ({
             templatesOpen={templatesOpen}
           />
         </React.Suspense>
+        </PanelChunkBoundary>
       </InspectorErrorBoundary>
     </div>
   );
