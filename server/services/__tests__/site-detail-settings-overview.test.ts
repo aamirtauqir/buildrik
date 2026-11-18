@@ -224,7 +224,7 @@ describe("getSettingsOverview — the seeded site", () => {
     ]) expect(model).toHaveBeenCalledTimes(1);
     // One page read serves both the translation count and the suggester (S3).
     expect(db.page.findMany).toHaveBeenCalledWith({
-      where: { siteId: "s1" },
+      where: { siteId: "s1", deletedAt: null },
       orderBy: { position: "asc" },
       select: { id: true, name: true, slug: true, isHomePage: true, slugHistory: true, translations: true, seoDescription: true, meta: true },
     });

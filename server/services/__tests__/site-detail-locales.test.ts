@@ -57,7 +57,7 @@ describe("getLocales — the seeded site", () => {
       ],
     });
     expect(db.page.findMany).toHaveBeenCalledWith({
-      where: { siteId: "s1" },
+      where: { siteId: "s1", deletedAt: null },
       orderBy: { position: "asc" },
       select: { name: true, translations: true },
     });

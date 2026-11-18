@@ -2,6 +2,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { type NextRequest } from "next/server";
 
 vi.mock("@/server/services/publish-bundle.service", () => ({ recoverPendingForms: vi.fn(async () => 0) }));
+vi.mock("@/server/services/page-trash.service", () => ({ purgeExpiredPageTrash: vi.fn(async () => ({ deleted: 3 })) }));
+vi.mock("@/server/services/user-template.service", () => ({ purgeExpiredUserTemplateTrash: vi.fn(async () => ({ deleted: 1 })) }));
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     session: { deleteMany: vi.fn() },
@@ -166,7 +168,7 @@ describe("soft-delete-purge", () => {
     const res = await softDeletePurge(makeReq("soft-delete-purge", "Bearer test-secret"));
     expect(res.status).toBe(200);
     const body = await res.json();
-    expect(body).toEqual({ ok: true, deleted: 2 });
+    expect(body).toEqual({ ok: true, deleted: 2, pagesDeleted: 3, templatesDeleted: 1 });
   });
 
   it("calls deleteMany with deletedAt not null and lt 30 days ago", async () => {

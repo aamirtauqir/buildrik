@@ -11,9 +11,9 @@ import { describe, it, expect } from "vitest";
 import { defineSection, type SectionContext } from "../index";
 
 function makeCtx(styles: Record<string, string>): SectionContext {
-  // Only `styles` is read by the probe adapter below; the factory spreads
-  // ctx, so a partial object is sufficient for this unit.
-  return { styles } as unknown as SectionContext;
+  // The probe adapter reads only `styles`; the factory also keys its error
+  // boundary on `selectedElement.id`, so a partial object with both suffices.
+  return { styles, selectedElement: { id: "el-1", type: "box" } } as unknown as SectionContext;
 }
 
 describe("defineSection — style slicing via pickKeys", () => {

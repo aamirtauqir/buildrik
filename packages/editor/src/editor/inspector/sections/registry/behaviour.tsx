@@ -28,6 +28,9 @@ import type { AnimationConfig } from "@/shared/types/animations";
 /** The element under the canvas selection, for the interaction preview. */
 const canvasNode = (id: string) => document.querySelector(`[data-buildrick-id="${id}"]`) as HTMLElement | null;
 
+/** The preview run each canvas node is playing, so Stop can cancel exactly it. */
+const previewRuns = new WeakMap<HTMLElement, Animation>();
+
 const DEVICES = ["Desktop", "Tablet", "Mobile"] as const;
 
 /** Visibility and Interactions arrive open, except under a type's own
@@ -70,18 +73,23 @@ function adaptInteractions(ctx: SectionContext) {
           : null
         : INTERACTION_PRESET_KEYFRAMES[anim.preset];
     if (!frames) return;
-    domEl.animate(frames, {
+    previewRuns.get(domEl)?.cancel();
+    const run = domEl.animate(frames, {
       duration: anim.duration || 300,
       delay: anim.delay || 0,
       easing: INTERACTION_EASINGS[anim.easing] || "ease",
       iterations: 1,
     });
+    previewRuns.set(domEl, run);
   };
-  /* 2L9 I17: Stop restores the authored appearance — the preview's
-     animation (fill: forwards) comes off the canvas node. */
+  /* 2L9 I17: Stop restores the authored appearance — the preview's WAAPI run
+     is cancelled. Clearing `style.animation` here (the pre-WAAPI preview's
+     carrier) would also strip the element's own inline animation. */
   const onStopPreview = () => {
     const domEl = canvasNode(ctx.selectedElement.id);
-    if (domEl) domEl.style.animation = "";
+    if (!domEl) return;
+    previewRuns.get(domEl)?.cancel();
+    previewRuns.delete(domEl);
   };
   /* G2-157 (option A): the element's CSS animation is a row of this list. */
   const getAnimation = () => {

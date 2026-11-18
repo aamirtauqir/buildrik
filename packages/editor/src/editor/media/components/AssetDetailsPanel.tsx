@@ -22,6 +22,7 @@ import * as React from "react";
 import type { Composer } from "@/engine/Composer";
 import type { LibraryItem, VersionEntry } from "@/editor/sidebar/tabs/media/data/mediaTypes";
 import { formatBytes } from "@shared/utils/helpers/number";
+import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 import { versionLabel, collectUsageByPage } from "@/editor/sidebar/tabs/media/data/mediaUtils";
 import { useAltTextDraft } from "@/editor/sidebar/tabs/media/hooks/useAltTextDraft";
 import {
@@ -301,7 +302,7 @@ export function AssetDetailsPanel({
   /* 2L9 B6-A01 — Details | Usage | Versions; the tab survives a file change. */
   const [tab, setTab] = React.useState<DetailTab>("details");
   const copyAltText = (alt: string) => {
-    void navigator.clipboard?.writeText(alt).then(
+    void writeClipboardText(alt).then(
       () => addToast({ description: "Alt text copied", tone: "success" }),
       () => addToast({ description: "Couldn’t copy the alt text", tone: "error" }),
     );

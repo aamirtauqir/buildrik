@@ -72,6 +72,7 @@ vi.mock("@buildrik/shared/schemas/sites", () => {
     listSitesSchema: any, createSiteSchema: any, bulkActionSchema: any,
     transferSiteSchema: any, checkSlugSchema: any,
     getProjectDataSchema: any, editorSaveProjectSchema: any, restoreSiteSchema: any,
+    codeExportAccessSchema: any, CODE_EXPORT_NOT_IN_PLAN: "CODE_EXPORT_NOT_IN_PLAN",
     SITE_RESTORE_WINDOW_DAYS: 30,
   };
 });

@@ -20,7 +20,7 @@ const editor = (p: string) => join(__dirname, "..", "..", p);
 const read = (p: string) => readFileSync(editor(p), "utf8");
 const siteMenu = readFileSync(join(__dirname, "../SiteMenu.tsx"), "utf8");
 const shortcuts = readFileSync(join(__dirname, "../hooks/useEditorShortcuts.ts"), "utf8");
-const palette = readFileSync(join(__dirname, "../modals/CommandPalette.tsx"), "utf8");
+const palette = readFileSync(join(__dirname, "../modals/paletteCommands.ts"), "utf8");
 const sheetRows = read("canvas/controls/keyboardSheetRows.ts");
 
 describe("help chords", () => {
@@ -35,9 +35,9 @@ describe("help chords", () => {
   });
 
   it("the sheet's zoom rows match the keys the flyout binds", () => {
-    expect(sheetRows).toMatch(/keys: "ctrl\+0", description: "Zoom to 100%"/);
-    expect(sheetRows).toMatch(/keys: "ctrl\+1", description: "Zoom to fit"/);
-    expect(sheetRows).toMatch(/keys: "ctrl\+2", description: "Zoom to selection"/);
+    expect(sheetRows).toMatch(/keys: "shift\+0 \/ ctrl\+0", description: "Zoom to 100%"/);
+    expect(sheetRows).toMatch(/keys: "shift\+1", description: "Zoom to fit"/);
+    expect(sheetRows).toMatch(/keys: "shift\+2", description: "Zoom to selection"/);
   });
 
   it("names ONE palette, on ⌘K with ⌘⇧P as its alias", () => {
@@ -46,7 +46,7 @@ describe("help chords", () => {
   });
 
   it("the ⌘K palette's fit row prints the chord that fits (G1-093 / SH-90)", () => {
-    expect(palette).toMatch(/label: "Zoom to fit", group: "More", shortcut: "Ctrl\+1"/);
+    expect(palette).toMatch(/label: "Zoom to fit", group: "More", shortcut: "Shift\+1"/);
     expect(palette).not.toMatch(/label: "Fit to view"/);
   });
 

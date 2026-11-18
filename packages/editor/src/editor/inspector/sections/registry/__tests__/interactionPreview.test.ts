@@ -24,8 +24,11 @@ describe("interaction Preview", () => {
     document.body.appendChild(node);
 
     const ctx = { composer: null, styles: {}, selectedElement: { id: "el-1", type: "heading" } } as unknown as SectionContext;
-    const { props } = BEHAVIOUR_SECTIONS.interactions.render(ctx) as { props: { onPreview: (i: unknown) => void } };
-    props.onPreview({
+    /* The entry renders the section inside its SectionErrorBoundary (2L9 B4-S05). */
+    const boundary = BEHAVIOUR_SECTIONS.interactions.render(ctx) as {
+      props: { children: { props: { onPreview: (i: unknown) => void } } };
+    };
+    boundary.props.children.props.onPreview({
       id: "i1",
       trigger: "click",
       enabled: true,
@@ -38,5 +41,25 @@ describe("interaction Preview", () => {
       easing: INTERACTION_EASINGS["power2.out"],
       iterations: 1,
     });
+  });
+
+  it("Stop cancels the preview run and leaves the element's own animation alone", () => {
+    const node = document.createElement("div");
+    node.setAttribute("data-buildrick-id", "el-2");
+    node.style.animation = "spin 1s infinite";
+    const cancel = vi.fn();
+    (node as unknown as { animate: () => { cancel: typeof cancel } }).animate = () => ({ cancel });
+    document.body.appendChild(node);
+
+    const ctx = { composer: null, styles: {}, selectedElement: { id: "el-2", type: "heading" } } as unknown as SectionContext;
+    const boundary = BEHAVIOUR_SECTIONS.interactions.render(ctx) as {
+      props: { children: { props: { onPreview: (i: unknown) => void; onStopPreview: () => void } } };
+    };
+    const { onPreview, onStopPreview } = boundary.props.children.props;
+    onPreview({ id: "i1", trigger: "click", enabled: true, animation: { preset: "fadeIn", duration: 300, delay: 0, easing: "ease" } });
+    onStopPreview();
+
+    expect(cancel).toHaveBeenCalledTimes(1);
+    expect(node.style.animation).toBe("spin 1s infinite");
   });
 });
