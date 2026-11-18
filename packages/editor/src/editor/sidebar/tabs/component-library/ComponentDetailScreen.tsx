@@ -17,6 +17,9 @@ import { ELEMENT_TYPE_LABELS } from "@/shared/constants/elementTypeLabels";
 import { ExportPackageDialog } from "./ExportPackageDialog";
 import { INSTANTIATE_TOASTS, instantiateComponentAtSelection } from "./instantiate";
 import { beginUpdateFromSelection } from "./sourcePick";
+import { captureDeleteRecord } from "./componentTrash";
+import { stageComponentTrash } from "@/services/componentSync";
+import { COMPONENT_TRASH_RETENTION_DAYS } from "@buildrik/shared/schemas/site-component";
 /* Same "switch page, then select + scroll to the element" seam Review's
    Locate row uses (`locateComment`'s own header: "the REGRESSION-guarded
    seam"). Reused rather than re-implemented for the used-on row below —
@@ -51,6 +54,8 @@ export interface ComponentDetailScreenProps {
   onDuplicate?: () => void;
   /** Callback when component is deleted */
   onDelete?: () => void;
+  /** K18: the delete receipt's "Recently deleted ›" (absent without a site). */
+  onOpenTrash?: () => void;
 }
 
 const LIST_ROW = "tw:flex tw:items-center tw:gap-2 tw:h-8 tw:pl-3 tw:pr-1 tw:rounded tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
@@ -75,26 +80,39 @@ export function componentDeleteCopy(name: string, instances: number): { title: s
         : `${instances} instances on this site will become independent elements and keep their content.`;
   return {
     title: `Delete “${name}”?`,
-    message: `${fate} The saved ${name} component will be permanently deleted.`,
+    message: `${fate} ${name} moves to Recently deleted for ${COMPONENT_TRASH_RETENTION_DAYS} days.`,
   };
 }
 
 const count = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
 
 /**
- * Delete a master — board 4418:142651: "Menu card deleted · 18 instances
- * detached · Undo". Snapshots first, so Undo can re-register the master and
- * relink the instances it detached. Both delete doors (this screen and the
- * list's row menu) use it. Throws when the engine does.
+ * Delete a master — board 217:42047 (K18): "Footer deleted · 3 instances on 2
+ * pages were detached · Undo · Recently deleted ›". Snapshots first, so Undo
+ * can re-register the master and relink the instances it detached, and
+ * records the detach for the server's Recently deleted (a restore there
+ * re-links the unchanged ones). Both delete doors (this screen and the list's
+ * row menu) use it. Throws when the engine does.
  */
-export async function deleteComponentWithUndo(composer: Composer, id: string): Promise<ToastInput> {
+export async function deleteComponentWithUndo(
+  composer: Composer,
+  id: string,
+  onOpenTrash?: () => void,
+): Promise<ToastInput> {
   const snapshot = composer.components.snapshotComponent(id);
+  const record = captureDeleteRecord(composer, id);
   const detached = composer.components.getInstancesOfComponent(id).length;
+  stageComponentTrash(id, record);
   await composer.components.deleteComponent(id);
   const name = snapshot?.component.name ?? "Component";
+  const pages = record.pageCount;
   return {
-    description: detached > 0 ? `${name} deleted · ${count(detached, "instance", "instances")} detached` : `${name} deleted`,
+    description:
+      detached > 0
+        ? `${name} deleted · ${count(detached, "instance", "instances")}${pages > 0 ? ` on ${count(pages, "page", "pages")}` : ""} ${detached === 1 ? "was" : "were"} detached`
+        : `${name} deleted`,
     ...(snapshot && { action: { label: "Undo", onClick: () => void composer.components.restoreDeletedComponent(snapshot) } }),
+    ...(onOpenTrash && { secondaryAction: { label: "Recently deleted ›", onClick: onOpenTrash } }),
   };
 }
 
@@ -110,6 +128,7 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   onInsert,
   onDuplicate,
   onDelete,
+  onOpenTrash,
 }) => {
   // DrillInHeader handles focus-on-mount automatically
   const { addToast } = useToast();
@@ -183,7 +202,7 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
     if (!composer) return;
     setShowDeleteConfirm(false);
     try {
-      addToast(await deleteComponentWithUndo(composer, component.id));
+      addToast(await deleteComponentWithUndo(composer, component.id, onOpenTrash));
     } catch {
       addToast({ description: "Couldn't delete component.", tone: "error" });
       return;

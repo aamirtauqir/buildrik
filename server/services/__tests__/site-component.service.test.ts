@@ -73,45 +73,63 @@ describe("site-component.service", () => {
     );
   });
 
+  it("saving a master again takes it out of Recently deleted (Undo of a delete)", async () => {
+    upsert.mockResolvedValueOnce({ componentId: "c1" });
+    await upsertSiteComponent({ siteId: "s1", componentId: "c1", name: "Card", payload: { id: "c1" } });
+    expect(upsert.mock.calls[0][0].update).toMatchObject({ deletedAt: null, deletedById: null });
+  });
+
   it("listSiteComponents selects metadata only (never the payload) — incl. its scope", async () => {
     findMany.mockResolvedValueOnce([]);
     await listSiteComponents("s1");
     expect(findMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { siteId: "s1" },
+        where: { siteId: "s1", deletedAt: null },
         select: { componentId: true, name: true, pageId: true, createdBy: true, createdAt: true, updatedAt: true },
       })
     );
   });
 
-  it("getSiteComponent returns the payload, null when missing", async () => {
-    findUnique.mockResolvedValueOnce({ payload: { id: "c1" } });
+  it("getSiteComponent returns a live master's payload, null when missing or trashed", async () => {
+    findFirst.mockResolvedValueOnce({ payload: { id: "c1" } });
     expect(await getSiteComponent("s1", "c1")).toEqual({ id: "c1" });
-    findUnique.mockResolvedValueOnce(null);
+    expect(findFirst.mock.calls[0][0].where).toEqual({ siteId: "s1", componentId: "c1", deletedAt: null });
+    findFirst.mockResolvedValueOnce(null);
     expect(await getSiteComponent("s1", "nope")).toBeNull();
   });
 
-  it("deleteSiteComponent uses deleteMany (a missing row is a no-op)", async () => {
-    deleteMany.mockResolvedValueOnce({ count: 0 });
-    expect(await deleteSiteComponent("s1", "gone")).toEqual({ ok: true });
-    expect(deleteMany).toHaveBeenCalledWith({ where: { siteId: "s1", componentId: "gone" } });
+  it("deleteSiteComponent moves the master to Recently deleted with what it detached (K18)", async () => {
+    updateMany.mockResolvedValueOnce({ count: 1 });
+    const trash = { instances: [{ record: { elementId: "e1" }, fingerprint: "abc" }], pageCount: 1 };
+    expect(await deleteSiteComponent("s1", "c1", "u1", trash)).toEqual({ ok: true });
+    const call = updateMany.mock.calls[0][0];
+    expect(call.where).toEqual({ siteId: "s1", componentId: "c1", deletedAt: null });
+    expect(call.data).toMatchObject({ deletedById: "u1", trash });
+    expect(call.data.deletedAt).toBeInstanceOf(Date);
+    expect(deleteMany).not.toHaveBeenCalled();
+  });
+
+  it("deleteSiteComponent of a missing or already-trashed row is a no-op", async () => {
+    updateMany.mockResolvedValueOnce({ count: 0 });
+    expect(await deleteSiteComponent("s1", "gone", "u1")).toEqual({ ok: true });
   });
 
   it("renameWorkspaceComponent renames the master on every site in the workspace", async () => {
     updateMany.mockResolvedValueOnce({ count: 3 });
     expect(await renameWorkspaceComponent("ws-1", "c1", "Hero v2")).toEqual({ updated: 3 });
     expect(updateMany).toHaveBeenCalledWith({
-      where: { componentId: "c1", site: { workspaceId: "ws-1", deletedAt: null } },
+      where: { componentId: "c1", deletedAt: null, site: { workspaceId: "ws-1", deletedAt: null } },
       data: { name: "Hero v2" },
     });
   });
 
-  it("deleteWorkspaceComponent removes the master from every site in the workspace", async () => {
-    deleteMany.mockResolvedValueOnce({ count: 2 });
-    expect(await deleteWorkspaceComponent("ws-1", "c1")).toEqual({ deleted: 2 });
-    expect(deleteMany).toHaveBeenCalledWith({
-      where: { componentId: "c1", site: { workspaceId: "ws-1", deletedAt: null } },
-    });
+  it("deleteWorkspaceComponent moves the master to every carrying site's Recently deleted", async () => {
+    updateMany.mockResolvedValueOnce({ count: 2 });
+    expect(await deleteWorkspaceComponent("ws-1", "c1", "u1")).toEqual({ deleted: 2 });
+    const call = updateMany.mock.calls[0][0];
+    expect(call.where).toEqual({ componentId: "c1", deletedAt: null, site: { workspaceId: "ws-1", deletedAt: null } });
+    expect(call.data).toMatchObject({ deletedById: "u1" });
+    expect(deleteMany).not.toHaveBeenCalled();
   });
 });
 
@@ -146,7 +164,7 @@ describe("FROM LIBRARY — the workspace's shared masters (board 4418:99857)", (
       { componentId: "mine", name: "Site header", siteId: "s1", updatedAt: d(4) },
     ]);
     const out = await listComponentLibrary("s1", "u1");
-    expect(findMany.mock.calls[0][0].where).toEqual({ pageId: null, site: { workspaceId: "w1", deletedAt: null } });
+    expect(findMany.mock.calls[0][0].where).toEqual({ pageId: null, deletedAt: null, site: { workspaceId: "w1", deletedAt: null } });
     expect(out.map((c) => [c.componentId, c.siteCount, c.onThisSite])).toEqual([
       ["btn", 2, true],
       ["price", 1, false],
@@ -158,7 +176,7 @@ describe("FROM LIBRARY — the workspace's shared masters (board 4418:99857)", (
     findFirst.mockResolvedValueOnce({ payload: { id: "price" } });
     await expect(getLibraryComponent("s1", "price", "u1")).resolves.toEqual({ id: "price" });
     expect(findFirst.mock.calls[0][0].where).toEqual({
-      componentId: "price", pageId: null, site: { workspaceId: "w1", deletedAt: null },
+      componentId: "price", pageId: null, deletedAt: null, site: { workspaceId: "w1", deletedAt: null },
     });
   });
 });
@@ -171,9 +189,13 @@ describe("FROM LIBRARY — only the sites this member may open", () => {
     findMany.mockResolvedValueOnce([]);
     await listComponentLibrary("s1", "u-scoped");
     expect(scope).toHaveBeenCalledWith(expect.anything(), "u-scoped", "w1");
-    expect(findMany.mock.calls.at(-1)![0].where.site).toEqual({ workspaceId: "w1", deletedAt: null, id: { in: ["s1"] } });
+    expect(findMany.mock.calls.at(-1)![0].where).toEqual({
+      pageId: null, deletedAt: null, site: { workspaceId: "w1", deletedAt: null, id: { in: ["s1"] } },
+    });
     findFirst.mockResolvedValueOnce(null);
     await getLibraryComponent("s1", "price", "u-scoped");
-    expect(findFirst.mock.calls.at(-1)![0].where.site).toEqual({ workspaceId: "w1", deletedAt: null, id: { in: ["s1"] } });
+    expect(findFirst.mock.calls.at(-1)![0].where).toEqual({
+      componentId: "price", pageId: null, deletedAt: null, site: { workspaceId: "w1", deletedAt: null, id: { in: ["s1"] } },
+    });
   });
 });

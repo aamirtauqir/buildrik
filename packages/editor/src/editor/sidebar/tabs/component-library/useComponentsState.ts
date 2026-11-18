@@ -120,11 +120,11 @@ export function useComponentsState({
 
   // Actual delete after confirmation
   // Returns the success toast (board 4418:142651, with Undo) for the caller to show.
-  const confirmDeleteAction = React.useCallback(async (): Promise<ToastInput | null> => {
+  const confirmDeleteAction = React.useCallback(async (onOpenTrash?: () => void): Promise<ToastInput | null> => {
     if (!composer || !confirmDelete) return null;
     let toast: ToastInput | null = null;
     try {
-      toast = await deleteComponentWithUndo(composer, confirmDelete.id);
+      toast = await deleteComponentWithUndo(composer, confirmDelete.id, onOpenTrash);
       setSelectedId(null);
     } catch {
       setPendingToast({ message: "Couldn't delete component.", variant: "error" });

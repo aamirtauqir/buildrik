@@ -21,6 +21,11 @@ import { ImportPackageDialog } from "./component-library/ImportPackageDialog";
 import { LibraryDetailPane } from "./component-library/LibraryDetailPane";
 import { UsedOnView } from "./component-library/UsedOnView";
 import { ExportPackageDialog } from "./component-library/ExportPackageDialog";
+import { RecentlyDeletedComponents } from "./component-library/RecentlyDeletedComponents";
+import { useComponentTrash } from "./component-library/useComponentTrash";
+import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
+import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
+import { roleAtLeast } from "@/services/RoleService";
 
 import "./component-library/ComponentsTab.css";
 import { EVENTS } from "@/shared/constants";
@@ -102,6 +107,16 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   const [exportId, setExportId] = React.useState<string | null>(null);
   const [renameFor, setRenameFor] = React.useState<string | null>(null);
   const consumeRename = React.useCallback(() => setRenameFor(null), []);
+  /* K19 217:41750: Recently deleted replaces the list until ‹ Back to Components. */
+  const [showTrash, setShowTrash] = React.useState(false);
+  const siteId = getSiteIdFromUrl();
+  const trash = useComponentTrash(composer, siteId);
+  const canPurge = roleAtLeast(useEditorRole(), "ADMIN") !== false;
+  const { handleBackFromDetail } = state;
+  const openTrash = React.useCallback(() => {
+    handleBackFromDetail();
+    setShowTrash(true);
+  }, [handleBackFromDetail]);
 
 
   // Which of this site's masters are shared from the workspace library.
@@ -159,7 +174,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         }
       : null;
   const pickedLibrary = scope === "library" ? library.find((l) => l.componentId === libraryPick) : undefined;
-  const pane = updating
+  const pane = updating || showTrash
     ? null
     : composer?.components?.isAvailable() && !state.error && pickedLibrary ? (
       <LibraryDetailPane entry={pickedLibrary} composer={composer} onClose={() => setLibraryPick(null)} />
@@ -175,6 +190,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         onBackToInstance={backToLayers ? undefined : state.backToInstance}
         onInsert={state.handleDetailInsert}
         onDelete={state.handleDetailDelete}
+        onOpenTrash={siteId ? openTrash : undefined}
       />
     ) : null;
 
@@ -204,8 +220,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             );
           })}
         </div>
-        {/* 215:46914 — the footer sits 24 below the scopes. "Recently deleted"
-            is not drawn: there is no component trash yet (B6-K19). */}
+        {/* 215:46914 — the footer sits 24 below the scopes. */}
         <div className="tw:flex tw:flex-col tw:gap-1 tw:pt-6">
           <Button
             color="light"
@@ -219,6 +234,20 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
           >
             Import package…
           </Button>
+          {siteId && (
+            <Button
+              color="light"
+              size="xs"
+              className="tw:h-8 tw:w-full tw:justify-start tw:border-0 tw:bg-transparent tw:pl-3 tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink)] tw:shadow-none tw:hover:bg-[var(--bk-bg-subtle)] tw:focus:ring-0"
+              onClick={() => {
+                openTrash();
+                setCompactNavOpen(false);
+              }}
+              data-testid="comp-trash-open"
+            >
+              {trash.items.length > 0 ? `Recently deleted · ${trash.items.length}` : "Recently deleted"}
+            </Button>
+          )}
         </div>
     </>
   );
@@ -305,7 +334,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         onClose={() => state.setConfirmDelete(null)}
         onConfirm={() => {
           const deleting = state.confirmDelete?.id;
-          void state.confirmDeleteAction().then((toast) => {
+          void state.confirmDeleteAction(siteId ? openTrash : undefined).then((toast) => {
             if (toast) addToast(toast);
             /* The summary must not outlive the master it shows. */
             if (deleting && state.detailComponent?.id === deleting) state.handleBackFromDetail();
@@ -345,6 +374,18 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         title="Couldn't load your components."
         message="Your components are safe — only this list failed."
         onRetry={state.retry}
+      />,
+    );
+  }
+
+  if (showTrash) {
+    return frame(
+      <RecentlyDeletedComponents
+        composer={composer}
+        trash={trash}
+        canPurge={canPurge}
+        online={online}
+        onBack={() => setShowTrash(false)}
       />,
     );
   }

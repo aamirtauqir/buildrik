@@ -41,7 +41,7 @@ describe("listWorkspaceComponents (C1)", () => {
       { componentId: "hero", name: "Hero", siteCount: 1, updatedAt: new Date("2026-06-21") },
     ]);
     // workspace-scoped filter through the site relation
-    expect(findMany.mock.calls[0][0].where).toEqual({ site: { workspaceId: "w1", deletedAt: null } });
+    expect(findMany.mock.calls[0][0].where).toEqual({ deletedAt: null, site: { workspaceId: "w1", deletedAt: null } });
   });
 
   it("returns [] when the workspace has no components", async () => {

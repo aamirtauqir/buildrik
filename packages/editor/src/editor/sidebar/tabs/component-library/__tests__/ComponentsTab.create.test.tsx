@@ -17,7 +17,11 @@ vi.mock("@/editor/chrome-ui", async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>();
   return { ...actual, useToast: () => ({ addToast: (t: { description: string }) => toasts.push(t) }) };
 });
-vi.mock("@/services/componentSync", () => ({ fetchComponentLibrary: vi.fn(async () => []) }));
+vi.mock("@/services/componentSync", () => ({
+  onComponentTrashChanged: () => () => {},
+  stageComponentTrash: vi.fn(),
+  fetchComponentLibrary: vi.fn(async () => []),
+}));
 
 import { ComponentsTab } from "@/editor/sidebar/tabs/ComponentsTab";
 

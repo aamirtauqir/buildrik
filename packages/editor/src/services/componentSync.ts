@@ -17,6 +17,7 @@ import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 import { getSiteIdFromUrl } from "./BuildrikSyncProvider";
 import { loadComponents, saveComponent } from "../engine/components/ComponentStorage";
 import type { ComponentDefinition } from "../shared/types/components";
+import type { ComponentTrashInfo } from "@buildrik/shared/schemas/site-component";
 import {
   SyncRetryQueue,
   hasServerStamp,
@@ -76,19 +77,40 @@ export async function mirrorComponentUpsert(component: ComponentDefinition): Pro
   );
 }
 
-/** Mirror a component deletion to the server. */
+/* Component trash (design-2l9 K18): what a delete detached travels with the
+   delete mirror, so the server's Recently deleted can re-link on restore. The
+   engine's COMPONENT_DELETED carries only the id, so the delete door stages
+   the record here just before it deletes. */
+const stagedTrash = new Map<string, ComponentTrashInfo>();
+const trashListeners = new Set<() => void>();
+
+/** Record what deleting `componentId` detaches; the next delete mirror sends it. */
+export function stageComponentTrash(componentId: string, info: ComponentTrashInfo): void {
+  stagedTrash.set(componentId, info);
+}
+
+/** Called after a delete reaches the server (Recently deleted changed). */
+export function onComponentTrashChanged(cb: () => void): () => void {
+  trashListeners.add(cb);
+  return () => trashListeners.delete(cb);
+}
+
+/** Mirror a component deletion to the server (it moves to Recently deleted). */
 export async function mirrorComponentDelete(componentId: string): Promise<void> {
   const siteId = getSiteIdFromUrl();
+  const trash = stagedTrash.get(componentId);
+  stagedTrash.delete(componentId);
   if (!siteId) return;
   // A pending upsert for the same component is moot — deletion wins, so drop it
   // to avoid resurrecting a deleted master on a reconnect retry.
   queue.drop(`componentUpsert:${componentId}`);
-  await queue.run(
+  const landed = await queue.run(
     `componentDelete:${componentId}`,
-    () => client().siteComponents.delete.mutate({ siteId, componentId }),
+    () => client().siteComponents.delete.mutate({ siteId, componentId, trash }),
     // eslint-disable-next-line no-console
     (e) => console.warn("[component-sync] delete mirror failed", e)
   );
+  if (landed) trashListeners.forEach((cb) => cb());
 }
 
 /**

@@ -411,7 +411,7 @@ async function withKeptSiteTokens(
   }
   const [pages, components] = await Promise.all([
     prisma.page.findMany({ where: { siteId: site.id, deletedAt: null }, select: { blocks: true, settings: true } }),
-    prisma.siteComponent.findMany({ where: { siteId: site.id }, select: { payload: true } }),
+    prisma.siteComponent.findMany({ where: { siteId: site.id, deletedAt: null }, select: { payload: true } }),
   ]);
   /* A theme that carries presets replaces the site's; otherwise the site's
      presets stay and their token references count. */

@@ -12,12 +12,12 @@ describe("componentDeleteCopy", () => {
     expect(componentDeleteCopy("Menu card", 18)).toEqual({
       title: "Delete “Menu card”?",
       message:
-        "18 instances on this site will become independent elements and keep their content. The saved Menu card component will be permanently deleted.",
+        "18 instances on this site will become independent elements and keep their content. Menu card moves to Recently deleted for 30 days.",
     });
   });
 
   it("uses the singular for one instance and says so plainly for none", () => {
     expect(componentDeleteCopy("CTA", 1).message).toMatch(/^1 instance on this site will become an independent element/);
-    expect(componentDeleteCopy("CTA", 0).message).toBe("No instances on this site use it. The saved CTA component will be permanently deleted.");
+    expect(componentDeleteCopy("CTA", 0).message).toBe("No instances on this site use it. CTA moves to Recently deleted for 30 days.");
   });
 });

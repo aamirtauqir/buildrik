@@ -153,7 +153,8 @@ export function LibraryPanel() {
         <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
           <strong>{deleting?.name}</strong> is used on <strong>{deleting?.siteCount}</strong> site
           {deleting?.siteCount === 1 ? "" : "s"}. Deleting removes it from all of them — the sites keep
-          the elements they already placed, but the shared master is gone. This can’t be undone.
+          the elements they already placed. Each site can restore it from Recently deleted in the
+          editor’s Components panel for 30 days.
         </p>
       </Modal>
     </SectionCard>

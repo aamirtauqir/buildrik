@@ -14,7 +14,11 @@ import { ToastProvider } from "@/editor/chrome-ui";
 import { createMockComposer } from "@/editor/sidebar/__tests__/test-utils/mockComposer";
 
 const { fetchLibrary } = vi.hoisted(() => ({ fetchLibrary: vi.fn() }));
-vi.mock("@/services/componentSync", () => ({ fetchComponentLibrary: fetchLibrary }));
+vi.mock("@/services/componentSync", () => ({
+  onComponentTrashChanged: () => () => {},
+  stageComponentTrash: vi.fn(),
+  fetchComponentLibrary: fetchLibrary,
+}));
 
 import { ComponentsTab } from "@/editor/sidebar/tabs/ComponentsTab";
 

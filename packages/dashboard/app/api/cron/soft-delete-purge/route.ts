@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { checkCronAuth } from "@/lib/cron-auth";
 import { SITE_RESTORE_WINDOW_DAYS } from "@buildrik/shared/schemas/sites";
 import { purgeExpiredPageTrash } from "@/server/services/page-trash.service";
+import { purgeExpiredComponentTrash } from "@/server/services/component-trash.service";
 import { purgeExpiredUserTemplateTrash } from "@/server/services/user-template.service";
 
 export const dynamic = "force-dynamic";
@@ -19,8 +20,16 @@ export async function GET(req: NextRequest) {
   });
   // A-21: pages in "Recently deleted" past their 30 days, on the same daily run.
   const pages = await purgeExpiredPageTrash();
+  // K19: components in "Recently deleted" past their 30 days, same run.
+  const components = await purgeExpiredComponentTrash();
   // B6-T24: saved templates in "Recently deleted" past their 30 days.
   const templates = await purgeExpiredUserTemplateTrash();
 
-  return Response.json({ ok: true, deleted: count, pagesDeleted: pages.deleted, templatesDeleted: templates.deleted });
+  return Response.json({
+    ok: true,
+    deleted: count,
+    pagesDeleted: pages.deleted,
+    componentsDeleted: components.deleted,
+    templatesDeleted: templates.deleted,
+  });
 }
