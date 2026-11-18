@@ -4,6 +4,10 @@
  * tag so the user's custom CSS actually applies on the canvas — previously it
  * was saved but injected nowhere (PRD gap A5 / Module 3 §3.1).
  *
+ * The returned CSS has foreign resource URLs blocked (`blockForeignCssUrls`):
+ * that <style> sits in the dashboard document, not a frame, so its selectors
+ * see the signed-in chrome. The saved and published CSS is unchanged.
+ *
  * @license BSD-3-Clause
  */
 
@@ -11,6 +15,7 @@ import * as React from "react";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants";
 import type { ProjectSettings } from "@/shared/types";
+import { blockForeignCssUrls } from "@/shared/utils/canvasCssUrls";
 
 export function useGlobalCustomCss(composer: Composer | null): string {
   const [css, setCss] = React.useState(
@@ -30,5 +35,5 @@ export function useGlobalCustomCss(composer: Composer | null): string {
     };
   }, [composer]);
 
-  return css;
+  return React.useMemo(() => blockForeignCssUrls(css), [css]);
 }

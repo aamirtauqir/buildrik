@@ -36,6 +36,11 @@ export async function captureAndUploadThumbnail(siteId: string, pageHtml: string
   try {
     frame = document.createElement("iframe");
     frame.setAttribute("aria-hidden", "true");
+    /* The exported page carries the site's own head/body code and runs in the
+       dashboard's origin here. `allow-same-origin` without `allow-scripts`
+       keeps contentDocument (and html2canvas's clone frame inside it)
+       readable from this script while nothing the page carries can execute. */
+    frame.setAttribute("sandbox", "allow-same-origin");
     frame.style.cssText = [
       "position:fixed",
       "left:-100000px",

@@ -336,6 +336,27 @@ describe("StyleEngine style element lifecycle", () => {
     expect(styleEl().textContent).toContain("color: red;");
   });
 
+  it("blocks a foreign url() in an attribute rule on the canvas sheet, not in the export", () => {
+    engine.setRule('input[name^="t"]', { backgroundImage: "url(https://evil.example/t)" });
+    engine.setRule(".hero", { backgroundImage: "url(https://images.unsplash.com/photo-1)" });
+    vi.runAllTimers();
+
+    const sheet = styleEl().textContent ?? "";
+    expect(sheet).not.toContain("evil.example");
+    expect(sheet).toContain("url(data:,)");
+    expect(sheet).toContain("url(https://images.unsplash.com/photo-1)");
+    // The published stylesheet keeps the CSS as written.
+    expect(engine.generateResponsiveCSS()).toContain("url(https://evil.example/t)");
+  });
+
+  it("keeps a pasted url() in a rule that tests no attribute value (element or class)", () => {
+    engine.setRule('[data-buildrick-id="el-1"]', { backgroundImage: "url(https://pasted.example/a.png)" }, { pseudo: ":hover" });
+    engine.setRule(".card", { backgroundImage: "url(https://pasted.example/b.png)" });
+    vi.runAllTimers();
+    expect(styleEl().textContent).toContain("url(https://pasted.example/a.png)");
+    expect(styleEl().textContent).toContain("url(https://pasted.example/b.png)");
+  });
+
   it("clear() removes all rules and flushes an empty stylesheet", () => {
     engine.setRule(".a", { color: "red" });
     engine.setRule(".b", { color: "blue" }, { mediaQuery: "(max-width: 1023px)" });
