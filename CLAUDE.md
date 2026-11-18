@@ -361,6 +361,18 @@ Rules that come out of that, learned the expensive way:
    eighteen. Counting the rest as covered is how `Settings has no Figma family`
    got written about a family that existed.
 
+## Software factory
+
+`/factory run` builds every open GitHub issue labeled `factory`, through intake → spec → build → gate → review → approve, one PR per issue. State is in `factory/jobs/` (gitignored); `factory/bin/job` is its only writer. Checks: `factory/checks.sh`. Dashboard: `cd factory && python3 -m http.server`, then open http://localhost:8000/dashboard.html.
+
+Each job works in its own git worktree, a full checkout of the repo at `.worktrees/<job-id>` (gitignored), branched from `origin/main` — so the factory files must be pushed before a job can see them. A tool run from the repo root that doesn't read `.gitignore` sees those copies too; exclude `.worktrees/` in its config.
+
+- **Setup (fresh worktree):** `pnpm install --frozen-lockfile`, `pnpm db:generate`. `factory/checks.sh` copies `.env.local` and `packages/dashboard/.env` from the main checkout when the worktree has none.
+- **Dev server:** `pnpm dev -p <port>` (dashboard + bundled editor at `/edit/:id`). The port-5050 Vite demo does not load real projects.
+- **Validation:** `bash factory/checks.sh` (install, Prisma, lint, tsc baseline, root vitest). DB tests, Playwright and `next build` run in CI only.
+
+The older PM-style factory (`docs/factory/`, `factory-*` agents, `T-NNN` ledger) is now the `/factory-pm` skill.
+
 ## Skill routing
 
 When the user's request matches an available skill, ALWAYS invoke it using the Skill

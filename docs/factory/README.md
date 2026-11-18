@@ -8,7 +8,7 @@ the one who builds never approves.
 
 | Role | Agent | Writes | Never |
 |---|---|---|---|
-| PM / coordinator | main session (`/factory` skill) | `task.md`, merges | writes product code |
+| PM / coordinator | main session (`/factory-pm` skill) | `task.md`, merges | writes product code |
 | Analyst | `factory-analyst` | `spec.md` | edits code |
 | Product designer | `factory-designer` | `design/` in the task folder, Figma | edits app code |
 | Design reviewer | `design-guard-reviewer` | nothing (returns report) | edits anything |
