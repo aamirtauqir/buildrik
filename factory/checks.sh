@@ -22,16 +22,19 @@ main="$(cd "$(git rev-parse --git-common-dir)/.." && pwd)"
 echo "▶ install"
 pnpm install --frozen-lockfile --prefer-offline --reporter=silent
 
+# Tools are called directly, not through package.json scripts, so a branch
+# cannot pass the gate by rewriting a script. The configs they read
+# (eslint.config.mjs, vitest.config.ts, the tsc baseline) are protected_paths.
 echo "▶ prisma generate"
-pnpm db:generate
+pnpm exec prisma generate
 
 echo "▶ lint"
-pnpm lint
+pnpm exec eslint packages/dashboard server lib __tests__ packages/shared
 
 echo "▶ tsc baseline (editor + dashboard)"
-pnpm --filter @buildrik/editor run gate:tsc
+node packages/editor/scripts/check-tsc-baseline.mjs
 
 echo "▶ vitest"
-pnpm test
+pnpm exec vitest run
 
 echo "✓ factory/checks.sh: all checks passed"

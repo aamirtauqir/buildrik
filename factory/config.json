@@ -27,7 +27,11 @@
     "*CLAUDE.local.md",
     "*.mcp.json",
     ".github/*",
-    ".gitignore"
+    ".gitignore",
+    "eslint.config.mjs",
+    "vitest.config.ts",
+    "packages/editor/scripts/check-tsc-baseline.mjs",
+    "packages/editor/scripts/.tsc-baselines.json"
   ],
   "ports": { "base": 5100, "step": 10 },
   "prices_usd_per_mtok": {
