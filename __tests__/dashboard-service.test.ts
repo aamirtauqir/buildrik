@@ -16,10 +16,8 @@ vi.mock("@/lib/prisma", () => ({
 import { prisma } from "@/lib/prisma";
 import {
   getDashboardStats,
-  getRecentSites,
   getActivityFeed,
   getWorkspaceHealth,
-  getQuickActions,
 } from "@/server/services/dashboard.service";
 
 describe("Dashboard Service", () => {
@@ -61,32 +59,6 @@ describe("Dashboard Service", () => {
     });
   });
 
-  describe("getRecentSites", () => {
-    it("returns sites ordered by lastEditedAt", async () => {
-      const mockSites = [
-        {
-          id: "s1",
-          name: "Site 1",
-          slug: "site-1",
-          status: "PUBLISHED",
-          thumbnail: null,
-          pages: 5,
-          lastEditedAt: new Date(),
-          publishedUrl: "https://site-1.buildrik.app",
-        },
-      ];
-      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({
-        id: "m1",
-        role: "ADMIN",
-        _count: { sitePermissions: 0 },
-      } as any);
-      vi.mocked(prisma.site.findMany).mockResolvedValue(mockSites as any);
-      const sites = await getRecentSites("ws_123", "u_1");
-      expect(sites).toHaveLength(1);
-      expect(sites[0].id).toBe("s1");
-    });
-  });
-
   describe("getActivityFeed", () => {
     it("returns activity entries", async () => {
       vi.mocked(prisma.activityLog.findMany).mockResolvedValue([
@@ -105,48 +77,6 @@ describe("Dashboard Service", () => {
       ] as any);
       const activity = await getActivityFeed("ws_123");
       expect(activity.groups).toBeDefined();
-    });
-  });
-
-  describe("getQuickActions", () => {
-    it("returns new user actions when 0 sites", () => {
-      const actions = getQuickActions({
-        siteCount: 0,
-        hasPendingInvites: false,
-        isNearLimit: false,
-        isDunning: false,
-      });
-      expect(actions).toHaveLength(4);
-      expect(actions[0].label).toBe("Create Site");
-    });
-    it("returns active user actions when 5+ sites", () => {
-      const actions = getQuickActions({
-        siteCount: 5,
-        hasPendingInvites: false,
-        isNearLimit: false,
-        isDunning: false,
-      });
-      expect(actions[0].label).toBe("New Site");
-    });
-    it("returns near-limit actions", () => {
-      const actions = getQuickActions({
-        siteCount: 3,
-        hasPendingInvites: false,
-        isNearLimit: true,
-        isDunning: false,
-      });
-      expect(
-        actions.some((a: { label: string }) => a.label === "Upgrade Plan")
-      ).toBe(true);
-    });
-    it("returns dunning actions", () => {
-      const actions = getQuickActions({
-        siteCount: 5,
-        hasPendingInvites: false,
-        isNearLimit: false,
-        isDunning: true,
-      });
-      expect(actions[0].label).toBe("Update Payment");
     });
   });
 

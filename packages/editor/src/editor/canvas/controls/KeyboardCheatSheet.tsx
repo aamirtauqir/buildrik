@@ -30,6 +30,8 @@ export interface KeyboardCheatSheetProps {
   onClose: () => void;
   /** Source of the registry rows. Without one only the chrome-bound chords show. */
   composer: Composer | null;
+  /** Off: the review-only keys (R, C) are not bound, so they are not printed. */
+  reviewsEnabled?: boolean;
 }
 
 const isMacPlatform = () =>
@@ -74,7 +76,7 @@ function filterGroups(groups: SheetGroup[], query: string, isMac: boolean): Shee
     .filter((g) => g.rows.length > 0);
 }
 
-export const KeyboardCheatSheet: React.FC<KeyboardCheatSheetProps> = ({ isOpen, onClose, composer }) => {
+export const KeyboardCheatSheet: React.FC<KeyboardCheatSheetProps> = ({ isOpen, onClose, composer, reviewsEnabled = true }) => {
   /* 263:255899 / 263:256463: "Show keys for macOS | Windows" — starts on
      this machine's keys; the other set is a click away (a Mac user writing
      docs for Windows colleagues, a shared screen). */
@@ -88,8 +90,8 @@ export const KeyboardCheatSheet: React.FC<KeyboardCheatSheetProps> = ({ isOpen, 
   /* Read on every open: the registry changes while panels mount and unmount
      (the Pages panel registers its rows only while it is open). */
   const groups = React.useMemo(
-    () => (isOpen ? buildSheetGroups(composer?.commands.getAll() ?? []) : []),
-    [isOpen, composer],
+    () => (isOpen ? buildSheetGroups(composer?.commands.getAll() ?? [], { reviewsEnabled }) : []),
+    [isOpen, composer, reviewsEnabled],
   );
   const visible = filterGroups(groups, query, isMac);
 

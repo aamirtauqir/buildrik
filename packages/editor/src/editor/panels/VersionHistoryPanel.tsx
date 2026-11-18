@@ -3,7 +3,7 @@
  *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
  *
  * VersionHistoryPanel - Saves view with FAB, compare, restore, delete
- * Phase 4: Visual snapshots, Compare view, AI Summary
+ * Phase 4: Visual snapshots, Compare view
  * Phase 3: Uses useVersionHistory hook, FAB design, inline confirmations
  *
  * @license BSD-3-Clause
@@ -23,7 +23,6 @@ import {
   formatTime,
 } from "./version-history/VersionList";
 import { CompareView } from "./version-history/CompareView";
-import { useAISummary } from "./version-history/useAISummary";
 import { Button, ConfirmDialog, Modal, Tooltip, useToast } from "@/editor/chrome-ui";
 import { SaveVersionFooter } from "./version-history/SaveVersionFooter";
 import { ALL_SAVES, SavesFilter, applySavesFilter, type SavesFilterValue } from "./version-history/SavesFilter";
@@ -36,8 +35,6 @@ import { useOnline } from "@/editor/design-system/state/useOnline";
 // ./version-history/CompareView.tsx (D3 Stage 2, audit-remediation 2026-05-08).
 // VersionRow + EmptyState moved to ./version-history/VersionList.tsx
 // (D3 Stage 1, audit-remediation 2026-05-08).
-// AI summary state machinery (rate-limit + cooldown tick + handler) moved to
-// ./version-history/useAISummary.ts (D3 Stage 4, audit-remediation 2026-05-08).
 
 // ============================================
 // Main Component
@@ -127,7 +124,6 @@ export function VersionHistoryPanel({
     deleteVersion,
     renameVersion,
     compareWithDraft,
-    updateAiSummary,
   } = useVersionHistory(composer);
 
   // Restore / delete confirmation + in-flight state
@@ -154,9 +150,6 @@ export function VersionHistoryPanel({
     [addToast],
   );
 
-  // AI summary state — hook owns the rate-limit + cooldown tick + handler.
-  const { aiSummaryStates, handleGetAiSummary, getCooldownSeconds } =
-    useAISummary({ versions, compareResults, updateAiSummary });
 
   /* Board 163:269 — pruning used to happen with nothing said, so a user's
      older auto-saves simply stopped being there. The engine now announces it
@@ -584,11 +577,6 @@ export function VersionHistoryPanel({
             version={expandedVersion}
             compareResult={compareResults[expandedVersion.id] ?? null}
             currentVisualSnapshot={currentVisualSnapshot}
-            aiSummaryState={
-              aiSummaryStates[expandedVersion.id] ?? { loading: false, result: null, error: null }
-            }
-            onGetAiSummary={() => handleGetAiSummary(expandedVersion.id)}
-            aiCooldownSeconds={getCooldownSeconds(expandedVersion.id)}
           />
         </div>
       )}

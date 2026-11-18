@@ -46,13 +46,9 @@ export interface PaletteCommand {
  * StudioPanels' rail/ui:switch-tab handler and useStudioState's
  * openLeftPanelToTab/setLeftPanelTab sink use. A row absent from this map
  * opens no tab (new-page, replace-layout, issues, shortcuts, permissions)
- * and is never hidden here. "ai" is not a formal GroupedTabId (it opens the
- * inspector column, not a rail tab) but shares the same VIEWER_TABS gate at
- * the sink, so it is included for consistency — a VIEWER's ⌘K would
- * otherwise show a live "Open AI assistant" row that the sink silently
- * swallows.
+ * and is never hidden here.
  */
-const NAV_TAB_TARGET: Partial<Record<string, GroupedTabId | "ai">> = {
+const NAV_TAB_TARGET: Partial<Record<string, GroupedTabId>> = {
   pages: "pages",
   add: "add",
   layers: "layers",
@@ -61,7 +57,6 @@ const NAV_TAB_TARGET: Partial<Record<string, GroupedTabId | "ai">> = {
   content: "content",
   design: "design",
   publish: "publish",
-  ai: "ai",
   templates: "templates",
   review: "review",
   activity: "activity",
@@ -112,14 +107,7 @@ export function buildCommands(
   ];
   for (const [id, label, fn, keywords] of nav) {
     const target = NAV_TAB_TARGET[id];
-    // "ai" isn't a real GroupedTabId (it opens the inspector column, not a
-    // rail tab) but shares VIEWER_TABS' gate: it isn't in that set, so a
-    // VIEWER never sees it, same as every other tab absent from the set.
-    if (target === "ai") {
-      if (viewerChrome) continue;
-    } else if (target !== undefined && !isTabAllowedForViewer(target, viewerChrome)) {
-      continue;
-    }
+    if (target !== undefined && !isTabAllowedForViewer(target, viewerChrome)) continue;
     commands.push({ id: `nav-${id}`, label, group: "Navigate", keywords, handler: run(fn) });
   }
   /* 263:250083 / 263:250988: the pages are one nested list, not rows. */
@@ -147,6 +135,8 @@ export function buildCommands(
      engine cannot carry this — its list is built once at startup while the
      selection changes under it — so the reason is computed here, each open. */
   const guard = (cmd: { id: string; requiresSelection?: boolean }): string | undefined => {
+    const blocked = composer.commands.blockedReason(cmd.id);
+    if (blocked) return blocked;
     if (cmd.id === "group") return selectedCount < 2 ? "Select two or more elements" : undefined;
     if (cmd.id === "ungroup") return selectedType !== "container" ? "Select a group" : undefined;
     if (cmd.id === "paste") return composer.clipboard?.length ? undefined : "Nothing copied";
@@ -172,15 +162,19 @@ export function buildCommands(
     });
   };
 
+  /* Undo, Redo and Clear history answer to the registry's gate (read-only,
+     Time-travel, a full-page surface) — the same one ⌘Z does. */
+  const historyBlock = composer.commands.blockedReason("undo");
+
   // EDIT
   commands.push({
     id: "edit-undo",
     label: "Undo",
     group: "Edit",
     shortcut: "Ctrl+Z",
-    disabled: !composer.history.canUndo(),
-    disabledReason: "No changes to undo",
-    handler: run(() => composer.history.undo()),
+    disabled: !!historyBlock || !composer.history.canUndo(),
+    disabledReason: historyBlock ?? "No changes to undo",
+    handler: run(() => composer.commands.run("undo")),
   });
   used.add("undo");
   fromRegistry("duplicate", "Edit");
@@ -227,24 +221,27 @@ export function buildCommands(
       label: "Redo",
       group: "More",
       shortcut: "Ctrl+Y",
-      disabled: !composer.history.canRedo(),
-      disabledReason: "nothing to redo",
-      handler: run(() => composer.history.redo()),
+      disabled: !!historyBlock || !composer.history.canRedo(),
+      disabledReason: historyBlock ?? "nothing to redo",
+      handler: run(() => composer.commands.run("redo")),
     },
-    { id: "view-zoom-in", label: "Zoom in", group: "More", shortcut: "Ctrl++", handler: run(() => composer.emit(EVENTS.ZOOM_IN, {})) },
-    { id: "view-zoom-out", label: "Zoom out", group: "More", shortcut: "Ctrl+-", handler: run(() => composer.emit(EVENTS.ZOOM_OUT, {})) },
-    /* Ctrl+1 is fit (CanvasFooterToolbar binds ⌘1 to fit, ⌘0 to 100%). */
-    { id: "view-fit", label: "Zoom to fit", group: "More", shortcut: "Ctrl+1", handler: run(() => composer.emit(EVENTS.ZOOM_FIT, {})) },
-    /* The footer flyout's third row (⌘2). Canvas has always listened for
+    { id: "view-zoom-in", label: "Zoom in", group: "More", shortcut: "Ctrl++", handler: run(() => composer.commands.run("zoom-in")) },
+    { id: "view-zoom-out", label: "Zoom out", group: "More", shortcut: "Ctrl+-", handler: run(() => composer.commands.run("zoom-out")) },
+    /* ⇧1 is fit (CanvasFooterToolbar binds ⇧1 fit, ⇧2 selection, ⇧0 100% —
+       SC-12 / BD-39 moved them off ⌘1 / ⌘2, which switch browser tabs). */
+    { id: "view-fit", label: "Zoom to fit", group: "More", shortcut: "Shift+1", handler: run(() => composer.emit(EVENTS.ZOOM_FIT, {})) },
+    /* The footer flyout's third row (⇧2). Canvas has always listened for
        ZOOM_SELECTION; nothing emitted it (DQ-003). */
-    { id: "view-zoom-selection", label: "Zoom to selection", group: "More", shortcut: "Ctrl+2", handler: run(() => composer.emit(EVENTS.ZOOM_SELECTION, {})) },
-    /* The registry's chordless "Reset zoom" printed nothing although ⌘0 works
+    { id: "view-zoom-selection", label: "Zoom to selection", group: "More", shortcut: "Shift+2", handler: run(() => composer.emit(EVENTS.ZOOM_SELECTION, {})) },
+    /* The registry's chordless "Reset zoom" printed nothing although ⇧0 works
        (the flyout binds it). The row prints the flyout's chord, like fit's. */
-    { id: "view-zoom-100", label: "Reset zoom", group: "More", shortcut: "Ctrl+0", handler: run(() => composer.setZoom(100)) },
+    { id: "view-zoom-100", label: "Reset zoom", group: "More", shortcut: "Shift+0", handler: run(() => composer.setZoom(100)) },
     {
       id: "history-clear",
       label: "Clear history",
       group: "More",
+      disabled: !!historyBlock,
+      disabledReason: historyBlock,
       /* PD-38: kept, but not as a confirm-less destructive action — it used
          to emit HISTORY_CLEARED as pure notification, with nothing actually
          clearing the undo stack (C-6/A14-3). composer.history.clear() is the
@@ -329,7 +326,7 @@ export function buildCommands(
     });
   }
 
-  /* Everything else the registry holds (Export HTML/JSON, devices, nudges…) —
+  /* Everything else the registry holds (devices, nudges…) —
      searchable under MORE. The Pages panel's rows keep their PAGES band. Dedup
      by id AND label: a registry row the board list already carries is not
      printed twice. */

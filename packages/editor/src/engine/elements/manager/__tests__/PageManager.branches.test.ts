@@ -64,6 +64,7 @@ function makeHarness() {
       activeId = id;
     },
     buildElementTree: (data: ElementData) => registerTree(data) as never,
+    copyStyleRules: () => {},
     cloneElementData: (data) => {
       let n = 0;
       const clone = (d: ElementData): ElementData => ({

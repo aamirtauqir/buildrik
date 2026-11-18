@@ -130,3 +130,28 @@ describe("RichTextEditor — menus keep every tool (TX05)", () => {
     expect(onCommand).toHaveBeenCalledWith("unlink");
   });
 });
+
+/* Audit 2026-10-20 #16: the size select was uncontrolled, so it always showed
+   its first option — "10px" on a 36px H2. */
+describe("RichTextEditor — shows the edited element's own values", () => {
+  it("shows the block tag and the caret's font size", () => {
+    renderEditor({ blockTag: "h2", fontSizePx: 36 });
+    expect(screen.getByTestId("rte-block")).toHaveTextContent("Heading ▾");
+    click("rte-more");
+    const size = screen.getByTestId("rte-fontSize") as HTMLSelectElement;
+    expect(size.options[size.selectedIndex].text).toBe("36px");
+  });
+
+  it("selects a listed size when the element's size is on the scale", () => {
+    renderEditor({ blockTag: "p", fontSizePx: 16 });
+    click("rte-more");
+    const size = screen.getByTestId("rte-fontSize") as HTMLSelectElement;
+    expect(size.value).toBe("3");
+    expect(screen.getAllByRole("option", { name: "16px" })).toHaveLength(1);
+  });
+
+  it("names a tag the block menu does not hold instead of claiming Paragraph", () => {
+    renderEditor({ blockTag: "span", fontSizePx: 14 });
+    expect(screen.getByTestId("rte-block")).toHaveTextContent("Text ▾");
+  });
+});

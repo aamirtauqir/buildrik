@@ -8,6 +8,11 @@ const updateMany = vi.fn();
 const findFirst = vi.fn();
 const pageFindUnique = vi.fn();
 const siteFindUnique = vi.fn();
+const scope = vi.fn(async (..._a: unknown[]) => ({}));
+vi.mock("@/server/services/permission.service", async (orig) => ({
+  ...(await orig<typeof import("@/server/services/permission.service")>()),
+  siteScopeWhere: (...a: unknown[]) => scope(...a),
+}));
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -140,7 +145,7 @@ describe("FROM LIBRARY — the workspace's shared masters (board 4418:99857)", (
       { componentId: "price", name: "Price row", siteId: "s3", updatedAt: d(3) },
       { componentId: "mine", name: "Site header", siteId: "s1", updatedAt: d(4) },
     ]);
-    const out = await listComponentLibrary("s1");
+    const out = await listComponentLibrary("s1", "u1");
     expect(findMany.mock.calls[0][0].where).toEqual({ pageId: null, site: { workspaceId: "w1", deletedAt: null } });
     expect(out.map((c) => [c.componentId, c.siteCount, c.onThisSite])).toEqual([
       ["btn", 2, true],
@@ -151,9 +156,24 @@ describe("FROM LIBRARY — the workspace's shared masters (board 4418:99857)", (
   it("libraryGet reads the newest site-scoped copy within the site's workspace only", async () => {
     siteFindUnique.mockResolvedValue({ workspaceId: "w1" });
     findFirst.mockResolvedValueOnce({ payload: { id: "price" } });
-    await expect(getLibraryComponent("s1", "price")).resolves.toEqual({ id: "price" });
+    await expect(getLibraryComponent("s1", "price", "u1")).resolves.toEqual({ id: "price" });
     expect(findFirst.mock.calls[0][0].where).toEqual({
       componentId: "price", pageId: null, site: { workspaceId: "w1", deletedAt: null },
     });
+  });
+});
+
+/* BK-08: a member scoped to one site read every site's masters. */
+describe("FROM LIBRARY — only the sites this member may open", () => {
+  it("applies the member's site scope to the library list and the get", async () => {
+    siteFindUnique.mockResolvedValue({ workspaceId: "w1" });
+    scope.mockResolvedValue({ id: { in: ["s1"] } } as never);
+    findMany.mockResolvedValueOnce([]);
+    await listComponentLibrary("s1", "u-scoped");
+    expect(scope).toHaveBeenCalledWith(expect.anything(), "u-scoped", "w1");
+    expect(findMany.mock.calls.at(-1)![0].where.site).toEqual({ workspaceId: "w1", deletedAt: null, id: { in: ["s1"] } });
+    findFirst.mockResolvedValueOnce(null);
+    await getLibraryComponent("s1", "price", "u-scoped");
+    expect(findFirst.mock.calls.at(-1)![0].where.site).toEqual({ workspaceId: "w1", deletedAt: null, id: { in: ["s1"] } });
   });
 });

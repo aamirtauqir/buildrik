@@ -22,14 +22,7 @@ import {
   runTxn,
   writeAttribute,
 } from "./attributeWriter";
-const styles = {
-  nameWarning: {
-    margin: "-6px 0 10px",
-    fontSize: 11,
-    lineHeight: 1.45,
-    color: "var(--bk-warning-text)",
-  } as React.CSSProperties,
-};
+const NAME_WARNING_CLASS = "tw:mt-[-6px] tw:mb-2.5 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-warning-text)]";
 
 // ============================================================================
 // TYPES
@@ -121,10 +114,17 @@ const PropertyField: React.FC<PropertyFieldProps> = ({
         placeholder={prop.placeholder}
       />
       {prop.id === "name" && clobberingWarning(value) ? (
-        <p style={styles.nameWarning} role="status">
+        <p className={NAME_WARNING_CLASS} role="status">
           {clobberingWarning(value)}
         </p>
       ) : null}
+      {/* BK-44: a form with its own action is left as it is at publish, so its
+          answers never reach Submissions — that happened without a word. */}
+      {prop.id === "action" && selectedElement.type === "form" && value.trim() && (
+        <p className={NAME_WARNING_CLASS} role="status">
+          Answers go to this URL instead of Submissions. Clear it to collect them in Buildrick.
+        </p>
+      )}
     </>
   );
 };
@@ -173,7 +173,7 @@ function writeRow(composer: Composer, el: Element, type: string, id: string, val
       .filter((line) => line.length > 0)
       .map((line) => `<option>${escapeHTML(line)}</option>`)
       .join("");
-    el.setContent?.(html);
+    el.setContent?.(html, "html");
     return;
   }
   handleGenericAttributeChange(el, id, value);

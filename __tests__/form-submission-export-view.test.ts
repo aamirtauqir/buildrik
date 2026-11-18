@@ -15,14 +15,14 @@ beforeEach(() => prismaMock.formSubmission.findMany.mockReset().mockResolvedValu
 
 describe("exportSubmissions — view filter", () => {
   it("narrows to the view when isSpam / isArchived are given", async () => {
-    await exportSubmissions("s1", "fb1", "csv", { isSpam: true, isArchived: false });
+    await exportSubmissions("s1", "fb1", "csv", { technical: false }, { isSpam: true, isArchived: false });
     expect(prismaMock.formSubmission.findMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: { siteId: "s1", formBlockId: "fb1", isSpam: true, isArchived: false } }),
     );
   });
 
   it("leaves both states in when no view is given", async () => {
-    await exportSubmissions("s1", undefined, "csv");
+    await exportSubmissions("s1", undefined, "csv", { technical: false });
     expect(prismaMock.formSubmission.findMany).toHaveBeenCalledWith(expect.objectContaining({ where: { siteId: "s1" } }));
   });
 });

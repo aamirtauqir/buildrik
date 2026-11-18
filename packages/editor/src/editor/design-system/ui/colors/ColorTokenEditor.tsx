@@ -41,7 +41,7 @@ export interface ColorTokenEditorProps {
   composer: Composer | null | undefined;
   allTokens: readonly DesignToken[];
   mode?: "light" | "dark";
-  onValueChange: (id: string, value: string, darkValue?: string) => void;
+  onValueChange: (id: string, value: string, darkValue?: string) => boolean;
   /** Point the light mode at another token, or (null) back to a literal of the value it shows. */
   onAliasChange: (id: string, targetId: string | null) => void;
   onSelectToken: (id: string) => void;
@@ -118,6 +118,7 @@ export function ColorTokenEditor(props: ColorTokenEditorProps) {
   const [usageOpen, setUsageOpen] = React.useState(false);
   const [renameOpen, setRenameOpen] = React.useState(false);
   const [deleteUsage, setDeleteUsage] = React.useState<TokenUsageCount | null>(null);
+  const [autoFixFailed, setAutoFixFailed] = React.useState(false);
   const [invalidRows, setInvalidRows] = React.useState<{ light: boolean; dark: boolean }>({ light: false, dark: false });
   const invalid = invalidRows.light || invalidRows.dark;
   const invalidFor = (which: "light" | "dark") => (v: boolean) => setInvalidRows((r) => (r[which] === v ? r : { ...r, [which]: v }));
@@ -322,11 +323,14 @@ export function ColorTokenEditor(props: ColorTokenEditorProps) {
       <TokenChecksLine
         issue={issue}
         contrast={tokenContrastLine(token, allTokens, mode)}
+        autoFixFailed={autoFixFailed}
         onAutoFix={() => {
           if (!issue || !composer) return;
           const fixed = composer.designSystem.computeAutoFix(light, issue.autoFixHint);
-          if (fixed && fixed !== light) onValueChange(token.id, fixed);
-          lintState?.suppress(token.id);
+          /* B-2: hide the warning only once the fix is written. */
+          const written = !!fixed && fixed !== light && onValueChange(token.id, fixed);
+          setAutoFixFailed(!written);
+          if (written) lintState?.suppress(token.id);
         }}
         onIgnore={() => lintState?.suppress(token.id)}
       />

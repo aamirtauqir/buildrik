@@ -1,6 +1,6 @@
 import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
-import { createPresignedUrl, confirmUpload, getUploadLimits } from "@/server/services/upload.service";
+import { createPresignedUrl, confirmUpload } from "@/server/services/upload.service";
 import { presignSchema, confirmSchema } from "@buildrik/shared/schemas/upload";
 import { resolveWorkspaceId as getWorkspaceId } from "@/server/trpc/workspace-ctx";
 import { PermissionError } from "@/server/services/permission.service";
@@ -28,5 +28,4 @@ export const uploadRouter = router({
       throw e;
     }
   }),
-  limits: protectedProcedure.query(() => getUploadLimits()),
 });

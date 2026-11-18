@@ -11,13 +11,15 @@
  * The reference is the selection's own bounds — the one AlignmentHandler
  * measures against — so the select offers that and nothing it cannot do.
  * Align / Distribute are actions, not a state: no option stays lit.
+ * They move elements by left/top from their rendered boxes, so they are shut,
+ * with the reason, while any member sits in the normal flow (static).
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 import type { Composer } from "@/engine";
-import { AlignmentHandler } from "@/engine/canvas/AlignmentHandler";
+import { AlignmentHandler, isMovable, type RenderedBox } from "@/engine/canvas/AlignmentHandler";
 import { Button } from "@/editor/chrome-ui";
 import { SelectRow } from "../shared/controls/InputControls";
 import { GROUP_TITLE } from "../shared/controls/controlClasses";
@@ -38,11 +40,36 @@ const ROW = "tw:flex tw:h-8 tw:items-center tw:gap-2";
 const REFERENCE = [{ value: "selection", label: "Selection bounds" }];
 const LABEL = "tw:w-[88px] tw:shrink-0 tw:truncate tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 
+const IN_FLOW_REASON = "Align and Distribute move positioned elements only — set Position to Absolute or Relative first";
+
+/** The element's box on the canvas, zoom removed (offsetWidth ignores transforms). */
+function measureRenderedBox(id: string): RenderedBox | null {
+  const node = document.querySelector<HTMLElement>(`[data-buildrick-id="${CSS.escape(id)}"]`);
+  if (!node) return null;
+  const rect = node.getBoundingClientRect();
+  const scale = node.offsetWidth && rect.width ? rect.width / node.offsetWidth : 1;
+  const computed = getComputedStyle(node);
+  return {
+    left: rect.left / scale,
+    top: rect.top / scale,
+    width: rect.width / scale,
+    height: rect.height / scale,
+    position: computed.position,
+    cssLeft: parseFloat(computed.left) || 0,
+    cssTop: parseFloat(computed.top) || 0,
+  };
+}
+
 export function AlignDistribute({ composer, selectedIds }: AlignDistributeProps) {
-  const handler = React.useMemo(() => (composer ? new AlignmentHandler(composer) : null), [composer]);
+  const handler = React.useMemo(() => (composer ? new AlignmentHandler(composer, measureRenderedBox) : null), [composer]);
   const ids = [...selectedIds];
   const n = ids.length;
-  const canDistribute = Boolean(handler) && n >= 3;
+  const inFlow = ids.some((id) => {
+    const box = measureRenderedBox(id);
+    return !box || !isMovable(box);
+  });
+  const canAlign = Boolean(handler) && n >= 2 && !inFlow;
+  const canDistribute = canAlign && n >= 3;
   const [reference, setReference] = React.useState(REFERENCE[0].value);
 
   const align: [string, string, () => void][] = [
@@ -64,9 +91,14 @@ export function AlignDistribute({ composer, selectedIds }: AlignDistributeProps)
         <span className={LABEL} id="inspector-multi-align-label" data-testid="inspector-multi-align-label">
           Align
         </span>
-        <div className={SEGMENT} role="group" aria-labelledby="inspector-multi-align-label">
+        <div
+          className={SEGMENT}
+          role="group"
+          aria-labelledby="inspector-multi-align-label"
+          title={inFlow ? IN_FLOW_REASON : undefined}
+        >
           {align.map(([label, glyph, run]) => (
-            <Button key={label} type="button" aria-label={label} title={label} className={OPTION} disabled={!handler || n < 2} onClick={run}>
+            <Button key={label} type="button" aria-label={label} title={label} className={OPTION} disabled={!canAlign} onClick={run}>
               <span aria-hidden="true">{glyph}</span>
             </Button>
           ))}
@@ -80,7 +112,7 @@ export function AlignDistribute({ composer, selectedIds }: AlignDistributeProps)
           className={SEGMENT}
           role="group"
           aria-labelledby="inspector-multi-distribute-label"
-          title={canDistribute ? undefined : "Distribute needs 3 or more elements"}
+          title={canDistribute ? undefined : inFlow ? IN_FLOW_REASON : "Distribute needs 3 or more elements"}
         >
           <Button type="button" className={OPTION} disabled={!canDistribute} data-testid="inspector-multi-distribute-h" onClick={() => handler?.distribute(ids, "horizontal")}>
             Horizontal

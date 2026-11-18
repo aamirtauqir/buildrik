@@ -18,6 +18,18 @@ import {
   updateFormBlockSchema,
 } from "@buildrik/shared/schemas/forms";
 import { guardSiteAccess as guardSite, guardSiteRole } from "@/server/trpc/guards";
+import { getEffectiveSiteRole } from "@/server/services/permission.service";
+import { ROLE_RANK } from "@/lib/constants/enums";
+
+/** D7: a submitter's IP and device go to ADMIN and up on the site, by the
+ *  effective (capped) role — a VIEWER exported every visitor's IP. */
+async function seesTechnical(
+  ctx: { prisma: Parameters<typeof getEffectiveSiteRole>[0]; session: { user: { id: string } } },
+  siteId: string,
+): Promise<boolean> {
+  const role = await getEffectiveSiteRole(ctx.prisma, ctx.session.user.id, siteId);
+  return (ROLE_RANK[role] ?? -1) >= ROLE_RANK.ADMIN;
+}
 
 export const formsRouter = router({
   listBlocks: protectedProcedure
@@ -31,7 +43,7 @@ export const formsRouter = router({
     .input(listSubmissionsSchema)
     .query(async ({ ctx, input }) => {
       await guardSite(ctx.prisma, ctx.session.user.id, input.siteId);
-      return listSubmissions(input);
+      return listSubmissions(input, { technical: await seesTechnical(ctx, input.siteId) });
     }),
 
   updateSubmission: protectedProcedure
@@ -94,6 +106,12 @@ export const formsRouter = router({
     .query(async ({ ctx, input }) => {
       await guardSite(ctx.prisma, ctx.session.user.id, input.siteId);
       const { siteId, formBlockId, format, isSpam, isArchived } = input;
-      return exportSubmissions(siteId, formBlockId, format, { isSpam, isArchived });
+      return exportSubmissions(
+        siteId,
+        formBlockId,
+        format,
+        { technical: await seesTechnical(ctx, siteId) },
+        { isSpam, isArchived },
+      );
     }),
 });

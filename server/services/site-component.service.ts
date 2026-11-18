@@ -151,26 +151,6 @@ export async function deleteWorkspaceComponent(
   return { deleted: res.count };
 }
 
-export async function getComponentUsage(
-  workspaceId: string,
-  componentId: string
-): Promise<{
-  componentId: string;
-  siteCount: number;
-  sites: Array<{ siteId: string; siteName: string; updatedAt: Date }>;
-}> {
-  const rows = await prisma.siteComponent.findMany({
-    where: { componentId, site: { workspaceId, deletedAt: null } },
-    orderBy: { updatedAt: "desc" },
-    select: { siteId: true, updatedAt: true, site: { select: { name: true } } },
-  });
-  return {
-    componentId,
-    siteCount: rows.length,
-    sites: rows.map((r) => ({ siteId: r.siteId, siteName: r.site.name, updatedAt: r.updatedAt })),
-  };
-}
-
 /**
  * FROM LIBRARY (board 4418:99857) / LINKED FROM LIBRARY (board 4418:142419):
  * the workspace's shared component library, as seen from one site. A master
@@ -179,13 +159,16 @@ export async function getComponentUsage(
  * carries it). `onThisSite` marks the ones already linked here. Page-scoped
  * masters are never shared. The workspace is the SITE's, never client input.
  */
-export async function listComponentLibrary(siteId: string): Promise<
+export async function listComponentLibrary(siteId: string, userId: string): Promise<
   Array<{ componentId: string; name: string; siteCount: number; onThisSite: boolean; updatedAt: Date }>
 > {
   const site = await prisma.site.findUnique({ where: { id: siteId }, select: { workspaceId: true } });
   if (!site) throw new Error("SITE_NOT_FOUND");
+  /* BK-08: only the sites this member may open — a member scoped to one site
+     read the masters of every site in the workspace. */
+  const scope = await siteScopeWhere(prisma, userId, site.workspaceId);
   const rows = await prisma.siteComponent.findMany({
-    where: { pageId: null, site: { workspaceId: site.workspaceId, deletedAt: null } },
+    where: { pageId: null, site: { workspaceId: site.workspaceId, deletedAt: null, ...scope } },
     select: { componentId: true, name: true, siteId: true, updatedAt: true },
   });
   const byId = new Map<string, { componentId: string; name: string; sites: Set<string>; updatedAt: Date }>();
@@ -215,11 +198,12 @@ export async function listComponentLibrary(siteId: string): Promise<
 
 /** The newest site-scoped copy of a library master in the site's workspace —
  *  what "insert from library" brings onto this site. Null if not in it. */
-export async function getLibraryComponent(siteId: string, componentId: string): Promise<unknown | null> {
+export async function getLibraryComponent(siteId: string, componentId: string, userId: string): Promise<unknown | null> {
   const site = await prisma.site.findUnique({ where: { id: siteId }, select: { workspaceId: true } });
   if (!site) throw new Error("SITE_NOT_FOUND");
+  const scope = await siteScopeWhere(prisma, userId, site.workspaceId);
   const row = await prisma.siteComponent.findFirst({
-    where: { componentId, pageId: null, site: { workspaceId: site.workspaceId, deletedAt: null } },
+    where: { componentId, pageId: null, site: { workspaceId: site.workspaceId, deletedAt: null, ...scope } },
     orderBy: { updatedAt: "desc" },
     select: { payload: true },
   });

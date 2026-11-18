@@ -55,6 +55,7 @@ function makeSettings(over: Partial<UsePageSettingsReturn> = {}): UsePageSetting
     setCustomHead: vi.fn(),
     headCodeError: null,
     domain: null,
+    servesCleanUrls: false,
     saveState: "clean",
     isDirty: false,
     save: vi.fn(),
@@ -409,9 +410,22 @@ describe("SeoTab Google preview — served URL", () => {
     { id: "p1", slug: "about" },
   ];
 
-  it("shows /<slug>.html — the file the export writes — not /<slug>", () => {
+  it("shows /<slug> once the live deploy serves clean URLs (cleanUrls, REA #26)", () => {
     render(
-      <SeoTab s={makeSettings({ slug: "about", domain: "bellacucina.com" })} page={makePage({ id: "p1", slug: "about" })} composer={composerWithPages(pages)} />,
+      <SeoTab s={makeSettings({ slug: "about", domain: "bellacucina.com", servesCleanUrls: true })} page={makePage({ id: "p1", slug: "about" })} composer={composerWithPages(pages)} />,
+    );
+    expect(screen.getByTestId("seo-preview-url").textContent).toBe("bellacucina.com/about");
+  });
+
+  /* BD-39 (4): until the site is republished with cleanUrls the live deploy
+     serves only `/about.html`, so that is the URL the preview names. */
+  it("shows /<slug>.html while the live deploy predates cleanUrls", () => {
+    render(
+      <SeoTab
+        s={makeSettings({ slug: "about", domain: "bellacucina.com", servesCleanUrls: false })}
+        page={makePage({ id: "p1", slug: "about" })}
+        composer={composerWithPages(pages)}
+      />,
     );
     expect(screen.getByTestId("seo-preview-url").textContent).toBe("bellacucina.com/about.html");
   });
@@ -430,12 +444,12 @@ describe("SeoTab Google preview — served URL", () => {
   it("follows the drafted slug, numbered on a clash exactly as the export numbers it", () => {
     render(
       <SeoTab
-        s={makeSettings({ slug: "menu", domain: "bellacucina.com" })}
+        s={makeSettings({ slug: "menu", domain: "bellacucina.com", servesCleanUrls: true })}
         page={makePage({ id: "p1", slug: "about" })}
         composer={composerWithPages([pages[0], { id: "p0", slug: "menu" }, pages[1]])}
       />,
     );
-    expect(screen.getByTestId("seo-preview-url").textContent).toBe("bellacucina.com/menu-2.html");
+    expect(screen.getByTestId("seo-preview-url").textContent).toBe("bellacucina.com/menu-2");
   });
 
   /* design-2l9 67:11341 — back from Settings › Redirects, the SEO tab says

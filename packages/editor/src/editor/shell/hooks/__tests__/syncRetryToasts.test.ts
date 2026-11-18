@@ -35,8 +35,10 @@ describe("sync failure toasts", () => {
   it("none promise that the next save flushes the queue", () => {
     /* The old sentences survive in the comments explaining why they went, so
        read the toast DESCRIPTION rather than the file. */
-    const description = (src: string) =>
-      src.slice(src.indexOf("description:"), src.indexOf("tone: \"error\""));
+    const description = (src: string) => {
+      const end = src.indexOf("tone: \"error\"");
+      return src.slice(src.lastIndexOf("description:", end), end);
+    };
     expect(description(version)).not.toMatch(/retry when you save the next version/);
     expect(description(component)).not.toMatch(/retry when you next edit a component/);
     expect(description(version)).toMatch(/reconnect replays the queue/);

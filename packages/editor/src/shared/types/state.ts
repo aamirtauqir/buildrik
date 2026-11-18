@@ -27,8 +27,6 @@ export interface ComposerState {
   snapToGrid: boolean;
   /** Grid size in pixels */
   gridSize: number;
-  /** Is composer in preview mode */
-  isPreviewMode: boolean;
 }
 
 export type DeviceType = "desktop" | "tablet" | "mobile" | "wide";

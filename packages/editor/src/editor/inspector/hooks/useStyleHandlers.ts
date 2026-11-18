@@ -21,6 +21,8 @@ import { getDOMElement } from "@/engine/canvas/resize/utils";
 import type { PseudoStateId } from "@/shared/types";
 import type { BreakpointId } from "@/shared/types/breakpoints";
 import { devLogger } from "@/shared/utils/devLogger";
+import { parseColor } from "@/shared/utils/parsers/colorParser";
+import { rgbToHex } from "@/shared/utils/parsers/colorConversionBasic";
 import { computeEffectiveStyles } from "../config/cssContext";
 import { activeBreakpoint, canWrite, setStyleAt, writableElements } from "@/engine/commands/commandOperations";
 
@@ -29,6 +31,7 @@ import { activeBreakpoint, canWrite, setStyleAt, writableElements } from "@/engi
 // ============================================================================
 
 import type { SelectedElementInfo as SelectedElement } from "@/shared/types";
+import { elementSelector } from "@/shared/utils/elementSelector";
 export type { SelectedElement };
 
 export interface StyleHandlers {
@@ -59,10 +62,10 @@ const WRITE_INTERVAL_MS = 50;
  * What the element ACTUALLY renders, for the properties it has no value of its
  * own. Keeps the panel honest without changing which rows it shows.
  *
- * Colours are skipped: `getComputedStyle` returns `rgb(...)` and the colour
- * controls expect a hex string, so a computed colour would be shown as a
- * broken value rather than a truer one. They keep the type default until the
- * controls speak both.
+ * Colours arrive as `rgb(...)` and the colour controls speak hex, so an
+ * opaque one is converted. A translucent one keeps the type default: the
+ * controls have no way to show it (REA #18 — an H2 rendering #334155 read
+ * 1a1a1a, the type default, a colour nothing rendered).
  */
 function readRenderedValues(
   elementId: string,
@@ -75,9 +78,14 @@ function readRenderedValues(
   const out: Record<string, string> = {};
   for (const key of keys) {
     if (authored[key]) continue;
-    if (key === "color" || key.endsWith("-color")) continue;
-    const value = cs.getPropertyValue(key);
-    if (value) out[key] = value.trim();
+    const value = cs.getPropertyValue(key).trim();
+    if (!value) continue;
+    if (key === "color" || key.endsWith("-color")) {
+      const rgb = parseColor(value);
+      if (rgb && (rgb.a === undefined || rgb.a >= 1)) out[key] = rgbToHex(rgb);
+      continue;
+    }
+    out[key] = value;
   }
   return out;
 }
@@ -265,42 +273,17 @@ export function useStyleHandlers(
       if (pendingFlushRef.current && pendingFlushRef.current.property !== property) flushPending();
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
       const writeOne = (el: Element) => {
-        const id = el.getId();
-        const sel = `[data-buildrick-id="${id}"]`;
         /* P-8: a device-hide flag (`--hide-tablet`) names its own device, so it
-           always goes on the base styles — the one place the canvas
-           (Canvas.css `[style*="--hide-<bp>: true"]`) and the export
-           (ExportEngine hideRulesFor) read it. Written into the tablet rule
+           always goes on the base styles — the one place the canvas and
+           the export both read it (cascadeCSS hideRulesFor). Written into the tablet rule
            while the canvas was on Tablet, it hid nothing anywhere. */
         const baseOnly = property.startsWith("--hide-");
         const bp = baseOnly ? "desktop" : currentBreakpoint;
         const pseudo = baseOnly ? "normal" : currentPseudoState;
-        if (pseudo !== "normal" && composer?.styles) {
-          const mq = bp === "desktop" ? undefined : getBreakpointQuery(bp) ?? undefined;
-          const pseudoSelector = `${sel}:${pseudo}`;
-          if (value === "" || value == null) {
-            const existingRule = composer.styles.getRule(pseudoSelector, mq);
-            if (existingRule) {
-              const props = { ...existingRule.properties };
-              delete props[property];
-              composer.styles.setRule(sel, props, {
-                pseudo: `:${pseudo}`,
-                mediaQuery: mq,
-                replace: true,
-              });
-            }
-          } else {
-            composer.styles.setRule(
-              sel,
-              { [property]: value },
-              { pseudo: `:${pseudo}`, mediaQuery: mq }
-            );
-          }
-        } else {
-          /* The base on desktop, the breakpoint override elsewhere — the same
-             branch the canvas-direct writes use (engine setStyleAt). */
-          setStyleAt(composer, el, bp, property, value ?? "");
-        }
+        /* The base on desktop, the breakpoint override elsewhere, the
+           `:state` rule in a pseudo-state — the same branch paste-style and
+           the canvas-direct writes use (engine setStyleAt). */
+        setStyleAt(composer, el, bp, property, value ?? "", pseudo);
       };
 
       const flush = () => {
@@ -369,7 +352,7 @@ export function useStyleHandlers(
         const id = el.getId();
         // Pseudo-state batch changes: each element's OWN rule.
         if (currentPseudoState !== "normal" && composer.styles) {
-          const selector = `[data-buildrick-id="${id}"]`;
+          const selector = elementSelector(id);
           const existingRule = composer.styles.getRule(`${selector}:${currentPseudoState}`, mq);
           const existing = existingRule ? { ...existingRule.properties } : {};
           Object.entries(changes).forEach(([prop, val]) => {

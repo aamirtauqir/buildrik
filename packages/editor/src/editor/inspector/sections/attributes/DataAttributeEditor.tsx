@@ -1,107 +1,96 @@
 /**
- * @lint-hex-policy: component-theme
- *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
+ * DataAttributeEditor — the row that adds a custom data-* / aria-* attribute;
+ * CustomAttributesList lists the ones the element has. `data-buildrick-*` is
+ * the editor's own namespace (element id, interactions, runtimes) and is
+ * neither listed nor writable here.
  *
- * DataAttributeEditor - Custom data-* attribute editor
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 import type { Composer } from "@/engine";
-import { Button, TextInput } from "@/editor/chrome-ui";
+import { BK_HELPER_CLASS, BK_HELPER_ERROR_CLASS, Button, TextInput } from "@/editor/chrome-ui";
 import { writeElement } from "@/engine/commands/commandOperations";
 import { CommitRow, NoteRow } from "../behaviourRows";
 import { useElementVersion } from "../typeBlock/bodies/bodyRows";
 import { WIDE_BUTTON } from "@/editor/inspector/shared/controls/controlClasses";
-// ============================================================================
-// TYPES
-// ============================================================================
 
 interface DataAttributeEditorProps {
   elementId: string;
   composer?: Composer | null;
 }
 
-// ============================================================================
-// STYLES
-// ============================================================================
+const RESERVED_PREFIX = "data-buildrick";
+const VALID_NAME = /^(data|aria)-[a-z0-9][a-z0-9._-]*$/;
 
-const styles = {
-  input: {
-    flex: 1,
-    padding: "8px 10px",
-    background: "var(--bk-bg-subtle)",
-    border: "1px solid var(--bk-border-medium)",
-    borderRadius: 6,
-    color: "var(--bk-ink)",
-    fontSize: 12,
-    outline: "none",
-  } as React.CSSProperties,
-  addButton: {
-    padding: "8px 16px",
-    background: "var(--bk-accent)",
-    border: "none",
-    borderRadius: 6,
-    color: "var(--bk-accent-on)",
-    fontSize: 12,
-    fontWeight: 600,
-    cursor: "pointer",
-  } as React.CSSProperties,
-  hint: {
-    fontSize: 12,
-    color: "var(--bk-ink-soft)",
-  } as React.CSSProperties,
-};
+/** The attribute a typed key writes (a bare key gets `data-`), or why not. */
+export function resolveAttributeName(raw: string): { name: string } | { error: string } {
+  const key = raw.trim().toLowerCase();
+  if (/^on/.test(key)) return { error: "Event handlers (on…) can't be added as attributes." };
+  const name = key.startsWith("data-") || key.startsWith("aria-") ? key : `data-${key}`;
+  if (name.startsWith(RESERVED_PREFIX)) return { error: "data-buildrick-* is reserved by the editor." };
+  if (!VALID_NAME.test(name)) return { error: "Use letters, digits, '-', '_' or '.' after the prefix." };
+  return { name };
+}
 
-// ============================================================================
-// COMPONENT
-// ============================================================================
-
-export const DataAttributeEditor: React.FC<DataAttributeEditorProps> = ({
-  elementId,
-  composer,
-}) => {
+export const DataAttributeEditor: React.FC<DataAttributeEditorProps> = ({ elementId, composer }) => {
   const [newKey, setNewKey] = React.useState("");
   const [newValue, setNewValue] = React.useState("");
+  const [error, setError] = React.useState<string | null>(null);
 
   const addAttribute = () => {
     if (!newKey.trim()) return;
-
-    const key =
-      newKey.startsWith("data-") || newKey.startsWith("aria-") ? newKey : `data-${newKey}`;
-
-    if (composer) {
-      /* P-1: the lock gate — refused (and said) on a locked element. */
-      if (!writeElement(composer, composer.elements.getElement(elementId), "data-attribute-add", (el) => el.setAttribute?.(key, newValue))) return;
-      setNewKey("");
-      setNewValue("");
+    const resolved = resolveAttributeName(newKey);
+    if ("error" in resolved) {
+      setError(resolved.error);
+      return;
     }
+    if (!composer) return;
+    /* P-1: the lock gate — refused (and said) on a locked element. */
+    if (!writeElement(composer, composer.elements.getElement(elementId), "data-attribute-add", (el) => el.setAttribute?.(resolved.name, newValue))) return;
+    setNewKey("");
+    setNewValue("");
+    setError(null);
   };
 
   return (
     <div>
       <div className="tw:flex tw:gap-2 tw:mb-2">
         <TextInput
+          sizing="sm"
           type="text"
           value={newKey}
-          onChange={(e) => setNewKey(e.target.value)}
+          onChange={(e) => {
+            setNewKey(e.target.value);
+            setError(null);
+          }}
           placeholder="data-*"
-          style={styles.input}
+          aria-label="Attribute name"
+          aria-invalid={error ? true : undefined}
+          className="tw:flex-1 tw:min-w-0"
         />
         <TextInput
+          sizing="sm"
           type="text"
           value={newValue}
           onChange={(e) => setNewValue(e.target.value)}
           placeholder="value"
-          style={styles.input}
+          aria-label="Attribute value"
+          className="tw:flex-1 tw:min-w-0"
         />
         {/* The row's only action was a bare "+" — announced as "plus" with no
             hint of what it adds, on a panel that also adds classes and ids. */}
-        <Button aria-label="Add attribute" onClick={addAttribute} style={styles.addButton}>
+        <Button aria-label="Add attribute" size="sm" onClick={addAttribute}>
           +
         </Button>
       </div>
-      <div style={styles.hint}>Add custom data-* or aria-* attributes</div>
+      {error ? (
+        <p role="alert" className={BK_HELPER_ERROR_CLASS}>
+          {error}
+        </p>
+      ) : (
+        <p className={`${BK_HELPER_CLASS} tw:text-[var(--bk-ink-soft)]`}>Add custom data-* or aria-* attributes</p>
+      )}
     </div>
   );
 };
@@ -109,7 +98,7 @@ export const DataAttributeEditor: React.FC<DataAttributeEditorProps> = ({
 /** The aria-* / data-* attributes the element really carries (editor
  *  markers excluded). */
 export function customAttributesOf(attrs: Readonly<Record<string, string>>): [string, string][] {
-  return Object.entries(attrs).filter(([k]) => (k.startsWith("aria-") || k.startsWith("data-")) && !k.startsWith("data-buildrick") && !k.startsWith("data-bk-"));
+  return Object.entries(attrs).filter(([k]) => (k.startsWith("aria-") || k.startsWith("data-")) && !k.startsWith(RESERVED_PREFIX) && !k.startsWith("data-bk-"));
 }
 
 /**

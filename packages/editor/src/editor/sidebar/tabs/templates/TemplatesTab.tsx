@@ -18,7 +18,7 @@ import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
 import { usePageCapacity } from "@/editor/sidebar/tabs/pages/usePageCapacity";
 import { type TemplateItem, SITE_TEMPLATES, PAGE_TEMPLATES, DEFAULT_TEMPLATE_VERSION, getMyTemplates } from "./templatesData";
-import { clearAppliedId, recordTemplateApplied, saveAppliedId } from "./templatesStorage";
+import { recordTemplateApplied, saveAppliedId } from "./templatesStorage";
 import { ReplaceModal, CreatePageConfirmModal, CreatePageErrorModal, BackupFailedModal } from "./TemplatesTabModals";
 import { TemplatePreview } from "./TemplatePreview";
 import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";

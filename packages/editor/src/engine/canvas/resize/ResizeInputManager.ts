@@ -35,6 +35,7 @@ export class ResizeInputManager extends EventEmitter {
   private boundKeyUp: (e: KeyboardEvent) => void;
   private boundTouchMove: (e: TouchEvent) => void;
   private boundTouchEnd: (e: TouchEvent) => void;
+  private boundBlur: () => void;
 
   constructor(callbacks: InputCallbacks) {
     super();
@@ -46,6 +47,7 @@ export class ResizeInputManager extends EventEmitter {
     this.boundKeyUp = this.handleKeyUp.bind(this);
     this.boundTouchMove = this.handleTouchMove.bind(this);
     this.boundTouchEnd = this.handleTouchEnd.bind(this);
+    this.boundBlur = this.handleBlur.bind(this);
   }
 
   attach(): void {
@@ -56,6 +58,7 @@ export class ResizeInputManager extends EventEmitter {
     document.addEventListener("touchmove", this.boundTouchMove, { passive: false });
     document.addEventListener("touchend", this.boundTouchEnd);
     document.addEventListener("touchcancel", this.boundTouchEnd);
+    window.addEventListener("blur", this.boundBlur);
   }
 
   detach(): void {
@@ -66,6 +69,7 @@ export class ResizeInputManager extends EventEmitter {
     document.removeEventListener("touchmove", this.boundTouchMove);
     document.removeEventListener("touchend", this.boundTouchEnd);
     document.removeEventListener("touchcancel", this.boundTouchEnd);
+    window.removeEventListener("blur", this.boundBlur);
   }
 
   getModifiers(): InputModifiers {
@@ -73,7 +77,19 @@ export class ResizeInputManager extends EventEmitter {
   }
 
   private handleMouseMove(e: MouseEvent): void {
+    /* The button came up where no mouseup reached us (outside the window, an
+       iframe, a dialog): the drag is over. Left open, it held its transaction
+       — and so autosave — until the next press (E2 / D3). */
+    if (e.buttons === 0) {
+      this.callbacks.onEnd(e.clientX, e.clientY);
+      return;
+    }
     this.callbacks.onMove(e.clientX, e.clientY);
+  }
+
+  /* Focus left the window mid-gesture (alt-tab, a native dialog): cancel. */
+  private handleBlur(): void {
+    this.callbacks.onCancel();
   }
 
   private handleMouseUp(e: MouseEvent): void {

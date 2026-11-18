@@ -2,7 +2,7 @@
  * Every page used to declare the same canonical — see publish-urls.ts.
  */
 import { describe, it, expect } from "vitest";
-import { resolveSiteOrigin, resolveSiteOrigins, withSitemapDirective } from "../publish-urls";
+import { resolveSiteOrigin, resolveSiteOrigins } from "../publish-urls";
 
 describe("resolveSiteOrigin", () => {
   it("prefers the canonical domain the owner typed", () => {
@@ -25,23 +25,6 @@ describe("resolveSiteOrigin", () => {
     expect(
       resolveSiteOrigin({ canonicalUrl: null, verifiedDomain: null, vercelProjectName: null }),
     ).toBeNull();
-  });
-});
-
-describe("withSitemapDirective", () => {
-  it("appends the pointer to a default robots.txt", () => {
-    expect(withSitemapDirective("User-agent: *\nAllow: /\n", "https://example.com")).toContain(
-      "Sitemap: https://example.com/sitemap.xml",
-    );
-  });
-
-  it("does not touch a robots.txt that already names one", () => {
-    const custom = "User-agent: *\nAllow: /\nSitemap: https://cdn.example/sm.xml\n";
-    expect(withSitemapDirective(custom, "https://example.com")).toBe(custom);
-  });
-
-  it("adds nothing when there is no origin to point at", () => {
-    expect(withSitemapDirective("User-agent: *\n", null)).toBe("User-agent: *\n");
   });
 });
 

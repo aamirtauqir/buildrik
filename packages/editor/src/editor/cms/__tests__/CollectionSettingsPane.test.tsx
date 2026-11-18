@@ -52,6 +52,15 @@ describe("CollectionSettingsPane", () => {
     await waitFor(() => expect(updateCollection).toHaveBeenCalledWith("col-1", { name: "Dishes", slug: "dishes" }));
   });
 
+  it("C-6: a rename the manager answers with null says so instead of ending in silence", async () => {
+    const { updateCollection } = mount(MENU, []);
+    updateCollection.mockResolvedValueOnce(null);
+    fireEvent.change(screen.getByTestId("cms-settings-name"), { target: { value: "Dishes" } });
+    fireEvent.click(screen.getByTestId("cms-settings-rename"));
+    expect(await screen.findByTestId("cms-settings-save-failed")).toBeInTheDocument();
+    expect(screen.queryByText("Collection saved")).toBeNull();
+  });
+
   it("refuses a slug another collection already uses, or an empty name", () => {
     mount(MENU, []);
     fireEvent.change(screen.getByTestId("cms-settings-slug"), { target: { value: "team" } });

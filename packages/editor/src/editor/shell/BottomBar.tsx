@@ -59,6 +59,13 @@ export function BottomBar({ composer, pages, resourceArea, onBackToEditor }: Bot
   const openPagesPanel = React.useCallback(() => {
     composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "pages" });
   }, [composer]);
+  /* "Add page" opens the Pages panel and asks for its New page dialog, as
+     every other Add-page door does — the panel alone was a label the click
+     did not keep (REA S-4). */
+  const addPage = React.useCallback(() => {
+    composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "pages" });
+    composer?.emit(EVENTS.UI_NEW_PAGE_REQUESTED, {});
+  }, [composer]);
 
   const save = useShellSaveStatus();
   /* Keeps "Saved 2m ago" honest without a render on every tick. */
@@ -74,7 +81,14 @@ export function BottomBar({ composer, pages, resourceArea, onBackToEditor }: Bot
   const saveGroup = save ? (
     <div className="tw:flex tw:flex-none tw:items-center" data-testid="bottom-bar-save">
       <span className="tw:flex tw:w-[248px] tw:min-w-0 tw:items-center">
-        <SaveStatus state={save.state} savedAt={save.savedAt} onClick={save.onClick} hint={save.hint} />
+        <SaveStatus
+          state={save.state}
+          savedAt={save.savedAt}
+          onClick={save.onClick}
+          hint={save.hint}
+          stalledFor={save.stalledFor}
+          panel={save.panel}
+        />
       </span>
       {save.onDetails ? (
         <Button
@@ -120,7 +134,7 @@ export function BottomBar({ composer, pages, resourceArea, onBackToEditor }: Bot
       onOpenChange={setOpen}
       onSelect={(id) => composer?.elements.setActivePage(id)}
       onManagePages={openPagesPanel}
-      onAddPage={openPagesPanel}
+      onAddPage={addPage}
       disabledReason={notLoaded ? "Available when the site loads" : undefined}
     />
     {saveGroup}

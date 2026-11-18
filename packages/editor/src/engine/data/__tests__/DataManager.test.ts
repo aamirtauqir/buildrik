@@ -5,7 +5,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi } from "vitest";
-import { DataManager } from "../DataManager";
+import { DataManager, DataSourceConflictError } from "../DataManager";
 import { EVENTS } from "@/shared/constants/events";
 import type { Composer } from "@/engine/Composer";
 import type { DataBinding, DataSource } from "@/shared/types/data";
@@ -264,6 +264,29 @@ describe("import / export / clear", () => {
     expect(imported).toHaveBeenCalledWith({ products: [1, 2], settings: { a: 1 } });
   });
 
+  it("C-2: a key that names an existing source imports nothing and says which", () => {
+    const dm = makeManager();
+    dm.registerSource({ id: "site", name: "Site variables", type: "object", data: {} });
+    const imported = vi.fn();
+    dm.on(EVENTS.DATA_SAMPLE_IMPORTED, imported);
+
+    let thrown: unknown;
+    try {
+      dm.importSampleData(JSON.stringify({ products: [1], site: { a: 1 } }));
+    } catch (err) {
+      thrown = err;
+    }
+
+    expect(thrown).toBeInstanceOf(DataSourceConflictError);
+    expect((thrown as DataSourceConflictError).ids).toEqual(["site"]);
+    expect(dm.getSource("products")).toBeUndefined();
+    expect(imported).not.toHaveBeenCalled();
+  });
+
+  it("C-2: malformed JSON throws a SyntaxError", () => {
+    expect(() => makeManager().importSampleData("{nope")).toThrow(SyntaxError);
+  });
+
   it("exportData serializes object/array sources but skips function sources", () => {
     const dm = makeManager();
     dm.registerSource(userSource());
@@ -353,7 +376,7 @@ describe("element binding application", () => {
     const el = makeElementMock();
 
     dm.bindVariable(el as never, "user", "profile.name");
-    await vi.waitFor(() => expect(el.setContent).toHaveBeenCalledWith("Ada"));
+    await vi.waitFor(() => expect(el.setContent).toHaveBeenCalledWith("Ada", "text"));
 
     expect(el.setDataBinding).toHaveBeenCalledWith(
       "content",
@@ -368,7 +391,7 @@ describe("element binding application", () => {
 
     dm.bindVariable(el as never, "user", "profile.name", { transform: "uppercase" });
 
-    await vi.waitFor(() => expect(el.setContent).toHaveBeenCalledWith("ADA"));
+    await vi.waitFor(() => expect(el.setContent).toHaveBeenCalledWith("ADA", "text"));
   });
 
   it("bindVariable falls back when the source is missing", async () => {
@@ -377,7 +400,7 @@ describe("element binding application", () => {
 
     dm.bindVariable(el as never, "ghost", "x", { fallback: "fb" });
 
-    await vi.waitFor(() => expect(el.setContent).toHaveBeenCalledWith("fb"));
+    await vi.waitFor(() => expect(el.setContent).toHaveBeenCalledWith("fb", "text"));
   });
 
   it("bindCondition toggles data-condition-hidden from the condition result", async () => {

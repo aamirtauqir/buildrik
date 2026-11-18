@@ -12,6 +12,7 @@ import {
   listEntries,
   upsertEntry,
   deleteEntry,
+  restoreEntry,
   resolveDynamicPages,
   previewCsvImport,
   importCsvEntries,
@@ -108,6 +109,16 @@ export const cmsRouter = router({
       try {
         await deleteEntry(input.siteId, input.id);
         return { ok: true as const };
+      } catch (e) {
+        translateCms(e);
+      }
+    }),
+    /* Undo of a record delete: the same id comes back (REA 2026-10-20 #11a).
+       Same input shape as delete — a site and a record id. */
+    restore: protectedProcedure.input(deleteEntryInput).mutation(async ({ ctx, input }) => {
+      await requireWrite(ctx, input.siteId);
+      try {
+        return await restoreEntry(input.siteId, input.id);
       } catch (e) {
         translateCms(e);
       }

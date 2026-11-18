@@ -77,6 +77,9 @@ function lockedComposer(locks: string[], canUndo = false) {
   return {
     editLocks: new Set(locks),
     readOnly: locks.length > 0,
+    getChangeSeq: () => 0,
+    isDirty: () => false,
+    isTransactionActive: () => false,
     on: (e: string, fn: () => void) => { (listeners.get(e) ?? listeners.set(e, new Set()).get(e)!).add(fn); },
     off: (e: string, fn: () => void) => { listeners.get(e)?.delete(fn); },
     emit: () => undefined,

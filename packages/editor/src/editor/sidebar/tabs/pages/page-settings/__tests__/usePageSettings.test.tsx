@@ -303,6 +303,23 @@ describe("usePageSettings save", () => {
     expect(lastToast()).toMatchObject({ tone: "warning" });
   });
 
+  it("accepts void tags in head code: a site-verification <meta> without a slash saves", async () => {
+    const composer = createMockComposer({});
+    const { result } = setup(composer, page());
+    act(() =>
+      result.current.setCustomHead(
+        '<meta name="google-site-verification" content="abc123XYZ">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
+      )
+    );
+
+    await act(async () => {
+      await result.current.save();
+    });
+
+    expect(result.current.headCodeError).toBeNull();
+    expect(composer.elements.updatePage).toHaveBeenCalled();
+  });
+
   /* D1: editing only the description must not stamp the page name in as the
      page's own title (live: "Blog Post | Acme" shipped instead of the site
      default). */

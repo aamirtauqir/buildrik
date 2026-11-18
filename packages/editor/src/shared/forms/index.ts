@@ -12,4 +12,3 @@ export { ColorField, type ColorFieldProps } from "./ColorField";
 export { TextareaField, type TextareaFieldProps } from "./TextareaField";
 export { SliderField, type SliderFieldProps } from "./SliderField";
 export { FileField, type FileFieldProps } from "./FileField";
-export { FormStateOverlay, type FormStateOverlayProps } from "./FormStateOverlay";

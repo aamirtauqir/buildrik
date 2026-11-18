@@ -15,6 +15,7 @@ const duplicateSiteMock = vi.fn();
 const getScheduledPublishMock = vi.fn();
 const saveProjectFromEditorMock = vi.fn();
 const cancelPublishMock = vi.fn();
+const loadSiteForEditorMock = vi.fn();
 
 vi.mock("@/server/auth", () => ({ auth: vi.fn().mockResolvedValue(null) }));
 vi.mock("@/server/services/api-token.service", () => ({
@@ -40,6 +41,7 @@ vi.mock("@/server/services/permission.service", () => ({
 }));
 vi.mock("@/server/services/sites.service", () => ({
   listSites: vi.fn(), getSite: vi.fn(), renameSite: vi.fn(), archiveSite: vi.fn(),
+  loadSiteForEditor: (...a: unknown[]) => loadSiteForEditorMock(...a),
   unarchiveSite: vi.fn(), deleteSite: vi.fn(), bulkAction: vi.fn(),
   checkSlugAvailability: vi.fn(), transferSite: vi.fn(), saveProjectData: vi.fn(),
   saveProjectFromEditor: (...a: unknown[]) => saveProjectFromEditorMock(...a), getProjectData: vi.fn(), createSite: vi.fn(),
@@ -77,6 +79,7 @@ vi.mock("@buildrik/shared/schemas/sites", () => {
     listSitesSchema: any, createSiteSchema: any, bulkActionSchema: any,
     transferSiteSchema: any, checkSlugSchema: any, saveProjectDataSchema: any,
     getProjectDataSchema: any, editorSaveProjectSchema: any, restoreSiteSchema: any,
+    codeExportAccessSchema: any, CODE_EXPORT_NOT_IN_PLAN: "CODE_EXPORT_NOT_IN_PLAN",
     SITE_RESTORE_WINDOW_DAYS: 30,
   };
 });
@@ -88,7 +91,7 @@ import { PageSlugTakenError } from "@/server/services/sites.service";
 const ctx = () => ({ session: { user: { id: "u_1" } }, prisma: {} as never });
 
 beforeEach(() => {
-  [checkSiteRoleMock, checkWorkspaceRoleMock, assertSiteAccessMock, duplicateSiteMock, getScheduledPublishMock, saveProjectFromEditorMock, cancelPublishMock].forEach((m) =>
+  [checkSiteRoleMock, checkWorkspaceRoleMock, assertSiteAccessMock, duplicateSiteMock, getScheduledPublishMock, saveProjectFromEditorMock, cancelPublishMock, loadSiteForEditorMock].forEach((m) =>
     m.mockReset(),
   );
 });
@@ -204,5 +207,40 @@ describe("sites.cancelPublish — ADMIN only", () => {
     cancelPublishMock.mockResolvedValueOnce({ id: "j_1", status: "CANCELLED" });
     const caller = sitesRouter.createCaller(jobCtx() as never);
     await expect(caller.cancelPublish({ jobId: "j_1" })).resolves.toMatchObject({ status: "CANCELLED" });
+  });
+});
+
+describe("sites.loadForEditor — the editor's one-snapshot load (O2)", () => {
+  it("a foreign site is FORBIDDEN and nothing is read", async () => {
+    assertSiteAccessMock.mockRejectedValueOnce(new PermissionError("FORBIDDEN"));
+    const caller = sitesRouter.createCaller(ctx() as never);
+    await expect(caller.loadForEditor({ siteId: "s_foreign" })).rejects.toMatchObject({ code: "FORBIDDEN" });
+    expect(loadSiteForEditorMock).not.toHaveBeenCalled();
+  });
+
+  it("a member gets the snapshot, read for the caller", async () => {
+    assertSiteAccessMock.mockResolvedValueOnce(undefined);
+    const snapshot = { site: { id: "s_1" }, pages: [], settings: {}, lastEditedBy: null };
+    loadSiteForEditorMock.mockResolvedValueOnce(snapshot);
+    const caller = sitesRouter.createCaller(ctx() as never);
+    await expect(caller.loadForEditor({ siteId: "s_1" })).resolves.toEqual(snapshot);
+    expect(loadSiteForEditorMock).toHaveBeenCalledWith("s_1", "u_1");
+  });
+
+  it("a deleted or missing site is NOT_FOUND", async () => {
+    assertSiteAccessMock.mockResolvedValueOnce(undefined);
+    loadSiteForEditorMock.mockResolvedValueOnce(null);
+    const caller = sitesRouter.createCaller(ctx() as never);
+    await expect(caller.loadForEditor({ siteId: "s_gone" })).rejects.toMatchObject({ code: "NOT_FOUND" });
+  });
+});
+
+describe("sites.saveProject — records who saved (A1)", () => {
+  it("passes the caller's id through to the save", async () => {
+    checkSiteRoleMock.mockResolvedValueOnce(undefined);
+    saveProjectFromEditorMock.mockResolvedValueOnce({ success: true, savedAt: new Date(0) });
+    const caller = sitesRouter.createCaller(ctx() as never);
+    await caller.saveProject({ siteId: "s_a", projectData: { version: "1", pages: [], styles: [], assets: [] } } as never);
+    expect(saveProjectFromEditorMock).toHaveBeenCalledWith("s_a", expect.anything(), undefined, "u_1");
   });
 });

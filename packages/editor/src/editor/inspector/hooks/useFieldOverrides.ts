@@ -28,6 +28,7 @@ import type { PseudoStateId } from "@/shared/types";
 import type { BreakpointId } from "@/shared/types/breakpoints";
 import { writeElement } from "@/engine/commands/commandOperations";
 import type { OverrideEntry, OverrideKind } from "../shared/controls/InspectorFieldContext";
+import { elementSelector } from "@/shared/utils/elementSelector";
 
 
 export interface FieldOverrides {
@@ -69,7 +70,6 @@ const REREAD_ON = [
   EVENTS.HISTORY_REDO,
 ] as const;
 
-const selectorOf = (elementId: string) => `[data-buildrick-id="${elementId}"]`;
 const mediaOf = (bp: BreakpointId) => (bp === "desktop" ? undefined : getBreakpointQuery(bp) ?? undefined);
 
 /** The properties an element inside a (live) component instance sets over its
@@ -107,7 +107,7 @@ export function useFieldOverrides(
   const read = React.useCallback((): Read => {
     if (!composer?.styles || !elementId) return EMPTY;
     const pseudoRule =
-      pseudoState === "normal" ? null : composer.styles.getRule(`${selectorOf(elementId)}:${pseudoState}`, mediaOf(breakpoint));
+      pseudoState === "normal" ? null : composer.styles.getRule(`${elementSelector(elementId)}:${pseudoState}`, mediaOf(breakpoint));
     return {
       breakpoint: breakpoint === "desktop" ? [] : Object.keys(composer.styles.getBreakpointStyle(elementId, breakpoint)),
       pseudo: Object.keys(pseudoRule?.properties ?? {}),
@@ -172,9 +172,9 @@ export function useFieldOverrides(
       if (pseudoState === "normal") return;
       write(label, (id) => {
         const mediaQuery = mediaOf(breakpoint);
-        const current = composer?.styles.getRule(`${selectorOf(id)}:${pseudoState}`, mediaQuery)?.properties ?? {};
+        const current = composer?.styles.getRule(`${elementSelector(id)}:${pseudoState}`, mediaQuery)?.properties ?? {};
         const kept = Object.fromEntries(Object.entries(current).filter(([p]) => keep(p)));
-        composer?.styles.setRule(selectorOf(id), kept, { pseudo: `:${pseudoState}`, mediaQuery, replace: true });
+        composer?.styles.setRule(elementSelector(id), kept, { pseudo: `:${pseudoState}`, mediaQuery, replace: true });
       });
     },
     [write, pseudoState, breakpoint, composer],
@@ -211,7 +211,7 @@ export function useFieldOverrides(
         return Object.keys(layer).map((p) => ({ property: p, value: String(layer[p]), fallback: base[p] ?? "" }));
       }
       if (pseudoState === "normal") return [];
-      const rule = composer.styles.getRule(`${selectorOf(elementId)}:${pseudoState}`, mediaOf(breakpoint))?.properties ?? {};
+      const rule = composer.styles.getRule(`${elementSelector(elementId)}:${pseudoState}`, mediaOf(breakpoint))?.properties ?? {};
       const atBreakpoint = breakpoint === "desktop" ? {} : (composer.styles.getBreakpointStyle(elementId, breakpoint) as Record<string, string>);
       return Object.keys(rule).map((p) => ({ property: p, value: String(rule[p]), fallback: atBreakpoint[p] ?? base[p] ?? "" }));
     },

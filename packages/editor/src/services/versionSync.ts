@@ -16,8 +16,8 @@
  */
 import { getBuildrikClient } from "./api-client";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
-import { getSiteIdFromUrl, loadProject } from "./BuildrikSyncProvider";
-import { loadVersions, saveVersion } from "../engine/storage/VersionHistoryStorage";
+import { getSiteIdFromUrl } from "./BuildrikSyncProvider";
+import { loadVersions, pruneVersions, saveVersion } from "../engine/storage/VersionHistoryStorage";
 import type { NamedVersion } from "../shared/types/versions";
 import {
   SyncRetryQueue,
@@ -72,40 +72,6 @@ export async function mirrorVersionCreate(version: NamedVersion, isAuto: boolean
   );
 }
 
-/**
- * Keep the server's newer copy as a Saves version named "Before overwrite"
- * before this tab overwrites it (2L9 B7-G16 `225:10249`). Reads the server's
- * current project and writes it through the existing `siteVersions.create`
- * — no new endpoint. NOT queued like `mirrorVersionCreate`: the overwrite
- * must wait for this to land, and a failure must stop it (B7-G17), so it
- * throws. The local cache gets the same version so History › Saves lists it
- * without a reload.
- */
-export async function keepBeforeOverwrite(siteId: string): Promise<NamedVersion> {
-  const snapshot = await loadProject(siteId);
-  const version: NamedVersion = {
-    id: `before-overwrite-${Date.now().toString(36)}`,
-    name: "Before overwrite",
-    snapshot,
-    createdAt: Date.now(),
-    isAutoCheckpoint: false,
-    projectId: siteId,
-  };
-  await client().siteVersions.create.mutate({
-    siteId,
-    versionId: version.id,
-    name: version.name,
-    isAuto: false,
-    payload: version as unknown as Record<string, unknown>,
-  });
-  try {
-    await saveVersion(version);
-  } catch {
-    /* The server holds it; the cache catches up on the next hydrate. */
-  }
-  return version;
-}
-
 /** The persisted server stamp (`syncRetryQueue` C-4) for a cached version.
  *  Its "local" half is the version's NAME — the one field that syncs after
  *  create — so "unchanged since the stamp" means "not renamed here since". */
@@ -157,7 +123,14 @@ const HYDRATE_CHUNK = 10;
  * has no stamp at all; otherwise the local name stays and its rename is mirrored
  * again (a rename made offline survives a reload — the retry queue is in memory
  * and does not). Returns how many versions were added or renamed —
- * they surface on the next version-list read. Best-effort; never throws.
+ * they surface on the next version-list read. Best-effort; never throws —
+ * a failure is reported through `opts.onError` (H-7: a teammate's versions
+ * silently did not appear).
+ *
+ * H-8: what it adds goes through the same cap the local store keeps
+ * (`opts.maxVersions`). Local prunes are not mirrored to the server, so an
+ * auto-save pruned here could still be on the server and came back on every
+ * open; pruning after the pull drops it again under the same rule.
  *
  * Bounded (walk 2026-09-24): on a cold cache it fetched every missing payload
  * one after another — 50 sequential `siteVersions.get` in 6.7 s on open,
@@ -165,7 +138,9 @@ const HYDRATE_CHUNK = 10;
  * versions (the list comes back newest-first), fetched concurrently in
  * chunks so tRPC batches each chunk into one request.
  */
-export async function hydrateVersionsFromServer(): Promise<number> {
+export async function hydrateVersionsFromServer(
+  opts: { onError?: (e: unknown) => void; maxVersions?: number } = {},
+): Promise<number> {
   const siteId = getSiteIdFromUrl();
   if (!siteId) return 0;
   let added = 0;
@@ -253,9 +228,11 @@ export async function hydrateVersionsFromServer(): Promise<number> {
         added++;
       }
     }
+    if (missing.length > 0 && opts.maxVersions !== undefined) await pruneVersions(siteId, opts.maxVersions);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.warn("[version-sync] hydrate from server failed", e);
+    opts.onError?.(e);
   }
   return added;
 }

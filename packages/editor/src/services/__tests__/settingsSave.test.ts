@@ -26,7 +26,20 @@ const m = vi.hoisted(() => ({
 
 vi.mock("../api-client", () => {
   const client = {
-    sites: { get: { query: m.sitesGet }, saveProject: { mutate: m.saveProject }, myRole: { query: m.myRole } },
+    sites: {
+      get: { query: m.sitesGet },
+      // One server snapshot; the mock composes the three reads it replaced.
+      loadForEditor: {
+        query: async ({ siteId }: { siteId: string }) => ({
+          site: await m.sitesGet({ id: siteId }),
+          pages: await m.pagesList({ siteId }),
+          settings: await m.settingsGet({ siteId }),
+          lastEditedBy: null,
+        }),
+      },
+      saveProject: { mutate: m.saveProject },
+      myRole: { query: m.myRole },
+    },
     pages: { list: { query: m.pagesList } },
     siteDetail: {
       settings: { get: { query: m.settingsGet }, update: { mutate: m.settingsUpdate } },

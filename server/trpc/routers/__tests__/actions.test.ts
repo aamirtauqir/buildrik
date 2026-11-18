@@ -97,4 +97,17 @@ describe("actions router", () => {
     await expect(caller().confirm({ token: "tok-1" })).rejects.toThrow(/Invalid confirmation/);
     expect(h.execute).not.toHaveBeenCalled();
   });
+
+  /* D11: the AI's publish meets the same checks as the editor's — and is
+     refused the same way, not as a 500. */
+  it("confirm turns the server's publish refusal into PRECONDITION_FAILED with its rows", async () => {
+    const { PublishBlockedError } = await import("@/server/services/publish.service");
+    h.consumeConfirmation.mockResolvedValueOnce({ ok: true, claims: { siteId: "s1", actionId: "site.publish", argsHash: "x" } });
+    h.execute.mockRejectedValueOnce(new PublishBlockedError([{ label: "Pages ready", detail: "No pages." }]));
+    await expect(caller().confirm({ token: "tok-1", payload: { pages: [] } })).rejects.toMatchObject({
+      code: "PRECONDITION_FAILED",
+      message: "Publish stopped: Pages ready.",
+      cause: expect.objectContaining({ reason: "PUBLISH_BLOCKED", blockers: [{ label: "Pages ready", detail: "No pages." }] }),
+    });
+  });
 });

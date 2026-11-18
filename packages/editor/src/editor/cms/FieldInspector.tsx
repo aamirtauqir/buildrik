@@ -105,8 +105,16 @@ export function FieldInspector({ composer, collection, collections, field, recor
   /* The addable types, plus whatever this field already is. */
   const types = (FIELD_TYPES as readonly string[]).includes(field.type) ? FIELD_TYPES : [...FIELD_TYPES, field.type];
 
+  /* C-6: a refused change used to be dropped by `void`; it now says so. */
+  const [saveFailed, setSaveFailed] = React.useState(false);
+  React.useEffect(() => setSaveFailed(false), [field.id]);
   const update = (updates: Partial<Omit<CMSField, "id">>) => {
-    if (composer) void composer.cms.collections.updateField(collection.id, field.id, updates);
+    if (!composer) return;
+    setSaveFailed(false);
+    composer.cms.collections
+      .updateField(collection.id, field.id, updates)
+      .then((saved) => setSaveFailed(saved === null))
+      .catch(() => setSaveFailed(true));
   };
   const changes = (required: boolean): Partial<Omit<CMSField, "id">> => ({
     ...(nextName !== field.name ? { name: nextName } : {}),
@@ -262,6 +270,11 @@ export function FieldInspector({ composer, collection, collections, field, recor
         <Button className="tw:h-8 tw:w-full tw:text-[13px] tw:font-medium" disabled={!canSave} onClick={save} data-testid="cms-fi-save">
           Save field
         </Button>
+        {saveFailed ? (
+          <p className="tw:m-0 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-error-text)]" role="alert" data-testid="cms-fi-save-error">
+            Could not save that change to {field.name}. Try again.
+          </p>
+        ) : null}
         {/* Beyond the board: the default and the type's rules, folded under
             Save field so the board's column reads as drawn. */}
         {TYPED_VALUE_TYPES.has(field.type) || (FIELD_RULES[field.type] ?? []).length > 0 ? (

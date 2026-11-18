@@ -109,13 +109,8 @@ export const createAssetVersionSchema = z.object({
   edits: z.record(z.unknown()), // crop/rotate/brightness/contrast/saturation/filter snapshot
 });
 
-export const restoreAssetVersionSchema = z.object({
-  versionId: z.string(),
-});
-
 export type ListAssetVersionsInput = z.infer<typeof listAssetVersionsSchema>;
 export type CreateAssetVersionInput = z.infer<typeof createAssetVersionSchema>;
-export type RestoreAssetVersionInput = z.infer<typeof restoreAssetVersionSchema>;
 
 // ─── AI alt-text (P7) ─────────────────────────────────────────────────────
 

@@ -26,7 +26,6 @@ function getConfig(variant: EmptyStateVariant): EmptyStateConfig {
         heading: "Welcome to Buildrick!",
         description: "Build your first site in under 5 minutes.",
         ctas: [
-          { label: "AI Generate", href: "/dashboard/sites/new?method=ai", icon: <Sparkles className="h-4 w-4" /> },
           { label: "Use Template", href: "/dashboard/templates", icon: <LayoutTemplate className="h-4 w-4" /> },
           { label: "Start Blank", href: "/dashboard/sites/new", icon: <FileText className="h-4 w-4" /> },
         ],
@@ -37,7 +36,6 @@ function getConfig(variant: EmptyStateVariant): EmptyStateConfig {
         heading: "Your workspace is empty",
         description: "Ready for something new?",
         ctas: [
-          { label: "AI Generate", href: "/dashboard/sites/new?method=ai", icon: <Sparkles className="h-4 w-4" /> },
           { label: "Use Template", href: "/dashboard/templates", icon: <LayoutTemplate className="h-4 w-4" /> },
           { label: "Start Blank", href: "/dashboard/sites/new", icon: <FileText className="h-4 w-4" /> },
         ],

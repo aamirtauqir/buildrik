@@ -22,7 +22,6 @@ import {
   getOnboardingState,
   selectRole,
   setupProject,
-  completeStep,
   completeDashboardTask,
   dismissOnboarding,
 } from "@/server/services/onboarding.service";
@@ -47,8 +46,8 @@ const mockState = {
 /**
  * `selectRole` and `setupProject` were the old 2-step onboarding. The M2 wizard
  * replaced them and the service functions were deleted; their tests stayed and
- * have been red ever since. Removed. getOnboardingState and completeStep are
- * still live and still covered below.
+ * have been red ever since. Removed. getOnboardingState is still live and
+ * still covered below (completeStep went with its unused tRPC procedure).
  */
 describe("Onboarding Service", () => {
   beforeEach(() => {
@@ -109,64 +108,6 @@ describe("Onboarding Service", () => {
   });
 
 
-
-  describe("completeStep", () => {
-    /** What the caller says it finished only counts if that is where they are. */
-    function standingOn(step: string) {
-      vi.mocked(prisma.onboardingState.findUnique).mockResolvedValue({
-        ...mockState,
-        step,
-      } as any);
-    }
-
-    it("advances from SITE_CREATION to EDITOR_TOUR", async () => {
-      standingOn("SITE_CREATION");
-      vi.mocked(prisma.onboardingState.update).mockResolvedValue({} as any);
-      await completeStep("user_1", "SITE_CREATION");
-      expect(prisma.onboardingState.update).toHaveBeenCalledWith(
-        expect.objectContaining({ data: expect.objectContaining({ step: "EDITOR_TOUR" }) }),
-      );
-    });
-
-    it("advances from EDITOR_TOUR to CHECKLIST", async () => {
-      standingOn("EDITOR_TOUR");
-      vi.mocked(prisma.onboardingState.update).mockResolvedValue({} as any);
-      await completeStep("user_1", "EDITOR_TOUR");
-      expect(prisma.onboardingState.update).toHaveBeenCalledWith(
-        expect.objectContaining({ data: expect.objectContaining({ step: "CHECKLIST" }) }),
-      );
-    });
-
-    it("sets completed=true when completing CHECKLIST", async () => {
-      standingOn("CHECKLIST");
-      vi.mocked(prisma.onboardingState.update).mockResolvedValue({} as any);
-      await completeStep("user_1", "CHECKLIST");
-      expect(prisma.onboardingState.update).toHaveBeenCalledWith(
-        expect.objectContaining({ data: expect.objectContaining({ completed: true }) }),
-      );
-    });
-
-    it("rejects unknown step ids instead of completing all onboarding", async () => {
-      await expect(completeStep("user_1", "add-text-block")).rejects.toThrow("INVALID_STEP");
-      expect(prisma.onboardingState.update).not.toHaveBeenCalled();
-    });
-
-    it("will not finish onboarding for someone who is still on the first step", async () => {
-      standingOn("ROLE_SELECT");
-      await completeStep("user_1", "CHECKLIST");
-      expect(prisma.onboardingState.update).not.toHaveBeenCalled();
-    });
-
-    it("is a no-op when the same step arrives twice", async () => {
-      standingOn("CHECKLIST");
-      vi.mocked(prisma.onboardingState.update).mockResolvedValue({} as any);
-      await completeStep("user_1", "CHECKLIST");
-      vi.mocked(prisma.onboardingState.update).mockClear();
-      standingOn("COMPLETED");
-      await completeStep("user_1", "CHECKLIST");
-      expect(prisma.onboardingState.update).not.toHaveBeenCalled();
-    });
-  });
 
   describe("completeDashboardTask", () => {
     it("appends the task without touching step/completed", async () => {

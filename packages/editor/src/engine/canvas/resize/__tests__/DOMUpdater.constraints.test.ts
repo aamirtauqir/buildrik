@@ -92,7 +92,7 @@ describe("expandParent — growing a parent to fit still honours its constraints
       },
     };
   }
-  const domStub = () => ({ style: {} }) as unknown as HTMLElement;
+  const domStub = () => document.createElement("div");
 
   it("does not store a parent width past its max-width", () => {
     const { written, model } = parentEl({ "max-width": "1200px" });

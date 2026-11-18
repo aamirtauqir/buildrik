@@ -86,6 +86,14 @@ function job(over: Partial<UsePublishJobResult> = {}): UsePublishJobResult {
     unpublished: vi.fn(),
     startedAt: null,
     pollLost: false,
+    formsStatus: null,
+    formsError: null,
+    failedPhase: null,
+    postDeployError: null,
+    retryError: null,
+    retryForms: async () => {},
+    retryPostDeploy: async () => {},
+    serverBlockers: null,
     ...over,
   };
 }

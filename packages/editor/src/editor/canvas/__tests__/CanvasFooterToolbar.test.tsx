@@ -67,7 +67,7 @@ describe("CanvasFooterToolbar — the View menu (board 145:64586)", () => {
     expect(screen.queryByRole("menu")).toBeNull();
     openMenu();
     expect(screen.getByText("Canvas view")).toBeTruthy();
-    const rows = screen.getAllByRole("menuitemcheckbox").map((r) => r.textContent?.replace(/(⌘.*|›|✓)$/, "").trim());
+    const rows = screen.getAllByRole("menuitemcheckbox").map((r) => r.textContent?.replace(/([⌘⇧⌥].*|›|✓)$/, "").trim());
     /* "Show hidden elements" (176:19089) is on by default, so it carries its ✓. */
     expect(rows).toEqual(["Grid · 7 px", "Rulers and guides", "Snap guides", "Show outlines", "Show hidden elements", "Spacing", "Badges", "X-Ray"]);
     expect(screen.queryByTestId("canvas-view-breakpoint")).toBeNull();
@@ -103,16 +103,55 @@ describe("CanvasFooterToolbar — the View menu (board 145:64586)", () => {
   it("prints each row's chord", () => {
     renderToolbar();
     openMenu();
-    expect(screen.getByTestId("canvas-view-rulers").textContent).toContain("⌘R");
-    expect(screen.getByTestId("canvas-view-xray").textContent).toContain("⌘⇧X");
+    expect(screen.getByTestId("canvas-view-rulers").textContent).toContain("⇧R");
+    expect(screen.getByTestId("canvas-view-badges").textContent).toContain("⌥B");
+    expect(screen.getByTestId("canvas-view-xray").textContent).toContain("⌥X");
   });
 
-  it("⌘R toggles rulers with the menu closed, and ⌘⇧R is left to the browser", () => {
+  /* SC-12 / BD-39 (2): ⌘R reloads the page, ⌘B is Bold and ⌘⇧X strikethrough
+     in Text scope, so the overlays moved to ⇧R / ⌥B / ⌥X and the old chords
+     go back to the browser. ⌥ and ⇧ change `key` on macOS (⌥B types "∫",
+     ⌥X "≈"), so the physical key decides. */
+  it("⇧R / ⌥B / ⌥X toggle rulers, badges and X-Ray with the menu closed", () => {
     const { onOverlayChange } = renderToolbar();
-    fireEvent.keyDown(window, { key: "r", metaKey: true });
-    expect(onOverlayChange).toHaveBeenCalledWith("rulers", true);
-    onOverlayChange.mockClear();
-    fireEvent.keyDown(window, { key: "r", metaKey: true, shiftKey: true });
+    fireEvent.keyDown(window, { key: "R", code: "KeyR", shiftKey: true });
+    fireEvent.keyDown(window, { key: "∫", code: "KeyB", altKey: true });
+    fireEvent.keyDown(window, { key: "≈", code: "KeyX", altKey: true });
+    expect(onOverlayChange.mock.calls).toEqual([
+      ["rulers", true],
+      ["badges", true],
+      ["xray", true],
+    ]);
+  });
+
+  it("leaves ⌘R, ⌘B and ⌘⇧X to the browser", () => {
+    const { onOverlayChange } = renderToolbar();
+    const events = [
+      { key: "r", code: "KeyR", metaKey: true },
+      { key: "r", code: "KeyR", metaKey: true, shiftKey: true },
+      { key: "b", code: "KeyB", metaKey: true },
+      { key: "b", code: "KeyB", ctrlKey: true },
+      { key: "x", code: "KeyX", metaKey: true, shiftKey: true },
+    ];
+    for (const init of events) expect(fireEvent.keyDown(window, init)).toBe(true);
+    expect(onOverlayChange).not.toHaveBeenCalled();
+  });
+
+  it("a bare R / B / X, or ⌥ with ⇧, toggles nothing", () => {
+    const { onOverlayChange } = renderToolbar();
+    fireEvent.keyDown(window, { key: "r", code: "KeyR" });
+    fireEvent.keyDown(window, { key: "b", code: "KeyB" });
+    fireEvent.keyDown(window, { key: "ı", code: "KeyB", altKey: true, shiftKey: true });
+    expect(onOverlayChange).not.toHaveBeenCalled();
+  });
+
+  it("never fires while typing in a field or in inline text", () => {
+    const { onOverlayChange } = renderToolbar();
+    const input = document.createElement("input");
+    document.body.appendChild(input);
+    fireEvent.keyDown(input, { key: "R", code: "KeyR", shiftKey: true });
+    fireEvent.keyDown(input, { key: "∫", code: "KeyB", altKey: true });
+    input.remove();
     expect(onOverlayChange).not.toHaveBeenCalled();
   });
 
@@ -251,5 +290,35 @@ describe("CanvasFooterToolbar — Show hidden elements", () => {
     fireEvent.click(screen.getByTestId("canvas-view-menu-trigger"));
     fireEvent.click(screen.getByTestId("canvas-view-hidden"));
     expect(localStorage.getItem("bk-canvas-show-hidden")).toBe("true");
+  });
+});
+
+/* SC-12 / BD-39 (2): ⌘1 / ⌘2 switch browser tabs and ⌘0 resets browser zoom,
+   so the zoom chords are ⇧1 fit · ⇧2 selection · ⇧0 100% (⌘0 kept as the
+   alias SC-12 allows). ⇧1 types "!" on every layout, so the physical key
+   decides. */
+describe("CanvasFooterToolbar — zoom chords (SC-12)", () => {
+  it("⇧1 fits, ⇧2 zooms to the selection, ⇧0 goes to 100%", () => {
+    const onFitToScreen = vi.fn();
+    const onZoomToSelection = vi.fn();
+    const { onZoomChange } = renderToolbar({ zoom: 75, onFitToScreen, onZoomToSelection });
+    fireEvent.keyDown(window, { key: "!", code: "Digit1", shiftKey: true });
+    fireEvent.keyDown(window, { key: "@", code: "Digit2", shiftKey: true });
+    fireEvent.keyDown(window, { key: ")", code: "Digit0", shiftKey: true });
+    expect(onFitToScreen).toHaveBeenCalledTimes(1);
+    expect(onZoomToSelection).toHaveBeenCalledTimes(1);
+    expect(onZoomChange).toHaveBeenCalledWith(100);
+  });
+
+  it("leaves ⌘1 and ⌘2 to the browser; ⌘0 stays an alias of ⇧0", () => {
+    const onFitToScreen = vi.fn();
+    const onZoomToSelection = vi.fn();
+    const { onZoomChange } = renderToolbar({ zoom: 75, onFitToScreen, onZoomToSelection });
+    expect(fireEvent.keyDown(window, { key: "1", code: "Digit1", metaKey: true })).toBe(true);
+    expect(fireEvent.keyDown(window, { key: "2", code: "Digit2", ctrlKey: true })).toBe(true);
+    expect(onFitToScreen).not.toHaveBeenCalled();
+    expect(onZoomToSelection).not.toHaveBeenCalled();
+    fireEvent.keyDown(window, { key: "0", code: "Digit0", metaKey: true });
+    expect(onZoomChange).toHaveBeenCalledWith(100);
   });
 });

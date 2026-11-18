@@ -1,10 +1,10 @@
 /**
  * Interaction runtime for EXPORTED / PUBLISHED sites.
  *
- * The editor canvas runs interactions through GSAP (`InteractionRuntime` +
- * `GSAPEngine`). Bundling GSAP into every published page is heavy and carries
- * licensing weight, so the published site instead ships this tiny, dependency
- * free runtime built on the native Web Animations API (`element.animate`).
+ * Bundling GSAP into every published page is heavy and carries licensing
+ * weight, so the published site (and the Preview overlay) ships this tiny,
+ * dependency-free runtime built on the native Web Animations API
+ * (`element.animate`).
  *
  * It reads the same `data-buildrick-interactions` JSON the editor serializes
  * (shape: `Interaction[]` from `engine/interactions/types.ts`) and plays the

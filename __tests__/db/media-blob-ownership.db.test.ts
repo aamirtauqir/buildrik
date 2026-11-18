@@ -39,7 +39,6 @@ import {
   createAssetVersion,
   deleteAsset,
   isOwnedBlobUrl,
-  restoreAssetVersion,
 } from "@/server/services/media.service";
 import { POST } from "@/packages/dashboard/app/api/asset-upload/route";
 import { createTestUser, truncateTables } from "./helpers";
@@ -136,17 +135,6 @@ describe("asset versions — S-4", () => {
     await expect(
       createAssetVersion(user.id, { assetId: row.id, url: `${STORE}/sites/victim/og-image.png`, bytes: 1, edits: {} }),
     ).rejects.toThrow("URL_NOT_OWNED");
-  });
-
-  it("restoreAssetVersion refuses a legacy version pointing outside the prefix", async () => {
-    const user = await createTestUser();
-    const row = await createAsset(user.id, asset(`${STORE}/u/${user.id}/p-x1.png`));
-    const version = await prisma.mediaAssetVersion.create({
-      data: { assetId: row.id, url: `${STORE}/sites/victim/favicon.png`, bytes: 1, edits: {} },
-    });
-    await expect(restoreAssetVersion(user.id, { versionId: version.id })).rejects.toThrow("URL_NOT_OWNED");
-    const after = await prisma.mediaAsset.findUniqueOrThrow({ where: { id: row.id } });
-    expect(after.url).toBe(`${STORE}/u/${user.id}/p-x1.png`);
   });
 });
 

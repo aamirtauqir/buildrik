@@ -76,10 +76,10 @@ export const publishInputSchema = z
      *  was approved) and chose to publish anyway (contracts §1.5). Without it, a
      *  stale approval blocks the publish with APPROVAL_STALE. */
     acknowledgeStale: z.boolean().optional(),
-    /** C-3: the `lastEditedAt` the publishing tab last loaded or saved. The
-     *  tab publishes its IN-MEMORY pages, so a tab that fell behind another
-     *  writer would ship the older copy over theirs; the server refuses with
-     *  SAVE_CONFLICT when the site moved past this. Required whenever `pages`
+    /** C-3 / REA #9: the `lastEditedAt` of the saved revision the pages were
+     *  rendered from — the editor saves any unsaved edits first, then sends
+     *  the stamp that save returned. The server refuses with SAVE_CONFLICT
+     *  unless the site is still exactly that revision. Required whenever `pages`
      *  is sent (refined below): a tab with no token never loaded the site, and
      *  its pages are whatever the fallback put on screen. Callers that send no
      *  pages (cron, dashboard) carry nothing to be stale. */

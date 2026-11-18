@@ -32,6 +32,7 @@ import {
   subscribeHistorySessionMarkers,
   type HistorySessionMarker,
 } from "@/shared/utils/historySessionMarkers";
+import { useCheckpointedRestore } from "@/editor/shell/hooks/useCheckpointedRestore";
 
 /** "⌘Z" on a Mac, "Ctrl+Z" elsewhere — the spelling the palette uses. */
 const undoChord = () =>
@@ -385,6 +386,9 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
     },
     [composer, reducedMotion, cancelPendingRestore, clearCanvasAnim]
   );
+  /* Same safety as Time-travel's restore: a "Before restoring" version first
+     (R1 H-1). */
+  const confirmRestore = useCheckpointedRestore(composer, runRestore);
 
   /* The timestamp is a RESTORE, not a jump: `history.restoreEntry` truncates
      the undo stack at that point and empties the redo stack, so everything
@@ -441,7 +445,7 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
         onClose={() => setPendingRestoreId(null)}
         onConfirm={() => {
           setPendingRestoreId(null);
-          runRestore(pendingRestore.id);
+          void confirmRestore(pendingRestore.id);
         }}
       />
     );

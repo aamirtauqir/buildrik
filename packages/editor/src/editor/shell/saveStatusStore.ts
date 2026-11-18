@@ -12,7 +12,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import type { SaveState } from "@/editor/chrome-ui";
+import type { SaveState, SaveStatusProps } from "@/editor/chrome-ui";
 
 export interface ShellSaveStatus {
   state: SaveState;
@@ -23,6 +23,9 @@ export interface ShellSaveStatus {
   hint?: string;
   /** "Details" — the History panel (what the old topbar save pill opened). */
   onDetails?: () => void;
+  /** `stalled`: how long saving has been stuck (ms), and its panel. */
+  stalledFor?: number;
+  panel?: SaveStatusProps["panel"];
 }
 
 let current: ShellSaveStatus | null = null;
@@ -39,7 +42,9 @@ export const saveStatusStore = {
         next.savedAt === current.savedAt &&
         next.onClick === current.onClick &&
         next.hint === current.hint &&
-        next.onDetails === current.onDetails)
+        next.onDetails === current.onDetails &&
+        next.stalledFor === current.stalledFor &&
+        next.panel === current.panel)
     ) {
       return;
     }

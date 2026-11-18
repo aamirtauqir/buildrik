@@ -9,8 +9,7 @@ const makeEl = (classes: string[] = []) => ({
 });
 
 const makeComposer = (el: ReturnType<typeof makeEl>) => ({
-  elements: { getElement: () => el },
-  styles: { getGlobalClasses: () => ["btn-primary", "card", "hero-section"] },
+  elements: { getElement: () => el, getAllElements: () => [el, makeEl(["card", "buildrick-page-root"]), makeEl(["hero-section", "card"])] },
   history: { push: vi.fn() },
   beginTransaction: vi.fn(),
   endTransaction: vi.fn(),
@@ -76,5 +75,16 @@ describe("CSSClassesSection — Tab key does not add class", () => {
     fireEvent.change(input, { target: { value: "my-class" } });
     fireEvent.keyDown(input, { key: "Tab" });
     expect(addClassSpy).not.toHaveBeenCalled();
+  });
+});
+
+describe("CSSClassesSection — suggestions come from the element tree", () => {
+  it("offers classes other elements carry, most-used first, minus engine and applied ones", () => {
+    const el = makeEl(["hero-section"]);
+    const { container } = render(
+      <CSSClassesSection selectedElement={{ id: "el-1", type: "text" }} composer={makeComposer(el) as never} />
+    );
+    const options = [...container.querySelectorAll("datalist option")].map((o) => o.getAttribute("value"));
+    expect(options).toEqual(["card"]);
   });
 });

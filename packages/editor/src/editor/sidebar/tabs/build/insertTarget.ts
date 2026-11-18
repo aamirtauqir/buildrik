@@ -3,13 +3,12 @@
  * "Insert into Hero · Home / Hero · At end" strip names it (boards 7:18981,
  * 302:3965).
  *
- * The rule is `useBlockInsertion`'s smart placement, written once so the strip
- * and the insert cannot disagree (REQUESTS.md #10 moves the hook onto it):
- * - a selected element that accepts the type takes it at its end;
- * - a selected text leaf never does — the insert goes after it;
+ * The rule is `insertionPlace` (the one paste also uses, audit 2026-10-20
+ * #15), read here so the strip and the insert cannot disagree:
+ * - a selected CONTAINER that accepts the type takes it at its end;
  * - a selected Section with one inner container fills that container;
- * - otherwise walk up to the first ancestor that accepts it and insert after
- *   the child on the selection path;
+ * - anything else (a text leaf, a Button, an Image) gets it as the next
+ *   sibling, climbing to the first ancestor that accepts it;
  * - nothing selected (or nothing accepts it): the page root, at the end.
  *
  * Pure read: no selection, history or DOM.
@@ -18,7 +17,7 @@
  */
 import type { Composer } from "@/engine";
 import type { ElementType } from "@/shared/types";
-import { canNestElement, ELEMENT_CATEGORIES, ElementCategory } from "@/shared/utils/nesting";
+import { insertionPlace } from "@/shared/utils/nesting";
 import { elementLocation } from "@/editor/canvas/utils/elementInfo";
 
 export interface InsertTarget {
@@ -60,23 +59,10 @@ export function resolveInsertTarget(composer: Composer, elementType: ElementType
   const ids = composer.selection?.getSelectedIds?.() ?? [];
   const selected = ids.length === 1 ? composer.elements.getElement(ids[0]) : undefined;
   if (selected && selected !== root) {
-    let candidate: El | null = selected;
-    let childOnPath: El = selected;
-    let isSelected = true;
-    while (candidate) {
-      const type = candidate.getType() as ElementType;
-      const textLeaf = isSelected && (ELEMENT_CATEGORIES[type] ?? []).includes(ElementCategory.TEXT);
-      const kids = isSelected && type === "section" ? candidate.getChildren() : [];
-      const slot = kids.length === 1 && kids[0].getType() === "container" ? kids[0] : null;
-      if (slot && canNestElement(elementType, "container")) return at(slot, slot.getChildCount(), null);
-      if (!textLeaf && canNestElement(elementType, type)) {
-        if (isSelected) return at(candidate, candidate.getChildCount(), null);
-        const i = candidate.getChildren().findIndex((c) => c.getId() === childOnPath.getId());
-        return at(candidate, i >= 0 ? i + 1 : candidate.getChildCount(), i >= 0 ? childOnPath : null);
-      }
-      childOnPath = candidate;
-      candidate = candidate.getParent();
-      isSelected = false;
+    const place = insertionPlace(elementType, selected);
+    if (place) {
+      const inside = place.parent === selected || place.parent.getParent() === selected;
+      return at(place.parent, place.index, inside ? null : place.parent.getChildren()[place.index - 1] ?? null);
     }
   }
   return at(root, root.getChildCount(), null);

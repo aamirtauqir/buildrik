@@ -56,33 +56,16 @@ export function AICreditsTab({
 }: AICreditsTabProps) {
   // -1 is "unlimited", not "a limit of minus one". Reading it as a number made
   // BUSINESS — the plan that advertises "Unlimited AI generations" — show
-  // "0 remaining this month", "0/-1 credits used", and a Generate New Site CTA
-  // greyed out by the remaining === 0 branch below. The plan's headline feature
-  // was unreachable on the screen that exists to run it.
+  // "0 remaining this month" and "0/-1 credits used".
   const creditsUnlimited = limit < 0;
   const remaining = Math.max(0, limit - used);
-  const outOfCredits = !creditsUnlimited && remaining === 0;
   const usagePercent = limit > 0 ? Math.min(100, (used / limit) * 100) : 0;
   const promptsUnlimited = dailyPromptsLimit < 0;
   const promptsPercent = dailyPromptsLimit > 0 ? Math.min(100, (dailyPromptsUsed / dailyPromptsLimit) * 100) : 0;
 
   return (
     <div className="space-y-8">
-      <SectionCard
-        title="AI site generation credits"
-        actions={
-          <Link
-            href="/dashboard/sites/new?method=ai"
-            className={`inline-flex items-center px-4 py-2 text-body font-medium rounded-md text-white ${
-              outOfCredits ? "pointer-events-none opacity-50" : ""
-            }`}
-            style={{ backgroundColor: "var(--color-primary)" }}
-            aria-disabled={outOfCredits}
-          >
-            Generate New Site
-          </Link>
-        }
-      >
+      <SectionCard title="AI site generation credits">
         <div className="flex items-center justify-between mb-2">
           <p className="text-body" style={{ color: "var(--color-text-primary)" }}>
             {creditsUnlimited ? (

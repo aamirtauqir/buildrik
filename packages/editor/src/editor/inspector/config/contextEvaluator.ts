@@ -1,12 +1,8 @@
 /**
- * Context Evaluator for showIf Conditions
- * Evaluates showIf expressions from groups.json against current inspector context.
- *
- * Supported expressions:
- * - "always" - Always show
- * - "ctx.display == 'flex'" - Check display property
- * - "ctx.isTextLike == true" - Check boolean trait
- * - "ctx.elementType == 'modal'" - Check element type
+ * Inspector context builder
+ * Derives the element-trait context (text-like, media, link-like, display)
+ * that cssContext.ts reads. The groups.json showIf evaluator this file once
+ * held is gone; section visibility lives in the inspector registry.
  *
  * @license BSD-3-Clause
  */
@@ -16,7 +12,7 @@
 // ============================================================================
 
 /**
- * Full inspector context for evaluating showIf conditions
+ * Element-trait context for the current selection
  */
 export interface InspectorContext {
   /** Current element type (text, button, container, etc.) */

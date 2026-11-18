@@ -28,6 +28,11 @@ import { EVENTS } from "@/shared/constants/events";
 import { getDefaultPageName } from "@/shared/utils/pageUtils";
 import { BK_LABEL_CLASS, Button, Checkbox, Label, Modal, TextInput, useToast } from "@/editor/chrome-ui";
 import { usePageCapacity, type PageCapacity } from "../usePageCapacity";
+import { getSiteIdFromUrl, hasProjectLoaded } from "@/services/BuildrikSyncProvider";
+
+/** Why page creation waits (REA #13): `importProject` replaces the whole page
+ *  set when the load lands, so a page added before it is wiped with no undo. */
+export const PAGES_LOADING_REASON = "You can add a page once the site has finished loading.";
 
 type Source = "blank" | "template";
 
@@ -56,6 +61,11 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
     /* A plain request starts fresh; Templates' "‹ Back to New page" / Change
        (104:28892) hands back what the dialog had, from template. */
     const onRequest = (data?: { name?: string; addToNavigation?: boolean }) => {
+      const siteId = getSiteIdFromUrl();
+      if (siteId && !hasProjectLoaded(siteId)) {
+        addToast({ title: "Pages are still loading", description: PAGES_LOADING_REASON, tone: "warning" });
+        return;
+      }
       setName(data?.name ?? getDefaultPageName(composer.elements.getAllPages()));
       setSource(data?.name ? "template" : "blank");
       setAddToNav(data?.addToNavigation ?? true);
@@ -66,7 +76,7 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
     return () => {
       composer.off(EVENTS.UI_NEW_PAGE_REQUESTED, onRequest);
     };
-  }, [composer]);
+  }, [composer, addToast]);
 
 
   const create = () => {

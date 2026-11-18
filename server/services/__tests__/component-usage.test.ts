@@ -17,7 +17,7 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
-import { listWorkspaceComponents, getComponentUsage } from "@server/services/site-component.service";
+import { listWorkspaceComponents } from "@server/services/site-component.service";
 
 beforeEach(() => {
   findMany.mockReset();
@@ -47,32 +47,5 @@ describe("listWorkspaceComponents (C1)", () => {
   it("returns [] when the workspace has no components", async () => {
     findMany.mockResolvedValueOnce([]);
     expect(await listWorkspaceComponents("w1", "u1")).toEqual([]);
-  });
-});
-
-describe("getComponentUsage (C1 jump-to / C3 blast-radius)", () => {
-  it("returns the sites carrying a master with a count", async () => {
-    findMany.mockResolvedValueOnce([
-      { siteId: "s1", updatedAt: new Date("2026-06-22"), site: { name: "bloomcafe.com" } },
-      { siteId: "s2", updatedAt: new Date("2026-06-21"), site: { name: "cobalt.io" } },
-    ]);
-    const res = await getComponentUsage("w1", "card");
-    expect(res.componentId).toBe("card");
-    expect(res.siteCount).toBe(2);
-    expect(res.sites).toEqual([
-      { siteId: "s1", siteName: "bloomcafe.com", updatedAt: new Date("2026-06-22") },
-      { siteId: "s2", siteName: "cobalt.io", updatedAt: new Date("2026-06-21") },
-    ]);
-    expect(findMany.mock.calls[0][0].where).toEqual({
-      componentId: "card",
-      site: { workspaceId: "w1", deletedAt: null },
-    });
-  });
-
-  it("reports zero usage for an unused master", async () => {
-    findMany.mockResolvedValueOnce([]);
-    const res = await getComponentUsage("w1", "ghost");
-    expect(res.siteCount).toBe(0);
-    expect(res.sites).toEqual([]);
   });
 });

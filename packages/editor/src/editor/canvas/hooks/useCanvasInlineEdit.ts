@@ -10,12 +10,11 @@ import type { Composer } from "@/engine";
 import { getElementId } from "@/shared/utils/dragDrop";
 import { sanitizeHTML } from "@/shared/utils/html";
 import { EVENTS } from "@/shared/constants";
-import { canWrite } from "@/engine/commands/commandOperations";
+import { canWrite, writeElement } from "@/engine/commands/commandOperations";
 
 export interface EditingState {
   id: string | null;
   original: string;
-  rect: { top: number; left: number; width: number; height: number } | null;
 }
 
 export interface UseCanvasInlineEditOptions {
@@ -68,7 +67,6 @@ export function useCanvasInlineEdit({
   const [editing, setEditing] = React.useState<EditingState>({
     id: null,
     original: "",
-    rect: null,
   });
 
   /** Start editing this canvas node if it is editable text; false if not. */
@@ -93,21 +91,10 @@ export function useCanvasInlineEdit({
       if (composer && !canWrite(composer, id)) return false;
 
       const original = editableEl.innerHTML;
-      const domRect = editableEl.getBoundingClientRect();
-      const canvasRect = canvasRef.current?.getBoundingClientRect();
-      // Get position relative to canvas wrapper
-      const rect = canvasRect
-        ? {
-            top: domRect.top - canvasRect.top,
-            left: domRect.left - canvasRect.left,
-            width: domRect.width,
-            height: domRect.height,
-          }
-        : null;
-      setEditing({ id, original, rect });
+      setEditing({ id, original });
       return true;
     },
-    [canvasRef, composer]
+    [composer]
   );
 
   // Handle double-click to start inline editing
@@ -168,14 +155,16 @@ export function useCanvasInlineEdit({
         // contentEditable can hold pasted/typed markup — sanitize before it
         // is persisted into the element tree and re-rendered onto the canvas.
         const newHtml = sanitizeHTML(el.innerHTML);
-        if (newHtml !== editing.original) {
-          composer.beginTransaction("inline-edit");
-          try {
-            const element = composer.elements.getElement(editing.id!);
-            element?.setContent?.(newHtml);
-          } finally {
-            composer.endTransaction();
-          }
+        /* REA #12: the lock is asked again at commit — one applied mid-edit
+           (another door, a collaborator) refuses the write through the one
+           lock gate, and the canvas text goes back to what it was. */
+        const written =
+          newHtml !== editing.original &&
+          writeElement(composer, composer.elements.getElement(editing.id!), "inline-edit", (element) =>
+            element.setContent?.(newHtml, "html"),
+          );
+        if (newHtml !== editing.original && !written) el.innerHTML = editing.original;
+        if (written) {
           /* The one signal that says "the user edited text on the canvas".
              EVENTS.ELEMENT_EDIT_INLINE existed as a constant with no
              emitter, so the onboarding step that asks for exactly this
@@ -192,7 +181,7 @@ export function useCanvasInlineEdit({
       } finally {
         el.contentEditable = "false";
         el.draggable = true;
-        setEditing({ id: null, original: "", rect: null });
+        setEditing({ id: null, original: "" });
       }
     };
 
@@ -203,8 +192,10 @@ export function useCanvasInlineEdit({
          focus itself — the edit stays open and is not refocused. */
       if (relatedTarget?.closest(".bd-inline-keep, [data-testid='rte-link-dialog']")) return;
       if (relatedTarget?.closest(".bd-inline-toolbar")) {
-        // Re-focus the contentEditable element after toolbar interaction
-        setTimeout(() => el.focus(), 0);
+        /* Re-focus the contentEditable element after toolbar interaction —
+           except into a toolbar text field (the link URL), which must keep
+           focus so the URL is typed there, not over the selection. */
+        if (!relatedTarget.matches("input, textarea, select")) setTimeout(() => el.focus(), 0);
         return;
       }
       finishEdit();

@@ -20,10 +20,14 @@ import { ALLOWED_HEAD_TAGS } from "@/shared/constants/headCode";
 const warnings = (code: string) => validateHtml(code).warnings.join(" | ");
 
 describe("validateHtml — export policy", () => {
-  it("warns that an inline script never reaches the published page", () => {
-    expect(warnings("<script>track()</script>")).toMatch(
-      /Inline <script> is removed when the site is published/
-    );
+  /* REA #27: the site's inline scripts now ship to the published site and the
+     ZIP — but never run inside the editor or its Preview. Said where the code
+     is typed, so a widget that "does nothing" in Preview is not a surprise. */
+  it("says an inline script runs on the published site only, not in the editor or Preview", () => {
+    const w = warnings("<script>track()</script>");
+    expect(w).toMatch(/Inline <script> runs on the published site/);
+    expect(w).toMatch(/not in the editor or Preview/);
+    expect(w).not.toMatch(/removed when the site is published/);
   });
 
   it("says nothing about a script that loads from a src", () => {

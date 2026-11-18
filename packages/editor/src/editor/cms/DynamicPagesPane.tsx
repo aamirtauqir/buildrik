@@ -214,26 +214,35 @@ export function DynamicPagesPane({ composer, collection, records, onOpenPage, on
   const save = async () => {
     if (!composer || unknown.length || patternProblem || seoUnknown.length) return;
     setSaving(true);
+    /* C-6: a refused save used to end in silence (try/finally, no catch). */
+    let saved = false;
     try {
       /* Empty clears the binding rather than storing "" — a collection with
          no pattern is one that generates nothing, and both are optional. */
-      await composer.cms.collections.updateCollection(collection.id, {
-        pageSlugPattern: trimmed || undefined,
-        pageTemplatePath: template || undefined,
-        pageSeoTitle: seoTitle.trim() || undefined,
-        pageSeoDescription: seoDescription.trim() || undefined,
-        pageSocialImage: socialImage || undefined,
-      });
-      addToast({
-        tone: "success",
-        title: "Dynamic pages saved",
-        description: ready
-          ? `${collection.name} generates ${published.length} page${published.length === 1 ? "" : "s"} on the next publish.`
-          : `${collection.name} · nothing is generated until the pattern, template and a published record are all in place.`,
-      });
+      saved =
+        (await composer.cms.collections.updateCollection(collection.id, {
+          pageSlugPattern: trimmed || undefined,
+          pageTemplatePath: template || undefined,
+          pageSeoTitle: seoTitle.trim() || undefined,
+          pageSeoDescription: seoDescription.trim() || undefined,
+          pageSocialImage: socialImage || undefined,
+        })) !== null;
+    } catch {
+      saved = false;
     } finally {
       setSaving(false);
     }
+    if (!saved) {
+      addToast({ tone: "error", title: "Could not save dynamic pages", description: `${collection.name}'s pattern and template are unchanged. Try again.` });
+      return;
+    }
+    addToast({
+      tone: "success",
+      title: "Dynamic pages saved",
+      description: ready
+        ? `${collection.name} generates ${published.length} page${published.length === 1 ? "" : "s"} on the next publish.`
+        : `${collection.name} · nothing is generated until the pattern, template and a published record are all in place.`,
+    });
   };
 
   /* 165:3693 / 4418:164278: what is wrong with the URL pattern is said under

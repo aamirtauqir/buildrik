@@ -34,6 +34,18 @@ describe("composeTransform", () => {
   });
 });
 
+describe("composeTransform · functions the sliders do not own", () => {
+  it("keeps translate(-50%, -50%) when rotate is edited", () => {
+    expect(composeTransform("translate(-50%, -50%)", "rotate", "45deg")).toBe("translate(-50%, -50%) rotate(45deg)");
+  });
+
+  it("keeps a filter's drop-shadow (nested parentheses) when blur is edited", () => {
+    expect(composeFilter("drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5)) blur(2px)", "blur", "8px")).toBe(
+      "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5)) blur(8px)"
+    );
+  });
+});
+
 describe("composeFilter", () => {
   it("keeps brightness when editing blur (canonical order)", () => {
     const after = composeFilter("brightness(120%)", "blur", "4px");

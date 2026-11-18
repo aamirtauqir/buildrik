@@ -70,10 +70,18 @@ describe("LoadErrorBanner — cause and copy", () => {
   });
 
   it("a deleted site offers the dashboard, not a Retry that cannot work, and no 'no trash' line", () => {
-    renderBanner({ kind: "missing" });
+    const onSignIn = vi.fn();
+    const assign = vi.fn();
+    vi.stubGlobal("location", { ...window.location, assign });
+    renderBanner({ kind: "missing", onSignIn });
     expect(screen.queryByRole("button", { name: /^retry$/i })).toBeNull();
-    expect(screen.getByRole("button", { name: /go to dashboard/i })).toBeInTheDocument();
     expect(screen.queryByText(/no trash/i)).toBeNull();
+    /* "Go to dashboard" goes to the dashboard, not the session-expired
+       sign-in page (R1 S-1): the user lost the site, not the session. */
+    fireEvent.click(screen.getByRole("button", { name: /go to dashboard/i }));
+    expect(assign).toHaveBeenCalledWith(expect.stringMatching(/\/dashboard$/));
+    expect(onSignIn).not.toHaveBeenCalled();
+    vi.unstubAllGlobals();
   });
 
   it("no access offers Back to dashboard and no Retry, in the warning tone", () => {

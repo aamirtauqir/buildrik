@@ -269,6 +269,23 @@ describe("Form › FIELDS (2L9 156:716)", () => {
       expect(composer.elements.getElement("email")?.getAttribute("value")).toBe("Ada");
     });
   });
+
+  /* BK-44: the name came from the field count, so a field added after a
+     delete repeated an existing name and the two answers merged into one. */
+  it("+ Add field never repeats a name already in the form", () => {
+    const composer = project([{ id: "f", type: "form", tagName: "form", children: [
+      input("a", "text", "A", { name: "field-2" }),
+      input("b", "text", "B", { name: "field-3" }),
+    ] }]);
+    render(<FormFieldsSection elementId="f" composer={composer} isOpen />);
+    for (let i = 0; i < 2; i++) {
+      fireEvent.click(screen.getByTestId("form-add-field"));
+      act(() => { fireEvent.click(screen.getByTestId("form-add-field-input")); });
+      composer.selection.select(composer.elements.getElement("f")!);
+    }
+    const names = composer.elements.getElement("f")!.getChildren().map((el) => el.getAttribute("name"));
+    expect(names).toEqual(["field-2", "field-3", "field-4", "field-5"]);
+  });
 });
 
 describe("Slider › SLIDES", () => {

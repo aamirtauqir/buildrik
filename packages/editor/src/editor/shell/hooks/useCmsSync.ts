@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { ToastInput, dismissToast } from "@/editor/chrome-ui";
+import { ToastInput, dismissToast, dismissToastKey } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
 import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
@@ -24,6 +24,8 @@ import {
   retryCmsSync,
   bindCmsEngine,
   consumeDirectSync,
+  onCmsHydrationChange,
+  retryCmsHydration,
 } from "@/services/cmsSync";
 
 export function useCmsSync(
@@ -47,6 +49,24 @@ export function useCmsSync(
        C0.5: first replay what an earlier load left in the outbox, so a change
        that never reached the server goes up before the server's copy is
        read (hydration also leaves any row still in the outbox alone). */
+    /* C-8: with collections already on screen the Content panel shows no
+       error state, so a failed hydrate said nothing while the list could be
+       out of date. (With none, the panel's own load-error state answers.) */
+    const HYDRATE_TOAST_KEY = "cms-hydrate-failed";
+    const offHydration = addToast
+      ? onCmsHydrationChange((status) => {
+          if (status === "ready") return dismissToastKey(HYDRATE_TOAST_KEY);
+          if (status !== "error" || cm.getAllCollections().length === 0) return;
+          addToast({
+            key: HYDRATE_TOAST_KEY,
+            title: "Couldn't refresh collections",
+            description: "You're seeing this browser's copy, which may be out of date.",
+            tone: "warning",
+            action: { label: "Try again", onClick: () => void retryCmsHydration() },
+          });
+        })
+      : undefined;
+
     void flushCmsOutbox()
       .then(() => hydrateCmsFromServer())
       .then(() => cm.refreshFromStorage());
@@ -206,6 +226,7 @@ export function useCmsSync(
       offConflict?.();
       offGone?.();
       offInvalid?.();
+      offHydration?.();
       bindCmsEngine(null);
     };
   }, [composer, addToast]);

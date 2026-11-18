@@ -43,7 +43,7 @@ function engine() {
     getDataBindings: () => ({}),
     removeDataBinding: () => {},
   });
-  (e.composer.cms.collections as unknown as { updateField: unknown }).updateField = vi.fn(() => Promise.resolve(null));
+  (e.composer.cms.collections as unknown as { updateField: unknown }).updateField = vi.fn((_c: string, id: string) => Promise.resolve({ id }));
   return e;
 }
 
@@ -147,6 +147,14 @@ describe("FieldInspector", () => {
     fireEvent.click(screen.getByTestId("cms-fi-save"));
     fireEvent.click(screen.getByTestId("cms-required-confirm"));
     expect(updateField).toHaveBeenCalledWith("col-1", "f3", { validation: { required: true } });
+  });
+
+  it("C-6: a refused save is said under the field, not dropped", async () => {
+    const { updateField } = mount(1);
+    updateField.mockRejectedValueOnce(new Error("quota"));
+    fireEvent.change(screen.getByTestId("cms-fi-name"), { target: { value: "Cost" } });
+    fireEvent.click(screen.getByTestId("cms-fi-save"));
+    expect(await screen.findByTestId("cms-fi-save-error")).toHaveTextContent("Could not save that change");
   });
 
   /* 165:2917 — edits wait for Save field. */

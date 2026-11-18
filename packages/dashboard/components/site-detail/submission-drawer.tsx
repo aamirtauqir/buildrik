@@ -11,7 +11,8 @@ export interface FormSubmissionData {
   siteId: string;
   data: Record<string, string>;
   sourceUrl: string | null;
-  ip: string | null;
+  /** D7: present only for ADMIN and above on the site — absent, not unknown, below. */
+  ip?: string | null;
   isRead: boolean;
   isSpam: boolean;
   isArchived: boolean;
@@ -198,7 +199,7 @@ export function SubmissionDrawer({
               label="Source URL"
               value={submission.sourceUrl ?? "Unknown"}
             />
-            <MetaRow label="IP Address" value={maskIp(submission.ip)} />
+            {"ip" in submission && <MetaRow label="IP Address" value={maskIp(submission.ip ?? null)} />}
           </div>
 
           {/* Toggles */}

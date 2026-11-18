@@ -193,7 +193,7 @@ describe("PublishTab — only a fail blocks the publish", () => {
 describe("PublishTab — fix affordances match severity and ownership", () => {
   /* Board 893:4518 — the connection is the blocker, and the checklist is what
      explains it. An earlier pass routed this to board 784:4480 (the panel's
-     "Connect Vercel to publish." state) instead, which reads fine on its own
+     no-publish-path state) instead, which reads fine on its own
      and quietly made 893:4518 unreachable. 784:4480 is the panel with no
      publish path wired at all; this is a wired publish blocked on a missing
      account. Two boards, two states. */

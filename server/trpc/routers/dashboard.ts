@@ -12,15 +12,12 @@ interface WorkspaceCtx {
 }
 import {
   getDashboardStats,
-  getRecentSites,
   getActivityFeed,
   getWorkspaceHealth,
-  getQuickActions,
   getAttentionQueue,
 } from "@/server/services/dashboard.service";
 import { getWorkspaceUsage } from "@/server/services/usage.service";
 import { getPartnerDashboard } from "@/server/services/partner.service";
-import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 
 async function getWorkspaceMember(ctx: WorkspaceCtx) {
   if (!ctx.session?.user) throw new TRPCError({ code: "UNAUTHORIZED" });
@@ -45,11 +42,6 @@ export const dashboardRouter = router({
   stats: protectedProcedure.query(async ({ ctx }) => {
     const member = await getWorkspaceMember(ctx);
     return getDashboardStats(member.workspaceId, ctx.session!.user!.id, member.role);
-  }),
-
-  recentSites: protectedProcedure.query(async ({ ctx }) => {
-    const member = await getWorkspaceMember(ctx);
-    return getRecentSites(member.workspaceId, ctx.session!.user!.id);
   }),
 
   attentionQueue: protectedProcedure.query(async ({ ctx }) => {
@@ -95,32 +87,4 @@ export const dashboardRouter = router({
     return getPartnerDashboard(member.workspaceId);
   }),
 
-  quickActions: protectedProcedure.query(async ({ ctx }) => {
-    const member = await ctx.prisma.workspaceMember.findFirst({
-      where: { userId: ctx.session.user.id },
-      include: { workspace: { select: { plan: true } } },
-    });
-    if (!member) throw new TRPCError({ code: "NOT_FOUND", message: "No workspace found" });
-
-    const [siteCount, subscription, pendingInvites] = await Promise.all([
-      ctx.prisma.site.count({ where: { workspaceId: member.workspaceId } }),
-      ctx.prisma.subscription.findUnique({
-        where: { workspaceId: member.workspaceId },
-        select: { status: true },
-      }),
-      ctx.prisma.invite.count({
-        where: { workspaceId: member.workspaceId, status: "PENDING" },
-      }),
-    ]);
-
-    const plan = member.workspace.plan as PlanName;
-    const limits = PLAN_LIMITS[plan];
-
-    return getQuickActions({
-      siteCount,
-      hasPendingInvites: pendingInvites > 0,
-      isNearLimit: siteCount / (limits.sites as number) >= 0.8,
-      isDunning: subscription?.status === "PAST_DUE",
-    });
-  }),
 });

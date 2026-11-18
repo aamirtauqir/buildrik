@@ -19,7 +19,7 @@ async function loadRuntimeEnv() {
 const READ_KEYS = [
   "VITE_DASHBOARD_URL", "NEXT_PUBLIC_APP_URL",
   "VITE_SENTRY_DSN", "NEXT_PUBLIC_SENTRY_DSN",
-  ...["PUBLISH", "DS_AI", "COLLAB"].flatMap((n) => [
+  ...["PUBLISH", "DS_AI", "COLLAB", "CMS_DATA_SOURCES"].flatMap((n) => [
     `VITE_FEATURE_${n}`, `NEXT_PUBLIC_FEATURE_${n}`,
   ]),
 ];
@@ -72,6 +72,7 @@ describe("feature flags — exact 'true' string gating", () => {
     expect(env.FEATURE_PUBLISH).toBe(false);
     expect(env.FEATURE_DS_AI).toBe(false);
     expect(env.FEATURE_COLLAB).toBe(false);
+    expect(env.FEATURE_CMS_DATA_SOURCES).toBe(false);
   });
 
   it("enable only on the exact lowercase string 'true'", async () => {
@@ -94,5 +95,16 @@ describe("feature flags — exact 'true' string gating", () => {
     vi.stubEnv("NEXT_PUBLIC_FEATURE_COLLAB", "true");
     const env = await loadRuntimeEnv();
     expect(env.FEATURE_COLLAB).toBe(true);
+  });
+
+  /* BD-39 (8): hidden by default; the shipping (Next) bundle reads the
+     NEXT_PUBLIC_ half. */
+  it("reads CMS data sources from either half of the pair", async () => {
+    vi.stubEnv("NEXT_PUBLIC_FEATURE_CMS_DATA_SOURCES", "true");
+    expect((await loadRuntimeEnv()).FEATURE_CMS_DATA_SOURCES).toBe(true);
+    vi.resetModules();
+    vi.stubEnv("NEXT_PUBLIC_FEATURE_CMS_DATA_SOURCES", undefined as unknown as string);
+    vi.stubEnv("VITE_FEATURE_CMS_DATA_SOURCES", "true");
+    expect((await loadRuntimeEnv()).FEATURE_CMS_DATA_SOURCES).toBe(true);
   });
 });

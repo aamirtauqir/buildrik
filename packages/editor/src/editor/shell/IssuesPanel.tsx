@@ -18,8 +18,8 @@
  */
 
 import * as React from "react";
-import { CheckCircle2, X } from "lucide-react";
-import { PanelHeader, Button, IconButton, EmptyState, Spinner } from "@/editor/chrome-ui";
+import { CheckCircle2, MoreHorizontal, X } from "lucide-react";
+import { PanelHeader, Button, IconButton, EmptyState, Spinner, Menu, MenuItem, Popover } from "@/editor/chrome-ui";
 import { issueAppliesToPage, type Issue } from "./hooks/useStudioState";
 import { publishTray } from "./publishTrayStore";
 
@@ -79,6 +79,16 @@ export interface IssuesPanelProps {
   scanState?: "idle" | "scanning" | "error";
   /** Re-run the scan — the scan-failed banner's "Try again". */
   onRescan?: () => void;
+  /** Possible damage (design decision 8): apply the row's `after`. False = the
+   *  text changed since the scan, and nothing was written. */
+  onDamageFix?: (issue: Issue) => boolean;
+  /** "Keep as written" / dismiss a "Couldn't verify" row. */
+  onDamageKeep?: (issue: Issue) => void;
+  /** VIEWER / view mode: damage rows are read-only ("An editor can fix this."). */
+  damageReadOnly?: boolean;
+  /** BD-39 (6): a no-H1 row's "Make this H1" — re-level the page's first
+   *  heading. False = no heading could be (none, or locked). */
+  onMakeH1?: (issue: Issue) => boolean;
 }
 
 type Filter = "all" | "error" | "warning";
@@ -161,7 +171,13 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
   suppressedTokenIds = [],
   scanState = "idle",
   onRescan,
+  onDamageFix,
+  onDamageKeep,
+  damageReadOnly = false,
+  onMakeH1,
 }) => {
+  const [h1Failed, setH1Failed] = React.useState(false);
+  const [damageMenu, setDamageMenu] = React.useState<string | null>(null);
   const [filter, setFilter] = React.useState<Filter>("all");
   // T10 page scope. Defaults to "page" — "what's wrong with what I'm looking
   // at" is the question the panel opens to answer. Site-wide issues pass the
@@ -170,6 +186,7 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
   const [fixing, setFixing] = React.useState<Issue | null>(null);
   const [failed, setFailed] = React.useState<Issue | null>(null);
   const [altOpen, setAltOpen] = React.useState(false);
+  const canMakeH1 = (i: Issue) => i.contentKind === "missing-h1" && !!onMakeH1 && !damageReadOnly;
   const scoped = scope === "page" ? issues.filter((i) => issueAppliesToPage(i, activePageId)) : issues;
 
   const runFix = async (issue: Issue) => {
@@ -193,10 +210,13 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
   const visible = (filter === "all" ? scoped : scoped.filter((i) => i.type === filter))
     .slice()
     .sort((a, b) => Number(b.type === "error") - Number(a.type === "error"));
+  /* "Couldn't verify" rows are their own group, after the rest (decision 8). */
+  const unverified = visible.filter((i) => i.damage?.kind === "unverified-styles");
+  const listed = visible.filter((i) => i.damage?.kind !== "unverified-styles");
   /* Play C02 (353:24569, list row on F4.01 303:32296): two or more images
      without alt text are ONE card — "2 images have no alt text" with their
      places — whose Fix › opens "Images missing alt text" to pick one. */
-  const altIssues = visible.filter((i) => i.contentKind === "missing-alt");
+  const altIssues = listed.filter((i) => i.contentKind === "missing-alt");
   const altGrouped = altIssues.length >= 2;
   const firstAltId = altIssues[0]?.id;
   const filterIndex = FILTERS.findIndex((f) => f.key === filter);
@@ -345,7 +365,19 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
             </div>
           )}
 
-          {failed && (
+          {h1Failed && (
+            <div className={`${BAND} tw:bg-[var(--bk-warning-tint)]`} role="alert" data-testid="issues-h1-failed">
+              <div className="tw:text-xs tw:text-[var(--bk-error-text)]">
+                No heading on this page could be made H1. Add a Heading, or unlock the first one.
+              </div>
+            </div>
+          )}
+          {failed?.damage && (
+            <div className={`${BAND} tw:bg-[var(--bk-warning-tint)]`} role="alert" data-testid="issues-damage-failed">
+              <div className="tw:text-xs tw:text-[var(--bk-error-text)]">This text changed since the check. Nothing was replaced.</div>
+            </div>
+          )}
+          {failed && !failed.damage && (
             <div className={`${BAND} tw:bg-[var(--bk-warning-tint)]`} role="alert">
               <div className="tw:text-xs tw:text-[var(--bk-error-text)]">Couldn&apos;t fix this automatically.</div>
               <div className="tw:text-[11px] tw:font-medium tw:text-[var(--bk-ink-muted)] tw:leading-[1.45] tw:mt-1.5">
@@ -378,7 +410,8 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
                 title={`No ${filter === "error" ? "errors" : "warnings"}`}
               />
             ) : (
-              visible.map((i, idx) => {
+              <>
+              {listed.map((i, idx) => {
                 if (altGrouped && i.contentKind === "missing-alt") {
                   if (i.id !== firstAltId) return null;
                   return (
@@ -426,7 +459,8 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
                       disabled={!locatable}
                       onClick={() => onSelectElement?.(i)}
                       data-testid={`issue-message-${idx}`}
-                      title={i.message}
+                      /* A damage card's second line is its preview, so its place rides here. */
+                      title={i.damage && i.location ? `${i.message} · ${i.location}` : i.message}
                     >
                       <span className="tw:block tw:text-left">
                         <span aria-hidden="true" data-testid={`issue-dot-${idx}`} className={GLYPH[i.type]}>
@@ -438,12 +472,66 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
                         {i.message}
                       </span>
                     </Button>
-                    {i.location ? (
+                    {i.damage?.kind === "escaped-text" ? (
+                      /* Decision 8A: the card shows what Fix would do. */
+                      <p
+                        className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]"
+                        title={`${i.damage.before} → ${i.damage.after}`}
+                        data-testid={`issue-damage-preview-${idx}`}
+                      >
+                        {i.damage.before} → {i.damage.after}
+                        {damageReadOnly ? " · An editor can fix this." : ""}
+                      </p>
+                    ) : i.location ? (
                       <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]" data-testid={`issue-location-${idx}`}>
                         {i.location}
                       </p>
                     ) : null}
-                    {autoFix || exact ? (
+                    {i.damage?.kind === "escaped-text" && !damageReadOnly ? (
+                      <div className="tw:mt-1 tw:mb-0.5 tw:flex tw:items-center tw:gap-1">
+                        <Button
+                          color="light"
+                          size="xs"
+                          className={FIX_BTN}
+                          data-testid={`issue-damage-fix-${idx}`}
+                          onClick={() => {
+                            if (onDamageFix && !onDamageFix(i)) setFailed(i);
+                          }}
+                        >
+                          Fix ›
+                        </Button>
+                        <Popover
+                          open={damageMenu === i.id}
+                          onClose={() => setDamageMenu(null)}
+                          placement="bottom-end"
+                          label="More for this issue"
+                          trigger={
+                            <IconButton
+                              label="More for this issue"
+                              className="tw:h-6 tw:w-6"
+                              data-testid={`issue-damage-more-${idx}`}
+                              aria-haspopup="menu"
+                              aria-expanded={damageMenu === i.id}
+                              onClick={() => setDamageMenu((m) => (m === i.id ? null : i.id))}
+                            >
+                              <MoreHorizontal size={14} aria-hidden="true" />
+                            </IconButton>
+                          }
+                        >
+                          <Menu label="More for this issue">
+                            <MenuItem
+                              data-testid={`issue-damage-keep-${idx}`}
+                              onClick={() => {
+                                setDamageMenu(null);
+                                onDamageKeep?.(i);
+                              }}
+                            >
+                              Keep as written
+                            </MenuItem>
+                          </Menu>
+                        </Popover>
+                      </div>
+                    ) : autoFix || exact ? (
                       <Button
                         color="light"
                         size="xs"
@@ -455,9 +543,66 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
                         Fix ›
                       </Button>
                     ) : null}
+                    {canMakeH1(i) ? (
+                      <Button
+                        color="light"
+                        size="xs"
+                        className={`tw:mt-1 tw:mb-0.5 ${FIX_BTN}`}
+                        data-testid={`issue-make-h1-${idx}`}
+                        onClick={() => setH1Failed(!onMakeH1!(i))}
+                      >
+                        Make this H1
+                      </Button>
+                    ) : null}
                   </div>
                 );
-              })
+              })}
+              {unverified.length > 0 && (
+                <div data-testid="issues-unverified-group">
+                  <div className="tw:flex tw:h-8 tw:items-center tw:px-4 tw:text-[11px] tw:font-medium tw:text-[var(--bk-ink-muted)]">
+                    Couldn&apos;t verify
+                  </div>
+                  {unverified.map((i, idx) => (
+                    <div
+                      key={i.id}
+                      className="tw:mx-3 tw:mb-1.5 tw:rounded-[var(--bk-radius-sm)] tw:bg-[var(--bk-bg-subtle)] tw:px-2 tw:py-1"
+                      data-testid={`issue-unverified-${idx}`}
+                    >
+                      <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
+                        <span aria-hidden="true" className={GLYPH[i.type]}>! </span>
+                        <span className="tw:sr-only">{SEVERITY_LABEL[i.type]}: </span>
+                        {i.message}
+                      </p>
+                      <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">
+                        {i.location}
+                        {damageReadOnly ? " · An editor can fix this." : ""}
+                      </p>
+                      <div className="tw:mt-1 tw:mb-0.5 tw:flex tw:items-center tw:gap-1">
+                        <Button
+                          color="light"
+                          size="xs"
+                          className={FIX_BTN}
+                          data-testid={`issue-unverified-open-${idx}`}
+                          onClick={() => onSelectElement?.(i)}
+                        >
+                          Open element
+                        </Button>
+                        {!damageReadOnly && (
+                          <IconButton
+                            label="Dismiss"
+                            className="tw:h-6 tw:w-6"
+                            data-testid={`issue-unverified-dismiss-${idx}`}
+                            onClick={() => onDamageKeep?.(i)}
+                          >
+                            <X size={14} aria-hidden="true" />
+                          </IconButton>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              </>
             )}
               {/* F4.05: nothing blocks — the next move is the publish tray. */}
               {!scoped.some((i) => i.type === "error") ? (

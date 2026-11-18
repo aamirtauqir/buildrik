@@ -236,6 +236,30 @@ describe("shortcut guard (shouldHandleShortcut)", () => {
     );
   });
 
+  /* REA #12: the palette's Add rows ran on a read-only composer (and during
+     Time-travel, which sets readOnly) because they were not mutating. */
+  it("run() refuses Add text / Add container on a read-only composer", () => {
+    const { center, composer } = makeCenter();
+    composer.readOnly = true;
+    center.run("add-text");
+    center.run("add-container");
+    expect(composer.emit).not.toHaveBeenCalledWith(EVENTS.ELEMENT_QUICK_ADD, expect.anything());
+  });
+
+  it("blockedReason answers for mutating commands only: read-only, then a full-page surface", () => {
+    const { center, composer } = makeCenter();
+    expect(center.blockedReason("undo")).toBeUndefined();
+    const host = document.createElement("div");
+    host.setAttribute("data-bk-surface", "fullpage");
+    document.body.appendChild(host);
+    expect(center.blockedReason("undo")).toMatch(/full-page/);
+    expect(center.blockedReason("save")).toBeUndefined();
+    expect(center.blockedReason("zoom-in")).toBeUndefined();
+    host.remove();
+    composer.readOnly = true;
+    expect(center.blockedReason("add-text")).toMatch(/read-only/i);
+  });
+
   it("run() still allows a command that changes nothing", () => {
     const { center, composer } = makeCenter();
     composer.readOnly = true;
@@ -279,6 +303,32 @@ describe("shortcut guard (shouldHandleShortcut)", () => {
 
     expect(composer.history.undo).not.toHaveBeenCalled();
     input.remove();
+  });
+
+  // ⌘⇧V in a field is the browser's paste-as-plain-text, not "Paste HTML…" (R1 I-3).
+  it.each([
+    ["an input", () => document.createElement("input")],
+    ["contenteditable", () => {
+      const div = document.createElement("div");
+      div.setAttribute("contenteditable", "true");
+      return div;
+    }],
+  ])("leaves ⌘⇧V to the caret in %s", (_name, make) => {
+    const { composer } = makeCenter();
+    const el = make();
+    document.body.appendChild(el);
+
+    const e = new KeyboardEvent("keydown", { key: "v", ctrlKey: true, shiftKey: true, bubbles: true, cancelable: true });
+    el.dispatchEvent(e);
+
+    expect(composer.emit).not.toHaveBeenCalledWith(EVENTS.UI_PASTE_HTML_REQUESTED);
+    expect(e.defaultPrevented).toBe(false);
+  });
+
+  it("⌘⇧V outside a field still opens Paste HTML", () => {
+    const { composer } = makeCenter();
+    document.body.dispatchEvent(new KeyboardEvent("keydown", { key: "v", ctrlKey: true, shiftKey: true, bubbles: true }));
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_PASTE_HTML_REQUESTED);
   });
 
   // The listener is global, capture-phase, and calls preventDefault(). With the
@@ -404,13 +454,6 @@ describe("destroy", () => {
 });
 
 describe("AUDIT — command registry reachability", () => {
-  it.todo(
-    "AUDIT: registered 'export-html' and 'export-json' commands are unreachable — they have no " +
-      "shortcut field (so KeybindingManager never indexes them) and no UI affordance calls " +
-      "commands.run('export-html') / commands.run('export-json') anywhere in src/editor. " +
-      "Either wire an affordance or delete the registrations.",
-  );
-
   it.todo(
     "AUDIT: CommandPalette (src/editor/shell/modals/CommandPalette.tsx) builds its own hardcoded " +
       "command list (composer.history.undo(), composer.emit(ZOOM_IN), ...) and never reads the " +

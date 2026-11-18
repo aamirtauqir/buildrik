@@ -21,9 +21,20 @@ afterAll(removeEngineBrowserStubs);
 afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
+  document.querySelectorAll("[data-buildrick-id]").forEach((n) => n.remove());
 });
 
-function setup(count: number) {
+/** Stand-ins for the canvas nodes the section measures. */
+function mountCanvasNodes(ids: readonly string[], position: string) {
+  for (const id of ids) {
+    const node = document.createElement("div");
+    node.setAttribute("data-buildrick-id", id);
+    node.style.position = position;
+    document.body.appendChild(node);
+  }
+}
+
+function setup(count: number, position = "absolute") {
   const composer = createTestComposer();
   const page = composer.elements.createPage("Home");
   const ids = Array.from({ length: count }, (_, i) => {
@@ -31,6 +42,7 @@ function setup(count: number) {
     composer.elements.addElement(h, page.root.id);
     return h.getId();
   });
+  mountCanvasNodes(ids, position);
   render(<AlignDistribute composer={composer} selectedIds={ids} />);
   return { composer, ids };
 }
@@ -68,6 +80,14 @@ describe("AlignDistribute — B04", () => {
     expect(screen.getByTestId("inspector-multi-distribute-h")).toBeEnabled();
     fireEvent.click(screen.getByTestId("inspector-multi-distribute-v"));
     expect(spy).toHaveBeenCalledWith(ids, "vertical");
+  });
+
+  it("Align and Distribute are shut, with the reason, while a member is in the normal flow", () => {
+    setup(3, "static");
+    const group = screen.getByRole("group", { name: "Align" });
+    for (const b of within(group).getAllByRole("button")) expect(b).toBeDisabled();
+    expect(screen.getByTestId("inspector-multi-distribute-h")).toBeDisabled();
+    expect(group).toHaveAttribute("title", expect.stringMatching(/positioned elements only/));
   });
 
 });

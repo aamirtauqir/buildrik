@@ -20,11 +20,11 @@ describe("sanitizeHTMLForPreview", () => {
     );
   });
 
-  it("removes script, iframe, object, embed, link, base and form elements", () => {
+  it("removes script, iframe, object, embed, link and base elements", () => {
     const out = sanitizeHTMLForPreview(
       '<div>keep</div><script>alert(1)</script><iframe src="x"></iframe>' +
         '<object data="x"></object><embed src="x"><link rel="stylesheet" href="x">' +
-        '<base href="x"><form action="x"><input></form>'
+        '<base href="x">'
     );
     expect(out).toContain("<div>keep</div>");
     expect(out).not.toContain("<script");
@@ -33,7 +33,21 @@ describe("sanitizeHTMLForPreview", () => {
     expect(out).not.toContain("<embed");
     expect(out).not.toContain("<link");
     expect(out).not.toContain("<base");
-    expect(out).not.toContain("<form");
+  });
+
+  /* REA #18: the form — and every field and button inside it — was removed,
+     so Preview showed a page without its contact form while canvas and the
+     published page both had it. It stays, with nowhere to send. */
+  it("keeps a form and its fields, but with nowhere to submit to", () => {
+    const out = sanitizeHTMLForPreview(
+      '<form action="https://evil.example/x" method="post" target="_top" formaction="x">' +
+        '<input name="email"><button type="submit" formaction="https://evil.example/y">Send</button></form>'
+    );
+    expect(out).toContain("<form");
+    expect(out).toContain('name="email"');
+    expect(out).toContain(">Send</button>");
+    expect(out).not.toContain("evil.example");
+    expect(out).not.toMatch(/\b(action|method|target)=/);
   });
 
   it("strips on* event handler attributes but keeps the element", () => {

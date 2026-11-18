@@ -190,9 +190,6 @@ const WRITES: Array<[string, (f: Fixture) => unknown]> = [
   ["designSystem.setTokens", ({ composer }) => composer.designSystem.setTokens([], "Clear")],
   ["designSystem.setDarkMode", ({ composer }) => composer.designSystem.setDarkMode("auto", "Dark")],
   ["designSystem.applyConnect", ({ composer }) => composer.designSystem.applyConnect([{ key: "k", tokenId: "t" }])],
-  // interactions
-  ["canvas.interactions.addInteraction", ({ composer, heading }) => composer.canvas.interactions.addInteraction(heading.getId(), "click" as never)],
-  ["canvas.interactions.clearInteractions", ({ composer, heading }) => composer.canvas.interactions.clearInteractions(heading.getId())],
   // CMS bindings
   [
     "cms.bindings.bind",

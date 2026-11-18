@@ -153,6 +153,7 @@ export function usePublishSnapshot(
   }, [composer]);
 
   const latest = rows?.[0] ?? null;
+  const previous = rows?.[1] ?? null;
   const lastDeployAt = latest?.completedAt ? new Date(latest.completedAt).getTime() : null;
 
   /* Changes SINCE the last deploy, not the whole undo stack: the section's
@@ -204,7 +205,7 @@ export function usePublishSnapshot(
           isLive: Boolean(publishedUrl),
         }
       : null,
-    previousDeploy: rows?.[1] ? { id: rows[1].id, version: rows[1].version, rollbackable: rows[1].rollbackable } : null,
+    previousDeploy: previous ? { id: previous.id, version: previous.version, rollbackable: previous.rollbackable } : null,
     loading,
     error,
     reload: () => setRetry((n) => n + 1),

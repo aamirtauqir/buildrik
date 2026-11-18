@@ -46,6 +46,7 @@ function readNextEnv(): EnvMap {
       NEXT_PUBLIC_FEATURE_PUBLISH: process.env.NEXT_PUBLIC_FEATURE_PUBLISH,
       NEXT_PUBLIC_FEATURE_DS_AI: process.env.NEXT_PUBLIC_FEATURE_DS_AI,
       NEXT_PUBLIC_FEATURE_COLLAB: process.env.NEXT_PUBLIC_FEATURE_COLLAB,
+      NEXT_PUBLIC_FEATURE_CMS_DATA_SOURCES: process.env.NEXT_PUBLIC_FEATURE_CMS_DATA_SOURCES,
       NODE_ENV: process.env.NODE_ENV,
     };
   } catch {
@@ -97,3 +98,10 @@ export const IS_DEV_BUILD: boolean =
 // not exposed as production-ready until a real OT/CRDT arc lands.
 export const FEATURE_COLLAB: boolean =
   (vite.VITE_FEATURE_COLLAB ?? proc.NEXT_PUBLIC_FEATURE_COLLAB) === "true";
+
+// CMS Data sources (BD-39 (8)): hidden this version. Sources live only in
+// DataManager's in-memory Map — nothing saves them, a reload drops them — so
+// the CMS drawer offers no Sources door unless this is exactly "true". The
+// code stays for when sources get a persisted home.
+export const FEATURE_CMS_DATA_SOURCES: boolean =
+  (vite.VITE_FEATURE_CMS_DATA_SOURCES ?? proc.NEXT_PUBLIC_FEATURE_CMS_DATA_SOURCES) === "true";

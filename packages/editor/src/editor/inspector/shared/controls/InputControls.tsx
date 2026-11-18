@@ -158,6 +158,9 @@ export interface InputWithUnitProps {
    *  of the inline unit select (2L9 I06 161:11006 "Font size unit" — px, em,
    *  rem, %, vw · Cancel). Only the field that passes it changes. */
   unitCardTitle?: string;
+  /** Accept a typed calc() / min() / max() / clamp() / var() as it is
+   *  written (spacing sides, #22). */
+  allowExpression?: boolean;
 }
 
 const NO_UNITS: readonly string[] = [""];
@@ -240,26 +243,60 @@ function splitValue(val: string, units: readonly string[]): { num: string; unit:
      height's "1.5 ×", 7079:79176). */
   const bare = units.includes("") ? "" : "px";
   if (match) return { num: match[1], unit: match[2] || bare };
-  return { num: val, unit: val === "" ? (units[0] ?? "px") : "px" };
+  return { num: val, unit: val === "" ? (units.includes("") ? "" : units[0] ?? "px") : "px" };
+}
+
+/** The unit a bare typed number takes: the field's own, or — over a keyword
+    ("normal", "auto") — unitless where the field offers it (line height's
+    1.5 stays 1.5, never 1.5px), else the first real unit. */
+function numericUnit(unit: string, units: readonly string[]): string {
+  if (!KEYWORDS.has(unit)) return unit;
+  return units.includes("") ? "" : (units.find((u) => !KEYWORDS.has(u)) ?? "px");
 }
 
 const NUMBER = /^-?(\d+\.?\d*|\.\d+)$/;
 
 /**
- * Read what was typed (DD-19): 24 · 24px · 2rem · 50% · auto · a token.
- * A bare number takes the field's current unit. `null` = cannot be read.
+ * A CSS math / variable expression — calc(), min(), max(), clamp(), var() —
+ * complete enough to write: parentheses balanced, something inside, nothing
+ * that could end the declaration. Where the browser can judge the value
+ * (`CSS.supports`), it has the last word.
  */
-export function parseEntry(raw: string, units: readonly string[], currentUnit: string): string | null {
+function isCssExpression(raw: string): boolean {
+  const text = raw.trim();
+  if (!/^(calc|min|max|clamp|var)\(\s*\S[\s\S]*\)$/i.test(text)) return false;
+  if (/[;{}<>"'\\]|url\(/i.test(text)) return false;
+  let depth = 0;
+  for (const ch of text) {
+    if (ch === "(") depth++;
+    else if (ch === ")" && --depth < 0) return false;
+  }
+  if (depth !== 0) return false;
+  return typeof CSS !== "undefined" && typeof CSS.supports === "function" ? CSS.supports("margin-left", text) : true;
+}
+
+/**
+ * Read what was typed (DD-19): 24 · 24px · 2rem · 50% · auto · a token — and,
+ * where the field allows it, a calc() / var() expression, kept as typed
+ * (custom-property names are case-sensitive). A bare number takes the
+ * field's current unit. `null` = cannot be read.
+ */
+export function parseEntry(
+  raw: string,
+  units: readonly string[],
+  currentUnit: string,
+  allowExpression = false,
+): string | null {
   const text = raw.trim().toLowerCase();
   if (text === "") return "";
   if (isTokenVar(raw.trim())) return raw.trim();
+  if (allowExpression && isCssExpression(raw)) return raw.trim();
   if (KEYWORDS.has(text)) return units.includes(text) ? text : null;
   const m = text.match(/^(-?(?:\d+\.?\d*|\.\d+))\s*([a-z%]*)$/);
   if (!m) return null;
   const [, num, typed] = m;
   if (typed) return units.includes(typed) ? `${num}${typed}` : null;
-  const unit = KEYWORDS.has(currentUnit) ? (units.find((u) => !KEYWORDS.has(u)) ?? "px") : currentUnit;
-  return `${num}${unit}`;
+  return `${num}${numericUnit(currentUnit, units)}`;
 }
 
 export const InputWithUnit: React.FC<InputWithUnitProps> = ({
@@ -276,6 +313,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   inherited,
   mixed: mixedProp = false,
   unitCardTitle,
+  allowExpression = false,
 }) => {
   const field = useInspectorField(property);
   const [unitCardOpen, setUnitCardOpen] = React.useState(false);
@@ -317,24 +355,27 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
 
   /* Enter / blur: read the entry. Unreadable → red border + the message, the
      entry stays so it can be corrected, the element keeps its old value. */
-  const commit = () => {
-    if (field.readOnly || (mixed && text === "")) return;
+  /* Returns the value the property holds once the entry is read, or null
+     when nothing was committed (read-only, unreadable). */
+  const commit = (): string | null => {
+    if (field.readOnly || (mixed && text === "")) return null;
     /* Untouched is not an entry. A token-bound size shows the number it
        resolves to, so reading that back on blur wrote "24px" over the token —
        which is also what undid an Escape the moment focus left. */
-    if (text === shown && !invalid) return;
-    const parsed = parseEntry(text, units, unit);
+    if (text === shown && !invalid) return value;
+    const parsed = parseEntry(text, units, unit, allowExpression);
     /* A negative where CSS takes none is refused like any other bad entry. */
     const next = parsed !== null && property && NON_NEGATIVE.has(property) && parsed.startsWith("-") ? null : parsed;
     if (next === null) {
       setInvalid(true);
-      return;
+      return null;
     }
     setInvalid(false);
     /* Emptied = clear the property (DD-19, P-11d); an empty field left empty
        writes nothing. */
-    if (next === "" && value === "") return;
+    if (next === "" && value === "") return value;
     if (next !== value) onChange(next);
+    return next;
   };
 
   const step = (delta: number) => {
@@ -360,7 +401,10 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
       }
       restore();
     } else if (e.key === "Enter") {
-      commit();
+      /* Enter commits: Escape now cancels only what is typed after it, so it
+         never reverts a saved value (REA 2026-10-20 P0-1). */
+      const committed = commit();
+      if (committed !== null) atFocusRef.current = committed;
     }
   };
 
@@ -402,8 +446,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
           /* A plain number is written as it is typed (live on the canvas);
              anything else waits for Enter / blur to be read. */
           if (!field.readOnly && NUMBER.test(next.trim())) {
-            const unitNow = KEYWORDS.has(unit) ? (units.find((u) => !KEYWORDS.has(u)) ?? "px") : unit;
-            onChange(`${next.trim()}${unitNow}`);
+            onChange(`${next.trim()}${numericUnit(unit, units)}`);
           }
         }}
         onFocus={() => {

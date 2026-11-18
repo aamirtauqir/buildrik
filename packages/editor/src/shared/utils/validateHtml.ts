@@ -68,14 +68,16 @@ export function validateHtml(code: string): HtmlValidationResult {
   }
 
   /* The export sanitizer's allowlist, reported here instead of at publish
-     time. This validator used to answer "✓ HTML looks good" for an inline
-     <script> — the one form that is guaranteed NOT to reach the published
-     page — and for any tag outside the allowlist, all of which are dropped
-     silently. Same list, one source: shared/constants/headCode. */
+     time. This validator used to answer "✓ HTML looks good" for any tag
+     outside the allowlist, all of which are dropped silently. Same list, one
+     source: shared/constants/headCode.
+     An inline <script> in the site's code ships to the published site and the
+     ZIP (REA #27) but is kept inert inside the app, so a widget that does
+     nothing in Preview is expected — said here, where it is typed. */
   const inlineScript = /<script(?![^>]*\bsrc\s*=)[^>]*>/i.test(code);
   if (inlineScript) {
     warnings.push(
-      "Inline <script> is removed when the site is published — load the code from a file with <script src=\"…\"> instead"
+      "Inline <script> runs on the published site and in the ZIP export — not in the editor or Preview"
     );
   }
 

@@ -356,3 +356,34 @@ describe("InputWithUnit — unit card (I06)", () => {
     expect(screen.getByRole("combobox", { name: /unit/ })).toBeInTheDocument();
   });
 });
+
+describe("InputWithUnit — unitless line height stays unitless", () => {
+  const units = ["px", "", "em", "%", "normal"];
+  it.each(["normal", ""])("typing 1.5 over %j writes 1.5, not 1.5px", (value) => {
+    const { onChange, input } = renderInput({ label: "Line height", value, units });
+    fireEvent.change(input, { target: { value: "1.5" } });
+    expect(onChange).toHaveBeenLastCalledWith("1.5");
+    fireEvent.keyDown(input, { key: "Enter" });
+    expect(onChange).toHaveBeenLastCalledWith("1.5");
+  });
+});
+
+/* #22: spacing sides take a calc() / var() as typed; other fields do not. */
+describe("InputWithUnit — allowExpression (spacing sides)", () => {
+  it("writes a typed calc() where allowed, flags it where not", () => {
+    const allowed = renderInput({ label: "Padding top", value: "4px", allowExpression: true });
+    fireEvent.change(allowed.input, { target: { value: "calc(1rem + 2px)" } });
+    fireEvent.keyDown(allowed.input, { key: "Enter" });
+    expect(allowed.onChange).toHaveBeenLastCalledWith("calc(1rem + 2px)");
+    cleanup();
+    const plain = renderInput({ label: "Padding top", value: "4px" });
+    fireEvent.change(plain.input, { target: { value: "calc(1rem + 2px)" } });
+    fireEvent.keyDown(plain.input, { key: "Enter" });
+    expect(plain.onChange).not.toHaveBeenCalledWith("calc(1rem + 2px)");
+  });
+
+  it("parseEntry refuses an unbalanced or declaration-ending expression", () => {
+    expect(parseEntry("calc(1rem + 2px", ["px"], "px", true)).toBeNull();
+    expect(parseEntry("calc(1px); color: red", ["px"], "px", true)).toBeNull();
+  });
+});

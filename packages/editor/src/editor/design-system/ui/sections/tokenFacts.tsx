@@ -117,7 +117,7 @@ export function TokenUsageList({ composer, usageRefs }: { composer: Composer | n
 }
 
 /** "△ issue · Auto-fix · Ignore", or "✓ Brand checks pass · {contrast}". */
-export function TokenChecksLine({ issue, contrast, onAutoFix, onIgnore }: { issue: LintIssue | undefined; contrast: string | null; onAutoFix: () => void; onIgnore: () => void }) {
+export function TokenChecksLine({ issue, contrast, autoFixFailed = false, onAutoFix, onIgnore }: { issue: LintIssue | undefined; contrast: string | null; autoFixFailed?: boolean; onAutoFix: () => void; onIgnore: () => void }) {
   return (
     <div className="tw:mt-1 tw:flex tw:min-h-6 tw:flex-col tw:justify-center tw:gap-1.5">
         {issue ? (
@@ -146,6 +146,11 @@ export function TokenChecksLine({ issue, contrast, onAutoFix, onIgnore }: { issu
             >
               Ignore
             </Button>
+            {autoFixFailed && (
+              <span role="alert" data-testid="brand-token-autofix-failed" className="tw:basis-full">
+                Auto-fix wasn't applied. The warning stays.
+              </span>
+            )}
           </div>
         ) : (
           /* `--bk-success-text` — the one green that passes AA at this size. */

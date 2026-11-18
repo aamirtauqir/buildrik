@@ -108,6 +108,22 @@ describe("ComponentDetailScreen — master screen (4418:142876)", () => {
     expect(relink).toHaveBeenCalledWith([{ elementId: "e1" }, { elementId: "e2" }, { elementId: "e3" }]);
   });
 
+  it("a failed Detach all stays on the screen and says so (P-4)", async () => {
+    const { composer, detachInstance } = makeComposer();
+    detachInstance.mockRejectedValueOnce(new Error("boom"));
+    const onBack = vi.fn();
+    render(
+      <ToastProvider>
+        <ComponentDetailScreen component={makeComponent()} composer={composer} onBack={onBack} />
+      </ToastProvider>,
+    );
+    fireEvent.click(screen.getByTestId("component-more"));
+    fireEvent.click(screen.getByTestId("component-detach-all"));
+    expect(await screen.findByText("Couldn't detach every instance. Try again.")).toBeTruthy();
+    expect(screen.queryByText(/^Detached /)).toBeNull();
+    expect(onBack).not.toHaveBeenCalled();
+  });
+
   /* Flow-check (2026-09-25): a used-on row click used to ONLY switch page —
      on the page that was already active (this fixture's "home"), that read
      as nothing happening at all: no selection, no scroll. It now also

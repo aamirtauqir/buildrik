@@ -177,12 +177,28 @@ describe("createRemoteAssetSync — uploadAndCreate", () => {
     expect(media.createAsset).not.toHaveBeenCalled();
   });
 
-  it("returns null when createAsset rejects after a successful upload", async () => {
+  /* BK-42: the file is in storage — its URL is kept so the retry registers
+     it instead of uploading it again. */
+  it("keeps the uploaded URL when createAsset rejects after a successful upload", async () => {
     uploadMock.mockResolvedValue({ url: "https://blob.example/x.png" });
     media.createAsset.mockRejectedValue(new Error("UNAUTHORIZED"));
 
     const sync = createRemoteAssetSync();
-    await expect(sync.uploadAndCreate(pngBlob(), meta)).resolves.toBeNull();
+    await expect(sync.uploadAndCreate(pngBlob(), meta)).resolves.toEqual({ serverId: null, url: "https://blob.example/x.png" });
+  });
+
+  it("registerUploaded creates the row for the URL without uploading; null on failure", async () => {
+    media.createAsset.mockResolvedValue({ id: "srv-9", url: "https://blob.example/x.png", bytes: 1 });
+    const sync = createRemoteAssetSync({ siteId: "s1" });
+    await expect(sync.registerUploaded("https://blob.example/x.png", meta)).resolves.toEqual({
+      serverId: "srv-9",
+      url: "https://blob.example/x.png",
+    });
+    expect(uploadMock).not.toHaveBeenCalled();
+    expect(media.createAsset.mock.calls.at(-1)?.[0]).toMatchObject({ url: "https://blob.example/x.png", siteId: "s1" });
+
+    media.createAsset.mockRejectedValue(new Error("network"));
+    await expect(sync.registerUploaded("https://blob.example/x.png", meta)).resolves.toBeNull();
   });
 });
 

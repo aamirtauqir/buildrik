@@ -19,6 +19,7 @@ const payload = (over: Partial<ConfirmFolderDeletePayload> = {}): ConfirmFolderD
   folderName: "Heroes",
   assetCount: 0,
   subFolderCount: 0,
+  inUseCount: 0,
   ...over,
 });
 
@@ -80,6 +81,19 @@ describe("ConfirmFolderDeleteModal", () => {
       />
     );
     expect(screen.queryByRole("button", { name: /move files/i })).not.toBeInTheDocument();
+  });
+
+  it("says how many of the files are in use and that the delete can be undone", () => {
+    render(
+      <ConfirmFolderDeleteModal
+        payload={payload({ assetCount: 3, inUseCount: 2 })}
+        onConfirm={vi.fn()}
+        onCancel={vi.fn()}
+      />,
+    );
+    const alert = screen.getByRole("alert");
+    expect(alert.textContent).toMatch(/2 of the files are used on the site/);
+    expect(alert.textContent).toMatch(/undo/i);
   });
 
   it("invokes onConfirm only on click of the Delete button", () => {

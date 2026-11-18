@@ -9,14 +9,20 @@
  * A dialog is a `[role="dialog"]` carrying `data-modal-key`; a trigger points
  * at it with `data-modal-target`. A modal saved before the keys existed (a
  * `.modal-trigger` and the `.modal-overlay` the block placed after it) links
- * each un-keyed trigger to the first un-keyed dialog after it.
+ * each un-keyed trigger to the dialog its `aria-controls` names, else to the
+ * first un-keyed dialog after it.
  *
  * Published page: a trigger opens its dialog — focus moves in and is trapped,
- * the rest of the page is made inert, Escape / a click on the backdrop itself
+ * the rest of the page is made inert and stops scrolling, Escape / a click on the backdrop itself
  * / any `[data-modal-close]` (or legacy `.modal-close`) closes it when allowed
  * (`data-modal-escape`, `data-modal-backdrop`), and focus returns to the
  * trigger. `data-modal-initial="open"` opens on load. A dialog with no name of
- * its own is labelled by its first heading (`aria-labelledby`).
+ * its own is labelled by its first heading (`aria-labelledby`), and a close
+ * button with no name of its own is named "Close".
+ *
+ * Until 2026-10-20 nothing wired the trigger on a published site, and the
+ * dialog is hidden by a static per-element `display:none`, so it could never
+ * open (REA audit R4 P0 #3).
  *
  * Canvas (`interactive: false`): dialogs stay closed unless `reveal` (the
  * selection) is the dialog or inside it — then it shows, without
@@ -58,7 +64,8 @@ export function initModalRuntime(root: ParentNode, opts: ModalRuntimeOptions = {
   const legacyDialogs = dialogs.filter(function (d) { return !d.getAttribute("data-modal-key"); });
   (Array.prototype.slice.call(root.querySelectorAll(".modal-trigger:not([data-modal-target])")) as HTMLElement[]).forEach(function (t) {
     const at = order(t);
-    const d = legacyDialogs.filter(function (x) { return order(x) > at; })[0];
+    const named = t.getAttribute("aria-controls");
+    const d = legacyDialogs.filter(function (x) { return named ? x.id === named : order(x) > at; })[0];
     if (d) pairs.push({ trigger: t, dialog: d });
   });
 
@@ -81,10 +88,17 @@ export function initModalRuntime(root: ParentNode, opts: ModalRuntimeOptions = {
         if (minted) heading.removeAttribute("id");
       });
     }
+    const closeButtons = Array.prototype.slice.call(d.querySelectorAll("[data-modal-close], .modal-close")) as HTMLElement[];
+    closeButtons.forEach(function (b) {
+      if (b.getAttribute("aria-label") || b.getAttribute("aria-labelledby")) return;
+      b.setAttribute("aria-label", "Close");
+      cleanups.push(function () { b.removeAttribute("aria-label"); });
+    });
     const shown = d.style.display && d.style.display !== "none" ? d.style.display : d.getAttribute("data-modal-display") || "flex";
     let openedBy: HTMLElement | null = null;
     let inerted: Element[] = [];
     let restore: (() => void) | null = null;
+    let prevOverflow = "";
 
     function setShown(on: boolean): void {
       d.style.display = on ? shown : "none";
@@ -108,6 +122,8 @@ export function initModalRuntime(root: ParentNode, opts: ModalRuntimeOptions = {
           inerted.push(sib);
         });
       }
+      prevOverflow = doc.body ? doc.body.style.overflow : "";
+      if (doc.body) doc.body.style.overflow = "hidden";
       const first = d.querySelector<HTMLElement>(FOCUSABLE);
       if (first) first.focus();
       else {
@@ -161,6 +177,7 @@ export function initModalRuntime(root: ParentNode, opts: ModalRuntimeOptions = {
         el.removeAttribute("aria-hidden");
       });
       inerted = [];
+      if (doc.body) doc.body.style.overflow = prevOverflow;
       setShown(false);
       const back = openedBy;
       openedBy = null;

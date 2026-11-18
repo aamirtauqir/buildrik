@@ -140,13 +140,16 @@ export function useMediaState(composer: Composer): MediaStateResult {
   const autoSaveStockToLibrary = useCallback(async (src: string, name: string) => {
     try {
       const res = await fetch(src);
+      if (!res.ok) throw new Error(`stock fetch ${res.status}`);
       const blob = await res.blob();
       const file = new File([blob], `imported-${name.substring(0, 10)}.webp`, { type: "image/webp" });
       upload.upload([file]);
     } catch (err) {
-      console.error("Silent save failed:", err);
+      /* M-9: the library copy is missing — say so instead of console-only. */
+      console.error("Stock auto-save failed:", err);
+      showToast("Couldn't save a copy of this stock image to your library.", "warning");
     }
-  }, [upload]);
+  }, [upload, showToast]);
 
   const insertToCanvas = useCallback(
     async (key: string) => {
@@ -363,7 +366,6 @@ export function useMediaState(composer: Composer): MediaStateResult {
     createFolder: library.createFolder,
     inspectFolder: library.inspectFolder,
     deleteFolder: library.deleteFolder,
-    moveAsset: library.moveAsset,
     bulkMoveAssets: library.bulkMoveAssets,
     uploadQueue: upload.uploadQueue,
     counts: library.counts,

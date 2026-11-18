@@ -37,7 +37,6 @@ describe("useEditorShortcuts › ⌘Z/⇧⌘Z go to native field undo when focus
       useEditorShortcuts({
         composer: composer as unknown as UseEditorShortcutsOptions["composer"],
         modals: { setShowShortcuts: vi.fn() },
-        saveProject: vi.fn(),
       }),
     );
   });

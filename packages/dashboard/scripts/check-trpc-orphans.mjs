@@ -53,25 +53,25 @@ const ROUTER_KEYS = {
  * should shrink. Adding one requires saying why in the same commit.
  */
 const ALLOWED = {
+  // --- server AI kept, editor AI removed (owner 2026-10-20) ---
+  "actions.propose": "Server AI kept for the future Build tab; the editor AI surfaces were removed 2026-10-20 (owner: no AI this version).",
+  "actions.confirm": "Server AI kept for the future Build tab; the editor AI surfaces were removed 2026-10-20 (owner: no AI this version).",
+  "ai.content": "Server AI kept for the future Build tab; the editor AI surfaces were removed 2026-10-20 (owner: no AI this version).",
+  "ai.summarize": "Server AI kept for the future Build tab; the editor AI surfaces were removed 2026-10-20 (owner: no AI this version).",
+  "ai.milestoneSuggest": "Server AI kept for the future Build tab; the editor AI surfaces were removed 2026-10-20 (owner: no AI this version).",
+  "ai.quota": "Server AI kept for the future Build tab; the editor AI surfaces were removed 2026-10-20 (owner: no AI this version).",
+  "ai.streamPrompt": "Server AI kept for the future Build tab; the editor AI surfaces were removed 2026-10-20 (owner: no AI this version).",
+  "ai.componentSchema": "Server AI kept for the future Build tab; the editor AI surfaces were removed 2026-10-20 (owner: no AI this version).",
+  "ai.logAdoption": "Server AI kept for the future Build tab; the editor AI surfaces were removed 2026-10-20 (owner: no AI this version).",
+  "media.generateAltText": "Server AI kept for the future Build tab; the editor AI surfaces were removed 2026-10-20 (owner: no AI this version).",
   // --- superseded: a shipped screen already does this job ---
-  "billing.usage": "The Usage screen reads dashboard.usage; this is a second reader of the same numbers.",
-  "team.auditLog": "Reads activityLog — the same table /dashboard/activity already shows via dashboard.activity.",
-  "dashboard.quickActions": "Home's quick actions are a fixed list now (components/dashboard/quick-actions.tsx).",
-  "dashboard.recentSites": "Home shows recent ACTIVITY, not recent sites; the sites list is its own screen.",
-  "auth.logout": "Sign-out goes through NextAuth signOut + /api/auth/logout.",
   "sites.getProjectData": "The editor loads through sites.get; saves through sites.saveProject.",
-  "upload.limits": "Upload limits are read from PLAN_LIMITS on the client.",
-  "siteComponents.usage": "The editor's component library shows usage from its own local registry.",
-  "help.categories": "The Help index renders its categories from help.articles.",
-  "onboarding.completeStep": "The wizard persists its position through onboarding.saveProgress.",
 
   // --- built server-side, UI never built. A product decision, not dead code ---
   "theme.presets.list": "Theme presets: server half complete, no UI. FOUNDER DECISION — build or drop.",
   "theme.presets.save": "Theme presets: server half complete, no UI. FOUNDER DECISION — build or drop.",
   "theme.presets.delete": "Theme presets: server half complete, no UI. FOUNDER DECISION — build or drop.",
   "theme.presets.applyPreset": "Theme presets: server half complete, no UI. FOUNDER DECISION — build or drop.",
-  "pages.create": "Page CRUD lives in the editor's Pages panel, which mutates through the project save.",
-  "pages.update": "Page CRUD lives in the editor's Pages panel, which mutates through the project save.",
   "pages.getTranslation": "Per-locale page content: server half complete, no i18n UI. FOUNDER DECISION.",
   "pages.setTranslation": "Per-locale page content: server half complete, no i18n UI. FOUNDER DECISION.",
   "pages.removeTranslation": "Per-locale page content: server half complete, no i18n UI. FOUNDER DECISION.",

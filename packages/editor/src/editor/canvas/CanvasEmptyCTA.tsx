@@ -8,8 +8,8 @@
  *
  * The board draws an empty page as five things, top to bottom: the title
  * ("This page is empty"), one sentence naming the three ways forward, a row
- * of three template cards, and a row of four actions — Browse all templates ·
- * Add a block · ✦ Describe your site · Start blank. What shipped before was
+ * of three template cards, and a row of actions — Browse all templates ·
+ * Add a block · Start blank. What shipped before was
  * board 65:2's first-run pair (one sentence, Browse templates / Start blank),
  * which offered less than the design (G2-018).
  *
@@ -107,7 +107,7 @@ export function CanvasEmptyCTA({
                   color="light"
                   className={CARD}
                   data-testid={`canvas-empty-template-${t.id}`}
-                  aria-label={`Start from the ${t.name} template`}
+                  aria-label={`Browse templates, starting with ${t.name}`}
                   onClick={onBrowseTemplates}
                 >
                   {/* Board 4428:44164: a light wireframe thumbnail with the

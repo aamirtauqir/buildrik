@@ -29,7 +29,7 @@ import {
   installEngineBrowserStubs,
   removeEngineBrowserStubs,
 } from "@/engine/__tests__/test-utils/realComposer";
-import { KeybindingManager } from "@/engine/commands";
+import { KeybindingManager } from "@/engine/commands/KeybindingManager";
 import {
   editSubmenu,
   insertSubmenu,

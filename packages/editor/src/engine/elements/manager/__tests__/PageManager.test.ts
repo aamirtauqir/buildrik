@@ -72,6 +72,7 @@ function makeHarness() {
       elements.set(data.id, el as never);
       return el as never;
     },
+    copyStyleRules: () => {},
     cloneElementData: (data) => {
       // Mirror the real implementation: fresh IDs recursively.
       let counter = 0;

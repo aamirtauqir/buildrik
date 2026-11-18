@@ -29,6 +29,10 @@ declare module "@sentry/react" {
 
   export function init(options: SentryOptions): void;
   export function captureException(error: Error): void;
+  export function captureMessage(
+    message: string,
+    context?: { level?: "info" | "warning" | "error"; tags?: Record<string, string>; extra?: Record<string, unknown> },
+  ): string;
   export function withScope(callback: (scope: Scope) => void): void;
   export function setUser(user: User | null): void;
 }

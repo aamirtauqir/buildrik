@@ -68,15 +68,16 @@ describe("FullPageRouter", () => {
      resource area — they render where the router is mounted (LayoutShell's
      fullpage slot, beside the rail, between the topbar and the bottom bar),
      not into a full-viewport portal that covered the shell. */
-  /* data-bk-surface="fullpage" is CommandCenter's keyboard guard: Assets and
-     Settings own the keys; Brand must let ⌘Z reach the composer. */
+  /* data-bk-surface="fullpage" is CommandCenter's keyboard guard: Templates,
+     Assets, Settings and Brand own the keys (Brand keeps ⌘Z for its token
+     edits, D36 — asserted below). */
   it.each([
     ["templates", "tpl-host", "fp-templates", "fullpage"],
     ["assets", "mgr-host", "fp-library", "fullpage"],
     ["settings", "set-host", "fp-settings", "fullpage"],
-    ["design", "brand-host", "fp-brand", null],
-    /* 2L9 215:43588 (B6-K02): Components is a resource area too. Like Brand it
-       leaves ⌘Z to the composer — detach and delete are composer writes. */
+    ["design", "brand-host", "fp-brand", "fullpage"],
+    /* 2L9 215:43588 (B6-K02): Components is a resource area too. It leaves
+       ⌘Z to the composer — detach and delete are composer writes. */
     ["components", "comp-host", "fp-components", null],
   ])("renders %s in place, not in the overlay root", async (tab, hostId, bodyId, surface) => {
     const { container } = renderRouter(tab);
@@ -85,6 +86,11 @@ describe("FullPageRouter", () => {
     expect(host.getAttribute("data-bk-surface")).toBe(surface);
     expect(host.className).not.toContain("tw:fixed");
     expect(await screen.findByTestId(bodyId)).toBeInTheDocument();
+  });
+
+  it("Brand keeps ⌘Z for its own token edits only (BK-05, D36)", async () => {
+    renderRouter("design");
+    expect(await screen.findByTestId("brand-host")).toHaveAttribute("data-bk-history", "tokens");
   });
 });
 

@@ -272,6 +272,23 @@ describe("useCanvasElementDrag", () => {
     });
   });
 
+  /* REA #12 (ISS-C03): the hook had no read-only gate, and Ctrl/Cmd+drag
+     duplicates at dragstart — so view mode and Time-travel cloned anyway. */
+  describe("dragstart — a read-only composer drags nothing", () => {
+    it("refuses a Ctrl/Cmd+drag clone and a plain move", () => {
+      composer = makeComposer({ readOnly: true });
+      mountHook();
+      const clone = dragEvent("dragstart", makeDataTransfer(), { ctrlKey: true });
+      child.dispatchEvent(clone);
+      const move = dragEvent("dragstart", makeDataTransfer());
+      child.dispatchEvent(move);
+      expect(composer.elements.duplicateElement).not.toHaveBeenCalled();
+      expect(clone.defaultPrevented).toBe(true);
+      expect(move.defaultPrevented).toBe(true);
+      expect(onDraggingChange).not.toHaveBeenCalled();
+    });
+  });
+
   describe("dragstart — Ctrl/Cmd+drag clone mode", () => {
     it("duplicates the element in a clone-element transaction and drags the clone", () => {
       const clone = { getId: () => "el-1-copy", getType: () => "text", getParent: () => null };
@@ -297,12 +314,14 @@ describe("useCanvasElementDrag", () => {
       composer.elements.duplicateElement.mockImplementation(() => {
         throw new Error("dup failed");
       });
-      mountHook();
+      const addToast = vi.fn();
+      mountHook({ addToast });
 
       const dt = makeDataTransfer();
       child.dispatchEvent(dragEvent("dragstart", dt, { ctrlKey: true }));
 
       expect(composer.rollbackTransaction).toHaveBeenCalled();
+      expect(addToast).toHaveBeenCalledWith(expect.objectContaining({ tone: "error" })); // ISS-C21
       expect(JSON.parse(dt.getData("element"))).toEqual({ elementId: "el-1" });
       expect(dt.effectAllowed).toBe("move");
       expect(child.classList.contains("bd-clone-mode")).toBe(false);
@@ -443,7 +462,9 @@ describe("useCanvasElementDrag", () => {
 
       child.dispatchEvent(dragEvent("dragend", null));
 
-      expect(child.style.opacity).toBe("1");
+      // Removed, not set to "1": a leftover inline value would override the
+      // element's own opacity, now that the canvas keeps styles in a sheet.
+      expect(child.style.opacity).toBe("");
       expect(child.classList.contains("bd-dragging")).toBe(false);
       expect(child.classList.contains("bd-clone-mode")).toBe(false);
       expect(mocks.stopAutoScroll).toHaveBeenCalled();

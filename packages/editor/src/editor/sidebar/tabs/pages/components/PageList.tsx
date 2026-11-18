@@ -18,6 +18,7 @@ import type { Composer } from "@/engine";
 import type { FolderItem, PageItem } from "../types";
 import type { CollectionPagesRow } from "../useDynamicPagesSummary";
 import { AddPageButton } from "./AddPageButton";
+import { PAGES_LOADING_REASON } from "./NewPageModal";
 import { BulkToolbar } from "./BulkToolbar";
 import { NewFolderDraft } from "./NewFolderDraft";
 import { PageFolder } from "./PageFolder";
@@ -71,6 +72,8 @@ interface Props {
   onContextMenu: (id: string, x: number, y: number) => void;
   /** ⌥↑ / ⌥↓ on a top-level row. */
   onMovePage?: (id: string, direction: -1 | 1) => void;
+  /** BK-28: ⌘D / ⌫ on a focused page row act on that PAGE (not the canvas). */
+  onPageShortcut?: (id: string, action: "duplicate" | "delete") => void;
   onRenameStart: (id: string) => void;
   onRenameCommit: (id: string, name: string, updateUrl?: boolean) => void;
   onRenameCancel: () => void;
@@ -118,6 +121,7 @@ export const PageList: React.FC<Props> = ({
   onClearSelection,
   onContextMenu,
   onMovePage,
+  onPageShortcut,
   onRenameStart,
   onRenameCommit,
   onRenameCancel,
@@ -162,7 +166,12 @@ export const PageList: React.FC<Props> = ({
           <PanelLoadingSkeleton label="Loading pages" testId="pages-loading" barTestId="pages-sk-bar" />
         </div>
         <div className="bd-pg-footer" data-testid="pages-footer">
-          <AddPageButton onAddBlank={onAddPage} onFromTemplate={onRequestTemplates} onAddFolder={onAddFolder} />
+          <AddPageButton
+            onAddBlank={onAddPage}
+            onFromTemplate={onRequestTemplates}
+            onAddFolder={onAddFolder}
+            disabledReason={loading ? PAGES_LOADING_REASON : undefined}
+          />
         </div>
       </div>
     );
@@ -286,6 +295,7 @@ export const PageList: React.FC<Props> = ({
                   onRenameCancel={onRenameCancel}
                   onContextMenu={(x, y) => onContextMenu(page.id, x, y)}
                   onMove={!search && onMovePage ? (d) => onMovePage(page.id, d) : undefined}
+                  onShortcut={onPageShortcut ? (action) => onPageShortcut(page.id, action) : undefined}
                   searchContext={
                     search
                       ? folders.find((f) => f.id === pageToFolder.get(page.id))?.name
@@ -335,6 +345,7 @@ export const PageList: React.FC<Props> = ({
                   onFolderDelete={() => onFolderDelete(folder.id)}
                   onSelectPage={onSelectPage}
                   onContextMenu={onContextMenu}
+                  onPageShortcut={onPageShortcut}
                   onRenameStart={onRenameStart}
                   onRenameCommit={onRenameCommit}
                   onRenameCancel={onRenameCancel}
@@ -430,7 +441,12 @@ export const PageList: React.FC<Props> = ({
       )}
       {/* Board 139:47668: the footer stays while pages are ticked. */}
       <div className="bd-pg-footer" data-testid="pages-footer">
-        <AddPageButton onAddBlank={onAddPage} onFromTemplate={onRequestTemplates} onAddFolder={onAddFolder} />
+        <AddPageButton
+          onAddBlank={onAddPage}
+          onFromTemplate={onRequestTemplates}
+          onAddFolder={onAddFolder}
+          disabledReason={loading ? PAGES_LOADING_REASON : undefined}
+        />
       </div>
     </div>
   );

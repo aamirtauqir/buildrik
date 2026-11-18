@@ -24,7 +24,6 @@ import { Canvas, type CanvasRef } from "../canvas/Canvas";
 import type { CanvasOverlayState } from "../canvas/CanvasFooterToolbar";
 import { ProInspector } from "../inspector/ProInspector";
 import type { FocusSectionPayload } from "../inspector/hooks/usePropertyJump";
-import { AITab } from "../sidebar/tabs/ai/AITab";
 import { LayoutShell } from "../rail/LayoutShell";
 import { LeftSidebar } from "../sidebar/LeftSidebar";
 import { TabRouter } from "../sidebar/TabRouter";
@@ -43,7 +42,6 @@ import { ThemeTogglePreview } from "@/editor/design-system/ui/ThemeTogglePreview
 import { useBlockInsertion } from "./hooks/useBlockInsertion";
 import { useClipboardToasts } from "./hooks/useClipboardToasts";
 import { useConnectOfferToast } from "./hooks/useConnectOfferToast";
-import { useAltTextAutoTrigger } from "./hooks/useAltTextAutoTrigger";
 import { BottomBar } from "./BottomBar";
 import { usePageSummaries } from "./usePageSummaries";
 import { RightColumnPanel } from "./RightColumnPanel";
@@ -133,8 +131,12 @@ export interface StudioPanelsProps {
   /** The ONE publish door — AquibraStudio's `requestPublish`, which routes on
    *  `nextMove.gate`. Absent = no publish path is wired (flag off). */
   onRequestPublish?: () => void;
-  /** FB-8: Issues is a right-column mode, same mechanism as the AI drill-in
-   *  (`aiInInspector` below) — it swaps in for ProInspector rather than
+  /** One-click ZIP of the site's code — the Publish panel's ⋯ row. */
+  onDownloadCode?: () => void;
+  /** The ZIP is being built. */
+  downloadingCode?: boolean;
+  /** FB-8: Issues is a right-column mode, same mechanism as the column
+   *  tabs — it swaps in for ProInspector rather than
    *  floating an absolute overlay on top of it. AquibraStudio owns the open
    *  state and builds the panel (it needs `composer.designSystem` +
    *  `requestBrandToken`, already in scope there); this just says where it
@@ -268,6 +270,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   publishJob,
   nextMove = null,
   onRequestPublish,
+  onDownloadCode,
+  downloadingCode,
   issuesOpen = false,
   renderIssuesPanel,
   onCloseIssues,
@@ -291,7 +295,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   useClipboardToasts(composer, addToast);
   useConnectOfferToast(composer, addToast);
   const { handleBlockClick } = useBlockInsertion(composer);
-  useAltTextAutoTrigger(composer);
 
   /* v3 FC-2: page-jump ⌘K rows registered from the shell — always present,
      like Layers/Assets/Records/Templates — instead of only while the Pages
@@ -305,7 +308,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   );
 
   const [canvasHoveredId, setCanvasHoveredId] = React.useState<string | null>(null);
-  /** AI drills in over the inspector (boards 170:* · 66:225). */
   /* URL-derived, so it is stable for the life of the document — view mode
      is entered by navigation (StudioHeader.toggleReadOnlyView), never by state. */
   const readOnlyView = React.useMemo(() => getEditorViewMode().readOnlyView, []);
@@ -342,13 +344,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
     return () => root.classList.remove("bk-read-only-view", "bk-viewer-chrome");
   }, [readOnlyView, viewerChrome]);
 
-  const [aiInInspector, setAiInInspector] = React.useState(false);
-  /* The intent the door that opened AI carried (L5-014) — its prompt fills
-     the empty field. Cleared when AI closes so the next door starts clean. */
-  const [aiSeedPrompt, setAiSeedPrompt] = React.useState<string | undefined>(undefined);
-  React.useEffect(() => {
-    if (!aiInInspector) setAiSeedPrompt(undefined);
-  }, [aiInInspector]);
   /* Inspector visibility, user-operated. Defaults to SHOWN so the drawn
      no-selection board is still the default state — collapsing it
      automatically was tried before and rendered that board off-viewport.
@@ -419,17 +414,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   /* FB-8: Issues is a right-column mode too — Escape returns to the
      Inspector the same way it does for Publish/Review/History. */
   useColumnPanelEscape(!readOnlyView && issuesOpen, () => onCloseIssues?.());
-  /* FA-1: AI is the other right-column mode (over the inspector, not the
-     drawer) — Escape returns to the Inspector the same way it returns from
-     Publish/Review/History. The hook's own isTyping guard is what makes the
-     first Escape (still focused in the AI composer field) a no-op here; the
-     Composer blurs on that Escape, so the next one lands with isTyping
-     false and closes. */
-  useColumnPanelEscape(aiInInspector, () => setAiInInspector(false));
-  /* …and Issues replaces AI the same way. */
-  React.useEffect(() => {
-    if (issuesOpen) setAiInInspector(false);
-  }, [issuesOpen]);
   /* Play F4.02 / C02.2 (303:32650, 353:24957) — A-39: Issues closed because
      Fix › / Open image › selected an element, so the Inspector heads with
      "‹ Back to Issues" while that element stays selected. A plain close (✕,
@@ -534,14 +518,13 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   /* design-2l9 Task 1.7 — the publish tray docks in this column (boards
      499:2656 / 233:2), wider than the inspector, and replaces whatever the
      column held. One right-column mode at a time: opening the tray closes
-     Issues, AI and a column tab; opening one of those closes the tray. */
+     Issues and a column tab; opening one of those closes the tray. */
   const trayState = usePublishTray();
   const trayShown = trayState.open && !readOnlyView;
   React.useEffect(() => {
     if (!trayState.open) return;
     if (issuesOpen) onCloseIssues?.();
     if (rightColumnTab) onLeftPanelToggle?.();
-    setAiInInspector(false);
     // Only on the tray's opening — the effect below handles the reverse.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trayState.open]);
@@ -554,29 +537,28 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
       onLeftPanelToggle?.();
       return;
     }
-    if (rightColumnTab || issuesOpen || aiInInspector) publishTray.close();
+    if (rightColumnTab || issuesOpen) publishTray.close();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rightColumnTab, issuesOpen, aiInInspector]);
+  }, [rightColumnTab, issuesOpen]);
   const inspectorOpen = isInspectorColumnOpen({
     readOnlyView,
     viewerChrome,
     fullPage: effectiveFullPageMode,
     cmsWorkspaceOpen,
     inspectorShown,
-    columnModeOpen: rightColumnTab || issuesOpen || aiInInspector || trayShown,
+    columnModeOpen: rightColumnTab || issuesOpen || trayShown,
   });
   /* Board 36's "Show inspector ⌘\": only when the user hid the inspector and
      nothing else fills or replaces its column. */
   const showInspectorDoor =
     !readOnlyView && !inspectorShown && !inspectorOpen && !effectiveFullPageMode && !cmsWorkspaceOpen;
   /* The inspector BODY (ProInspector) is on screen: its column is open and no
-     mode (Issues · a column tab · AI) has replaced it. */
+     mode (Issues · a column tab) has replaced it. */
   const inspectorBodyShown =
     !readOnlyView &&
     inspectorOpen &&
     !(issuesOpen && renderIssuesPanel) &&
     !rightColumnTab &&
-    !aiInInspector &&
     !trayShown;
 
   /* I-1: UI_INSPECTOR_FOCUS_SECTION ("Bind to CMS field…", "Add
@@ -624,7 +606,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
       clearTimeout(pendingLapse.current);
       pendingLapse.current = setTimeout(dropPendingFocus, PENDING_FOCUS_MS);
       setInspectorShown(true);
-      setAiInInspector(false);
       onCloseIssues?.();
       if (r.rightColumnTab) onLeftPanelToggle?.();
     };
@@ -759,32 +740,15 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   // Listen for tab switch events
   React.useEffect(() => {
     if (!composer) return;
-    const handler = (data: { tab: string; fullPage?: boolean; prompt?: string }) => {
+    const handler = (data: { tab: string; fullPage?: boolean }) => {
       /* Every "ui:switch-tab" emitter (⌘K palette, canvas context menus,
          inspector doors, PublishTab, CmsWorkspace, …) is a second door onto
          the same tabs the rail gates — without this check a VIEWER could not
-         click into Add/CMS/Brand from the rail, but ⌘K "Open AI assistant"
-         or CmsWorkspace's own emit routed them there anyway. Same predicate
+         click into Add/CMS/Brand from the rail, but CmsWorkspace's own emit
+         routed them there anyway. Same predicate
          the rail uses (isTabAllowedForViewer), so the two doors can't drift. */
       if (!isTabAllowedForViewer(data.tab as GroupedTabId, viewerChrome)) {
         addToast({ description: "View only — adding, pages, CMS and brand edits need an Editor role." });
-        return;
-      }
-      /* Boards 170:2 and 66:225 put AI in the INSPECTOR column with a
-         "‹ Inspector" way back — not in the left sidebar. Every existing
-         entry point (the inspector's ✦ AI chip, the multi-select toolbar, the
-         no-selection state, the shell's own onShowAI) emits this same event,
-         so routing it here moves them all at once. */
-      if (data.tab === "ai") {
-        /* One right-column mode at a time: AI replaces Issues rather than
-           opening hidden under it (Issues wins the render, so both open meant
-           an invisible AI that one Escape also closed). */
-        onCloseIssues?.();
-        /* A-14: with the inspector hidden, AI used to mount into a 0-px
-           column; isInspectorColumnOpen now opens the column for any panel
-           it hosts, AI included. */
-        setAiSeedPrompt(data.prompt);
-        setAiInInspector(true);
         return;
       }
       onLeftPanelTabChange?.(data.tab, () => {
@@ -872,26 +836,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
     setMediaFullPage(true);
   }, []);
 
-  const handleEditMedia = React.useCallback(
-    (item: { key: string; src: string; name: string }) => {
-      if (!onOpenImageEditor || !composer) return;
-      onOpenImageEditor(item.src, async (editedSrc) => {
-        try {
-          const res = await fetch(editedSrc);
-          const blob = await res.blob();
-          const file = new File([blob], `edited-${item.name}.webp`, { type: "image/webp" });
-          const result = await composer.media.uploadFile(file);
-          if (result.success && result.asset) {
-            composer.elements.getElement(item.key)?.setAttribute("src", result.asset.src);
-          }
-        } catch (err) {
-          console.error("Failed to save edited canvas media:", err);
-        }
-      });
-    },
-    [onOpenImageEditor, composer]
-  );
-
   /* The column-hosted tab (Publish · Review · History · Activity). One
      element, two hosts: the inspector column, and a VIEWER's (X-8). */
   const columnPanel = rightColumnTab ? (
@@ -907,6 +851,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
         publishJob={publishJob}
         nextMove={nextMove}
         onRequestPublish={onRequestPublish}
+        onDownloadCode={onDownloadCode}
+        downloadingCode={downloadingCode}
         onResendReview={onResendReview}
         reviewsEnabled={reviewsEnabled}
       />
@@ -916,11 +862,11 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   return (
     <DSModeProvider>
     <TokenRegistryProvider composer={composer}>
-    <StylePresetRegistryProvider projectId={projectId}>
+    <StylePresetRegistryProvider composer={composer}>
       {/* Headless. The linter only ran from inside the Brand panel, so the
           topbar Issues chip — which gates the publish-anyway confirm — read
           "No issues" until the user happened to open Brand. */}
-      <DSLintRunner composer={composer} />
+      <DSLintRunner composer={composer} siteId={projectId} />
       <MigrationProgressMount composer={composer} />
       {/* Headless, for the same reason the linter above is: a site's own
           tokens reached the page only when the Brand panel mounted, so a
@@ -942,7 +888,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
            content: mounted ⇔ fullpage, whether or not the drawer is open. */
         fullPageMode={effectiveFullPageMode}
         // Open whenever not fullpage — the no-selection state is a DRAWN
-        // board (2 lines + ✦ Ask AI); gating on selectedElement collapsed the
+        // board; gating on selectedElement collapsed the
         // column to 1px, so that state rendered off-viewport, unseeable.
         /* 2L9 S30: a hidden inspector keeps its column, empty, with the way back. */
         inspectorOpen={inspectorOpen || showInspectorDoor}
@@ -1001,7 +947,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
               showRulers={showRulers}
               showXRay={showXRay}
               showOutlines={showOutlines}
-              onOpenImageEditor={handleEditMedia}
               onZoomChange={onZoomChange}
               onOverlayChange={handleOverlayChange}
               onDeviceChange={onDeviceChange}
@@ -1025,8 +970,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           ) : null}
         </LayoutShell.Canvas>
 
-        {/* Right Inspector — element properties, or the AI drill-in that
-            replaces them (boards 170:*). In view mode it is absent — except
+        {/* Right Inspector — element properties. In view mode it is absent — except
             for a workspace VIEWER, who is always in view mode and gets the
             role notice board 4418:126059 draws in this column. */}
         {readOnlyView ? (
@@ -1073,27 +1017,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             columnPanel
           ) : (
           <>
-            {aiInInspector ? (
-              <AITab
-                composer={composer}
-                isExpanded={false}
-                onExpandToggle={() => {}}
-                onClose={() => setAiInInspector(false)}
-                seedPrompt={aiSeedPrompt}
-                /* M-1: "‹ Inspector" leads to the inspector — shown even if it
-                   was hidden, where closing AI alone took the column with it. */
-                onBack={() => {
-                  setAiInInspector(false);
-                  setInspectorShown(true);
-                }}
-              />
-            ) : null}
-            {/* P-7a: AI covers the inspector; it does not unmount it. The
-                round trip used to reset the tab to Style, the scroll to 0 and
-                a :hover state to Base. `invisible` keeps the layout box, so
-                the scroll offset survives, and takes it out of the tab order
-                and the accessibility tree. */}
-            {issuesReturn && !aiInInspector && !showInspectorDoor ? (
+            {issuesReturn && !showInspectorDoor ? (
               <div className="tw:flex tw:flex-none tw:justify-center tw:pt-2" data-testid="inspector-back-to-issues">
                 <Button
                   type="button"
@@ -1110,8 +1034,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
               </div>
             ) : null}
             <div
-              className={aiInInspector || showInspectorDoor ? "tw:absolute tw:inset-0 tw:invisible tw:pointer-events-none" : "tw:contents"}
-              aria-hidden={aiInInspector || showInspectorDoor || undefined}
+              className={showInspectorDoor ? "tw:absolute tw:inset-0 tw:invisible tw:pointer-events-none" : "tw:contents"}
+              aria-hidden={showInspectorDoor || undefined}
               data-testid="inspector-body-host"
             >
               <ProInspector

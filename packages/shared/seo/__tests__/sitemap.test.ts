@@ -2,7 +2,7 @@
  * The one sitemap builder (publish worker + editor ZIP export).
  */
 import { describe, it, expect } from "vitest";
-import { buildSitemapXml } from "../sitemap";
+import { buildRobotsTxt, buildSitemapXml } from "../sitemap";
 
 describe("buildSitemapXml", () => {
   const pages = [
@@ -11,13 +11,13 @@ describe("buildSitemapXml", () => {
     { path: "blog/post.html", html: "<html></html>" },
   ];
 
-  it("lists the filenames the deploy serves, with the root as the bare origin", () => {
+  it("lists the clean URLs the deploy serves, with the root as the bare origin", () => {
     const xml = buildSitemapXml("https://example.com", pages, "2026-08-21T10:00:00.000Z");
     expect(xml).toContain("<loc>https://example.com/</loc>");
-    expect(xml).toContain("<loc>https://example.com/about.html</loc>");
-    expect(xml).toContain("<loc>https://example.com/blog/post.html</loc>");
-    // NOT the clean-URL form: there is no vercel.json, so /about would 404.
-    expect(xml).not.toContain("<loc>https://example.com/about</loc>");
+    expect(xml).toContain("<loc>https://example.com/about</loc>");
+    expect(xml).toContain("<loc>https://example.com/blog/post</loc>");
+    // NOT the .html form: under vercel.json `cleanUrls` it is a 308 (REA #26).
+    expect(xml).not.toContain(".html</loc>");
     expect(xml).toContain("<lastmod>2026-08-21</lastmod>");
     expect(xml).toContain('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">');
   });
@@ -32,7 +32,7 @@ describe("buildSitemapXml", () => {
       "2026-08-21T00:00:00.000Z",
     );
     expect(xml).toContain("https://example.com/");
-    expect(xml).not.toContain("secret.html");
+    expect(xml).not.toContain("secret");
   });
 
   it("gives the root priority 1.0 and the rest 0.8", () => {
@@ -43,7 +43,7 @@ describe("buildSitemapXml", () => {
 
   it("escapes XML special characters in a loc", () => {
     const xml = buildSitemapXml("https://example.com", [{ path: `a&b<c>.html` }], "2026-08-21T00:00:00.000Z");
-    expect(xml).toContain("<loc>https://example.com/a&amp;b&lt;c&gt;.html</loc>");
+    expect(xml).toContain("<loc>https://example.com/a&amp;b&lt;c&gt;</loc>");
   });
 
   it("produces an empty urlset when every page is noindex", () => {
@@ -54,5 +54,24 @@ describe("buildSitemapXml", () => {
     );
     expect(xml).not.toContain("<url>");
     expect(xml).toContain("</urlset>");
+  });
+});
+
+describe("buildRobotsTxt", () => {
+  const origin = "https://example.com";
+  it("defaults to Allow plus the sitemap pointer when indexing is on", () => {
+    expect(buildRobotsTxt({ robotsTxt: null, allowIndexing: true, origin })).toBe(
+      "User-agent: *\nAllow: /\n\nSitemap: https://example.com/sitemap.xml\n",
+    );
+  });
+  it("disallows, with no pointer, when indexing is off", () => {
+    expect(buildRobotsTxt({ robotsTxt: null, allowIndexing: false, origin })).toBe("User-agent: *\nDisallow: /\n");
+  });
+  it("does not touch a robots.txt that already names a sitemap", () => {
+    const custom = "User-agent: *\nAllow: /\nSitemap: https://cdn.example/sm.xml\n";
+    expect(buildRobotsTxt({ robotsTxt: custom, allowIndexing: true, origin })).toBe(custom);
+  });
+  it("adds no pointer when there is no origin to point at", () => {
+    expect(buildRobotsTxt({ robotsTxt: null, allowIndexing: true, origin: null })).toBe("User-agent: *\nAllow: /\n");
   });
 });

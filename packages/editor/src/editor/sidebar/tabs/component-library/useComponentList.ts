@@ -28,7 +28,9 @@ export interface UseComponentListResult {
   isLoaded: boolean;
   /** Set if `getAllComponents()` threw; the caller decides how to show it. */
   error: string | null;
-  setError: (error: string | null) => void;
+  /** Load again — the error state's Retry (R1 P-3: it used to only clear the
+   *  error, leaving an empty list). */
+  retry: () => void;
   /** The workspace's shared library entries (fetchComponentLibrary); [] while
    *  the read has failed. */
   library: LibraryComponentEntry[];
@@ -43,6 +45,8 @@ export function useComponentList(composer: Composer | null): UseComponentListRes
   const [error, setError] = React.useState<string | null>(null);
   const [library, setLibrary] = React.useState<LibraryComponentEntry[]>([]);
   const [libraryLoadFailed, setLibraryLoadFailed] = React.useState(false);
+  const [attempt, setAttempt] = React.useState(0);
+  const retry = React.useCallback(() => setAttempt((n) => n + 1), []);
 
   const loadLibrary = React.useCallback(() => {
     void fetchComponentLibrary().then((rows) => {
@@ -81,7 +85,7 @@ export function useComponentList(composer: Composer | null): UseComponentListRes
       composer.off(EVENTS.COMPONENT_INSTANTIATED, loadComponents);
       composer.off(EVENTS.INSTANCE_DETACHED, loadComponents);
     };
-  }, [composer, loadLibrary]);
+  }, [composer, loadLibrary, attempt]);
 
-  return { components, isLoaded, error, setError, library, libraryLoadFailed, retryLibraryLoad: loadLibrary };
+  return { components, isLoaded, error, retry, library, libraryLoadFailed, retryLibraryLoad: loadLibrary };
 }

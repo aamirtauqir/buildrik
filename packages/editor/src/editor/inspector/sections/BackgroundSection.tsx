@@ -262,8 +262,16 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
           </Button>
         </AuthoredValue>
       )}
+      {/* A gradient the saved-gradient card cannot read either (several
+          layers) is shown, never offered to the 2-stop editor: any edit there
+          rewrote it as two stops, destroying the rest. */}
+      {bgType === "gradient" && gradientUI?.isOpaque && !saved && (
+        <p className={`${FIELD_LABEL} tw:mb-3`} data-testid="inspector-fill-gradient-complex">
+          This gradient has more than two colour stops or layers, so it can&apos;t be edited here. It is kept as it is.
+        </p>
+      )}
 
-      {bgType === "gradient" && !saved && (
+      {bgType === "gradient" && !gradientUI?.isOpaque && (
         <>
           <ButtonGroup
             label="Type"

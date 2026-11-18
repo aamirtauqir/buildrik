@@ -14,7 +14,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 const worker = readFileSync(
-  join(__dirname, "../../packages/dashboard/app/api/workers/publish/[jobId]/route.ts"),
+  join(__dirname, "../../server/services/publish-worker.service.ts"),
   "utf8",
 );
 

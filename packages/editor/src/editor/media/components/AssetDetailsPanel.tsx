@@ -23,6 +23,7 @@ import type { Composer } from "@/engine/Composer";
 import type { LibraryItem, VersionEntry } from "@/editor/sidebar/tabs/media/data/mediaTypes";
 import { formatBytes } from "@shared/utils/helpers/number";
 import { versionLabel, collectUsageByPage } from "@/editor/sidebar/tabs/media/data/mediaUtils";
+import { useAltTextDraft } from "@/editor/sidebar/tabs/media/hooks/useAltTextDraft";
 import {
   Button,
   IconButton,
@@ -209,12 +210,10 @@ export interface AssetDetailsPanelProps {
   composer: Composer;
   addToast(t: ToastInput): void;
   /**
-   * P7 — write user-typed alt text back to the engine. Implementations
-   * should also clear `generatedMetadata.altText` so the provenance chip
-   * disappears once the user edits (the chip is misleading if the text
-   * is no longer the AI's output).
+   * P7 — write user-typed alt text back. Called once per commit (blur or
+   * Enter, `useAltTextDraft`); a rejection shows under the field.
    */
-  onUpdateAltText?(key: string, altText: string): void;
+  onUpdateAltText?(key: string, altText: string): Promise<void>;
   /**
    * BLOCKERS C3 (authority `code:tag-writer`) — write the file's whole tag
    * list back. The Clone draws the TAGS chips (3695:45155) and the tag filter
@@ -717,8 +716,7 @@ export function AssetDetailsPanel({
           </ModalClose>
           <ModalBody>
             <p className={`tw:mb-3 ${MUTED_SM}`}>
-              Pick a replacement asset. All canvas usages will be swapped atomically
-              (one undo reverses everything).
+              Pick a replacement asset. Every use on the canvas switches to it.
             </p>
             <div className="med-grid" data-cols="3">
               {replaceCandidates.map((i) => (
@@ -777,15 +775,18 @@ export function AssetDetailsPanel({
 
 interface AltTextSectionProps {
   item: LibraryItem;
-  onUpdateAltText(key: string, altText: string): void;
+  onUpdateAltText(key: string, altText: string): Promise<void>;
 }
 
 /* No Generate / Regenerate: no AI entry point in the editor UI (owner,
    2026-10-17). Text the model wrote earlier still says so (the ✨ AI chip). */
 function AltTextSection({ item, onUpdateAltText }: AltTextSectionProps) {
   const provenance = item.generatedAltMeta;
-
-  const altText = item.altText ?? "";
+  const { field: draftProps, saveFailed } = useAltTextDraft(item, onUpdateAltText);
+  const altText = draftProps.value;
+  /* The box follows the SAVED text, not the draft: swapping branches
+     remounts the textarea, which would drop focus mid-typing. */
+  const saved = !!item.altText;
   const field = (filled: boolean) => (
     <Textarea
       className={
@@ -794,11 +795,10 @@ function AltTextSection({ item, onUpdateAltText }: AltTextSectionProps) {
           : "tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700"
       }
       id={`alt-text-${item.key}`}
-      value={altText}
+      {...draftProps}
       maxLength={ALT_TEXT_MAX}
       rows={2}
       placeholder="Add a description for this image"
-      onChange={(e) => onUpdateAltText(item.key, e.target.value)}
     />
   );
   return (
@@ -806,7 +806,7 @@ function AltTextSection({ item, onUpdateAltText }: AltTextSectionProps) {
       <label htmlFor={`alt-text-${item.key}`} className="mgr-det-label">
         Default alt
       </label>
-      {altText ? (
+      {saved ? (
         /* 4418:58292 — written alt text reads as a grey box: the text, then
            "✨ AI" (when the model wrote it). The field stays
            editable in place. */
@@ -834,9 +834,14 @@ function AltTextSection({ item, onUpdateAltText }: AltTextSectionProps) {
         <>
           {field(false)}
           <div className="tw:flex tw:items-center tw:justify-between tw:gap-2 tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-disabled)]">
-            <span>0 / {ALT_TEXT_MAX}</span>
+            <span>{altText.length} / {ALT_TEXT_MAX}</span>
           </div>
         </>
+      )}
+      {saveFailed && (
+        <p role="alert" data-testid="alt-text-error" className="tw:mt-1 tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-error-text)]">
+          Could not save the alt text — the server did not save the change.
+        </p>
       )}
       <p className="mgr-det-note" data-testid="alt-text-hint">Used for new placements. Existing alt text stays unchanged.</p>
     </div>

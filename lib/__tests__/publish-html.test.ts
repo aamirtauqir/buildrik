@@ -62,8 +62,8 @@ describe("canonical, across a multi-page site", () => {
     );
     expect(out).toEqual([
       "https://example.com/",
-      "https://example.com/about.html",
-      "https://example.com/pricing.html",
+      "https://example.com/about",
+      "https://example.com/pricing",
     ]);
     expect(new Set(out).size).toBe(3);
   });
@@ -85,7 +85,7 @@ describe("canonical, across a multi-page site", () => {
     // The editor emits og:title/description/type/locale but cannot emit og:url
     // — it does not know the deploy domain.
     const html = publishPage("about.html", page("About"), { canonicalDomain: "https://example.com" });
-    expect(html).toContain('<meta property="og:url" content="https://example.com/about.html">');
+    expect(html).toContain('<meta property="og:url" content="https://example.com/about">');
   });
 
   it("adds no og:url when there is no canonical to point at", () => {

@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Plus, LayoutTemplate, Sparkles, Check, X, Lock, ArrowUpRight } from "lucide-react";
+import { Plus, LayoutTemplate, Check, X, Lock, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { trpc } from "@lib/trpc/client";
 import { Button, InputField, Modal } from "@/components/dashboard/primitives";
@@ -8,7 +8,7 @@ import { Button, InputField, Modal } from "@/components/dashboard/primitives";
 interface CreateSiteModalProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: { name: string; method: string }) => void;
+  onSubmit: (data: { name: string; method: "template" | "blank" }) => void;
 }
 
 function slugify(name: string): string {
@@ -36,7 +36,7 @@ export function CreateSiteModal({ open, onClose, onSubmit }: CreateSiteModalProp
     return () => clearTimeout(id);
   }, [name]);
 
-  function submitOnce(data: { name: string; method: string }) {
+  function submitOnce(data: { name: string; method: "template" | "blank" }) {
     if (submitting) return;
     setSubmitting(true);
     onSubmit(data);
@@ -48,7 +48,6 @@ export function CreateSiteModal({ open, onClose, onSubmit }: CreateSiteModalProp
   );
 
   const health = trpc.dashboard.health.useQuery(undefined, { enabled: open });
-  const aiCredits = health.data?.aiCredits;
   const sitesUsed = health.data?.sites?.used ?? 0;
   const sitesLimit = health.data?.sites?.limit ?? 0;
   const atSiteLimit = health.data !== undefined && sitesLimit > 0 && sitesUsed >= sitesLimit;
@@ -118,26 +117,6 @@ export function CreateSiteModal({ open, onClose, onSubmit }: CreateSiteModalProp
           <button disabled={submitting} onClick={() => submitOnce({ name, method: "template" })} className="flex w-full items-center gap-3 rounded-lg border p-4 text-left transition-colors hover:bg-[var(--color-bg-subtle)] disabled:opacity-60" style={{ borderColor: "var(--color-border-default)" }}>
             <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }}><LayoutTemplate className="h-5 w-5" style={{ color: "var(--color-text-secondary)" }} /></div>
             <div><p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Use a Template</p><p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>Browse 50+ templates</p></div>
-          </button>
-          <button disabled={submitting} onClick={() => submitOnce({ name, method: "ai" })} className="flex w-full items-center gap-3 rounded-lg border p-4 text-left transition-colors hover:bg-[var(--color-primary-subtle)]/50 disabled:opacity-60" style={{ borderColor: "var(--color-border-default)" }}>
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "var(--color-primary-subtle)" }}><Sparkles className="h-5 w-5" style={{ color: "var(--color-primary)" }} /></div>
-            <div className="flex-1">
-              <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Generate with AI</p>
-              <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>AI-powered site creation</p>
-            </div>
-            {aiCredits && (
-              <div className="text-right">
-                {aiCredits.used < aiCredits.limit ? (
-                  <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
-                    {aiCredits.used}/{aiCredits.limit} credits remaining
-                  </p>
-                ) : (
-                  <p className="flex items-center gap-1 text-body-sm" style={{ color: "var(--color-text-muted)" }}>
-                    <Lock className="h-3 w-3" /> Upgrade for more
-                  </p>
-                )}
-              </div>
-            )}
           </button>
           <button disabled={submitting} onClick={() => submitOnce({ name, method: "blank" })} className="flex w-full items-center gap-3 rounded-lg border p-4 text-left transition-colors hover:bg-[var(--color-bg-subtle)] disabled:opacity-60" style={{ borderColor: "var(--color-border-default)" }}>
             <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }}><Plus className="h-5 w-5" style={{ color: "var(--color-text-secondary)" }} /></div>

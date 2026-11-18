@@ -25,11 +25,20 @@ import { AlertTriangle, Check, LoaderCircle, WifiOff } from "lucide-react";
 import { formatRelativeTime } from "@/shared/utils/relativeTime";
 /* The LOCAL Tooltip — see HelpTooltip.tsx. */
 import { Tooltip } from "./Tooltip";
+import { Popover } from "./Popover";
 
 /** `not-loaded` (Task 1.6, board B7-G02): the site never arrived, so this
  *  session has saved nothing and can save nothing — it describes the session,
  *  not the stored site, which is untouched. */
-export type SaveState = "saved" | "saving" | "unsaved" | "conflict" | "offline" | "error" | "not-loaded";
+export type SaveState =
+  | "saved"
+  | "saving"
+  | "unsaved"
+  | "stalled"
+  | "conflict"
+  | "offline"
+  | "error"
+  | "not-loaded";
 
 export interface SaveStatusProps extends React.HTMLAttributes<HTMLSpanElement> {
   state: SaveState;
@@ -47,6 +56,11 @@ export interface SaveStatusProps extends React.HTMLAttributes<HTMLSpanElement> {
    * 7563:233691's tooltip). Rendered as a tooltip on the plain status.
    */
   hint?: string;
+  /** `stalled` only: how long the oldest unsaved change has waited (ms). */
+  stalledFor?: number;
+  /** A panel the pill opens (the stalled state's "Autosave is stuck"). The
+   *  pill becomes its trigger; open/close are the container's. */
+  panel?: { open: boolean; onClose: () => void; label: string; content: React.ReactNode };
 }
 
 /** U1: one relative-time SSOT — seconds granularity preserved for saves.
@@ -69,7 +83,17 @@ const COPY: Record<Exclude<SaveState, "saved">, string> = {
   /* Board C05 10:2199. */
   error: "Couldn’t save — Retry",
   "not-loaded": "Not loaded · nothing saved yet",
+  /* Design decision 4: dirty for 30 s with no save attempt. The age is added
+     by `stalledLabel`. */
+  stalled: "Not saving",
 };
+
+/** "Not saving · unsaved for 45 s" / "… for 3 min". */
+function stalledLabel(ms: number | undefined): string {
+  if (!ms || !Number.isFinite(ms)) return COPY.stalled;
+  const s = Math.round(ms / 1000);
+  return `${COPY.stalled} · unsaved for ${s < 120 ? `${s} s` : `${Math.round(s / 60)} min`}`;
+}
 
 const BASE_CLASS =
   "tw:inline-flex tw:min-w-0 tw:items-center tw:gap-2 tw:h-6 tw:border-0 tw:bg-transparent tw:p-0 " +
@@ -82,6 +106,7 @@ const STATE_CLASS: Record<SaveState, string> = {
   saved: "tw:text-[var(--bk-ink-muted)]",
   saving: "tw:text-[var(--bk-ink-muted)]",
   unsaved: "tw:text-[var(--bk-ink-muted)]",
+  stalled: "tw:text-[var(--bk-warning-text)]",
   conflict: "tw:text-[var(--bk-warning-text)]",
   offline: "tw:text-[var(--bk-warning-text)]",
   error: "tw:text-[var(--bk-error-text)]",
@@ -100,14 +125,16 @@ function Glyph({ state }: { state: SaveState }) {
       return <span aria-hidden="true" className="tw:mx-1 tw:size-1.5 tw:flex-none tw:rounded-full tw:bg-[var(--bk-warning)]" />;
     case "offline":
       return <WifiOff {...props} />;
+    case "stalled":
     case "conflict":
     case "error":
       return <AlertTriangle {...props} />;
   }
 }
 
-export function SaveStatus({ state, savedAt, onClick, hint, className, ...rest }: SaveStatusProps) {
-  const label = state === "saved" ? `Saved${savedAt ? ago(savedAt) : ""}` : COPY[state];
+export function SaveStatus({ state, savedAt, onClick, hint, stalledFor, panel, className, ...rest }: SaveStatusProps) {
+  const label =
+    state === "saved" ? `Saved${savedAt ? ago(savedAt) : ""}` : state === "stalled" ? stalledLabel(stalledFor) : COPY[state];
   const classes = [BASE_CLASS, STATE_CLASS[state], className].filter(Boolean).join(" ");
 
   /* `save-status-${state}` is the anchor the boards are measured through —
@@ -115,7 +142,7 @@ export function SaveStatus({ state, savedAt, onClick, hint, className, ...rest }
      inline at BOTH call sites: `check-anchors` greps the literal text before
      the interpolation, so a hoisted template is invisible to it. */
   if (onClick) {
-    return (
+    const button = (
       <button
         type="button"
         className={`${classes} tw:cursor-pointer tw:rounded tw:outline-none tw:hover:underline tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]`}
@@ -126,6 +153,13 @@ export function SaveStatus({ state, savedAt, onClick, hint, className, ...rest }
         <Glyph state={state} />
         <span className="tw:truncate">{label}</span>
       </button>
+    );
+    return panel ? (
+      <Popover open={panel.open} onClose={panel.onClose} placement="top" label={panel.label} trigger={button}>
+        {panel.content}
+      </Popover>
+    ) : (
+      button
     );
   }
   const status = (

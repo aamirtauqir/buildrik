@@ -164,7 +164,11 @@ export const FormFieldsSection: React.FC<FormFieldsSectionProps> = ({ elementId,
     const before = blockId === "submit" ? undefined : submit;
     const parent = before?.getParent() ?? form;
     const index = before ? parent.getChildIndex(before) : undefined;
-    const n = fields.length + 1;
+    /* BK-44: `field-<count+1>` repeated a name after a delete, and two fields
+       with one name merged into one answer. The first free number is used. */
+    const taken = new Set(form.getDescendants().map((el) => el.getAttribute("name")));
+    let n = fields.length + 1;
+    while (taken.has(`field-${n}`)) n++;
     let added: Element | null = null as Element | null;
     writeElement(composer, form, "form-field-add", () => {
       if (blockId === "input") {

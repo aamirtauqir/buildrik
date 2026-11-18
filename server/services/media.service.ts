@@ -10,7 +10,6 @@ import type {
   ListAssetVersionsInput,
   ListAssetsInput,
   MoveAssetInput,
-  RestoreAssetVersionInput,
   StorageQuotaResult,
   UpdateAssetInput,
 } from "@buildrik/shared/schemas/media";
@@ -100,17 +99,11 @@ function assertOwnedBlobUrl(url: string, userId: string): void {
  * Phase B5++ codex re-review pass 4 P1 fix: cross-tenant URL guard
  * applied at every URL-mutation surface, not just createAsset.
  *
- * The B5++ commit blocked URL_CONFLICT in createAsset, but missed two
- * other surfaces that ALSO write to MediaAsset.url:
- *   1. createAssetVersion accepts an arbitrary client-supplied URL
- *      and stores it on a MediaAssetVersion row (which becomes the
- *      MediaAsset.url after a restore call).
- *   2. restoreAssetVersion copies that version URL onto MediaAsset.url
- *      directly.
- *
- * Without a guard at all three surfaces, a user could smuggle another
- * tenant's URL into their own MediaAsset row via version+restore,
- * resurrecting the cross-tenant blob deletion vulnerability.
+ * The B5++ commit blocked URL_CONFLICT in createAsset, but missed
+ * createAssetVersion, which accepts an arbitrary client-supplied URL and
+ * stores it on a MediaAssetVersion row. (A server-side restore that copied
+ * that URL onto MediaAsset.url existed until 2026-10-21, REA M-5; the
+ * editor's restore now moves canvas placements onto the version's URL.)
  *
  * This helper centralizes the check so future URL-mutation surfaces
  * either use it or fail review.
@@ -506,11 +499,8 @@ export async function createAssetVersion(userId: string, input: CreateAssetVersi
 
   // Phase B5++ codex re-review pass 4 P1 fix: cross-tenant URL guard.
   // Pre-fix, createAssetVersion accepted any client-supplied URL and
-  // stored it on the version row. A user could then call
-  // restoreAssetVersion to copy that URL onto their MediaAsset, ending
-  // up with their tenant's row pointing at another tenant's blob —
-  // re-opening the cross-tenant blob deletion vulnerability that the
-  // B5++ createAsset URL_CONFLICT guard was meant to close.
+  // stored it on the version row, from where it could be placed on a
+  // site as another tenant's blob.
   assertOwnedBlobUrl(input.url, userId);
   await assertUrlNotOwnedByOther(userId, input.url);
 
@@ -556,33 +546,6 @@ export async function createAssetVersion(userId: string, input: CreateAssetVersi
   });
 }
 
-export async function restoreAssetVersion(userId: string, input: RestoreAssetVersionInput) {
-  const version = await prisma.mediaAssetVersion.findUnique({
-    where: { id: input.versionId },
-    include: { asset: { select: { userId: true, siteId: true } } },
-  });
-  if (!version || version.asset.userId !== userId) {
-    throw new Error("NOT_FOUND");
-  }
-  await assertMediaWrite(userId, version.asset.siteId);
-
-  // Phase B5++ codex re-review pass 4 P1 fix: defense-in-depth URL
-  // guard at restore time too. createAssetVersion now blocks adding
-  // cross-tenant URLs to new versions, but legacy versions created
-  // before the guard could still smuggle a foreign URL onto the
-  // parent asset row at restore. Re-checking here closes that gap
-  // for legacy data and protects against any future code path that
-  // bypasses the createAssetVersion guard.
-  assertOwnedBlobUrl(version.url, userId);
-  await assertUrlNotOwnedByOther(userId, version.url);
-
-  // Restore = update the parent asset to point at this version's URL.
-  // The version row itself stays; parent asset reflects the active state.
-  return prisma.mediaAsset.update({
-    where: { id: version.assetId },
-    data: { url: version.url, bytes: version.bytes },
-  });
-}
 
 // ─── Storage quota (Phase C) ───────────────────────────────────────────────
 

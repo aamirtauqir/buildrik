@@ -317,6 +317,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         )}
         confirmLabel="Delete"
         tone="destructive"
+        testId="comp-delete-confirm"
       />
     </div>
   );
@@ -343,7 +344,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
       <PanelErrorState
         title="Couldn't load your components."
         message="Your components are safe — only this list failed."
-        onRetry={() => state.setError(null)}
+        onRetry={state.retry}
       />,
     );
   }
@@ -377,6 +378,9 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         onDragStart={(e) => state.handleDragStart(e, component)}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") { e.preventDefault(); state.handleViewDetail(component); }
+          /* P-6: Delete / Backspace on a focused row opens the delete confirm,
+             the keys the Pages list and the canvas use. */
+          if (e.key === "Delete" || e.key === "Backspace") { e.preventDefault(); state.handleDelete(component.id); }
         }}
       >
         <Thumb />

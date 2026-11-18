@@ -36,27 +36,38 @@ const base: DeployInputs = {
 const build = (over: Partial<DeployInputs> = {}) => buildDeployFiles({ ...base, ...over });
 const byName = (files: ReturnType<typeof build>, name: string) =>
   files.find((f) => f.file === name)?.data ?? "";
+/** vercel.json minus `cleanUrls`, which every deploy carries (REA #26 —
+ *  asserted on its own below); null when that is all it carries. */
 const vercelJson = (over: Partial<DeployInputs> = {}) => {
-  const data = byName(build(over), "vercel.json");
-  return data ? (JSON.parse(data) as Record<string, unknown>) : null;
+  const { cleanUrls, ...rest } = JSON.parse(byName(build(over), "vercel.json")) as Record<string, unknown>;
+  expect(cleanUrls).toBe(true);
+  return Object.keys(rest).length > 0 ? rest : null;
 };
 
 describe("buildDeployFiles", () => {
-  it("uploads every page plus robots.txt and sitemap.xml", () => {
+  it("uploads every page plus robots.txt, sitemap.xml and vercel.json", () => {
     expect(build().map((f) => f.file)).toEqual([
       "index.html",
       "about.html",
       "pricing.html",
       "robots.txt",
       "sitemap.xml",
+      "vercel.json",
     ]);
+  });
+
+  /* REA #26: the sitemap, canonicals and internal links name clean URLs
+     (/about), so the deploy must serve them: Vercel's `cleanUrls` serves
+     about.html at /about and 308s the .html form. */
+  it("serves clean URLs on every deploy", () => {
+    expect(JSON.parse(byName(build(), "vercel.json"))).toEqual({ cleanUrls: true });
   });
 
   it("gives each page its own canonical and og:url", () => {
     const files = build();
     expect(byName(files, "index.html")).toContain('<link rel="canonical" href="https://example.com/">');
-    expect(byName(files, "about.html")).toContain('<link rel="canonical" href="https://example.com/about.html">');
-    expect(byName(files, "about.html")).toContain('<meta property="og:url" content="https://example.com/about.html">');
+    expect(byName(files, "about.html")).toContain('<link rel="canonical" href="https://example.com/about">');
+    expect(byName(files, "about.html")).toContain('<meta property="og:url" content="https://example.com/about">');
     const canonicals = files
       .filter((f) => f.file.endsWith(".html"))
       .map((f) => f.data.match(/rel="canonical" href="([^"]+)"/)?.[1]);
@@ -68,8 +79,8 @@ describe("buildDeployFiles", () => {
     expect(byName(files, "robots.txt")).toContain("Sitemap: https://example.com/sitemap.xml");
     const xml = byName(files, "sitemap.xml");
     expect(xml).toContain("<loc>https://example.com/</loc>");
-    expect(xml).toContain("<loc>https://example.com/about.html</loc>");
-    expect(xml).not.toContain("<loc>https://example.com/about</loc>");
+    expect(xml).toContain("<loc>https://example.com/about</loc>");
+    expect(xml).not.toContain(".html</loc>");
   });
 
   it("ships no sitemap and disallows crawling when indexing is off", () => {
@@ -116,9 +127,9 @@ describe("buildDeployFiles", () => {
         domains: [{ domain: "bellacucina.com", kind: "PRIMARY", isPrimary: true, status: "VERIFIED" }],
       });
       expect(byName(files, "index.html")).toContain('<link rel="canonical" href="https://bellacucina.com/">');
-      expect(byName(files, "about.html")).toContain('<link rel="canonical" href="https://bellacucina.com/about.html">');
-      expect(byName(files, "about.html")).toContain('<meta property="og:url" content="https://bellacucina.com/about.html">');
-      expect(byName(files, "sitemap.xml")).toContain("<loc>https://bellacucina.com/about.html</loc>");
+      expect(byName(files, "about.html")).toContain('<link rel="canonical" href="https://bellacucina.com/about">');
+      expect(byName(files, "about.html")).toContain('<meta property="og:url" content="https://bellacucina.com/about">');
+      expect(byName(files, "sitemap.xml")).toContain("<loc>https://bellacucina.com/about</loc>");
     });
 
     it("a typed canonical still wins over the primary domain", () => {
@@ -126,7 +137,7 @@ describe("buildDeployFiles", () => {
         canonicalUrl: "https://www.bellacucina.com",
         domains: [{ domain: "bellacucina.com", kind: "PRIMARY", isPrimary: true, status: "VERIFIED" }],
       });
-      expect(byName(files, "about.html")).toContain('<link rel="canonical" href="https://www.bellacucina.com/about.html">');
+      expect(byName(files, "about.html")).toContain('<link rel="canonical" href="https://www.bellacucina.com/about">');
     });
 
     it("never canonicalises to *.vercel.app — no custom domain means no canonical (sitemap may still list the vercel host)", () => {
@@ -168,8 +179,7 @@ describe("buildDeployFiles — vercel.json", () => {
   const headers = (over: Partial<DeployInputs["headers"]>) => ({ ...base.headers, ...over });
   const rule = (fromPath: string, toUrl: string, type = "301", matchQuery = false) => ({ fromPath, toUrl, type, matchQuery });
 
-  it("ships no vercel.json when the site has no redirects, no redirect domains and no headers", () => {
-    expect(build().map((f) => f.file)).not.toContain("vercel.json");
+  it("carries nothing but cleanUrls when the site has no redirects, no redirect domains and no headers", () => {
     expect(vercelJson({ domains: [{ domain: "bellacucina.com", kind: "PRIMARY", isPrimary: true, status: "VERIFIED" }] })).toBeNull();
     expect(vercelJson({ headers: headers({ cspPolicy: "   ", hstsMaxAge: 0, xFrameOptions: "" }) })).toBeNull();
   });
@@ -266,6 +276,7 @@ describe("buildDeployFiles — vercel.json", () => {
     const files = build({ redirects: [rule("/a", "/b")], headers: headers({ xFrameOptions: "DENY" }) });
     expect(files.map((f) => f.file)).toEqual(["index.html", "about.html", "pricing.html", "robots.txt", "sitemap.xml", "vercel.json"]);
     expect(JSON.parse(byName(files, "vercel.json"))).toEqual({
+      cleanUrls: true,
       redirects: [{ source: "/a", destination: "/b", statusCode: 301 }],
       headers: [{ source: "/(.*)", headers: [{ key: "X-Frame-Options", value: "DENY" }] }],
     });

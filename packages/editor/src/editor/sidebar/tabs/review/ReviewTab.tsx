@@ -6,7 +6,7 @@
  * revoked · 158:213 review-closed · 453:3974 load-error · 1138:4527 loading).
  *
  * The frame every state shares, top to bottom: the panel header (its ⋯ holds
- * Compare rounds and Round history, board 7071:79114), one status line
+ * Compare with approved and Round history, board 7071:79114), one status line
  * ("2 open · 1 resolved · Awaiting Sara", board 4418:115784), the thread, then
  * a fixed foot — the note composer. The 4418 Review boards (116040–118896)
  * draw no primary under it, so the re-send ("Re-send review link" · "Send a new
@@ -324,15 +324,21 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   /* Every mutation in this panel — reply, resolve, reopen — lands here. The
      canvas draws the same comments as pins and refetches them on
      "comments:refresh". */
+  const { addToast } = useToast();
   const reload = React.useCallback(async () => {
     try {
       setComments(await fetchReviewComments());
       setRound(await fetchCurrentRound());
       composer?.emit("comments:refresh", {});
     } catch {
-      /* keep the current view; the next explicit load surfaces errors */
+      /* The list on screen is stale; say so instead of keeping it silently (R-2). */
+      addToast({
+        key: "review-refresh-failed",
+        tone: "warning",
+        description: "The comment list didn't refresh. Reopen Review to see the latest.",
+      });
     }
-  }, [composer]);
+  }, [composer, addToast]);
 
   /* Board 156:2 labels a group "OPEN · HOME" — the page's NAME. The engine is
      the only thing that knows it; without this the panel printed the raw
@@ -408,7 +414,16 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       // Carry the round's client forward. `submitReview` only mints a token
       // when it is given an email, so a re-send without this produced a round
       // with `token: null` that the client could never open.
-      const outcome = await onResend(round?.invitedEmail ?? undefined, { preview });
+      let outcome: Awaited<ReturnType<typeof onResend>>;
+      try {
+        outcome = await onResend(round?.invitedEmail ?? undefined, { preview });
+      } catch (err) {
+        if (err instanceof ReviewPreviewError) throw err;
+        /* R1 R-1: a refused submit was an unhandled rejection with the
+           confirm already closed — nothing on screen said it failed. */
+        setNotice("Couldn't re-send. Try again.");
+        return;
+      }
       await reload();
       /* The round lands either way — a mail failure must never fail the
          re-send. Saying nothing is what made a misconfigured SMTP look
@@ -435,7 +450,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
     });
 
   /* Board 7071:79114 — the round's own actions live in a panel ⋯ menu
-     (G1-058/059). Compare rounds and Round history live here, not in the
+     (G1-058/059). Compare and Round history live here, not in the
      body. "Open current review link" needs the round's token, which
      `currentRound` carries only while the client's link still opens — so the
      row is drawn only then (post-Oct-1 R4). */
@@ -475,7 +490,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
               openCompare();
             }}
           >
-            Compare rounds
+            Compare with approved
           </MenuItem>
           <MenuItem
             onClick={() => {
@@ -552,7 +567,6 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
      page-then-select seam (C2, #39). An anchor deleted since the list loaded
      moves the row into the Detached group — where it has Reattach, not
      Locate (#27) — and a toast says why nothing was selected. */
-  const { addToast } = useToast();
   const locate = React.useCallback(
     (c: ReviewComment) => {
       if (!composer) return;

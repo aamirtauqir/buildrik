@@ -20,7 +20,6 @@ import {
   validateUpload,
   confirmUpload,
   getPendingUpload,
-  getUploadLimits,
 } from "@/server/services/upload.service";
 
 const p = prisma as unknown as {
@@ -107,15 +106,6 @@ describe("Upload Service", () => {
     });
   });
 
-  describe("getUploadLimits", () => {
-    it("returns limits for all contexts", () => {
-      const limits = getUploadLimits();
-      expect(limits.avatar).toBeDefined();
-      expect(limits.avatar.maxSizeMB).toBe(5);
-      expect(limits.favicon.maxSizeMB).toBe(0.5);
-      expect(limits.site_media.maxSizeMB).toBe(50);
-    });
-  });
 });
 
 /* Presign is the write authorisation for a PUT that overwrites a fixed path

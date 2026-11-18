@@ -26,11 +26,12 @@ describe("StudioPanels — where projectId comes from", () => {
     expect(src).not.toMatch(/^\s*projectId\??:\s*string/m);
   });
 
-  /* The token registry no longer keys anything by site: it reads the
-     project's own tokens through the composer (Brand Part 1a Task 10). The
-     preset registry still caches per site. */
-  it("hands the composer to the token registry and the resolved id to the preset registry", () => {
+  /* Neither registry keys anything by site: both read the project's own
+     settings through the composer (tokens: Brand Part 1a Task 10; presets:
+     B-3). The lint runner scopes "Ignore" by the resolved id (B-1). */
+  it("hands the composer to both registries and the resolved id to the lint runner", () => {
     expect(src).toContain("<TokenRegistryProvider composer={composer}>");
-    expect(src).toContain("<StylePresetRegistryProvider projectId={projectId}>");
+    expect(src).toContain("<StylePresetRegistryProvider composer={composer}>");
+    expect(src).toContain("<DSLintRunner composer={composer} siteId={projectId} />");
   });
 });

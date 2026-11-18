@@ -11,6 +11,8 @@
 import { afterEach, describe, expect, it } from "vitest";
 import {
   clearUnsaved,
+  compareKeptToServer,
+  peekOffScreenUnsaved,
   discardUnsaved,
   keepUnsaved,
   markUnsavedOffScreen,
@@ -33,21 +35,21 @@ afterEach(() => {
 
 describe("a kept copy the screen does not show", () => {
   it("survives a save of the screen", () => {
-    keepUnsaved(SITE, mine);
+    keepUnsaved(SITE, mine, null);
     markUnsavedOffScreen(SITE);
     clearUnsaved(SITE);
     expect(readUnsaved(SITE)?.project).toEqual(mine);
   });
 
   it("is not overwritten by a failed save of the screen", () => {
-    keepUnsaved(SITE, mine);
+    keepUnsaved(SITE, mine, null);
     markUnsavedOffScreen(SITE);
-    keepUnsaved(SITE, screen);
+    keepUnsaved(SITE, screen, null);
     expect(readUnsaved(SITE)?.project).toEqual(mine);
   });
 
   it("is handed over once, then follows the normal rules", () => {
-    keepUnsaved(SITE, mine);
+    keepUnsaved(SITE, mine, null);
     markUnsavedOffScreen(SITE);
     expect(takeOffScreenUnsaved(SITE)?.project).toEqual(mine);
     expect(takeOffScreenUnsaved(SITE)).toBeNull();
@@ -58,7 +60,7 @@ describe("a kept copy the screen does not show", () => {
   });
 
   it("goes when the user discards it", () => {
-    keepUnsaved(SITE, mine);
+    keepUnsaved(SITE, mine, null);
     markUnsavedOffScreen(SITE);
     discardUnsaved(SITE);
     expect(readUnsaved(SITE)).toBeNull();
@@ -70,7 +72,7 @@ describe("a kept copy the screen does not show", () => {
    thrown away, the prompt has nothing left to offer — its owner hears so. */
 describe("the off-screen offer settling", () => {
   it("is announced once when the copy is handed over", () => {
-    keepUnsaved(SITE, mine);
+    keepUnsaved(SITE, mine, null);
     markUnsavedOffScreen(SITE);
     let heard = 0;
     onOffScreenSettled(SITE, () => (heard += 1));
@@ -80,7 +82,7 @@ describe("the off-screen offer settling", () => {
   });
 
   it("is announced when the copy is discarded", () => {
-    keepUnsaved(SITE, mine);
+    keepUnsaved(SITE, mine, null);
     markUnsavedOffScreen(SITE);
     let heard = 0;
     onOffScreenSettled(SITE, () => (heard += 1));
@@ -98,5 +100,32 @@ describe("the off-screen offer settling", () => {
     stop();
     takeOffScreenUnsaved(SITE);
     expect(heard).toBe(0);
+  });
+});
+
+/* R1: whether restoring the kept edits would replace someone's later save is
+   decided by the token the edits were made on, never by when they were made. */
+describe("compareKeptToServer", () => {
+  const T = "2026-10-15T10:00:00.000Z";
+  it.each([
+    ["the loaded token is the edits' base", { base: T }, T, "unchanged"],
+    ["the same instant in another ISO spelling", { base: T }, "2026-10-15T10:00:00Z", "unchanged"],
+    ["the server saved since", { base: T }, "2026-10-15T10:05:00.000Z", "server-newer"],
+    ["an older record without a base", {}, T, "unknown"],
+    ["no loaded token", { base: T }, null, "unknown"],
+  ])("%s", (_case, extra, loaded, expected) => {
+    expect(compareKeptToServer({ project: mine, at: "2026-10-15T11:00:00.000Z", ...extra }, loaded)).toBe(expected);
+  });
+});
+
+describe("peekOffScreenUnsaved", () => {
+  it("shows the waiting copy without handing it over", () => {
+    keepUnsaved(SITE, mine, null);
+    expect(peekOffScreenUnsaved(SITE)).toBeNull();
+    markUnsavedOffScreen(SITE);
+    expect(peekOffScreenUnsaved(SITE)?.project).toEqual(mine);
+    expect(takeOffScreenUnsaved(SITE)?.project).toEqual(mine);
+    expect(peekOffScreenUnsaved(SITE)).toBeNull();
+    clearUnsaved(SITE);
   });
 });

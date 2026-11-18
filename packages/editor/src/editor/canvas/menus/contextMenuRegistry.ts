@@ -28,6 +28,8 @@ export type ContextAction = {
   submenu?: ContextAction[];
   isVisible?: (ctx: ActionContext) => boolean;
   isEnabled?: (ctx: ActionContext) => boolean;
+  /** Why a disabled row is disabled — shown on it (design decision 13). */
+  disabledReason?: (ctx: ActionContext) => string | undefined;
   handler?: (ctx: ActionContext) => void;
 };
 

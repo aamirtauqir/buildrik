@@ -23,6 +23,7 @@ import type { RemoteAssetSync, MediaAsset } from "@/shared/types/media";
 function makeRemoteSync(): RemoteAssetSync {
   return {
     uploadAndCreate: vi.fn(async () => ({ serverId: "srv", url: "https://x/y" })),
+    registerUploaded: vi.fn(async (url: string) => ({ serverId: "srv-reg", url })),
     deleteRemote: vi.fn(async () => true),
     createFolder: vi.fn(async () => ({ serverId: "srv-f" })),
     deleteFolder: vi.fn(async () => true),
@@ -492,5 +493,61 @@ describe("MediaManager server mirror — versionOf / edits ↔ userMetadata (369
     expect(manager.getAsset("v3")?.versionOf).toBeUndefined();
     expect(manager.getAsset("v4")?.versionOf).toBe("hero");
     expect(manager.getAsset("v4")?.edits).toBeUndefined();
+  });
+});
+
+/* REA 2026-10-20 #14: every mirror used to `catch → return false`, and the
+   manager ignored the result — local moved ahead of the server and the UI
+   reported success. Now the server goes first: a refused write leaves the
+   local library as it was and throws, so the caller can say so. */
+describe("MediaManager server mirror — a refused write keeps local in step and throws", () => {
+  it("a failed move leaves the asset where it was and rejects", async () => {
+    const remote = makeRemoteSync();
+    (remote.moveAsset as ReturnType<typeof vi.fn>).mockResolvedValue(false);
+    const manager = makeManager(remote);
+    seedAsset(manager, { id: "a1", serverId: "s1", folderId: "f-old" });
+    await expect(manager.updateAsset("a1", { folderId: "f-new" })).rejects.toThrow(/server/i);
+    expect(manager.getAsset("a1")?.folderId).toBe("f-old");
+    expect((manager as any).storage.saveAsset).not.toHaveBeenCalled();
+  });
+
+  it("a failed metadata write leaves the name as it was and rejects", async () => {
+    const remote = makeRemoteSync();
+    (remote.updateAsset as ReturnType<typeof vi.fn>).mockResolvedValue(false);
+    const manager = makeManager(remote);
+    seedAsset(manager, { id: "a1", serverId: "s1", name: "old.png" });
+    await expect(manager.updateAsset("a1", { name: "new.png" })).rejects.toThrow(/server/i);
+    expect(manager.getAsset("a1")?.name).toBe("old.png");
+  });
+
+  it("a failed folder rename keeps the old name and rejects", async () => {
+    const remote = makeRemoteSync();
+    (remote.renameFolder as ReturnType<typeof vi.fn>).mockResolvedValue(false);
+    const manager = makeManager(remote);
+    seedFolder(manager, "f1", "Old");
+    await expect(manager.renameFolder("f1", "New")).rejects.toThrow(/server/i);
+    expect(manager.getAllFolders().find((f) => f.id === "f1")?.name).toBe("Old");
+  });
+
+  it("a failed folder delete keeps the folder and rejects", async () => {
+    const remote = makeRemoteSync();
+    (remote.deleteFolder as ReturnType<typeof vi.fn>).mockResolvedValue(false);
+    const manager = makeManager(remote);
+    (manager as any).storage.deleteFolder = vi.fn(async () => {});
+    seedFolder(manager, "f1", "Keep");
+    await expect(manager.deleteFolder("f1")).rejects.toThrow(/server/i);
+    expect(manager.getAllFolders().some((f) => f.id === "f1")).toBe(true);
+    expect((manager as any).storage.deleteFolder).not.toHaveBeenCalled();
+  });
+
+  it("a folder delete re-roots its files locally without a second server move", async () => {
+    const remote = makeRemoteSync();
+    const manager = makeManager(remote);
+    (manager as any).storage.deleteFolder = vi.fn(async () => {});
+    seedFolder(manager, "f1", "Gone");
+    seedAsset(manager, { id: "a1", serverId: "s1", folderId: "f1" });
+    await manager.deleteFolder("f1");
+    expect(manager.getAsset("a1")?.folderId).toBeUndefined();
+    expect(remote.moveAsset).not.toHaveBeenCalled();
   });
 });

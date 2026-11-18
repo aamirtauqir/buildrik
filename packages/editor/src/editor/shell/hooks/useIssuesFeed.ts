@@ -64,6 +64,8 @@ export interface IssuesFeedTriggers {
   publishState?: string;
   /** The Issues panel is open — opening it must never show a stale list. */
   panelOpen?: boolean;
+  /** Load-scan findings (useLoadRepair) — computed elsewhere, listed here. */
+  damageIssues?: Issue[];
 }
 
 /** Issue-id prefix of a collection list with no source; the rest is its element id. */
@@ -117,7 +119,7 @@ export function useIssuesFeed(
   composer: Composer | null,
   siteId: string | null,
   setIssues: React.Dispatch<React.SetStateAction<Issue[]>>,
-  { publishState, panelOpen }: IssuesFeedTriggers = {},
+  { publishState, panelOpen, damageIssues }: IssuesFeedTriggers = {},
 ): UseIssuesFeedReturn {
   const content = useContentIssueScanner(composer);
 
@@ -195,7 +197,11 @@ export function useIssuesFeed(
               id: `${PUBLISH_CHECK_ISSUE}${c.label}`,
               type: c.status === "fail" ? ("error" as const) : ("warning" as const),
               message: c.detail,
-              location: `Publish › ${c.label}`,
+              // Not `Publish › ${c.label}`: every label names the PASSING
+              // state ("Vercel connected", "Domain connected"), so a failing
+              // row read "Vercel connected · … Connect it to publish." The
+              // detail already says what is wrong.
+              location: "Publish",
             })),
         );
       })
@@ -238,8 +244,8 @@ export function useIssuesFeed(
   useRefetchOnFocus(refetchChecks);
 
   React.useEffect(() => {
-    setIssues([...lintIssues, ...content.issues, ...listIssues, ...checkIssues]);
-  }, [lintIssues, content.issues, listIssues, checkIssues, setIssues]);
+    setIssues([...lintIssues, ...content.issues, ...listIssues, ...checkIssues, ...(damageIssues ?? [])]);
+  }, [lintIssues, content.issues, listIssues, checkIssues, damageIssues, setIssues]);
 
   const rescan = React.useCallback(() => {
     content.rescan();

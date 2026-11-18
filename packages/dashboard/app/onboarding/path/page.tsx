@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, PanelsTopLeft, Sparkles, type LucideIcon } from "lucide-react";
+import { Plus, PanelsTopLeft, type LucideIcon } from "lucide-react";
 import { cn } from "@lib/utils";
 import { WizardShell } from "@/components/onboarding/wizard/wizard-shell";
 import { OnbButton } from "@/components/onboarding/wizard/onb-button";
@@ -8,10 +8,9 @@ import { OnbBack } from "@/components/onboarding/wizard/onb-back";
 import { useWizard } from "@/components/onboarding/wizard/wizard-context";
 import { useOnboardingComplete } from "@/components/onboarding/wizard/use-onboarding-complete";
 
-type Path = "ai" | "template" | "blank";
+type Path = "template" | "blank";
 
 const ROUTE: Record<Path, string> = {
-  ai: "/onboarding/ai/basics",
   template: "/onboarding/template",
   blank: "/onboarding/blank",
 };
@@ -24,23 +23,18 @@ const ROLE_LABEL: Record<string, string> = {
   other: "your role",
 };
 
-// Which path we nudge, by the role captured at S1. Everyone else → AI Draft.
+// Which path we nudge, by the role captured at S1. Everyone else → Template.
+// The AI Draft path is not offered this version (no AI in the UI, R3-22); its
+// /onboarding/ai/* routes and the server generator are left in place.
 const RECOMMEND: Record<string, Path> = {
-  freelancer: "ai",
-  agency: "ai",
+  freelancer: "template",
+  agency: "template",
   "in-house": "template",
   student: "blank",
-  other: "ai",
+  other: "template",
 };
 
 const CARDS: { path: Path; title: string; description: string; cta: string; icon: LucideIcon }[] = [
-  {
-    path: "ai",
-    title: "AI Draft",
-    description: "Answer a few questions and Buildrick creates a first draft with pages, sections, and copy.",
-    cta: "Start AI Draft",
-    icon: Sparkles,
-  },
   {
     path: "template",
     title: "Template",
@@ -57,14 +51,14 @@ const CARDS: { path: Path; title: string; description: string; cta: string; icon
   },
 ];
 
-/** S3 · How do you want to start? Three build paths; the one matching the S1
+/** S3 · How do you want to start? Two build paths; the one matching the S1
  *  role is highlighted + mirrored by the bottom CTA. Back → S2. */
 export default function PathPage() {
   const { data, saveAndGo } = useWizard();
   const { skipSetup, skipping } = useOnboardingComplete();
 
   const role = data.workspace?.role ?? "";
-  const recommended = RECOMMEND[role] ?? "ai";
+  const recommended = RECOMMEND[role] ?? "template";
   const recCard = CARDS.find((c) => c.path === recommended)!;
 
   const choose = (path: Path) => saveAndGo(ROUTE[path], { path });
@@ -78,7 +72,7 @@ export default function PathPage() {
         </p>
       </div>
 
-      {/* The 3×320 card row (992px) is wider than the 480px wizard column, so it
+      {/* The card row (992px) is wider than the 480px wizard column, so it
           breaks out of it and re-centres on the viewport. */}
       <div className="relative left-1/2 mt-12 flex w-[992px] max-w-[calc(100vw-2rem)] -translate-x-1/2 flex-wrap items-start justify-center gap-4">
         {CARDS.map((c) => {

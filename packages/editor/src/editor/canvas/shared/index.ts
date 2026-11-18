@@ -21,12 +21,6 @@ export {
 } from "./tokens";
 
 // ============================================
-// Shared Hooks
-// ============================================
-export { useCanvasDOM } from "./useCanvasDOM";
-export type { CanvasElement, UseCanvasDOMOptions, UseCanvasDOMResult } from "./useCanvasDOM";
-
-// ============================================
 // Geometry Utilities
 // ============================================
 export {

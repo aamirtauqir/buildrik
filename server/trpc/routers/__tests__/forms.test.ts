@@ -20,6 +20,7 @@ const svc = vi.hoisted(() => ({
   exportSubmissions: vi.fn(),
 }));
 const guards = vi.hoisted(() => ({ guardSiteAccess: vi.fn(), guardSiteRole: vi.fn() }));
+const perm = vi.hoisted(() => ({ getEffectiveSiteRole: vi.fn(async () => "ADMIN") }));
 // The router reads the stored notifyEmail through the service (keyed by
 // site + element id), never through Prisma — an empty client proves it.
 const prismaMock = vi.hoisted(() => ({}));
@@ -30,6 +31,7 @@ vi.mock("next/headers", () => ({ cookies: () => Promise.resolve({ get: () => und
 vi.mock("@/lib/prisma", () => ({ prisma: prismaMock }));
 vi.mock("@/server/services/form-submission.service", () => svc);
 vi.mock("@/server/trpc/guards", () => ({ guardSiteAccess: guards.guardSiteAccess, guardSiteRole: guards.guardSiteRole }));
+vi.mock("@/server/services/permission.service", () => perm);
 
 import { formsRouter } from "@/server/trpc/routers/forms";
 
@@ -91,5 +93,24 @@ describe("forms.updateBlock — notifyEmail ADMIN gate", () => {
     // prismaMock is `{}` — no `formBlock` property was ever attached to it,
     // which is only possible if nothing in this call read `ctx.prisma.formBlock.*`.
     expect((prismaMock as { formBlock?: unknown }).formBlock).toBeUndefined();
+  });
+});
+
+/* D7: a VIEWER exported every visitor's IP. Technical data (ip, device) goes
+   to ADMIN and up on the site, by the effective role. */
+describe("forms — submitter IP and device below ADMIN (D7)", () => {
+  it.each([
+    ["VIEWER", false],
+    ["EDITOR", false],
+    ["ADMIN", true],
+    ["OWNER", true],
+  ])("%s → technical %s on list and export", async (role, technical) => {
+    perm.getEffectiveSiteRole.mockResolvedValue(role as never);
+    svc.listSubmissions.mockResolvedValue({ data: [], total: 0, page: 1, perPage: 20 });
+    svc.exportSubmissions.mockResolvedValue("[]");
+    await caller().listSubmissions({ siteId: "s1", page: 1, perPage: 20 } as never);
+    await caller().exportSubmissions({ siteId: "s1", format: "json" });
+    expect(svc.listSubmissions.mock.calls.at(-1)![1]).toEqual({ technical });
+    expect(svc.exportSubmissions.mock.calls.at(-1)![3]).toEqual({ technical });
   });
 });

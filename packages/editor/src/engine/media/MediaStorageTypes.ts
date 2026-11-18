@@ -84,6 +84,18 @@ export class MediaValidationError extends MediaError {
   }
 }
 
+/** The server refused (or never answered) a library write. The local library
+ *  was left as it was, so it still matches the server — the caller says so. */
+export class MediaRemoteWriteError extends MediaError {
+  readonly operation: "move" | "update" | "rename-folder" | "delete-folder";
+
+  constructor(operation: MediaRemoteWriteError["operation"]) {
+    super(`The server did not save this change (${operation})`, "retry");
+    this.name = "MediaRemoteWriteError";
+    this.operation = operation;
+  }
+}
+
 /** Insert attempted with no active page in the composer. */
 export class MediaNoActivePageError extends MediaError {
   constructor() {

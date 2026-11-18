@@ -15,11 +15,13 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const siteFindUnique = vi.fn();
 const pageFindFirst = vi.fn();
+const jobFindFirst = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     site: { findUnique: (...a: unknown[]) => siteFindUnique(...a), update: vi.fn() },
     page: { findFirst: (...a: unknown[]) => pageFindFirst(...a) },
+    publishBuildJob: { findFirst: (...a: unknown[]) => jobFindFirst(...a) },
     slugHistory: { create: vi.fn() },
   },
 }));
@@ -41,6 +43,8 @@ beforeEach(() => {
   siteFindUnique.mockReset();
   pageFindFirst.mockReset();
   siteFindUnique.mockResolvedValue(site);
+  jobFindFirst.mockReset();
+  jobFindFirst.mockResolvedValue(null);
 });
 
 describe("getSiteSettings — page SEO", () => {
@@ -127,3 +131,20 @@ describe("getSiteSettings — brand token kill switch", () => {
   });
 });
 
+
+/* BD-39 (4): the editor's Copy link / search preview name `/about.html` until
+   the live deploy serves clean URLs. The answer rides the settings read the
+   editor already makes for the site's host (useSiteOrigin). */
+describe("getSiteSettings — servesCleanUrls", () => {
+  it("is false for a site whose live deploy predates cleanUrls", async () => {
+    pageFindFirst.mockResolvedValue(null);
+    jobFindFirst.mockResolvedValue({ bundle: { files: [{ file: "vercel.json", data: "{}" }] } });
+    expect((await getSiteSettings("s1")).servesCleanUrls).toBe(false);
+  });
+
+  it("is true once the last publish shipped cleanUrls", async () => {
+    pageFindFirst.mockResolvedValue(null);
+    jobFindFirst.mockResolvedValue({ bundle: { files: [{ file: "vercel.json", data: '{"cleanUrls":true}' }] } });
+    expect((await getSiteSettings("s1")).servesCleanUrls).toBe(true);
+  });
+});

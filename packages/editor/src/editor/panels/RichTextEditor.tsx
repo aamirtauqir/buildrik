@@ -27,6 +27,8 @@ export interface RichTextEditorProps {
     strikethrough?: boolean;
     link?: boolean;
   };
+  /** Its computed font size in px — what Font size shows. */
+  fontSizePx?: number;
 }
 
 const BLOCKS = [
@@ -75,7 +77,7 @@ function blockLabel(tag?: string): string {
 
 type Open = null | "block" | "lists" | "align" | "color" | "link" | "more" | "highlight";
 
-export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, blockTag, activeStyles = {} }) => {
+export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, blockTag, fontSizePx, activeStyles = {} }) => {
   const [open, setOpen] = React.useState<Open>(null);
   const [linkUrl, setLinkUrl] = React.useState("");
   const toggle = (which: Exclude<Open, null>) => setOpen((v) => (v === which ? null : which));
@@ -153,6 +155,13 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, block
       {glyph}
     </Button>
   );
+
+  /* Audit 2026-10-20 #16: the size select was uncontrolled, so it showed
+     its first option, not the text's. It shows the caret's computed size; one
+     not on the list gets its own row (the size scale is execCommand's 1–7,
+     not every px value). */
+  const sizePx = fontSizePx === undefined ? undefined : Math.round(fontSizePx);
+  const sizeValue = FONT_SIZES.find((s) => s.label === `${sizePx}px`)?.value ?? "";
 
   return (
     <div
@@ -241,7 +250,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, block
             autoFocus
             onChange={(e) => setLinkUrl(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && linkUrl) applyLink();
+              if (e.key === "Enter") {
+                e.preventDefault();
+                applyLink();
+              }
             }}
           />
           <div className="tw:flex tw:items-center tw:justify-end tw:gap-2">
@@ -286,10 +298,12 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, block
           <MenuSeparator />
           <div className="tw:flex tw:items-center tw:gap-2 tw:px-2 tw:py-1 tw:text-[12px] tw:text-[var(--bk-ink-muted)]">
             Text size
-            <Select aria-label="Text size" data-testid="rte-fontSize" defaultValue="" onChange={(e) => run("fontSize", e.target.value)}>
-              <option value="" disabled>
-                —
-              </option>
+            <Select aria-label="Text size" data-testid="rte-fontSize" value={sizeValue} onChange={(e) => run("fontSize", e.target.value)}>
+              {sizeValue === "" && (
+                <option value="" disabled>
+                  {sizePx === undefined ? "—" : `${sizePx}px`}
+                </option>
+              )}
               {FONT_SIZES.map((s) => (
                 <option key={s.value} value={s.value}>
                   {s.label}

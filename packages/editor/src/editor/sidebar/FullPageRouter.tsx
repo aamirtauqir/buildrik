@@ -128,9 +128,10 @@ const BrandHost: React.FC<{
   const [attempt, setAttempt] = React.useState(0);
   const BrandWorkspace = React.useMemo(() => React.lazy(loadBrandWorkspace), [attempt]);
   return (
-    /* No data-bk-surface: Brand edits are composer writes, so ⌘Z/⌘⇧Z must
-       reach the engine (CommandCenter's full-page guard would refuse them). */
-    <div className={RESOURCE_HOST} data-testid="brand-host">
+    /* BK-05 / D36: Brand owns the keyboard like the other full-page
+       surfaces, but keeps ⌘Z for its own token edits — never for a canvas
+       edit behind it. */
+    <div className={RESOURCE_HOST} data-testid="brand-host" data-bk-surface="fullpage" data-bk-history="tokens">
       <InspectorErrorBoundary key={attempt} fallback={<BrandLoadFailed onRetry={() => setAttempt((n) => n + 1)} />}>
         <React.Suspense fallback={<BrandLoading />}>
           <BrandWorkspace composer={composer} projectId={projectId} initialPage={initialPage} onClose={onClose} />
@@ -188,8 +189,8 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
     /* Templates (222:43842, 223:44891 — C-17), Assets (B6-A01 199:37199),
        Site settings (B8-S01 238:9980) and Brand (B6-B01) are the resource
        area (shape 1 above): in place, inside the shell. Each owns its Escape,
-       its guard and its dialogs; Templates, Assets and Settings also own the
-       keyboard (data-bk-surface, CommandCenter). */
+       its guard, its dialogs and the keyboard (data-bk-surface,
+       CommandCenter); Brand keeps ⌘Z for its token edits (D36). */
     case "templates":
       return (
         <div className={RESOURCE_HOST} data-testid="tpl-host" data-bk-surface="fullpage">
@@ -215,8 +216,8 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
       ) : null;
 
     /* 2L9 215:43588 (B6-K02): Components is a resource area. No
-       data-bk-surface, like Brand: detach and delete are composer writes and
-       their ⌘Z must reach the composer. */
+       data-bk-surface: detach and delete are composer writes and their ⌘Z
+       must reach the composer. */
     case "components":
       return (
         <div className={RESOURCE_HOST} data-testid="comp-host">

@@ -50,8 +50,9 @@ export interface TokenDetailViewProps {
   /** The preview mode — the contrast line reads the value the page shows. */
   mode?: "light" | "dark";
   /** Commit a token edit. `darkValue` carries the dark-mode variant; only the
-   *  color registry stores one, and passing it for other kinds is a no-op. */
-  onValueChange?: (id: string, value: string, darkValue?: string) => void;
+   *  color registry stores one, and passing it for other kinds is a no-op.
+   *  True when the value is now written; false when the write was refused. */
+  onValueChange?: (id: string, value: string, darkValue?: string) => boolean;
   /**
    * Delete callback. Accepts an optional `{ replaceWith }` second arg routed
    * through the B1 `replacedBy` bridge (B4 follow-up). Without the second
@@ -199,6 +200,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
   };
 
   // ─ Lint actions.
+  const [autoFixFailed, setAutoFixFailed] = React.useState(false);
   const handleAutoFix = () => {
     const issue = lintIssues[0];
     if (!issue || !composer) return;
@@ -206,8 +208,12 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
        exactly like Brand checks' Fix: one ⌘Z step AND a Review-changes row.
        The engine's applyAutoFix wrote around that log. */
     const fixed = composer.designSystem.computeAutoFix(value, issue.autoFixHint);
-    if (fixed && fixed !== value) onValueChange?.(token.id, fixed);
-    lintState?.suppress(token.id);
+    /* B-2: hide the warning only once the fix is written. A refused write
+       (read-only, invalid) used to suppress it anyway, so the problem stayed
+       and the warning went. */
+    const written = !!fixed && fixed !== value && (onValueChange?.(token.id, fixed) ?? false);
+    setAutoFixFailed(!written);
+    if (written) lintState?.suppress(token.id);
   };
   const handleIgnore = () => lintState?.suppress(token.id);
 
@@ -538,7 +544,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
       )}
 
       {/* Brand checks */}
-      <TokenChecksLine issue={issue} contrast={contrast} onAutoFix={handleAutoFix} onIgnore={handleIgnore} />
+      <TokenChecksLine issue={issue} contrast={contrast} autoFixFailed={autoFixFailed} onAutoFix={handleAutoFix} onIgnore={handleIgnore} />
 
 
       <TokenRenameDialog

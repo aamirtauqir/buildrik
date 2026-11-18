@@ -5,7 +5,7 @@
  *
  * One hook, one dialog, one chokepoint: AquibraStudio hands every door the
  * guarded `setLeftPanelTab` (the rail, `ui:switch-tab`, StudioPanels' open
- * requests) and the guarded `openLeftPanelToTab` (⌘H, ⇧A, the palette,
+ * requests) and the guarded `openLeftPanelToTab` (⇧A, the palette,
  * `UI_PANEL_OPEN`, every `onOpen*` deep link) this returns.
  *
  * Closing the drawer is guarded too (EDT-007): it unmounts the CMS workspace

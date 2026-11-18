@@ -87,7 +87,7 @@ describe("the ZIP's sitemap follows the publish rule", () => {
     const zip = await zipOf(twoPageComposer("about"), "https://bellacucina.com");
     const xml = await zip.file("sitemap.xml")!.async("string");
     expect(xml).toContain("<loc>https://bellacucina.com/</loc>");
-    expect(xml).toContain("<loc>https://bellacucina.com/about.html</loc>");
+    expect(xml).toContain("<loc>https://bellacucina.com/about</loc>");
   });
 
   it("has no sitemap when the site has no origin yet", async () => {

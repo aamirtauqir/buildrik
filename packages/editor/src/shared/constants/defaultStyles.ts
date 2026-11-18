@@ -17,7 +17,11 @@ export const THEME = {
   // migrations (cobalt→#406ED6 2026-07-21, #406ED6→#1A56DB 2026-07-30), each
   // time handing a retired brand blue to user sites.
   primary: "#1A56DB",
-  textPrimary: "#1a1a1a",
+  // The site's seed Text token (defaultTokens.ts `color-text`), which is what
+  // unstyled text renders on the canvas, in Preview and when published. It was
+  // #1a1a1a, a colour nothing rendered: the inspector showed it, flagged as
+  // off-design-system, over a heading painted #334155 (REA #18).
+  textPrimary: "#334155",
   textSecondary: "#333333",
   // Every element this product creates carries this. The EXPORT's base rule
   // uses it too (ExportHelpers RESET_CSS): elements parsed out of a template's

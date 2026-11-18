@@ -77,9 +77,10 @@ describe("exportPublishPages", () => {
     } as never);
     const pages = await exportPublishPages(composer);
     const byPath = new Map(pages.map((p) => [p.path, p.html]));
-    expect(byPath.get("index.html")).toContain('href="/about.html"');
-    expect(byPath.get("about.html")).toContain('href="/index.html"');
-    for (const html of byPath.values()) expect(html).not.toMatch(/href="(?:about|index)\.html"/);
+    // Clean, as the deploy serves them (vercel.json cleanUrls, REA #26).
+    expect(byPath.get("index.html")).toContain('href="/about"');
+    expect(byPath.get("about.html")).toContain('href="/"');
+    for (const html of byPath.values()) expect(html).not.toMatch(/href="[^"]*(?:about|index)\.html"/);
   });
 
   it("ships html for each page, not empty documents", async () => {
@@ -95,53 +96,59 @@ describe("exportPublishPages", () => {
    rendered with browser defaults, because the exported markup carries classes
    (`class="buildrick-el-…"`) rather than style attributes. */
 describe("exportPublishPages — the stylesheet has to travel", () => {
-  const page = (body: string) =>
-    `<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <link rel="stylesheet" href="styles.css">\n</head>\n<body>\n${body}\n</body>\n</html>`;
+  /* Neutral values on purpose: the assertion is that the CSS TRAVELS, and a
+     realistic element class in prose would trip the class-namespace gate. */
+  function styledSite() {
+    const composer = new Composer({} as never);
+    composer.importProject({
+      pages: [
+        { id: "home", name: "Home", slug: "", isHome: true,
+          root: { id: "r1", type: "container" as const, tagName: "div", children: [
+            { id: "t1", type: "heading" as const, tagName: "h1", content: "Home", styles: { color: "rgb(1, 1, 1)" }, children: [] },
+          ] } },
+        { id: "about", name: "About", slug: "about",
+          root: { id: "r2", type: "container" as const, tagName: "div", children: [
+            { id: "t2", type: "paragraph" as const, tagName: "p", content: "About", styles: { color: "rgb(2, 2, 2)" }, children: [] },
+          ] } },
+      ],
+    } as never);
+    return composer;
+  }
 
-  it("folds the stylesheet into every page and drops the dead link", async () => {
-    const { inlinePublishStylesheet } = await import("../exportPublishPages");
-    const out = inlinePublishStylesheet([
-      { name: "index.html", content: page("<h1>Home</h1>") },
-      { name: "about.html", content: page("<h1>About</h1>") },
-      /* Neutral selector on purpose: the assertion is that the sheet TRAVELS,
-         and a realistic element class here would trip the class-namespace
-         gate, which counts prose as well as code. */
-      { name: "styles.css", content: ".el-1{color:red}" },
-    ]);
-    expect(out.map((p) => p.path)).toEqual(["index.html", "about.html"]);
-    for (const p of out) {
+  it("puts each page's CSS in the page and links no stylesheet", async () => {
+    const pages = await exportPublishPages(styledSite());
+    expect(pages.map((p) => p.path).sort()).toEqual(["about.html", "index.html"]);
+    for (const p of pages) {
       expect(p.html).not.toContain('href="styles.css"');
-      expect(p.html).toContain("<style>.el-1{color:red}</style>");
+      expect(p.html).toMatch(/<style>[^<]*box-sizing:border-box/);
     }
   });
 
-  it("keeps the folded stylesheet inside its <style> (S-1)", async () => {
-    const { inlinePublishStylesheet } = await import("../exportPublishPages");
-    const [out] = inlinePublishStylesheet([
-      { name: "index.html", content: page("<h1>Home</h1>") },
-      { name: "styles.css", content: ".a{content:\"$'\"}</Style><script>alert(1)</script>" },
-    ]);
-    const doc = new DOMParser().parseFromString(out.html, "text/html");
+  /* REA #25: the whole site's CSS on every page put 18 KB of home-page rules
+     on a one-heading About page. */
+  it("carries only that page's element rules", async () => {
+    const byPath = new Map((await exportPublishPages(styledSite())).map((p) => [p.path, p.html]));
+    expect(byPath.get("index.html")).toContain("rgb(1, 1, 1)");
+    expect(byPath.get("index.html")).not.toContain("rgb(2, 2, 2)");
+    expect(byPath.get("about.html")).toContain("rgb(2, 2, 2)");
+    expect(byPath.get("about.html")).not.toContain("rgb(1, 1, 1)");
+  });
+
+  it("keeps the CSS inside its <style> (S-1)", async () => {
+    const composer = styledSite();
+    composer.setProjectSettings({
+      ...composer.getProjectSettings(),
+      customCode: { globalCss: ".a{content:\"$'\"}</Style><script>alert(1)</script>" },
+    } as never);
+    const [home] = await exportPublishPages(composer);
+    const doc = new DOMParser().parseFromString(home.html, "text/html");
     expect(doc.querySelectorAll("script")).toHaveLength(0);
     expect(doc.querySelector("h1")?.textContent).toBe("Home");
-    expect(doc.querySelector("style")?.textContent).toContain(".a{content:\"$'\"}");
   });
 
   it("returns page files only — the payload schema takes pages, nothing else", async () => {
-    const { inlinePublishStylesheet } = await import("../exportPublishPages");
-    const out = inlinePublishStylesheet([
-      { name: "index.html", content: page("<h1>Home</h1>") },
-      { name: "styles.css", content: ".a{}" },
-      { name: "sitemap.xml", content: "<urlset/>" },
-    ]);
-    expect(out.every((p) => p.path.endsWith(".html"))).toBe(true);
-  });
-
-  it("leaves a page alone when the export produced no stylesheet", async () => {
-    const { inlinePublishStylesheet } = await import("../exportPublishPages");
-    const html = "<!DOCTYPE html><html><head></head><body></body></html>";
-    const out = inlinePublishStylesheet([{ name: "index.html", content: html }]);
-    expect(out).toEqual([{ path: "index.html", html }]);
+    const pages = await exportPublishPages(styledSite());
+    expect(pages.every((p) => p.path.endsWith(".html"))).toBe(true);
   });
 });
 

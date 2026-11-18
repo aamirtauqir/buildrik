@@ -174,11 +174,14 @@ export default function ProjectsPage() {
   }, [foldersQuery.isError, addToast]);
 
   // Mutations
+  // BD-37: every create-site path opens the editor on the new site.
   const createMutation = trpc.sites.create.useMutation({
-    onSuccess: () => {
-      sitesQuery.refetch();
+    onSuccess: (site) => {
       setCreateOpen(false);
       addToast("success", "Site created");
+      const href = getEditorHref(site.id, unified);
+      if (unified) router.push(href);
+      else window.location.href = href;
     },
     onError: (err) => addToast("error", "Failed to create site", err.message),
   });
@@ -701,12 +704,9 @@ export default function ProjectsPage() {
         onSubmit={(data) => {
           if (data.method === "blank") {
             createMutation.mutate({ name: data.name, method: "blank" });
-          } else if (data.method === "template") {
-            setCreateOpen(false);
-            router.push("/dashboard/templates");
           } else {
             setCreateOpen(false);
-            router.push(`/dashboard/sites/new?method=${data.method}&name=${encodeURIComponent(data.name)}`);
+            router.push("/dashboard/templates");
           }
         }}
       />

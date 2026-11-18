@@ -183,8 +183,10 @@ describe("templateSync hydrate edge paths", () => {
   it("a failed hydrate warns + never throws into editor open", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     list.mockRejectedValueOnce(new Error("offline"));
-    await expect(hydrateUserTemplatesFromServer()).resolves.toBeUndefined();
+    const onError = vi.fn();
+    await expect(hydrateUserTemplatesFromServer(onError)).resolves.toBeUndefined();
     expect(warn).toHaveBeenCalledWith("[template-sync] hydrate from server failed", expect.any(Error));
+    expect(onError).toHaveBeenCalledWith(expect.any(Error));
     warn.mockRestore();
   });
 

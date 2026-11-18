@@ -123,23 +123,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   const rootId = composer?.elements?.getActivePage?.()?.root.id;
   const selectedElement = selectedProp && selectedProp.id !== rootId ? selectedProp : null;
 
-  const { currentPseudoState, setCurrentPseudoState } = useInspectorState(selectedElement);
-
-  // Board 160:512 — while the AI agent runs, the inspector hands over to a
-  // status card; selection is kept and restored on return.
-  const [agentRun, setAgentRun] = React.useState<{ running: boolean; summary: string }>({
-    running: false,
-    summary: "",
-  });
-  React.useEffect(() => {
-    if (!composer) return;
-    const onRun = (p: { running?: boolean; summary?: string }) =>
-      setAgentRun({ running: Boolean(p?.running), summary: p?.summary ?? "" });
-    composer.on("ai:agent-run", onRun);
-    return () => {
-      composer.off("ai:agent-run", onRun);
-    };
-  }, [composer]);
+  const { currentPseudoState, setCurrentPseudoState } = useInspectorState(selectedElement, composer);
 
   /* ⋯ "Apply style to all … on this page" reviews first, as the tab's body
      (2L9 S11 — it was a confirm dialog, DD-6b). */
@@ -484,102 +468,90 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
         {targetIds.length <= 1 && composer?.components?.getInstanceByElementId?.(selectedElement.id) ? (
           <ComponentRow composer={composer} elementId={selectedElement.id} />
         ) : null}
-        {agentRun.running ? (
-          /* AI agent takeover (board 160:512) — the run replaces the
-             controls; the selection is kept and restored when it ends. */
-          <div role="status" aria-live="polite" className="tw:flex tw:flex-col tw:gap-2 tw:px-4 tw:py-5" data-testid="inspector-ai-run">
-            <div className="tw:text-[13px] tw:font-semibold tw:text-[var(--bk-ink)]">AI</div>
-            <div className="tw:text-[13px] tw:text-[var(--bk-ink)]">{agentRun.summary || "Working…"}</div>
-            <div className="tw:text-[12px] tw:text-[var(--bk-ink-muted)]">Your selection is kept and restored when you go back.</div>
-          </div>
-        ) : (
-          <>
-            <Tabs
-              tabs={INSPECTOR_TABS}
-              value={activeTab}
-              onChange={(id) => requestTab(id as TabId)}
-              label="Inspector tabs"
-              panelId="inspector-tabpanel"
-              data-testid="inspector-tab-strip"
-              className="tw:h-10 tw:px-3 tw:py-1 tw:gap-1 tw:border-0"
-              tabClassName={INSPECTOR_TAB_CLASS}
-            />
-            {leaveGuard}
-            {/* 2L9 S22: "Editing unavailable" heads the tab body of a locked element. */}
-            <StatusLine composer={composer} elementId={selectedElement.id} locked={locked && !pasteRefused && !addRefused} conflict={NO_CONFLICT} />
-            {showContextRow ? (
-              <ContextRow
-                state={currentPseudoState}
-                stateOverrideCount={fieldOverrides.counts.pseudo}
-                onResetState={() => runDiscrete(fieldOverrides.resetPseudo)}
-                breakpointName={breakpointName}
-                breakpointOverrideCount={fieldOverrides.counts.breakpoint}
-                onRevertBreakpoint={() => runDiscrete(fieldOverrides.revertBreakpoint)}
-                entries={fieldOverrides.entries}
+        <Tabs
+          tabs={INSPECTOR_TABS}
+          value={activeTab}
+          onChange={(id) => requestTab(id as TabId)}
+          label="Inspector tabs"
+          panelId="inspector-tabpanel"
+          data-testid="inspector-tab-strip"
+          className="tw:h-10 tw:px-3 tw:py-1 tw:gap-1 tw:border-0"
+          tabClassName={INSPECTOR_TAB_CLASS}
+        />
+        {leaveGuard}
+        {/* 2L9 S22: "Editing unavailable" heads the tab body of a locked element. */}
+        <StatusLine composer={composer} elementId={selectedElement.id} locked={locked && !pasteRefused && !addRefused} conflict={NO_CONFLICT} />
+        {showContextRow ? (
+          <ContextRow
+            state={currentPseudoState}
+            stateOverrideCount={fieldOverrides.counts.pseudo}
+            onResetState={() => runDiscrete(fieldOverrides.resetPseudo)}
+            breakpointName={breakpointName}
+            breakpointOverrideCount={fieldOverrides.counts.breakpoint}
+            onRevertBreakpoint={() => runDiscrete(fieldOverrides.revertBreakpoint)}
+            entries={fieldOverrides.entries}
+            elementId={selectedElement.id}
+          />
+        ) : null}
+        <div
+          ref={contentRef}
+          className="bdi-panel-scroll"
+          role="tabpanel"
+          id="inspector-tabpanel"
+          aria-labelledby={`inspector-tabpanel-tab-${activeTab}`}
+        >
+          <div
+            className="bdi-body"
+            /* A group, so the disabled state has a role that carries it. */
+            role="group"
+            aria-label="Element properties"
+            aria-disabled={editLocks.length > 0 || undefined}
+          >
+            {targetIds.length <= 1 ? <LockRefusalNote composer={composer} elementId={selectedElement.id} kind="paste-style" /> : null}
+            {/* 2L9 147:78900: dimmed in the editor only — said above every tab's body. */}
+            {targetIds.length <= 1 ? (
+              <DimmedNotice
+                composer={composer}
                 elementId={selectedElement.id}
+                onHideOnLiveSite={() => {
+                  setActiveTab("behaviour");
+                  requestAnimationFrame(() => document.getElementById("inspector-section-visibility")?.scrollIntoView({ block: "nearest" }));
+                }}
               />
             ) : null}
-            <div
-              ref={contentRef}
-              className="bdi-panel-scroll"
-              role="tabpanel"
-              id="inspector-tabpanel"
-              aria-labelledby={`inspector-tabpanel-tab-${activeTab}`}
-            >
-              <div
-                className="bdi-body"
-                /* A group, so the disabled state has a role that carries it. */
-                role="group"
-                aria-label="Element properties"
-                aria-disabled={editLocks.length > 0 || undefined}
+            {connectionFailure ? (
+              <LoadFailedCard retry={loadRetry} />
+            ) : (
+              <InspectorErrorBoundary
+                targetName={
+                  getLayerName(composer?.elements.getElement(selectedElement.id)) ?? elementTypeLabel(selectedElement.type)
+                }
               >
-                {targetIds.length <= 1 ? <LockRefusalNote composer={composer} elementId={selectedElement.id} kind="paste-style" /> : null}
-                {/* 2L9 147:78900: dimmed in the editor only — said above every tab's body. */}
-                {targetIds.length <= 1 ? (
-                  <DimmedNotice
-                    composer={composer}
-                    elementId={selectedElement.id}
-                    onHideOnLiveSite={() => {
-                      setActiveTab("behaviour");
-                      requestAnimationFrame(() => document.getElementById("inspector-section-visibility")?.scrollIntoView({ block: "nearest" }));
-                    }}
-                  />
-                ) : null}
-                {connectionFailure ? (
-                  <LoadFailedCard retry={loadRetry} />
-                ) : (
-                  <InspectorErrorBoundary
-                    targetName={
-                      getLayerName(composer?.elements.getElement(selectedElement.id)) ?? elementTypeLabel(selectedElement.type)
-                    }
-                  >
-                    <InspectorTabContent
-                      tabId={activeTab}
-                      breakpoint={currentBreakpoint}
-                      pseudoState={currentPseudoState}
-                      composer={composer}
-                      selectedElement={selectedElement}
-                      selectedIds={targetIds}
-                      selectedTypes={selectedTypes}
-                      styles={styles_state}
-                      authoredStyles={authoredStyles}
-                      onChange={handleStyleChange}
-                      onBatchChange={handleBatchStyleChange}
-                      cssContext={enrichedContext}
-                      propertyStates={propertyStates}
-                      choices={choices}
-                      onSetChoices={setChoices}
-                      advancedState={advancedState}
-                      onOpenMediaLibrary={onOpenMediaLibrary}
-                      onOpenIconPicker={onOpenIconPicker}
-                      onOpenCreateCollection={onOpenCreateCollection}
-                    />
-                  </InspectorErrorBoundary>
-                )}
-              </div>
-            </div>
-          </>
-        )}
+                <InspectorTabContent
+                  tabId={activeTab}
+                  breakpoint={currentBreakpoint}
+                  pseudoState={currentPseudoState}
+                  composer={composer}
+                  selectedElement={selectedElement}
+                  selectedIds={targetIds}
+                  selectedTypes={selectedTypes}
+                  styles={styles_state}
+                  authoredStyles={authoredStyles}
+                  onChange={handleStyleChange}
+                  onBatchChange={handleBatchStyleChange}
+                  cssContext={enrichedContext}
+                  propertyStates={propertyStates}
+                  choices={choices}
+                  onSetChoices={setChoices}
+                  advancedState={advancedState}
+                  onOpenMediaLibrary={onOpenMediaLibrary}
+                  onOpenIconPicker={onOpenIconPicker}
+                  onOpenCreateCollection={onOpenCreateCollection}
+                />
+              </InspectorErrorBoundary>
+            )}
+          </div>
+        </div>
       </div>
     </InspectorFieldContext.Provider>
   );

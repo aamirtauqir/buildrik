@@ -151,6 +151,7 @@ export async function useTemplate(
       templateId: template.id,
       pages: templatePageCount,
       lastEditedAt: new Date(),
+      lastEditedById: userId,
     },
   });
 
@@ -210,6 +211,7 @@ export async function applyTemplateToSite(
         templateId: template.id,
         pages: pageRows.length,
         lastEditedAt: new Date(),
+        lastEditedById: userId,
       },
     });
   });

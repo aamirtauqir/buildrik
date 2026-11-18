@@ -209,6 +209,24 @@ export interface MediaAsset {
    * or next upload attempt. UI surfaces a "pending sync" badge. Phase B2.
    */
   localOnly?: boolean;
+
+  /**
+   * BK-42: the file reached storage at this URL but its asset row was not
+   * created. `src` is this URL, so placements work everywhere; the retry only
+   * registers it (`registerUploaded`) and never uploads the file again — the
+   * re-upload made three Blob copies and duplicate rows for one file.
+   */
+  uploadedUrl?: string;
+}
+
+/** What an asset upload is registered with on the server. */
+export interface RemoteAssetMeta {
+  filename: string;
+  mimeType: string;
+  bytes: number;
+  type: "image" | "video" | "icon" | "font";
+  folderId?: string | null;
+  siteId?: string | null;
 }
 
 /**
@@ -227,22 +245,26 @@ export interface RemoteAssetSync {
    * Upload a file to remote storage and create the asset row server-side.
    * Returns the server-assigned CUID + final URL on success. The engine
    * uses the CUID as the canonical asset ID once persistence succeeds.
-   * Returns null on auth fail, offline, quota rejection, or any error —
-   * caller marks the asset localOnly and queues for retry.
+   * Returns null when the file did not reach storage (auth fail, offline,
+   * quota) — caller marks the asset localOnly and queues for retry. When the
+   * file DID reach storage but the row was not created, returns its URL with
+   * `serverId: null`: the caller keeps the URL and retries only the row
+   * (`registerUploaded`), BK-42.
    */
   uploadAndCreate(
     file: Blob,
-    meta: {
-      filename: string;
-      mimeType: string;
-      bytes: number;
-      type: "image" | "video" | "icon" | "font";
-      folderId?: string | null;
-      siteId?: string | null;
+    meta: RemoteAssetMeta & {
       /** The network transfer's progress, 0–1 (L4-006). */
       onProgress?: (fraction: number) => void;
     }
-  ): Promise<{ serverId: string; url: string } | null>;
+  ): Promise<{ serverId: string | null; url: string } | null>;
+
+  /**
+   * Create the asset row for a file already in storage at `url`. The server's
+   * create is idempotent on URL, so a row the upload's completion hook made
+   * meanwhile is returned, not duplicated. Null on any failure.
+   */
+  registerUploaded(url: string, meta: RemoteAssetMeta): Promise<{ serverId: string; url: string } | null>;
 
   /**
    * Delete an asset row server-side. Returns true on success or 404

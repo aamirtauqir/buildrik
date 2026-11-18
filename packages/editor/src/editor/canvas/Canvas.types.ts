@@ -37,8 +37,6 @@ export interface CanvasProps {
   onOverlayChange?: (overlay: keyof CanvasOverlayState, enabled: boolean) => void;
   /** Change the active device/breakpoint (from the footer toolbar's switcher). */
   onDeviceChange?: (device: DeviceType) => void;
-  /** Open the image editor for a media element on the canvas (consumed by CanvasOverlayGroup) */
-  onOpenImageEditor?: (item: { key: string; src: string; name: string }) => void;
 }
 
 export interface CanvasRef {

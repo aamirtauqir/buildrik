@@ -44,6 +44,12 @@ describe("Clone 3695:45573 · Assets · Stock image saved", () => {
     expect(props.onClose).toHaveBeenCalledTimes(2);
   });
 
+  it("a saved stock video is called a video, not an image", () => {
+    mount({ saved: { name: "harbour.mp4", video: true } });
+    expect(screen.getByRole("heading", { name: "Stock video saved" })).toBeInTheDocument();
+    expect(screen.getByTestId("stock-saved-note")).toHaveTextContent("ready to insert or replace a video.");
+  });
+
   it("renders nothing without a saved file", () => {
     mount({ saved: null });
     expect(screen.queryByRole("heading")).toBeNull();

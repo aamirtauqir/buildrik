@@ -84,6 +84,30 @@ describe("RepeaterRenderer.expandCollectionLists", () => {
     expect(canvas.querySelector("p")!.textContent).toBe("{{item.missing}}");
   });
 
+  it("#21: export drops a slot the record has nothing for — no empty <p> in the card", async () => {
+    const doc = new DOMParser().parseFromString(
+      '<div data-buildrick-id="list"><div data-buildrick-id="card"><div data-buildrick-id="media"></div><h3 data-buildrick-id="t">{{item.name}}</h3><p data-buildrick-id="p">{{item.description}}</p></div></div>',
+      "text/html",
+    );
+    await setup([binding()], [item("r1", { name: "Margherita" }), item("r2", { name: "Quattro", description: "Four cheeses" })]).renderer.expandCollectionLists(doc);
+    const c = cards(doc);
+    expect(c).toHaveLength(2);
+    expect(c[0].querySelector("p")).toBeNull();
+    expect(c[0].querySelector("h3")!.textContent).toBe("Margherita");
+    // The author's own (non-CMS) element stays.
+    expect(c[0].querySelector('[data-buildrick-id="media"]')).not.toBeNull();
+    expect(c[1].querySelector("p")!.textContent).toBe("Four cheeses");
+  });
+
+  it("#21: the canvas keeps the empty slot so the author can re-aim it", async () => {
+    const doc = new DOMParser().parseFromString(
+      '<div data-buildrick-id="list"><p data-buildrick-id="p">{{item.description}}</p></div>',
+      "text/html",
+    );
+    await setup([binding()]).renderer.expandCollectionLists(doc, { canvas: true });
+    expect(doc.querySelectorAll("p")).toHaveLength(3);
+  });
+
   it("a data key with RegExp metacharacters neither throws nor mis-matches an attribute token", async () => {
     const doc = new DOMParser().parseFromString(
       '<div data-buildrick-id="list"><p data-buildrick-id="p" title="{{item.name}}">x</p></div>',

@@ -11,7 +11,7 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
 import type { Composer } from "@/engine/Composer";
 import type { Element } from "@/engine/elements/Element";
 import { createTestComposer, installEngineBrowserStubs, removeEngineBrowserStubs } from "@/engine/__tests__/test-utils/realComposer";
-import { KeybindingManager } from "@/engine/commands";
+import { KeybindingManager } from "@/engine/commands/KeybindingManager";
 import { quickStyleSubmenu } from "../styleActions";
 
 beforeAll(installEngineBrowserStubs);

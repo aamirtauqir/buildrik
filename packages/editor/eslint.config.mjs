@@ -251,7 +251,7 @@ export default [
   },
   // D-6: engine/ ↔ services/ boundary is new — WARN, not ERROR, until the
   // existing crossings it flags (Composer.ts's EmailService import,
-  // FormHandler.ts, cmsSync/componentSync/versionSync) are triaged. See
+  // cmsSync/componentSync/versionSync) are triaged. See
   // ledger D-6 decision_free_fix. Uses the CORE `no-restricted-imports`
   // rule (a different key from `@typescript-eslint/no-restricted-imports`
   // above) so its "warn" severity does not get replaced by the ERROR

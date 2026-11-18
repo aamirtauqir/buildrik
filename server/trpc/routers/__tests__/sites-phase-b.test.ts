@@ -71,7 +71,7 @@ describe("sites.rename — ADMIN (BE-5, PD-4)", () => {
     actAs("ADMIN");
     await caller().rename({ id: "s1", name: "New name" });
     expect(m.checkSiteRole).toHaveBeenCalledWith({}, "u_1", "s1", "ADMIN");
-    expect(m.renameSite).toHaveBeenCalledWith("s1", "New name");
+    expect(m.renameSite).toHaveBeenCalledWith("s1", "New name", "u_1");
   });
 });
 

@@ -10,6 +10,7 @@ import type { ElementType } from "../shared/types";
 import { sanitizeHTML } from "../shared/utils/html";
 import { canNestElement } from "../shared/utils/nesting";
 import { EVENTS } from "../shared/constants";
+import { hasH1 } from "@buildrik/shared/content/contentIssues";
 import {
   containerBlockConfig,
   textBlockConfig,
@@ -354,6 +355,13 @@ function applyTypeDefaults(el: EngineElement, elementType: string): void {
   }
 }
 
+/** Does the page `element` sits on carry an h1 anywhere (BD-39 (6))? */
+function pageHasH1(element: EngineElement): boolean {
+  let root = element;
+  for (let up = root.getParent(); up; up = up.getParent()) root = up;
+  return hasH1(root.toJSON());
+}
+
 function insertOne(
   composer: Composer,
   block: BlockDefinition,
@@ -365,6 +373,8 @@ function insertOne(
 
   // HTML content: sanitized at this boundary before it reaches the tree.
   if (typeof block.content === "string" && HTML_CONTENT_PATTERN.test(block.content)) {
+    const parent = composer.elements.getElement(parentId);
+    const needsH1 = block.elementType === "heading" && !!parent && !pageHasH1(parent);
     const inserted = composer.elements.insertHTMLToElement(
       parentId,
       sanitizeHTML(block.content),
@@ -387,6 +397,12 @@ function insertOne(
        Anything the block's own HTML specified wins — this only fills gaps. */
     if (Array.isArray(inserted)) {
       for (const el of inserted) applyTypeDefaults(el, block.elementType);
+      /* BD-39 (6): a Heading dropped on a page with no H1 becomes the page's
+         H1. Re-tagged AFTER the defaults, as the inspector's Level row does:
+         it keeps the block's token-bound size (font-size-4xl, Brand's
+         "Heading 1") rather than h1's raw 48px. New inserts only; the page
+         was read before this element joined it. */
+      if (needsH1) inserted[0]?.setTagName?.("h1");
     }
     return Array.isArray(inserted) && inserted.length > 0
       ? (inserted[0]?.getId?.() ?? undefined)

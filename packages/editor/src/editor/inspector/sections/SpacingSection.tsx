@@ -147,6 +147,7 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
         label={`${NAME[box]} ${side}`}
         property={property}
         units={UNITS[box]}
+        allowExpression
         placeholder=""
         value={boxes[box][side]}
         onChange={(v) => onChange(property, v)}
@@ -173,6 +174,7 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
               label={`${NAME[box]} sides`}
               property={`${box}-left`}
               units={UNITS[box]}
+              allowExpression
               placeholder=""
               value={s.left}
               onChange={(v) => onBatchChange({ [`${box}-left`]: v, [`${box}-right`]: v })}
@@ -189,6 +191,7 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
         label="Padding"
         property="padding-top"
         units={UNITS.padding}
+        allowExpression
         placeholder=""
         value={p.top}
         onChange={(v) => onBatchChange({ "padding-top": v, "padding-right": v, "padding-bottom": v, "padding-left": v })}

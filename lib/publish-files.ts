@@ -18,9 +18,9 @@ import {
   injectSeoTags,
   injectBadge,
 } from "@lib/publish-html";
-import { resolveSiteOrigin, withSitemapDirective } from "@lib/publish-urls";
+import { resolveSiteOrigin } from "@lib/publish-urls";
 import { pageCanonicalUrl } from "@buildrik/shared/seo/urls";
-import { buildSitemapXml } from "@buildrik/shared/seo/sitemap";
+import { buildRobotsTxt, buildSitemapXml } from "@buildrik/shared/seo/sitemap";
 import { publishPathError } from "@buildrik/shared/schemas/publish";
 
 export interface DeployPage {
@@ -101,15 +101,20 @@ interface VercelRedirect {
 }
 
 interface VercelConfig {
+  cleanUrls: true;
   redirects?: VercelRedirect[];
   headers?: Array<{ source: string; headers: Array<{ key: string; value: string }> }>;
 }
 
 /**
  * The deployment's vercel.json — Vercel's own file-based configuration, read
- * on every deployment (docs/project-configuration/vercel-json). Null when the
- * site has nothing to put in it, so a site without rules ships exactly what
- * it shipped before S3.
+ * on every deployment (docs/project-configuration/vercel-json).
+ *
+ * `cleanUrls: true` on every deploy (REA #26; owner-accepted SEO plan Q3 and
+ * L3-010 default): Vercel serves `about.html` at `/about` and 308-redirects
+ * the `.html` form. The sitemap, canonical and og:url (`pageCanonicalUrl`) and
+ * the export's internal links (`publicPagePath`) all name the clean form, so
+ * none of them points at a redirect.
  *
  * Redirects (verified against the vercel.json reference and
  * @vercel/routing-utils `convertRedirects`, 2026-09-14):
@@ -131,7 +136,7 @@ interface VercelConfig {
  * Headers apply to every path (`/(.*)`), one entry per column that is set;
  * HSTS is `max-age=<hstsMaxAge>` and only when the age is > 0.
  */
-function buildVercelConfig(input: Pick<DeployInputs, "redirects" | "domains" | "headers">): VercelConfig | null {
+function buildVercelConfig(input: Pick<DeployInputs, "redirects" | "domains" | "headers">): VercelConfig {
   const redirects: VercelRedirect[] = input.redirects.map((r) => ({
     source: r.fromPath,
     destination: r.toUrl,
@@ -162,8 +167,8 @@ function buildVercelConfig(input: Pick<DeployInputs, "redirects" | "domains" | "
     ...set("Permissions-Policy", h.permissionsPolicy),
   ];
 
-  if (redirects.length === 0 && headers.length === 0) return null;
   return {
+    cleanUrls: true,
     ...(redirects.length > 0 ? { redirects } : {}),
     ...(headers.length > 0 ? { headers: [{ source: "/(.*)", headers }] } : {}),
   };
@@ -200,14 +205,9 @@ export function buildDeployFiles(input: DeployInputs): DeployFile[] {
     ),
   }));
 
-  // The site's custom rules if set, else a default driven by the indexing
-  // toggle — plus the sitemap pointer, unless the author wrote their own.
-  const robotsBody = input.robotsTxt?.trim()
-    ? input.robotsTxt
-    : `User-agent: *\n${input.allowIndexing ? "Allow: /" : "Disallow: /"}\n`;
   files.push({
     file: "robots.txt",
-    data: input.allowIndexing ? withSitemapDirective(robotsBody, input.origin) : robotsBody,
+    data: buildRobotsTxt({ robotsTxt: input.robotsTxt, allowIndexing: input.allowIndexing, origin: input.origin }),
   });
 
   /* No sitemap when indexing is off: a staging site asking to be crawled is the
@@ -216,8 +216,7 @@ export function buildDeployFiles(input: DeployInputs): DeployFile[] {
     files.push({ file: "sitemap.xml", data: buildSitemapXml(input.origin, input.pages, input.now) });
   }
 
-  const config = buildVercelConfig(input);
-  if (config) files.push({ file: "vercel.json", data: JSON.stringify(config, null, 2) });
+  files.push({ file: "vercel.json", data: JSON.stringify(buildVercelConfig(input), null, 2) });
 
   return files;
 }

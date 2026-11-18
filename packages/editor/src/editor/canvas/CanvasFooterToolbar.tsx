@@ -104,15 +104,15 @@ const VIEW_ROWS: readonly { key: keyof CanvasOverlayState; label: string; kbd?: 
   /* 145:64586 "Rulers and guides…": the rulers are where guides are placed
      (click a ruler). No "…" — it toggles; the board's guide-detail dialog
      (S11) does not exist. */
-  { key: "rulers", label: "Rulers and guides", kbd: "⌘R" },
+  { key: "rulers", label: "Rulers and guides", kbd: "⇧R" },
   { key: "guides", label: "Snap guides", kbd: "⌘;" },
   { key: "outlines", label: "Show outlines" },
 ];
 /* The code's other overlays — not on the board, kept under a rule. */
 const MORE_VIEW_ROWS: readonly { key: keyof CanvasOverlayState; label: string; kbd: string }[] = [
   { key: "spacing", label: "Spacing", kbd: "⌘⇧;" },
-  { key: "badges", label: "Badges", kbd: "⌘B" },
-  { key: "xray", label: "X-Ray", kbd: "⌘⇧X" },
+  { key: "badges", label: "Badges", kbd: "⌥B" },
+  { key: "xray", label: "X-Ray", kbd: "⌥X" },
 ];
 
 /* The bar's popovers open downward, 5 under the bar's bottom edge (145:65011:
@@ -161,11 +161,16 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
      handler lives here rather than in the shell's shortcut hook because this
      component already owns the toggles' state and callback.
 
-     ⌘R (Rulers) is one of them, and it is the browser's reload. Taken anyway,
-     because a chord printed on a control and not honoured is the worse of the
-     two failures — and only the PLAIN chord is taken, so ⌘⇧R (hard reload) and
-     F5 both still reload the editor. */
+     SC-12 / BD-39 moved the chords that collide with the browser or with Text
+     scope off ⌘: Rulers ⇧R (⌘R reloads), Badges ⌥B (⌘B is Bold), X-Ray ⌥X
+     (⌘⇧X is strikethrough), zoom ⇧1 / ⇧2 / ⇧0 (⌘1 / ⌘2 switch browser
+     tabs). Those read `e.code`: on macOS ⌥B types "∫" and ⇧1 types "!". ⌘0
+     stays as the 100% alias SC-12 allows. */
   React.useEffect(() => {
+    const toggle = (e: KeyboardEvent, overlay: keyof CanvasOverlayState) => {
+      e.preventDefault();
+      onOverlayChange(overlay, !overlays[overlay]);
+    };
     const onKeyDown = (e: KeyboardEvent) => {
       if (isModalOpen()) return;
       const target = e.target instanceof HTMLElement ? e.target : null;
@@ -176,22 +181,34 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
       ) {
         return;
       }
-      if (!(e.metaKey || e.ctrlKey)) return;
+
+      if (!(e.metaKey || e.ctrlKey)) {
+        /* Exactly one of ⇧ / ⌥. */
+        if (e.shiftKey === e.altKey) return;
+        if (e.shiftKey) {
+          if (e.code === "Digit1" && onFitToScreen) {
+            e.preventDefault();
+            onFitToScreen();
+          } else if (e.code === "Digit2" && onZoomToSelection) {
+            e.preventDefault();
+            onZoomToSelection();
+          } else if (e.code === "Digit0") {
+            e.preventDefault();
+            onZoomChange(100);
+          } else if (e.code === "KeyR") {
+            toggle(e, "rulers");
+          }
+        } else if (e.code === "KeyB") {
+          toggle(e, "badges");
+        } else if (e.code === "KeyX") {
+          toggle(e, "xray");
+        }
+        return;
+      }
 
       const key = e.key.toLowerCase();
 
-      /* Board 817:4723's own rows: fit, selection, 100%, in, out. Printed on
-         the flyout and bound nowhere until now. */
-      if (key === "1" && onFitToScreen) {
-        e.preventDefault();
-        onFitToScreen();
-        return;
-      }
-      if (key === "2" && onZoomToSelection) {
-        e.preventDefault();
-        onZoomToSelection();
-        return;
-      }
+      /* Board 817:4723's own rows: 100%, in, out. */
       if (key === "0") {
         e.preventDefault();
         onZoomChange(100);
@@ -208,16 +225,8 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
         return;
       }
 
-      let overlay: keyof CanvasOverlayState | null = null;
-      if (key === ";" || key === ":") overlay = e.shiftKey ? "spacing" : "guides";
-      else if (key === "'" || key === '"') overlay = "grid";
-      else if (key === "b" && !e.shiftKey) overlay = "badges";
-      else if (key === "r" && !e.shiftKey) overlay = "rulers";
-      else if (key === "x" && e.shiftKey) overlay = "xray";
-      if (!overlay) return;
-
-      e.preventDefault();
-      onOverlayChange(overlay, !overlays[overlay]);
+      if (key === ";" || key === ":") toggle(e, e.shiftKey ? "spacing" : "guides");
+      else if (key === "'" || key === '"') toggle(e, "grid");
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
@@ -329,7 +338,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
                 radio
                 tick="box"
                 selected={false}
-                kbd="⌘1"
+                kbd="⇧1"
                 data-testid="canvas-zoom-fit"
                 onClick={() => {
                   onFitToScreen();

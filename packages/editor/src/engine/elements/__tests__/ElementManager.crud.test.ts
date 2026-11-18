@@ -393,15 +393,25 @@ describe("ElementManager.duplicateElement / serializeElement / pasteElement", ()
     expect(emitsOf(composer, EVENTS.ELEMENT_DUPLICATED)).toHaveLength(1);
   });
 
-  it("serializeElement returns fresh-ID clipboard data, null for unknown", () => {
-    const { manager, card, title } = seeded();
+  /* The clipboard keeps the SOURCE ids (paste re-ids, and finds the
+     breakpoint/:state rules to copy through them — BK-06), as a deep copy
+     the live element cannot reach. */
+  it("serializeElement returns a detached deep copy with the source ids, null for unknown", () => {
+    const { manager, root, card, title } = seeded();
     expect(manager.serializeElement("ghost")).toBeNull();
 
     const data = manager.serializeElement(card.getId())!;
-    expect(data.id).not.toBe(card.getId());
+    expect(data.id).toBe(card.getId());
     expect(data.children).toHaveLength(2);
-    expect(data.children![0].id).not.toBe(title.getId());
+    expect(data.children![0].id).toBe(title.getId());
     expect(data.children![0].content).toBe("Hi");
+
+    data.children![0].content = "changed";
+    expect(title.getContent()).toBe("Hi");
+
+    const pasted = manager.pasteElement(data, root)!;
+    expect(pasted.getId()).not.toBe(card.getId());
+    expect(pasted.getChildren()[0].getId()).not.toBe(title.getId());
   });
 
   it("pasteElement builds + registers the tree at the target index and emits CLIPBOARD_PASTE", () => {

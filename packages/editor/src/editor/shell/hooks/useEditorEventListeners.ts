@@ -238,8 +238,8 @@ export function useEditorEventListeners({
      "Preview", the canvas palette's Preview and the onboarding step that asks
      for one all reported success and showed nothing. Board 65:211 says preview
      is the overlay, and `AquibraStudio` owns that state, so it handles the
-     event now. The engine method is left alone: it drives InteractionManager's
-     runtime, which the sandboxed-iframe overlay does not replace. */
+     event now. `setPreviewMode` and the InteractionManager it drove were
+     removed once nothing called them (R1 §7). */
 
   // 3e) ELEMENT_QUICK_ADD → create + insert an element via the engine API.
   // Emitters: canvas command palette (SmartSuggestions' empty-container actions are gone with it).

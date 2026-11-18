@@ -41,6 +41,20 @@ describe("startPublish — freshness (C-3)", () => {
     expect(await prisma.publishBuildJob.count({ where: { siteId: site.id } })).toBe(0);
   });
 
+  /* REA #9: the token names the saved revision the pages were rendered from.
+     One that is not the stored revision — even a later one — is refused. */
+  it("refuses a token that is not the stored revision, even a later one", async () => {
+    const { user, site } = await seed();
+
+    await expect(
+      startPublish(site.id, user.id, [], false, {
+        expectedLastEditedAt: new Date(site.lastEditedAt.getTime() + 1).toISOString(),
+      }),
+    ).rejects.toThrow(`SAVE_CONFLICT:${site.lastEditedAt.toISOString()}`);
+
+    expect(await prisma.publishBuildJob.count({ where: { siteId: site.id } })).toBe(0);
+  });
+
   it("a tab holding the current token passes the freshness gate", async () => {
     const { user, workspace, site } = await seed();
 

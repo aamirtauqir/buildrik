@@ -241,8 +241,9 @@ export class RepeaterRenderer {
       const intoTemplate = canvas && index === 0;
       const nodes = intoTemplate ? templates : pristine.map((t) => t.cloneNode(true) as HTMLElement);
       for (const node of nodes) {
+        const copySlots = canvas ? [] : this.placeholderSlots(node, binding.itemVar || "item");
         this.applyContext(node, context, binding, null, refs);
-        this.applyCurrentItem(node, listEl, item, binding.collectionId, canvas);
+        copySlots.push(...this.applyCurrentItem(node, listEl, item, binding.collectionId, canvas));
         /* B-11: conditions in this copy read its record. */
         applyCopyConditions(node, listEl, item.data, this.composer.cms.bindings, canvas, pageRecord, Boolean(perRecordOnServer && template));
         if (intoTemplate) continue;
@@ -252,7 +253,14 @@ export class RepeaterRenderer {
           node.setAttribute(CMS_LIST_ROW_ATTR, encodeCmsJson(Object.fromEntries(rowFields.map((f) => [f, item.data[f] ?? null]))));
         }
         if (canvas) node.setAttribute("data-cms-repeater-clone", String(index));
-        else this.clearUnresolved(node, binding.itemVar || "item");
+        else {
+          this.clearUnresolved(node, binding.itemVar || "item");
+          /* #21: a slot this record has nothing for ships as nothing, not as
+             an empty <p> holding the card's space open. */
+          const empty = copySlots.filter((slot) => !slot.textContent?.trim() && slot.children.length === 0);
+          if (empty.includes(node)) continue;
+          empty.forEach((slot) => slot.remove());
+        }
         listEl.appendChild(node);
       }
     });
@@ -315,6 +323,16 @@ export class RepeaterRenderer {
     }
   }
 
+  /** Elements in a copy whose whole text is `{{item.…}}` placeholders — what
+   *  they show comes only from the record. Raw-text elements are never
+   *  substituted (see applyContext), so they are not slots. */
+  private placeholderSlots(node: HTMLElement, itemVar: string): HTMLElement[] {
+    const only = new RegExp(`^\\s*(?:\\{\\{\\s*${escapeRegExp(itemVar)}\\.[\\w.-]+\\s*\\}\\}\\s*)+$`);
+    return [node, ...Array.from(node.querySelectorAll<HTMLElement>("*"))].filter(
+      (el) => el.children.length === 0 && !el.matches(RAW_TEXT_SELECTOR) && only.test(el.textContent ?? ""),
+    );
+  }
+
   /**
    * "Current item" (C0.8, BD-01): a field binding with no pinned record on an
    * element in this list's copy, bound to the list's own collection, reads
@@ -322,7 +340,8 @@ export class RepeaterRenderer {
    * same record. An element inside a nested list belongs to that list.
    * The canvas keeps an element's own text when the record has no value
    * (as the page-wide preview does); the export writes the fallback, or
-   * nothing (C0.7).
+   * nothing (C0.7). Returns the elements whose content the export left
+   * empty that way.
    */
   private applyCurrentItem(
     node: HTMLElement,
@@ -330,7 +349,8 @@ export class RepeaterRenderer {
     item: CMSContentItem,
     collectionId: string,
     canvas: boolean,
-  ): void {
+  ): HTMLElement[] {
+    const emptied: HTMLElement[] = [];
     const bindings = this.composer.cms.bindings;
     const rich = richtextKeys(this.composer.cms.collections?.getCollection?.(collectionId)?.fields);
     const isList = (el: Element) => bindings.getCollectionBinding?.(el.getAttribute("data-buildrick-id") ?? "")?.repeat === "children";
@@ -347,10 +367,12 @@ export class RepeaterRenderer {
         const value = cmsTextOf(item.data[b.fieldSlug]) || b.fallback || "";
         if (canvas && !value) continue;
         writeBoundValue(el, b.property, value, rich.has(b.fieldSlug));
+        if (!value && b.property === "content") emptied.push(el);
       }
       el.setAttribute(CURRENT_ITEM_ATTR, collectionId);
       if (canvas) el.setAttribute("data-cms-bound", "true");
     }
+    return emptied;
   }
 
   /** A published page never shows `{{item.x}}` for a field the record does

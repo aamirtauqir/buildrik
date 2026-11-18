@@ -141,7 +141,10 @@ export async function commitUpdateFromSelection(
 ): Promise<ToastInput> {
   const before = composer.components.snapshotComponent(component.id);
   const { full } = sourceLabel(composer, sourceId);
-  const { updated, instancesSynced, overridesDropped } = await composer.components.updateComponentMaster(component.id, sourceId);
+  /* P-4: a throw is a failed update, said like one — not an unhandled rejection. */
+  const { updated, instancesSynced, overridesDropped } = await composer.components
+    .updateComponentMaster(component.id, sourceId)
+    .catch(() => ({ updated: false, instancesSynced: 0, overridesDropped: 0 }));
   if (!updated) return { description: `Couldn't update "${component.name}" from that selection.`, tone: "error", duration: 4000 };
 
   put(composer, null);

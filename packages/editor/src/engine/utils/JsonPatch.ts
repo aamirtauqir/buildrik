@@ -306,13 +306,6 @@ export function reversePatch(patch: Patch): Patch {
 }
 
 /**
- * Calculate approximate memory size of a patch
- */
-export function getPatchSize(patch: Patch): number {
-  return JSON.stringify(patch).length;
-}
-
-/**
  * Check if a patch is empty (no changes)
  */
 export function isPatchEmpty(patch: Patch): boolean {

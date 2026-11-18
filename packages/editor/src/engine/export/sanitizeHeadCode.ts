@@ -11,7 +11,9 @@
  * - PRESERVE: text content of allowed tags (CSS inside <style>, <title> text)
  *             and `property`/`itemprop`/`http-equiv` on <meta> (Open Graph +
  *             microdata + meta-equiv).
- * - BLOCK:  inline <script> (no src), event handlers, javascript: URIs,
+ * - BLOCK:  inline <script> (no src) — or keep it inert, on request, for the
+ *           site's own code on the shipped site (REA #27) — event handlers,
+ *           javascript: URIs,
  *           <iframe>, srcdoc, data-* attributes, any unknown element,
  *           any unknown attribute
  * - NORMALIZE: lowercase tag names, collapse whitespace
@@ -29,6 +31,10 @@
 
 import createDOMPurify, { type DOMPurify } from "dompurify";
 import { ALLOWED_HEAD_TAGS, ALLOWED_HEAD_ATTRS } from "@/shared/constants/headCode";
+import { CUSTOM_CODE_ATTR } from "./publishPostProcess";
+
+/** Set for the length of one synchronous `sanitize` call (see the option). */
+let keepInlineInert = false;
 
 /* The allowlist itself lives in shared/constants/headCode.ts — the settings
    validator reports against the SAME list, so the field can no longer bless
@@ -57,6 +63,13 @@ function getPurify(): DOMPurify {
     if (data.tagName !== "script") return;
     const el = node as Element;
     const src = (el.getAttribute?.("src") ?? "").trim();
+    if (!src && keepInlineInert) {
+      /* REA #27: kept, but unable to run — the original type is parked on the
+         marker and `activateCustomCode` restores it on the shipped page. */
+      el.setAttribute(CUSTOM_CODE_ATTR, el.getAttribute("type") ?? "");
+      el.setAttribute("type", "text/plain");
+      return;
+    }
     if (!src || src.toLowerCase().startsWith("javascript:")) {
       el.remove?.();
     }
@@ -71,8 +84,13 @@ function getPurify(): DOMPurify {
   const FORCE_KEEP_ATTRS = new Set(["property", "itemprop", "http-equiv"]);
   _purify.addHook(
     "uponSanitizeAttribute",
-    (_node: Node, data: { attrName: string; forceKeepAttr?: boolean }) => {
+    (node: Node, data: { attrName: string; forceKeepAttr?: boolean }) => {
       if (FORCE_KEEP_ATTRS.has(data.attrName)) {
+        data.forceKeepAttr = true;
+      }
+      // The inert marker set above — only on the inline scripts it was set on.
+      const el = node as Element;
+      if (keepInlineInert && data.attrName === CUSTOM_CODE_ATTR && el.nodeName === "SCRIPT" && !el.getAttribute("src")) {
         data.forceKeepAttr = true;
       }
     }
@@ -89,11 +107,21 @@ function getPurify(): DOMPurify {
  * render/export path runs through this sanitizer. Users see what they typed
  * in the settings drawer; attackers can't ship what they typed to visitors.
  */
-export function sanitizeHeadCode(raw: string | undefined | null): string {
+export function sanitizeHeadCode(
+  raw: string | undefined | null,
+  /** `inertInlineScripts`: keep an inline `<script>` as `type="text/plain"`
+   *  instead of removing it — for the SITE's head/body code on the shipped
+   *  site only (REA #27). The page that holds it is also rendered inside the
+   *  app, so it must not run there; `activateCustomCode` (publishPostProcess,
+   *  run by the publish worker and the ZIP) makes it a real script. Everything
+   *  else the allowlist removes is still removed. */
+  opts: { inertInlineScripts?: boolean } = {},
+): string {
   if (!raw || !raw.trim()) return "";
 
   try {
     const purify = getPurify();
+    keepInlineInert = opts.inertInlineScripts === true;
     // WHOLE_DOCUMENT: true is REQUIRED to allow head-context tags (<meta>,
     // <link>, <script>, <base>). Without it, DOMPurify treats input as body
     // context and drops every tag typically found in <head>. We wrap the raw
@@ -130,5 +158,7 @@ export function sanitizeHeadCode(raw: string | undefined | null): string {
     // Fail CLOSED: a broken sanitizer must NOT pass raw content through.
     console.warn("[sanitizeHeadCode] sanitization failed; dropping content", err);
     return "";
+  } finally {
+    keepInlineInert = false;
   }
 }

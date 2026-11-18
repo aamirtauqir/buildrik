@@ -1,14 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Prisma } from "@prisma/client";
 
-const findUniqueMock = vi.fn();
+const findFirstMock = vi.fn();
 const updateMock = vi.fn();
 const siteFindUniqueMock = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     page: {
-      findUnique: (...args: unknown[]) => findUniqueMock(...args),
+      findFirst: (...args: unknown[]) => findFirstMock(...args),
       update: (...args: unknown[]) => updateMock(...args),
     },
     site: {
@@ -47,18 +47,18 @@ describe("buildFallbackChain", () => {
 
 describe("resolveTranslation", () => {
   beforeEach(() => {
-    findUniqueMock.mockReset();
+    findFirstMock.mockReset();
     updateMock.mockReset();
     siteFindUniqueMock.mockReset();
   });
 
   it("returns null when page missing", async () => {
-    findUniqueMock.mockResolvedValueOnce(null);
+    findFirstMock.mockResolvedValueOnce(null);
     await expect(resolveTranslation("missing", "fr")).resolves.toBeNull();
   });
 
   it("exact-locale hit returns translation entry, isFallback=false", async () => {
-    findUniqueMock.mockResolvedValueOnce({
+    findFirstMock.mockResolvedValueOnce({
       id: "p1",
       siteId: "s1",
       blocks: [{ type: "hero" }],
@@ -70,7 +70,7 @@ describe("resolveTranslation", () => {
   });
 
   it("region locale falls back to base language, isFallback=true", async () => {
-    findUniqueMock.mockResolvedValueOnce({
+    findFirstMock.mockResolvedValueOnce({
       id: "p1",
       siteId: "s1",
       blocks: [{ type: "hero" }],
@@ -82,7 +82,7 @@ describe("resolveTranslation", () => {
   });
 
   it("all-miss falls back to defaultLocale via Page.blocks (canonical), isFallback=true", async () => {
-    findUniqueMock.mockResolvedValueOnce({
+    findFirstMock.mockResolvedValueOnce({
       id: "p1",
       siteId: "s1",
       blocks: [{ type: "hero-en" }],
@@ -94,7 +94,7 @@ describe("resolveTranslation", () => {
   });
 
   it("default-locale request reads from Page.blocks directly", async () => {
-    findUniqueMock.mockResolvedValueOnce({
+    findFirstMock.mockResolvedValueOnce({
       id: "p1",
       siteId: "s1",
       blocks: [{ type: "hero-en" }],
@@ -108,27 +108,27 @@ describe("resolveTranslation", () => {
 
 describe("setTranslation", () => {
   beforeEach(() => {
-    findUniqueMock.mockReset();
+    findFirstMock.mockReset();
     updateMock.mockReset();
     siteFindUniqueMock.mockReset();
   });
 
   it("rejects when page missing", async () => {
-    findUniqueMock.mockResolvedValueOnce(null);
+    findFirstMock.mockResolvedValueOnce(null);
     await expect(
       setTranslation({ pageId: "x", siteId: "s1", locale: "fr", blocks: [] }),
     ).rejects.toThrow("NOT_FOUND");
   });
 
   it("rejects when siteId does not match page.siteId", async () => {
-    findUniqueMock.mockResolvedValueOnce({ id: "p1", siteId: "OTHER", translations: null });
+    findFirstMock.mockResolvedValueOnce({ id: "p1", siteId: "OTHER", translations: null });
     await expect(
       setTranslation({ pageId: "p1", siteId: "s1", locale: "fr", blocks: [] }),
     ).rejects.toThrow("SITE_MISMATCH");
   });
 
   it("rejects when locale not in enabledLocales", async () => {
-    findUniqueMock.mockResolvedValueOnce({ id: "p1", siteId: "s1", translations: null });
+    findFirstMock.mockResolvedValueOnce({ id: "p1", siteId: "s1", translations: null });
     siteFindUniqueMock.mockResolvedValueOnce({ defaultLocale: "en", enabledLocales: ["en", "fr"] });
     await expect(
       setTranslation({ pageId: "p1", siteId: "s1", locale: "de", blocks: [] }),
@@ -136,7 +136,7 @@ describe("setTranslation", () => {
   });
 
   it("rejects when writing the default locale (default lives on Page.blocks)", async () => {
-    findUniqueMock.mockResolvedValueOnce({ id: "p1", siteId: "s1", translations: null });
+    findFirstMock.mockResolvedValueOnce({ id: "p1", siteId: "s1", translations: null });
     siteFindUniqueMock.mockResolvedValueOnce({ defaultLocale: "en", enabledLocales: ["en", "fr"] });
     await expect(
       setTranslation({ pageId: "p1", siteId: "s1", locale: "en", blocks: [] }),
@@ -144,7 +144,7 @@ describe("setTranslation", () => {
   });
 
   it("merges new locale into existing translations map", async () => {
-    findUniqueMock.mockResolvedValueOnce({
+    findFirstMock.mockResolvedValueOnce({
       id: "p1",
       siteId: "s1",
       translations: { de: { blocks: [{ type: "hero-de" }] } },
@@ -163,20 +163,20 @@ describe("setTranslation", () => {
 
 describe("removeTranslation", () => {
   beforeEach(() => {
-    findUniqueMock.mockReset();
+    findFirstMock.mockReset();
     updateMock.mockReset();
   });
 
   it("is idempotent when locale absent (returns page without update call)", async () => {
     const page = { id: "p1", siteId: "s1", translations: { fr: { blocks: [] } } };
-    findUniqueMock.mockResolvedValueOnce(page);
+    findFirstMock.mockResolvedValueOnce(page);
     const r = await removeTranslation({ pageId: "p1", siteId: "s1", locale: "de" });
     expect(r).toBe(page);
     expect(updateMock).not.toHaveBeenCalled();
   });
 
   it("removes the targeted locale entry", async () => {
-    findUniqueMock.mockResolvedValueOnce({
+    findFirstMock.mockResolvedValueOnce({
       id: "p1",
       siteId: "s1",
       translations: { fr: { blocks: [{ a: 1 }] }, de: { blocks: [{ b: 2 }] } },
@@ -188,7 +188,7 @@ describe("removeTranslation", () => {
   });
 
   it("nulls the column when removing the last translation", async () => {
-    findUniqueMock.mockResolvedValueOnce({
+    findFirstMock.mockResolvedValueOnce({
       id: "p1",
       siteId: "s1",
       translations: { fr: { blocks: [{ a: 1 }] } },
@@ -203,7 +203,7 @@ describe("removeTranslation", () => {
   });
 
   it("rejects siteId mismatch", async () => {
-    findUniqueMock.mockResolvedValueOnce({ id: "p1", siteId: "OTHER", translations: {} });
+    findFirstMock.mockResolvedValueOnce({ id: "p1", siteId: "OTHER", translations: {} });
     await expect(
       removeTranslation({ pageId: "p1", siteId: "s1", locale: "fr" }),
     ).rejects.toThrow("SITE_MISMATCH");

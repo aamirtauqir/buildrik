@@ -1,6 +1,5 @@
 import type { Composer, Element } from "@/engine";
 import { stylesAt } from "@/engine/commands/commandOperations";
-import { getBreakpointQuery } from "@/shared/constants/breakpoints";
 import type { PseudoStateId } from "@/shared/types";
 import type { BreakpointId } from "@/shared/types/breakpoints";
 import type { InspectorContext } from "../config";
@@ -44,11 +43,10 @@ const FLEX_DISPLAYS = new Set(["flex", "inline-flex"]);
 const GRID_DISPLAYS = new Set(["grid", "inline-grid"]);
 
 /**
- * Compute the effective (merged) style map for an element at the given
- * breakpoint + pseudo-state. Layers base styles with breakpoint overlay
- * and pseudo rule — same cascade order as useStyleHandlers applies to the
- * selected element. Used to derive parent styles for isFlexItem/isGridItem
- * detection under responsive overrides.
+ * The effective (merged) style map for an element at the given breakpoint +
+ * pseudo-state, by the published cascade (ResolvedStyle via stylesAt). Used to
+ * derive parent styles for isFlexItem/isGridItem detection under responsive
+ * overrides, and as the values the inspector shows.
  */
 export function computeEffectiveStyles(
   el: Element | null | undefined,
@@ -57,16 +55,7 @@ export function computeEffectiveStyles(
   currentPseudoState: PseudoStateId,
 ): Record<string, string> {
   if (!el) return {};
-  let out = stylesAt(composer, el, currentBreakpoint);
-
-  if (currentPseudoState !== "normal" && composer?.styles) {
-    const selector = `[data-buildrick-id="${el.getId()}"]:${currentPseudoState}`;
-    const mq = currentBreakpoint === "desktop" ? undefined : getBreakpointQuery(currentBreakpoint) ?? undefined;
-    const pseudoRule = composer.styles.getRule(selector, mq);
-    if (pseudoRule) out = { ...out, ...pseudoRule.properties };
-  }
-
-  return out;
+  return stylesAt(composer, el, currentBreakpoint, currentPseudoState);
 }
 
 export function deriveCssContext(

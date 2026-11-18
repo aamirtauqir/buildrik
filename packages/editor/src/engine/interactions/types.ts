@@ -127,72 +127,6 @@ export interface InteractionAnimationConfig {
 }
 
 // =============================================================================
-// INTERACTION
-// =============================================================================
-
-/** Single interaction definition */
-export interface Interaction {
-  /** Unique identifier */
-  id: string;
-  /** Trigger event type */
-  trigger: InteractionTrigger;
-  /** Animation configuration */
-  animation: InteractionAnimationConfig;
-  /** Whether interaction is enabled */
-  enabled: boolean;
-  /** Optional name for UI display */
-  name?: string;
-}
-
-/** Data stored on an element */
-export interface ElementInteractionsData {
-  interactions: Interaction[];
-}
-
-// =============================================================================
-// EVENT DATA
-// =============================================================================
-
-/** Event data for interaction changes */
-export interface InteractionEventData {
-  elementId: string;
-  interaction: Interaction;
-}
-
-/** Event data for interaction update */
-export interface InteractionUpdateEventData extends InteractionEventData {
-  previousInteraction: Interaction;
-}
-
-// =============================================================================
-// TRIGGER GROUPS (for UI organization)
-// =============================================================================
-
-export interface TriggerGroup {
-  label: string;
-  triggers: InteractionTrigger[];
-}
-
-export const TRIGGER_GROUPS: TriggerGroup[] = [
-  {
-    label: "Mouse",
-    triggers: ["hover", "click", "mouse-over", "mouse-move", "mouse-out"],
-  },
-  {
-    label: "Focus",
-    triggers: ["focus", "blur"],
-  },
-  {
-    label: "Page",
-    triggers: ["page-load", "page-scroll", "page-leave"],
-  },
-  {
-    label: "Scroll",
-    triggers: ["scroll-into-view", "while-scrolling", "scroll-out"],
-  },
-];
-
-// =============================================================================
 // DEFAULTS
 // =============================================================================
 
@@ -204,10 +138,4 @@ export const DEFAULT_ANIMATION_CONFIG: InteractionAnimationConfig = {
   target: "self",
   reverse: false,
   loop: 1,
-};
-
-export const DEFAULT_INTERACTION: Omit<Interaction, "id"> = {
-  trigger: "hover",
-  animation: DEFAULT_ANIMATION_CONFIG,
-  enabled: true,
 };

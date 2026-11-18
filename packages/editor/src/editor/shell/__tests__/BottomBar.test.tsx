@@ -55,7 +55,7 @@ function Shell({ composer, resourceArea = false, onBack = () => {} }: {
 }) {
   const c = composer as unknown as Composer;
   const modals = React.useMemo(() => ({ setShowShortcuts: () => {} }), []);
-  useEditorShortcuts({ composer: c, modals, saveProject: () => {} });
+  useEditorShortcuts({ composer: c, modals });
   const pages = usePageSummaries(c);
   return (
     <>
@@ -122,12 +122,13 @@ describe("BottomBar — page switcher chord", () => {
     expect(screen.getByTestId("page-switcher-trigger").textContent).toContain("About");
   });
 
-  it('"+ Add page" opens the Pages panel, as the tab bar\'s "+" did', () => {
+  it('"+ Add page" opens the Pages panel and its New page dialog (REA S-4)', () => {
     const composer = makeComposer();
     render(<Shell composer={composer} />);
     fireEvent.click(screen.getByTestId("page-switcher-trigger"));
     fireEvent.click(screen.getByRole("button", { name: "Add page" }));
     expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_PANEL_OPEN, { panel: "pages" });
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_NEW_PAGE_REQUESTED, {});
   });
 
   it('while the site is not loaded the switcher opens but rows are disabled with "Available when the site loads"', () => {

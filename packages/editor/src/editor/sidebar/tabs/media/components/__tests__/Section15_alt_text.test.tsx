@@ -65,13 +65,26 @@ describe("§15 — Edit tab alt-text input", () => {
     expect(onUpdate).toHaveBeenCalledWith("a1", { altText: "New alt text" });
   });
 
-  it("Enter key commits altText via onUpdate", () => {
+  it("Enter key commits altText via onUpdate exactly once (M-4)", () => {
     const onUpdate = vi.fn(async () => {});
     renderOverlay(makeItem(), { onUpdate });
     const input = screen.getByLabelText(/alt text/i) as HTMLInputElement;
+    input.focus();
     fireEvent.change(input, { target: { value: "Logo for site" } });
     fireEvent.keyDown(input, { key: "Enter", code: "Enter" });
+    expect(onUpdate).toHaveBeenCalledTimes(1);
     expect(onUpdate).toHaveBeenCalledWith("a1", { altText: "Logo for site" });
+  });
+
+  it("a refused alt-text save is shown under the field (M-4)", async () => {
+    const onUpdate = vi.fn(async () => {
+      throw new Error("refused");
+    });
+    renderOverlay(makeItem(), { onUpdate });
+    const input = screen.getByLabelText(/alt text/i) as HTMLInputElement;
+    fireEvent.change(input, { target: { value: "x" } });
+    fireEvent.blur(input);
+    expect(await screen.findByTestId("media-alt-error")).toBeTruthy();
   });
 
   it("does NOT call onUpdate if alt text unchanged", () => {

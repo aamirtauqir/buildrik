@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@server/auth";
-import { getEditorAccess } from "@server/services/sites.service";
+import { appRouter } from "@server/trpc/router";
+import { createTRPCContext } from "@server/trpc/trpc";
 import { EditorClient } from "@/components/editor-route/EditorClient";
 import { DeniedState } from "@/components/states";
 
@@ -33,7 +34,8 @@ export default async function EditPage({
     );
   }
 
-  const access = await getEditorAccess(session.user.id, siteId);
+  const caller = appRouter.createCaller(await createTRPCContext());
+  const access = await caller.sites.editorAccess({ siteId });
   /* Access is correctly denied here; the generic 404 just did not say so, and
      left no way back (gap walk 93 #10). One answer covers no-such-site and
      no-access alike — the same words the site-detail screen uses — so the

@@ -232,3 +232,15 @@ describe("Fill — v4 labels (boards 1, 21, 27)", () => {
     expect(screen.queryByRole("button", { name: "Add background image" })).not.toBeInTheDocument();
   });
 });
+
+describe("BackgroundSection — a gradient the 2-stop editor cannot hold", () => {
+  it("a 3-stop gradient is not offered to the 2-stop editor, and says so", () => {
+    const { onChange } = renderBg({
+      styles: { background: "linear-gradient(90deg, #ff0000, #00ff00 50%, #0000ff)" },
+    });
+    expect(screen.queryByRole("textbox", { name: /Color 1/ })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Radial" })).toBeNull();
+    expect(screen.getByTestId("inspector-fill-saved-gradient")).toBeInTheDocument();
+    expect(onChange).not.toHaveBeenCalled();
+  });
+});

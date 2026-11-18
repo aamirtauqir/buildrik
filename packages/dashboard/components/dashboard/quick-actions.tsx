@@ -7,6 +7,7 @@ import { trpc } from "@lib/trpc/client";
 import { CreateSiteModal } from "@/components/sites/create-site-modal";
 import { Button, ButtonLink } from "@/components/dashboard/primitives";
 import { useToast } from "@/components/dashboard/toast-provider";
+import { getEditorHref, useUnifiedEditorFlag } from "@/components/editor-route/unified-flag";
 
 // Fixed destinations, reusing the hrefs the dynamic quick-action list already
 // pointed at (team invite, template start). "Create a site" opens the create
@@ -22,6 +23,7 @@ export function QuickActions() {
   const router = useRouter();
   const { addToast } = useToast();
   const utils = trpc.useUtils();
+  const unified = useUnifiedEditorFlag();
   // team.* is ADMIN-gated, so "Invite teammate" led everyone else to "Team is
   // admin-only" (gap walk 93 #8). Withheld the way api-tokens and integrations
   // withhold their admin doors: disabled, with the reason, from the same role.
@@ -31,14 +33,17 @@ export function QuickActions() {
   const role = health.data?.role;
   const knownNonAdmin = role != null && role !== "OWNER" && role !== "ADMIN";
 
-  // Same contract the Projects screen uses: a blank site is created inline,
-  // the template and AI methods carry the name into the full flow.
+  // Same contract the Projects screen uses: a blank site is created inline and
+  // opens in the editor (BD-37), the template method carries the name into
+  // the full flow.
   const createMutation = trpc.sites.create.useMutation({
     onSuccess: (site) => {
       setCreateOpen(false);
       void utils.dashboard.stats.invalidate();
       addToast("success", "Site created");
-      router.push(`/dashboard/sites/${site.id}`);
+      const href = getEditorHref(site.id, unified);
+      if (unified) router.push(href);
+      else window.location.href = href;
     },
     onError: (e) => addToast("error", "Failed to create site", e.message),
   });

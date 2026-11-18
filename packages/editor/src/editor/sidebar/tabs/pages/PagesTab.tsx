@@ -38,6 +38,7 @@ import { MovePagesDialog, TOP_LEVEL } from "./components/MovePagesDialog";
 import { PageList } from "./components/PageList";
 import { SiteStructureTree } from "./components/SiteStructureTree";
 import { AddPageButton } from "./components/AddPageButton";
+import { PAGES_LOADING_REASON } from "./components/NewPageModal";
 import { LiveUrlConfirm, type LiveUrlChange } from "./components/LiveUrlConfirm";
 import { usePagesNotice } from "./usePagesNotice";
 import { SearchListingsTable } from "./components/SearchListingsTable";
@@ -129,7 +130,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
      to, and the URL is where the editor already gets it. */
   const folderScopeId = getSiteIdFromUrl();
   /* The Structure view's root (board 63:21939): the published host. */
-  const getSiteOrigin = useSiteOrigin(composer, folderScopeId);
+  const { getOrigin: getSiteOrigin } = useSiteOrigin(composer, folderScopeId);
   const siteOrigin = getSiteOrigin();
   const siteHost = siteOrigin ? siteOrigin.replace(/^https?:\/\//, "").replace(/\/$/, "") : null;
   const livePageIds = React.useMemo(
@@ -612,6 +613,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
                   onAddBlank={requestNewPage}
                   onFromTemplate={onRequestTemplates}
                   onAddFolder={() => { setView("pages"); setDraftingFolder(true); }}
+                  disabledReason={p.loading ? PAGES_LOADING_REASON : undefined}
                 />
               </div>
             </div>
@@ -634,6 +636,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
                   onAddBlank={requestNewPage}
                   onFromTemplate={onRequestTemplates}
                   onAddFolder={() => { setView("pages"); setDraftingFolder(true); }}
+                  disabledReason={p.loading ? PAGES_LOADING_REASON : undefined}
                 />
               </div>
             </div>
@@ -670,6 +673,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             onClearSelection={leaveSelectMode}
             onContextMenu={p.openContextMenu}
             onMovePage={movePage}
+            onPageShortcut={(id, action) => (action === "duplicate" ? p.duplicatePage(id) : handleDeleteRequest(id))}
             dirtyPages={dirtyPages}
             onRenameStart={p.startRename}
             onRenameCommit={handleRenameCommit}

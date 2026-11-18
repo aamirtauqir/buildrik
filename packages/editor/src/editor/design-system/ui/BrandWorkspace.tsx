@@ -366,6 +366,17 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
       composer.off(EVENTS.BRAND_PREVIEW_CHANGED, sync);
     };
   }, [composer]);
+  /* D36: ⌘Z here undoes Brand edits only. When the next undo is a canvas
+     change, say so instead of reverting something out of sight. */
+  React.useEffect(() => {
+    if (!composer || typeof composer.on !== "function") return;
+    const outOfScope = () =>
+      addToast({ description: "Nothing to undo in Brand. Canvas edits undo on the canvas.", tone: "info" });
+    composer.on(EVENTS.HISTORY_UNDO_OUT_OF_SCOPE, outOfScope);
+    return () => {
+      composer.off(EVENTS.HISTORY_UNDO_OUT_OF_SCOPE, outOfScope);
+    };
+  }, [composer, addToast]);
   const shownMode: "light" | "dark" = canvasPreview?.theme ?? "light";
   /* L4-021: the Light / Dark switch is PREVIEW-ONLY — a dark preview of the
      saved brand through the preview layer: never saved, never in ⌘Z, gone
@@ -612,17 +623,19 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   }, [requestedToken, allTokens]);
   /* A value edit — light, and the dark value when the card sets one — is ONE
      write, so ⌘Z undoes it in one step (and Review changes lists one row). */
-  const changeToken = (id: string, value: string, darkValue?: string) => {
+  const changeToken = (id: string, value: string, darkValue?: string): boolean => {
     const tok = tokenById(id);
-    if (!tok) return;
+    if (!tok) return false;
     let next = allTokens;
     const write = (mode: "light" | "dark", v: string) => {
       if ((resolveTokenLiteral(next, id, mode) ?? "") !== v) next = setTokenLiteral(next, id, mode, v);
     };
     write("light", value);
     if (darkValue !== undefined) write("dark", darkValue);
-    if (next === allTokens) return;
-    if (!store.commit(next, "Edit token")) refused(`"${tok.name}"`);
+    if (next === allTokens) return true;
+    if (store.commit(next, "Edit token")) return true;
+    refused(`"${tok.name}"`);
+    return false;
   };
   /* B6-B02's alias select: the light mode points at another token, or back
      to a literal of the value it shows now. One commit, one ⌘Z. */

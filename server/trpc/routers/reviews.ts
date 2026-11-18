@@ -15,6 +15,7 @@ import {
   submitReview,
   listReviews,
   resolveReview,
+  getReviewSiteId,
   getReviewStatusForSite,
   getCurrentRound,
   listRounds,
@@ -183,6 +184,17 @@ export const reviewsRouter = router({
       const workspaceId = await resolveWorkspaceId(ctx);
       await requireAgencyLayer(workspaceId);
       await requireAdmin(ctx, workspaceId);
+      /* BK-08: approving unblocks publish for the review's OWN site, so the
+         effective role there must be ADMIN — a workspace ADMIN capped to
+         VIEWER on that site approved it. */
+      const siteId = await getReviewSiteId(workspaceId, input.id);
+      if (!siteId) throw new TRPCError({ code: "NOT_FOUND", message: "Review not found" });
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user.id, siteId, "ADMIN");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
       try {
         return await resolveReview(workspaceId, input.id, input.status, ctx.session.user.id);
       } catch (e) {
@@ -275,7 +287,7 @@ export const reviewsRouter = router({
         if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
       }
-      const result = await revokeReviewRound(siteWorkspace.workspaceId, input.reviewId, input.expectedRevision);
+      const result = await revokeReviewRound(siteWorkspace.workspaceId, input.siteId, input.reviewId, input.expectedRevision);
       if (result.revoked) {
         await recordForSite({
           siteId: input.siteId,

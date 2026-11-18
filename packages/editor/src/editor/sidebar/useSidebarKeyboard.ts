@@ -26,10 +26,15 @@ export function useSidebarKeyboard(
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
+      /* A native <select> takes letters too (type-ahead: "L" picks "Large"),
+         and a key inside contenteditable is text — SC-12: Field and Text
+         scopes keep the browser's meaning. */
       if (
         target.tagName === "INPUT" ||
         target.tagName === "TEXTAREA" ||
+        target.tagName === "SELECT" ||
         target.isContentEditable ||
+        target.closest?.('[contenteditable]:not([contenteditable="false"])') ||
         e.metaKey ||
         e.ctrlKey ||
         e.altKey

@@ -11,6 +11,7 @@ import type { Composer } from "@/engine";
 import { getBreakpointQuery } from "@/shared/constants/breakpoints";
 import type { PseudoStateId } from "@/shared/types";
 import type { BreakpointId } from "@/shared/types/breakpoints";
+import { elementSelector } from "@/shared/utils/elementSelector";
 
 const PSEUDO_STATES = ["hover", "focus", "active", "disabled"] as const;
 
@@ -25,7 +26,7 @@ export function computeStatesWithOverrides(
   const mq = currentBreakpoint === "desktop" ? undefined : getBreakpointQuery(currentBreakpoint) ?? undefined;
 
   for (const state of PSEUDO_STATES) {
-    const rule = composer.styles.getRule(`[data-buildrick-id="${elementId}"]:${state}`, mq);
+    const rule = composer.styles.getRule(`${elementSelector(elementId)}:${state}`, mq);
     if (rule && Object.keys(rule.properties ?? {}).length > 0) {
       withOverrides.add(state);
     }

@@ -13,7 +13,7 @@ const overview = vi.fn();
 vi.mock("@/services/api-client", () => ({
   getBuildrikClient: () => ({ siteDetail: { settingsOverview: { query: (...a: unknown[]) => overview(...a) } } }),
 }));
-vi.mock("@/services/BuildrikSyncProvider", () => ({ getSiteIdFromUrl: () => "site-1" }));
+vi.mock("@/services/BuildrikSyncProvider", () => ({ getSiteIdFromUrl: () => "site-1", hasProjectLoaded: () => true }));
 vi.mock("@/editor/chrome-ui", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/editor/chrome-ui")>()),
   useToast: () => ({ addToast: vi.fn(), removeToast: vi.fn(), toasts: [] }),

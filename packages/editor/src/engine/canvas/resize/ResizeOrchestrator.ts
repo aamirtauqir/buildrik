@@ -81,11 +81,12 @@ export function calculateResizeBounds(
   newBounds = applyConstraints(newBounds, constraints);
 
   // Step 7: Apply boundary constraints
-  newBounds = applyBoundaryConstraints(
-    newBounds,
-    state.boundaryConstraints,
-    (parentId, parentEl, w, h) => expandParent(parentId, parentEl, w, h, composer)
-  );
+  /* Growing a parent writes the model mid-gesture: noted, so a cancel rolls
+     the gesture back (BK-03); sizes go in CSS px (BK-01). */
+  newBounds = applyBoundaryConstraints(newBounds, state.boundaryConstraints, (parentId, parentEl, w, h) => {
+    state.modelTouched = true;
+    expandParent(parentId, parentEl, w / state.scale, h / state.scale, composer);
+  });
 
   return newBounds;
 }

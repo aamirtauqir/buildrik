@@ -10,6 +10,10 @@ import path from "path";
 export default defineConfig({
   test: {
     globals: true,
+    // startPublish refuses unless the Publish flag is on (it gates the server,
+    // not only the button). Tests run with it on; a test of the off state
+    // stubs it.
+    env: { NEXT_PUBLIC_FEATURE_PUBLISH: "true" },
     environment: "node",
     include: ["**/*.db.test.{ts,tsx}"],
     exclude: ["**/node_modules/**", ".worktrees/**"],

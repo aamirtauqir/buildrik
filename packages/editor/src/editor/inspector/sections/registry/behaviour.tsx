@@ -22,6 +22,7 @@ import { VisibilitySection } from "../VisibilitySection";
 import { InteractionsSection, type Interaction } from "../interactions";
 import { IS_DEV_BUILD } from "@/shared/utils/runtimeEnv";
 import { writeElement } from "@/engine/commands/commandOperations";
+import { INTERACTION_EASINGS, INTERACTION_PRESET_KEYFRAMES } from "@/engine/export/interactionRuntime";
 import type { AnimationConfig } from "@/shared/types/animations";
 
 /** The element under the canvas selection, for the interaction preview. */
@@ -54,13 +55,27 @@ function adaptInteractions(ctx: SectionContext) {
       el.setInteractions?.(interactions);
     });
   };
+  /* Plays with the published runtime's keyframes and easings (WAAPI), so the
+     preview is what a visitor gets. It set a CSS `animation` shorthand with
+     the GSAP easing name (`power2.out`), which CSS rejects — nothing played
+     (FLOW-SENSE FS-07). No fill: the element returns to its edited state. */
   const onPreview = (interaction: Interaction) => {
     const domEl = canvasNode(ctx.selectedElement.id);
     const anim = interaction.animation;
-    if (!domEl || !anim) return;
-    domEl.style.animation = "";
-    void domEl.offsetHeight;
-    domEl.style.animation = `bd-anim-${anim.preset} ${anim.duration}ms ${anim.easing} ${anim.delay}ms 1 normal forwards`;
+    if (!domEl || !anim || typeof domEl.animate !== "function") return;
+    const frames =
+      anim.preset === "custom"
+        ? anim.customProperties
+          ? [{}, anim.customProperties]
+          : null
+        : INTERACTION_PRESET_KEYFRAMES[anim.preset];
+    if (!frames) return;
+    domEl.animate(frames, {
+      duration: anim.duration || 300,
+      delay: anim.delay || 0,
+      easing: INTERACTION_EASINGS[anim.easing] || "ease",
+      iterations: 1,
+    });
   };
   /* 2L9 I17: Stop restores the authored appearance — the preview's
      animation (fill: forwards) comes off the canvas node. */

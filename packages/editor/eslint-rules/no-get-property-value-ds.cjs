@@ -1,6 +1,6 @@
 /**
  * ESLint rule: no-get-property-value-ds
- * Bans `getComputedStyle(...).getPropertyValue('--buildrick-...')` — use getToken() helper.
+ * Bans `getComputedStyle(...).getPropertyValue('--buildrick-...')` — the namespace is dead.
  * @license BSD-3-Clause
  */
 "use strict";
@@ -8,10 +8,10 @@
 module.exports = {
   meta: {
     type: "problem",
-    docs: { description: "Disallow getPropertyValue on --buildrick-* tokens; use getToken()" },
+    docs: { description: "Disallow getPropertyValue on --buildrick-* tokens; the namespace is dead" },
     schema: [],
     messages: {
-      directRead: "getPropertyValue('{{name}}') — use getToken('{{name}}') from shared/utils/tokens",
+      directRead: "getPropertyValue('{{name}}') — --buildrick-* is a dead namespace; read a --bk-* token instead",
     },
   },
   create(context) {

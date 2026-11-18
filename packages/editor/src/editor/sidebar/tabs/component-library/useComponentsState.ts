@@ -39,7 +39,7 @@ export function useComponentsState({
   onClose,
 }: UseComponentsStateParams) {
   // v3 FC-10: the load + subscribe shape lives once, in useComponentList.
-  const { components, isLoaded, error, setError, library, libraryLoadFailed, retryLibraryLoad } =
+  const { components, isLoaded, error, retry, library, libraryLoadFailed, retryLibraryLoad } =
     useComponentList(composer);
 
   // Use controlled selectedId if provided, otherwise internal state
@@ -254,7 +254,7 @@ export function useComponentsState({
     // Loading & Error
     isLoaded,
     error,
-    setError,
+    retry,
     // Limits
     isAtComponentLimit,
     maxComponents: MAX_COMPONENTS,

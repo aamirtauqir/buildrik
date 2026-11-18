@@ -23,11 +23,6 @@ import {
 import type { CMSCollection } from "@/shared/types/cms";
 import { SCROLL, SECTION_H } from "./ContentViews";
 
-/** BD-39 (board RL00 424:337803): Sources is a future capability, hidden in
- *  this release. Its door goes; the view, authored sources and the
- *  conditions that read them stay, so turning this on brings it all back. */
-export const SOURCES_IN_RELEASE = false;
-
 /* ── Root (148:2) + empty (149:7) ────────────────────────────────────────── */
 
 export function RootView({
@@ -57,12 +52,14 @@ export function RootView({
   conditionsOpen?: boolean;
   onOpenCollection: (id: string) => void;
   onCreateCollection?: () => void;
-  onOpenSources: () => void;
+  /** Absent = Sources is hidden (BD-39 (board RL00 424:337803), the
+   *  `cmsDataSources` flag): no Sources row, no zero-state door. The view,
+   *  authored sources and the conditions that read them stay. */
+  onOpenSources?: () => void;
   onOpenVariables: () => void;
   onOpenConditions: () => void;
 }) {
-  const shownSources = SOURCES_IN_RELEASE ? sourcesCount : 0;
-  if (collections.length === 0 && shownSources === 0 && variablesCount === 0 && conditionsCount === 0) {
+  if (collections.length === 0 && sourcesCount === 0 && variablesCount === 0 && conditionsCount === 0) {
     return (
       /*
         Board 149:7 draws this block composed, not with the default slots:
@@ -104,7 +101,7 @@ export function RootView({
               Create a collection
             </Button>
           ) : null}
-          {SOURCES_IN_RELEASE ? (
+          {onOpenSources ? (
             <Button
               color="light"
               size="xs"
@@ -175,7 +172,7 @@ export function RootView({
       <SectionHeader tint className={SECTION_H} data-testid="content-section-data">Data</SectionHeader>
       {/* RL01 (424:337006) — Data is Site variables · Conditions · Recently
           deleted; Sources is hidden by BD-39. */}
-      {SOURCES_IN_RELEASE ? (
+      {onOpenSources ? (
         <ListRow icon={<Database size={16} />} label="Sources" count={sourcesCount} chevron data-testid="content-open-sources" onClick={onOpenSources} />
       ) : null}
       <ListRow icon={<Braces size={16} />} label="Site variables" count={variablesCount} chevron selected={variablesOpen} aria-current={variablesOpen ? "true" : undefined} data-testid="content-open-variables" onClick={onOpenVariables} />

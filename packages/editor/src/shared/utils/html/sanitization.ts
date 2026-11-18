@@ -32,6 +32,7 @@ import {
 import { sanitizeCmsRichText } from "@buildrik/shared/content/cmsRichText";
 import type { ElementData } from "@/shared/types";
 import { generateId } from "../helpers/id";
+import { escapeHTML } from "./encoding";
 import {
   ALLOWED_URL_SCHEMES,
   ALLOWED_SRC_SCHEMES,
@@ -192,6 +193,26 @@ export function sanitizeHTML(html: string, options: SanitizeOptions = {}): strin
   );
 }
 
+/* The canvas rewrites every element's content on each change; DOMPurify per
+   element per frame is the cost, and content rarely changes between frames. */
+const sanitizedContent = new Map<string, string>();
+const SANITIZED_CONTENT_CAP = 4000;
+
+/**
+ * An element's `content` as page markup — the ONE rule the canvas, Preview,
+ * export and publish share (BK-40, BK-51; see `ElementData.contentFormat`):
+ * `"text"` is escaped, anything else is sanitized markup.
+ */
+export function contentToHTML(content: string, format: ElementData["contentFormat"]): string {
+  if (format === "text") return escapeHTML(content);
+  const hit = sanitizedContent.get(content);
+  if (hit !== undefined) return hit;
+  const clean = sanitizeHTML(content);
+  if (sanitizedContent.size >= SANITIZED_CONTENT_CAP) sanitizedContent.clear();
+  sanitizedContent.set(content, clean);
+  return clean;
+}
+
 /**
  * Sanitize the rich-text `content` of every node in an ElementData tree,
  * in place. This is the ingest trust boundary: external project JSON
@@ -221,7 +242,9 @@ export function sanitizeHTML(html: string, options: SanitizeOptions = {}): strin
 export function sanitizeElementTreeContent(data: ElementData): void {
   if (data.id !== undefined && !isSafeElementId(data.id)) data.id = generateId("el");
   if (data.tagName) data.tagName = toAllowedElementTag(data.tagName);
-  if (typeof data.content === "string" && data.content.length > 0) {
+  /* Plain text is escaped where it is written (contentToHTML); sanitizing it
+     as markup here would eat a literal "<b>" the user typed. */
+  if (typeof data.content === "string" && data.content.length > 0 && data.contentFormat !== "text") {
     data.content = sanitizeHTML(data.content);
   }
   // Stored JSON of any shape reaches here (a component master is only

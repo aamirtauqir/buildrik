@@ -14,6 +14,7 @@ const svc = vi.hoisted(() => ({
   exportSubmissions: vi.fn(),
 }));
 const guards = vi.hoisted(() => ({ guardSiteAccess: vi.fn(), guardSiteRole: vi.fn() }));
+const perm = vi.hoisted(() => ({ getEffectiveSiteRole: vi.fn(async () => "EDITOR") }));
 const prismaMock = vi.hoisted(() => ({}));
 
 vi.mock("@/server/auth", () => ({ auth: vi.fn().mockResolvedValue(null) }));
@@ -22,6 +23,7 @@ vi.mock("next/headers", () => ({ cookies: () => Promise.resolve({ get: () => und
 vi.mock("@/lib/prisma", () => ({ prisma: prismaMock }));
 vi.mock("@/server/services/form-submission.service", () => svc);
 vi.mock("@/server/trpc/guards", () => ({ guardSiteAccess: guards.guardSiteAccess, guardSiteRole: guards.guardSiteRole }));
+vi.mock("@/server/services/permission.service", () => perm);
 
 import { formsRouter } from "@/server/trpc/routers/forms";
 
@@ -33,13 +35,13 @@ describe("forms.exportSubmissions — the editor's view rides through", () => {
     svc.exportSubmissions.mockResolvedValue("id,createdAt,form");
     const csv = await caller().exportSubmissions({ siteId: "s1", formBlockId: "f1", isSpam: true, format: "csv" });
     expect(guards.guardSiteAccess).toHaveBeenCalledWith(prismaMock, "u1", "s1");
-    expect(svc.exportSubmissions).toHaveBeenCalledWith("s1", "f1", "csv", { isSpam: true, isArchived: undefined });
+    expect(svc.exportSubmissions).toHaveBeenCalledWith("s1", "f1", "csv", { technical: false }, { isSpam: true, isArchived: undefined });
     expect(csv).toBe("id,createdAt,form");
   });
 
   it("a dashboard call without a view keeps both states", async () => {
     guards.guardSiteAccess.mockResolvedValue(undefined);
     await caller().exportSubmissions({ siteId: "s1", format: "csv" });
-    expect(svc.exportSubmissions).toHaveBeenLastCalledWith("s1", undefined, "csv", { isSpam: undefined, isArchived: undefined });
+    expect(svc.exportSubmissions).toHaveBeenLastCalledWith("s1", undefined, "csv", { technical: false }, { isSpam: undefined, isArchived: undefined });
   });
 });

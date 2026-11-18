@@ -9,6 +9,8 @@
 import { canvasScale } from "../utils/canvasScale";
 import * as React from "react";
 import type { Composer } from "@/engine";
+import type { ToastInput } from "@/editor/chrome-ui";
+import { canWrite } from "@/engine/commands/commandOperations";
 import { EVENTS } from "@/shared/constants/events";
 import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
@@ -40,7 +42,7 @@ export interface UseSectionReorderOptions {
   canvasRef: React.RefObject<HTMLDivElement | null>;
   enabled?: boolean;
   /** Board 5940:148012: a finished move says so — "Moved down" + Undo. */
-  addToast?: (toast: { description: string; action?: { label: string; onClick: () => void } }) => void;
+  addToast?: (toast: ToastInput) => void;
 }
 
 export interface UseSectionReorderResult {
@@ -265,7 +267,9 @@ export function useSectionReorder({
     const { sectionId, fromIndex, toIndex } = dragState;
 
     // Only move if target is different
-    if (fromIndex !== toIndex && fromIndex !== toIndex - 1) {
+    /* REA #12: a read-only composer (view mode, Time-travel) moves nothing,
+       and a locked section stays put — the one lock gate says so. */
+    if (fromIndex !== toIndex && fromIndex !== toIndex - 1 && !composer.readOnly && canWrite(composer, sectionId)) {
       const page = composer.elements.getActivePage();
       if (!page?.root?.id) {
         setDragState(null);
@@ -294,6 +298,7 @@ export function useSectionReorder({
         });
       } catch {
         composer.rollbackTransaction();
+        addToastRef.current?.({ tone: "error", description: "Couldn't move the section. Nothing changed." });
       }
     }
 

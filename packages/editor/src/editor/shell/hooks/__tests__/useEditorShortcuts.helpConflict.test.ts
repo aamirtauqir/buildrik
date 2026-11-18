@@ -44,7 +44,6 @@ function mount(c = composer()) {
     useEditorShortcuts({
       composer: c,
       modals: { setShowShortcuts },
-      saveProject: vi.fn(),
     }),
   );
   return { setShowShortcuts, c };

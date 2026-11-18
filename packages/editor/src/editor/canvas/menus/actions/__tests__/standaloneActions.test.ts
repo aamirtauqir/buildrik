@@ -65,6 +65,19 @@ describe("standaloneActions", () => {
     });
   });
 
+  /* REA ISS-C18: the registry's refusal reason reached the Inspector ⋯ but
+     not the canvas menu, which drew a bare grey row. */
+  describe("replace-with-block", () => {
+    it("carries the registry's reason when a lock refuses it, and none when allowed", () => {
+      const section = makeElementStub({ id: "s-1", type: "section", parent });
+      const sectionCtx = { ...ctx, element: section as unknown as Element };
+      expect(action("replace-with-block").disabledReason!(sectionCtx)).toBeUndefined();
+      section.isLocked.mockReturnValue(true);
+      expect(action("replace-with-block").isEnabled!(sectionCtx)).toBe(false);
+      expect(action("replace-with-block").disabledReason!(sectionCtx)).toBe("Unlock it to replace it");
+    });
+  });
+
   describe("save-as-component", () => {
     it("emits COMPONENT_SAVE_AS_REQUESTED with the multi-selection when present", () => {
       composer.selection.getSelectedIds.mockReturnValue(["a", "b"]);
@@ -97,20 +110,22 @@ describe("standaloneActions", () => {
   });
 
   describe("group / ungroup", () => {
-    it("group-elements groups the selection and selects the new group", () => {
-      const group = makeElementStub({ id: "group-1", type: "container" });
+    /* REA #12: the menu door ran groupElements itself, outside the
+       registry's read-only gate. It runs the registry's "group" now, like the
+       Multi-select bar and ⌘G (the command owns the transaction and select). */
+    it("group-elements runs the registry's group command", () => {
+      const run = vi.fn();
+      (composer as unknown as { commands: { run: typeof run } }).commands = { run };
       composer.selection.getSelectedIds.mockReturnValue(["a", "b"]);
-      composer.elements.groupElements.mockReturnValue(group);
 
       action("group-elements").handler!(ctx);
 
-      expect(composer.beginTransaction).toHaveBeenCalledWith("group-elements");
-      expect(composer.elements.groupElements).toHaveBeenCalledWith(["a", "b"]);
-      expect(composer.selection.select).toHaveBeenCalledWith(group);
-      expect(composer.endTransaction).toHaveBeenCalled();
+      expect(run).toHaveBeenCalledWith("group");
+      expect(composer.elements.groupElements).not.toHaveBeenCalled();
     });
 
     it("group-elements bails silently below 2 selected ids", () => {
+      (composer as unknown as { commands: { run: ReturnType<typeof vi.fn> } }).commands = { run: vi.fn() };
       composer.selection.getSelectedIds.mockReturnValue(["a"]);
       action("group-elements").handler!(ctx);
       expect(composer.elements.groupElements).not.toHaveBeenCalled();

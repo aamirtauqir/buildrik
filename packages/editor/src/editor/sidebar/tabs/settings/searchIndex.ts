@@ -69,7 +69,7 @@ const SECTIONS: SectionDef[] = [
     aliases: ["localization", "locale", "translation", "i18n", "multilingual"],
     fields: [
       ["Default language", "Default", "default-locale", ["site language", "default locale"]],
-      ["Languages", "Published languages and translation progress", "locales", ["locales"]],
+      ["Languages", "Languages and translation progress", "locales", ["locales"]],
     ],
   },
   { screen: "branding", aliases: ["design", "colours", "colors", "fonts", "theme"] },

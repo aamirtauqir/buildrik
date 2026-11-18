@@ -13,9 +13,17 @@
  * The root's `data-tabs-initial` names the pair shown first (else the tab
  * marked `aria-selected="true"`, else the first).
  *
+ * Until 2026-10-20 nothing shipped for tabs, so clicking a tab on a
+ * published site did nothing (REA audit R4 P0 #2). The per-element
+ * stylesheet hides the inactive panels, so a shown panel gets the display
+ * the initial one had; a tab whose look lives in that stylesheet rather than
+ * inline gets the active look (colour, weight, bottom border) copied from the
+ * tab that was active at load.
+ *
  * Writes the ARIA the pattern needs (ids derived per load — element ids are
  * remapped on duplicate, so none are stored), hides inactive panels, and on a
- * published page activates on click and ArrowLeft / ArrowRight / Home / End.
+ * published page activates on click and ArrowLeft / ArrowRight (Up / Down
+ * too) / Home / End.
  * The canvas passes `interactive: false` and may `reveal` the panel holding
  * the selection. Idempotent per root; returns a cleanup.
  *
@@ -33,6 +41,7 @@ export function initTabsRuntime(root: ParentNode, opts: TabsRuntimeOptions = {})
   const cleanups: Array<() => void> = [];
   const interactive = opts.interactive !== false;
   let seq = 0;
+  const LOOK = ["color", "fontWeight", "borderBottomColor"] as const;
 
   const lists = root.querySelectorAll<HTMLElement>('[role="tablist"]');
   lists.forEach(function (list) {
@@ -59,6 +68,18 @@ export function initTabsRuntime(root: ParentNode, opts: TabsRuntimeOptions = {})
     const onLook = savedSelected ? savedSelected.getAttribute("style") : null;
     const offTab = tabs.filter(function (t) { return t !== savedSelected; })[0];
     const offLook = offTab ? offTab.getAttribute("style") : null;
+    const win = box.ownerDocument.defaultView;
+    const looks = function (el: HTMLElement | undefined): Record<string, string> | null {
+      if (!el || !win) return null;
+      const cs = win.getComputedStyle(el);
+      const out: Record<string, string> = {};
+      LOOK.forEach(function (k) { out[k] = cs[k]; });
+      return out;
+    };
+    const inlineLooks = onLook !== null && offLook !== null;
+    const onComputed = interactive && !inlineLooks ? looks(savedSelected || tabs[0]) : null;
+    const offComputed = interactive && !inlineLooks ? looks(tabs.filter(function (t) { return t !== (savedSelected || tabs[0]); })[0]) : null;
+    let shownDisplay = "block";
 
     tabs.forEach(function (tab, i) {
       const key = tab.getAttribute("data-tab-key") || "p" + i;
@@ -81,13 +102,16 @@ export function initTabsRuntime(root: ParentNode, opts: TabsRuntimeOptions = {})
         tab.setAttribute("tabindex", on ? "0" : "-1");
         tab.classList.toggle("active", on);
         const look = on ? onLook : offLook;
-        if (look !== null && onLook !== null && offLook !== null) tab.setAttribute("style", look);
+        if (look !== null && inlineLooks) tab.setAttribute("style", look);
+        const computed = on ? onComputed : offComputed;
+        if (computed) LOOK.forEach(function (k) { tab.style[k] = computed[k]; });
         const panel = panelFor(tab, i);
         if (panel) {
           panel.classList.toggle("active", on);
           if (on) {
             panel.removeAttribute("hidden");
             if (panel.style.display === "none") panel.style.display = "";
+            if (win && win.getComputedStyle(panel).display === "none") panel.style.display = shownDisplay;
           } else {
             panel.setAttribute("hidden", "");
             panel.style.display = "none";
@@ -114,6 +138,9 @@ export function initTabsRuntime(root: ParentNode, opts: TabsRuntimeOptions = {})
       }
     }
     if (start < 0) start = savedSelected ? tabs.indexOf(savedSelected) : 0;
+    const loadPanel = panelFor(savedSelected || tabs[0], savedSelected ? tabs.indexOf(savedSelected) : 0);
+    const loadDisplay = loadPanel && win ? win.getComputedStyle(loadPanel).display : "";
+    if (loadDisplay && loadDisplay !== "none") shownDisplay = loadDisplay;
     select(start, false);
 
     if (!interactive) {
@@ -124,8 +151,8 @@ export function initTabsRuntime(root: ParentNode, opts: TabsRuntimeOptions = {})
       const onClick = function (): void { select(i, false); };
       const onKey = function (e: KeyboardEvent): void {
         let next = -1;
-        if (e.key === "ArrowRight") next = (i + 1) % tabs.length;
-        else if (e.key === "ArrowLeft") next = (i - 1 + tabs.length) % tabs.length;
+        if (e.key === "ArrowRight" || e.key === "ArrowDown") next = (i + 1) % tabs.length;
+        else if (e.key === "ArrowLeft" || e.key === "ArrowUp") next = (i - 1 + tabs.length) % tabs.length;
         else if (e.key === "Home") next = 0;
         else if (e.key === "End") next = tabs.length - 1;
         if (next < 0) return;

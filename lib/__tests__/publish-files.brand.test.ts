@@ -1,8 +1,8 @@
 /**
  * A Brand-heavy page through the WHOLE publish chain, without publishing:
  * the editor's publish export (`exportPublishPages`, the payload the Publish
- * button sends) → the worker's own page passes (`wireSliders`,
- * `wireWidgetRuntimes`) → `buildDeployFiles`, the file set Vercel would get.
+ * button sends) → the worker's own page pass (`injectPageRuntimes`)
+ * → `buildDeployFiles`, the file set Vercel would get.
  *
  * Final Brand QA (2026-10-09) checked dark Auto, the theme toggle and token CSS
  * on the single-file export only; nothing proved the deployed page carries the
@@ -14,8 +14,7 @@
  */
 import { describe, it, expect, beforeAll } from "vitest";
 import { buildDeployFiles, type DeployInputs } from "@lib/publish-files";
-import { wireSliders } from "@lib/publish-sliders";
-import { wireWidgetRuntimes } from "@lib/publish-widgets";
+import { injectPageRuntimes } from "@buildrik/editor/src/engine/export/publishPostProcess";
 import { Composer } from "@/engine/Composer";
 import { ExportEngine } from "@/engine/export/ExportEngine";
 import { emitSiteTokenCss } from "@/engine/export/ExportHelpers";
@@ -103,7 +102,7 @@ const inputs = (pages: DeployInputs["pages"]): DeployInputs => ({
 /** What the worker route does to the editor's pages before buildDeployFiles. */
 async function deploy(c: Composer) {
   const exported = await exportPublishPages(c);
-  const worked = exported.map((p) => ({ ...p, html: wireWidgetRuntimes(wireSliders(p.html)) }));
+  const worked = exported.map((p) => ({ ...p, html: injectPageRuntimes(p.html) }));
   return { exported, files: buildDeployFiles(inputs(worked)) };
 }
 
@@ -118,7 +117,7 @@ describe("publish file builder = export, for a Brand-heavy page", () => {
     const single = new ExportEngine(brandSite("auto")).generateHTML();
     const tokenCss = emitSiteTokenCss(c.getProjectSettings() as never, { migrate: true, hasThemeToggle: true });
 
-    expect(files.map((f) => f.file)).toEqual(["index.html", "about.html", "robots.txt", "sitemap.xml"]);
+    expect(files.map((f) => f.file)).toEqual(["index.html", "about.html", "robots.txt", "sitemap.xml", "vercel.json"]);
     const deployed = file(files, "index.html");
     expect(deployed).toContain('data-bk-theme-toggle="true"');
     expect(deployed).toContain("var(--buildrick-design-color-brand-x)");

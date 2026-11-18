@@ -54,6 +54,8 @@ interface Props {
   onContextMenu: (x: number, y: number) => void;
   /** ⌥↑ / ⌥↓ — the row menu's Move up / Move down (board 137:55343). */
   onMove?: (direction: -1 | 1) => void;
+  /** BK-28: ⌘D duplicates this page, ⌫ / Delete asks to delete it. */
+  onShortcut?: (action: "duplicate" | "delete") => void;
   /** Board 141:40 search results: the owning folder, shown muted right. */
   searchContext?: string;
   /** Board 140:21 / 1171:4729 — 8px warning dot when the page has unsaved edits. */
@@ -84,6 +86,7 @@ export const PageRow = React.memo<Props>(
     onRenameStart,
     onContextMenu,
     onMove,
+    onShortcut,
     searchContext,
     isDirty = false,
   }) => {
@@ -245,6 +248,7 @@ export const PageRow = React.memo<Props>(
              `aria-selected` carries the multi-select state below. */
           aria-selected={onToggleSelect ? isSelected : (page.isActive ?? false)}
           data-testid={`page-row-${page.id}`}
+          data-bk-owns-keys={onShortcut ? "true" : undefined}
           onClick={(e) => {
             if (onToggleSelect && (e.ctrlKey || e.metaKey || e.shiftKey)) {
               onToggleSelect(e);
@@ -267,6 +271,18 @@ export const PageRow = React.memo<Props>(
             if (e.key === " " && onToggleSelect && !isRenaming) {
               e.preventDefault();
               onToggleSelect(e);
+            }
+            /* BK-28: the canvas's ⌘D duplicated the selected ELEMENT from a
+               focused page row. The row marks itself `data-bk-owns-keys`, so
+               the command registry leaves these to it. */
+            if (!isRenaming && onShortcut && e.target === e.currentTarget) {
+              if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "d") {
+                e.preventDefault();
+                onShortcut("duplicate");
+              } else if (e.key === "Backspace" || e.key === "Delete") {
+                e.preventDefault();
+                onShortcut("delete");
+              }
             }
           }}
         >

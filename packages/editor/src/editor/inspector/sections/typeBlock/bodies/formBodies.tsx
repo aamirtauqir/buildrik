@@ -74,8 +74,9 @@ const ChoiceBody: React.FC<TypeBlockBodyProps> = (props) => {
     <>
       <EditTextRow composer={composer} elementId={attrs.textId} />
       <InputRow label="Name" value={attrs.name} onChange={(v) => write("name", v)} placeholder="field_name" />
-      {/* B69/06: what the form submits when it is checked ("on" when unset). */}
-      <InputRow label="Submission value" value={attrs.value} onChange={(v) => write("value", v)} placeholder="on" />
+      {/* B69/06 + BK-44: what this choice submits. Empty publishes the label's
+          text — never the browser's "on". */}
+      <InputRow label="Submission value" value={attrs.value} onChange={(v) => write("value", v)} placeholder="Label text" />
       <CheckRow label="Checked by default" checked={attrs.checked} onChange={(on) => write("checked", on ? "true" : "")} />
       <CheckRow label="Required" checked={attrs.required} onChange={(on) => write("required", on ? "true" : "")} />
     </>

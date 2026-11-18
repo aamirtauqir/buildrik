@@ -13,7 +13,6 @@ import * as React from "react";
 import { Z_LAYERS } from "@/shared/constants/canvas";
 import { getBoxModel, getElementInfo } from "../utils/elementInfo";
 import type { BoxModel, ElementInfo } from "../utils/elementInfo";
-import { DragHandle } from "./DragHandle";
 import {
   MarginBoxes,
   PaddingBoxes,
@@ -157,7 +156,6 @@ const ElementHoverOverlayComponent: React.FC<ElementHoverOverlayProps> = ({
         <MinimalOverlay
           rect={rect}
           info={info}
-          hoveredElementId={hoveredElementId}
           isCloneMode={isCloneMode}
         />
       )}
@@ -168,7 +166,6 @@ const ElementHoverOverlayComponent: React.FC<ElementHoverOverlayProps> = ({
           rect={rect}
           info={info}
           parentHierarchy={parentHierarchy}
-          hoveredElementId={hoveredElementId}
           isCloneMode={isCloneMode}
         />
       )}
@@ -179,7 +176,6 @@ const ElementHoverOverlayComponent: React.FC<ElementHoverOverlayProps> = ({
           rect={rect}
           boxModel={boxModel}
           info={info}
-          hoveredElementId={hoveredElementId}
           isCloneMode={isCloneMode}
         />
       )}
@@ -194,14 +190,12 @@ const ElementHoverOverlayComponent: React.FC<ElementHoverOverlayProps> = ({
 interface MinimalOverlayProps {
   rect: DOMRect;
   info: ElementInfo;
-  hoveredElementId: string | null;
   isCloneMode: boolean;
 }
 
 const MinimalOverlay: React.FC<MinimalOverlayProps> = ({
   rect,
   info,
-  hoveredElementId,
   isCloneMode,
 }) => (
   <>
@@ -239,9 +233,6 @@ const MinimalOverlay: React.FC<MinimalOverlayProps> = ({
       {info.friendlyName}
     </div>
 
-    {/* Small drag handle (4x4) */}
-    <DragHandle rect={rect} elementId={hoveredElementId || ""} size="small" />
-
     {/* Clone mode badge — visible when Ctrl/Cmd held, signals Ctrl/Cmd+drag will clone */}
     {isCloneMode && <CloneBadge rect={rect} />}
   </>
@@ -255,7 +246,6 @@ interface HierarchyOverlayProps {
   rect: DOMRect;
   info: ElementInfo;
   parentHierarchy: Array<{ id: string; type: string; label: string }>;
-  hoveredElementId: string | null;
   isCloneMode: boolean;
 }
 
@@ -263,7 +253,6 @@ const HierarchyOverlay: React.FC<HierarchyOverlayProps> = ({
   rect,
   info,
   parentHierarchy,
-  hoveredElementId,
   isCloneMode,
 }) => (
   <>
@@ -327,9 +316,6 @@ const HierarchyOverlay: React.FC<HierarchyOverlayProps> = ({
       )}
     </div>
 
-    {/* Drag handle */}
-    <DragHandle rect={rect} elementId={hoveredElementId || ""} />
-
     {/* Clone mode badge */}
     {isCloneMode && <CloneBadge rect={rect} />}
   </>
@@ -343,7 +329,6 @@ interface BoxModelOverlayProps {
   rect: DOMRect;
   boxModel: BoxModel;
   info: ElementInfo;
-  hoveredElementId: string | null;
   isCloneMode: boolean;
 }
 
@@ -351,7 +336,6 @@ const BoxModelOverlay: React.FC<BoxModelOverlayProps> = ({
   rect,
   boxModel,
   info,
-  hoveredElementId,
   isCloneMode,
 }) => {
   const { margin, padding } = boxModel;
@@ -391,9 +375,6 @@ const BoxModelOverlay: React.FC<BoxModelOverlayProps> = ({
 
       {/* Full info badge */}
       <InfoBadge rect={rect} info={info} colors={COLORS} />
-
-      {/* Drag handle */}
-      <DragHandle rect={rect} elementId={hoveredElementId || ""} />
 
       {/* Spacing labels */}
       <SpacingLabels rect={rect} margin={margin} padding={padding} />

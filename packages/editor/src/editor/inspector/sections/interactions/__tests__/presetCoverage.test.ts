@@ -1,9 +1,10 @@
 /**
- * Every animation preset the inspector offers must have a timeline in the
- * runtime. It offered 31 and the runtime implemented 2 — the other 29 fell to
- * a default that returns a 0.2s opacity nudge, so Bounce, Zoom In, Shake and
- * Flip all produced the same faint flicker. Nothing looked broken, which is
- * why nothing caught it.
+ * Every animation preset the inspector offers must exist in each runtime
+ * that plays it. The canvas GSAP runtime once implemented 2 of 31, so most
+ * presets fell to a faint default flicker and nothing looked broken. That
+ * runtime (engine/interactions/InteractionRuntime) was removed with its
+ * uncalled InteractionManager (R1 §7); the CSS keyframes and the published
+ * WAAPI runtime remain.
  *
  * This is the cross-layer check the two separate lists never had.
  *
@@ -11,7 +12,6 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { PRESET_TIMELINES } from "@/engine/interactions/InteractionRuntime";
 import { ANIMATION_KEYFRAMES } from "@/shared/constants/animationKeyframes";
 import { INTERACTION_PRESET_KEYFRAMES } from "@/engine/export/interactionRuntime";
 import { ANIMATION_PRESET_GROUPS, TRIGGER_GROUPS } from "../types";
@@ -24,10 +24,6 @@ const OFFERED_PRESETS = Object.values(ANIMATION_PRESET_GROUPS)
 describe("inspector option catalogues vs the runtime", () => {
   it("offers at least one preset per group", () => {
     expect(OFFERED_PRESETS.length).toBeGreaterThan(0);
-  });
-
-  it.each(OFFERED_PRESETS)("preset %s has a timeline", (preset) => {
-    expect(PRESET_TIMELINES[preset]).toBeDefined();
   });
 
   /* The picker's trigger list and the engine's InteractionTrigger union are
@@ -46,16 +42,15 @@ describe("inspector option catalogues vs the runtime", () => {
     },
   );
 
-  /* A preset reaches the page two ways: the GSAP timeline (interactions
-     runtime) and a CSS @keyframes (element animations + the inspector's own
-     Preview button, which sets `animation: bd-anim-<name>`). 20 of the 39 had
-     a timeline but no keyframe, so Preview showed nothing for them — on the
+  /* A CSS @keyframes serves element animations and the inspector's own
+     Preview button, which sets `animation: bd-anim-<name>`. 20 of the 39 had
+     no keyframe, so Preview showed nothing for them — on the
      canvas and on the published site alike. */
   it.each(OFFERED_PRESETS)("preset %s has a keyframe", (preset) => {
     expect(ANIMATION_KEYFRAMES[`bd-anim-${preset}`]).toBeDefined();
   });
 
-  /* Third implementation, and the only one a PUBLISHED page runs: the
+  /* The only implementation a PUBLISHED page runs: the
      dependency-free WAAPI runtime shipped in the export boot script. It had 17
      of the 39, so 22 presets animated in the editor and did nothing on the
      live site. */

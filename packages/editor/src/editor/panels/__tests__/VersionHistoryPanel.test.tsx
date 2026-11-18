@@ -3,14 +3,13 @@
  * (audit-remediation 2026-05-08).
  *
  * VersionHistoryPanel.tsx is 962 LOC with zero pre-existing tests. D3
- * Stages 1-4 split the file into VersionList + CompareView + AIPanel +
+ * Stages 1-4 split the file into VersionList + CompareView +
  * orchestrator. Without baseline tests, splits are blind. These cases
  * pin the user-observable behaviors that must survive each split.
  *
  * Coverage targets (from audit-remediation plan §D3 Stage 0):
  *   - Versions list renders with N items, empty list shows empty state
  *   - Compare view toggles on, calls compareWithDraft
- *   - AI summary fetch fires on demand, renders result
  *   - Restore action calls restoreVersion + emits success toast
  *   - Delete confirmation flow + deleteVersion
  *   - Save flow: form open → name → submit → createVersion
@@ -20,7 +19,6 @@
  *     versions list + spies on the action handlers.
  *   - `react-window` FixedSizeList mocked to render all rows directly
  *     (jsdom returns 0 height; the real virtualization no-ops).
- *   - global.fetch mocked for AI summary path (real call hits tRPC).
  *
  * @license BSD-3-Clause
  */
@@ -80,7 +78,6 @@ const mocks = vi.hoisted(() => {
     deleteVersion: vi.fn(),
     compareWithDraft: vi.fn(),
     retryLoad: vi.fn(),
-    updateAiSummary: vi.fn(),
     getVersion: vi.fn(),
   };
 });
@@ -97,7 +94,6 @@ vi.mock("@/shared/hooks/useVersionHistory", () => ({
     deleteVersion: mocks.deleteVersion,
     getVersion: mocks.getVersion,
     compareWithDraft: mocks.compareWithDraft,
-    updateAiSummary: mocks.updateAiSummary,
   }),
 }));
 
@@ -114,7 +110,6 @@ function makeVersion(overrides: Partial<NamedVersion> = {}): NamedVersion {
     isAutoCheckpoint: overrides.isAutoCheckpoint ?? false,
     projectId: overrides.projectId,
     visualSnapshot: overrides.visualSnapshot,
-    aiSummary: overrides.aiSummary,
     userId: overrides.userId,
   };
 }
@@ -167,7 +162,6 @@ beforeEach(() => {
   mocks.restoreVersion.mockReset();
   mocks.deleteVersion.mockReset();
   mocks.compareWithDraft.mockReset();
-  mocks.updateAiSummary.mockReset();
   mocks.getVersion.mockReset();
 });
 

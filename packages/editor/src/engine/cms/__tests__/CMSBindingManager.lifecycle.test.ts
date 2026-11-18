@@ -74,6 +74,41 @@ describe("binding lifecycle", () => {
   });
 });
 
+describe("a merged duplicate collection (REA C-7)", () => {
+  it("moves field and list bindings from the local id to the server's, and saves", () => {
+    const handlers = new Map<string, Array<(p: unknown) => void>>();
+    const composer = {
+      data: { on: vi.fn(), off: vi.fn() },
+      markDirty: vi.fn(),
+      on: (ev: string, fn: (p: unknown) => void) => handlers.set(ev, [...(handlers.get(ev) ?? []), fn]),
+      emit: vi.fn(),
+      elements: { getElement: () => null },
+    } as unknown as Composer;
+    const cms = new CollectionManager();
+    const bindings = new CMSBindingManager(composer, cms);
+    bindings.import({ h1: [field("c-local")], h2: [field("c-other")] });
+    bindings.bindCollection("list", "c-local", { repeat: "children", limit: 2 });
+    (composer.markDirty as ReturnType<typeof vi.fn>).mockClear();
+
+    cms.emit(EVENTS.CMS_COLLECTION_REKEYED, { from: "c-local", to: "c-server" });
+
+    expect(bindings.getBindings("h1")).toEqual([field("c-server")]);
+    expect(bindings.getBindings("h2")).toEqual([field("c-other")]);
+    expect(bindings.getCollectionBinding("list")).toMatchObject({ collectionId: "c-server", limit: 2, repeat: "children" });
+    expect(composer.markDirty).toHaveBeenCalled();
+  });
+
+  it("an id nothing is bound to changes nothing", () => {
+    const { bindings, composer } = setup(new Set());
+    const cms = (bindings as unknown as { cmsManager: CollectionManager }).cmsManager;
+    bindings.import({ h1: [field("c1")] });
+    (composer.markDirty as ReturnType<typeof vi.fn>).mockClear();
+    cms.emit(EVENTS.CMS_COLLECTION_REKEYED, { from: "c-local", to: "c-server" });
+    expect(bindings.getBindings("h1")).toEqual([field("c1")]);
+    expect(composer.markDirty).not.toHaveBeenCalled();
+  });
+});
+
 describe("bindable types (BD-11)", () => {
   it("a container never takes a field binding, from any door; a heading does", () => {
     const types: Record<string, string> = { box: "container", h: "heading" };

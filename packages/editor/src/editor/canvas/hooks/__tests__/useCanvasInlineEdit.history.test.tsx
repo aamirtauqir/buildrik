@@ -69,7 +69,7 @@ describe("useCanvasInlineEdit › an inline edit commits as one composer history
     });
     expect(calls).toEqual(["begin", "setContent", "end"]);
     expect(composer.beginTransaction).toHaveBeenCalledWith("inline-edit");
-    expect(setContent).toHaveBeenCalledWith("Hello world!");
+    expect(setContent).toHaveBeenCalledWith("Hello world!", "html");
     expect(result.current.isEditing).toBe(false);
   });
 

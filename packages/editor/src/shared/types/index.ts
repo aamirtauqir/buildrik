@@ -46,21 +46,9 @@ export interface ComposerConfig {
   onUpdate?: (data: ProjectData) => void;
   /**
    * Optional remote asset sync (Phase B2). When provided, MediaManager mirrors
-   * uploads/deletes to the server in addition to local IndexedDB. Mirrored
-   * field — duplicate of `shared/types/config.ts` ComposerConfig (pre-existing
-   * SSOT violation; index.ts is what Composer.ts resolves to). Both must
-   * stay in sync until the duplication is collapsed.
+   * uploads/deletes to the server in addition to local IndexedDB.
    */
   remoteSync?: import("./media").RemoteAssetSync;
-  /**
-   * Optional AI client for AIAssistService production wire (Phase C.1).
-   * Concrete type is `AIClient` in `editor/design-system/services`; declared
-   * structurally here because `shared/` cannot import from `editor/` per the
-   * import-direction rule.
-   */
-  aiClient?: {
-    generate(input: { prompt: string; signal?: AbortSignal }): Promise<string>;
-  } | null;
 }
 
 export interface StorageConfig {

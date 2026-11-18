@@ -162,10 +162,14 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   const handleDuplicate = async () => {
     if (!composer) return;
 
-    const duplicate = await composer.components.duplicateComponent(component.id);
-    if (duplicate) {
-      onDuplicate?.();
+    /* P-4: it said nothing either way and a throw went unhandled. */
+    const duplicate = await composer.components.duplicateComponent(component.id).catch(() => null);
+    if (!duplicate) {
+      addToast({ description: `Couldn't duplicate "${component.name}".`, tone: "error", duration: 4000 });
+      return;
     }
+    addToast({ description: `Duplicated "${component.name}".`, duration: 4000 });
+    onDuplicate?.();
   };
 
 
@@ -206,7 +210,13 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
     const snapshot = composer.components.snapshotComponent(component.id);
     const onPages = pageCount;
     const n = instances.length;
-    await Promise.all(instances.map((inst) => composer.components.detachInstance(inst.elementId)));
+    /* P-4: a failure is said, not left as an unhandled rejection. */
+    try {
+      await Promise.all(instances.map((inst) => composer.components.detachInstance(inst.elementId)));
+    } catch {
+      addToast({ description: "Couldn't detach every instance. Try again.", tone: "error", duration: 4000 });
+      return;
+    }
     addToast({
       description: `Detached ${count(n, "instance", "instances")} on ${count(onPages, "page", "pages")} from ${component.name}`,
       ...(snapshot && { action: { label: "Undo", onClick: () => void composer.components.relinkInstances(snapshot.instances) } }),

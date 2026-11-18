@@ -57,7 +57,7 @@ describe("the published page carries the site's own fonts", () => {
       { id: "font-mono", value: "IBM Plex Mono" },
     ]);
     expect(css).toContain("h1,h2,h3,h4,h5,h6{font-family:Georgia,sans-serif}");
-    expect(css).toContain("body{font-family:Verdana,sans-serif}");
+    expect(css).toMatch(/body\{font-family:Verdana,sans-serif[;}]/);
     expect(css).toContain("code,pre,kbd,samp{font-family:IBM Plex Mono,monospace}");
   });
 
@@ -86,6 +86,14 @@ describe("the published page carries the site's own fonts", () => {
     expect(css).not.toMatch(/body\{[^}]*color:#334155/);
     expect(css).toContain(':root[data-theme="dark"]{');
     expect(css).toMatch(/:root\[data-theme="dark"\]\{[^}]*--buildrick-design-color-text:#E5E7EB/);
+  });
+
+  /* REA #18: a site that never saved a token (the test site carried 0) was
+     slate on the canvas — site-content.css paints the seed Text token — and
+     browser black in Preview and on the published page. */
+  it("paints body text with the seed Text token when the site saved no tokens", () => {
+    const css = exportCSSWithFonts([]);
+    expect(css).toMatch(/body\{[^}]*color:var\(--buildrick-design-color-text,#334155\)/);
   });
 
   it("says nothing when the site carries no font tokens", () => {

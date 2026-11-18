@@ -8,17 +8,14 @@
 
 import { fireEvent, waitFor, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { AIAssistService } from "@/engine/designSystem/services/AIAssistService";
-import { EventEmitter } from "@/engine/EventEmitter";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
 import { installDomShims, makeFakeComposer, openPage, renderOnRadius, renderWorkspace } from "./brandWorkspaceHarness";
 import { requestBrandToken } from "../brandOpenRequest";
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 import type { DesignToken } from "@/engine/designSystem/types";
 
-/* The AI entry is gated on the SAME flag that decides whether an AIClient is
-   built at all (useComposerInit.ts:132). Default the mock ON so the entry
-   tests exercise the wired path; the flag-off test flips it. */
+/* Brand from logo or website is gated on `dsAi`. Default the mock ON; the
+   flag-off test flips it. */
 vi.mock("@/shared/utils/featureFlags", () => ({
   isFeatureEnabled: vi.fn(() => true),
 }));

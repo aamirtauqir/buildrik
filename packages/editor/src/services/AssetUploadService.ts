@@ -22,7 +22,7 @@
 import { upload } from "@vercel/blob/client";
 import { safeBlobName } from "@buildrik/shared/schemas/upload";
 import { createBuildrikApiClient } from "./api-client";
-import type { RemoteAssetSync } from "@/shared/types/media";
+import type { RemoteAssetMeta, RemoteAssetSync } from "@/shared/types/media";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 
 let _client: ReturnType<typeof createBuildrikApiClient> | null = null;
@@ -146,13 +146,34 @@ export async function uploadBlob(
 export function createRemoteAssetSync(opts?: { siteId?: string | null }): RemoteAssetSync {
   const siteId = opts?.siteId ?? null;
 
+  const register = async (
+    url: string,
+    meta: RemoteAssetMeta,
+    dims: { width: number; height: number } | null,
+  ): Promise<{ serverId: string; url: string }> => {
+    // Idempotent on URL server-side: if onUploadCompleted already created the
+    // row this returns it; if not, this creates it and the hook is the no-op.
+    const created = (await getClient().media.createAsset.mutate({
+      url,
+      bytes: meta.bytes,
+      type: meta.type,
+      mimeType: meta.mimeType,
+      filename: meta.filename,
+      ...(dims ?? {}),
+      folderId: meta.folderId ?? null,
+      siteId: meta.siteId ?? siteId,
+    })) as { id: string; url: string; bytes: number };
+    return { serverId: created.id, url };
+  };
+
   return {
     async uploadAndCreate(blob: Blob, meta) {
+      let uploaded: UploadBlobResult;
       try {
         // Forward server-row metadata via clientPayload so the route's
         // onUploadCompleted handler can create the canonical MediaAsset
         // row independently (P1A defense in depth).
-        const uploaded = await uploadBlob(
+        uploaded = await uploadBlob(
           blob,
           meta.filename,
           meta.mimeType,
@@ -163,24 +184,24 @@ export function createRemoteAssetSync(opts?: { siteId?: string | null }): Remote
           },
           meta.onProgress,
         );
-        // Client-driven createAsset is now idempotent on URL match
-        // server-side. If onUploadCompleted already created the row,
-        // this returns the existing one. If completion hasn't fired
-        // yet, this creates and the completion handler is the no-op.
-        const dims = await imageDimensions(blob, meta.type);
-        const created = (await getClient().media.createAsset.mutate({
-          url: uploaded.url,
-          bytes: meta.bytes,
-          type: meta.type,
-          mimeType: meta.mimeType,
-          filename: meta.filename,
-          ...(dims ?? {}),
-          folderId: meta.folderId ?? null,
-          siteId: meta.siteId ?? siteId,
-        })) as { id: string; url: string; bytes: number };
-        return { serverId: created.id, url: uploaded.url };
       } catch {
         // Auth / quota / network — caller falls back to localOnly + retry queue.
+        return null;
+      }
+      try {
+        return await register(uploaded.url, meta, await imageDimensions(blob, meta.type));
+      } catch {
+        /* BK-42: the file is in storage. Throwing its URL away made the
+           retry upload it again — three copies, duplicate rows — and left a
+           placed image with a `blob:` src that died on reload. */
+        return { serverId: null, url: uploaded.url };
+      }
+    },
+
+    async registerUploaded(url, meta) {
+      try {
+        return await register(url, meta, null);
+      } catch {
         return null;
       }
     },

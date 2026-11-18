@@ -15,7 +15,6 @@ import { useCanvasNavigationGuard } from "./hooks/useCanvasNavigationGuard";
 /** Grey left each side of the page card when the canvas fits on load. */
 const FIT_GUTTER = 60;
 import { DeleteSelectionConfirm } from "./DeleteSelectionConfirm";
-import { stepZoom } from "@/shared/constants/canvas";
 import { getBreakpointForWidth } from "@/shared/constants/breakpoints";
 import type { DeviceType } from "@/shared/types";
 import { useToast } from "@/editor/chrome-ui";
@@ -274,6 +273,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       onDraggingChange: setDraggingElementId,
       onSnapLinesChange: setSnapLines,
       snapCalculator: calculateSnapping,
+      addToast,
     });
 
     // Ruler guides
@@ -412,7 +412,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
 
     /* React state and composer state each hold a zoom, and only some paths
        wrote both. The canvas paints from the PROP (zoom / 100), while
-       `EVENTS.ZOOM_IN` above steps from `composer.getState().zoom` — so after
+       the `zoom-in` command steps from `composer.getState().zoom` — so after
        a chord that moved only React state, the flyout's Zoom In computed from
        a stale percent and the canvas jumped. Push the prop down whenever they
        disagree; `setZoom` no-ops when the value already matches, and the
@@ -440,25 +440,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     React.useEffect(() => {
       composer?.setSnapToGrid(showGrid);
     }, [composer, showGrid]);
-
-    /* ZOOM_IN / ZOOM_OUT had no listener anywhere. The ⌘K palette emits them
-       (CommandPalette.tsx "view-zoom-in"/"view-zoom-out") — so "Zoom in" was a
-       command you could find, read and run, and nothing moved. Steps to the
-       next preset, like ⌘=/⌘- (stepZoom, G2-016). */
-    React.useEffect(() => {
-      if (!composer) return;
-      const step = (direction: 1 | -1) => () => {
-        composer.setZoom(stepZoom(composer.getState().zoom, direction));
-      };
-      const zoomIn = step(1);
-      const zoomOut = step(-1);
-      composer.on(EVENTS.ZOOM_IN, zoomIn);
-      composer.on(EVENTS.ZOOM_OUT, zoomOut);
-      return () => {
-        composer.off(EVENTS.ZOOM_IN, zoomIn);
-        composer.off(EVENTS.ZOOM_OUT, zoomOut);
-      };
-    }, [composer]);
 
     // Emit hover events for LayersPanel sync
     React.useEffect(() => {
@@ -697,6 +678,18 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
         if (!id) return;
         const el = composer.elements.getElement(id);
         if (!el) return;
+        /* BK-13: a locked element is not selected by a left click, and a
+           right click selected it — and opened every structural action on
+           it. Same answer as the left click. */
+        if (el.isLocked?.()) {
+          closeContextMenu();
+          addToast({
+            description: "This element is locked. Unlock it here in the inspector or in Layers.",
+            tone: "info",
+            duration: 2500,
+          });
+          return;
+        }
         /* G2-056: right-clicking a member of a multi-selection keeps the
            selection, so the menu's Delete / Duplicate / Group act on all of
            it; right-clicking anything else selects just that. */
@@ -705,7 +698,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
 
         setContextMenu({ x: e.clientX, y: e.clientY, elementId: id });
       },
-      [composer, select, closeContextMenu, setContextMenu]
+      [composer, select, closeContextMenu, setContextMenu, addToast]
     );
 
     /* G2-014: "Custom width…" previews at a width of the user's choosing, in
@@ -902,10 +895,9 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
               span={emptyCtaSpan}
               scale={scale}
               onBrowseTemplates={() => composer?.emit("ui:browse-templates", {})}
-              /* Board 4428:44164's two new doors reuse the seams that already
-                 exist: the Add drawer opened on BLOCKS (the canvas menu's
-                 "Replace with block…" does the same), and the AI panel (the
-                 inspector's ✦ chip). */
+              /* Board 4428:44164's Add-a-block door reuses the seam that
+                 already exists: the Add drawer opened on BLOCKS (the canvas
+                 menu's "Replace with block…" does the same). */
               onAddBlock={() => {
                 if (!composer) return;
                 composer.emit("ui:switch-tab", { tab: "add" });

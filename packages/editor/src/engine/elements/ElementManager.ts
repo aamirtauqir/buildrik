@@ -7,6 +7,7 @@
  */
 
 import { EVENTS } from "@/shared/constants/events";
+import { writableElements } from "../commands/commandOperations";
 import type { ElementData, PageData, ExportOptions } from "@/shared/types";
 import { generateId } from "@/shared/utils/helpers";
 import type { Composer } from "../Composer";
@@ -17,7 +18,7 @@ import type { SectionProgress } from "./manager/HTMLParser";
 import { HTMLParser } from "./manager/HTMLParser";
 import { PageManager } from "./manager/PageManager";
 import type { ElementManagerContext } from "./manager/types";
-import type { IdRename } from "@buildrik/shared/content/elementIds";
+import { copyIdKeyedStyles, type IdRename } from "@buildrik/shared/content/elementIds";
 
 /**
  * Manages the element tree and operations
@@ -49,7 +50,8 @@ export class ElementManager {
       },
       buildElementTree: (data: ElementData, parent?: Element) =>
         this.buildElementTree(data, parent),
-      cloneElementData: (data: ElementData) => this.cloneElementData(data),
+      cloneElementData: (data: ElementData, renames?: IdRename[]) => this.cloneElementData(data, renames),
+      copyStyleRules: (renames: IdRename[]) => this.copyStyleRules(renames),
       getAllDescendants: (element: Element) => this.getAllDescendants(element),
     };
 
@@ -81,6 +83,14 @@ export class ElementManager {
   /** Get active page */
   getActivePage(): PageData | undefined {
     return this.pageManager.getActivePage();
+  }
+
+  /** The active page's element tree as data, read from the live root (so
+   *  edits applied through Element APIs are included). */
+  getActivePageRootData(): ElementData | undefined {
+    const root = this.getActivePage()?.root;
+    if (!root?.id) return root;
+    return this.getElement(root.id)?.toJSON() ?? root;
   }
 
   /** Update page metadata (name/slug/settings/slugManuallySet/meta) */
@@ -215,6 +225,9 @@ export class ElementManager {
       .map((id) => this.getElement(id))
       .filter((e): e is Element => Boolean(e));
     if (els.length < 2) return null;
+    /* REA #12: a locked element is not reparented, from any door — the one
+       lock gate refuses and raises the "locked" toast (ungroup's twin). */
+    if (writableElements(this.composer, els).length !== els.length) return null;
 
     const parent = els[0].getParent();
     if (!parent) return null;
@@ -238,7 +251,9 @@ export class ElementManager {
    */
   ungroupElement(id: string): boolean {
     const group = this.getElement(id);
-    if (!group) return false;
+    /* BK-13: ungrouping removes the container — a locked one stays, from
+       every door (menu, ⌘⇧G, palette). */
+    if (!group || group.isLocked?.()) return false;
     const parent = group.getParent();
     if (!parent) return false;
     const parentId = parent.getId();
@@ -286,7 +301,7 @@ export class ElementManager {
       if (links.some((a) => a.getAttribute("href") === href)) continue;
       const copy = this.duplicateElement(links[links.length - 1].getId());
       if (!copy) continue;
-      copy.setContent(page.name);
+      copy.setContent(page.name, "text");
       copy.setAttribute("href", href);
       added++;
     }
@@ -362,13 +377,30 @@ export class ElementManager {
    * element's own `attributes` object, so a spread clone shared it — setting
    * the duplicate's href (or src, alt…) rewrote the original's too.
    */
-  private cloneElementData(data: ElementData): ElementData {
+  private cloneElementData(data: ElementData, renames?: IdRename[]): ElementData {
     const { children, ...own } = data;
+    const id = generateId("el");
+    renames?.push({ from: data.id, to: id });
     return {
       ...structuredClone(own),
-      id: generateId("el"),
-      children: children?.map((c) => this.cloneElementData(c)),
+      id,
+      children: children?.map((c) => this.cloneElementData(c, renames)),
     };
+  }
+
+  /**
+   * An element's breakpoint and `:state` styles live in StyleEngine rules
+   * keyed to its id (`[data-buildrick-id="<id>"]` + media/pseudo), not on the
+   * element. A copy with a fresh id therefore came out with its base styles
+   * only — every Tablet/Mobile value and every :hover lost, and a reload did
+   * not bring them back (BK-06). The rules are copied onto the new ids; the
+   * originals stay with the source.
+   */
+  private copyStyleRules(renames: IdRename[]): void {
+    const styles = this.composer.styles;
+    if (!styles || renames.length === 0) return;
+    const copies = copyIdKeyedStyles(styles.exportStyles(), renames);
+    if (copies.length > 0) styles.importStyles(copies);
   }
 
   /**

@@ -29,7 +29,7 @@
   ],
   "source": "specs/*.json copy[] (board, contract) · docs/designs/2026-07-18-editor-shell-wireframes.md#57 (advisory)",
   "generatedAt": "2026-08-06",
-  "driftFloor": 4,
+  "driftFloor": 3,
   "lines": [
     {
       "surface": "Insert · search, no hits",
@@ -78,7 +78,7 @@
     {
       "surface": "Inspector · no selection",
       "copy": "Select something on the canvas to edit it.",
-      "status": "missing",
+      "status": "ships",
       "file": null,
       "shipsInstead": null,
       "note": "superseded by Page panel, board 7995:204447 (Inspector v4 · 21, 2026-09-28): with nothing selected the Inspector shows the page's own Fill / Size / Typography / Spacing, not a hint. The 'ships' match was a comment in InspectorLoading.tsx, and still is: check-copy reports this line as 'now shipping' because of that comment — do NOT --update-floor it back to ships."
@@ -114,6 +114,22 @@
       "file": "src/editor/canvas/CanvasEmptyCTA.tsx",
       "shipsInstead": "Use Add to insert elements or sections.",
       "note": "Superseded 2026-10-26 by the canonical design file 2L9OTGzBrL6kYmU18yA1c7 (owner decision 2026-10-22), board 101:42581: 'Your page is ready' / 'Use Add to insert elements or sections.'. The §5.7 line also named the AI door ('describe your site') that the no-AI-in-UI decision removes. Lane L-A."
+    },
+    {
+      "surface": "Publish panel ⋯ · Download code",
+      "copy": "Download code (ZIP)",
+      "status": "ships",
+      "file": "src/editor/sidebar/tabs/publish/PublishTab.tsx",
+      "shipsInstead": null,
+      "note": "Owner decision (REA audit follow-up, lane A): the one-click ZIP (useExportHandlers.handleExportHTML) restored as a Publish panel ⋯ row, Pro-gated via getEditorPlanTier + openUpgrade. Not a board line."
+    },
+    {
+      "surface": "Publish panel ⋯ · Download code",
+      "copy": "Preparing ZIP…",
+      "status": "ships",
+      "file": "src/editor/sidebar/tabs/publish/PublishTab.tsx",
+      "shipsInstead": null,
+      "note": "Owner decision (REA audit follow-up, lane A): the one-click ZIP (useExportHandlers.handleExportHTML) restored as a Publish panel ⋯ row, Pro-gated via getEditorPlanTier + openUpgrade. Not a board line."
     }
   ]
 }

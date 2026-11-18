@@ -3,7 +3,7 @@
  * classes as chips ("hero-title ▾" — the chevron opens Remove class), then an
  * "Add class" field. The field takes several at once: "card hero .wide" typed
  * or pasted adds all three in one step (multi-class paste). Suggestions are
- * the project's global classes.
+ * the classes other elements in the project already carry, most-used first.
  *
  * SSOT: reads classes from composer.elements.getElement().getClasses() and
  * re-reads on element:updated, so undo / redo never leave it stale. Every
@@ -17,6 +17,7 @@ import * as React from "react";
 import type { Composer } from "@/engine";
 import { Button, Menu, MenuItem, Popover } from "@/editor/chrome-ui";
 import { writeElement } from "@/engine/commands/commandOperations";
+import { tallySiteClasses } from "@/editor/design-system/ui/sections/ClassesSection";
 import { Section, type SectionTier } from "../shared/controls";
 import { CommitRow } from "./behaviourRows";
 
@@ -108,10 +109,7 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
     };
   }, [composer, selectedElement?.id]);
 
-  const globalClasses = React.useMemo<string[]>(() => {
-    const global = (composer?.styles as { getGlobalClasses?: () => string[] } | null)?.getGlobalClasses?.();
-    return global ?? [];
-  }, [composer]);
+  const siteClasses = React.useMemo(() => tallySiteClasses(composer).map(([name]) => name), [composer, classes]);
 
   /** One step for however many were typed or pasted. */
   const addClasses = (text: string) => {
@@ -144,7 +142,7 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
         placeholder="Add a class…"
         clearOnCommit
         testId="class-add"
-        suggestions={globalClasses.filter((c) => !classes.includes(c))}
+        suggestions={siteClasses.filter((c) => !classes.includes(c))}
         onCommit={addClasses}
         onPaste={(e) => {
           const text = e.clipboardData.getData("text");

@@ -1989,6 +1989,141 @@ REALITY: deferred-asks pass nothing deferred; re-review NOT in scope lists two e
 REALITY: pr-count pass no ship-policy file; one PR per lane (4), S0 merged first — 855c8b08b
 ```
 
+### Implementation decisions (during build)
+
+| # | Decision | Why | Approved |
+|---|---|---|---|
+| D35 | Canvas picks the breakpoint from the active device: the previewed breakpoint's rules are written unwrapped, in publish order, at publish specificity. Container queries (D5's mechanism) are dropped. | The canvas content has 20px padding and the frame can show a classic scrollbar, so a container's inline size is 15–40px narrower than the device: Tablet (768) matched the Mobile rules and Desktop the Tablet ones. The D5/D10 outcome (one cascade, no `!important`, base styles as sheet rules) is unchanged. | owner, 2026-10-15 (AskUserQuestion D35) |
+| — | Canvas base-rule cache per element (id + serialized styles) | Full rewrite measured p90 34 ms at 500 elements, above D7's 8 ms budget. With the cache: p50 ~4 ms, p90 2–6 ms across four live runs. CSSOM was not needed. | within D7 ("CSSOM only if it fails") |
+
+| D36 | ⌘Z inside Brand undoes only Brand edits; a canvas edit next on the stack is refused with "Nothing to undo in Brand. Canvas edits undo on the canvas." | One undo stack (D21), but a full-page surface hides the canvas, so an undo there changed what the user could not see. | owner, 2026-10-15 (AskUserQuestion D36) |
+| — | S3 state lives in a new hook, `editor/shell/hooks/useServerConflict.ts`, not inline in AquibraStudio | D21 listed FullPageHost as the only new file. Both variants' actions (O1, O7, R1, BK-59) plus the fetch made ~200 lines; inline it would grow a 950-line shell file. The hook is the one owner of conflict + restore state; ConflictModal stays presentational. | within D21's intent (one modal, two variants) |
+| — | A restore offer does not set the save-failed state on load; closing the dialog unanswered does | The save-failed banner is a portal that rendered ABOVE the dialog's scrim (live 2026-10-15) — decision 1 says nothing over the modal. The pill reads neither "Saved" nor failed while the dialog is up; Escape raises the banner, whose Retry re-offers the dialog. | within design decision 1 |
+| — | Retry / ⌘S do not restore kept edits whose base is not the loaded token; they re-offer the restore dialog | `useSaveCallback` restored any off-screen copy before saving (L5-074), which would save edits made on an older copy over a teammate's newer save without asking — the exact case R1 exists for. | within R1 |
+
+| — | S7 content rule: `contentFormat` "text" is escaped, anything else (incl. absent) is sanitized markup — on canvas, Preview, export and publish (`contentToHTML`) | Absent meant "markup" on the canvas and "text" in export; every load already sanitized content as markup, so absent = markup is the reading that matches what users saw. | within BK-40 / BK-51 |
+| — | BK-44 radio/checkbox default value = the label's text at export (no per-insert unique value) | Block HTML is static and elements carry no option index; the label text is what the visitor chose, and a Value row on the block overrides it. | within BK-44 |
+| — | D10 fallback: deployment origins (`publishedUrl`, `<project>.vercel.app`) count only while the site has a live deployment | Verified on code, not on a registered origin: the local workspace lost its Vercel connection in the 2026-10-15 DB rebuild. Regression tests cover accepted and rejected `_return`. | within D10 (live verify pending) |
+| — | E-T9: D9's "exact-match images" repair not built | Placed images carry no asset id, so a dead `blob:` src has no exact asset to relink to; the library's URL remap already covers the case where a match exists. BK-42 now prevents new dead `blob:` srcs. | owner to confirm |
+| — | Form wiring prepends action/method/enctype instead of removing the inspector's | Two background security reviews flagged removal-by-pattern (and a stricter walker) as parser differentials; the browser keeps the first of a repeated attribute, so prepending needs no parsing. | security review |
+
+| — | DR-T1: RecoveryBanner stays a banner, not folded into the restore dialog | It shows only when the server load FAILED and the local draft is on screen (`localDraftShown`); the restore dialog only follows a SUCCESSFUL load. They never coexist, so the "never two overlays" rule holds without merging a load-failure surface into the conflict dialog. Order verified: restore dialog → repair scan → repair toast → Issues (useLoadRepair waits for the restore choice; unit + live). | within decision 1 |
+
+| — | Decision 10's "IP addresses are hidden for your role." note is not shown | Both export doors (editor Forms › Export CSV, dashboard Submissions › Export CSV) export CSV only, and the CSV has never carried an IP column for any role — the note would claim a difference that does not exist. The server now strips ip/deviceInfo below ADMIN from the list and the JSON export (D7); the note belongs on a future JSON/IP-bearing export door. | within D7 / decision 10 |
+
+**D8 runbook lines (proposed; owner to confirm):**
+- `repair.undone` / `repair.applied` above 5 % over a week → the non-finite-size rule is removing values people want; set `EDITOR_LOAD_REPAIR=off`, restart, and read the "Before automatic repair" versions of the affected sites.
+- `component.overrides_dropped` above 0 after Phase 3 ships → the component format migration is losing overrides; stop the rollout and diff a dropped instance against its master.
+
+Built so far on `feat/phase1-s3-recovery` (worktree `~/Desktop/buildrik-worktrees/phase1-s0`): S0 / ER-T1 `93484937d`; S2 / E-T1 + E-T3 part `89367e913`, `bee52ba1c`; BK-06 `5f57d4f29`; BK-05 / D36 `80e0ad723`, `80a20de1a`; BK-11 `377e1197a`; S3 (BK-04, BK-59, O1, O7, R1, T1, C1) — see the S3 commit.
+
+## Implementation status (2026-10-16)
+
+All Phase 1 slices are committed on one stacked chain of local branches,
+`feat/phase1-s0-consistent-load` → … → `feat/phase1-s6-publish` (tip
+`3d13305e9`). Nothing is pushed or merged.
+
+| Slice | Commits | Notes |
+|---|---|---|
+| S0 consistent load | 93484937d | migration `20261015120000_site_last_edited_by` |
+| S2 precedence | 89367e913, bee52ba1c, 5f57d4f29, 80e0ad723, 80a20de1a, 377e1197a | D35, D36 |
+| S3 recovery | 765343348 | one ConflictModal (save / restore) |
+| S7 content | 2530f1626, 823586eb2, 1fb7ce981, e8b25045a, 931fb6c90, 5cfd71467, 5ca521fce, 28dc5dda1 | BK-40/42/44/51, E-T9, DR-T5, DR-T1 decision |
+| S1 gestures | 9e1958a5e | E-T2, DR-T3 |
+| S4 locks/keys | cbdb7d6c8 | E-T8, DR-T7, DR-T8 |
+| S5 authz | 7140abdd2 | BK-08, D7 |
+| S6 publish | 64c6c973e, 9e65d8b7d, 84f13e841, 3d13305e9 | DR-T6, E-T6, ER-T3, ER-T4, DR-T4; migration `20261016120000_publish_bundle_forms_status` |
+
+S6 decisions taken while building:
+
+- The bundle lives on the job row (`publish_build_jobs.bundle`, `bundleHash`,
+  `formsPlan`, `formsStatus`, `failedPhase`), not a new table — pruning a
+  version already nulls its payload, and the bundle goes with it.
+- A rollback redeploys the stored bytes only while the workspace's
+  entitlements match the ones the bundle was built under (`bundle.context`:
+  badge + app-scripts hash). Otherwise it rebuilds from that version's pages
+  with today's settings. Without this a downgraded workspace could roll back
+  to a paid-era version with no badge (security review finding, fixed in
+  84f13e841, verified live in both directions).
+- Rollbacks skip the server's pre-publish checks: they re-ship a version that
+  already passed them.
+- The server refusal reaches the editor as `Publish stopped: <labels>.`;
+  `parseServerBlockers` in `usePublishJob.ts` reads that message.
+
+Decision 10 (VIEWER IP note): not shown. Both VIEWER exports are CSV-only and
+never carried IP, so there was nothing to explain.
+
+Not built: D9's exact-match image relink — assets carry no id to match on, so
+no relink is unambiguous yet. Owner to confirm.
+
+Not live-verified (unit-tested only): a published form's real submission
+end to end, the `EDITOR_LOAD_REPAIR` kill switch flip, S5 authorization with
+a second real user (no new users created on purpose), the "Updating forms" /
+"Forms couldn't update" / post-deploy retry lines (simulation finishes forms
+too fast to see PENDING), the server-refusal line, and any real Vercel deploy
+(the QA workspace lost its Vercel connection in the 2026-10-15 DB rebuild).
+
+Production needs `prisma migrate deploy` for both migrations above before
+this code ships.
+
+## Pre-landing review (2026-10-16) and Phase 1.5 TODOs
+
+`/review` on the whole chain: 8 specialists + red team + adversarial pass.
+Fixed on `feat/phase1-s6-publish` (owner chose "fix all", "write the tests",
+"fix the design items"):
+
+- **Text corruption (critical, live-confirmed).** `lib/sanitize-blocks.ts`
+  purified `contentFormat: "text"` content on every save: "Tom & Jerry a<b"
+  came back as "Tom &amp; Jerry a". Text is never parsed as HTML on any render
+  path, so it is no longer purified. Two QA elements on the test site still
+  hold the corrupted text — the load scan lists them.
+- Worker: anything that throws after the deploy is live is recorded as
+  `post-deploy`, never FAILED, and never wipes the stored copy; the
+  deployment id lands with COMPLETED (unpublish could take down the previous
+  deployment); forms are PENDING from the bundle write (a worker dying after
+  COMPLETED left forms off for good); failed / cancelled / swept jobs drop
+  their bundle and forms state.
+- Post-deploy retry re-runs the project pin and the password (it re-applied
+  only the password and cleared everything); the panel names the step.
+- Restore dialog "Keep" no longer stops recovery copies for the session.
+- `forms.updateSubmission` / `deleteSubmission` no longer return IP and
+  device to an EDITOR (D7).
+- ⌘⇧G / palette could ungroup a locked group — refused in the engine.
+- `loadSiteForEditor` transaction ceilings (2s/5s defaults failed large sites).
+- AI `actions.confirm` returns the publish refusal as PRECONDITION_FAILED.
+- `blob:` check matches URL positions only; forms polling backs off (15s,
+  stops after 10 min); narrow `select`s on bundle-carrying rows.
+- Design: `disabledReason` uses the theme's disabled look (was 60% faded
+  brand blue, ~3:1); "Yes, replace" keeps its place and focus; "Autosave is
+  stuck" is announced; dashboard hides the IP row below ADMIN.
+- Tests added for the stored-bundle worker branch, rollback bundle branch,
+  retry routers (VIEWER refused), theme snapshots/targets authz, the refusal
+  message, and the server-side retries.
+
+Security-review false positive: radio/checkbox `value` XSS — ExportEngine's
+`escapeHTML` comes from `ExportHelpers.ts`, which escapes quotes.
+
+**Phase 1.5 TODOs (owner decision D4: record, decide later)**
+
+| # | Item | Why it matters | Options |
+|---|---|---|---|
+| P15-1 | Rollback bundle context covers badge + app scripts only | Tightened CSP/HSTS/robots/redirects or a sanitizer fix is undone by rolling back to an older bundle | add a settings + build-version hash to `BundleContext` (rebuild on change), or regenerate `vercel.json`/`robots.txt` from today's settings when reusing HTML |
+| P15-2 | Password protection is applied after the deploy goes live | A failed apply leaves a password-protected site public with a COMPLETED job (shown as a red post-deploy line) | apply protection to the project before the production deploy; or fail the publish when a password is set and cannot be applied |
+| P15-3 | New forms refuse submissions until activation lands | From go-live until the switch-over (minutes on the cron path; indefinitely after 3 failures) visitors get FORM_NOT_FOUND | upsert new forms active before deploy, deactivate only missing ones after; or accept a blockId present in the live job's formsPlan; notify the owner on FAILED |
+| P15-4 | "Before overwrite / restore / repair" copies live in one browser | The teammate whose work was replaced cannot recover it | write the replaced server copy as a server-side site version |
+| P15-5 | Scheduled publish and dashboard publish send no pages | They pass the new checks, then the worker fails "No page content to deploy" | render pages server-side, or refuse at startPublish before queueing and have schedules follow the job's result |
+| P15-6 | Concurrent forms activation has no compare-and-set | worker, cron and a user retry racing can let an older job deactivate the newer one's forms | activate inside a transaction that re-checks the live job |
+| P15-7 | Restore dialog decides "save a Before restore version" from the relation computed at open | after autosave moved the server, a later Restore can replace newer on-screen work without a version | recompute the relation at click time |
+| P15-8 | ⌘S imports kept edits without a prompt when their base still matches | typed-but-not-autosaved changes on the server copy are discarded | ask, or merge |
+| P15-9 | AI regeneration writes lastEditedAt without lastEditedById | the conflict dialog credits the previous human | write the actor (or a system marker) in every lastEditedAt writer |
+| P15-10 | Load repair can run before the role is known | a VIEWER session can apply repairs, then autosave is FORBIDDEN | gate on the resolved role |
+| P15-11 | Retained publish payload roughly doubles (log + bundle, 20 versions) | table/TOAST growth on cPanel Postgres | measure `pg_total_relation_size('publish_build_jobs')` after deploy; drop `log.pages` once a bundle exists |
+| P15-12 | `sites.lastEditedById` FK has no index | user deletion scans `sites` | `@@index([lastEditedById])` |
+
+Deploy order for this release: `prisma migrate deploy` (after the pg_dump
+backup) **before** the new build serves traffic, even on staging — default
+`findUnique` reads every column and would fail against an unmigrated DB.
+
 ## GSTACK REVIEW REPORT
 
 | Review | Trigger | Why | Runs | Status | Findings |

@@ -42,7 +42,18 @@ const WIDGET_ROLES = [
  * Each of these is a chord the OS/browser already binds to text editing, so
  * when the caret is in a field the user means the text, not the canvas.
  */
-const TEXT_OWNED_COMMANDS = new Set(["select-all", "cut", "copy", "paste", "undo", "redo", "copy-style", "paste-style"]);
+const TEXT_OWNED_COMMANDS = new Set([
+  "select-all",
+  "cut",
+  "copy",
+  "paste",
+  "undo",
+  "redo",
+  "copy-style",
+  "paste-style",
+  // ⌘⇧V is the browser's paste-as-plain-text; in a field it is not "Paste HTML…" (R1 I-3).
+  "paste-html",
+]);
 
 /**
  * Commands that CHANGE the document. In a read-only composer they must not run,
@@ -70,6 +81,7 @@ const MUTATING_COMMANDS = new Set([
   "paste-style", "reset-style", "lock-element", "unlock-element",
   "bring-forward", "send-backward", "bring-to-front", "send-to-back",
   "move-up", "move-down", "nudge-up", "nudge-down", "nudge-left", "nudge-right",
+  "add-text", "add-heading", "add-image", "add-button", "add-container",
 ]);
 
 /** Is the keystroke aimed at somewhere the user is typing? */
@@ -79,6 +91,16 @@ function isTextEntry(el: HTMLElement | null): boolean {
   return typeof el.closest === "function"
     ? !!el.closest("input, textarea, [contenteditable='true']")
     : false;
+}
+
+/**
+ * Whether a full-page surface (Templates, Asset library, Settings, Brand)
+ * owns the keyboard. The canvas stays mounted behind it, but no canvas
+ * shortcut may act on a document the user is not looking at. DOM query, not
+ * an import — engine/ must not depend on editor/.
+ */
+export function getFullPageSurface(): Element | null {
+  return typeof document !== "undefined" ? document.querySelector('[data-bk-surface="fullpage"]') : null;
 }
 
 export class CommandCenter {
@@ -171,6 +193,20 @@ export class CommandCenter {
 
   // ─── Query ──────────────────────────────────────────────────────────────────
 
+  /**
+   * Why a command that changes the document may not run right now, or
+   * undefined. The one gate ⌘Z and every other mutating chord answer to; the
+   * ⌘K palette asks it too, so a row cannot run what the keyboard refuses
+   * (REA #12: palette Undo changed the live document during Time-travel,
+   * which sets readOnly).
+   */
+  blockedReason(id: string): string | undefined {
+    if (!MUTATING_COMMANDS.has(id)) return undefined;
+    if (this.composer.readOnly) return "Read-only right now";
+    if (!UNIVERSAL_COMMANDS.has(id) && getFullPageSurface() !== null) return "Close the full-page view first";
+    return undefined;
+  }
+
   isActive(id: string): boolean {
     return this.activeCommands.has(id);
   }
@@ -211,17 +247,19 @@ export class CommandCenter {
     const target = e.target as HTMLElement | null;
 
     // A read-only composer runs no command that changes the document.
-    if (this.composer.readOnly && MUTATING_COMMANDS.has(commandId)) return false;
+    if (this.blockedReason(commandId)) return false;
+
+    // BK-28: a focused control that owns its shortcuts (a page row's ⌘D / ⌫)
+    // keeps them — this capture-phase listener ran first and duplicated the
+    // canvas selection instead. DOM attribute, not an import (engine/ must
+    // not depend on editor/).
+    if (target?.closest?.("[data-bk-owns-keys]")) return false;
 
     // A full-page surface (Templates, Asset library, Settings) owns the
     // keyboard while mounted — the canvas stays mounted behind it but is not
     // what the user is looking at. DOM query, not an import — engine/ must
     // not depend on editor/, same contract as the modal carve-out below.
-    if (
-      !UNIVERSAL_COMMANDS.has(commandId) &&
-      typeof document !== "undefined" &&
-      document.querySelector('[data-bk-surface="fullpage"]')
-    ) {
+    if (!UNIVERSAL_COMMANDS.has(commandId) && getFullPageSurface() !== null) {
       return false;
     }
 

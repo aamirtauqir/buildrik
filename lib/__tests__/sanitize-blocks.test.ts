@@ -41,6 +41,24 @@ describe("sanitizeBlocks", () => {
     expect(blocks.content).toContain("PWNED");
   });
 
+  /* BK-40/51: "text" content is never parsed as HTML on any render path —
+     every one escapes it — so purifying it rewrote the user's words: "&"
+     came back as "&amp;" and "a<b" lost everything after "<". */
+  it("leaves plain-text content exactly as typed", () => {
+    const blocks = { id: "r", type: "text", tagName: "p", contentFormat: "text", content: "Tom & Jerry a<b <script>x</script>" };
+    sanitizeBlocks(blocks);
+    expect(blocks.content).toBe("Tom & Jerry a<b <script>x</script>");
+  });
+
+  it("still purifies HTML content and content with no format", () => {
+    const html = { id: "r", type: "text", tagName: "p", contentFormat: "html", content: '<img src=x onerror="alert(1)">a' };
+    const legacy = { id: "s", type: "text", tagName: "p", content: '<img src=x onerror="alert(1)">a' };
+    sanitizeBlocks(html);
+    sanitizeBlocks(legacy);
+    expect(html.content).not.toMatch(/onerror/i);
+    expect(legacy.content).not.toMatch(/onerror/i);
+  });
+
   it("recurses into children", () => {
     const blocks = {
       id: "r",

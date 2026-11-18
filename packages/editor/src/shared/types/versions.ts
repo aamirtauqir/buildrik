@@ -39,8 +39,6 @@ export interface NamedVersion {
   projectId?: string;
   /** Base64 JPEG visual snapshot of the canvas at save time */
   visualSnapshot?: string | null;
-  /** Cached AI-generated summary */
-  aiSummary?: string | null;
   /** User ID of who created this version */
   userId?: string | null;
   /** The author's display name, from the server's version list (G1-075).

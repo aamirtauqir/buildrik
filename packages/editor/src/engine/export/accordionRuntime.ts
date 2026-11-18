@@ -4,7 +4,7 @@
  * Same single-source model as `sliderRuntime.ts`: ONE function, run directly
  * by the canvas (`editor/canvas/hooks/useAccordionRuntime.ts`) and serialized
  * with `Function.prototype.toString()` into the published page by the
- * dashboard (`lib/publish-widgets.ts`). Keep it free of imports and of any
+ * dashboard (`publishPostProcess.ts`, run by the publish worker and the ZIP export). Keep it free of imports and of any
  * module-level reference — everything it uses is declared inside it.
  *
  * The block's markup: a root carrying `data-allow-multiple`, holding

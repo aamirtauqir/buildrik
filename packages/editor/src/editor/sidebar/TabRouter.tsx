@@ -77,6 +77,9 @@ export interface TabRouterProps {
   /** The site's ONE next move + the ONE publish door (B4) — see StudioPanels. */
   nextMove?: NextMove | null;
   onRequestPublish?: () => void;
+  /** One-click ZIP of the site's code (Publish panel ⋯) — see StudioPanels. */
+  onDownloadCode?: () => void;
+  downloadingCode?: boolean;
   /** Switches the assets tab from slim launcher to fullpage library manager. */
   onOpenLibrary?: (opts?: { searchQuery?: string; folderId?: string | null }) => void;
   /** §17 — opens ImageEditorModal for asset crop/rotate/adjust in panel-mode MediaTab. */
@@ -126,6 +129,8 @@ export const TabRouter: React.FC<TabRouterProps> = ({
   publishJob,
   nextMove,
   onRequestPublish,
+  onDownloadCode,
+  downloadingCode,
   onOpenLibrary,
   onOpenImageEditor,
   onOpenIconPicker,
@@ -182,6 +187,8 @@ export const TabRouter: React.FC<TabRouterProps> = ({
           publishJob={publishJob}
           nextMove={nextMove ?? null}
           onRequestPublish={isFeatureEnabled("publish") ? onRequestPublish : undefined}
+          onDownloadCode={onDownloadCode}
+          downloadingCode={downloadingCode}
           initialUnpublish={unpublishIntent}
           onUnpublishIntentConsumed={onUnpublishIntentConsumed}
         />

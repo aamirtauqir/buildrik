@@ -7,6 +7,7 @@ import {
   consumeConfirmation,
 } from "@/server/services/action-confirmation.service";
 import { getAction } from "@/server/services/ai-actions.service";
+import { PublishBlockedError } from "@/server/services/publish.service";
 import { checkRateLimit } from "@/server/services/rate-limiter";
 
 /**
@@ -87,6 +88,15 @@ export const actionsRouter = router({
         if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         if (e instanceof Error && e.message === "ALREADY_PUBLISHING") {
           throw new TRPCError({ code: "CONFLICT", message: "A publish job is already in progress." });
+        }
+        /* The AI's publish goes through the same checks as the editor's
+           (D11) — and refuses the same way, not as a 500. */
+        if (e instanceof PublishBlockedError) {
+          throw new TRPCError({
+            code: "PRECONDITION_FAILED",
+            message: e.userMessage,
+            cause: { reason: "PUBLISH_BLOCKED", blockers: e.blockers },
+          });
         }
         throw e;
       }

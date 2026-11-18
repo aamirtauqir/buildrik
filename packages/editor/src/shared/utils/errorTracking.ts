@@ -82,3 +82,31 @@ export function setUser(userId: string | null): void {
     Sentry.setUser(userId ? { id: userId } : null);
   });
 }
+
+/**
+ * Production signals (CEO D8): one named event per failure class the Webflow
+ * plan fixes, so production says whether each fix holds. Payloads are counts
+ * and kinds only — never content, names or URLs — which the value type
+ * enforces.
+ */
+export type ProductEvent =
+  | "save.conflict"
+  | "restore.stale_choice"
+  | "undo.blocked_surface"
+  | "media.registration_failed"
+  | "media.registration_recovered"
+  | "repair.applied"
+  | "repair.undone"
+  | "autosave.stalled"
+  | "geometry.refused"
+  | "publish.refused"
+  | "preview.build_failed"
+  | "component.overrides_dropped";
+
+export function trackEvent(name: ProductEvent, data: Record<string, number | boolean | string> = {}): void {
+  if (!SENTRY_DSN) return;
+  void getSentry().then((Sentry) => {
+    if (!Sentry) return;
+    Sentry.captureMessage(name, { level: "info", tags: { event: name }, extra: data });
+  });
+}

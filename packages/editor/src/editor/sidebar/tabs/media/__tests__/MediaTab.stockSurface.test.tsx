@@ -51,7 +51,6 @@ vi.mock("../hooks/useMediaState", () => ({
     createFolder: vi.fn(),
     inspectFolder: vi.fn(),
     deleteFolder: vi.fn(),
-    moveAsset: vi.fn(),
     bulkMoveAssets: vi.fn(),
     uploadQueue: [],
     counts: { all: 0, img: 0, vid: 0, ico: 0, fnt: 0 },

@@ -157,6 +157,38 @@ export interface ConfirmFolderDeletePayload {
   folderName: string;
   assetCount: number;
   subFolderCount: number;
+  /** Of `assetCount`, the files something on the site still uses. */
+  inUseCount: number;
+}
+
+/** Which files a bulk move moved, and which the server refused (those stay
+ *  where they were). */
+export interface BulkMoveResult {
+  moved: string[];
+  failed: string[];
+}
+
+/** What a forced folder delete would take: every file in the folder and its
+ *  sub-folders (`assetIds`), so the confirm can count them and ask which are
+ *  in use. */
+export interface FolderInspection {
+  assetCount: number;
+  subFolderCount: number;
+  assetIds: string[];
+}
+
+/** A forced folder delete, still inside its grace window. `undo` brings
+ *  every file back (and their cleared references) and keeps the folder. */
+export interface FolderDeleteResult {
+  files: number;
+  failed: number;
+  /** Elements whose reference to a deleted file was cleared. */
+  usageCount: number;
+  /** Settles once the grace window closes: resolves when the folders are
+   *  gone (or kept, after an Undo or a failed file), rejects when removing
+   *  them failed. */
+  settled: Promise<void>;
+  undo(): void;
 }
 
 // --- Upload failure tracking ---
@@ -223,10 +255,9 @@ export interface LibraryStateResult {
   setCurrentFolderId(id: string | null): void;
   /** Files `name` under the current folder; resolves with the folder made. */
   createFolder(name: string): Promise<MediaFolder>;
-  inspectFolder(id: string): { assetCount: number; subFolderCount: number };
-  deleteFolder(id: string, options?: { force?: boolean }): Promise<void>;
-  moveAsset(assetId: string, folderId: string | null): Promise<void>;
-  bulkMoveAssets(assetIds: string[], folderId: string | null): Promise<void>;
+  inspectFolder(id: string): FolderInspection;
+  deleteFolder(id: string, options?: { force?: boolean }): Promise<FolderDeleteResult | undefined>;
+  bulkMoveAssets(assetIds: string[], folderId: string | null): Promise<BulkMoveResult>;
   counts: TypeCounts;
   sort: MediaSortBy;
   sortDir: SortDirection;
@@ -358,10 +389,9 @@ export interface MediaStateResult {
   folderCounts: ReadonlyMap<string, number>;
   /** Files `name` under the current folder; resolves with the folder made. */
   createFolder(name: string): Promise<MediaFolder>;
-  inspectFolder(id: string): { assetCount: number; subFolderCount: number };
-  deleteFolder(id: string, options?: { force?: boolean }): Promise<void>;
-  moveAsset(assetId: string, folderId: string | null): Promise<void>;
-  bulkMoveAssets(assetIds: string[], folderId: string | null): Promise<void>;
+  inspectFolder(id: string): FolderInspection;
+  deleteFolder(id: string, options?: { force?: boolean }): Promise<FolderDeleteResult | undefined>;
+  bulkMoveAssets(assetIds: string[], folderId: string | null): Promise<BulkMoveResult>;
   uploadQueue: UploadProgress[];
   counts: TypeCounts;
   sort: MediaSortBy;

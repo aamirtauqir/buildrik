@@ -34,6 +34,9 @@ export interface TransferSiteDialogProps {
   siteName: string;
   /** null while the members load. */
   members: TransferMember[] | null;
+  /** The member list failed to load — not the same as an empty team. */
+  membersFailed: boolean;
+  onRetryMembers(): void;
   /** Rejects with the server's sentence. */
   onTransfer(member: TransferMember): Promise<void>;
   onCancel(): void;
@@ -42,7 +45,15 @@ export interface TransferSiteDialogProps {
 const roleLabel = (role: string) => role.charAt(0) + role.slice(1).toLowerCase();
 const LABEL_11 = "tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink)]";
 
-export function TransferSiteDialog({ open, siteName, members, onTransfer, onCancel }: TransferSiteDialogProps) {
+export function TransferSiteDialog({
+  open,
+  siteName,
+  members,
+  membersFailed,
+  onRetryMembers,
+  onTransfer,
+  onCancel,
+}: TransferSiteDialogProps) {
   const [memberId, setMemberId] = React.useState("");
   const [typed, setTyped] = React.useState("");
   const [busy, setBusy] = React.useState(false);
@@ -94,7 +105,7 @@ export function TransferSiteDialog({ open, siteName, members, onTransfer, onCanc
               onChange={(e) => setMemberId(e.target.value)}
               data-testid="set-danger-transfer-member"
             >
-              {members === null ? <option value="">Loading members…</option> : null}
+              {members === null ? <option value="">{membersFailed ? "Couldn't load members" : "Loading members…"}</option> : null}
               {members !== null && members.length === 0 ? <option value="">No other admins or editors</option> : null}
               {(members ?? []).map((m) => (
                 <option key={m.userId} value={m.userId}>
@@ -102,6 +113,16 @@ export function TransferSiteDialog({ open, siteName, members, onTransfer, onCanc
                 </option>
               ))}
             </Select>
+            {membersFailed ? (
+              <div className="tw:flex tw:items-center tw:gap-2" role="alert" data-testid="set-danger-transfer-members-error">
+                <span className="tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-error-text)]">
+                  Couldn't load workspace members.
+                </span>
+                <Button size="xs" variant="ghost" className={LIBRARY_MODAL_BTN_GHOST} onClick={onRetryMembers}>
+                  Try again
+                </Button>
+              </div>
+            ) : null}
           </div>
           <div className="tw:flex tw:flex-col tw:gap-1">
             <label htmlFor="danger-transfer-typed" className={LABEL_11}>

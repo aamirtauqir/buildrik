@@ -79,15 +79,17 @@ export function CollectionSettingsPane({ composer, collection, records }: Collec
     if (!composer || error || !dirty) return;
     setSaving(true);
     setSaveState("idle");
+    /* C-6: updateCollection answers a refused rename with null, not a throw. */
+    let saved = false;
     try {
-      await composer.cms.collections.updateCollection(collection.id, { name: nextName, slug: nextSlug });
-      setSaveState("saved");
-      addToast({ tone: "success", title: "Collection saved", description: nextName });
+      saved = (await composer.cms.collections.updateCollection(collection.id, { name: nextName, slug: nextSlug })) !== null;
     } catch {
-      setSaveState("failed");
+      saved = false;
     } finally {
       setSaving(false);
     }
+    setSaveState(saved ? "saved" : "failed");
+    if (saved) addToast({ tone: "success", title: "Collection saved", description: nextName });
   };
 
   const remove = async () => {

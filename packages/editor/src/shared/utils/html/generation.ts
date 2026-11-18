@@ -10,7 +10,7 @@ import type { ElementData } from "@/shared/types";
 import { camelToKebab } from "../helpers";
 import { escapeAttr } from "./encoding";
 import { toAllowedElementTag } from "@buildrik/shared/schemas/element-markup";
-import { classTokens, isSafeAttrValue } from "./sanitization";
+import { classTokens, contentToHTML, isSafeAttrValue } from "./sanitization";
 import { isSelfClosing } from "./tagCategories";
 import { embedFrameHTML } from "../embed/embedFrameHTML";
 
@@ -34,6 +34,13 @@ export interface HTMLGenerationOptions {
   includeComments?: boolean;
   /** Self-close void elements (<br /> vs <br>) */
   xhtml?: boolean;
+  /**
+   * Write each element's own styles as a `style` attribute (default). The
+   * editor canvas and Preview pass false: they carry those styles as
+   * stylesheet rules (engine/styles/cascadeCSS), so breakpoint and :hover
+   * rules can win over them as they do on the published page.
+   */
+  inlineStyles?: boolean;
 }
 
 // =============================================================================
@@ -109,7 +116,7 @@ export function buildAttributeString(
 
   // Inline styles — drop the whole declaration block if it carries a dangerous
   // CSS pattern (expression(), -moz-binding, behavior:).
-  if (data.styles && Object.keys(data.styles).length > 0) {
+  if (options.inlineStyles !== false && data.styles && Object.keys(data.styles).length > 0) {
     const styleStr = Object.entries(data.styles)
       .map(([k, v]) => `${camelToKebab(k)}: ${v}`)
       .join("; ");
@@ -129,7 +136,7 @@ export function elementDataToHTML(data: ElementData, options: HTMLGenerationOpti
 
   const tag = toAllowedElementTag(data.tagName || "div");
   const attrs = buildAttributeString(data, options);
-  const content = data.content || "";
+  const content = data.content ? contentToHTML(data.content, data.contentFormat) : "";
   const indent = prettyPrint ? indentString.repeat(indentLevel) : "";
   const newline = prettyPrint ? "\n" : "";
 

@@ -39,6 +39,8 @@ interface Props {
   onFolderDelete: () => void;
   onSelectPage: (id: string) => void;
   onContextMenu: (id: string, x: number, y: number) => void;
+  /** BK-28: ⌘D / ⌫ on a focused page row act on that PAGE (not the canvas). */
+  onPageShortcut?: (id: string, action: "duplicate" | "delete") => void;
   onRenameStart: (id: string) => void;
   onRenameCommit: (id: string, name: string, updateUrl?: boolean) => void;
   onRenameCancel: () => void;
@@ -61,6 +63,7 @@ export const PageFolder: React.FC<Props> = ({
   onFolderDelete,
   onSelectPage,
   onContextMenu,
+    onPageShortcut,
   onRenameStart,
   onRenameCommit,
   onRenameCancel,
@@ -304,6 +307,7 @@ export const PageFolder: React.FC<Props> = ({
                 onRenameCancel={onRenameCancel}
                 onContextMenu={(x, y) => onContextMenu(page.id, x, y)}
                 searchContext={folder.name}
+                onShortcut={onPageShortcut ? (action) => onPageShortcut(page.id, action) : undefined}
                 draggable
                 nested
               />

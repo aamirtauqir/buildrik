@@ -21,7 +21,7 @@ import { describe, expect, it } from "vitest";
 import { NotificationType, NOTIFICATION_TYPE_CATEGORY } from "../constants/enums";
 
 const worker = readFileSync(
-  join(__dirname, "../../packages/dashboard/app/api/workers/publish/[jobId]/route.ts"),
+  join(__dirname, "../../server/services/publish-worker.service.ts"),
   "utf8",
 );
 const service = readFileSync(join(__dirname, "../../server/services/publish.service.ts"), "utf8");
