@@ -9697,7 +9697,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-C 2026-10-31 AS-1 frame probe-compared (media-fullpage-library) vs shots/199-37199.png: no top bar; rail head 'Assets' / 'Your uploads for this site'; grid column '‹ Back to Editor · {page}' + scope title, grey search + blue 'Upload ▾'; footer '{used} of {total} used' · 'All assets saved' (or 'N not on the server'); smart scopes 'Used on this site' / 'No known placements'; columns 240 · grid · 320. Open (next archetypes): rail rows centred without icons/counts + Fonts row (AS-2), filter row All types/Any tag/Date added/Grid|List/4 columns and borderless cards with 'W × H · size' (AS-3), details Details|Usage|Versions tabs with Place on canvas · Edit image · More ▾ (AS-4). | Full-page shell-in layout, nav, filters, Details/Usage/Versions tabs and copy differ from LibraryManager (no shell, “Asset library”)",
+   "verifiedNote": "L-C 2026-10-31 AS-1 frame + AS-3 grid + AS-4 details rail probe-compared (media-fullpage-library, 1440×900) vs shots/199-37199.png: rail head; '‹ Back to Editor · {page}' + scope title; search + 'Upload ▾'; filter row 'All types ▾ · Any tag ▾ · Date added ▾ · Grid | List · 4 columns ▾' (tag filter moved off the rail; sort = Date added menu + Reverse order); count line '{n} assets · {scope}' + 'Select' (code: the board draws no multi-select; bulk move/download/delete kept); borderless cards 'name / W × H · size', 1px accent outline when selected; details rail = file name, Details | Usage | Versions tabs, preview, 'W × H · WebP · size', Default alt + 'Used for new placements…', Tags, Folder, Place on canvas (primary) · Edit image · More ▾. Open: rail rows centred without icons/counts + Fonts row (AS-2). | Full-page shell-in layout, nav, filters, Details/Usage/Versions tabs and copy differ from LibraryManager (no shell, “Asset library”)",
    "tier": "P2"
   },
   {
@@ -9706,9 +9706,9 @@
    "page": "05",
    "family": "assets",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Usage grouped Pages/CMS with outside-site note; code has single “Used in” list",
+   "authority": "code:no-cms-usage-index",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 AS-4 built + probe-compared (Usage tab, media-fullpage-library) vs shots/199-37822.png: 'Version N · Selected' (family of 2+), 'Usage outside this site isn’t checked.', 'Pages · N placements', one centred accent row per placement 'Page › element ↗' (jumps to the element), primary 'Replace across site…' (disabled with reason at 0). Code: the CMS block ('CMS · 1 record', record rows, 'CMS records are edited separately.') is not drawn — there is no usage index over CMS records, so it would be invented. The probe composer has no placements; rows pinned in AssetDetailsPanel.clone.test. | Usage grouped Pages/CMS with outside-site note; code has single “Used in” list",
    "tier": "P2"
   },
   {
@@ -9718,8 +9718,8 @@
    "family": "assets",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Inline version list, Upload new version… and Use on N placements; code has VersionsModal, no version upload",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 AS-4 built + probe-compared (Versions tab) vs shots/199-38433.png: family name, rows newest first 'Version N · Selected · Used in N pages' / 'Version N · Available' over 'D Mon YYYY · FMT' (a row opens Asset versions, where using a version stays the explicit step), primary 'Upload new version…' (picks a file and saves it as the next version of the family through the same path as the image editor's save) + 'A new version does not replace any images until you choose where to use it.' | Inline version list, Upload new version… and Use on N placements; code has VersionsModal, no version upload",
    "tier": "P2"
   },
   {
@@ -9739,9 +9739,9 @@
    "page": "05",
    "family": "assets",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Board: Uploading… + Cancel upload, no %; code shows % fill, no cancel",
+   "authority": "code:no-upload-abort",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 AS-5 built + probe-compared (new case media-fullpage-uploading) vs shots/199-39336.png: the confirm closes on Upload and the file is a row above the grid — name left, 'Uploading…' right; footer '{n} file(s) not saved to Assets' (in-flight + refused + local-only). Code: no 'Cancel upload' — MediaManager.uploadFile has no abort path, so a cancel would only hide a transfer that still lands. | Board: Uploading… + Cancel upload, no %; code shows % fill, no cancel",
    "tier": "P2"
   },
   {
@@ -9751,8 +9751,8 @@
    "family": "assets",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Distinct Saving… registration phase not modelled; single progress phase in code",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 AS-5 built + probe-compared (media-fullpage-uploading) vs shots/199-39965.png: the row reads 'Saving…' while the pipeline registers the asset (engine status optimizing/processing); footer as A05. | Distinct Saving… registration phase not modelled; single progress phase in code",
    "tier": "P2"
   },
   {
@@ -9762,8 +9762,8 @@
    "family": "assets",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Failed tile copy + Retry/Remove file; code error row/toast differs",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 AS-5 built + probe-compared (media-fullpage-uploading) vs shots/199-40594.png: 'Couldn’t save' (error ink) right of the name, the engine's reason on the next line, primary 'Retry' (re-sends the kept File) and 'Remove file'. Not drawn: the failed file's thumbnail (the refused file has no library src). The board's 'Your file is kept on this device.' case is the local-only asset, which the footer counts. | Failed tile copy + Retry/Remove file; code error row/toast differs",
    "tier": "P2"
   },
   {
@@ -9773,8 +9773,8 @@
    "family": "assets",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Inline “saved to Assets” receipt vs code “Upload complete” modal",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 AS-5 built; compared vs shots/199-41227.png by unit pin (LibraryManager.clone 'saved to Assets' test — the probe cannot complete an upload): the Upload complete dialog is gone; what landed is a line under the grid, '{file} saved to Assets' ('{n} files saved to Assets'); pressing it opens the file in the rail. Footer back to 'All assets saved'. | Inline “saved to Assets” receipt vs code “Upload complete” modal",
    "tier": "P2"
   },
   {
@@ -9817,8 +9817,8 @@
    "family": "assets",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Copy: Delete asset + 8-second + Site settings caveat; code “Delete permanently”, Replace instead",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 AS-7 built + probe-compared (media-fullpage-library, More ▾ › Delete asset…) vs shots/199-42695.png: 'Delete {file}?', 'Used in N known place(s). Those images will break.' (or 'No known placements on this site.'), the 11 muted caveat 'May also be used as a favicon, social image or brand image — check Site settings. After 8 seconds this can’t be undone.', Cancel (primary) · Delete asset. The V3 'Replace instead' shortcut is gone (Replace across site… stays in More ▾ and Usage). Same dialog in the media drawer. The checked-set confirm (no 2L9 board) keeps its red button. Small residual: the shared library modal title is 20/600 vs the board's ~14. | Copy: Delete asset + 8-second + Site settings caveat; code “Delete permanently”, Replace instead",
    "tier": "P2"
   },
   {
@@ -9828,8 +9828,8 @@
    "family": "assets",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "8s grace Undo exists; toast copy differs",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 AS-7 built; compared by unit pin (useSelectionState.usage) vs shots/199-42990.png: the toast reads '{file} deleted. Undo available for 8 seconds.' ('{n} files deleted. …') with Undo, 8 s — the engine's grace window. The old 'cleared it from N elements' tail is dropped (the confirm said it). | 8s grace Undo exists; toast copy differs",
    "tier": "P3"
   },
   {
@@ -9906,8 +9906,8 @@
    "family": "assets",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Menu lacks Upload new version, Copy URL, Copy alt text, Download, Move to folder",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 AS-4 built + probe-compared (More ▾ open) vs shots/200-31384.png: Optimize · Upload new version… · Replace across site… · Rename · Copy URL · Copy alt text · Download · Move to folder · Delete asset… (red) · Close. Rows the file's kind cannot use are left out (video: no Optimize / Upload new version / Copy alt text; font: Delete asset… · Close); Copy alt text is disabled while the image has none; viewers see the write rows disabled with the reason. | Menu lacks Upload new version, Copy URL, Copy alt text, Download, Move to folder",
    "tier": "P2"
   },
   {

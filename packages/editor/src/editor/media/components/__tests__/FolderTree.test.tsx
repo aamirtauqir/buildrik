@@ -26,9 +26,6 @@ function mount(over: Partial<FolderTreeProps> = {}) {
     recentCount: 0,
     inUseCount: 0,
     unusedCount: 0,
-    allTags: [],
-    tagFilter: null,
-    setTagFilter: vi.fn(),
     folderCounts: new Map(),
     onNewFolder: vi.fn(),
     deleteFolder: vi.fn(async () => {}),
@@ -169,51 +166,11 @@ describe("FolderTree — user folders", () => {
   });
 });
 
-/* Board 4418:58292 — the rail's foot is one "Tags ▾" row (it replaced the
-   chips of Clone 3721:43697 and the Trash stub). The row opens a menu of the
-   site's tags; a tag FILTERS (`tagFilter`, never the search string), the
-   current one is checked, and picking it again — or "Clear tag filter" —
-   clears it. */
-describe("FolderTree — Tags ▾ (4418:58292)", () => {
-  const openTags = () => fireEvent.click(screen.getByTestId("mgr-row-tags"));
-
-  it("draws the Tags row at the foot, with no chips and no Trash row", () => {
-    mount({ allTags: ["summer"] });
-    expect(screen.getByTestId("mgr-row-tags")).toHaveTextContent("Tags");
-    expect(screen.queryByTestId("mgr-tag-summer")).toBeNull();
-    expect(screen.queryByText("Trash")).toBeNull();
-  });
-
-  it("picking a tag from the menu sets the tag filter", () => {
-    const { props } = mount({ allTags: ["summer"] });
-    openTags();
-    fireEvent.click(screen.getByTestId("mgr-tag-summer"));
-    expect(props.setTagFilter).toHaveBeenCalledWith("summer");
-  });
-
-  it("the active tag is checked; the others are not; the row reads active", () => {
-    mount({ allTags: ["food", "menu", "team"], tagFilter: "menu" });
-    expect(screen.getByTestId("mgr-row-tags")).toHaveAttribute("aria-current", "true");
-    openTags();
-    expect(screen.getByTestId("mgr-tag-menu")).toHaveAttribute("aria-checked", "true");
-    expect(screen.getByTestId("mgr-tag-team")).toHaveAttribute("aria-checked", "false");
-  });
-
-  it("picking the active tag again, or Clear tag filter, clears it", () => {
-    const { props } = mount({ allTags: ["menu"], tagFilter: "menu" });
-    openTags();
-    fireEvent.click(screen.getByTestId("mgr-tag-menu"));
-    expect(props.setTagFilter).toHaveBeenLastCalledWith(null);
-    openTags();
-    fireEvent.click(screen.getByTestId("mgr-tag-clear"));
-    expect(props.setTagFilter).toHaveBeenLastCalledWith(null);
-  });
-
-  it("with no tags the menu says where tags come from", () => {
-    mount({ allTags: [] });
-    openTags();
-    expect(screen.getByText(/No tags yet/)).toBeInTheDocument();
-  });
+/* 2L9 B6-A01 — the tag filter left the rail for the grid's "Any tag ▾". */
+it("FolderTree draws no Tags row and no Trash row", () => {
+  mount();
+  expect(screen.queryByTestId("mgr-row-tags")).toBeNull();
+  expect(screen.queryByText("Trash")).toBeNull();
 });
 
 describe("FolderTree — FC-4 (fix-all 2026-09-25): folders are per-user, never shared", () => {

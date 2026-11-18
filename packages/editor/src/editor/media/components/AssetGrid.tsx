@@ -82,19 +82,19 @@ const FORMAT_ROWS: ReadonlyArray<{ id: MediaBucket; label: string }> = [
   { id: "fnt", label: "Fonts" },
 ];
 
-/* 4418:58292 grid-toolbar — 28-high outlined buttons, 11 ink-soft, radius 4;
-   the ⋯ is a 24 square at radius 6; Grid · List is a 24 segmented pair. */
-const TOOLBAR_BTN =
-  "tw:h-7 tw:min-h-0 tw:px-2.5 tw:py-0 tw:rounded-[var(--bk-radius-sm)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] " +
-  "tw:text-[length:var(--bk-text-11)] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink-soft)] tw:shadow-none";
-const TOOLBAR_MORE =
-  "tw:size-6 tw:min-h-0 tw:p-0 tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-ink)]";
-const SEGMENTED =
-  "tw:flex tw:h-6 tw:items-center tw:gap-0.5 tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:p-0.5";
+/* 2L9 B6-A01 (199:37199) filter row — 28-high white selects (1px gray-200,
+   radius 6, 12 ink-soft, chevron at the right edge, 128 wide); Grid | List is
+   a pair of 28 buttons, the current one on the accent tint. */
+const FILTER_SELECT =
+  "tw:h-7 tw:w-32 tw:min-h-0 tw:justify-between tw:gap-1 tw:px-2 tw:py-0 tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] " +
+  "tw:text-[length:var(--bk-text-12)] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink-soft)] tw:shadow-none tw:[&>span]:w-full tw:[&>span]:justify-between";
+const SEGMENTED = "tw:flex tw:h-7 tw:items-center tw:gap-1";
 const SEGMENT =
-  "tw:h-5 tw:min-h-0 tw:px-2 tw:py-0 tw:rounded-[var(--bk-radius-sm)] tw:border-0 tw:shadow-none tw:text-[length:var(--bk-text-11)] tw:leading-4";
-const SEGMENT_ON = "tw:bg-[var(--bk-bg-subtle)] tw:font-semibold tw:text-[var(--bk-ink)]";
-const SEGMENT_OFF = "tw:bg-transparent tw:font-normal tw:text-[var(--bk-ink-soft)]";
+  "tw:h-7 tw:min-h-0 tw:px-4 tw:py-0 tw:rounded-[var(--bk-radius-md)] tw:border-0 tw:shadow-none tw:text-[length:var(--bk-text-12)] tw:leading-4";
+const SEGMENT_ON = "tw:bg-[var(--bk-accent-tint)] tw:font-medium tw:text-[var(--bk-ink)]";
+const SEGMENT_OFF = "tw:bg-transparent tw:font-normal tw:text-[var(--bk-ink)]";
+const SELECT_LINK =
+  "tw:h-5 tw:min-h-0 tw:gap-1 tw:px-0 tw:py-0 tw:text-[length:var(--bk-text-11)] tw:font-normal tw:text-[var(--bk-ink-soft)]";
 
 /* 4418:58608 — the bulk bar's actions are 13 regular text on the tint: ink
    for Move / Download / ✕ Clear, error ink for Delete. `link` carries the
@@ -102,11 +102,6 @@ const SEGMENT_OFF = "tw:bg-transparent tw:font-normal tw:text-[var(--bk-ink-soft
 const BULK_LINK = "tw:min-h-6 tw:px-0 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:text-[var(--bk-ink)]";
 const BULK_LINK_DANGER = `${BULK_LINK} tw:text-[var(--bk-error-text)]`;
 const BULK_LINK_MUTED = "tw:min-h-6 tw:px-0 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:text-[var(--bk-ink-muted)]";
-/* 4418:58608 — in select mode the toolbar carries a "☑ Select" word before
-   Grid · List; pressing it leaves select mode. */
-const SELECT_CHIP =
-  "tw:h-6 tw:min-h-0 tw:gap-1 tw:border-0 tw:bg-transparent tw:px-1.5 tw:py-0 tw:shadow-none tw:text-[length:var(--bk-text-11)] tw:font-medium tw:text-[var(--bk-ink)]";
-
 /* 6930:80054 — Date added · Name A→Z · Name Z→A · File size; each option
    carries its direction. Type is not drawn and stays (a sort the library had);
    "Reverse order" keeps oldest-first / smallest-first reachable. */
@@ -155,11 +150,23 @@ const GHOST_BADGE =
 /* 4418:58292 btn/more — on every card at rest: 24 square, 92% white over the
    thumb, 1px border, radius 6, 16 glyph. */
 const CARD_MENU_BTN =
-  "tw:absolute tw:top-0.5 tw:right-0.5 tw:z-[1] tw:size-6 tw:min-h-0 tw:p-0 tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-border)] " +
+  "tw:opacity-0 tw:group-hover:opacity-100 tw:focus-visible:opacity-100 tw:absolute tw:top-0.5 tw:right-0.5 tw:z-[1] tw:size-6 tw:min-h-0 tw:p-0 tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-border)] " +
   "tw:bg-[color-mix(in_srgb,var(--bk-bg-card)_92%,transparent)] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-card)]";
 
 const LIST_MENU_BTN =
   "tw:size-6 tw:min-h-0 tw:p-0 tw:justify-self-end tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-ink)]";
+
+/* 2L9 B6-A01 — a card's second line says what the file is: "1600 × 1000 ·
+   240 KB" for a picture with known pixels, otherwise its kind and size
+   ("SVG · 8 KB", "Video · 24 MB"). Placement counts live in Usage. */
+function cardFacts(item: LibraryItem): string {
+  const bytes = formatBytes(item.size, item.size >= 1024 * 1024 ? 1 : 0);
+  if (item.type === "ico") return `SVG · ${bytes}`;
+  if (item.type === "vid") return `Video · ${bytes}`;
+  if (item.type === "fnt") return `Font · ${bytes}`;
+  if (item.width && item.height) return `${item.width} × ${item.height} · ${bytes}`;
+  return `${LIST_TYPE_LABEL[item.type]} · ${bytes}`;
+}
 
 function sortButtonLabel(sort: MediaSortBy, dir: "asc" | "desc"): string {
   if (sort === "name") return dir === "asc" ? "Name A→Z" : "Name Z→A";
@@ -204,6 +211,8 @@ export interface AssetGridProps {
   visibleItems: LibraryItem[];
   /** key → usage count (orchestrator-computed against composer). */
   usageMap: Map<string, number>;
+  /** Every tag on the library's assets (unscoped) — the "Any tag ▾" menu. */
+  allTags: ReadonlyArray<string>;
   /** Smart folder gating the visibleItems filter (drives footer label). */
   smartFolder: SmartFolder;
   /** Clone 3721:45960 — the file a menu move just moved; the count line
@@ -212,6 +221,8 @@ export interface AssetGridProps {
   movedNote?: string | null;
   /** Board 1163:13948 — the error row's Dismiss. */
   onDismissUpload?: (fileName: string) => void;
+  /** 199:40594 — Retry re-sends the failed file. */
+  onRetryUpload?: (fileName: string) => void;
   /** Board 1163:4641's bulk Download — routed to the engine's media layer. */
   onDownload: (assets: ReadonlyArray<{ src: string; name: string }>) => number;
   /** Whole grid becomes the drop zone while a file drag is over the manager. */
@@ -257,9 +268,11 @@ export function AssetGrid({
   state,
   visibleItems,
   usageMap,
+  allTags,
   smartFolder,
   movedNote = null,
   onDismissUpload,
+  onRetryUpload,
   onDownload,
   isDragOver = false,
   selectedAssetId,
@@ -329,22 +342,22 @@ export function AssetGrid({
     ? `${n} matching ${n === 1 ? "asset" : "assets"} · Tag: ${state.tagFilter}`
     : searchQuery
       ? `${n} ${n === 1 ? "result" : "results"} for "${searchQuery}"`
-      : `${n} ${n === 1 ? "file" : "files"} · ${scopeLabel}`;
+      : `${n} ${n === 1 ? "asset" : "assets"} · ${scopeLabel}`;
   const [sortMenuOpen, setSortMenuOpen] = React.useState(false);
   const [filterOpen, setFilterOpen] = React.useState(false);
   const [colsOpen, setColsOpen] = React.useState(false);
-  const [moreOpen, setMoreOpen] = React.useState(false);
+  const [tagsOpen, setTagsOpen] = React.useState(false);
   const formatRows = React.useMemo(
     () => FORMAT_ROWS.filter((r) => r.id !== "fnt" || state.libraryItems.some((i) => i.type === "fnt")),
     [state.libraryItems],
   );
   const filterLabel = state.fmtFilter
-    ? `Filter · ${state.fmtFilter.toUpperCase()}`
+    ? state.fmtFilter.toUpperCase()
     : state.activeTypes.size === 1
-      ? `Filter · ${FORMAT_ROWS.find((r) => state.activeTypes.has(r.id))?.label ?? ""}`
+      ? (FORMAT_ROWS.find((r) => state.activeTypes.has(r.id))?.label ?? "All types")
       : state.activeTypes.size > 1
-        ? `Filter · ${state.activeTypes.size} kinds`
-        : "Filter";
+        ? `${state.activeTypes.size} types`
+        : "All types";
 
   /* Clone 3700:20353 — an empty FOLDER is not an empty library. Only for a
      folder scope that truly holds nothing: a folder whose assets a search or
@@ -406,51 +419,41 @@ export function AssetGrid({
         filtered library with no cause on screen.
       */}
       {!emptyFolderScope && (
+      <>
+      {/* 2L9 B6-A01 (199:37199) — the filter row reads All types ▾ · Any tag ▾ ·
+          Date added ▾ · Grid | List · 4 columns ▾, every control 28 high. Type
+          keeps FORMAT and FILE TYPE in one menu; the tag filter moved here from
+          the rail; Date added is the sort (with Reverse order). */}
       <div className="mgr-subbar" data-testid="mgr-subbar">
-        {/* Clone 3721:45960 — right after a menu move the line is the move's
-            receipt, `<Scope> · <file> moved`, until the next scope or filter
-            change clears it upstream. */}
-        <span className="mgr-count" data-testid="mgr-count">
-          {movedNote ? `${scopeLabel} · ${movedNote} moved` : countLabel}
-        </span>
-
-        {/* 4418:58292 / 7093:78182 — one "Filter ▾" button; its popover holds
-            FORMAT (All · Images · Video · Icons, one-of). The per-extension
-            chips that used to sit in this row live under it as FILE TYPE, so a
-            JPG-only view is still one click away and the button names it
-            ("Filter · JPG", 6879:61904). */}
         <Popover
           open={filterOpen}
           onClose={() => setFilterOpen(false)}
           placement="bottom"
-          label="Filter"
+          label="Type"
           trigger={
             <Button
               type="button"
               color="light"
               size="xs"
-              className={TOOLBAR_BTN}
+              className={FILTER_SELECT}
               aria-haspopup="menu"
               aria-expanded={filterOpen}
               data-testid="mgr-filter"
               onClick={() => setFilterOpen((o) => !o)}
             >
-              <span className="tw:flex tw:items-center tw:gap-1">
-                {filterLabel}
-                <ChevronDown size={12} aria-hidden="true" />
-              </span>
+              <span className="tw:flex-1 tw:truncate tw:text-left">{filterLabel}</span>
+              <ChevronDown size={12} aria-hidden="true" />
             </Button>
           }
         >
-          <Menu label="Filter" className="tw:w-[200px]">
-            <MenuLabel>Format</MenuLabel>
+          <Menu label="Type" className="tw:w-[200px]">
             <MenuItem
               radio
               selected={state.activeTypes.size === 0 && !state.fmtFilter}
               data-testid="mgr-filter-all"
               onClick={() => { state.setType("all"); setFilterOpen(false); }}
             >
-              All
+              All types
             </MenuItem>
             {formatRows.map((row) => (
               <MenuItem
@@ -483,25 +486,107 @@ export function AssetGrid({
           </Menu>
         </Popover>
 
-        <div className="mgr-spacer" />
+        <Popover
+          open={tagsOpen}
+          onClose={() => setTagsOpen(false)}
+          placement="bottom"
+          label="Tag"
+          trigger={
+            <Button
+              type="button"
+              color="light"
+              size="xs"
+              className={FILTER_SELECT}
+              aria-haspopup="menu"
+              aria-expanded={tagsOpen}
+              data-testid="mgr-tags"
+              onClick={() => setTagsOpen((o) => !o)}
+            >
+              <span className="tw:flex-1 tw:truncate tw:text-left">{state.tagFilter ?? "Any tag"}</span>
+              <ChevronDown size={12} aria-hidden="true" />
+            </Button>
+          }
+        >
+          <Menu label="Tag" className="tw:w-[200px]">
+            <MenuItem
+              radio
+              selected={state.tagFilter === null}
+              data-testid="mgr-tag-clear"
+              onClick={() => { state.setTagFilter(null); setTagsOpen(false); }}
+            >
+              Any tag
+            </MenuItem>
+            {allTags.length === 0 ? (
+              <MenuLabel>No tags yet — add them in an asset&rsquo;s details.</MenuLabel>
+            ) : (
+              allTags.map((tag) => (
+                <MenuItem
+                  key={tag}
+                  radio
+                  selected={state.tagFilter === tag}
+                  data-testid={`mgr-tag-${tag}`}
+                  onClick={() => { state.setTagFilter(state.tagFilter === tag ? null : tag); setTagsOpen(false); }}
+                >
+                  {tag}
+                </MenuItem>
+              ))
+            )}
+          </Menu>
+        </Popover>
 
-        {state.selMode ? (
-          <Button
-            type="button"
-            color="light"
-            size="xs"
-            className={SELECT_CHIP}
-            aria-pressed="true"
-            aria-label="Exit select mode"
-            data-testid="mgr-select-chip"
-            onClick={() => state.toggleSelMode()}
-          >
-            <CheckSquare size={12} aria-hidden="true" />
-            Select
-          </Button>
-        ) : null}
+        <Popover
+          open={sortMenuOpen}
+          onClose={() => setSortMenuOpen(false)}
+          placement="bottom"
+          label="Sort"
+          trigger={
+            <Button
+              type="button"
+              color="light"
+              size="xs"
+              className={FILTER_SELECT}
+              aria-haspopup="menu"
+              aria-expanded={sortMenuOpen}
+              data-testid="mgr-sort"
+              onClick={() => setSortMenuOpen((o) => !o)}
+            >
+              <span className="tw:flex-1 tw:truncate tw:text-left">{sortButtonLabel(state.sort, state.sortDir)}</span>
+              <ChevronDown size={12} aria-hidden="true" />
+            </Button>
+          }
+        >
+          <Menu label="Sort" className="tw:w-[200px]">
+            {SORT_OPTIONS.map((opt) => (
+              <MenuItem
+                key={opt.label}
+                radio
+                selected={state.sort === opt.value && (opt.value !== "name" || state.sortDir === opt.dir)}
+                data-testid={`mgr-sort-${opt.value}${opt.value === "name" ? `-${opt.dir}` : ""}`}
+                onClick={() => {
+                  state.setSort(opt.value, opt.dir);
+                  setSortMenuOpen(false);
+                }}
+              >
+                {opt.label}
+              </MenuItem>
+            ))}
+            {state.sort !== "name" ? (
+              <>
+                <MenuSeparator />
+                <MenuItem
+                  data-testid="mgr-sort-reverse"
+                  onClick={() => {
+                    state.setSort(state.sort, state.sortDir === "asc" ? "desc" : "asc");
+                    setSortMenuOpen(false);
+                  }}
+                >
+                  Reverse order
+                </MenuItem>
+              </>
+            ) : null}
+          </Menu>
+        </Popover>
 
-        {/* 4418:58292 — Grid · List as a 24-high segmented pair. */}
         <div className={SEGMENTED} role="group" aria-label="View" data-testid="mgr-view">
           {(["grid", "list"] as const).map((mode) => (
             <Button
@@ -519,33 +604,28 @@ export function AssetGrid({
           ))}
         </div>
 
-        {/* 7093:78204 — "Grid ▾" sets the column count (COLUMNS 2 / 3 / 4). */}
         <Popover
           open={colsOpen}
           onClose={() => setColsOpen(false)}
-          placement="bottom-end"
+          placement="bottom"
           label="Columns"
           trigger={
             <Button
               type="button"
               color="light"
               size="xs"
-              className={TOOLBAR_BTN}
+              className={FILTER_SELECT}
               aria-haspopup="menu"
               aria-expanded={colsOpen}
-              aria-label={`Grid · ${state.gridN} columns`}
               data-testid="mgr-gridn"
               onClick={() => setColsOpen((o) => !o)}
             >
-              <span className="tw:flex tw:items-center tw:gap-1">
-                Grid
-                <ChevronDown size={12} aria-hidden="true" />
-              </span>
+              <span className="tw:flex-1 tw:truncate tw:text-left">{state.gridN} columns</span>
+              <ChevronDown size={12} aria-hidden="true" />
             </Button>
           }
         >
           <Menu label="Columns" className="tw:w-[160px]">
-            <MenuLabel>Columns</MenuLabel>
             {([2, 3, 4] as const).map((cols) => (
               <MenuItem
                 key={cols}
@@ -563,83 +643,38 @@ export function AssetGrid({
             ))}
           </Menu>
         </Popover>
-
-        {/* 7093:78219 — the ⋯ holds "Sort by  <key> ▾" (its options,
-            6930:80054, open in place) and "Select assets…", which enters the
-            list's select mode (the toolbar ☑ it replaces). */}
-        <Popover
-          open={moreOpen}
-          onClose={() => { setMoreOpen(false); setSortMenuOpen(false); }}
-          placement="bottom-end"
-          label="Library options"
-          trigger={
-            <IconButton
-              label="Library options"
-              className={TOOLBAR_MORE}
-              aria-haspopup="menu"
-              aria-expanded={moreOpen}
-              data-testid="mgr-more"
-              onClick={() => setMoreOpen((o) => !o)}
-            >
-              <MoreHorizontal size={16} />
-            </IconButton>
-          }
-        >
-          <Menu label="Library options" className="tw:w-[220px]">
-            <MenuItem data-testid="mgr-sort" aria-expanded={sortMenuOpen} onClick={() => setSortMenuOpen((o) => !o)}>
-              <span className="tw:flex tw:w-full tw:items-center tw:justify-between tw:gap-2">
-                Sort by
-                <span className="tw:flex tw:items-center tw:gap-1 tw:text-[var(--bk-ink-soft)]">
-                  {sortButtonLabel(state.sort, state.sortDir)}
-                  <ChevronDown size={12} aria-hidden="true" />
-                </span>
-              </span>
-            </MenuItem>
-            {sortMenuOpen ? (
-              <>
-                {SORT_OPTIONS.map((opt) => (
-                  <MenuItem
-                    key={opt.label}
-                    radio
-                    selected={state.sort === opt.value && (opt.value !== "name" || state.sortDir === opt.dir)}
-                    data-testid={`mgr-sort-${opt.value}${opt.value === "name" ? `-${opt.dir}` : ""}`}
-                    onClick={() => {
-                      state.setSort(opt.value, opt.dir);
-                      setSortMenuOpen(false);
-                      setMoreOpen(false);
-                    }}
-                  >
-                    {opt.label}
-                  </MenuItem>
-                ))}
-                {state.sort !== "name" ? (
-                  <MenuItem
-                    data-testid="mgr-sort-reverse"
-                    onClick={() => {
-                      state.setSort(state.sort, state.sortDir === "asc" ? "desc" : "asc");
-                      setSortMenuOpen(false);
-                      setMoreOpen(false);
-                    }}
-                  >
-                    Reverse order
-                  </MenuItem>
-                ) : null}
-              </>
-            ) : null}
-            <MenuSeparator />
-            <MenuItem
-              data-testid="mgr-select-mode"
-              onClick={() => {
-                if (!state.selMode) setViewMode("list");
-                state.toggleSelMode();
-                setMoreOpen(false);
-              }}
-            >
-              {state.selMode ? "Done selecting" : "Select assets…"}
-            </MenuItem>
-          </Menu>
-        </Popover>
       </div>
+
+      {/* 199:37199 — "8 assets · Your files", 11 muted, under the filters. The
+          board draws no select mode; "Select" at the line's end keeps the
+          list's multi-select (bulk move / download / delete) one click away. */}
+      <div className="mgr-countline">
+        <span className="mgr-count" data-testid="mgr-count">
+          {movedNote ? `${scopeLabel} · ${movedNote} moved` : countLabel}
+        </span>
+        <div className="mgr-spacer" />
+        <Button
+          type="button"
+          variant="link"
+          className={SELECT_LINK}
+          aria-pressed={state.selMode}
+          data-testid="mgr-select-mode"
+          onClick={() => {
+            if (!state.selMode) setViewMode("list");
+            state.toggleSelMode();
+          }}
+        >
+          {state.selMode ? (
+            <>
+              <CheckSquare size={12} aria-hidden="true" />
+              Done selecting
+            </>
+          ) : (
+            "Select"
+          )}
+        </Button>
+      </div>
+      </>
       )}
 
       {/* Board 1163:4641 draws the bulk bar BELOW the toolbar, not in
@@ -711,32 +746,51 @@ export function AssetGrid({
         </div>
       )}
 
-      {/* Board 1163:13948 — files still landing report themselves above the
-          grid: what failed and why, what is still working, what arrived. */}
+      {/* 2L9 B6-A05/A06/A07 (199:39336 / 39965 / 40594) — a file still
+          landing is a row above the grid: its name, then "Uploading…" while
+          the bytes move and "Saving…" while the asset is registered. A file
+          that did not land says "Couldn’t save" with the reason, Retry and
+          Remove file. No Cancel upload: the pipeline cannot abort a transfer
+          (code:no-upload-abort). */}
       {activeUploads.length > 0 && (
-        <ul className="mgr-uploads" aria-label="Uploads">
-          {activeUploads.map((u) => (
-            <li key={u.fileName} className={`mgr-upload ${u.status}`}>
-              <span className="mgr-upload-name">
-                {u.fileName}
-                {u.status === "error"
-                  ? ` → ${u.error ?? "not supported"}`
-                  : u.status === "complete"
-                    ? ""
-                    : " → uploading…"}
-              </span>
-              {u.status === "uploading" || u.status === "processing" || u.status === "optimizing" ? (
-                <span className="mgr-upload-track" aria-hidden="true">
-                  <span className="mgr-upload-fill" style={{ width: `${Math.round(u.progress)}%` }} />
-                </span>
-              ) : null}
-              {u.status === "error" && onDismissUpload ? (
-                <Button className="mgr-upload-dismiss" onClick={() => onDismissUpload(u.fileName)}>
-                  Dismiss
-                </Button>
-              ) : null}
-            </li>
-          ))}
+        <ul className="mgr-upl-list" aria-label="Uploads" data-testid="mgr-uploads">
+          {activeUploads.map((u) => {
+            const failed = u.status === "error";
+            const phase = failed
+              ? "Couldn’t save"
+              : u.status === "optimizing" || u.status === "processing"
+                ? "Saving…"
+                : "Uploading…";
+            return (
+              <li key={u.fileName} className={`mgr-upl${failed ? " mgr-upl--failed" : ""}`} data-testid={`mgr-upl-${u.fileName}`}>
+                <div className="mgr-upl-head">
+                  <span className="mgr-upl-name">{u.fileName}</span>
+                  <span className="mgr-upl-phase" role="status" data-testid={`mgr-upl-phase-${u.fileName}`}>{phase}</span>
+                </div>
+                {failed ? (
+                  <>
+                    <p className="mgr-upl-reason">{u.error ?? "Not saved to Assets."}</p>
+                    <div className="mgr-upl-actions">
+                      {onRetryUpload ? (
+                        <Button size="xs" className="mgr-btn-primary" data-testid={`mgr-upl-retry-${u.fileName}`} onClick={() => onRetryUpload(u.fileName)}>
+                          Retry
+                        </Button>
+                      ) : null}
+                      <Button
+                        type="button"
+                        variant="link"
+                        className="mgr-upl-link"
+                        data-testid={`mgr-upl-remove-${u.fileName}`}
+                        onClick={() => onDismissUpload?.(u.fileName)}
+                      >
+                        Remove file
+                      </Button>
+                    </div>
+                  </>
+                ) : null}
+              </li>
+            );
+          })}
         </ul>
       )}
 
@@ -960,33 +1014,11 @@ export function AssetGrid({
                   >
                     <MoreHorizontal size={16} />
                   </IconButton>
-                  {/*
-                    Board 1161:66/80/111 — the only badge on a card says what
-                    KIND of file it is (▶ video, SVG vector — 4418:58292 — Aa font); an image
-                    needs none. The old "UP/STOCK/AI" provenance badge sat on
-                    every card saying where it came from, which is the one
-                    thing the grid never has to answer.
-                  */}
-                  {item.type !== "img" && (
-                    <div className="mgr-kind" aria-hidden="true">
-                      {item.type === "vid" ? "▶" : item.type === "fnt" ? "Aa" : "SVG"}
-                    </div>
-                  )}
                 </div>
                 <div className="mgr-asset-meta" data-testid={`mgr-meta-${item.key}`}>
                   <div className="mgr-asset-name" data-testid={`mgr-name-${item.key}`}>{item.displayName ?? item.name}</div>
-                  {/*
-                    4418:58292 meta — "used ×3" / "Unused", 11 muted, no dot.
-                    Dimensions and bytes live in the details rail; on the card
-                    the question is always "can I delete this?".
-                  */}
-                  <div
-                    className={`mgr-asset-use${(usageMap.get(item.key) ?? 0) > 0 ? "" : " unused"}`}
-                    data-testid={`mgr-use-${item.key}`}
-                  >
-                    {(usageMap.get(item.key) ?? 0) > 0
-                      ? `used ×${usageMap.get(item.key)}`
-                      : "Unused"}
+                  <div className="mgr-asset-facts" data-testid={`mgr-facts-${item.key}`}>
+                    {cardFacts(item)}
                   </div>
                 </div>
               </div>

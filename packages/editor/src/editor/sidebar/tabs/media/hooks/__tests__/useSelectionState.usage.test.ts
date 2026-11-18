@@ -107,7 +107,7 @@ describe("executeDelete — the Undo toast", () => {
     const { result } = renderHook(() => useSelectionState(composer as never, [HERO, CHEF, TEAM], showToast));
     act(() => result.current.requestDelete("hero"));
     await act(() => result.current.executeDelete());
-    expect(showToast).toHaveBeenCalledWith('Deleted "hero-dark.jpg".', "info", expect.anything());
+    expect(showToast).toHaveBeenCalledWith('hero-dark.jpg deleted. Undo available for 8 seconds.', "info", expect.anything());
   });
 });
 
@@ -148,7 +148,7 @@ describe("a file's delete is its family's — versions go with the original, and
     act(() => result.current.requestDelete("team"));
     await act(() => result.current.executeDelete());
     expect(vi.mocked(composer.mediaOps.deleteWithGrace).mock.calls.map((c) => c[0])).toEqual(["team-v2", "team"]);
-    expect(showToast).toHaveBeenCalledWith('Deleted "team-photo.jpg" and cleared it from 1 element.', "info", expect.anything());
+    expect(showToast).toHaveBeenCalledWith('team-photo.jpg deleted. Undo available for 8 seconds.', "info", expect.anything());
   });
 
   it("a file without versions is its own family — the payload is unchanged", () => {

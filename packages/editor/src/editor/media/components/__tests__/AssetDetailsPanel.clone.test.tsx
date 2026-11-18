@@ -5,9 +5,9 @@
  * 3705:21280 ("Assets · List · <file> selected"), 4215:26635 (2 checked),
  * 3699:20381 / 3683:19964 (Moved to <Folder>).
  *
- * The rail is one column, top to bottom: preview · filename · meta line ·
- * ALT TEXT · VERSIONS · USED IN · stacked actions. The V1 rail's three tabs
- * (Details / Versions / Used in) and its KV grid are displaced.
+ * 2L9 B6-A01/A02/A03/A19 (199:37199 / 37822 / 38433, 200:31384) bring the
+ * tabs back: the file's name, Details | Usage | Versions, and Place on
+ * canvas · Edit image · More ▾ under Details.
  *
  * Per-type action set, read off the shots (docs/design-jobs/CLONE-ASSETS/
  * phase1-journeys.md, "J-B per-type action table"; 3705:20396 / 3705:21059
@@ -69,81 +69,107 @@ function mount(selectedItem: LibraryItem, over: Partial<AssetDetailsPanelProps> 
     ...over,
   };
   const utils = render(<AssetDetailsPanel {...props} />);
-  /* 4418:58292 — TAGS / VERSIONS / USED IN sit behind "Details ▸"; these tests read them open. */
-  const details = utils.queryByTestId("mgr-det-details-toggle");
-  if (details) fireEvent.click(details);
   return { ...utils, props };
 }
 
 function actionNames() {
   return within(screen.getByTestId("mgr-det-actions"))
     .getAllByRole("button")
-    .map((b) => b.getAttribute("aria-label") ?? b.textContent?.trim());
+    .map((b) => b.textContent?.trim());
 }
 
-/* 4418:58292 — what the rail's ⋯ holds (the old stacked actions). */
+/* 200:31384 — what More ▾ holds. */
 function moreNames() {
   fireEvent.click(screen.getByTestId("mgr-det-more"));
   return screen.getAllByRole("menuitem").map((b) => b.textContent?.trim());
 }
 
-describe("Clone 3695:20340 · Selected · menu-cover.png", () => {
-  it("4418:58292: Insert to canvas · Edit image + ⋯, the ⋯ holding Rename · Replace across site… · Delete", () => {
-    mount(byName("menu-cover.png"), { usageCount: 1 });
-    expect(actionNames()).toEqual(["Insert to canvas", "Edit image", "More actions"]);
-    expect(moreNames()).toEqual(["Rename…", "Replace across site…", "Delete…"]);
-  });
+const tab = (id: "details" | "usage" | "versions") => fireEvent.click(screen.getByTestId(`mgr-det-tab-${id}`));
 
-  it("an image with an optimiser lists Optimize in the ⋯, and Delete is red", () => {
-    mount(byName("menu-cover.png"), { usageCount: 1, onOptimizeImage: vi.fn() });
-    expect(moreNames()).toEqual(["Rename…", "Replace across site…", "Optimize", "Delete…"]);
-    expect(screen.getByRole("menuitem", { name: "Delete…" }).className).toMatch(/red/);
-  });
+const usageComposer = () =>
+  ({
+    mediaOps: {
+      replaceAcross: vi.fn(() => ({ replaced: [], failed: [] })),
+      getUsagesByPage: vi.fn(
+        () => new Map([["page-1", [{ getId: () => "el-1", getType: () => "img", getAttribute: () => undefined }]]]),
+      ),
+    },
+    elements: { getAllPages: vi.fn(() => [{ id: "page-1", name: "Menu preview" }]) },
+  }) as unknown as AssetDetailsPanelProps["composer"];
 
-  it("prints the meta line as '<w> × <h> · <size> · PNG · added <Mon d>' when measured", () => {
+describe("2L9 B6-A01 (199:37199) · the rail's head and Details tab", () => {
+  it("names the file, then Details | Usage | Versions with Details current", () => {
     mount(byName("menu-cover.png"));
-    expect(screen.getByTestId("mgr-det-meta")).toHaveTextContent(/^1600 × 1000 · 215 KB · PNG · added /);
+    expect(screen.getByTestId("mgr-det-title")).toHaveTextContent("menu-cover.png");
+    expect(within(screen.getByTestId("mgr-det-tabs")).getAllByRole("tab").map((t) => t.textContent)).toEqual([
+      "Details",
+      "Usage",
+      "Versions",
+    ]);
+    expect(screen.getByTestId("mgr-det-tab-details")).toHaveAttribute("aria-selected", "true");
   });
 
-  it("has no Details / Versions / Used in tabs", () => {
+  it("prints '<w> × <h> · <format> · <size>' when measured, '<format> · <size>' when not", () => {
     mount(byName("menu-cover.png"));
-    expect(screen.queryByRole("button", { name: /^Details$/ })).toBeNull();
-    expect(screen.queryByRole("button", { name: /^Used in ·/ })).toBeNull();
+    expect(screen.getByTestId("mgr-det-meta")).toHaveTextContent("1600 × 1000 · PNG · 215 KB");
   });
 
-  it("USED IN lists the page and element as a navigable row, or says the asset is not used", () => {
-    const item = byName("menu-cover.png");
-    mount(item, {
-      usageCount: 1,
-      composer: {
-        mediaOps: {
-          replaceAcross: vi.fn(() => ({ replaced: [], failed: [] })),
-          getUsagesByPage: vi.fn(
-            () =>
-              new Map([
-                [
-                  "page-1",
-                  [
-                    {
-                      getId: () => "el-1",
-                      getType: () => "img",
-                      getAttribute: () => undefined,
-                    },
-                  ],
-                ],
-              ]),
-          ),
-        },
-        elements: { getAllPages: vi.fn(() => [{ id: "page-1", name: "Menu preview" }]) },
-      } as unknown as AssetDetailsPanelProps["composer"],
-    });
-    expect(screen.getByTestId("mgr-det-used-page-page-1")).toHaveTextContent("Menu preview");
-    expect(screen.getByTestId("mgr-det-used-row-el-1")).toHaveTextContent("img");
-  });
-
-  it("USED IN reads 'Not used on this site' at zero usage", () => {
+  it("falls back to '<format> · <size>' with no dimensions", () => {
     mount(byName("team-photo.jpg"));
-    expect(screen.getByTestId("mgr-det-used")).toHaveTextContent("Not used on this site");
+    expect(screen.getByTestId("mgr-det-meta")).toHaveTextContent(/^JPG · /);
+  });
+
+  it("an image: Place on canvas · Edit image · More ▾", () => {
+    mount(byName("menu-cover.png"), { usageCount: 1 });
+    expect(actionNames()).toEqual(["Place on canvas", "Edit image", "More"]);
+    expect(within(screen.getByTestId("mgr-det-actions")).getByRole("button", { name: "Place on canvas" })).toHaveClass("mgr-btn-primary");
+  });
+
+  it("200:31384 — More ▾ lists the board's rows in order, Delete asset… in red, then Close", () => {
+    mount(byName("menu-cover.png"), {
+      usageCount: 1,
+      onOptimizeImage: vi.fn(),
+      onUploadVersion: vi.fn(),
+      onCopyUrl: vi.fn(),
+      onDownloadItem: vi.fn(),
+      onMoveToFolder: vi.fn(),
+    });
+    expect(moreNames()).toEqual([
+      "Optimize",
+      "Upload new version…",
+      "Replace across site…",
+      "Rename",
+      "Copy URL",
+      "Copy alt text",
+      "Download",
+      "Move to folder",
+      "Delete asset…",
+      "Close",
+    ]);
+    expect(screen.getByRole("menuitem", { name: "Delete asset…" }).className).toMatch(/red/);
+  });
+
+  it("More ▾ rows run their doors with this file", () => {
+    const item = byName("menu-cover.png");
+    const onCopyUrl = vi.fn();
+    const onDownloadItem = vi.fn();
+    const onMoveToFolder = vi.fn();
+    mount(item, { onCopyUrl, onDownloadItem, onMoveToFolder });
+    fireEvent.click(screen.getByTestId("mgr-det-more"));
+    fireEvent.click(screen.getByTestId("mgr-det-copy-url"));
+    fireEvent.click(screen.getByTestId("mgr-det-more"));
+    fireEvent.click(screen.getByTestId("mgr-det-download"));
+    fireEvent.click(screen.getByTestId("mgr-det-more"));
+    fireEvent.click(screen.getByTestId("mgr-det-move"));
+    expect(onCopyUrl).toHaveBeenCalledWith(item);
+    expect(onDownloadItem).toHaveBeenCalledWith(item);
+    expect(onMoveToFolder).toHaveBeenCalledWith(item);
+  });
+
+  it("Copy alt text is disabled while the image has none", () => {
+    mount({ ...byName("menu-cover.png"), altText: "" });
+    fireEvent.click(screen.getByTestId("mgr-det-more"));
+    expect(screen.getByTestId("mgr-det-copy-alt")).toBeDisabled();
   });
 
   it("Replace across site… is disabled while nothing uses the asset", () => {
@@ -151,21 +177,39 @@ describe("Clone 3695:20340 · Selected · menu-cover.png", () => {
     fireEvent.click(screen.getByTestId("mgr-det-more"));
     expect(screen.getByRole("menuitem", { name: "Replace across site…" })).toBeDisabled();
   });
-});
 
-describe("Clone 3696:20530 · Selected · team-photo.jpg (unmeasured)", () => {
-  it("falls back to 'Selected asset · JPG' when there are no dimensions", () => {
-    mount(byName("team-photo.jpg"));
-    expect(screen.getByTestId("mgr-det-meta")).toHaveTextContent("Selected asset · JPG");
+  it("Folder names the file's folder, or says it has none", () => {
+    mount(byName("menu-cover.png"), { folderName: "Brand shots" });
+    expect(screen.getByTestId("mgr-det-folder")).toHaveTextContent("FolderBrand shots");
   });
 });
 
-describe("Clone 3696:20326 · Selected · chef-intro.mp4", () => {
-  it("has Rename at full width and no Edit image", () => {
+describe("2L9 B6-A02 (199:37822) · Usage", () => {
+  it("lists each placement as 'Page › element ↗' under 'Pages · N placements', with the scope caveat", () => {
+    const onJumpToElement = vi.fn();
+    mount(byName("menu-cover.png"), { usageCount: 1, composer: usageComposer(), onJumpToElement });
+    tab("usage");
+    const used = screen.getByTestId("mgr-det-used");
+    expect(used).toHaveTextContent("Usage outside this site isn’t checked.");
+    expect(screen.getByTestId("mgr-det-used-count")).toHaveTextContent("Pages · 1 placement");
+    expect(screen.getByTestId("mgr-det-jump-el-1")).toHaveTextContent("Menu preview › img ↗");
+    fireEvent.click(screen.getByTestId("mgr-det-jump-el-1"));
+    expect(onJumpToElement).toHaveBeenCalledWith("page-1", "el-1");
+  });
+
+  it("says there are no known placements at zero usage, and Replace across site… waits", () => {
+    mount(byName("team-photo.jpg"));
+    tab("usage");
+    expect(screen.getByTestId("mgr-det-used")).toHaveTextContent("No known placements on this site.");
+    expect(screen.getByTestId("mgr-det-usage-replace")).toBeDisabled();
+  });
+});
+
+describe("Clone 3696:20326 · chef-intro.mp4", () => {
+  it("a video: Place on canvas · Rename · More ▾; no Edit image, no Copy alt text", () => {
     mount(byName("chef-intro.mp4"), { usageCount: 1 });
-    expect(actionNames()).toEqual(["Insert to canvas", "Rename", "More actions"]);
-    expect(moreNames()).toEqual(["Replace across site…", "Delete…"]);
-    expect(screen.getByTestId("mgr-det-meta")).toHaveTextContent("Selected asset · MP4");
+    expect(actionNames()).toEqual(["Place on canvas", "Rename", "More"]);
+    expect(moreNames()).toEqual(["Replace across site…", "Delete asset…", "Close"]);
   });
 
   it("previews the video with a <video>, not a broken <img>", () => {
@@ -175,24 +219,20 @@ describe("Clone 3696:20326 · Selected · chef-intro.mp4", () => {
   });
 });
 
-describe("Clone 3696:20734 · Selected · logo-mark.svg", () => {
-  it("keeps Insert to canvas and Edit image", () => {
+describe("Clone 3696:20734 · logo-mark.svg", () => {
+  it("keeps Place on canvas and Edit image", () => {
     mount(byName("logo-mark.svg"), { usageCount: 5 });
-    expect(actionNames()).toEqual(["Insert to canvas", "Edit image", "More actions"]);
-    expect(moreNames()).toEqual(["Rename…", "Replace across site…", "Delete…"]);
-    expect(screen.getByTestId("mgr-det-meta")).toHaveTextContent("Selected asset · SVG");
+    expect(actionNames()).toEqual(["Place on canvas", "Edit image", "More"]);
+    expect(screen.getByTestId("mgr-det-meta")).toHaveTextContent(/^SVG · /);
   });
 });
 
-/* Phase 5 (Site fonts, 3686:42317) opened the door Phase 1 left drift-open:
-   the rail's actions read `Manage font · Rename · Delete`, and the meta line
-   says which of the model's two states the file is in. A font is still
-   neither inserted nor replaced across the site. */
-describe("Clone 3696:21550 · Selected · Inter-Var.woff2", () => {
-  it("offers Manage font · Rename · Delete — no Insert, no Replace, no alt text", () => {
+/* A font is neither placed nor replaced; Manage font opens Site fonts on it. */
+describe("Clone 3696:21550 · Inter-Var.woff2", () => {
+  it("offers Manage font · Rename · More ▾ (Delete asset… · Close) — no alt text", () => {
     mount(byName("Inter-Var.woff2"), { usageCount: 1, onManageFont: vi.fn() });
-    expect(actionNames()).toEqual(["Manage font", "Rename", "More actions"]);
-    expect(moreNames()).toEqual(["Delete…"]);
+    expect(actionNames()).toEqual(["Manage font", "Rename", "More"]);
+    expect(moreNames()).toEqual(["Delete asset…", "Close"]);
     expect(screen.queryByTestId("alt-text-section")).toBeNull();
   });
 
@@ -219,53 +259,43 @@ describe("Clone 3696:21550 · Selected · Inter-Var.woff2", () => {
   });
 });
 
-/* Phase 6 (3695:45529 / 3697:20326): the VERSIONS block lists the family
-   the version model knows — `v2 · Latest saved` over `v1 · Original` — and
-   a row is the door to Asset versions. Phase 1's `menu-cover_v4127 · current`
-   rows (3695:20340) read the `_v1234` stem heuristic, which is gone. */
-describe("Clone rail · versions inline", () => {
+/* 2L9 B6-A03 (199:38433) — the family, newest first: "Version N · Selected ·
+   Used in N pages" for the one the site carries, "Version N · Available" for
+   the rest; a row opens Asset versions; Upload new version… under them. */
+describe("2L9 B6-A03 (199:38433) · Versions", () => {
   const original = byName("hero-dark.jpg");
-  const saved: LibraryItem = { ...original, key: "hero-v2", name: "hero-dark-v2", src: "blob:hero-v2", versionOf: "hero", createdAt: "2026-09-02T10:00:00.000Z" };
+  const saved: LibraryItem = { ...original, key: "hero-v2", name: "hero-dark-v2", src: "blob:hero-v2", versionOf: "hero", createdAt: "2026-10-19T10:00:00.000Z" };
+  const family = [
+    { item: original, index: 1, placements: 3, pages: ["Home", "Menu"] },
+    { item: saved, index: 2, placements: 0, pages: [] },
+  ];
 
-  it("lists v2 · Latest saved over v1 · Original under a VERSIONS heading, without a tab click first", () => {
-    mount(original, {
-      versions: [
-        { item: original, index: 1, placements: 3, pages: ["Home"] },
-        { item: saved, index: 2, placements: 0, pages: [] },
-      ],
-    });
-    const versions = within(screen.getByTestId("mgr-det-versions"));
-    expect(versions.getByRole("heading", { name: "Versions" })).toBeInTheDocument();
-    expect(versions.getByTestId("mgr-det-version-hero-v2")).toHaveTextContent("v2 · Latest saved");
-    expect(versions.getByTestId("mgr-det-version-hero")).toHaveTextContent("v1 · Original");
+  it("names the family and lists Version 2 · Available over Version 1 · Selected · Used in 2 pages", () => {
+    mount(original, { versions: family, onUploadVersion: vi.fn() });
+    tab("versions");
+    expect(screen.getByTestId("mgr-det-family")).toHaveTextContent("hero-dark");
+    expect(screen.getByTestId("mgr-det-version-hero-v2")).toHaveTextContent("Version 2 · Available");
+    expect(screen.getByTestId("mgr-det-version-hero-v2")).toHaveTextContent("19 Oct 2026 · JPG");
+    expect(screen.getByTestId("mgr-det-version-hero")).toHaveTextContent("Version 1 · Selected · Used in 2 pages");
+    expect(screen.getByTestId("mgr-det-versions")).toHaveTextContent(
+      "A new version does not replace any images until you choose where to use it.",
+    );
   });
 
-  it("a row opens Asset versions", () => {
-    const { props } = mount(original, {
-      versions: [
-        { item: original, index: 1, placements: 3, pages: ["Home"] },
-        { item: saved, index: 2, placements: 0, pages: [] },
-      ],
-    });
+  it("a row opens Asset versions; Upload new version… asks for this file", () => {
+    const onUploadVersion = vi.fn();
+    const { props } = mount(original, { versions: family, onUploadVersion });
+    tab("versions");
     fireEvent.click(screen.getByTestId("mgr-det-version-hero"));
     expect(props.onOpenVersions).toHaveBeenCalledTimes(1);
-  });
-});
-
-describe("Clone 3705:20396 · List · chef-intro.mp4 selected (the one checked row is the full rail)", () => {
-  it("Insert to canvas is the dark ink button (4418:58292); the rest stay outlined", () => {
-    mount(byName("chef-intro.mp4"), { usageCount: 1 });
-    const actions = within(screen.getByTestId("mgr-det-actions"));
-    const insert = actions.getByRole("button", { name: "Insert to canvas" });
-    expect(insert).toHaveClass("mgr-btn-ink");
-    expect(insert).not.toHaveClass("mgr-btn-primary");
-    expect(actions.getByRole("button", { name: "Rename" })).toHaveClass("mgr-btn");
+    fireEvent.click(screen.getByRole("button", { name: "Upload new version…" }));
+    expect(onUploadVersion).toHaveBeenCalledWith(original);
   });
 
-  it("3705:21059 · a checked font offers Manage font · Rename · Delete", () => {
-    mount(byName("Inter-Var.woff2"), { usageCount: 1, onManageFont: vi.fn() });
-    expect(actionNames()).toEqual(["Manage font", "Rename", "More actions"]);
-    expect(moreNames()).toEqual(["Delete…"]);
+  it("a file with no saved version is its own Version 1", () => {
+    mount(byName("team-photo.jpg"));
+    tab("versions");
+    expect(screen.getByTestId("mgr-det-version-team")).toHaveTextContent("Version 1 · Available");
   });
 });
 
@@ -405,12 +435,12 @@ describe("code:tag-writer · the rail's TAGS block", () => {
     expect(onUpdateTags).toHaveBeenCalledWith("team", ["team"]);
   });
 
-  it("sits under ALT TEXT and above USED IN", () => {
+  it("199:37199 — sits under Default alt and above Folder", () => {
     mount(tagged(["team"]), { onUpdateTags: vi.fn(), onUpdateAltText: vi.fn() });
-    const order = Array.from(document.querySelectorAll("[data-testid='alt-text-section'], [data-testid='mgr-det-tags'], [data-testid='mgr-det-used']")).map(
+    const order = Array.from(document.querySelectorAll("[data-testid='alt-text-section'], [data-testid='mgr-det-tags'], [data-testid='mgr-det-folder']")).map(
       (el) => el.getAttribute("data-testid"),
     );
-    expect(order).toEqual(["alt-text-section", "mgr-det-tags", "mgr-det-used"]);
+    expect(order).toEqual(["alt-text-section", "mgr-det-tags", "mgr-det-folder"]);
   });
 
   it("Enter adds the typed tag lower-cased and trimmed, then empties the field", () => {

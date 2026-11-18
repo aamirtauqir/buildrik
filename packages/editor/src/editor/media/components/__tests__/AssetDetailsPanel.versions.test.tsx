@@ -54,9 +54,6 @@ function mount(over: Partial<AssetDetailsPanelProps> = {}) {
     ...over,
   };
   const utils = render(<AssetDetailsPanel {...props} />);
-  /* 4418:58292 — VERSIONS / USED IN sit behind "Details ▸"; these tests read them open. */
-  const details = utils.queryByTestId("mgr-det-details-toggle");
-  if (details) fireEvent.click(details);
   return { ...utils, props };
 }
 
@@ -70,20 +67,17 @@ describe("AssetDetailsPanel — empty + details", () => {
     expect(screen.getByText("Select an asset to see details.")).toBeInTheDocument();
   });
 
-  // Clone 3695:20340 — filename over one meta line; the KV grid is gone.
+  // 2L9 199:37199 — the name heads the rail; one facts line under the preview.
   it("renders filename and the one-line meta", () => {
     mount({ selectedItem: makeItem({ width: 640, height: 480 }) });
-    expect(screen.getByText("logo.png")).toBeInTheDocument();
-    expect(screen.getByTestId("mgr-det-meta")).toHaveTextContent(/^640 × 480 · 4 KB · PNG · added /);
+    expect(screen.getByTestId("mgr-det-title")).toHaveTextContent("logo.png");
+    expect(screen.getByTestId("mgr-det-meta")).toHaveTextContent("640 × 480 · PNG · 4 KB");
   });
 });
 
-/* Clone 3695:45529 / 3697:20326 (Phase 6): the rail's VERSIONS block lists
-   `versionsOf(selected)` — `v2 · Latest saved` over `v1 · Original`, the one
-   the site's placements carry marked APPLIED — and a row opens Asset
-   versions. The `_v1234` stem heuristic and the row's Revert are gone:
-   applying a version is the dialog's explicit step. */
-describe("AssetDetailsPanel — VERSIONS block (Clone 3695:45529)", () => {
+/* The marker follows the placements (199:38433): the version the site
+   carries reads Selected, the rest Available; a row swaps nothing. */
+describe("AssetDetailsPanel — Versions tab (199:38433)", () => {
   const original = makeItem({ key: "hero", name: "hero-dark", displayName: "hero-dark.jpg", src: "https://example.com/hero.jpg" });
   const saved = makeItem({
     key: "hero-v2",
@@ -92,47 +86,30 @@ describe("AssetDetailsPanel — VERSIONS block (Clone 3695:45529)", () => {
     versionOf: "hero",
     createdAt: "2026-09-02T10:00:00.000Z",
   });
+  const open = () => fireEvent.click(screen.getByTestId("mgr-det-tab-versions"));
 
-  it("is hidden while only the original exists", () => {
-    mount({ selectedItem: original, versions: [entry(original, 1, 3, ["Home"])] });
-    expect(screen.queryByTestId("mgr-det-versions")).not.toBeInTheDocument();
-  });
-
-  it("lists v2 · Latest saved over v1 · Original, marking the one on the site APPLIED", () => {
-    mount({ selectedItem: original, versions: [entry(original, 1, 3, ["Home"]), entry(saved, 2)] });
-    const block = within(screen.getByTestId("mgr-det-versions"));
-    const rows = block.getAllByTestId(/^mgr-det-version-/);
-    expect(rows.map((r) => r.getAttribute("data-testid"))).toEqual(["mgr-det-version-hero-v2", "mgr-det-version-hero"]);
-    expect(rows[0]).toHaveTextContent("v2 · Latest saved");
-    expect(rows[1]).toHaveTextContent("v1 · Original");
-    expect(within(rows[1]).getByText("APPLIED")).toBeInTheDocument();
-    expect(within(rows[0]).queryByText("APPLIED")).toBeNull();
-  });
-
-  it("the marker follows the placements: once v2 is applied, it is the marked row", () => {
+  it("once v2 is applied, v2 reads Selected and v1 Available, newest first", () => {
     mount({ selectedItem: original, versions: [entry(original, 1), entry(saved, 2, 3, ["Home"])] });
-    const block = within(screen.getByTestId("mgr-det-versions"));
-    expect(within(block.getByTestId("mgr-det-version-hero-v2")).getByText("APPLIED")).toBeInTheDocument();
-    expect(within(block.getByTestId("mgr-det-version-hero")).queryByText("APPLIED")).toBeNull();
+    open();
+    const rows = within(screen.getByTestId("mgr-det-versions")).getAllByTestId(/^mgr-det-version-/);
+    expect(rows.map((r) => r.getAttribute("data-testid"))).toEqual(["mgr-det-version-hero-v2", "mgr-det-version-hero"]);
+    expect(rows[0]).toHaveTextContent("Version 2 · Selected · Used in 1 page");
+    expect(rows[1]).toHaveTextContent("Version 1 · Available");
   });
 
   it("a row opens Asset versions; nothing on the row swaps the site's placements", () => {
     const { props } = mount({ selectedItem: original, versions: [entry(original, 1, 3, ["Home"]), entry(saved, 2)] });
+    open();
     fireEvent.click(screen.getByTestId("mgr-det-version-hero-v2"));
     expect(props.onOpenVersions).toHaveBeenCalledTimes(1);
-    expect(screen.queryByText("Revert")).toBeNull();
     expect(props.composer.mediaOps.replaceAcross).not.toHaveBeenCalled();
   });
 });
 
-describe("AssetDetailsPanel — USED IN", () => {
-  it("zero usage says so", () => {
-    mount({ usageCount: 0 });
-    expect(screen.getByTestId("mgr-det-used")).toHaveTextContent("Not used on this site");
-  });
-
+describe("AssetDetailsPanel — Usage tab", () => {
   it("non-zero usage with untraceable pages falls back to the count", () => {
     mount({ usageCount: 3 });
+    fireEvent.click(screen.getByTestId("mgr-det-tab-usage"));
     expect(screen.getByTestId("mgr-det-used")).toHaveTextContent("Used in 3 places");
   });
 });
@@ -214,7 +191,7 @@ describe("AssetDetailsPanel — replace-all picker", () => {
 describe("AssetDetailsPanel — action row", () => {
   it("Insert inserts the selected key", () => {
     const { props } = mount();
-    fireEvent.click(screen.getByText("Insert to canvas"));
+    fireEvent.click(screen.getByText("Place on canvas"));
     expect(props.onInsert).toHaveBeenCalledWith("asset-1");
   });
 
@@ -228,7 +205,6 @@ describe("AssetDetailsPanel — action row", () => {
   it("non-images get Rename → onOpenRename", () => {
     const font = makeItem({ key: "f", name: "Inter.woff2", type: "fnt" });
     const { props } = mount({ selectedItem: font });
-    fireEvent.click(screen.getByTestId("mgr-det-more"));
     fireEvent.click(screen.getByText("Rename"));
     expect(props.onOpenRename).toHaveBeenCalledWith(font);
     expect(props.onEditImage).not.toHaveBeenCalled();
@@ -237,7 +213,7 @@ describe("AssetDetailsPanel — action row", () => {
   it("Delete requests deletion by key", () => {
     const { props } = mount();
     fireEvent.click(screen.getByTestId("mgr-det-more"));
-    fireEvent.click(screen.getByText("Delete…"));
+    fireEvent.click(screen.getByText("Delete asset…"));
     expect(props.onRequestDelete).toHaveBeenCalledWith("asset-1");
   });
 });

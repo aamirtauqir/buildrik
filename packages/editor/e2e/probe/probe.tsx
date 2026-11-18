@@ -466,10 +466,18 @@ const MGR_FOLDERS = [
  * board 1163:13695's unused scope is drawn against.
  */
 const MGR_UNUSED = new Set(["mg3", "mg6", "mg9"]);
-const mgrComposer = (assets: typeof MGR_ASSETS = MGR_ASSETS) =>
+/* `uploads` replays upload events into the library's upload state (2L9
+   B6-A05…A07): progress rows by status, refusals through upload:error. */
+const mgrComposer = (
+  assets: typeof MGR_ASSETS = MGR_ASSETS,
+  uploads: { progress?: Array<{ fileName: string; progress: number; status: string }>; errors?: Array<{ fileName: string; error: string }> } = {},
+) =>
   ({
     media: {
-      on: () => {},
+      on: (event: string, cb: (p: unknown) => void) => {
+        const list = event === "media:upload:progress" ? uploads.progress : event === "media:upload:error" ? uploads.errors : undefined;
+        if (list) queueMicrotask(() => list.forEach((p) => cb(p)));
+      },
       off: () => {},
       isInitialized: true,
       initFailure: null,
@@ -4101,6 +4109,23 @@ const CASES: Record<string, () => React.ReactElement> = {
   "media-fullpage-library": () => (
     <div data-probe="media-fullpage-library">
       {mgrHost(<LibraryManager composer={mgrComposer()} onClose={() => {}} onOpenImageEditor={() => {}} />)}
+    </div>
+  ),
+  "media-fullpage-uploading": () => (
+    <div data-probe="media-fullpage-uploading">
+      {mgrHost(
+        <LibraryManager
+          composer={mgrComposer(MGR_ASSETS, {
+            progress: [
+              { fileName: "new-studio-study.webp", progress: 40, status: "uploading" },
+              { fileName: "terrace-wide.webp", progress: 90, status: "processing" },
+            ],
+            errors: [{ fileName: "lobby.webp", error: "Not saved to Assets. The server refused the file." }],
+          })}
+          onClose={() => {}}
+          onOpenImageEditor={() => {}}
+        />,
+      )}
     </div>
   ),
   "media-fullpage-drag-over": () => (

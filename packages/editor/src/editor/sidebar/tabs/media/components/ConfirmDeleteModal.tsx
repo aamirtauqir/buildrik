@@ -29,6 +29,8 @@ import {
   LIBRARY_MODAL_BODY,
   LIBRARY_MODAL_BTN_DANGER,
   LIBRARY_MODAL_BTN_GHOST,
+  LIBRARY_MODAL_BTN_PRIMARY,
+  LIBRARY_MODAL_BTN_SECONDARY,
   LIBRARY_MODAL_FOOT,
   LIBRARY_MODAL_TITLE,
 } from "@/editor/media/components/libraryModal";
@@ -38,9 +40,6 @@ interface ConfirmDeleteModalProps {
   payload: ConfirmDeletePayload;
   onConfirm(): void;
   onCancel(): void;
-  /** 3708:20650's "Replace instead" — opens the replace-across picker for
-   *  the asset. Absent (the drawer's MediaTab) the button does not render. */
-  onReplaceInstead?(key: string): void;
 }
 
 /* A checked set past this is named as "a, b, c, d, e and N more": the Clone's
@@ -55,7 +54,13 @@ function joinAnd(parts: string[]): string {
   return `${parts.slice(0, -1).join(", ")} and ${parts[parts.length - 1]}`;
 }
 
-export function ConfirmDeleteModal({ payload, onConfirm, onCancel, onReplaceInstead }: ConfirmDeleteModalProps) {
+/* 2L9 B6-A12 (199:42695): "Delete {file}?", what breaks ("Used in N known
+   places. Those images will break."), the caveat the usage index cannot see
+   past (favicon / social / brand image in Site settings) with the 8-second
+   undo, then Cancel as the primary and Delete asset beside it. The V3
+   "Replace instead" shortcut is not drawn; Replace across site… stays in the
+   rail's More ▾ and Usage tab. */
+export function ConfirmDeleteModal({ payload, onConfirm, onCancel }: ConfirmDeleteModalProps) {
   const { keys, names, inUse, isBulk } = payload;
   const countFor = (key: string) => inUse.find((u) => u.key === key)?.count ?? 0;
 
@@ -73,10 +78,9 @@ export function ConfirmDeleteModal({ payload, onConfirm, onCancel, onReplaceInst
         total > 0 ? `This affects ${plural(total, "placement")}.` : "None of them is used on the site."
       }`
     : total > 0
-      ? `Used in ${plural(total, "site placement")}. Deleting this file permanently breaks those elements. Replace the file instead if you want to preserve them.`
-      : "This file is not used on the site.";
-  const confirmLabel = isBulk ? `Delete ${plural(n, "file")}` : "Delete permanently";
-  const replaceKey = !isBulk && total > 0 && onReplaceInstead ? keys[0] : null;
+      ? `Used in ${plural(total, "known place")}. Those images will break.`
+      : "No known placements on this site.";
+  const confirmLabel = isBulk ? `Delete ${plural(n, "file")}` : "Delete asset";
 
   return (
     <ModalRoot open onOpenChange={(o) => { if (!o) onCancel(); }} dismissOnScrimClick={false}>
@@ -86,30 +90,34 @@ export function ConfirmDeleteModal({ payload, onConfirm, onCancel, onReplaceInst
         </h2>
 
         <ModalBody>
-          <p className={LIBRARY_MODAL_BODY} data-testid="media-delete-body">
+          <p className={`${LIBRARY_MODAL_BODY} tw:text-[var(--bk-ink)]`} data-testid="media-delete-body">
             {body}
+          </p>
+          <p
+            className="tw:m-0 tw:mt-3 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+            data-testid="media-delete-note"
+          >
+            May also be used as a favicon, social image or brand image — check Site settings. After 8 seconds this can’t be undone.
           </p>
 
         </ModalBody>
 
         <div className={LIBRARY_MODAL_FOOT} data-testid="media-delete-foot">
-          <Button size="xs" variant="secondary" className={LIBRARY_MODAL_BTN_GHOST} data-testid="media-delete-cancel" onClick={onCancel}>
-            Cancel
-          </Button>
-          {replaceKey !== null && (
-            <Button
-              size="xs"
-              variant="secondary"
-              className={LIBRARY_MODAL_BTN_GHOST}
-              data-testid="media-delete-replace"
-              onClick={() => onReplaceInstead?.(replaceKey)}
-            >
-              Replace instead
-            </Button>
-          )}
+          {/* One file follows 199:42695 (Cancel is the primary); the checked-set
+              confirm has no 2L9 board and keeps its red destructive button. */}
           <Button
             size="xs"
-            className={LIBRARY_MODAL_BTN_DANGER}
+            variant={isBulk ? "secondary" : undefined}
+            className={isBulk ? LIBRARY_MODAL_BTN_GHOST : LIBRARY_MODAL_BTN_PRIMARY}
+            data-testid="media-delete-cancel"
+            onClick={onCancel}
+          >
+            Cancel
+          </Button>
+          <Button
+            size="xs"
+            variant={isBulk ? undefined : "secondary"}
+            className={isBulk ? LIBRARY_MODAL_BTN_DANGER : LIBRARY_MODAL_BTN_SECONDARY}
             data-testid="media-delete-confirm"
             onClick={onConfirm}
           >

@@ -49,29 +49,22 @@ describe("Clone 3708:20650 · Delete hero-dark.jpg? — one used file", () => {
     inUse: [{ key: "hero", name: "hero-dark", count: 3, pages: ["Home", "Menu"] }],
   });
 
-  it("titles the dialog with the full filename and counts its site placements", () => {
-    render(<ConfirmDeleteModal payload={used} onConfirm={vi.fn()} onCancel={vi.fn()} onReplaceInstead={vi.fn()} />);
+  it("2L9 199:42695 — titles the dialog with the full filename and says what breaks", () => {
+    render(<ConfirmDeleteModal payload={used} onConfirm={vi.fn()} onCancel={vi.fn()} />);
     expect(screen.getByTestId("media-delete-title")).toHaveTextContent("Delete hero-dark.jpg?");
-    expect(screen.getByTestId("media-delete-body")).toHaveTextContent(
-      "Used in 3 site placements. Deleting this file permanently breaks those elements. Replace the file instead if you want to preserve them.",
+    expect(screen.getByTestId("media-delete-body")).toHaveTextContent("Used in 3 known places. Those images will break.");
+    expect(screen.getByTestId("media-delete-note")).toHaveTextContent(
+      "May also be used as a favicon, social image or brand image — check Site settings. After 8 seconds this can’t be undone.",
     );
   });
 
-  it("offers Cancel · Replace instead · Delete permanently, in that order", () => {
-    render(<ConfirmDeleteModal payload={used} onConfirm={vi.fn()} onCancel={vi.fn()} onReplaceInstead={vi.fn()} />);
-    expect(footButtons()).toEqual(["Cancel", "Replace instead", "Delete permanently"]);
+  it("offers Cancel (primary) · Delete asset, and no Replace instead", () => {
+    render(<ConfirmDeleteModal payload={used} onConfirm={vi.fn()} onCancel={vi.fn()} />);
+    expect(footButtons()).toEqual(["Cancel", "Delete asset"]);
+    expect(screen.queryByTestId("media-delete-replace")).toBeNull();
   });
 
-  it("Replace instead hands the asset key to the replace-across door and does not delete", () => {
-    const onConfirm = vi.fn();
-    const onReplaceInstead = vi.fn();
-    render(<ConfirmDeleteModal payload={used} onConfirm={onConfirm} onCancel={vi.fn()} onReplaceInstead={onReplaceInstead} />);
-    fireEvent.click(screen.getByTestId("media-delete-replace"));
-    expect(onReplaceInstead).toHaveBeenCalledWith("hero");
-    expect(onConfirm).not.toHaveBeenCalled();
-  });
-
-  it("singular: 'Used in 1 site placement.' (3708:21082 chef-intro.mp4)", () => {
+  it("singular: 'Used in 1 known place.'", () => {
     render(
       <ConfirmDeleteModal
         payload={payload({
@@ -82,39 +75,30 @@ describe("Clone 3708:20650 · Delete hero-dark.jpg? — one used file", () => {
         })}
         onConfirm={vi.fn()}
         onCancel={vi.fn()}
-        onReplaceInstead={vi.fn()}
       />,
     );
     expect(screen.getByTestId("media-delete-title")).toHaveTextContent("Delete chef-intro.mp4?");
-    expect(screen.getByTestId("media-delete-body")).toHaveTextContent(/^Used in 1 site placement\. /);
+    expect(screen.getByTestId("media-delete-body")).toHaveTextContent(/^Used in 1 known place\. /);
   });
 
-  it("Delete permanently confirms; Cancel does not", () => {
+  it("Delete asset confirms; Cancel does not", () => {
     const onConfirm = vi.fn();
     const onCancel = vi.fn();
-    render(<ConfirmDeleteModal payload={used} onConfirm={onConfirm} onCancel={onCancel} onReplaceInstead={vi.fn()} />);
+    render(<ConfirmDeleteModal payload={used} onConfirm={onConfirm} onCancel={onCancel} />);
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
     expect(onCancel).toHaveBeenCalledTimes(1);
     expect(onConfirm).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole("button", { name: "Delete permanently" }));
+    fireEvent.click(screen.getByRole("button", { name: "Delete asset" }));
     expect(onConfirm).toHaveBeenCalledTimes(1);
-  });
-
-  /* The drawer's MediaTab mounts this confirm without a replace door — the
-     button must not render as a dead control there. */
-  it("draws no Replace instead when no replace door is wired", () => {
-    render(<ConfirmDeleteModal payload={used} onConfirm={vi.fn()} onCancel={vi.fn()} />);
-    expect(footButtons()).toEqual(["Cancel", "Delete permanently"]);
   });
 });
 
-describe("Delete <file>? — one unused file (no Clone frame; the placement sentence and Replace instead are absent)", () => {
-  it("says the file is not used and offers only Cancel · Delete permanently", () => {
-    render(<ConfirmDeleteModal payload={payload()} onConfirm={vi.fn()} onCancel={vi.fn()} onReplaceInstead={vi.fn()} />);
+describe("Delete <file>? — one unused file", () => {
+  it("says there are no known placements and offers Cancel · Delete asset", () => {
+    render(<ConfirmDeleteModal payload={payload()} onConfirm={vi.fn()} onCancel={vi.fn()} />);
     expect(screen.getByTestId("media-delete-title")).toHaveTextContent("Delete hero-dark.jpg?");
-    expect(screen.getByTestId("media-delete-body")).toHaveTextContent("This file is not used on the site.");
-    expect(screen.queryByText(/site placement/)).toBeNull();
-    expect(footButtons()).toEqual(["Cancel", "Delete permanently"]);
+    expect(screen.getByTestId("media-delete-body")).toHaveTextContent("No known placements on this site.");
+    expect(footButtons()).toEqual(["Cancel", "Delete asset"]);
     expect(screen.queryByLabelText("Type DELETE to confirm")).not.toBeInTheDocument();
   });
 });
@@ -184,7 +168,7 @@ describe("Clone 3701:20385 · Delete 2 selected files? — the checked set", () 
         })}
         onConfirm={vi.fn()}
         onCancel={vi.fn()}
-        onReplaceInstead={vi.fn()}
+       
       />,
     );
     expect(screen.getByTestId("media-delete-title")).toHaveTextContent("Delete 1 selected file?");

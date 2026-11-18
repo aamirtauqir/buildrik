@@ -286,36 +286,31 @@
 }
 
 
-/* Clone 3695:20340 — a bordered card: 1px border, 8 inset, thumb over name
-   over usage. The V1 board's flat tile (no border, no inset) is displaced. */
+/* 2L9 B6-A01 (199:37199) — a borderless card: the thumb over the name over
+   "W × H · size". Selection draws a 1px accent outline round the whole card
+   (radius 6); the 2px V2 ring and the bordered 12-inset card are displaced. */
 .mgr-asset {
-  /* 4418:58292 asset card — 1px gray-200, radius 12, 12 inset, 8 gap. */
-  background: var(--bk-bg-card);
-  border: 1px solid var(--bk-border);
-  border-radius: var(--bk-radius-xl);
-  padding: var(--bk-space-12);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--bk-radius-md);
+  padding: 0 0 var(--bk-space-4);
   display: flex;
   flex-direction: column;
   gap: var(--bk-space-8);
   position: relative;
   cursor: pointer;
-  transition: box-shadow 0.12s;
 }
 
-.mgr-asset:hover { box-shadow: 0 2px 8px rgba(15,23,42,0.06); }
-
-/* 4418:58292 — selection is a 2px accent ring on the CARD (no checkbox); the
-   inset drops by the extra pixel so the thumb does not move. */
 .mgr-asset.selected {
-  border: 2px solid var(--bk-accent);
-  padding: 11px;
+  border-color: var(--bk-accent);
 }
 
 .mgr-asset-thumb {
-  height: 128px;
+  /* 199:37199 — 116 high at four columns, square-cornered under the outline. */
+  height: 116px;
   position: relative;
   background: var(--bk-gray-200);
-  border-radius: var(--bk-radius-lg);
+  border-radius: var(--bk-radius-md) var(--bk-radius-md) 0 0;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -337,8 +332,8 @@
 .mgr-asset-meta {
   display: flex;
   flex-direction: column;
-  gap: var(--bk-space-4);
-  padding: 0;
+  gap: 0;
+  padding: 0 var(--bk-space-8);
 }
 
 .mgr-asset-name {
@@ -536,15 +531,36 @@
   object-fit: contain;
 }
 
-.mgr-det-filename {
-  /* 4418:58292 — filename and meta are both 13/20 gray-600. */
-  font-size: var(--bk-text-13);
-  line-height: 20px;
-  font-weight: 400;
-  color: var(--bk-gray-600);
+/* 2L9 B6-A01 — the rail's head: the file's name, 13/600 ink, then the tabs. */
+.mgr-det-title {
+  margin: 0;
+  font: 600 var(--bk-text-13)/20px var(--bk-font-ui);
+  color: var(--bk-ink);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.mgr-det-pane {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bk-space-12);
+}
+/* 199:37822 / 199:38433 — "Pages · 2 placements", "Studio study": 12/500 ink. */
+.mgr-det-strong {
+  margin: 0;
+  font: 500 var(--bk-text-12)/16px var(--bk-font-ui);
+  color: var(--bk-ink);
+}
+/* 199:37199 / 37822 / 38433 — the rail's caveats: 11/16 muted. */
+.mgr-det-note {
+  margin: 0;
+  font: 400 var(--bk-text-11)/16px var(--bk-font-ui);
+  color: var(--bk-ink-muted);
+}
+.mgr-det-value {
+  margin: 0;
+  font: 400 var(--bk-text-13)/20px var(--bk-font-ui);
+  color: var(--bk-ink);
 }
 
 .mgr-det-meta {
@@ -561,13 +577,12 @@
 }
 
 /* 4418:58292 — ALT TEXT: 11/500 caps, 0.88 tracking, gray-600. */
+/* 2L9 199:37199 — "Default alt", "Tags", "Folder": 12 regular ink-soft,
+   sentence case (the V3 11/500 caps label is displaced). */
 .mgr-det-label {
   margin: 0;
-  font-size: var(--bk-text-11);
-  font-weight: 500;
-  letter-spacing: 0.88px;
-  text-transform: uppercase;
-  color: var(--bk-gray-600);
+  font: 400 var(--bk-text-12)/16px var(--bk-font-ui);
+  color: var(--bk-ink-soft);
 }
 
 /* 4418:58608 — "2 assets selected" 20/600 over a 13/20 gray-500 hint. */
@@ -627,32 +642,20 @@
   justify-content: center;
 }
 
-/* 4418:58292 act/Insert to canvas — ink fill, 40 tall, radius 8, 13 regular. */
-.mgr-det-actions .mgr-btn-ink {
-  height: 40px;
-  min-height: 0;
-  padding: 0 var(--bk-space-12);
-  border: 0;
-  border-radius: var(--bk-radius-lg);
-  background: var(--bk-ink);
-  color: var(--bk-accent-on);
-  font: 400 var(--bk-text-13)/20px var(--bk-font-ui);
-}
-.mgr-det-actions .mgr-btn-ink:hover { filter: brightness(1.25); }
 
 /* 4418:58292 act-row — Edit image: 11/500 ink-soft on a bordered white
    32 row; the ⋯ beside it is a 24 square, centred on the row. */
 .mgr-det-actions-row { align-items: center; }
+/* 199:37199 — More ▾ is text on the column, no border. */
+.mgr-det-actions-row .mgr-btn-quiet {
+  border-color: transparent;
+  background: transparent;
+  gap: var(--bk-space-4);
+}
 .mgr-det-actions-row .mgr-btn {
   flex: 1 1 0;
   width: auto;
   font-size: var(--bk-text-11);
-}
-.mgr-det-actions-row .mgr-btn-more {
-  flex: none;
-  width: 24px;
-  height: 24px;
-  padding: 0;
 }
 
 .mgr-det-actions .mgr-btn:disabled {
@@ -685,60 +688,19 @@
 
 
 
+/* 199:39336 — "1 file not saved to Assets" reads as plain footer text, in
+   the warning ink so it is not mistaken for "All assets saved". */
 .mgr-sync-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 3px var(--bk-space-8);
-  background: var(--bk-warning-tint);
   color: var(--bk-warning-text);
-  border-radius: var(--bk-radius-full);
-  font-size: var(--bk-text-11);
-  font-weight: 600;
 }
 
 .mgr-sync-pill svg { width: 10px; height: 10px; }
 
-.mgr-version-list {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
 
-.mgr-version-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: var(--bk-space-8);
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.1s;
-}
 
-.mgr-version-row:hover { background: var(--bk-bg-subtle); }
 
-.mgr-version-row.active {
-  background: var(--bk-accent-tint);
-}
 
-.mgr-version-thumb {
-  width: 40px;
-  height: 40px;
-  border-radius: 4px;
-  background: var(--bk-bg-subtle);
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  border: 1px solid var(--bk-border);
-}
 
-.mgr-version-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
 
 .mgr-empty {
   flex: 1;
@@ -804,25 +766,22 @@
   box-shadow: inset 0 0 0 1px var(--bk-accent);
 }
 
-/* ─── Board 1159:4593 card + toolbar ─────────────────────────────────── */
-.mgr-kind {
-  position: absolute;
-  top: 6px;
-  left: 6px;
-  padding: 2px var(--bk-space-4);
-  border-radius: var(--bk-radius-sm);
-  /* DQ-024: --bk-bg-overlay / --bk-ink-inverse never existed — the fallbacks
-     were what rendered. Same pixels, from real tokens. */
-  background: color-mix(in srgb, var(--bk-ink) 50%, transparent);
-  color: var(--bk-bg-card);
-  font: 500 var(--bk-text-11) var(--bk-font-ui);
+/* 199:37199 — the card's facts line, 11 muted. */
+.mgr-asset-facts {
+  font: 400 var(--bk-text-11) var(--bk-font-ui);
+  line-height: 16px;
+  color: var(--bk-ink-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.mgr-asset-use {
+
+/* 199:37199 — "8 assets · Your files" sits under the filter row. */
+.mgr-countline {
   display: flex;
   align-items: center;
-  gap: var(--bk-space-4);
-  font: 400 var(--bk-text-11) var(--bk-font-ui);
-  color: var(--bk-ink-muted);
+  min-height: 20px;
+  flex-shrink: 0;
 }
 
 .mgr-count {
@@ -903,44 +862,47 @@
 .mgr-dropzone-title { font: 600 15px var(--bk-font-ui); color: var(--bk-accent-text); }
 .mgr-dropzone-sub { font: 400 11px var(--bk-font-ui); color: var(--bk-ink-soft); }
 
-.mgr-uploads {
-  margin: var(--bk-space-8) var(--bk-space-20) 0;
+/* 2L9 199:39336 / 40594 — an upload row: name left, phase right (13 ink /
+   12 muted); a failed one adds its reason and Retry · Remove file. */
+.mgr-upl-list {
+  margin: 0;
   padding: 0;
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: var(--bk-space-4);
-}
-.mgr-upload {
-  display: flex;
-  align-items: center;
   gap: var(--bk-space-8);
-  padding: var(--bk-space-8) var(--bk-space-12);
-  border-radius: var(--bk-radius-md);
-  background: var(--bk-bg-subtle);
-  font: 400 11px var(--bk-font-ui);
-  color: var(--bk-ink-soft);
+  flex-shrink: 0;
 }
-.mgr-upload.error { background: var(--bk-error-tint); color: var(--bk-error-text, var(--bk-error)); }
-.mgr-upload.complete { background: var(--bk-success-tint); color: var(--bk-success-text, var(--bk-success)); }
-.mgr-upload-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.mgr-upload-track {
-  width: 120px;
-  height: 5px;
-  border-radius: var(--bk-radius-full);
-  background: var(--bk-border);
+.mgr-upl { display: flex; flex-direction: column; gap: var(--bk-space-8); padding: var(--bk-space-8) var(--bk-space-12); }
+.mgr-upl-head { display: flex; align-items: center; gap: var(--bk-space-12); }
+.mgr-upl-name {
+  flex: 1;
+  min-width: 0;
   overflow: hidden;
-  flex-shrink: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 400 var(--bk-text-13)/20px var(--bk-font-ui);
+  color: var(--bk-ink);
 }
-.mgr-upload-fill { display: block; height: 100%; background: var(--bk-accent); }
-.mgr-upload-dismiss {
-  border: 0;
-  background: transparent;
+.mgr-upl-phase { flex-shrink: 0; font: 400 var(--bk-text-12)/16px var(--bk-font-ui); color: var(--bk-ink-soft); }
+.mgr-upl--failed .mgr-upl-phase { color: var(--bk-error-text); }
+.mgr-upl-reason { margin: 0; font: 400 var(--bk-text-12)/16px var(--bk-font-ui); color: var(--bk-ink); }
+.mgr-upl-actions { display: flex; align-items: center; gap: var(--bk-space-16); }
+.mgr-upl-actions .mgr-upl-link {
+  min-height: 0;
   padding: 0;
-  font: 500 11px var(--bk-font-ui);
-  color: var(--bk-accent-text);
-  cursor: pointer;
+  font: 400 var(--bk-text-12)/16px var(--bk-font-ui);
+  color: var(--bk-ink);
+}
+
+/* 199:41227 — "{file} saved to Assets", 12 ink, under the grid. */
+.mgr-receipt {
   flex-shrink: 0;
+  align-self: flex-start;
+  min-height: 0;
+  padding: var(--bk-space-8) 0;
+  font: 400 var(--bk-text-12)/16px var(--bk-font-ui);
+  color: var(--bk-ink);
 }
 
 /* 4418:58292 — the "Tags ▾" row fills the rail like every other row. */

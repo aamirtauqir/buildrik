@@ -106,19 +106,18 @@ describe("Clone 3695:45155 · Assets · No selection — J-A library chrome", ()
 
   it("reads the toolbar count as '<N> files · <scope>' and moves the scope out of the grid foot", async () => {
     await mountLibrary();
-    expect(screen.getByTestId("mgr-count")).toHaveTextContent("10 files · All assets");
+    expect(screen.getByTestId("mgr-count")).toHaveTextContent("10 assets · All assets");
     expect(screen.queryByText(/^Showing/)).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: /^No known placements/ }));
-    expect(screen.getByTestId("mgr-count")).toHaveTextContent(/files · No known placements$/);
+    expect(screen.getByTestId("mgr-count")).toHaveTextContent(/assets? · No known placements$/);
   });
 
-  it("4418:58292 — the toolbar reads Filter ▾ · Grid|List · Grid ▾ · ⋯, and Grid ▾ names its column count", async () => {
+  it("199:37199 — the filter row reads All types · Any tag · Date added · Grid|List · N columns", async () => {
     await mountLibrary();
-    expect(screen.getByTestId("mgr-filter")).toHaveTextContent("Filter");
+    const row = screen.getByTestId("mgr-subbar");
+    expect(row.textContent).toBe("All typesAny tagDate addedGridList3 columns");
     expect(screen.getByRole("button", { name: "Grid" })).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByRole("button", { name: "List" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Grid · 3 columns" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Library options" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Library options" })).toBeNull();
   });
 
   it("7093:78182 — Filter ▾ offers FORMAT and the library's own file types, and the button names the choice", async () => {
@@ -131,15 +130,13 @@ describe("Clone 3695:45155 · Assets · No selection — J-A library chrome", ()
     expect(setFmtFilter).toHaveBeenCalledWith("jpg");
   });
 
-  it("7093:78219 / 6930:80054 — ⋯ › Sort by names the sort: 'Date added' by default", async () => {
+  it("199:37199 — the sort select names the sort: 'Date added' by default", async () => {
     await mountLibrary();
-    fireEvent.click(screen.getByRole("button", { name: "Library options" }));
     expect(screen.getByTestId("mgr-sort")).toHaveTextContent("Date added");
   });
 
   it("names the sort 'Name A→Z' when sorted by name ascending", async () => {
     await mountLibrary({ sort: "name", sortDir: "asc" });
-    fireEvent.click(screen.getByRole("button", { name: "Library options" }));
     expect(screen.getByTestId("mgr-sort")).toHaveTextContent("Name A→Z");
   });
 
@@ -184,10 +181,9 @@ describe("Clone 3695:44339 · Assets · Search menu", () => {
 });
 
 describe("Clone 3695:19968 / 20154 · bulk mode", () => {
-  it("⋯ › Select assets… enters select mode as the List with nothing checked, and the rail says so", async () => {
+  it("Select (count line) enters select mode as the List with nothing checked, and the rail says so", async () => {
     const toggleSelMode = vi.fn();
     await mountLibrary({ toggleSelMode });
-    fireEvent.click(screen.getByRole("button", { name: "Library options" }));
     fireEvent.click(screen.getByTestId("mgr-select-mode"));
     expect(toggleSelMode).toHaveBeenCalledTimes(1);
     expect(screen.getByTestId("mgr-list-head")).toBeInTheDocument();
@@ -214,21 +210,12 @@ describe("Clone 3695:19968 / 20154 · bulk mode", () => {
     const rail = within(screen.getByTestId("mgr-details"));
     expect(rail.queryByRole("heading", { name: "1 asset selected" })).toBeNull();
     expect(rail.getByText("chef-intro.mp4")).toBeInTheDocument();
-    expect(screen.getByTestId("mgr-det-meta")).toHaveTextContent("Selected asset · MP4");
-    expect(screen.getByTestId("mgr-det-summary")).toHaveTextContent("1 version · used in 1 place");
-    expect(screen.queryByTestId("mgr-det-used")).toBeNull(); // collapsed until "Details ▸" is opened
-    fireEvent.click(screen.getByTestId("mgr-det-details-toggle"));
-    expect(screen.getByTestId("mgr-det-used")).toHaveTextContent("Used in 1 place");
+    expect(screen.getByTestId("mgr-det-meta")).toHaveTextContent(/^MP4 · /);
     const actions = within(screen.getByTestId("mgr-det-actions"));
-    expect(actions.getAllByRole("button").map((b) => b.getAttribute("aria-label") ?? b.textContent?.trim())).toEqual([
-      "Insert to canvas",
-      "Rename",
-      "More actions",
-    ]);
-    expect(actions.getByRole("button", { name: "Insert to canvas" })).toHaveClass("mgr-btn-ink");
+    expect(actions.getAllByRole("button").map((b) => b.textContent?.trim())).toEqual(["Place on canvas", "Rename", "More"]);
+    expect(actions.getByRole("button", { name: "Place on canvas" })).toHaveClass("mgr-btn-primary");
     fireEvent.click(screen.getByTestId("mgr-det-more"));
-    expect(actions.getAllByRole("menuitem").map((b) => b.textContent?.trim())).toEqual(["Replace across site…", "Delete…"]);
-    fireEvent.click(actions.getByRole("menuitem", { name: "Delete…" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Delete asset…" }));
     expect(requestDelete).toHaveBeenCalledWith("chef");
   });
 
@@ -239,11 +226,7 @@ describe("Clone 3695:19968 / 20154 · bulk mode", () => {
     const emit = vi.fn();
     await mountLibrary({ selMode: true, selectedKeys: new Set(["inter"]) }, {}, { emit });
     const actions = within(screen.getByTestId("mgr-det-actions"));
-    expect(actions.getAllByRole("button").map((b) => b.getAttribute("aria-label") ?? b.textContent?.trim())).toEqual([
-      "Manage font",
-      "Rename",
-      "More actions",
-    ]);
+    expect(actions.getAllByRole("button").map((b) => b.textContent?.trim())).toEqual(["Manage font", "Rename", "More"]);
     fireEvent.click(actions.getByRole("button", { name: "Manage font" }));
     expect(emit).toHaveBeenCalledWith("ui:site-fonts", { assetId: "inter" });
   });
@@ -452,7 +435,7 @@ describe("Clone 3695:20614 / 44165 · Insert to canvas returns to the canvas", (
     const insertToCanvas = vi.fn(() => Promise.resolve());
     const { onClose } = await mountLibrary({ insertToCanvas });
     fireEvent.click(screen.getByTestId("mgr-asset-menu"));
-    fireEvent.click(within(screen.getByTestId("mgr-det-actions")).getByRole("button", { name: "Insert to canvas" }));
+    fireEvent.click(within(screen.getByTestId("mgr-det-actions")).getByRole("button", { name: "Place on canvas" }));
     await screen.findByTestId("mgr-details");
     expect(insertToCanvas).toHaveBeenCalledWith("menu");
     await vi.waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
@@ -760,7 +743,7 @@ describe("Clone 3397:18137 · fullpage · drag-over (re-draws V1 1163:13948)", (
   });
 });
 
-describe("Clone 3724:20828 / 3724:20832 · Upload files → Upload complete", () => {
+describe("Clone 3724:20828 · Upload files → 2L9 B6-A05…A08 upload rows and receipt", () => {
   it("the header Upload's picker opens the confirm; Cancel uploads nothing", async () => {
     const upload = vi.fn(() => Promise.resolve([]));
     await mountLibrary({ upload });
@@ -787,7 +770,7 @@ describe("Clone 3724:20828 / 3724:20832 · Upload files → Upload complete", ()
     expect(upload).toHaveBeenCalledWith([file], { folderId: "f-new" });
   });
 
-  it("Upload file → the modal waits on the queue, then Upload complete; View asset selects it in the rail and closes", async () => {
+  it("2L9 199:39336 → 41227 — Upload file closes the confirm; the grid row reads Uploading…, then '{file} saved to Assets' opens it in the rail", async () => {
     let finish: (v: UploadResult[]) => void = () => {};
     const upload = vi.fn(() => new Promise<UploadResult[]>((resolve) => { finish = resolve; }));
     await mountLibrary({
@@ -798,37 +781,48 @@ describe("Clone 3724:20828 / 3724:20832 · Upload files → Upload complete", ()
     pickFiles([file]);
     fireEvent.click(screen.getByTestId("mgr-upload-files-confirm"));
     expect(upload).toHaveBeenCalledWith([file], { folderId: null });
-    // Still the Upload files modal, now reading the queue.
-    expect(screen.getByTestId("mgr-upload-files-pct-0")).toHaveTextContent("62%");
-    expect(screen.queryByTestId("mgr-upload-complete")).toBeNull();
-    finish(landedResult(makeAsset({ id: "hero", name: "hero-dark", originalName: "hero-dark.jpg", mimeType: "image/jpeg" })));
-    const done = await screen.findByTestId("mgr-upload-complete");
     expect(screen.queryByTestId("mgr-upload-files")).toBeNull();
-    expect(within(done).getByTestId("mgr-upload-complete-body")).toHaveTextContent("hero-dark.jpg is now in your library.");
-    fireEvent.click(screen.getByTestId("mgr-upload-complete-view"));
-    expect(screen.queryByTestId("mgr-upload-complete")).toBeNull();
-    expect(within(screen.getByTestId("mgr-details")).getByText("hero-dark.jpg")).toBeInTheDocument();
+    expect(screen.getByTestId("mgr-upl-phase-hero-dark.jpg")).toHaveTextContent("Uploading…");
+    expect(screen.getByTestId("mgr-sync-pill")).toHaveTextContent("1 file not saved to Assets");
+    finish(landedResult(makeAsset({ id: "hero", name: "hero-dark", originalName: "hero-dark.jpg", mimeType: "image/jpeg" })));
+    const receipt = await screen.findByTestId("mgr-upload-receipt");
+    expect(receipt).toHaveTextContent("hero-dark.jpg saved to Assets");
+    fireEvent.click(receipt);
+    expect(screen.queryByTestId("mgr-upload-receipt")).toBeNull();
+    expect(screen.getByTestId("mgr-det-title")).toHaveTextContent("hero-dark.jpg");
   });
 
-  it("Done closes the result and selects nothing", async () => {
-    const upload = vi.fn(() => Promise.resolve(landedResult(makeAsset({ id: "hero", originalName: "hero-dark.jpg" }))));
-    await mountLibrary({ upload });
-    pickFiles([makeFile("hero-dark.jpg", 8 * MB)]);
-    fireEvent.click(screen.getByTestId("mgr-upload-files-confirm"));
-    fireEvent.click(await screen.findByTestId("mgr-upload-complete-done"));
-    expect(screen.queryByTestId("mgr-upload-complete")).toBeNull();
-    expect(within(screen.getByTestId("mgr-details")).queryByText("hero-dark.jpg")).toBeNull();
+  it("199:39965 — a file being registered reads Saving…", async () => {
+    await mountLibrary({ uploadQueue: [{ fileName: "hero-dark.jpg", progress: 90, status: "processing" }] });
+    expect(screen.getByTestId("mgr-upl-phase-hero-dark.jpg")).toHaveTextContent("Saving…");
   });
 
-  it("a batch where nothing landed closes without a result — the grid's failed rows are the door", async () => {
+  it("199:40594 — a refused file reads Couldn’t save with its reason, Retry and Remove file", async () => {
+    const retryUpload = vi.fn();
+    const dismissUpload = vi.fn();
+    await mountLibrary({
+      retryUpload,
+      dismissUpload,
+      uploadQueue: [{ fileName: "hero-dark.jpg", progress: 0, status: "error", error: "Server rejected" }],
+    });
+    expect(screen.getByTestId("mgr-upl-phase-hero-dark.jpg")).toHaveTextContent("Couldn’t save");
+    expect(screen.getByTestId("mgr-upl-hero-dark.jpg")).toHaveTextContent("Server rejected");
+    fireEvent.click(screen.getByTestId("mgr-upl-retry-hero-dark.jpg"));
+    expect(retryUpload).toHaveBeenCalledWith("hero-dark.jpg");
+    fireEvent.click(screen.getByTestId("mgr-upl-remove-hero-dark.jpg"));
+    expect(dismissUpload).toHaveBeenCalledWith("hero-dark.jpg");
+  });
+
+  it("a batch where nothing landed leaves no receipt — the grid's failed rows are the door", async () => {
     const upload = vi.fn(() =>
       Promise.resolve([{ success: false, error: "Server rejected", fileName: "hero-dark.jpg" }]),
     );
     await mountLibrary({ upload });
     pickFiles([makeFile("hero-dark.jpg", 8 * MB)]);
     fireEvent.click(screen.getByTestId("mgr-upload-files-confirm"));
-    await vi.waitFor(() => expect(screen.queryByTestId("mgr-upload-files")).toBeNull());
-    expect(screen.queryByTestId("mgr-upload-complete")).toBeNull();
+    await vi.waitFor(() => expect(upload).toHaveBeenCalled());
+    expect(screen.queryByTestId("mgr-upload-files")).toBeNull();
+    expect(screen.queryByTestId("mgr-upload-receipt")).toBeNull();
   });
 
   it("the empty-library hero's Upload goes through the same confirm", async () => {
@@ -1203,12 +1197,13 @@ async function mountVersions(opts: { family?: typeof HERO[]; on?: string; upload
   return { composer, onOpenImageEditor, door, placements };
 }
 
-/* 4418:58292 — VERSIONS / USED IN sit behind the rail's "Details ▸" row. */
-const selectHero = () => {
-  fireEvent.click(screen.getByTestId("mgr-asset-hero"));
-  fireEvent.click(screen.getByTestId("mgr-det-details-toggle"));
+/* 2L9 199:37199 — the rail opens on Details; Versions and Usage are tabs. */
+const selectHero = () => fireEvent.click(screen.getByTestId("mgr-asset-hero"));
+const railTab = (id: "details" | "usage" | "versions") => fireEvent.click(screen.getByTestId(`mgr-det-tab-${id}`));
+const openVersions = () => {
+  railTab("versions");
+  fireEvent.click(screen.getByTestId("mgr-det-version-hero-v2"));
 };
-const openVersions = () => fireEvent.click(screen.getByTestId("mgr-det-version-hero-v2"));
 
 describe("Clone 3681:20026 → 3695:45529 · Edit image → Save version → Done — the save path", () => {
   afterEach(() => vi.unstubAllGlobals());
@@ -1287,36 +1282,35 @@ describe("Clone 3681:20026 → 3695:45529 · Edit image → Save version → Don
   });
 });
 
-describe("Clone 3697:20326 · the rail's VERSIONS block", () => {
-  it("lists v2 · Latest saved over v1 · Original once a version exists, marks the applied one, and a row opens Asset versions", async () => {
+describe("2L9 199:38433 · the rail's Versions tab", () => {
+  it("lists Version 2 · Available over Version 1 · Selected · Used in 2 pages, and a row opens Asset versions", async () => {
     await mountVersions({ family: [HERO, HERO_V2] });
     selectHero();
+    railTab("versions");
     const block = within(screen.getByTestId("mgr-det-versions"));
-    expect(block.getByTestId("mgr-det-version-hero-v2")).toHaveTextContent("v2 · Latest saved");
-    expect(block.getByTestId("mgr-det-version-hero")).toHaveTextContent("v1 · Original");
-    expect(within(block.getByTestId("mgr-det-version-hero")).getByText("APPLIED")).toBeInTheDocument();
+    expect(block.getByTestId("mgr-det-version-hero-v2")).toHaveTextContent("Version 2 · Available");
+    expect(block.getByTestId("mgr-det-version-hero")).toHaveTextContent("Version 1 · Selected · Used in 2 pages");
     openVersions();
     expect(screen.getByTestId("versions-title")).toHaveTextContent("Asset versions");
     expect(screen.getByTestId("versions-card-state-hero")).toHaveTextContent("Currently used on Home and Menu · 3 placements");
     expect(screen.getByTestId("versions-card-state-hero-v2")).toHaveTextContent("Not applied to site");
   });
 
-  it("is absent while only the original exists, and USED IN still reads the placements", async () => {
+  it("with only the original, Usage lists every placement by page (199:37822)", async () => {
     await mountVersions();
     selectHero();
-    expect(screen.queryByTestId("mgr-det-versions")).toBeNull();
-    /* FC-6: a navigable row list, not a joined string — grouped by page,
-       each hit with its own "Jump ›" (same shape as the drawer's overlay). */
+    railTab("usage");
+    /* FC-6: a navigable row list — one "Page › element ↗" per placement. */
+    expect(screen.getByTestId("mgr-det-used-count")).toHaveTextContent("Pages · 3 placements");
     const used = within(screen.getByTestId("mgr-det-used"));
-    expect(used.getByTestId("mgr-det-used-page-p-home")).toHaveTextContent("Home");
-    expect(used.getByTestId("mgr-det-used-page-p-home")).toHaveTextContent("2");
-    expect(used.getByTestId("mgr-det-used-page-p-menu")).toHaveTextContent("Menu");
-    expect(used.getByTestId("mgr-det-used-page-p-menu")).toHaveTextContent("1");
+    expect(used.getByTestId("mgr-det-used-page-p-home")).toHaveTextContent(/^Home ›.*Home ›/);
+    expect(used.getByTestId("mgr-det-used-page-p-menu")).toHaveTextContent(/^Menu ›/);
   });
 
   it("USED IN follows the placements to the applied version", async () => {
     await mountVersions({ family: [HERO, HERO_V2], on: "blob:hero-v2" });
     selectHero();
+    railTab("usage");
     /* FC-6: still traces correctly when the ORIGINAL is selected but a saved
        version is what's actually applied — `AssetDetailsPanel` traces every
        family member with placements (`replaceSources`), not just the
@@ -1324,7 +1318,6 @@ describe("Clone 3697:20326 · the rail's VERSIONS block", () => {
     const used = within(screen.getByTestId("mgr-det-used"));
     expect(used.getByTestId("mgr-det-used-page-p-home")).toHaveTextContent("Home");
     expect(used.getByTestId("mgr-det-used-page-p-menu")).toHaveTextContent("Menu");
-    expect(screen.getByTestId("mgr-use-hero")).toHaveTextContent("used ×3");
   });
 
   it("Edit latest saved version opens the editor on v2's file; its save becomes v3 of hero", async () => {
@@ -1373,7 +1366,7 @@ describe("Clone 3695:45615 → 3720:43313 → 3720:43316 · Apply latest saved v
     expect(screen.getByTestId("versions-apply-latest")).toBeDisabled();
     /* And the rail's marker moved with the placements. */
     fireEvent.click(screen.getByTestId("versions-close"));
-    expect(within(screen.getByTestId("mgr-det-version-hero-v2")).getByText("APPLIED")).toBeInTheDocument();
+    expect(screen.getByTestId("mgr-det-version-hero-v2")).toHaveTextContent("Version 2 · Selected");
   });
 
   it("Done closes the result and the library stands as it was", async () => {
