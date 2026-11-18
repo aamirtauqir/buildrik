@@ -1,0 +1,444 @@
+{
+  "mutatedNodeIds": [
+    "8334:1114",
+    "8334:243982",
+    "8334:243984",
+    "8334:243791",
+    "8317:246696",
+    "8317:246866",
+    "8334:1123",
+    "8334:1139",
+    "8334:1061",
+    "8334:1235",
+    "8318:243970",
+    "8318:243960",
+    "8334:1299",
+    "8334:1260",
+    "8334:1348",
+    "8334:1349",
+    "8334:242979",
+    "8317:242539",
+    "8334:243012",
+    "8334:243088",
+    "8317:242020",
+    "8334:243320",
+    "8334:243324",
+    "8334:243341",
+    "8334:243431",
+    "8334:243453",
+    "8334:243357",
+    "8334:243361",
+    "8334:243465",
+    "8317:242482",
+    "8334:243683",
+    "8334:243685",
+    "8317:242865",
+    "8334:243768",
+    "8334:243770",
+    "8334:243984",
+    "8318:894",
+    "8317:287",
+    "8312:2"
+  ],
+  "connections": [
+    {
+      "sourceNodeId": "8317:246696",
+      "sourceFrameId": "8317:246658",
+      "destinationFrameId": "8334:1058",
+      "simulation": false,
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "destinationReadback": "8334:1058"
+    },
+    {
+      "sourceNodeId": "8317:246866",
+      "sourceFrameId": "8317:246658",
+      "destinationFrameId": "8334:1152",
+      "simulation": false,
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "destinationReadback": "8334:1152"
+    },
+    {
+      "sourceNodeId": "8334:1123",
+      "sourceFrameId": "8334:1058",
+      "destinationFrameId": "8334:1152",
+      "simulation": false,
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "destinationReadback": "8334:1152"
+    },
+    {
+      "sourceNodeId": "8334:1139",
+      "sourceFrameId": "8334:1058",
+      "destinationFrameId": "8334:1152",
+      "simulation": false,
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "destinationReadback": "8334:1152"
+    },
+    {
+      "sourceNodeId": "8334:1061",
+      "sourceFrameId": "8334:1058",
+      "destinationFrameId": "8317:246658",
+      "simulation": false,
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "destinationReadback": "8317:246658"
+    },
+    {
+      "sourceNodeId": "8334:1235",
+      "sourceFrameId": "8334:1152",
+      "destinationFrameId": "8334:1058",
+      "simulation": false,
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "destinationReadback": "8334:1058"
+    },
+    {
+      "sourceNodeId": "8318:243970",
+      "sourceFrameId": "8318:243842",
+      "destinationFrameId": "8334:1250",
+      "simulation": false,
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "destinationReadback": "8334:1250"
+    },
+    {
+      "sourceNodeId": "8318:243960",
+      "sourceFrameId": "8318:243842",
+      "destinationFrameId": "8334:1304",
+      "simulation": true,
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "destinationReadback": "8334:1304"
+    },
+    {
+      "sourceNodeId": "8334:1299",
+      "sourceFrameId": "8334:1250",
+      "destinationFrameId": "8334:1304",
+      "simulation": false,
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "destinationReadback": "8334:1304"
+    },
+    {
+      "sourceNodeId": "8334:1260",
+      "sourceFrameId": "8334:1250",
+      "destinationFrameId": "8334:1304",
+      "simulation": false,
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "destinationReadback": "8334:1304"
+    },
+    {
+      "sourceNodeId": "8334:1348",
+      "sourceFrameId": "8334:1304",
+      "destinationFrameId": "8334:1250",
+      "simulation": false,
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "destinationReadback": "8334:1250"
+    },
+    {
+      "sourceNodeId": "8334:1349",
+      "sourceFrameId": "8334:1304",
+      "destinationFrameId": "8334:242976",
+      "simulation": true,
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "destinationReadback": "8334:242976"
+    },
+    {
+      "sourceNodeId": "8334:242979",
+      "sourceFrameId": "8334:242976",
+      "destinationFrameId": "8317:297",
+      "simulation": true,
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "destinationReadback": "8317:297"
+    },
+    {
+      "sourceNodeId": "8317:242539",
+      "sourceFrameId": "8317:242436",
+      "destinationFrameId": "8334:243009",
+      "simulation": false,
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "destinationReadback": "8334:243009"
+    },
+    {
+      "sourceNodeId": "8334:243012",
+      "sourceFrameId": "8334:243009",
+      "destinationFrameId": "8317:242436",
+      "simulation": false,
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "destinationReadback": "8317:242436"
+    },
+    {
+      "sourceNodeId": "8334:243088",
+      "sourceFrameId": "8334:243009",
+      "destinationFrameId": "8334:243105",
+      "simulation": true,
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "destinationReadback": "8334:243105"
+    },
+    {
+      "sourceNodeId": "8317:242020",
+      "sourceFrameId": "8317:242017",
+      "destinationFrameId": "8334:243230",
+      "simulation": false,
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "destinationReadback": "8334:243230"
+    },
+    {
+      "sourceNodeId": "8334:243320",
+      "sourceFrameId": "8334:243230",
+      "destinationFrameId": "8317:242017",
+      "simulation": false,
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "destinationReadback": "8317:242017"
+    },
+    {
+      "sourceNodeId": "8334:243324",
+      "sourceFrameId": "8334:243230",
+      "destinationFrameId": "8317:242981",
+      "simulation": false,
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "destinationReadback": "8317:242981"
+    },
+    {
+      "sourceNodeId": "8334:243341",
+      "sourceFrameId": "8334:243338",
+      "destinationFrameId": "8317:297",
+      "simulation": false,
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "destinationReadback": "8317:297"
+    },
+    {
+      "sourceNodeId": "8334:243431",
+      "sourceFrameId": "8334:243338",
+      "destinationFrameId": "8317:297",
+      "simulation": false,
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "destinationReadback": "8317:297"
+    },
+    {
+      "sourceNodeId": "8334:243453",
+      "sourceFrameId": "8334:243450",
+      "destinationFrameId": "8317:297",
+      "simulation": false,
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "destinationReadback": "8317:297"
+    },
+    {
+      "sourceNodeId": "8334:243357",
+      "sourceFrameId": "8334:243338",
+      "destinationFrameId": "8334:243450",
+      "simulation": false,
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "destinationReadback": "8334:243450"
+    },
+    {
+      "sourceNodeId": "8334:243361",
+      "sourceFrameId": "8334:243338",
+      "destinationFrameId": "8334:243450",
+      "simulation": false,
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "destinationReadback": "8334:243450"
+    },
+    {
+      "sourceNodeId": "8334:243465",
+      "sourceFrameId": "8334:243450",
+      "destinationFrameId": "8334:243338",
+      "simulation": false,
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "destinationReadback": "8334:243338"
+    },
+    {
+      "sourceNodeId": "8317:242482",
+      "sourceFrameId": "8317:242436",
+      "destinationFrameId": "8334:243564",
+      "simulation": false,
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "destinationReadback": "8334:243564"
+    },
+    {
+      "sourceNodeId": "8334:243683",
+      "sourceFrameId": "8334:243564",
+      "destinationFrameId": "8317:242436",
+      "simulation": false,
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "destinationReadback": "8317:242436"
+    },
+    {
+      "sourceNodeId": "8334:243685",
+      "sourceFrameId": "8334:243564",
+      "destinationFrameId": "8317:242691",
+      "simulation": false,
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "destinationReadback": "8317:242691"
+    },
+    {
+      "sourceNodeId": "8317:242865",
+      "sourceFrameId": "8317:242809",
+      "destinationFrameId": "8334:243697",
+      "simulation": false,
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "destinationReadback": "8334:243697"
+    },
+    {
+      "sourceNodeId": "8334:243768",
+      "sourceFrameId": "8334:243697",
+      "destinationFrameId": "8317:242809",
+      "simulation": false,
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "destinationReadback": "8317:242809"
+    },
+    {
+      "sourceNodeId": "8334:243770",
+      "sourceFrameId": "8334:243697",
+      "destinationFrameId": "8334:243783",
+      "simulation": true,
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "destinationReadback": "8334:243783"
+    },
+    {
+      "sourceNodeId": "8334:243984",
+      "sourceFrameId": "8334:243783",
+      "destinationFrameId": "8317:242809",
+      "simulation": true,
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "destinationReadback": "8317:242809"
+    },
+    {
+      "sourceNodeId": "8318:894",
+      "sourceFrameId": "8318:751",
+      "destinationFrameId": "8332:2360",
+      "simulation": true,
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "destinationReadback": "8332:2360"
+    },
+    {
+      "sourceNodeId": "8317:287",
+      "sourceFrameId": "8317:201",
+      "destinationFrameId": "8332:2360",
+      "simulation": true,
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "destinationReadback": "8332:2360"
+    }
+  ],
+  "flows": [
+    {
+      "nodeId": "8318:244368",
+      "name": "Pages · create blank page"
+    },
+    {
+      "nodeId": "8317:297",
+      "name": "Editor · Home Desktop"
+    },
+    {
+      "nodeId": "8334:243783",
+      "name": "Editor · Home Desktop"
+    },
+    {
+      "nodeId": "8317:243948",
+      "name": "Pages · switch page"
+    },
+    {
+      "nodeId": "8317:245051",
+      "name": "Publish · simulated checks"
+    },
+    {
+      "nodeId": "8317:245216",
+      "name": "Preview · Home Mobile"
+    },
+    {
+      "nodeId": "8317:246897",
+      "name": "Components · reset, detach and master"
+    },
+    {
+      "nodeId": "8317:247144",
+      "name": "Inspector · unlock selection"
+    },
+    {
+      "nodeId": "8334:1250",
+      "name": "CMS · first collection"
+    },
+    {
+      "nodeId": "8317:246658",
+      "name": "CMS · bound record"
+    },
+    {
+      "nodeId": "8317:242436",
+      "name": "Settings · SEO and image choice"
+    },
+    {
+      "nodeId": "8317:242017",
+      "name": "Media · unsaved metadata"
+    },
+    {
+      "nodeId": "8334:243338",
+      "name": "Brand · foundations"
+    },
+    {
+      "nodeId": "8317:242809",
+      "name": "Templates · create page"
+    }
+  ],
+  "limitation": "Native readback only. SEO selected-image reopen edge remains pending."
+}

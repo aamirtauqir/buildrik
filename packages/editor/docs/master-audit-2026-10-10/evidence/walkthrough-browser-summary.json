@@ -1,0 +1,83 @@
+{
+  "meaning": "Attempted steps, not passed tests. Screenshots were reviewed separately; see CURRENT-FLOW-WALKTHROUGH.md.",
+  "batches": [
+    {
+      "file": "walk-batch-01.json.receipt.json",
+      "steps": 3,
+      "urlMatches": 0,
+      "urlMismatches": 0
+    },
+    {
+      "file": "walk-batch-02.json.receipt.json",
+      "steps": 21,
+      "urlMatches": 4,
+      "urlMismatches": 0
+    },
+    {
+      "file": "walk-batch-03.json.receipt.json",
+      "steps": 2,
+      "urlMatches": 0,
+      "urlMismatches": 0
+    },
+    {
+      "file": "walk-batch-04.json.receipt.json",
+      "steps": 7,
+      "urlMatches": 0,
+      "urlMismatches": 0
+    },
+    {
+      "file": "walk-batch-05.json.receipt.json",
+      "steps": 3,
+      "urlMatches": 0,
+      "urlMismatches": 0
+    },
+    {
+      "file": "walk-batch-06.json.receipt.json",
+      "steps": 5,
+      "urlMatches": 0,
+      "urlMismatches": 0
+    },
+    {
+      "file": "walk-batch-07.json.receipt.json",
+      "steps": 5,
+      "urlMatches": 0,
+      "urlMismatches": 0
+    },
+    {
+      "file": "walk-batch-08.json.receipt.json",
+      "steps": 7,
+      "urlMatches": 0,
+      "urlMismatches": 0
+    },
+    {
+      "file": "walk-batch-09.json.receipt.json",
+      "steps": 6,
+      "urlMatches": 3,
+      "urlMismatches": 1
+    },
+    {
+      "file": "walk-batch-10.json.receipt.json",
+      "steps": 5,
+      "urlMatches": 3,
+      "urlMismatches": 0
+    },
+    {
+      "file": "walk-batch-11.json.receipt.json",
+      "steps": 8,
+      "urlMatches": 1,
+      "urlMismatches": 0
+    },
+    {
+      "file": "walk-batch-12.json.receipt.json",
+      "steps": 6,
+      "urlMatches": 0,
+      "urlMismatches": 0
+    },
+    {
+      "file": "walk-batch-13.json.receipt.json",
+      "steps": 9,
+      "urlMatches": 6,
+      "urlMismatches": 0
+    }
+  ]
+}

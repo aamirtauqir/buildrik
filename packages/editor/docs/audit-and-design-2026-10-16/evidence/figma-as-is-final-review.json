@@ -1,0 +1,29 @@
+{
+  "scope": "AS-IS Figma audit; existing capabilities only",
+  "status": "partially_verified",
+  "structural_screens": 99,
+  "overview_visual_screens": 95,
+  "full_frame_visual_screens": 16,
+  "fresh_visual_unavailable": [95, 96, 98, 99],
+  "unavailable_reason": "Figma MCP tool call limit",
+  "original_figma_mutations": 0,
+  "new_figma_files": 0,
+  "application_code_changes": false,
+  "deployments": false,
+  "independent_review": {
+    "reviewer": "/root/audit_spec_review",
+    "critical_findings": 0,
+    "wording_findings": 2,
+    "corrections_applied": ["Component Undo does not restore captured instance records; snapshots do capture them", "CMS record exit uses Keep editing / Discard and leave; save is separate"],
+    "scope_and_preservation": "pass",
+    "runtime_mutation_recovery_tests": "not run"
+  },
+  "artifact_checks": {
+    "screen_ids_and_module_mapping": "99 checked",
+    "screenshot_hashes": "95 checked",
+    "html_image_paths": "95 checked",
+    "gallery_articles": 99,
+    "gallery_browser_navigation": "opened local file",
+    "gallery_filter_browser_execution": "not run: browse cookie-origin guard blocks JavaScript on file URLs"
+  }
+}

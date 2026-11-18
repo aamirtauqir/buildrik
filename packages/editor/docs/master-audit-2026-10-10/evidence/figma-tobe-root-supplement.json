@@ -1,0 +1,34 @@
+[
+  {
+    "key": "E18",
+    "id": "8318:244145",
+    "noteId": "8318:244365",
+    "title": "TO-BE E18 · New page / template",
+    "width": 1440,
+    "height": 900
+  },
+  {
+    "key": "E19",
+    "id": "8318:244368",
+    "noteId": "8318:244588",
+    "title": "TO-BE E19 · New page / blank",
+    "width": 1440,
+    "height": 900
+  },
+  {
+    "key": "E20",
+    "id": "8318:244591",
+    "noteId": "8318:244747",
+    "title": "TO-BE E20 · Layers / expanded long names",
+    "width": 1440,
+    "height": 900
+  },
+  {
+    "key": "E21",
+    "id": "8318:244750",
+    "noteId": "8318:244935",
+    "title": "TO-BE E21 · 1024 temporary Layers chooser",
+    "width": 1024,
+    "height": 768
+  }
+]

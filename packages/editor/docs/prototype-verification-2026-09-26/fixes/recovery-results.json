@@ -1,0 +1,61 @@
+{
+  "entries": {
+    "Media \u00b7 Empty": {
+      "expected": "6289:147437",
+      "actual": "6289:147437",
+      "pass": true
+    },
+    "Media \u00b7 Permission": {
+      "expected": "6289:148485",
+      "actual": "6289:148485",
+      "pass": true
+    },
+    "Activity \u00b7 Loading": {
+      "expected": "6278:147177",
+      "actual": "6278:147177",
+      "pass": true
+    },
+    "Activity \u00b7 Error": {
+      "expected": "6278:147511",
+      "actual": "6278:147511",
+      "pass": true
+    },
+    "AI page \u00b7 Unlimited": {
+      "expected": "7851:194888",
+      "actual": "7851:194888",
+      "pass": true
+    },
+    "AI page \u00b7 Daily limit": {
+      "expected": "7851:194982",
+      "actual": "7851:194982",
+      "pass": true
+    },
+    "AI block \u00b7 Unlimited": {
+      "expected": "7851:195076",
+      "actual": "7851:195076",
+      "pass": true
+    },
+    "AI block \u00b7 Daily limit": {
+      "expected": "7851:195167",
+      "actual": "7851:195167",
+      "pass": true
+    },
+    "Media \u00b7 Loading": {
+      "expected": "6289:147175",
+      "actual": "6289:147175",
+      "pass": true
+    }
+  },
+  "returns": {
+    "AI page \u00b7 Unlimited": "4418-123573",
+    "AI page \u00b7 Daily limit": "4418-123573",
+    "AI block \u00b7 Unlimited": "4418-99611",
+    "AI block \u00b7 Daily limit": "4418-99611",
+    "Media \u00b7 Loading": "4418-59771",
+    "Media \u00b7 Empty": "4418-59771",
+    "Media \u00b7 Permission": "4418-59771",
+    "Activity \u00b7 Loading": "4418-123573",
+    "Activity \u00b7 Error": "4418-140587"
+  },
+  "note": "Activity Loading reached 6278:147177 in the first run and automatically resolved to 4418:140587 before the later assertion. Escape from the resolved feed returns to canvas. Initial 250ms assertions for several other boards were premature; settled checks passed."
+}

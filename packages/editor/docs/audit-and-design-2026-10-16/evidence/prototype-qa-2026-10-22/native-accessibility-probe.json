@@ -1,0 +1,19 @@
+{
+  "screenReaderAdaptation": true,
+  "tabSequence": [
+    {
+      "tag": "ARTICLE",
+      "role": null,
+      "text": "ExitFieldwork StudioSite settingsIn review · 2PreviewPublishAddLayersPagesAssetsCMSBrandHelpLayersSe",
+      "href": null
+    },
+    {
+      "tag": "BUTTON",
+      "role": "link",
+      "text": "Edit text",
+      "href": null
+    }
+  ],
+  "destination": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=423-97218&starting-point-node-id=423%3A96903&scaling=scale-down",
+  "expected": "423-97218"
+}

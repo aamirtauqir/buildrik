@@ -1,0 +1,53 @@
+[
+  {
+    "label": "Heading editor baseline",
+    "goto": "8465:3",
+    "shot": "r29-editor-start.png"
+  },
+  {
+    "label": "Open History",
+    "x": 600,
+    "y": 28,
+    "shot": "r29-history-open.png"
+  },
+  {
+    "label": "Close History",
+    "x": 1391,
+    "y": 87,
+    "shot": "r29-history-return.png"
+  },
+  {
+    "label": "Open Publish",
+    "x": 897,
+    "y": 28,
+    "shot": "r29-publish-open.png"
+  },
+  {
+    "label": "Close Publish",
+    "x": 1391,
+    "y": 87
+  },
+  {
+    "label": "Open Pages",
+    "x": 109,
+    "y": 157,
+    "shot": "r29-pages-open.png"
+  },
+  {
+    "label": "Close Pages",
+    "x": 303,
+    "y": 87
+  },
+  {
+    "label": "Open Preview",
+    "x": 807,
+    "y": 28,
+    "shot": "r29-preview.png"
+  },
+  {
+    "label": "Back to same Editor",
+    "x": 81,
+    "y": 28,
+    "shot": "r29-preview-return.png"
+  }
+]

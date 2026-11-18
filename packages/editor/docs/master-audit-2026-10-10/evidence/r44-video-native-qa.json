@@ -1,0 +1,841 @@
+{
+  "scope": "Bounded native Video/Shared Style/Ratio chooser/refusal/review-fixture/source-dialog audit. Current authored visibility/geometry only; no variable changes, prototype-state traversal or browser playback.",
+  "scopeInventoryNote": "R44 IDs reconciled after authoring timeout; final reset/history corrections and source dialog from r44-video-mutation.json and r44-video-source-mutation.json included. Geometry reflects default variable values, not browser session state.",
+  "roots": [
+    {
+      "name": "Video",
+      "id": "8843:22237",
+      "width": 1440,
+      "height": 1000,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    },
+    {
+      "name": "Shared Style",
+      "id": "8841:14864",
+      "width": 1440,
+      "height": 1000,
+      "layoutMode": "NONE",
+      "clipsContent": true,
+      "scroll": "NONE"
+    },
+    {
+      "name": "Ratio chooser",
+      "id": "8844:265290",
+      "width": 400,
+      "height": 286,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    },
+    {
+      "name": "Refusal",
+      "id": "9051:17536",
+      "width": 560,
+      "height": 152,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    },
+    {
+      "name": "Design scenarios",
+      "id": "9051:19964",
+      "width": 600,
+      "height": 688,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    },
+    {
+      "name": "Source editor",
+      "id": "9055:17502",
+      "width": 600,
+      "height": 314,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    }
+  ],
+  "missingRoots": [],
+  "nodes": 412,
+  "visibleNodes": 186,
+  "instances": 165,
+  "componentIds": [
+    "8627:621",
+    "8314:3",
+    "8314:7",
+    "8314:5",
+    "8531:318"
+  ],
+  "missingComponents": [],
+  "componentErrors": [],
+  "reactionDestinations": [
+    "8581:11856",
+    "8628:12749",
+    "8628:12592",
+    "8581:11797",
+    "8465:31",
+    "8581:11815",
+    "8465:46",
+    "8539:9190",
+    "8581:11846",
+    "8539:9339",
+    "8539:9433",
+    "8465:2",
+    "8539:9579",
+    "8539:9786",
+    "8539:9881",
+    "8539:9974",
+    "8465:8",
+    "8465:10",
+    "8465:9",
+    "8465:5",
+    "8465:12",
+    "8844:16149",
+    "9055:17502",
+    "8841:14864",
+    "8841:14872",
+    "8465:3",
+    "9051:19964",
+    "8844:265290",
+    "9051:17536",
+    "8844:265268",
+    "8863:17177",
+    "8844:264650",
+    "8863:17140",
+    "8990:17560",
+    "8844:264670",
+    "8844:264690",
+    "8844:264710",
+    "8844:264727",
+    "8844:264744",
+    "8844:264764",
+    "8844:265243",
+    "8844:264784",
+    "8844:264801",
+    "8844:264818",
+    "8844:264838",
+    "8844:264855",
+    "8844:264872"
+  ],
+  "missingDestinations": [],
+  "destinationErrors": [],
+  "geometryChecks": 180,
+  "expectedScrolling": [],
+  "clippingCandidates": [],
+  "unclippedOverflow": [],
+  "geometrySkipped": [],
+  "selectorRow": null,
+  "captions": [],
+  "deviceWidthBindings": [],
+  "mutatedNodeIds": [],
+  "mutatedVariableIds": [],
+  "scrollContainers": [
+    {
+      "id": "8843:22274",
+      "name": "Canvas viewport",
+      "visible": true,
+      "scroll": "VERTICAL",
+      "clipsContent": true,
+      "width": 824,
+      "height": 762
+    },
+    {
+      "id": "8843:22302",
+      "name": "Inspector",
+      "visible": true,
+      "scroll": "VERTICAL",
+      "clipsContent": true,
+      "width": 352,
+      "height": 920
+    },
+    {
+      "id": "8841:14865",
+      "name": "Task panel / Style",
+      "visible": true,
+      "scroll": "VERTICAL",
+      "clipsContent": true,
+      "width": 352,
+      "height": 920
+    }
+  ],
+  "geometry": [
+    {
+      "id": "8843:22528",
+      "name": "Website / Video Embed",
+      "type": "FRAME",
+      "width": 720,
+      "height": 623.875,
+      "visible": true,
+      "horizontal": "FIXED",
+      "vertical": "HUG",
+      "layoutMode": "VERTICAL",
+      "padding": [
+        32,
+        32,
+        32,
+        32
+      ],
+      "strokes": 1,
+      "boundVariables": {
+        "width": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:8843:22529"
+        },
+        "fills": [
+          {
+            "type": "VARIABLE_ALIAS",
+            "id": "VariableID:8322:789"
+          }
+        ]
+      }
+    },
+    {
+      "id": "8843:22532",
+      "name": "Selected / Video Embed",
+      "type": "FRAME",
+      "width": 656,
+      "height": 419.875,
+      "visible": true,
+      "horizontal": "FILL",
+      "vertical": "HUG",
+      "layoutMode": "VERTICAL",
+      "padding": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "strokes": 1,
+      "boundVariables": {
+        "itemSpacing": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:8322:814"
+        },
+        "fills": [
+          {
+            "type": "VARIABLE_ALIAS",
+            "id": "VariableID:8322:789"
+          }
+        ],
+        "strokes": [
+          {
+            "type": "VARIABLE_ALIAS",
+            "id": "VariableID:8322:792"
+          }
+        ]
+      }
+    },
+    {
+      "id": "8843:22274",
+      "name": "Canvas viewport",
+      "type": "FRAME",
+      "width": 824,
+      "height": 762,
+      "visible": true,
+      "horizontal": "FIXED",
+      "vertical": "FIXED",
+      "layoutMode": "VERTICAL",
+      "padding": [
+        24,
+        24,
+        24,
+        24
+      ],
+      "strokes": 1,
+      "boundVariables": {
+        "itemSpacing": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:8322:814"
+        },
+        "paddingLeft": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:8322:816"
+        },
+        "paddingTop": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:8322:816"
+        },
+        "paddingRight": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:8322:816"
+        },
+        "paddingBottom": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:8322:816"
+        },
+        "fills": [
+          {
+            "type": "VARIABLE_ALIAS",
+            "id": "VariableID:8322:789"
+          }
+        ]
+      }
+    },
+    {
+      "id": "9051:19953",
+      "name": "Video player / ratio box",
+      "type": "FRAME",
+      "width": 622,
+      "height": 349.875,
+      "visible": true,
+      "horizontal": "FILL",
+      "vertical": "FIXED",
+      "layoutMode": "VERTICAL",
+      "padding": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "strokes": 1,
+      "boundVariables": {
+        "height": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:9051:17505"
+        }
+      }
+    },
+    {
+      "id": "9051:19954",
+      "name": "Preview poster",
+      "type": "FRAME",
+      "width": 622,
+      "height": 349.875,
+      "visible": true,
+      "horizontal": "FILL",
+      "vertical": "FILL",
+      "layoutMode": "VERTICAL",
+      "padding": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "strokes": 1,
+      "boundVariables": {
+        "visible": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:9051:17506"
+        }
+      }
+    },
+    {
+      "id": "9051:19957",
+      "name": "Unsupported video source",
+      "type": "FRAME",
+      "width": 622,
+      "height": 174.9375,
+      "visible": false,
+      "horizontal": "FIXED",
+      "vertical": "FIXED",
+      "layoutMode": "VERTICAL",
+      "padding": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "strokes": 1,
+      "boundVariables": {
+        "visible": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:9051:17507"
+        }
+      }
+    },
+    {
+      "id": "9051:17523",
+      "name": "R44 / Video ratio",
+      "type": "FRAME",
+      "width": 318,
+      "height": 130,
+      "visible": false,
+      "horizontal": "FIXED",
+      "vertical": "HUG",
+      "layoutMode": "VERTICAL",
+      "padding": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "strokes": 1,
+      "boundVariables": {
+        "visible": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:9051:17484"
+        }
+      }
+    },
+    {
+      "id": "9051:17524",
+      "name": "Property / Video ratio",
+      "type": "FRAME",
+      "width": 318,
+      "height": 34,
+      "visible": true,
+      "horizontal": "FILL",
+      "vertical": "HUG",
+      "layoutMode": "HORIZONTAL",
+      "padding": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "strokes": 1,
+      "boundVariables": {}
+    },
+    {
+      "id": "9051:17526",
+      "name": "Field / Ratio",
+      "type": "INSTANCE",
+      "width": 204,
+      "height": 34,
+      "visible": true,
+      "horizontal": "FILL",
+      "vertical": "FIXED",
+      "layoutMode": "HORIZONTAL",
+      "padding": [
+        8,
+        8,
+        0,
+        0
+      ],
+      "strokes": 1,
+      "boundVariables": {
+        "itemSpacing": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:8322:811"
+        },
+        "topLeftRadius": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:8322:823"
+        },
+        "topRightRadius": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:8322:823"
+        },
+        "bottomLeftRadius": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:8322:823"
+        },
+        "bottomRightRadius": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:8322:823"
+        },
+        "fills": [
+          {
+            "type": "VARIABLE_ALIAS",
+            "id": "VariableID:8322:789"
+          }
+        ],
+        "strokes": [
+          {
+            "type": "VARIABLE_ALIAS",
+            "id": "VariableID:8322:786"
+          }
+        ]
+      }
+    },
+    {
+      "id": "8844:265292",
+      "name": "This video · all breakpoints. URL and playback settings stay unchanged.",
+      "type": "TEXT",
+      "width": 352,
+      "height": 40,
+      "visible": true,
+      "horizontal": "FILL",
+      "vertical": "HUG",
+      "strokes": 1,
+      "boundVariables": {
+        "fills": [
+          {
+            "type": "VARIABLE_ALIAS",
+            "id": "VariableID:8322:780"
+          }
+        ]
+      },
+      "text": "This video · all breakpoints. URL and playback settings stay unchanged.",
+      "textAutoResize": "HEIGHT"
+    },
+    {
+      "id": "9055:17502",
+      "name": "R44 / Video / Source",
+      "type": "FRAME",
+      "width": 600,
+      "height": 314,
+      "visible": true,
+      "horizontal": "FIXED",
+      "vertical": "HUG",
+      "layoutMode": "VERTICAL",
+      "padding": [
+        24,
+        24,
+        24,
+        24
+      ],
+      "strokes": 1,
+      "boundVariables": {
+        "itemSpacing": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:8322:814"
+        },
+        "paddingLeft": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:8322:816"
+        },
+        "paddingTop": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:8322:816"
+        },
+        "paddingRight": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:8322:816"
+        },
+        "paddingBottom": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:8322:816"
+        },
+        "topLeftRadius": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:8322:825"
+        },
+        "topRightRadius": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:8322:825"
+        },
+        "bottomLeftRadius": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:8322:825"
+        },
+        "bottomRightRadius": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:8322:825"
+        },
+        "fills": [
+          {
+            "type": "VARIABLE_ALIAS",
+            "id": "VariableID:8322:789"
+          }
+        ]
+      }
+    },
+    {
+      "id": "9055:17510",
+      "name": "Action / https://www.youtube.com/watch?v=jNQXAC9IVRw",
+      "type": "INSTANCE",
+      "width": 552,
+      "height": 42,
+      "visible": true,
+      "horizontal": "FILL",
+      "vertical": "HUG",
+      "layoutMode": "HORIZONTAL",
+      "padding": [
+        10,
+        10,
+        0,
+        0
+      ],
+      "strokes": 1,
+      "boundVariables": {
+        "topLeftRadius": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:8322:824"
+        },
+        "topRightRadius": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:8322:824"
+        },
+        "bottomLeftRadius": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:8322:824"
+        },
+        "bottomRightRadius": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:8322:824"
+        },
+        "fills": [
+          {
+            "type": "VARIABLE_ALIAS",
+            "id": "VariableID:8322:789"
+          }
+        ],
+        "strokes": [
+          {
+            "type": "VARIABLE_ALIAS",
+            "id": "VariableID:8322:786"
+          }
+        ]
+      }
+    },
+    {
+      "id": "9055:17512",
+      "name": "Text",
+      "type": "TEXT",
+      "width": 552,
+      "height": 20,
+      "visible": false,
+      "horizontal": "FIXED",
+      "vertical": "FIXED",
+      "strokes": 1,
+      "boundVariables": {
+        "visible": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:9055:17498"
+        },
+        "characters": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:9055:17497"
+        },
+        "fills": [
+          {
+            "type": "VARIABLE_ALIAS",
+            "id": "VariableID:8322:780"
+          }
+        ]
+      },
+      "text": "",
+      "textAutoResize": "HEIGHT"
+    },
+    {
+      "id": "9055:17522",
+      "name": "Action / Cancel",
+      "type": "INSTANCE",
+      "width": 590,
+      "height": 32,
+      "visible": true,
+      "horizontal": "FILL",
+      "vertical": "FIXED",
+      "layoutMode": "HORIZONTAL",
+      "padding": [
+        10,
+        10,
+        0,
+        0
+      ],
+      "strokes": 1,
+      "boundVariables": {
+        "topLeftRadius": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:8322:824"
+        },
+        "topRightRadius": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:8322:824"
+        },
+        "bottomLeftRadius": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:8322:824"
+        },
+        "bottomRightRadius": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:8322:824"
+        },
+        "fills": [
+          {
+            "type": "VARIABLE_ALIAS",
+            "id": "VariableID:8322:789"
+          }
+        ],
+        "strokes": [
+          {
+            "type": "VARIABLE_ALIAS",
+            "id": "VariableID:8322:786"
+          }
+        ]
+      }
+    }
+  ],
+  "playerDefault": {
+    "width": 622,
+    "height": 349.875,
+    "expectedWidth": 622,
+    "expectedHeight": 349.875,
+    "ratio16by9Matches": true
+  },
+  "mobileGeometry": "277 width is derived from the authored viewport-minus-98 expression; no Mobile state was executed in this audit. Geometry assertions apply only to the current default state.",
+  "routes": {
+    "toSharedStyle": 83,
+    "gated": 83,
+    "ungated": [],
+    "wrongGateExpression": [],
+    "nodes": [
+      "8467:85",
+      "8468:445",
+      "8468:244789",
+      "8468:244842",
+      "8507:2858",
+      "8507:246931",
+      "8507:247361",
+      "8507:247771",
+      "8842:14553",
+      "8842:14565",
+      "8843:17016",
+      "8843:17034",
+      "8843:17320",
+      "8843:17332",
+      "8843:17618",
+      "8843:17630",
+      "8843:17893",
+      "8843:18231",
+      "8843:18588",
+      "8843:18905",
+      "8843:19228",
+      "8843:19527",
+      "8843:19814",
+      "8843:20101",
+      "8843:20388",
+      "8843:20675",
+      "8905:18143",
+      "8843:20991",
+      "8843:21309",
+      "8843:21602",
+      "8843:21877",
+      "8843:21895",
+      "8843:21901",
+      "8843:22164",
+      "8843:22445",
+      "8843:22463",
+      "8843:22745",
+      "8843:23020",
+      "8843:23288",
+      "8843:23556",
+      "8843:23844",
+      "8843:24131",
+      "8843:24418",
+      "8843:24686",
+      "8843:24954",
+      "8843:25222",
+      "8863:17136",
+      "8843:25490",
+      "8843:25811",
+      "8843:26132",
+      "8843:26453",
+      "8843:26774",
+      "8843:27042",
+      "8843:27310",
+      "8843:27578",
+      "8843:27846",
+      "8843:28114",
+      "8843:28382",
+      "8843:28650",
+      "8843:28918",
+      "8843:29186",
+      "8843:29454",
+      "8843:29722",
+      "8843:29990",
+      "8843:30258",
+      "8843:30526",
+      "8843:30797",
+      "8843:31131",
+      "8843:31436",
+      "8843:31729",
+      "8843:32000",
+      "8843:32271",
+      "8844:265290",
+      "8844:265293",
+      "8844:265296",
+      "8844:265299",
+      "8844:265302",
+      "8884:17463",
+      "8884:17697",
+      "8884:17931",
+      "9026:17688",
+      "9051:17536",
+      "9051:17547"
+    ]
+  },
+  "oldStateWriters": [],
+  "closePersistence": [
+    {
+      "id": "8841:14864",
+      "name": "R35 / Inspector / Shared Style",
+      "triggers": [
+        {
+          "type": "ON_KEY_DOWN",
+          "device": "KEYBOARD",
+          "keyCodes": [
+            27
+          ]
+        }
+      ],
+      "actionCount": 4346,
+      "variableWrites": 4290,
+      "closeActions": 1,
+      "ratioWrites": 0,
+      "rawWrites": 0,
+      "heightWrites": 0
+    },
+    {
+      "id": "8841:14868",
+      "name": "Action / Close",
+      "triggers": [
+        {
+          "type": "ON_CLICK"
+        }
+      ],
+      "actionCount": 4448,
+      "variableWrites": 4392,
+      "closeActions": 1,
+      "ratioWrites": 0,
+      "rawWrites": 0,
+      "heightWrites": 0
+    },
+    {
+      "id": "8841:15383",
+      "name": "Action / Back to Settings",
+      "triggers": [
+        {
+          "type": "ON_CLICK"
+        }
+      ],
+      "actionCount": 4448,
+      "variableWrites": 4392,
+      "closeActions": 1,
+      "ratioWrites": 0,
+      "rawWrites": 0,
+      "heightWrites": 0
+    },
+    {
+      "id": "8843:22522",
+      "name": "Action / Reset sample",
+      "triggers": [
+        {
+          "type": "ON_CLICK"
+        }
+      ],
+      "actionCount": 53,
+      "variableWrites": 46,
+      "closeActions": 0,
+      "ratioWrites": 3,
+      "rawWrites": 1,
+      "heightWrites": 3
+    }
+  ],
+  "caveats": [
+    "Route gating verifies immediate active-variable assignment with caller equals video-embed before every inspected shared Style destination; it does not execute each caller or prove the caller value is initialized correctly in every branch.",
+    "Close persistence action counts establish retained live actions; no pre-authoring byte-level snapshot was available to this audit.",
+    "Hidden Video Style section defaults were inspected structurally; visible-all-states layout and provider playback remain outside this audit."
+  ],
+  "referenceSummary": {
+    "roots": 6,
+    "nodes": 412,
+    "visibleNodes": 186,
+    "instances": 165,
+    "uniqueComponents": 5,
+    "uniqueDestinations": 47,
+    "missing": 0,
+    "errors": 0
+  },
+  "layoutSummary": {
+    "geometryChecks": 180,
+    "expectedScrolling": 0,
+    "clippingCandidates": 0,
+    "unclippedOverflow": 0,
+    "skippedRotated": 0
+  },
+  "checkpoint": "Final native audit after reset/history corrections and source dialog addition; default-state geometry only."
+}

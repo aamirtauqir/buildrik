@@ -1,0 +1,29 @@
+[
+  {
+    "label": "About options from manager after Escape",
+    "x": 970,
+    "y": 420
+  },
+  {
+    "label": "Duplicate About",
+    "x": 720,
+    "y": 509
+  },
+  {
+    "label": "Open copied page",
+    "x": 720,
+    "y": 503
+  },
+  {
+    "label": "Pages including copy",
+    "x": 109,
+    "y": 157,
+    "shot": "r31-drawer-copy-row.png"
+  },
+  {
+    "label": "Copy direct Options",
+    "x": 286,
+    "y": 327,
+    "shot": "r31-drawer-copy-options.png"
+  }
+]

@@ -1,0 +1,1 @@
+{"content":[{"type":"text","text":"Error: in set_y: This property cannot be overridden in an instance: relative-transform\n    at set (<input>:75:11)\n    at overlay (PLUGIN_9_SOURCE:69:979)\n"},{"type":"text","text":"Figma Debug UUID: 828cfac7-7415-445e-a9d5-856ed84cbdbd"}],"structuredContent":{"safeToRetryWithoutCanvasRead":true,"error_code":"INVALID_ARGUMENT"},"isError":true}

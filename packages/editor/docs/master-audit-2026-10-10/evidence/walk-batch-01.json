@@ -1,0 +1,20 @@
+[
+  {
+    "label": "Choose Heading On click trigger",
+    "x": 530,
+    "y": 262,
+    "shot": "walk-01-trigger-selected.png"
+  },
+  {
+    "label": "Return to Heading",
+    "x": 1260,
+    "y": 430,
+    "shot": "walk-02-heading-return.png"
+  },
+  {
+    "label": "Open text style picker",
+    "x": 1240,
+    "y": 315,
+    "shot": "walk-03-text-styles.png"
+  }
+]

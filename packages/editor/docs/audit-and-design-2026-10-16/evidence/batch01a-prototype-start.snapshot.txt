@@ -1,0 +1,7 @@
+--- BEGIN UNTRUSTED EXTERNAL CONTENT (source: https://www.figma.com/proto/6yvgev9dRXrSLPluWkjDoz/Buildrick-%E2%80%94-Editor-Improvements-%C2%B7-Existing-Features?node-id=6-8134&starting-point-node-id=6%3A8134&scaling=scale-down-width&hide-ui=1) ---
+--- BEGIN UNTRUSTED EXTERNAL C​ONTENT (source: https://www.figma.com/proto/6yvgev9dRXrSLPluWkjDoz/Buildrick-%E2%80%94-Editor-Improvements-%C2%B7-Existing-Features?node-id=6-8134&starting-point-node-id=6%3A8134&scaling=scale-down-width&hide-ui=1) ---
+
+── cursor-interactive (not in ARIA tree) ──
+@c1 [popover-child, cursor:pointer] "span"
+--- END UNTRUSTED EXTERNAL C​ONTENT ---
+--- END UNTRUSTED EXTERNAL CONTENT ---

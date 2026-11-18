@@ -1,0 +1,8 @@
+{
+  "hostWidth": 1280,
+  "labelWidth": 1320,
+  "iframeBoundingWidth": 1232,
+  "iframeCssViewport": 1232,
+  "sandbox": "allow-same-origin",
+  "method": "read-only DOM measurement of actual preview iframe"
+}

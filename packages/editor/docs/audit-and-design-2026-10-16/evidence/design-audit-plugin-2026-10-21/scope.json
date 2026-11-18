@@ -1,0 +1,52 @@
+{
+  "fileKey": "2L9OTGzBrL6kYmU18yA1c7",
+  "requestedPlugin": "1642857294716409032",
+  "mode": "read-only audit",
+  "pages": [
+    {
+      "id": "0:1",
+      "name": "00 \u00b7 Read me"
+    },
+    {
+      "id": "3:2",
+      "name": "01 \u00b7 Foundations"
+    },
+    {
+      "id": "3:3",
+      "name": "02 \u00b7 Components"
+    },
+    {
+      "id": "3:4",
+      "name": "03 \u00b7 Editor"
+    },
+    {
+      "id": "3:5",
+      "name": "04 \u00b7 Inspector"
+    },
+    {
+      "id": "3:6",
+      "name": "05 \u00b7 Resources"
+    },
+    {
+      "id": "3:7",
+      "name": "06 \u00b7 Site delivery"
+    },
+    {
+      "id": "3:8",
+      "name": "07 \u00b7 Recovery and access"
+    },
+    {
+      "id": "3:9",
+      "name": "08 \u00b7 First run"
+    },
+    {
+      "id": "3:10",
+      "name": "09 \u00b7 Play journeys"
+    },
+    {
+      "id": "326:1653",
+      "name": "10 \u00b7 Archived Inspector skill study"
+    }
+  ],
+  "note": "Pre-run page inventory snapshot; execution coverage and results are recorded in README.md. Archived page is separate from current design."
+}

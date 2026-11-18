@@ -1,0 +1,132 @@
+{
+  "mutatedNodeIds": [
+    "307:22037",
+    "307:22272",
+    "312:23202",
+    "312:23363",
+    "312:24303",
+    "312:24464",
+    "312:25432",
+    "312:25593",
+    "312:26563",
+    "312:26724",
+    "397:26117",
+    "397:26244",
+    "397:27334",
+    "397:27467"
+  ],
+  "rows": [
+    {
+      "control": "397:25594",
+      "row": "307:22036",
+      "width": 1416,
+      "labelWidth": 1218,
+      "controlX": 1226,
+      "controlRight": 1416
+    },
+    {
+      "control": "397:25597",
+      "row": "307:22271",
+      "width": 1416,
+      "labelWidth": 1218,
+      "controlX": 1226,
+      "controlRight": 1416
+    },
+    {
+      "control": "397:25600",
+      "row": "312:23201",
+      "width": 1416,
+      "labelWidth": 1218,
+      "controlX": 1226,
+      "controlRight": 1416
+    },
+    {
+      "control": "397:25603",
+      "row": "312:23362",
+      "width": 1416,
+      "labelWidth": 1218,
+      "controlX": 1226,
+      "controlRight": 1416
+    },
+    {
+      "control": "397:25606",
+      "row": "312:24302",
+      "width": 1416,
+      "labelWidth": 1218,
+      "controlX": 1226,
+      "controlRight": 1416
+    },
+    {
+      "control": "397:25609",
+      "row": "312:24463",
+      "width": 1416,
+      "labelWidth": 1218,
+      "controlX": 1226,
+      "controlRight": 1416
+    },
+    {
+      "control": "397:25612",
+      "row": "312:25431",
+      "width": 1416,
+      "labelWidth": 1218,
+      "controlX": 1226,
+      "controlRight": 1416
+    },
+    {
+      "control": "397:25615",
+      "row": "312:25592",
+      "width": 1416,
+      "labelWidth": 1218,
+      "controlX": 1226,
+      "controlRight": 1416
+    },
+    {
+      "control": "397:25618",
+      "row": "312:26562",
+      "width": 1416,
+      "labelWidth": 1218,
+      "controlX": 1226,
+      "controlRight": 1416
+    },
+    {
+      "control": "397:25621",
+      "row": "312:26723",
+      "width": 1416,
+      "labelWidth": 1218,
+      "controlX": 1226,
+      "controlRight": 1416
+    },
+    {
+      "control": "397:26118",
+      "row": "397:26116",
+      "width": 1416,
+      "labelWidth": 1218,
+      "controlX": 1226,
+      "controlRight": 1416
+    },
+    {
+      "control": "397:26245",
+      "row": "397:26243",
+      "width": 1416,
+      "labelWidth": 1218,
+      "controlX": 1226,
+      "controlRight": 1416
+    },
+    {
+      "control": "397:27335",
+      "row": "397:27333",
+      "width": 1416,
+      "labelWidth": 1218,
+      "controlX": 1226,
+      "controlRight": 1416
+    },
+    {
+      "control": "397:27468",
+      "row": "397:27466",
+      "width": 1416,
+      "labelWidth": 1218,
+      "controlX": 1226,
+      "controlRight": 1416
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+[
+ {"x":720,"y":451,"wait":2600,"shot":"r42-form-admin-recipient-saved.png"},
+ {"x":720,"y":621},
+ {"x":720,"y":499,"shot":"r42-form-admin-invalid-recipient.png"},
+ {"press":"Escape","shot":"r42-form-admin-dirty-exit.png"},
+ {"x":720,"y":575,"shot":"r42-form-admin-discard-keeps-recipient.png"}
+]

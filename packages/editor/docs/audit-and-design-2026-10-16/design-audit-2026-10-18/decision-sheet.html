@@ -1,0 +1,572 @@
+<title>Buildrick Owner Decisions</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column of decision cards; each card = issue → option mockups side by side → pick */
+:root{
+  --bg:#F3F4F6; --panel:#FFFFFF; --ink:#111827; --soft:#4B5563; --muted:#6C7079;
+  --line:#E5E7EB; --line2:#D1D5DB; --input:#868C97;
+  --accent:#1A56DB; --accent-h:#1E429F; --tint:#EBF5FF; --subtle:#E1EFFE;
+  --ok:#057A55; --ok-t:#DEF7EC; --warn:#723B13; --warn-t:#FDFDEA; --err:#C81E1E; --err-t:#FDE8E8;
+  --guide:#F05252;
+  --ui:"Inter",ui-sans-serif,sans-serif; --mono:"Geist Mono",ui-monospace,monospace;
+  --mk-bg:#FFFFFF; --mk-app:#F3F4F6;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1218; --panel:#171B23; --ink:#F3F4F6; --soft:#C3C8D2; --muted:#9AA1AD;
+  --line:#272D38; --line2:#343B48; --input:#6B7380;
+  --accent:#76A9FA; --accent-h:#A4CAFE; --tint:#16233B; --subtle:#1C2D4D;
+  --ok:#31C48D; --ok-t:#10261E; --warn:#FACA15; --warn-t:#2A2410; --err:#F98080; --err-t:#2C1515;
+  --mk-bg:#FFFFFF; --mk-app:#F3F4F6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1218; --panel:#171B23; --ink:#F3F4F6; --soft:#C3C8D2; --muted:#9AA1AD;
+  --line:#272D38; --line2:#343B48; --input:#6B7380;
+  --accent:#76A9FA; --accent-h:#A4CAFE; --tint:#16233B; --subtle:#1C2D4D;
+  --ok:#31C48D; --ok-t:#10261E; --warn:#FACA15; --warn-t:#2A2410; --err:#F98080; --err-t:#2C1515;
+  --mk-bg:#FFFFFF; --mk-app:#F3F4F6; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 14px/1.55 var(--ui);margin:0}
+.wrap{max-width:1120px;margin:0 auto;padding-block:28px 80px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{display:grid;gap:10px;margin-bottom:18px}
+h1{font-size:24px;line-height:32px;font-weight:600;margin:0;text-wrap:balance}
+.lede{color:var(--soft);max-width:72ch;margin:0}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding-block:10px;border-bottom:1px solid var(--line);margin-bottom:18px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.prog{font:500 13px/20px var(--mono);font-variant-numeric:tabular-nums;color:var(--soft);margin-right:auto}
+.prog b{color:var(--ink)}
+.track{height:4px;border-radius:2px;background:var(--line);width:160px;overflow:hidden;display:inline-block;vertical-align:middle;margin-left:8px}
+.track i{display:block;height:100%;background:var(--accent);width:0}
+button,select,textarea{font:inherit;color:inherit}
+.f{border:1px solid var(--line2);background:var(--panel);border-radius:8px;height:32px;padding:0 12px;font-size:13px;cursor:pointer}
+.f[aria-pressed="true"]{background:var(--subtle);border-color:var(--accent);color:var(--ink)}
+.f:focus-visible,.opt:focus-within,textarea:focus-visible,.save:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.primary:hover{background:var(--accent-h)}
+.status{font-size:13px;color:var(--muted)}
+.grp{margin:34px 0 10px;display:flex;align-items:baseline;gap:10px}
+.grp h2{font-size:16px;line-height:24px;font-weight:600;margin:0}
+.grp span{color:var(--muted);font-size:13px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px;margin-bottom:14px;display:grid;gap:12px}
+.card.done{border-color:var(--line2)}
+.chead{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.id{font:500 12px/16px var(--mono);color:var(--muted)}
+.card h3{font-size:15px;line-height:22px;font-weight:600;margin:0;flex:1 1 320px;text-wrap:balance}
+.sev{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:999px}
+.sev.c{background:var(--err-t);color:var(--err)} .sev.m{background:var(--warn-t);color:var(--warn)} .sev.n{background:var(--line);color:var(--soft)}
+.pickd{font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--ok-t);color:var(--ok)}
+.issue{color:var(--soft);max-width:80ch;margin:0}
+.ev{font:400 12px/16px var(--mono);color:var(--muted)}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.opt{border:1px solid var(--line);border-radius:8px;padding:12px;display:grid;gap:8px;align-content:start;cursor:pointer;position:relative;min-width:0}
+.opt:hover{border-color:var(--line2)}
+.opt.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.opt input{position:absolute;opacity:0;pointer-events:none}
+.ohead{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ok{font:600 12px/16px var(--mono);color:var(--muted)}
+.olabel{font-weight:600;font-size:13px}
+.rec{font-size:11px;font-weight:600;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:1px 7px}
+.odesc{font-size:13px;color:var(--soft);margin:0}
+.why{border-left:3px solid var(--accent);padding:2px 0 2px 12px;font-size:13px;color:var(--ink);margin:0;max-width:86ch}
+.why b{font-weight:600}
+.note{display:grid;gap:6px}
+.note textarea{min-height:56px;border:1px solid var(--line2);background:var(--panel);border-radius:8px;padding:8px 10px;font-size:13px;resize:vertical;width:100%}
+.save{justify-self:start}
+.ro{font-size:12px;color:var(--muted)}
+.hidden{display:none}
+/* ---- mockup kit: always light, it shows the product's own chrome ---- */
+.mk{background:var(--mk-app);border-radius:6px;padding:10px;min-height:120px;display:grid;place-items:center;overflow:hidden;color:#111827;font:400 12px/16px var(--ui);border:1px solid #E5E7EB}
+.mk *{box-sizing:border-box}
+.mk .p{background:#fff;border:1px solid #E5E7EB;border-radius:8px;width:100%;max-width:300px;overflow:hidden}
+.mk .dh{padding:10px 12px 4px;font-weight:600;font-size:13px}
+.mk .db{padding:0 12px 10px;color:#4B5563}
+.mk .df{display:flex;gap:6px;justify-content:flex-end;padding:8px 12px;border-top:1px solid #E5E7EB}
+.mk .b{height:24px;padding:0 9px;border-radius:6px;border:1px solid #D1D5DB;background:#fff;font-size:11px;display:inline-flex;align-items:center;white-space:nowrap}
+.mk .b.pr{background:#1A56DB;border-color:#1A56DB;color:#fff}
+.mk .b.dg{background:#E02424;border-color:#E02424;color:#fff}
+.mk .b.ds{opacity:.45}
+.mk .in{height:24px;border:1px solid #868C97;border-radius:6px;margin:6px 0;padding:0 8px;display:flex;align-items:center;color:#6C7079;font-size:11px}
+.mk .toast{background:#111827;color:#fff;border-radius:6px;padding:8px 10px;display:flex;gap:10px;align-items:center;font-size:11px;max-width:290px}
+.mk .toast a{color:#A4CAFE;font-weight:600}
+.mk .menu{background:#fff;border:1px solid #E5E7EB;border-radius:8px;box-shadow:0 4px 6px rgba(0,0,0,.1);width:190px;padding:4px 0;font-size:11px}
+.mk .mi{height:22px;padding:0 10px;display:flex;justify-content:space-between;align-items:center}
+.mk .mi.h{background:#EBF5FF}
+.mk .mi.dz{color:#C81E1E}
+.mk .mi.cx{color:#1A56DB;font-weight:500}
+.mk .mi.dim{color:#9CA3AF}
+.mk .sep{height:1px;background:#E5E7EB;margin:3px 0}
+.mk .gl{padding:4px 10px 2px;font-size:10px;color:#6C7079;font-weight:600}
+.mk .k{font-family:var(--mono);color:#6C7079;font-size:10px}
+.mk .row{display:flex;align-items:center;gap:8px;padding:0 10px;border-bottom:1px solid #F3F4F6;font-size:11px}
+.mk .th{background:#E5E7EB;border-radius:3px;flex:none}
+.mk .sub{color:#6C7079;font-size:10px}
+.mk .chip{font-size:10px;padding:1px 6px;border-radius:999px;background:#F3F4F6;color:#4B5563}
+.mk .chip.a{background:#E1EFFE;color:#1A56DB}
+.mk .chip.w{background:#FDFDEA;color:#723B13}
+.mk .chip.e{background:#FDE8E8;color:#C81E1E}
+.mk .chip.g{background:#DEF7EC;color:#057A55}
+.mk .cv{position:relative;background:#fff;border:1px solid #E5E7EB;width:100%;max-width:300px;height:120px;border-radius:4px}
+.mk .sel{position:absolute;border:1.5px solid #1A56DB}
+.mk .h8{position:absolute;width:7px;height:7px;background:#fff;border:1.5px solid #1A56DB}
+.mk .blk{position:absolute;background:#F3F4F6;border-radius:2px}
+.mk .tb{display:flex;gap:4px;align-items:center;background:#fff;border:1px solid #E5E7EB;border-radius:6px;padding:3px;box-shadow:0 1px 2px rgba(0,0,0,.08);font-size:10px;position:absolute}
+.mk .tb span{padding:2px 6px;border-radius:4px}
+.mk .banner{width:100%;max-width:300px;border-radius:6px;padding:8px 10px;font-size:11px;display:flex;gap:8px;align-items:center}
+.mk .code{font-family:var(--mono);font-size:10px;background:#fff;border:1px solid #E5E7EB;border-radius:6px;padding:6px 8px;color:#374151;width:100%;max-width:300px}
+.mk .stack{display:grid;gap:6px;justify-items:center;width:100%}
+.mk .muted{color:#6C7079}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>Buildrick owner decisions — 18 Oct 2026</h1>
+    <p class="lede">Every decision the 18 Oct design-doc audit left open. Each card shows the issue with its evidence, the options as small mockups of the editor, and my recommendation with the reason tied to that issue. Pick an option and save; I read your answers from here and apply them to the panel docs. Decisions already made under SC-22 (panels 14–25) are not repeated.</p>
+  </header>
+  <div class="bar" role="toolbar" aria-label="Filter and progress">
+    <span class="prog" id="prog">Loading answers…</span>
+    <button class="f" id="fAll" aria-pressed="true">All</button>
+    <button class="f" id="fOpen" aria-pressed="false">Unanswered</button>
+    <button class="f" id="fDiff" aria-pressed="false">Differs from my recommendation</button>
+    <button class="f primary" id="acceptAll">Accept recommendations for unanswered</button>
+  </div>
+  <div id="confirmBox" class="card hidden" role="alertdialog" aria-labelledby="cbT">
+    <strong id="cbT">Accept my recommendation for every unanswered decision?</strong>
+    <span class="issue" id="cbB"></span>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="f primary" id="cbYes">Accept them</button><button class="f" id="cbNo">Cancel</button></div>
+  </div>
+  <p class="status" id="saveState" role="status" aria-live="polite"></p>
+  <main id="list"></main>
+</div>
+
+<script>
+// ---------- mockup helpers (product chrome, always light) ----------
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const mk=inner=>`<div class="mk" aria-hidden="true">${inner}</div>`;
+const B=(t,k="")=>`<span class="b ${k}">${t}</span>`;
+const dlg=(title,body,btns,extra="")=>mk(`<div class="p"><div class="dh">${title}</div><div class="db">${body}${extra}</div><div class="df">${btns.join("")}</div></div>`);
+const toast=(msg,acts=[])=>mk(`<div class="toast"><span>${msg}</span>${acts.map(a=>`<a>${a}</a>`).join("")}</div>`);
+const menu=groups=>mk(`<div class="menu">${groups.map(g=>g.map(i=>{const [t,k="",c=""]=Array.isArray(i)?i:[i];return t.startsWith("§")?`<div class="gl">${t.slice(1)}</div>`:`<div class="mi ${c}"><span>${t}</span><span class="k">${k}</span></div>`}).join("")).join('<div class="sep"></div>')}</div>`);
+const rows=(items,h,thumb)=>mk(`<div class="p">${items.map(([t,s,c])=>`<div class="row" style="height:${h}px">${thumb?`<span class="th" style="width:${h-12}px;height:${h-12}px"></span>`:""}<div style="flex:1;min-width:0"><div>${t}</div>${s&&h>=40?`<div class="sub">${s}</div>`:""}</div>${c||""}</div>`).join("")}</div>`);
+const banner=(tone,msg,act="")=>{const t={i:["#F3F4F6","#4B5563"],a:["#EBF5FF","#1A56DB"],w:["#FDFDEA","#723B13"],e:["#FDE8E8","#C81E1E"]}[tone];return `<div class="banner" style="background:${t[0]};color:${t[1]}">ⓘ <span style="flex:1">${msg}</span>${act?`<b>${act}</b>`:""}</div>`};
+const canvas=inner=>mk(`<div class="cv">${inner}</div>`);
+const box=(x,y,w,h,handles=true,col="#1A56DB")=>`<div class="sel" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;border-color:${col}"></div>`+(handles?[[0,0],[w,0],[0,h],[w,h],[w/2,0],[w/2,h],[0,h/2],[w,h/2]].map(([a,b])=>`<div class="h8" style="left:${x+a-3.5}px;top:${y+b-3.5}px;border-color:${col}"></div>`).join(""):"");
+const blk=(x,y,w,h)=>`<div class="blk" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px"></div>`;
+const code=t=>mk(`<div class="code">${t}</div>`);
+const stack=(...p)=>mk(`<div class="stack">${p.join("")}</div>`);
+const chip=(t,k="")=>`<span class="chip ${k}">${t}</span>`;
+
+// ---------- the decisions ----------
+// sev: c critical, m major, n minor. rec = recommended option key.
+const G=[
+["safe","Data safety and recovery","Where a wrong choice loses someone's work"],
+["scope","Scope of this version","What ships, what waits, what goes"],
+["canvas","Canvas and editing","How editing gestures behave"],
+["nav","Navigation and content","Where things live and how they read"],
+["vis","Visual system","One value per rule, so every panel looks like one product"],
+["proc","Process","Before Figma"]];
+
+const D=[
+{id:"S1",g:"safe",sev:"c",t:"“Restore my edits” after a crash or conflict",
+ issue:"The recovery banner's Restore writes the kept local copy over the server. If a teammate saved newer work meanwhile, it is overwritten with no warning. Panel 22 keeps the action unchanged; the IA record IAF-22 says check the server first. A fix exists on an unmerged branch.",
+ ev:"T5-01 · P22 §5.2/§7 · IAF-22 H · INV 1476–1477 (BK-04, P0)",
+ o:[["A","Check server first","Compare the copy's time with the server's last save. Server older → Restore as today. Server newer → “Download my copy” and “Compare”; never a silent overwrite.",
+   ()=>stack(banner("w","Someone saved this page after your copy (2 min ago).","Compare"),`<div style="display:flex;gap:6px">${B("Download my copy")}${B("Compare","pr")}</div>`)],
+  ["B","Keep Restore, add a warning","Same overwrite, with a confirm that says newer work may be lost.",
+   ()=>dlg("Restore your edits?","This may replace changes saved by others.",[B("Cancel"),B("Restore","dg")])],
+  ["C","Download only","Remove Restore; the copy can only be downloaded.",
+   ()=>stack(banner("i","We kept your unsaved edits from 10:42."),B("Download copy"))]],
+ rec:"A",why:"The issue is overwriting <b>someone else's newer save</b>. Only A checks for that case. B still loses the teammate's work after one click past a warning. C makes the common solo case (server older, nothing to lose) worse for no gain."},
+
+{id:"S2",g:"safe",sev:"m",t:"Which actions keep a confirm dialog (SC-15)",
+ issue:"SC-15 says deletes use Undo, confirms only for a short list, and “any other confirm in panel text is overridden”. About 20 confirms in panels 01, 10, 13, 14, 15, 22, 23 and the Inspector spec contradict it, so an implementer can't tell which rule wins.",
+ ev:"CS-01 · D2-8 · D3-6 · T1-04 · T3-2 · T5-03 · T6-28",
+ o:[["A","Three classes","(a) Undo only: archive, locale remove, redirect delete, detach, update from selection, set primary. (b) Consequence confirm (live site or other people affected): replace page, republish, reload latest, overwrite, remove protection, slug change, column reduction. (c) Typed confirm: delete site, unpublish, transfer, permanent delete.",
+   ()=>stack(`<div class="toast" style="margin:0"><span>Redirect deleted</span><a>Undo</a></div>`,`<div class="p" style="max-width:240px"><div class="dh">Replace “About”?</div><div class="db">Its 14 elements are replaced by the template.</div><div class="df">${B("Cancel")}${B("Replace","pr")}</div></div>`)],
+  ["B","SC-15 strictly","Everything not on today's list becomes Undo-only, including republish and overwrite.",
+   ()=>toast("Site republished",["Undo"])],
+  ["C","Keep panel confirms","Drop the override sentence; each panel keeps its own confirms.",
+   ()=>dlg("Delete redirect?","/old-pricing → /pricing",[B("Cancel"),B("Delete","dg")])]],
+ rec:"A",why:"The conflict exists because one rule covers two different risks. Editor-only changes are fully undoable, so a dialog is friction (Undo wins). Changes to the <b>live site or another person's work</b> cannot be undone by ⌘Z, so B is unsafe there. C brings back the confirm fatigue SC-15 was written to remove."},
+
+{id:"S3",g:"safe",sev:"m",t:"One “leave with unsaved changes” dialog",
+ issue:"Four panels describe four different guard dialogs (Stay / Leave anyway / Save & leave; Keep editing / Leave and lose changes; Keep editing / Discard / Save and continue; Keep / Discard) and two of them claim to be the existing one.",
+ ev:"CS-02 · T1-01 · P01 §7.1 · P02 §7 · P10 §5 · P12",
+ o:[["A","Three buttons, Save where it exists","Keep editing (default) · Discard changes · Save and leave — the third only in surfaces with an explicit Save (Settings, CMS record, Page settings).",
+   ()=>dlg("Leave without saving?","You changed 3 settings on SEO.",[B("Discard changes"),B("Save and leave"),B("Keep editing","pr")])],
+  ["B","Two buttons everywhere","Keep editing · Leave and lose changes.",
+   ()=>dlg("Leave without saving?","Your changes will be lost.",[B("Leave and lose changes"),B("Keep editing","pr")])]],
+ rec:"A",why:"Settings and CMS records have an explicit Save, so a two-button dialog forces a user who wants to keep their work to cancel, find Save, then leave again. Showing Save only where a Save exists keeps autosaved areas (Brand, canvas) from offering a meaningless button."},
+
+{id:"S4",g:"safe",sev:"m",t:"Snapshot before “Overwrite” in a save conflict",
+ issue:"When two sessions conflict, Overwrite replaces the server version and keeps no copy of it. P22 keeps “existing confirm” only.",
+ ev:"T5-14 · P22 §5.4 · INV 1467 (BK-59)",
+ o:[["A","Auto-save “Before overwrite”","Overwrite first writes the server version to History › Saves as “Before overwrite · 10:42”, then overwrites. Toast links to it.",
+   ()=>toast("Overwritten. Previous version kept in History",["View"])],
+  ["B","Confirm only","Keep the confirm dialog; no copy.",
+   ()=>dlg("Overwrite the newer version?","The other session's changes will be lost.",[B("Cancel"),B("Overwrite","dg")])]],
+ rec:"A",why:"The risk is losing the other session's work for good. A keeps it recoverable in the History area that already exists, so even a mistaken Overwrite costs nothing. B only asks, and the dialog has no information that helps the user answer."},
+
+{id:"S5",g:"safe",sev:"m",t:"Deleting a named version in History › Saves",
+ issue:"Named-version delete has no Undo, no confirm decision and no Recently deleted. P24 defers to IAF-18, which is silent.",
+ ev:"T3-6 · P24 #45 · IAF-18 H/I",
+ o:[["A","Undo + 30-day Recently deleted","Same as pages and components (SC-15). Needs server soft delete for versions.",
+   ()=>toast("“Before launch” deleted",["Undo","Recently deleted ›"])],
+  ["B","Confirm, permanent","Dialog, then gone.",
+   ()=>dlg("Delete “Before launch”?","You can't restore this version later.",[B("Cancel"),B("Delete","dg")])]],
+ rec:"A",why:"A named version is itself a recovery point; deleting it by mistake removes the safety net the user made on purpose. A matches how every other delete in the editor already works, so there is no second rule to learn."},
+
+{id:"S6",g:"safe",sev:"m",t:"CMS record conflict: “Keep mine”",
+ issue:"When a record changed elsewhere, the user sees “Changed elsewhere — Review” but cannot see the other version, and Keep mine resends the stale copy, erasing fields the other person changed.",
+ ev:"T4-17 · P07 §5 · INV 1114, 1156",
+ o:[["A","Field diff, rebase","Show only fields that differ (mine vs theirs). Keep mine applies my changed fields on top of the latest record; untouched fields keep their new values.",
+   ()=>mk(`<div class="p"><div class="dh">Changed elsewhere</div><div class="row" style="height:28px"><b style="width:60px">Title</b><span class="muted">Spring menu</span>→<span>Spring menu 2026</span></div><div class="row" style="height:28px"><b style="width:60px">Price</b><span>$24</span><span class="chip">theirs only</span></div><div class="df">${B("Use theirs")}${B("Keep mine","pr")}</div></div>`)],
+  ["B","Two buttons as today","Use theirs / Keep mine (full overwrite).",
+   ()=>dlg("Changed elsewhere","This record was changed by someone else.",[B("Use theirs"),B("Keep mine","pr")])]],
+ rec:"A",why:"The data loss comes from resending <b>whole</b> records. Rebasing only the fields I changed removes it, and showing the differing fields makes the choice informed instead of a guess."},
+
+{id:"S7",g:"safe",sev:"m",t:"Password protection on a Vercel plan that can't protect",
+ issue:"On Vercel plans without protection, the password setting is skipped and the site publishes public with no message. No panel has a state for it.",
+ ev:"T5-08 · INV 1321 · P10 §7 · P14 §5.2",
+ o:[["A","Blocking publish check","“Your Vercel plan can't password-protect this site.” Publish blocked until the user removes protection or upgrades Vercel.",
+   ()=>stack(banner("e","Your Vercel plan can't password-protect this site.","Fix ›"),`<div style="display:flex;gap:6px">${B("Publish","pr ds")}</div>`)],
+  ["B","Tip, publish anyway","Shows a tip; site goes public.",
+   ()=>banner("w","Password protection may not apply on your Vercel plan.")]],
+ rec:"A",why:"A client who set a password expects private content; publishing it public is worse than not publishing. It is the same principle as SC-20 (never silently change what the visitor sees)."},
+
+{id:"S8",g:"safe",sev:"m",t:"“Password” field type in forms",
+ issue:"Form password values are stored in submissions and emailed in plain text. The docs have no answer.",
+ ev:"T4-7 · INV 1179 (🐞)",
+ o:[["A","Hide for new forms","Remove Password from the form field list. Existing password fields keep working, with an Inspector warning.",
+   ()=>stack(menu([["§Form fields"],["Text"],["Email"],["Phone"],["Message"]]))],
+  ["B","Keep, with warning","Field stays; Add and Inspector say values are stored and emailed as plain text.",
+   ()=>stack(banner("w","Password values are stored and emailed as plain text."))],
+  ["C","Keep as is","No change.",()=>menu([["Text"],["Email"],["Password"]])]],
+ rec:"A",why:"Site forms are contact and lead forms, not logins, so a password field has no legitimate job there but carries a real liability for the client. A keeps existing forms working, so no site breaks."},
+
+// ---- scope
+{id:"P1",g:"scope",sev:"m",t:"E-commerce",
+ issue:"Product blocks and the “Set up products collection” modal exist, but there is no design home. P03 says Defer; the preservation map says Redesign; P1-D15 is still only proposed. Stripe values are injected unescaped.",
+ ev:"T5-04 · T5-05 · P03 · CP M06-C1 · INV 1428–1433",
+ o:[["A","Defer, keep existing blocks working","No commerce in Add this version. Existing product blocks render and text/images stay editable; their Inspector shows “Commerce editing is planned”.",
+   ()=>stack(banner("i","Commerce editing is planned."))],
+  ["B","Design it now","Write a full commerce panel spec first.",()=>stack(B("New: Commerce panel spec"))],
+  ["C","Remove product blocks","Strip from Add and existing sites.",()=>banner("e","Product block removed from 3 sites")]],
+ rec:"A",why:"With no spec and a security fix outstanding, commerce is not ready to design into this release. C would break sites that already use the blocks; A keeps them alive."},
+
+{id:"P2",g:"scope",sev:"n",t:"Export “Soon” tiles (Vue, Next.js)",
+ issue:"Export shows Soon tiles. Nothing in the docs plans them, and the inventory says not to draw Soon unless planned.",
+ ev:"T5-06 · IAF-15 · INV 1420–1426",
+ o:[["A","Remove until planned","Show only formats that work (HTML, ZIP).",()=>stack(`<div style="display:flex;gap:6px">${B("HTML")}${B("ZIP")}</div>`)],
+  ["B","Keep as “Planned”","Disabled tiles with Planned label.",()=>stack(`<div style="display:flex;gap:6px">${B("HTML")}${B("ZIP")}${B("Vue · Planned","ds")}${B("Next · Planned","ds")}</div>`)]],
+ rec:"A",why:"Disabled tiles for things nobody has scheduled add choices the user can't take (Hick) and read as a promise. When a format is actually planned, add it then."},
+
+{id:"P3",g:"scope",sev:"m",t:"Brand › “From logo or URL”",
+ issue:"Panel 20 says it is not AI (deterministic colour/font extraction, “No AI”, brand-extract.service.ts). But it sits behind the dsAi flag, and SC-21 hides “Brand DS-AI entries”, so it disappears with AI.",
+ ev:"T7-22 · P20:26 · P09:33,88 · SC-21",
+ o:[["A","Ship it this version","Not AI, so SC-21 doesn't apply. Engineering moves it off the dsAi flag.",()=>stack(menu([["§Starters"],["Browse starters"],["From logo or URL","","cx"]]))],
+  ["B","Hide with AI","Stays hidden until the AI Build tab.",()=>stack(menu([["§Starters"],["Browse starters"]]))]],
+ rec:"A",why:"SC-21 removes AI, and this feature has no AI in it, so hiding it is a side effect of a shared flag, not a decision. It also directly serves job 1 (brief → branded site fast)."},
+
+{id:"P4",g:"scope",sev:"n",t:"Component variants",
+ issue:"Panel 13 has no variant-authoring UI; P1-D14 said Defer and revisit at the Components review. That review happened without a recorded decision.",
+ ev:"Q10 · P13:30 · PDB P1-D14 · RL #12",
+ o:[["A","Defer authoring","Panel 13 as written: no variant authoring this version.",()=>rows([["Button","Main component"],["Card","Main component"]],40,true)],
+  ["B","Build now","Needs a variants spec, states and engine work.",()=>rows([["Button","3 variants",chip("Primary")]],40,true)]],
+ rec:"A",why:"Panel 13 has no variant states, override rules or swap UI, so building now means designing a new system mid-release. Record the deferral so it stops showing as open."},
+
+{id:"P5",g:"scope",sev:"n",t:"The 27-component design-system catalogue",
+ issue:"27 canonical components exist in code, but no UI lists them. The only consumer is AI “insert component”, which SC-21 hides.",
+ ev:"F-AD-067 · T3-15 · INV §E1 · RL #11",
+ o:[["A","Keep in code, no UI now","Reserve it for the AI Build tab that will use it.",()=>rows([["Elements"],["Sections"],["Saved"]],32,false)],
+  ["B","Add as an Add group","New “Components” group in Add.",()=>rows([["Elements"],["Sections"],["Design-system components · 27"],["Saved"]],32,false)],
+  ["C","Delete it","Remove the catalogue.",()=>code("- catalog.ts (27 ids)")]],
+ rec:"A",why:"The Add redesign de-duplicated 54 items to 37 so each thing appears once. Many of these 27 overlap with Sections, so B would bring the duplication back. Its natural user is the future AI tab, so deleting it (C) throws away work that tab will need."},
+
+{id:"P6",g:"scope",sev:"n",t:"Classes as a selector field in the Inspector",
+ issue:"Today class names are only listed under Behaviour. The redesign list proposed class chips in the Inspector header (“Affects N”). FD-INS-02 has no class selector.",
+ ev:"RL I11 · FD-INS-02",
+ o:[["A","Defer to the classes arc","Keep names under Behaviour; design the class model (class vs element cascade) as its own spec.",()=>rows([["Behaviour › Classes","hero, cta"]],40,false)],
+  ["B","Add header chips now","Class chips + “Affects 12 elements” in the header.",()=>mk(`<div class="p"><div class="dh">Heading ${chip("hero","a")} ${chip("+ class")}</div><div class="db">Affects 12 elements</div></div>`)]],
+ rec:"A",why:"A class selector changes which elements an edit hits; without a written cascade and override model, B would create exactly the “what does this change affect?” confusion AR-03 flagged. It needs its own spec."},
+
+{id:"P7",g:"scope",sev:"m",t:"Beginner / Pro mode",
+ issue:"The toggle was removed, but the Inspector still reads a stored Beginner value, so some users are stuck in Beginner with no way out. Brand already forces Pro.",
+ ev:"T6-15 · INV 1771 · P09 §12 · RL I13",
+ o:[["A","Pro everywhere, remove Beginner","Inspector ignores the stored value; delete the Beginner path.",()=>rows([["Typography","All controls"]],40,false)],
+  ["B","Bring the toggle back","A visible Beginner/Pro switch.",()=>mk(`<div class="p"><div class="dh">Inspector <span class="chip">Beginner ▾</span></div></div>`)]],
+ rec:"A",why:"The bug is a hidden state the user can't see or change. The primary user is a professional designer, and progressive disclosure (More settings) already handles simplicity, so a second simplification mode adds a mode error without a job."},
+
+{id:"P8",g:"scope",sev:"n",t:"Scheduled publish",
+ issue:"A scheduled-publish control shows in the UI but is not wired (stub).",
+ ev:"RL U7 · INV Publish W7",
+ o:[["A","Remove the stub","Hide until it is built.",()=>stack(B("Publish","pr"))],
+  ["B","Build it","Needs scheduling backend, timezone, failure states.",()=>stack(`<div style="display:flex;gap:6px">${B("Publish","pr")}${B("Schedule…")}</div>`)]],
+ rec:"A",why:"A control that does nothing breaks trust in the publish flow, which is the north-star action. Build it later with its own spec."},
+
+{id:"P9",g:"scope",sev:"n",t:"Dark theme for the editor chrome",
+ issue:"Tokens are light only; DESIGN.md says light is canonical. The redesign list kept it as a decision.",
+ ev:"RL Z8 · DESIGN.md:107 · INV 1955",
+ o:[["A","Light only this version","",()=>mk(`<div class="p"><div class="dh">Layers</div></div>`)],
+  ["B","Add dark chrome","New token set; every state re-checked for contrast.",()=>mk(`<div class="p" style="background:#171B23;color:#F3F4F6;border-color:#272D38"><div class="dh">Layers</div></div>`)]],
+ rec:"A",why:"Dark chrome doubles the token and contrast work at the same time the light system still has drift (T7-6). Fix one theme first."},
+
+{id:"P10",g:"scope",sev:"n",t:"CMS “record history”",
+ issue:"The CMS binding spec says “record history per CMS rules”, but nothing defines it.",
+ ev:"Q6 · DYN:76",
+ o:[["A","Not this version","Recovery for records = Undo, Recently deleted, conflict diff (S6). Delete the phrase.",()=>toast("Record deleted",["Undo","Recently deleted ›"])],
+  ["B","Per-record history","A list of saves per record in the record panel.",()=>rows([["Today 10:42","Sara"],["Yesterday","You"]],40,false)]],
+ rec:"A",why:"An undefined line in an approved spec gets built as anyone imagines it. Records already have three recovery paths; per-record history is a new feature needing its own storage design."},
+
+{id:"P11",g:"scope",sev:"n",t:"Multi-reference CMS fields",
+ issue:"Multi-reference fields are not in the data model; the “contains any of” filter waits on them.",
+ ev:"Q7 · DYN:429",
+ o:[["A","Defer","Keep single reference; hide “contains any of”.",()=>rows([["Author","Reference"]],32,false)],
+  ["B","Add now","New field type + filter + binding states.",()=>rows([["Tags","Multi-reference"]],32,false)]],
+ rec:"A",why:"It touches the model, filters, bindings and publish snapshot. Not needed for the core loop's first release."},
+
+{id:"P12",g:"scope",sev:"n",t:"Features removed since September",
+ issue:"The inventory lists features removed in code (§23 of the redesign list). Docs revived a few (Wide preset, breadcrumbs, Show in Layers, one Settings row); the rest have no recorded decision.",
+ ev:"RL #20 · INV ❌ rows (126)",
+ o:[["A","Confirm the rest stay gone","Only the rows the docs revived come back.",()=>code("revived: Wide preset · breadcrumbs · Show in Layers · Y27")],
+  ["B","Review each","Go row by row before Figma.",()=>code("126 rows to review")]],
+ rec:"A",why:"The panel specs already chose which removed items to bring back, each for a stated reason. Re-opening all 126 delays design for features nobody asked to restore."},
+
+// ---- canvas
+{id:"C1",g:"canvas",sev:"m",t:"Desktop frame on laptop screens",
+ issue:"Desktop is a fixed 1440 frame; at 1280–1440 screens the canvas column is ~750–800px, so Fit shows the page at ~52%. Handle size and text legibility at that zoom aren't considered.",
+ ev:"T2 P20 · P05 §5 · REVIEW §7:71",
+ o:[["A","Keep 1440, Fit, compensate chrome","The page renders at its real width; selection handles, labels and the W×H pill keep screen size at any zoom; one-click 100%.",()=>canvas(blk(30,14,240,92)+box(60,30,120,30)+`<div class="tb" style="right:6px;bottom:6px"><span>52%</span><span>100%</span></div>`)],
+  ["B","Frame follows the column","Desktop frame shrinks to the column width.",()=>canvas(blk(10,10,280,100)+`<div class="tb" style="right:6px;bottom:6px"><span>Desktop · 780</span></div>`)],
+  ["C","100% with scroll","Default 100%, scroll sideways.",()=>canvas(blk(0,10,420,100)+`<div class="tb" style="right:6px;bottom:6px"><span>100%</span></div>`)]],
+ rec:"A",why:"B would show a 780px layout labelled Desktop, so the canvas no longer matches what publishes (WYSIWYG), and panel width would silently change the authored layout. C hides half the page. A keeps the truth and fixes the actual pain (tiny handles and labels). <i>This corrects my earlier note in the QA report.</i>"},
+
+{id:"C2",g:"canvas",sev:"m",t:"Right-click menu structure",
+ issue:"The canvas menu is one generic list from the SC-3 registry with no order, no groups and no actions specific to the element type, and SC-3 adds four more rows.",
+ ev:"T2-3 · T2-4 · SC-3 · P05 CV-16",
+ o:[["A","Fixed groups + type group on top","Group order everywhere: element-type actions (from the existing registry) · clipboard · structure · arrange · state · delete last.",()=>menu([[["§Image"]],[["Replace image…","","cx"],["Edit alt text","","cx"]],[["Copy","⌘C"],["Paste style","⌥⌘V"]],[["Group","⌘G"],["Show in Layers"]],[["Lock","⌘⇧L"],["Hide"]],[["Delete","⌫","dz"]]])],
+  ["B","Fixed groups only","Same order, no type group.",()=>menu([[["Copy","⌘C"],["Paste style","⌥⌘V"]],[["Group","⌘G"],["Show in Layers"]],[["Lock","⌘⇧L"],["Hide"]],[["Delete","⌫","dz"]]])]],
+ rec:"A",why:"Users right-click an image to replace it and a link to edit it; without those actions they leave the canvas for the Inspector. A adds no capability: every row already exists in the registry, it is only surfaced where the user is looking."},
+
+{id:"C3",g:"canvas",sev:"m",t:"Resizing a multi-selection",
+ issue:"With several elements selected, the handles resize only the primary element. No doc says whether to hide the handles or build real multi-resize.",
+ ev:"T2-6 · INV 6.8 · REVIEW §7:73",
+ o:[["A","Hide handles in multi-select","Show the combined box and the SC-17 toolbar only.",()=>canvas(blk(40,30,80,40)+blk(160,40,90,50)+box(36,26,218,68,false)+`<div class="tb" style="left:36px;top:2px"><span>Duplicate</span><span>Group</span><span>Delete</span></div>`)],
+  ["B","Proportional multi-resize","Handles scale all elements together; needs a spec.",()=>canvas(blk(40,30,80,40)+blk(160,40,90,50)+box(36,26,218,68))]],
+ rec:"A",why:"Handles that resize only one of several selected elements are a false affordance. Hiding them is honest now; multi-resize needs rules for mixed units and auto sizes before it can be built."},
+
+{id:"C4",g:"canvas",sev:"m",t:"Enter, Tab and Shift+Enter",
+ issue:"Two key conflicts: (1) “Tab enters resize handles” vs “Tab cycles elements”. (2) Enter always commits inline text, so lists can't get a second item and there are no line breaks.",
+ ev:"T2-5 · T2-9 · P05 §6, CV-15, CV-21",
+ o:[["A","Enter = handles; Shift+Enter = line break","Tab always cycles elements. Enter on a selection enters keyboard resize. In text: Shift+Enter line break, Enter in a list adds an item, Esc or click outside commits.",()=>code("Tab  next element<br>Enter  resize with arrows<br>⇧Enter  line break<br>Esc  commit text")],
+  ["B","Keep as written","Tab conflict and Enter-commits stay.",()=>code("Tab  ? handles / next element<br>Enter  commit (lists stuck)")]],
+ rec:"A",why:"Tab cycling is the keyboard user's main way across the canvas (WCAG 2.1.1), so it can't change meaning. Shift+Enter for line breaks is what users expect from every editor (Jakob's law)."},
+
+{id:"C5",g:"canvas",sev:"n",t:"How marquee selection starts",
+ issue:"Marquee only starts in a 20px strip outside the page and then selects parents together with their children.",
+ ev:"T2-11 · INV 7.5",
+ o:[["A","Shift+drag anywhere, same depth","Shift+drag on the page draws the marquee; selects elements at one depth.",()=>canvas(blk(40,30,80,40)+blk(160,40,90,50)+`<div style="position:absolute;left:30px;top:22px;width:230px;height:76px;border:1px dashed #1A56DB;background:rgba(26,86,219,.06)"></div>`)],
+  ["B","Keep the 20px strip","",()=>canvas(`<div style="position:absolute;left:0;top:0;width:12px;height:120px;background:#EBF5FF"></div>`+blk(30,30,240,60))]],
+ rec:"A",why:"On a page that fills the canvas, the strip is almost never reachable, so the feature is effectively hidden. A modifier avoids conflicting with plain drag (move)."},
+
+{id:"C6",g:"canvas",sev:"m",t:"Dropping an image file onto an existing image",
+ issue:"Today a dropped image replaces the image under it. The Assets panel decision (IAF-09) says replace must be explicit.",
+ ev:"T2-36 · INV 12.9 · P08 §3",
+ o:[["A","Insert; replace via a drop zone","Drop inserts after the image. Hovering the image's centre shows a “Replace image” zone.",()=>canvas(blk(40,20,220,80)+`<div style="position:absolute;left:110px;top:44px;padding:4px 8px;border:1.5px dashed #1A56DB;border-radius:4px;background:#fff;font-size:10px;color:#1A56DB">Replace image</div>`)],
+  ["B","Always replace","As today.",()=>canvas(blk(40,20,220,80))]],
+ rec:"A",why:"Accidental replace silently loses the original image choice and its alt text. A keeps replace one gesture away but visible."},
+
+{id:"C7",g:"canvas",sev:"m",t:"Edits on a component instance at Tablet, Mobile or hover",
+ issue:"Instance edits at non-Desktop breakpoints or states aren't recorded as overrides, so they're lost or applied wrongly.",
+ ev:"T3-14 · INV D14 · P13 §7/§9 · SC-13",
+ o:[["A","Record as instance overrides","Same cascade as SC-13, with the override dot on the field.",()=>rows([["Padding · Mobile",'',chip("● override","a")]],32,false)],
+  ["B","Block those edits","Instance style edits allowed at Desktop only.",()=>rows([["Padding · Mobile",'',chip("Edit main component")]],32,false)]],
+ rec:"A",why:"Responsive tweaks per instance are a normal need, and SC-13 already defines the cascade and markers, so A reuses a known rule. B surprises users the first time a Mobile fix does nothing."},
+
+// ---- nav
+{id:"N1",g:"nav",sev:"m",t:"A permanent way to reach Components",
+ issue:"Components has no rail item; its doors are ⇧A, ⌘K, a link in Add and a link in the Inspector. It is a primary reuse feature (BD-16).",
+ ev:"P26 · D2 · P02 §6 · P13 §4",
+ o:[["A","Entry in Add header + Layers link","“Components ›” in the Add panel header; instance rows in Layers link to their main component.",()=>mk(`<div class="p"><div class="dh" style="display:flex;justify-content:space-between">Add <span style="color:#1A56DB;font-weight:500">Components ›</span></div><div class="row" style="height:28px">Elements</div><div class="row" style="height:28px">Sections</div></div>`)],
+  ["B","Rail item","Add a Components item to the rail.",()=>code("Add · Layers │ Assets · CMS · Brand · Components")],
+  ["C","Shortcuts only","As specified.",()=>code("⇧A · ⌘K")]],
+ rec:"A",why:"The rail set is an approved decision (BD-05), so B reopens it. A puts the door where people already go to insert things, without a new permanent panel."},
+
+{id:"N2",g:"nav",sev:"m",t:"“Library” vs “This site” in Components",
+ issue:"Panels 03 and 13 define the scopes differently, so an adopted library component appears twice and counts disagree (the L1-024 bug returns).",
+ ev:"T3-1 · P03 §6.6 · P13 §4",
+ o:[["A","This site = everything usable here","This site: masters made here + library items already adopted (once). Library: workspace items not yet on this site.",()=>rows([["Hero card","This site"],["Pricing table","Library · adopt"]],40,true)],
+  ["B","Library = everything in the workspace","Library lists all items, adopted or not; This site shows only local ones.",()=>rows([["Hero card","This site"],["Hero card","Library · adopted"]],40,true)]],
+ rec:"A",why:"Each item then appears in exactly one list, which is the rule P03 already states and the only one that keeps counts honest."},
+
+{id:"N3",g:"nav",sev:"m",t:"SEO score",
+ issue:"The Listings pill and the SEO tab compute different scores for the same page.",
+ ev:"T3-5 · INV #44 · RL #7 · owner 2026-10-04 Yoast-level SEO",
+ o:[["A","One score, SEO tab model","Listings shows the same score with a link to the checklist.",()=>rows([["Home","",chip("Good · 8/10","g")],["About","",chip("Needs work · 5/10","w")]],32,false)],
+  ["B","Checklist only, no score","Show missing items instead of a number.",()=>rows([["Home","",chip("2 to fix")]],32,false)]],
+ rec:"A",why:"You chose Yoast-level SEO on 4 Oct, and Yoast's model is a score plus checklist. Keeping one model ends the contradiction without reversing that decision."},
+
+{id:"N4",g:"nav",sev:"m",t:"Issue count next to Publish",
+ issue:"The Issues chip was removed; the count lives in the ⋯ menu, yet errors change the button to “Publish anyway” with no visible reason.",
+ ev:"RL T2 · L4-038 · Q-TB3",
+ o:[["A","Chip only when there are problems","“3 issues” chip left of Publish, only when Blocking or errors exist; opens Issues.",()=>stack(`<div style="display:flex;gap:6px;align-items:center">${chip("3 issues","e")}${B("Publish anyway","pr")}</div>`)],
+  ["B","Always show a count","",()=>stack(`<div style="display:flex;gap:6px;align-items:center">${chip("0 issues")}${B("Publish","pr")}</div>`)],
+  ["C","Keep in ⋯ only","",()=>stack(`<div style="display:flex;gap:6px">${B("⋯")}${B("Publish anyway","pr")}</div>`)]],
+ rec:"A",why:"The problem is a button that changes without an explanation in view. A explains it exactly when it matters and stays quiet otherwise; B adds noise on every clean page."},
+
+{id:"N5",g:"nav",sev:"n",t:"Reload and deep links",
+ issue:"There is no URL state, so a reload or shared link always lands on the Editor and loses the open area, record or task.",
+ ev:"Q12 · REVIEW:62 · BK-156",
+ o:[["A","URL keeps area, record, task","Reload restores them; invalid target falls back to the nearest list (IA-07).",()=>code("/edit/site-42?area=cms&record=r-118")],
+  ["B","Always open the Editor","",()=>code("/edit/site-42")]],
+ rec:"A",why:"Losing your place on reload breaks orientation (IA-07 promises exact return). Shareable links to a CMS record also help client hand-off."},
+
+{id:"N6",g:"nav",sev:"n",t:"What the notification bell shows",
+ issue:"Open conflict: site-only notices vs site plus workspace notices in one bell.",
+ ev:"Q1 · BACKLOG:314 · 00:183",
+ o:[["A","One bell, grouped","“This site” first, then “Other sites” (open in a new tab, as SC already says).",()=>rows([["Client approved Home","This site"],["Publish failed · Cafe Nord","Other sites"]],40,false)],
+  ["B","This site only","",()=>rows([["Client approved Home","This site"]],40,false)]],
+ rec:"A",why:"A solo designer runs several client sites; a failed publish elsewhere must not be invisible. Shared contracts already define other-site rows, so A completes an existing rule."},
+
+{id:"N7",g:"nav",sev:"m",t:"Templates and Brand tokens",
+ issue:"Templates use fixed colours, so changing Brand doesn't recolour them; some use purple gradients (banned hue).",
+ ev:"T6-22 · L4-024 · B37 · RL #9",
+ o:[["A","Re-author templates on tokens","Templates use Brand tokens and no purple. Interim: after applying an old template, offer “Connect to Brand colours”.",()=>stack(banner("a","Template uses fixed colours.","Connect to Brand"))],
+  ["B","Connect offer only","Keep templates as they are; offer the connect step.",()=>banner("a","Connect this page to Brand colours?","Connect")],
+  ["C","Leave as is","",()=>banner("i","Brand change doesn't affect this page.")]],
+ rec:"A",why:"Job 1 is brand → professional site fast. A template that ignores Brand defeats that job, and purple violates DESIGN.md. B alone leaves every new site with a manual step."},
+
+{id:"N8",g:"nav",sev:"m",t:"Brand starters' names and colours",
+ issue:"Starters are named after real companies (Stripe, Notion, Apple, Linear, Vercel), and two use violet primaries.",
+ ev:"T6-14 · L4-028",
+ o:[["A","Generic names, recolour","e.g. “Fintech calm”, “Studio mono”; violet replaced.",()=>rows([["Fintech calm",""],["Studio mono",""]],32,false)],
+  ["B","Keep",'',()=>rows([["Stripe",""],["Notion",""]],32,false)]],
+ rec:"A",why:"Real brand names imply endorsement and invite trademark trouble on a product page; violet primaries break the one-accent rule the product sells to clients."},
+
+// ---- visual
+{id:"V1",g:"vis",sev:"m",t:"40px rows for lists with thumbnails",
+ issue:"GEO-01 (approved) uses 40px rows for resource lists (CMS, Assets, Components, Pages). DESIGN.md says “Never 40px”.",
+ ev:"T7-4 · CS-06 · DESIGN.md:362 · RIH:95",
+ o:[["A","40 for thumbnail lists only","Tool lists stay 32; resource lists with a thumbnail use 40. Pages moves to 40.",()=>rows([["About","/about"],["Pricing","/pricing"]],40,true)],
+  ["B","32 everywhere","",()=>rows([["About","/about"],["Pricing","/pricing"]],32,true)]],
+ rec:"A",why:"At 32px a thumbnail is ~20px, too small to recognise an image or page, which is the reason to show it. Keeping 32 for tool lists preserves the compact density DESIGN.md protects."},
+
+{id:"V2",g:"vis",sev:"n",t:"Colour for info banners",
+ issue:"DESIGN.md says info = accent blue, but there is no info token, and blue is the CTA and selection colour.",
+ ev:"T7 foundations · P22 §4.2",
+ o:[["A","Neutral grey + info icon","",()=>stack(banner("i","Changes apply on next publish."))],
+  ["B","Blue tint","",()=>stack(banner("a","Changes apply on next publish."))]],
+ rec:"A",why:"With one accent, a blue banner competes with the Publish button for attention. Info is the lowest severity, so it should be the quietest tone."},
+
+{id:"V3",g:"vis",sev:"n",t:"Colour of alignment guides on the canvas",
+ issue:"Snap guides use raw hex today; no token.",
+ ev:"T2-26 · INV 5.3",
+ o:[["A","Red guides","",()=>canvas(blk(40,30,90,40)+blk(170,30,90,40)+`<div style="position:absolute;left:0;right:0;top:30px;height:1px;background:#F05252"></div>`)],
+  ["B","Accent blue guides","",()=>canvas(blk(40,30,90,40)+blk(170,30,90,40)+`<div style="position:absolute;left:0;right:0;top:30px;height:1px;background:#1A56DB"></div>`)]],
+ rec:"A",why:"Selection is blue; blue guides would be indistinguishable from selection outlines. Red guides are the builder convention users already know."},
+
+{id:"V4",g:"vis",sev:"n",t:"Shadows on menus and popovers",
+ issue:"DESIGN.md gives menus the drag shadow in one place and says “only modals get elevation” in another.",
+ ev:"T7 elevation · DESIGN.md:169–173 vs :410",
+ o:[["A","Menus get the small shadow","",()=>menu([["Copy","⌘C"],["Paste","⌘V"]])],
+  ["B","Border only","",()=>mk(`<div class="menu" style="box-shadow:none"><div class="mi"><span>Copy</span></div><div class="mi"><span>Paste</span></div></div>`)]],
+ rec:"A",why:"A menu floats over canvas content; a border alone makes it read as part of the page underneath. Reword the anti-slop rule to “no decorative shadows”."},
+
+{id:"V5",g:"vis",sev:"n",t:"Animation durations",
+ issue:"Tokens are 100/160/240ms; DESIGN.md also says “100–150ms only”. Panels add 120, 300 and 600ms and a pulsing pill.",
+ ev:"T7 motion · CS-19",
+ o:[["A","Token set only (100/160/240)","Hover 100, menus 160, panels and sheets 240; no pulse.",()=>code("hover 100 · menu 160 · sheet 240")],
+  ["B","Cap at 150","Everything 100–150.",()=>code("hover 100 · menu 150 · sheet 150")]],
+ rec:"A",why:"A 360px task panel sliding in 150ms feels abrupt; the token set was built for that distance. The real problem is the off-token values, which A removes."},
+
+{id:"V6",g:"vis",sev:"m",t:"Header text style",
+ issue:"DESIGN.md says panel headers are 11px uppercase and, on the same line, 14px semibold; code uses 14/500. Five header heights exist.",
+ ev:"T7-7 · CS-03 · DESIGN.md:149",
+ o:[["A","Three-level ladder","Area 20/600 · panel/task 14/600 · section 12/600, sentence case.",()=>mk(`<div class="p"><div class="dh" style="font-size:16px">Site settings</div><div class="dh" style="font-size:12px;padding-top:2px">SEO</div><div class="db" style="font-size:11px;font-weight:600">Search preview</div></div>`)],
+  ["B","Uppercase small headers","Section headers 11/500 uppercase.",()=>mk(`<div class="p"><div class="dh">SEO</div><div class="db" style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:500">SEARCH PREVIEW</div></div>`)]],
+ rec:"A",why:"Small uppercase hurts scanning in dense inspectors (word shapes disappear) and the doc contradicts itself. A gives each header level one style."},
+
+{id:"V7",g:"vis",sev:"n",t:"Popover widths",
+ issue:"Help 240, site menu 260, People 320, status 360 — four widths, no tokens.",
+ ev:"T7 geometry · DS §2.6",
+ o:[["A","Three sizes: 240 / 280 / 360","Site menu → 280, People → 360.",()=>code("sm 240 · md 280 · lg 360")],
+  ["B","Keep each panel's value","",()=>code("240 · 260 · 320 · 360")]],
+ rec:"A",why:"Fewer sizes become tokens and stay consistent. The two changes are small and give the site menu room for its longest label."},
+
+{id:"V8",g:"vis",sev:"n",t:"Brand live-preview width",
+ issue:"Panel 09 fixes the preview at 468 (min 360, hidden under 1280); the IA record says “flex”.",
+ ev:"T6-12 · P09 §8 · IAF-10 F",
+ o:[["A","Fixed 468 (Panel 09)","",()=>code("nav 240 │ editor flex │ preview 468")],
+  ["B","Flexible preview","",()=>code("nav 240 │ editor 1fr │ preview 1fr")]],
+ rec:"A",why:"A flexible preview squeezes the token editor, which is the main task. Panel 09 already did the width arithmetic."},
+
+{id:"V9",g:"vis",sev:"n",t:"Text colour rule (“NO BLACK”)",
+ issue:"DESIGN.md caps text at #334155; the live ink token is #111827 and is used everywhere.",
+ ev:"DS §6 item 10 · DESIGN.md:117",
+ o:[["A","Keep the token, reword the rule","",()=>mk(`<div class="p"><div class="db" style="color:#111827;padding-top:10px">Spring menu 2026</div></div>`)],
+  ["B","Enforce #334155","Lighten all text.",()=>mk(`<div class="p"><div class="db" style="color:#334155;padding-top:10px">Spring menu 2026</div></div>`)]],
+ rec:"A",why:"Flowbite ink is the confirmed palette (29 Jul decision) and everything ships on it; B would restyle every panel to satisfy an outdated line."},
+
+// ---- process
+{id:"R1",g:"proc",sev:"m",t:"User validation before Figma",
+ issue:"The persona, jobs and activation path are hypotheses. The plan (5 interviews, 5-user tests) has no owner or date.",
+ ev:"D1-19 · 00-STRATEGY §7",
+ o:[["A","Before first-run Figma","5 interviews now; first-run prototype test with the first Figma pass.",()=>code("Week 1: 5 interviews<br>Week 3: 5-user prototype test")],
+  ["B","After launch","Ship, then learn from analytics.",()=>code("Launch → analytics → iterate")]],
+ rec:"A",why:"The whole IA assumes a solo designer. If the real buyer is a small agency, rail, review and permissions change; finding that after Figma is the most expensive time to learn it."}
+];
+
+// ---------- state + rendering ----------
+let answers={}; let db=null; let filter="all"; const busy=new Set();
+const byId=Object.fromEntries(D.map(d=>[d.id,d]));
+const list=document.getElementById("list");
+function render(){
+  const parts=[];
+  for(const [gk,gn,gd] of G){
+    const ds=D.filter(d=>d.g===gk).filter(d=>filter==="all"||(filter==="open"&&!answers[d.id])||(filter==="diff"&&answers[d.id]&&answers[d.id].choice!==d.rec));
+    if(!ds.length) continue;
+    parts.push(`<section aria-labelledby="g-${gk}"><div class="grp"><h2 id="g-${gk}">${gn}</h2><span>${gd}</span></div>`);
+    for(const d of ds){
+      const a=answers[d.id]; const ch=a?.choice||"";
+      parts.push(`<article class="card ${a?"done":""}" id="${d.id}">
+       <div class="chead"><span class="id">${d.id}</span><h3>${esc(d.t)}</h3><span class="sev ${d.sev}">${{c:"Critical",m:"Major",n:"Minor"}[d.sev]}</span>${a?`<span class="pickd">Answered: ${esc(ch)}${a.choice===d.rec?" (recommended)":""}</span>`:""}</div>
+       <p class="issue">${esc(d.issue)}</p><div class="ev">${esc(d.ev)}</div>
+       <div class="opts" role="radiogroup" aria-label="${esc(d.t)}">
+       ${d.o.map(([k,l,desc,m])=>`<label class="opt ${ch===k?"sel":""}"><input type="radio" name="r-${d.id}" value="${k}" ${ch===k?"checked":""} ${db?"":"disabled"}>
+         <div class="ohead"><span class="ok">${k}</span><span class="olabel">${esc(l)}</span>${k===d.rec?'<span class="rec">Recommended</span>':""}</div>
+         ${desc?`<p class="odesc">${esc(desc)}</p>`:""}${m()}</label>`).join("")}
+       </div>
+       <p class="why"><b>My recommendation: ${d.rec}.</b> ${d.why}</p>
+       <div class="note"><label for="n-${d.id}" class="ro">Your note (optional — a different answer, a condition, a question)</label>
+       <textarea id="n-${d.id}" ${db?"":"disabled"}>${esc(a?.note||"")}</textarea>
+       ${db?`<button class="f save" data-id="${d.id}">Save note</button>`:'<span class="ro">Sign in to claude.ai to save answers.</span>'}</div>
+      </article>`);
+    }
+    parts.push(`</section>`);
+  }
+  list.innerHTML=parts.join("")||'<p class="issue">Nothing in this filter.</p>';
+  const n=Object.keys(answers).filter(k=>byId[k]).length, same=Object.entries(answers).filter(([k,v])=>byId[k]&&v.choice===byId[k].rec).length;
+  document.getElementById("prog").innerHTML=`<b>${n}</b> of ${D.length} answered · ${same} as recommended<span class="track"><i style="width:${n/D.length*100}%"></i></span>`;
+}
+const say=t=>{document.getElementById("saveState").textContent=t};
+async function save(id,patch){
+  if(!db||busy.has(id)) return; busy.add(id);
+  const cur=answers[id]||{}; const next={...cur,...patch,updatedAt:new Date().toISOString()};
+  try{ await db.collection("decisions").doc(id).set(next); say(`${id} saved.`);}
+  catch(e){ say(`Couldn't save ${id} — ${e?.code||"try again"}.`);}
+  finally{busy.delete(id);}
+}
+list.addEventListener("change",e=>{const r=e.target; if(r.type==="radio"){const id=r.name.slice(2); save(id,{choice:r.value,note:document.getElementById("n-"+id)?.value||answers[id]?.note||""});}});
+list.addEventListener("click",e=>{const b=e.target.closest(".save"); if(b){const id=b.dataset.id; const note=document.getElementById("n-"+id).value; if(!answers[id]?.choice){say(`Pick an option for ${id} first, or write your answer in the note and pick the closest option.`);return;} save(id,{note});}});
+for(const [id,f] of [["fAll","all"],["fOpen","open"],["fDiff","diff"]]) document.getElementById(id).onclick=()=>{filter=f;for(const x of ["fAll","fOpen","fDiff"]) document.getElementById(x).setAttribute("aria-pressed",String(x===id));render();};
+const cb=document.getElementById("confirmBox");
+document.getElementById("acceptAll").onclick=()=>{if(!db){say("Sign in to claude.ai to save answers.");return;} const open=D.filter(d=>!answers[d.id]); if(!open.length){say("Every decision already has an answer.");return;} document.getElementById("cbB").textContent=`${open.length} decisions: ${open.map(d=>d.id).join(", ")}. Answers you already gave are not changed.`; cb.classList.remove("hidden"); document.getElementById("cbYes").focus();};
+document.getElementById("cbNo").onclick=()=>cb.classList.add("hidden");
+document.getElementById("cbYes").onclick=async()=>{cb.classList.add("hidden"); const open=D.filter(d=>!answers[d.id]); for(const d of open){ await save(d.id,{choice:d.rec,note:"",via:"accept-all"}); } say(`Accepted ${open.length} recommendations.`);};
+render();
+(async()=>{
+  try{ db=await window.claude?.use?.("db"); }catch(e){ db=null; }
+  if(!db){ render(); document.getElementById("prog").textContent="Read-only view — answers can't be saved here."; return; }
+  render();
+  db.collection("decisions").onSnapshot(s=>{answers={}; for(const d of s.docs){ answers[d.id]=d.data(); } render();},err=>say(`Couldn't load saved answers — ${err?.code||"reload to retry"}.`));
+})();
+</script>

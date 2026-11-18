@@ -1,0 +1,438 @@
+[
+  {
+    "id": "63:6393",
+    "name": "B3-P01 · Pages / manage without switching",
+    "type": "manager",
+    "refs": {
+      "close": "63:6907",
+      "search": "63:6917",
+      "Pages": "63:6925",
+      "Listings": "63:6927",
+      "Structure": "63:6929",
+      "More": "63:6932",
+      "home": "63:6941",
+      "about": "63:6956",
+      "aboutMenu": "I63:6956;62:1585",
+      "collection": "63:7049",
+      "cms": "63:7051",
+      "add": "63:7055",
+      "template": "63:7057",
+      "folder": "63:7060"
+    },
+    "surface": "63:6903"
+  },
+  {
+    "id": "63:13820",
+    "name": "B3-P02 · About / page actions",
+    "type": "menu",
+    "refs": {
+      "close": "63:14334",
+      "search": "63:14344",
+      "Pages": "63:14352",
+      "Listings": "63:14354",
+      "Structure": "63:14356",
+      "More": "63:14359",
+      "home": "63:14368",
+      "about": "63:14383",
+      "aboutMenu": "I63:14383;62:1585",
+      "collection": "63:14476",
+      "cms": "63:14478",
+      "add": "63:14482",
+      "template": "63:14484",
+      "folder": "63:14487",
+      "Rename…": "63:14497",
+      "Duplicate": "63:14504",
+      "Set as homepage": "63:14511",
+      "Replace layout with template…": "63:14518",
+      "Save as template…": "63:14525",
+      "Move up": "63:14532",
+      "Move down": "63:14539",
+      "Copy link": "63:14546",
+      "Page settings…": "63:14553",
+      "Delete page": "63:14560"
+    },
+    "surface": "63:14330"
+  },
+  {
+    "id": "63:14567",
+    "name": "B3-P03 · Rename / URL choice",
+    "type": "rename",
+    "refs": {
+      "close": "63:15081",
+      "search": "63:15091",
+      "Pages": "63:15099",
+      "Listings": "63:15101",
+      "Structure": "63:15103",
+      "More": "63:15106",
+      "home": "63:15115",
+      "about": "63:15130",
+      "aboutMenu": "I63:15130;62:1585",
+      "collection": "63:15223",
+      "cms": "63:15225",
+      "add": "63:15229",
+      "template": "63:15231",
+      "folder": "63:15234",
+      "keep": "63:15249",
+      "update": "63:15251",
+      "cancelRename": "63:15253"
+    },
+    "surface": "63:15077"
+  },
+  {
+    "id": "63:15255",
+    "name": "B3-P04 · Live URL / consequence",
+    "type": "consequence",
+    "refs": {
+      "Cancel": "63:15935",
+      "Change URL": "63:15937"
+    },
+    "surface": "63:15765"
+  },
+  {
+    "id": "63:15939",
+    "name": "B3-P05 · Page settings / SEO",
+    "type": "seo",
+    "refs": {
+      "close": "63:16453",
+      "SEO": "63:16463",
+      "Social": "63:16465",
+      "Advanced": "63:16467",
+      "defaults": "63:16499",
+      "cancel": "63:16503",
+      "save": "63:16505",
+      "scoreDetails": "64:19421"
+    },
+    "surface": "63:16449"
+  },
+  {
+    "id": "63:16507",
+    "name": "B3-P06 · Page settings / Social",
+    "type": "social",
+    "refs": {
+      "close": "63:17021",
+      "SEO": "63:17031",
+      "Social": "63:17033",
+      "Advanced": "63:17035",
+      "cancel": "63:17057",
+      "save": "63:17059"
+    },
+    "surface": "63:17017"
+  },
+  {
+    "id": "63:17061",
+    "name": "B3-P07 · Page settings / Advanced",
+    "type": "advanced",
+    "refs": {
+      "close": "63:17575",
+      "SEO": "63:17585",
+      "Social": "63:17587",
+      "Advanced": "63:17589",
+      "changeSEO": "63:17600",
+      "cancel": "63:17613",
+      "save": "63:17615"
+    },
+    "surface": "63:17571"
+  },
+  {
+    "id": "63:17617",
+    "name": "B3-P08 · URL changed / redirect offer",
+    "type": "redirect",
+    "refs": {
+      "close": "63:18131",
+      "SEO": "63:18141",
+      "Social": "63:18143",
+      "Advanced": "63:18145",
+      "redirect": "63:18179",
+      "later": "63:18181",
+      "cancel": "63:18185",
+      "save": "63:18187",
+      "scoreDetails": "64:19441"
+    },
+    "surface": "63:18127"
+  },
+  {
+    "id": "63:18189",
+    "name": "B3-P09 · Settings / save failed",
+    "type": "failure",
+    "refs": {
+      "close": "63:18703",
+      "SEO": "63:18713",
+      "Social": "63:18715",
+      "Advanced": "63:18717",
+      "defaults": "63:18749",
+      "cancel": "63:18754",
+      "save": "63:18756",
+      "scoreDetails": "64:19448"
+    },
+    "surface": "63:18699"
+  },
+  {
+    "id": "63:18758",
+    "name": "B3-P10 · Settings / unsaved close",
+    "type": "guard",
+    "refs": {
+      "Keep editing": "63:19330",
+      "Discard changes": "63:19332",
+      "scoreDetails": "64:19455",
+      "Save and leave": "66:11259"
+    },
+    "surface": "63:19268"
+  },
+  {
+    "id": "63:19334",
+    "name": "B3-P11 · About deleted / Undo",
+    "type": "removed",
+    "refs": {
+      "close": "63:19848",
+      "search": "63:19858",
+      "Pages": "63:19866",
+      "Listings": "63:19868",
+      "Structure": "63:19870",
+      "More": "63:19873",
+      "home": "63:19882",
+      "collection": "63:19975",
+      "cms": "63:19977",
+      "add": "63:19981",
+      "template": "63:19983",
+      "folder": "63:19986",
+      "undo": "63:19997",
+      "recent": "63:19999"
+    },
+    "surface": "63:19844"
+  },
+  {
+    "id": "63:20001",
+    "name": "B3-P12 · Recently deleted / Restore",
+    "type": "deleted",
+    "refs": {
+      "close": "63:20515",
+      "restore": "64:19129",
+      "back": "64:19109"
+    },
+    "surface": "63:20511"
+  },
+  {
+    "id": "63:20585",
+    "name": "B3-P13 · About restored",
+    "type": "restored",
+    "refs": {
+      "close": "63:21099",
+      "search": "63:21109",
+      "Pages": "63:21117",
+      "Listings": "63:21119",
+      "Structure": "63:21121",
+      "More": "63:21124",
+      "home": "63:21133",
+      "about": "63:21148",
+      "aboutMenu": "I63:21148;62:1585",
+      "collection": "63:21241",
+      "cms": "63:21243",
+      "add": "63:21248",
+      "template": "63:21250",
+      "folder": "63:21253",
+      "open": "64:19136"
+    },
+    "surface": "63:21095"
+  },
+  {
+    "id": "63:21262",
+    "name": "B3-P14 · Pages / Listings",
+    "type": "listings",
+    "refs": {
+      "close": "63:21776",
+      "search": "63:21786",
+      "Pages": "63:21794",
+      "Listings": "63:21796",
+      "Structure": "63:21798",
+      "More": "63:21801",
+      "home": "63:21811",
+      "about": "63:21826",
+      "aboutMenu": "I63:21826;62:1585",
+      "collection": "63:21919",
+      "cms": "63:21921",
+      "add": "63:21925",
+      "template": "63:21927",
+      "folder": "63:21930"
+    },
+    "surface": "63:21772"
+  },
+  {
+    "id": "63:21939",
+    "name": "B3-P15 · Pages / Structure",
+    "type": "structure",
+    "refs": {
+      "close": "63:22453",
+      "search": "63:22463",
+      "Pages": "63:22471",
+      "Listings": "63:22473",
+      "Structure": "63:22475",
+      "More": "63:22478",
+      "home": "63:22487",
+      "about": "63:22502",
+      "aboutMenu": "I63:22502;62:1585",
+      "collection": "63:22596",
+      "cms": "63:22598",
+      "add": "63:22602",
+      "template": "63:22604",
+      "folder": "63:22607"
+    },
+    "surface": "63:22449"
+  },
+  {
+    "id": "63:22616",
+    "name": "B3-P16 · Pages / no results",
+    "type": "empty",
+    "refs": {
+      "close": "63:23130",
+      "search": "63:23140",
+      "Pages": "63:23148",
+      "Listings": "63:23150",
+      "Structure": "63:23152",
+      "More": "63:23155",
+      "clear": "63:23165",
+      "add": "63:23168",
+      "template": "63:23170",
+      "folder": "63:23173"
+    },
+    "surface": "63:23126"
+  },
+  {
+    "id": "63:23182",
+    "name": "B3-P17 · Rename saved / keep URL",
+    "type": "kept",
+    "refs": {
+      "close": "63:23696",
+      "search": "63:23706",
+      "Pages": "63:23714",
+      "Listings": "63:23716",
+      "Structure": "63:23718",
+      "More": "63:23721",
+      "home": "63:23730",
+      "about": "63:23745",
+      "aboutMenu": "I63:23745;62:1585",
+      "collection": "63:23838",
+      "cms": "63:23840",
+      "add": "63:23844",
+      "template": "63:23846",
+      "folder": "63:23849",
+      "undo": "64:19408"
+    },
+    "surface": "63:23692"
+  },
+  {
+    "id": "64:10927",
+    "type": "renamed",
+    "refs": {
+      "close": "64:11441",
+      "search": "64:11451",
+      "Pages": "64:11459",
+      "Listings": "64:11461",
+      "Structure": "64:11463",
+      "More": "64:11466",
+      "home": "64:11475",
+      "about": "64:11490",
+      "aboutMenu": "I64:11490;62:1585",
+      "collection": "64:11583",
+      "cms": "64:11585",
+      "add": "64:11589",
+      "template": "64:11591",
+      "folder": "64:11594"
+    },
+    "surface": "64:11437"
+  },
+  {
+    "id": "64:18356",
+    "type": "saved",
+    "refs": {
+      "close": "64:18870",
+      "search": "64:18880",
+      "Pages": "64:18888",
+      "Listings": "64:18890",
+      "Structure": "64:18892",
+      "More": "64:18895",
+      "home": "64:18904",
+      "about": "64:18919",
+      "aboutMenu": "I64:18919;62:1585",
+      "collection": "64:19012",
+      "cms": "64:19014",
+      "add": "64:19018",
+      "template": "64:19020",
+      "folder": "64:19023"
+    },
+    "surface": "64:18866"
+  },
+  {
+    "id": "65:17148",
+    "name": "B3-P20 · Pages / more actions",
+    "type": "more",
+    "surface": "65:17658",
+    "refs": {
+      "Select pages…": "65:17825",
+      "Listings": "65:17832",
+      "Show structure": "65:17839",
+      "Reload": "65:17846",
+      "Recently deleted": "65:17853",
+      "close": "65:17662"
+    }
+  },
+  {
+    "id": "65:17860",
+    "name": "B3-P21 · SEO score / breakdown",
+    "type": "score",
+    "surface": "65:18370",
+    "refs": {
+      "Back to SEO": "65:18432"
+    }
+  },
+  {
+    "id": "65:18435",
+    "name": "B3-P22 · Redirect / captured repair",
+    "type": "repair",
+    "surface": "65:18945",
+    "refs": {
+      "back": "65:18947",
+      "save": "65:18975",
+      "cancel": "65:18977"
+    }
+  },
+  {
+    "id": "65:18981",
+    "name": "B3-P23 · Redirect saved / return",
+    "type": "repairSaved",
+    "surface": "65:19491",
+    "refs": {
+      "back": "65:19493",
+      "return": "65:19512"
+    }
+  },
+  {
+    "id": "67:11341",
+    "name": "B3-P24 · Redirect saved / exact SEO return",
+    "type": "returnSEO",
+    "refs": {
+      "cancel": "67:11583",
+      "save": "67:11584",
+      "close": "67:11549"
+    }
+  },
+  {
+    "id": "67:11915",
+    "name": "B3-P25 · Home retained / page renamed",
+    "type": "editorRenamed",
+    "refs": {}
+  },
+  {
+    "id": "67:12583",
+    "name": "B3-P26 · Home retained / About deleted",
+    "type": "editorDeleted",
+    "refs": {}
+  },
+  {
+    "id": "69:19044",
+    "name": "B3-P27 · Home retained / URL kept",
+    "type": "editorKept",
+    "refs": {
+      "Pages": "69:19241"
+    }
+  }
+]

@@ -1,0 +1,17 @@
+{
+  "fontOverride": {
+    "canvasFont": "32px",
+    "previewMobileFont": "52px",
+    "canvasLineHeight": "48px",
+    "previewLineHeight": "78px",
+    "inspectorLineHeight": "1.1x",
+    "repeated": true
+  },
+  "alignment": {
+    "computed": "center",
+    "checkedRadio": null
+  },
+  "undoFont": "52",
+  "redoFont": "32",
+  "pageErrors": []
+}

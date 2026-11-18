@@ -1,0 +1,81 @@
+{
+  "scope": "Read-only live Figma reaction interpretation; synthetic states only. Logical option identities/generations and immutable submitted-value text literals are modeled, not engine IDs, actual submission, native Select rendering or durable persistence. Value editing, optgroups, imported metadata and arbitrary labels are not represented.",
+  "sourceManifest": "r43-select-mutation.json",
+  "checks": 9186,
+  "passed": 9186,
+  "failed": [],
+  "categories": {
+    "order_label_default_delete_matrix": {
+      "checks": 8424,
+      "passed": 8424
+    },
+    "membership_empty_generation": {
+      "checks": 124,
+      "passed": 124
+    },
+    "single_multiple_reduction": {
+      "checks": 489,
+      "passed": 489
+    },
+    "noops_flags_protection": {
+      "checks": 103,
+      "passed": 103
+    },
+    "caller_return_unsupported_conversion": {
+      "checks": 36,
+      "passed": 36
+    },
+    "remote_domain_isolation": {
+      "checks": 10,
+      "passed": 10
+    }
+  },
+  "inspectedNodeIds": [
+    "9035:17710",
+    "9035:17721",
+    "9035:17724",
+    "9035:17727",
+    "9035:17730",
+    "9035:17732",
+    "9035:17734",
+    "9035:17737",
+    "9035:17739",
+    "9035:17742",
+    "9035:17744",
+    "9035:17748",
+    "9035:17750",
+    "9035:17754",
+    "9035:17756",
+    "9035:17769",
+    "9035:17771",
+    "9035:17774",
+    "9035:17777",
+    "9035:17787",
+    "9035:17788",
+    "9035:17791",
+    "9035:17802",
+    "9035:17806",
+    "9035:17816",
+    "9035:17817",
+    "9035:17819",
+    "9035:17837",
+    "9035:17839",
+    "9035:17842",
+    "9035:17855",
+    "8843:19246",
+    "8843:19240",
+    "8843:19252",
+    "8843:19258",
+    "8843:19264",
+    "9024:17498",
+    "9035:17847",
+    "9035:17852",
+    "8843:30815",
+    "9026:17532",
+    "9026:17487",
+    "9026:17471",
+    "9026:17583"
+  ],
+  "mutatedNodeIds": [],
+  "mutatedVariableIds": []
+}

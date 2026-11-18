@@ -1,0 +1,139 @@
+{
+  "status": "Prepared, syntax-checked only; root executes serial Figma batches and records returned IDs",
+  "scriptPath": "/tmp/buildrick-phase6-inspector-variants.js",
+  "durableScript": "phase6-inspector-variants.js",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "pageId": "8312:2",
+  "defaultBatch": [
+    "unlock",
+    "component-actions",
+    "reset-confirm"
+  ],
+  "recommendedBatches": [
+    [
+      "unlock",
+      "component-actions",
+      "reset-confirm"
+    ],
+    [
+      "reset-result",
+      "detach-confirm",
+      "detach-result"
+    ],
+    [
+      "master",
+      "image-result"
+    ],
+    [
+      "ai-image",
+      "ai-grid",
+      "ai-form"
+    ],
+    [
+      "ai-cms",
+      "ai-component",
+      "ai-heading"
+    ],
+    [
+      "ai-locked",
+      "ai-mixed"
+    ]
+  ],
+  "invocation": "Prefix const BUILD_KEYS = [...]; then paste full script into use_figma. Maximum 3 keys per call. All mutations are confined to deterministic P6 clone names at x20000+ and notes. Existing matching clones are reused.",
+  "connectionRecipes": [
+    {
+      "sourceNodeId": "8317:247330",
+      "action": "Unlock",
+      "targetKey": "unlock",
+      "result": "Same-canvas unlocked Heading; simulated mutation"
+    },
+    {
+      "sourceNodeId": "8317:247110",
+      "action": "Instance actions",
+      "targetKey": "component-actions"
+    },
+    {
+      "sourceNodeId": "8317:247119",
+      "action": "Reset to master",
+      "targetKey": "reset-confirm"
+    },
+    {
+      "sourceKey": "component-actions",
+      "sourceActionName": "Instance action / Reset to master",
+      "targetKey": "reset-confirm"
+    },
+    {
+      "sourceKey": "component-actions",
+      "sourceActionName": "Instance action / Detach instance",
+      "targetKey": "detach-confirm"
+    },
+    {
+      "sourceKey": "reset-confirm",
+      "sourceActionName": "Confirm reset",
+      "targetKey": "reset-result"
+    },
+    {
+      "sourceKey": "detach-confirm",
+      "sourceActionName": "Confirm detach",
+      "targetKey": "detach-result"
+    },
+    {
+      "sourceKeys": [
+        "reset-confirm",
+        "detach-confirm"
+      ],
+      "sourceActionNamePattern": "Cancel |Close confirmation",
+      "targetFrameId": "8317:246897",
+      "result": "Original instance; no simulated mutation"
+    },
+    {
+      "sourceNodeId": "8317:247108",
+      "action": "Edit master",
+      "targetKey": "master"
+    },
+    {
+      "sourceKey": "master",
+      "sourceActionName": "Back to Project grid instance",
+      "targetFrameId": "8317:246897"
+    },
+    {
+      "sourceNodeIds": [
+        "8318:894",
+        "8317:287"
+      ],
+      "action": "Use chosen image",
+      "targetKey": "image-result",
+      "result": "studio-gradient1.webp displayed; original alt retained; no persistence"
+    },
+    {
+      "sourceKey": "unlock",
+      "sourceActionName": "Effects",
+      "targetFrameId": "8318:1573"
+    },
+    {
+      "sourceNodeId": "8318:1705",
+      "action": "Heading Effects to Style",
+      "targetKey": "unlock",
+      "result": "Same website pose; avoids routing to E01's different fixture"
+    },
+    {
+      "sourceKeyPattern": "ai-*",
+      "sourceActionName": "Action / close",
+      "actionType": "BACK",
+      "result": "Return to actual caller; never hardcode a different Inspector tab/type"
+    }
+  ],
+  "mustNotWire": [
+    "Copied background actions under instance menu or confirmation overlays",
+    "Apply previous proposal in stale or locked AI",
+    "Regenerate / disabled for mixed scope",
+    "Reset to master / disabled on the reset result",
+    "Any node from source clones by guessed or arithmetically reconstructed ID"
+  ],
+  "limitations": [
+    "AI frames simulate stale/read-only scope; no generation or apply state.",
+    "Master edit is navigation/scope demonstration, no master data write.",
+    "Reset and detach results are finite visual examples, not document engine operations.",
+    "Pointer gestures, keyboard focus and history correctness require later prototype and implementation validation."
+  ]
+}

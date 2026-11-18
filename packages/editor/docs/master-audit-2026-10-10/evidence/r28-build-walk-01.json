@@ -1,0 +1,5 @@
+[
+  {"label":"Editor baseline","goto":"8465:3","wait":1200,"shot":"r28-editor-baseline.png","expected":"8465:3"},
+  {"label":"Open separate Build","x":411,"y":28,"wait":800,"shot":"r28-build-start.png","expected":"8628:12592"},
+  {"label":"Create scoped heading draft","x":202,"y":574,"wait":4000,"shot":"r28-build-draft.png","expected":"8628:12749"}
+]

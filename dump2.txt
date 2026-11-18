@@ -1,0 +1,14 @@
+node:fs:439
+    return binding.readFileUtf8(path, stringToFlags(options.flag));
+                   ^
+
+Error: ENOENT: no such file or directory, open '/Users/shahg/Desktop/pencil/buildrik/dump2.js'
+    at readFileSync (node:fs:439:20)
+    at file:///Users/shahg/Desktop/pencil/buildrik/scripts/baseline/figma-run.mjs:39:14 {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/shahg/Desktop/pencil/buildrik/dump2.js'
+}
+
+Node.js v24.13.0

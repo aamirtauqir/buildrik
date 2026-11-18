@@ -1,0 +1,87 @@
+<title>Reference · Figma audit — teen lens</title>
+<link rel="stylesheet" href="../assets/lesson.css" />
+
+<div class="wrap">
+
+<p class="eyebrow">Reference · Figma audit</p>
+<h1>Teen lens, char sawal, ek table</h1>
+<p class="lede">Print karke rakhne wala page. Har flow par yehi order: pehle
+<strong>chalta hai?</strong>, phir <strong>aasaan hai?</strong>, phir
+<strong>kyun nahi?</strong> — aur end mein ek issue-table row per fail.</p>
+
+<h2>Lens 1 · Chalta hai? (prototype wiring)</h2>
+<div class="tbl-scroll"><table>
+<thead><tr><th>Karo</th><th>Dekho</th><th>Matlab</th></tr></thead>
+<tbody>
+<tr><td>Presentation: <kbd>⌘</kbd><kbd>⌥</kbd><kbd>↩</kbd>, ya proto link</td><td>Left sidebar mein flow names</td><td>Har job ka apna named starting point hona chahiye (<a href="https://help.figma.com/hc/en-us/articles/360039823894-Create-and-manage-prototype-flows">Figma: flows</a>)</td></tr>
+<tr><td>Options → <strong>Show hints on click</strong> ON</td><td>Khali jagah click → blue box clickable cheezon par</td><td>Blue box nahi = wired nahi (<a href="https://help.figma.com/hc/en-us/articles/360040318013-Play-your-prototypes">Figma: play</a>)</td></tr>
+<tr><td>Button click, kuch nahi hua</td><td>URL ka <code>node-id</code> wahi ka wahi</td><td>Dead click. Is file mein #1 wajah: action list <em>Close</em> se shuru, overlay khula hi nahi → poori list abort</td></tr>
+<tr><td>Dialog khula, band nahi hota</td><td>✕ / Cancel / scrim par blue box nahi</td><td>Trapped overlay</td></tr>
+<tr><td>Screen par aage jaane ka koi button nahi</td><td>Sirf topbar/rail bacha</td><td>Dead end (task screen par = P0)</td></tr>
+<tr><td><kbd>R</kbd></td><td>Flow start par wapas</td><td>Agla flow test karo</td></tr>
+</tbody></table></div>
+
+<h2>Lens 2 · Aasaan hai? (cognitive walkthrough)</h2>
+<p>Pehle likho: <strong>persona</strong> (agency designer, Webflow jaanta hai, Buildrick pehli baar), <strong>task</strong> (ek jumla), <strong>action sequence</strong> (har click ek step). Phir har step par ye char sawal — NN/g ke alfaaz mein (<a href="https://www.nngroup.com/articles/cognitive-walkthroughs/">source</a>):</p>
+<div class="tbl-scroll"><table>
+<thead><tr><th>#</th><th>Sawal (NN/g)</th><th>Roman Urdu</th><th>Fail ka typical shakal</th></tr></thead>
+<tbody>
+<tr><td>Q1</td><td>Will users try to achieve the right result?</td><td>User ko pata hai yahan kya karna hai?</td><td>Do confirm ek ke baad ek; "main sahi jagah hoon?"</td></tr>
+<tr><td>Q2</td><td>Will users notice that the correct action is available?</td><td>Sahi control nazar aata hai?</td><td>⋯ ke peeche, hover par hi dikhta hai, 9 sections mein dafan</td></tr>
+<tr><td>Q3</td><td>Will users associate the correct action with the result?</td><td>Label dekh kar samajh aata hai?</td><td>"Content" jab matlab CMS; "Colours &amp; type" jab matlab tokens</td></tr>
+<tr><td>Q4</td><td>After the action, will users see that progress is made?</td><td>Karne ke baad progress dikhti hai?</td><td>"staged" chip, canvas nahi badla; toast nahi</td></tr>
+</tbody></table></div>
+<p>Step = <span class="pf pass">PASS</span> sirf jab charon Haan. Ek bhi Nahi = <span class="pf fail">FAIL</span> = issue-table row.</p>
+
+<h2>Lens 3 · Kyun fail? (10 heuristics — Fix column ki zabaan)</h2>
+<p>Source: <a href="https://www.nngroup.com/articles/ten-usability-heuristics/">NN/g, 10 Usability Heuristics</a>.</p>
+<div class="tbl-scroll"><table>
+<thead><tr><th>#</th><th>Heuristic</th><th>Ek line</th></tr></thead>
+<tbody>
+<tr><td>H1</td><td>Visibility of system status</td><td>Kya ho raha hai, dikhao (toast, chip, progress)</td></tr>
+<tr><td>H2</td><td>Match system &amp; real world</td><td>User ki zabaan: CMS, Assets, Add — engine ki nahi</td></tr>
+<tr><td>H3</td><td>User control &amp; freedom</td><td>Undo, Cancel, Back — har jagah</td></tr>
+<tr><td>H4</td><td>Consistency &amp; standards</td><td>Webflow/Framer jo karte hain, wahi</td></tr>
+<tr><td>H5</td><td>Error prevention</td><td>Confirm, backup — lekin ek baar</td></tr>
+<tr><td>H6</td><td>Recognition over recall</td><td>Option saamne ho, yaad na rakhna pade</td></tr>
+<tr><td>H7</td><td>Flexibility &amp; efficiency</td><td>Shortcuts, ⌘K, Recent</td></tr>
+<tr><td>H8</td><td>Aesthetic &amp; minimalist</td><td>Jo zaroori nahi, hatao</td></tr>
+<tr><td>H9</td><td>Recognise, diagnose, recover from errors</td><td>Error kya, ab kya karun</td></tr>
+<tr><td>H10</td><td>Help &amp; documentation</td><td>Tooltip, ⓘ, coach mark</td></tr>
+</tbody></table></div>
+
+<h2>Priority</h2>
+<div class="tbl-scroll"><table>
+<thead><tr><th>P</th><th>Kab</th></tr></thead>
+<tbody>
+<tr><td><strong>P0</strong></td><td>Primary job poora nahi hota: dead click / dead end / dangling on the main path</td></tr>
+<tr><td><strong>P1</strong></td><td>Job poora hota hai lekin ek step FAIL (Q1–Q4) — user atak sakta hai</td></tr>
+<tr><td><strong>P2</strong></td><td>Sab pass, lekin friction: extra click, weak label, hover-only control</td></tr>
+</tbody></table></div>
+
+<h2>Issue table (copy karo)</h2>
+<pre><code>Module/screen | Action | Expected | Actual | Required fix | Priority
+Brand · Simple | Primary row click | picker khule | khula, Draft chip | — | pass
+Templates · replace | "Replace Menu" ke baad | applied | doosra "Replace" (backup) | confirm mein merge | P1</code></pre>
+<p><strong>Observed problem</strong> (dekha, evidence hai) aur <strong>design suggestion</strong> (behtar ho sakta hai) alag columns ya alag lists mein — kabhi mix nahi.</p>
+
+<h2>Glossary</h2>
+<div class="tbl-scroll"><table>
+<tbody>
+<tr><td><strong>Flow / starting point</strong></td><td>Ek job ka naam + pehla frame; presentation sidebar mein dikhta hai</td></tr>
+<tr><td><strong>Overlay</strong></td><td>Dialog/popover jo current screen ke upar khulta hai; Close se band, Swap se doosra overlay</td></tr>
+<tr><td><strong>Hotspot</strong></td><td>Clickable area; "Show hints on click" blue box dikhata hai</td></tr>
+<tr><td><strong>Dead click</strong></td><td>Click hua, kuch nahi badla (node-id same)</td></tr>
+<tr><td><strong>Dead end</strong></td><td>Screen se aage ya wapas jaane ka koi wired raasta nahi</td></tr>
+<tr><td><strong>Close-first</strong></td><td>Action list jo Close se shuru hoti hai; overlay na khula ho to poori list abort — is file ki verified trap</td></tr>
+<tr><td><strong>Coverage</strong></td><td>tested-passing ÷ all intended; unverified denominator mein rehta hai</td></tr>
+</tbody></table></div>
+
+<div class="foot">
+  <ul>
+    <li>Lesson 01: <a href="../lessons/0001-char-sawal-har-step.html">Char sawal, har step par</a></li>
+    <li>Known traps in this file: <code>packages/editor/docs/plans/2026-09-14-editor-v3-ia.md</code> §0, §6</li>
+  </ul>
+</div>
+
+</div>

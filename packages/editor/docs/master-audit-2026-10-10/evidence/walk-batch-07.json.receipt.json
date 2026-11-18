@@ -1,0 +1,42 @@
+[
+  {
+    "label": "URL required validation",
+    "x": 720,
+    "y": 535,
+    "shot": "walk-url-empty.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8507%3A3011&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "URL enter fixture",
+    "x": 730,
+    "y": 488,
+    "shot": "walk-url-entered.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8507%3A3011&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "URL check",
+    "x": 720,
+    "y": 535,
+    "wait": 4000,
+    "shot": "walk-url-checked.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8507%3A3011&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Padding entry",
+    "goto": "8465:6",
+    "shot": "walk-padding-start.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-6&starting-point-node-id=8465%3A6&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Padding top picker",
+    "x": 1239,
+    "y": 232,
+    "shot": "walk-padding-picker.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-6&starting-point-node-id=8465%3A6&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

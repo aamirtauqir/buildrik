@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "fields": 53,
+  "height": 24,
+  "width": 160,
+  "stepperArrowsPerField": 2,
+  "unitDropdownCaret": 1,
+  "note": "Original audit counted dropdown caret as a stepper arrow; corrected expectation using unchanged read-back evidence."
+}

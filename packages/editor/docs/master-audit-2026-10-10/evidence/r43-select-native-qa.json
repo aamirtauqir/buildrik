@@ -1,0 +1,908 @@
+{
+  "scope": "Bounded native audit of Select, Form and Admin roots, five R43 dialogs, plus the existing Form fields manager containing the four-selector row. Current authored visibility/geometry only; no variable changes, prototype-state traversal or browser playback.",
+  "scopeInventoryNote": "Five R43 dialogs verified from r43-select-mutation.json. Existing R42 Form fields manager added specifically to inspect four-selector layout.",
+  "roots": [
+    {
+      "name": "Select",
+      "id": "8843:19020",
+      "width": 1440,
+      "height": 1000,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    },
+    {
+      "name": "Form",
+      "id": "8843:30589",
+      "width": 1440,
+      "height": 1000,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    },
+    {
+      "name": "Form Admin",
+      "id": "9026:17615",
+      "width": 1440,
+      "height": 1000,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    },
+    {
+      "name": "Select options",
+      "id": "9035:17710",
+      "width": 620,
+      "height": 598,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    },
+    {
+      "name": "Select details",
+      "id": "9035:17756",
+      "width": 560,
+      "height": 278,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    },
+    {
+      "name": "Select refusal",
+      "id": "9035:17777",
+      "width": 560,
+      "height": 162,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    },
+    {
+      "name": "Select conversion refusal",
+      "id": "9035:17791",
+      "width": 560,
+      "height": 182,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    },
+    {
+      "name": "Select confirmation",
+      "id": "9035:17806",
+      "width": 560,
+      "height": 210,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    },
+    {
+      "name": "Form fields manager / four selectors",
+      "id": "9024:17458",
+      "width": 560,
+      "height": 606,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    }
+  ],
+  "missingRoots": [],
+  "nodes": 579,
+  "visibleNodes": 462,
+  "instances": 184,
+  "componentIds": [
+    "8627:621",
+    "8314:3",
+    "8314:7",
+    "8314:5",
+    "8531:318"
+  ],
+  "missingComponents": [],
+  "componentErrors": [],
+  "reactionDestinations": [
+    {
+      "id": "8581:11856",
+      "type": "FRAME",
+      "name": "R27 / Captured workspace / Site menu"
+    },
+    {
+      "id": "8628:12749",
+      "type": "FRAME",
+      "name": "B03 / Build / Draft ready"
+    },
+    {
+      "id": "8628:12592",
+      "type": "FRAME",
+      "name": "B01 / Build / Start a scoped task"
+    },
+    {
+      "id": "8581:11797",
+      "type": "FRAME",
+      "name": "R27 / Captured workspace / Selected AI"
+    },
+    {
+      "id": "8465:31",
+      "type": "FRAME",
+      "name": "PROPOSED / scope unverified / G01 / Agents / Agents"
+    },
+    {
+      "id": "8581:11815",
+      "type": "FRAME",
+      "name": "R27 / Captured workspace / Review"
+    },
+    {
+      "id": "8465:46",
+      "type": "FRAME",
+      "name": "PROPOSED / scope unverified / C01 / Team / Team collaboration"
+    },
+    {
+      "id": "8539:9190",
+      "type": "FRAME",
+      "name": "R29 / Editor overlay / History"
+    },
+    {
+      "id": "8581:11846",
+      "type": "FRAME",
+      "name": "R27 / Captured workspace / Share preview link"
+    },
+    {
+      "id": "8539:9339",
+      "type": "FRAME",
+      "name": "R29 / Editor / Desktop visual preview"
+    },
+    {
+      "id": "8539:9433",
+      "type": "FRAME",
+      "name": "R29 / Editor overlay / Publish"
+    },
+    {
+      "id": "8465:2",
+      "type": "FRAME",
+      "name": "I01 / Design / Layout & spacing"
+    },
+    {
+      "id": "8539:9579",
+      "type": "FRAME",
+      "name": "R29 / Editor overlay / Pages"
+    },
+    {
+      "id": "8539:9786",
+      "type": "FRAME",
+      "name": "R33 / Media / Grid"
+    },
+    {
+      "id": "8539:9881",
+      "type": "FRAME",
+      "name": "R26 overlay / cms"
+    },
+    {
+      "id": "8539:9974",
+      "type": "FRAME",
+      "name": "R26 overlay / brand"
+    },
+    {
+      "id": "8465:8",
+      "type": "FRAME",
+      "name": "I07 / Design / Class & cascade manager"
+    },
+    {
+      "id": "8465:10",
+      "type": "FRAME",
+      "name": "I09 / Design / Element settings"
+    },
+    {
+      "id": "8465:9",
+      "type": "FRAME",
+      "name": "I08 / Design / Hover state"
+    },
+    {
+      "id": "8465:5",
+      "type": "FRAME",
+      "name": "I04 / Design / Grid editor"
+    },
+    {
+      "id": "8844:16149",
+      "type": "FRAME",
+      "name": "R35 / Inspector / Element library"
+    },
+    {
+      "id": "8841:14864",
+      "type": "FRAME",
+      "name": "R35 / Inspector / Shared Style"
+    },
+    {
+      "id": "8841:14872",
+      "type": "FRAME",
+      "name": "R35 / Inspector / Shared Interactions"
+    },
+    {
+      "id": "9035:17756",
+      "type": "FRAME",
+      "name": "R43 / Form / Service Select"
+    },
+    {
+      "id": "9035:17777",
+      "type": "FRAME",
+      "name": "R43 / Select / Change unavailable"
+    },
+    {
+      "id": "9035:17710",
+      "type": "FRAME",
+      "name": "R43 / Select / Options"
+    },
+    {
+      "id": "9035:17806",
+      "type": "FRAME",
+      "name": "R43 / Select / Review change"
+    },
+    {
+      "id": "8465:3",
+      "type": "FRAME",
+      "name": "I02 / Design / Typography"
+    },
+    {
+      "id": "9024:17458",
+      "type": "FRAME",
+      "name": "R42 / Form / Fields"
+    },
+    {
+      "id": "9026:17446",
+      "type": "FRAME",
+      "name": "R42 / Form / After submit"
+    },
+    {
+      "id": "9026:17476",
+      "type": "FRAME",
+      "name": "R42 / Form / Loading settings"
+    },
+    {
+      "id": "8844:265398",
+      "type": "FRAME",
+      "name": "R35 / Choice / Encoding"
+    },
+    {
+      "id": "9035:17791",
+      "type": "FRAME",
+      "name": "R43 / Select / Type conversion unavailable"
+    },
+    {
+      "id": "9024:17514",
+      "type": "FRAME",
+      "name": "R42 / Form / Choose field type"
+    },
+    {
+      "id": "9024:17500",
+      "type": "FRAME",
+      "name": "R42 / Form / Field change unavailable"
+    },
+    {
+      "id": "9024:17539",
+      "type": "FRAME",
+      "name": "R42 / Form / Default value"
+    }
+  ],
+  "missingDestinations": [],
+  "destinationErrors": [],
+  "geometryChecks": 453,
+  "expectedScrolling": [],
+  "clippingCandidates": [],
+  "unclippedOverflow": [],
+  "geometrySkipped": [],
+  "selectorRow": {
+    "id": "9024:17469",
+    "name": "Field selection",
+    "type": "FRAME",
+    "width": 512,
+    "height": 32,
+    "horizontal": "FILL",
+    "vertical": "HUG",
+    "minWidth": null,
+    "maxWidth": null,
+    "padding": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "layoutMode": "HORIZONTAL",
+    "itemSpacing": 8,
+    "children": [
+      {
+        "id": "9024:17470",
+        "name": "Action / Name",
+        "type": "INSTANCE",
+        "width": 122,
+        "height": 32,
+        "horizontal": "FILL",
+        "vertical": "FIXED",
+        "minWidth": null,
+        "maxWidth": null,
+        "padding": [
+          10,
+          10,
+          0,
+          0
+        ],
+        "texts": [
+          {
+            "id": "I9024:17470;8314:6",
+            "name": "Button",
+            "type": "TEXT",
+            "width": 100,
+            "height": 18,
+            "horizontal": "FILL",
+            "vertical": "HUG",
+            "minWidth": null,
+            "maxWidth": null,
+            "text": "Name",
+            "textAutoResize": "HEIGHT"
+          }
+        ]
+      },
+      {
+        "id": "9024:17473",
+        "name": "Action / Email",
+        "type": "INSTANCE",
+        "width": 122,
+        "height": 32,
+        "horizontal": "FILL",
+        "vertical": "FIXED",
+        "minWidth": null,
+        "maxWidth": null,
+        "padding": [
+          10,
+          10,
+          0,
+          0
+        ],
+        "texts": [
+          {
+            "id": "I9024:17473;8314:6",
+            "name": "Button",
+            "type": "TEXT",
+            "width": 100,
+            "height": 18,
+            "horizontal": "FILL",
+            "vertical": "HUG",
+            "minWidth": null,
+            "maxWidth": null,
+            "text": "Email",
+            "textAutoResize": "HEIGHT"
+          }
+        ]
+      },
+      {
+        "id": "9024:17476",
+        "name": "Action / Message",
+        "type": "INSTANCE",
+        "width": 122,
+        "height": 32,
+        "horizontal": "FILL",
+        "vertical": "FIXED",
+        "minWidth": null,
+        "maxWidth": null,
+        "padding": [
+          10,
+          10,
+          0,
+          0
+        ],
+        "texts": [
+          {
+            "id": "I9024:17476;8314:6",
+            "name": "Button",
+            "type": "TEXT",
+            "width": 100,
+            "height": 18,
+            "horizontal": "FILL",
+            "vertical": "HUG",
+            "minWidth": null,
+            "maxWidth": null,
+            "text": "Message",
+            "textAutoResize": "HEIGHT"
+          }
+        ]
+      },
+      {
+        "id": "9035:17842",
+        "name": "Action / Service",
+        "type": "INSTANCE",
+        "width": 122,
+        "height": 32,
+        "horizontal": "FILL",
+        "vertical": "FIXED",
+        "minWidth": null,
+        "maxWidth": null,
+        "padding": [
+          10,
+          10,
+          0,
+          0
+        ],
+        "texts": [
+          {
+            "id": "I9035:17842;8314:6",
+            "name": "Button",
+            "type": "TEXT",
+            "width": 100,
+            "height": 18,
+            "horizontal": "FILL",
+            "vertical": "HUG",
+            "minWidth": null,
+            "maxWidth": null,
+            "text": "Service",
+            "textAutoResize": "HEIGHT"
+          }
+        ]
+      }
+    ]
+  },
+  "captions": [
+    {
+      "id": "9035:17837",
+      "name": "Development",
+      "type": "TEXT",
+      "width": 622,
+      "height": 20,
+      "horizontal": "FILL",
+      "vertical": "HUG",
+      "minWidth": null,
+      "maxWidth": null,
+      "text": "Development",
+      "textAutoResize": "HEIGHT",
+      "boundCharacters": {
+        "type": "VARIABLE_ALIAS",
+        "id": "VariableID:9035:17666"
+      },
+      "ancestors": [
+        {
+          "id": "8843:19314",
+          "name": "Selected / Select",
+          "type": "FRAME",
+          "width": 656,
+          "height": 126,
+          "horizontal": "FILL",
+          "vertical": "HUG",
+          "minWidth": null,
+          "maxWidth": null,
+          "padding": [
+            16,
+            16,
+            16,
+            16
+          ]
+        },
+        {
+          "id": "8843:19310",
+          "name": "Website / Select",
+          "type": "FRAME",
+          "width": 720,
+          "height": 540,
+          "horizontal": "FIXED",
+          "vertical": "FIXED",
+          "minWidth": null,
+          "maxWidth": null,
+          "padding": [
+            32,
+            32,
+            32,
+            32
+          ]
+        },
+        {
+          "id": "8843:19057",
+          "name": "Canvas viewport",
+          "type": "FRAME",
+          "width": 824,
+          "height": 762,
+          "horizontal": "FIXED",
+          "vertical": "FIXED",
+          "minWidth": null,
+          "maxWidth": null,
+          "padding": [
+            24,
+            24,
+            24,
+            24
+          ]
+        },
+        {
+          "id": "8843:19051",
+          "name": "Main workspace",
+          "type": "FRAME",
+          "width": 872,
+          "height": 920,
+          "horizontal": "FIXED",
+          "vertical": "FIXED",
+          "minWidth": null,
+          "maxWidth": null,
+          "padding": [
+            24,
+            24,
+            24,
+            24
+          ]
+        }
+      ]
+    },
+    {
+      "id": "I9035:17847;8314:6",
+      "name": "Button",
+      "type": "TEXT",
+      "width": 600,
+      "height": 18,
+      "horizontal": "FILL",
+      "vertical": "HUG",
+      "minWidth": null,
+      "maxWidth": null,
+      "text": "Development",
+      "textAutoResize": "HEIGHT",
+      "boundCharacters": {
+        "type": "VARIABLE_ALIAS",
+        "id": "VariableID:9035:17666"
+      },
+      "ancestors": [
+        {
+          "id": "9035:17847",
+          "name": "Action / Development",
+          "type": "INSTANCE",
+          "width": 622,
+          "height": 42,
+          "horizontal": "FILL",
+          "vertical": "HUG",
+          "minWidth": null,
+          "maxWidth": null,
+          "padding": [
+            10,
+            10,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "9035:17845",
+          "name": "Service Select field",
+          "type": "FRAME",
+          "width": 622,
+          "height": 70,
+          "horizontal": "FILL",
+          "vertical": "HUG",
+          "minWidth": null,
+          "maxWidth": null,
+          "padding": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "8843:30918",
+          "name": "Selected / Form",
+          "type": "FRAME",
+          "width": 656,
+          "height": 452,
+          "horizontal": "FILL",
+          "vertical": "HUG",
+          "minWidth": null,
+          "maxWidth": null,
+          "padding": [
+            16,
+            16,
+            16,
+            16
+          ]
+        },
+        {
+          "id": "8843:30914",
+          "name": "Website / Form",
+          "type": "FRAME",
+          "width": 720,
+          "height": 656,
+          "horizontal": "FIXED",
+          "vertical": "HUG",
+          "minWidth": null,
+          "maxWidth": null,
+          "padding": [
+            32,
+            32,
+            32,
+            32
+          ]
+        }
+      ]
+    },
+    {
+      "id": "I9035:17852;8314:6",
+      "name": "Button",
+      "type": "TEXT",
+      "width": 600,
+      "height": 18,
+      "horizontal": "FILL",
+      "vertical": "HUG",
+      "minWidth": null,
+      "maxWidth": null,
+      "text": "Development",
+      "textAutoResize": "HEIGHT",
+      "boundCharacters": {
+        "type": "VARIABLE_ALIAS",
+        "id": "VariableID:9035:17666"
+      },
+      "ancestors": [
+        {
+          "id": "9035:17852",
+          "name": "Action / Development",
+          "type": "INSTANCE",
+          "width": 622,
+          "height": 42,
+          "horizontal": "FILL",
+          "vertical": "HUG",
+          "minWidth": null,
+          "maxWidth": null,
+          "padding": [
+            10,
+            10,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "9035:17850",
+          "name": "Service Select field",
+          "type": "FRAME",
+          "width": 622,
+          "height": 70,
+          "horizontal": "FILL",
+          "vertical": "HUG",
+          "minWidth": null,
+          "maxWidth": null,
+          "padding": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "9026:17657",
+          "name": "Selected / Form",
+          "type": "FRAME",
+          "width": 656,
+          "height": 452,
+          "horizontal": "FILL",
+          "vertical": "HUG",
+          "minWidth": null,
+          "maxWidth": null,
+          "padding": [
+            16,
+            16,
+            16,
+            16
+          ]
+        },
+        {
+          "id": "9026:17654",
+          "name": "Website / Form",
+          "type": "FRAME",
+          "width": 720,
+          "height": 656,
+          "horizontal": "FIXED",
+          "vertical": "HUG",
+          "minWidth": null,
+          "maxWidth": null,
+          "padding": [
+            32,
+            32,
+            32,
+            32
+          ]
+        }
+      ]
+    }
+  ],
+  "deviceWidthBindings": [
+    {
+      "node": {
+        "id": "8843:19310",
+        "name": "Website / Select",
+        "type": "FRAME",
+        "width": 720,
+        "height": 540,
+        "horizontal": "FIXED",
+        "vertical": "FIXED",
+        "minWidth": null,
+        "maxWidth": null,
+        "padding": [
+          32,
+          32,
+          32,
+          32
+        ]
+      },
+      "variable": {
+        "id": "VariableID:8843:19311",
+        "name": "select/viewport",
+        "values": {
+          "8840:0": 720
+        }
+      }
+    },
+    {
+      "node": {
+        "id": "8843:30914",
+        "name": "Website / Form",
+        "type": "FRAME",
+        "width": 720,
+        "height": 656,
+        "horizontal": "FIXED",
+        "vertical": "HUG",
+        "minWidth": null,
+        "maxWidth": null,
+        "padding": [
+          32,
+          32,
+          32,
+          32
+        ]
+      },
+      "variable": {
+        "id": "VariableID:8843:30915",
+        "name": "form/viewport",
+        "values": {
+          "8840:0": 720
+        }
+      }
+    },
+    {
+      "node": {
+        "id": "9026:17654",
+        "name": "Website / Form",
+        "type": "FRAME",
+        "width": 720,
+        "height": 656,
+        "horizontal": "FIXED",
+        "vertical": "HUG",
+        "minWidth": null,
+        "maxWidth": null,
+        "padding": [
+          32,
+          32,
+          32,
+          32
+        ]
+      },
+      "variable": {
+        "id": "VariableID:8843:30915",
+        "name": "form/viewport",
+        "values": {
+          "8840:0": 720
+        }
+      }
+    }
+  ],
+  "mutatedNodeIds": [],
+  "mutatedVariableIds": [],
+  "scrollContainers": [
+    {
+      "id": "8843:19085",
+      "name": "Inspector",
+      "visible": true,
+      "scroll": "VERTICAL",
+      "clipsContent": true,
+      "width": 352,
+      "height": 920
+    },
+    {
+      "id": "8843:30626",
+      "name": "Canvas viewport",
+      "visible": true,
+      "scroll": "VERTICAL",
+      "clipsContent": true,
+      "width": 824,
+      "height": 762
+    },
+    {
+      "id": "8843:30654",
+      "name": "Inspector",
+      "visible": true,
+      "scroll": "VERTICAL",
+      "clipsContent": true,
+      "width": 352,
+      "height": 920
+    },
+    {
+      "id": "9026:17653",
+      "name": "Canvas viewport",
+      "visible": true,
+      "scroll": "VERTICAL",
+      "clipsContent": true,
+      "width": 824,
+      "height": 762
+    },
+    {
+      "id": "9026:17685",
+      "name": "Inspector",
+      "visible": true,
+      "scroll": "VERTICAL",
+      "clipsContent": true,
+      "width": 352,
+      "height": 920
+    }
+  ],
+  "deviceRoutes": [
+    {
+      "nodeId": "8843:19054",
+      "label": "Desktop",
+      "writes": [
+        {
+          "variableId": "VariableID:8843:19311",
+          "value": 720
+        }
+      ]
+    },
+    {
+      "nodeId": "8843:19055",
+      "label": "Mobile",
+      "writes": [
+        {
+          "variableId": "VariableID:8843:19311",
+          "value": 375
+        }
+      ]
+    },
+    {
+      "nodeId": "8843:30623",
+      "label": "Desktop",
+      "writes": [
+        {
+          "variableId": "VariableID:8843:30915",
+          "value": 720
+        }
+      ]
+    },
+    {
+      "nodeId": "8843:30624",
+      "label": "Mobile",
+      "writes": [
+        {
+          "variableId": "VariableID:8843:30915",
+          "value": 375
+        }
+      ]
+    },
+    {
+      "nodeId": "9026:17650",
+      "label": "Desktop",
+      "writes": [
+        {
+          "variableId": "VariableID:8843:30915",
+          "value": 720
+        }
+      ]
+    },
+    {
+      "nodeId": "9026:17651",
+      "label": "Mobile",
+      "writes": [
+        {
+          "variableId": "VariableID:8843:30915",
+          "value": 375
+        }
+      ]
+    }
+  ],
+  "mobileWidthLimit": "Mobile widths are not executed or measured in this read-only audit. Width bindings, FILL/HUG and text wrapping metadata are recorded; current default geometry does not establish every caption/default combination fits after switching devices.",
+  "referenceSummary": {
+    "roots": 9,
+    "instances": 184,
+    "uniqueComponents": 5,
+    "uniqueDestinations": 36,
+    "missing": 0,
+    "errors": 0
+  },
+  "layoutSummary": {
+    "geometryChecks": 453,
+    "expectedScrolling": 0,
+    "clippingCandidates": 0,
+    "unclippedOverflow": 0,
+    "skippedRotated": 0
+  }
+}

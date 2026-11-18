@@ -1,0 +1,259 @@
+--- BEGIN UNTRUSTED EXTERNAL CONTENT (source: http://localhost:3000/edit/cmv8uviql000bucorbmjjol97) ---
+--- BEGIN UNTRUSTED EXTERNAL C​ONTENT (source: http://localhost:3000/edit/cmv8uviql000bucorbmjjol97) ---
+    @e1 [button] "‹ Exit"
+    @e2 [button] "s0-qa site"
+    @e3 [button] "Home"
+    @e4 [button] "History ›"
+    @e5 [button] "Review"
+    @e6 [button] "Comments"
+    @e7 [button] "Notifications, 2 unread"
+    @e8 [button] "Preview"
+    @e9 [button] "Site menu"
+@e10 [link] "Skip to Canvas"
+    @e11 [tab] "Add elements, blocks and components to your page": Add
+    @e12 [tab] "View and reorder page structure": Layers
+    @e13 [tab] "Manage all pages in your site": Pages
+    @e14 [tab] "Upload and manage images, videos, and fonts": Assets
+    @e15 [tab] "Collections, records and data sources for dynamic content": CMS
+    @e16 [tab] "Brand — global colors, fonts, spacing tokens": Brand
+    @e17 [button] "Help — keyboard shortcuts": Help
+    @e18 [tab] "Home, Homepage" [selected]: Home
+    @e19 [tab] "Home Copy"
+  @e20 [button] "Add page"
+  @e21 [radio] "Small"
+  @e22 [radio] "Large"
+  @e23 [button] "Send"
+  @e24 [button] "Click Me"
+  @e25 [link] "Link"
+  @e26 [button] "Resize from top-left corner"
+  @e27 [button] "Resize from top-right corner"
+  @e28 [button] "Resize from bottom-left corner"
+  @e29 [button] "Resize from bottom-right corner"
+  @e30 [button] "Resize from top edge"
+  @e31 [button] "Resize from bottom edge"
+  @e32 [button] "Resize from left edge"
+  @e33 [button] "Resize from right edge"
+  @e34 [slider] "Rotation handle - drag to rotate element"
+  @e35 [button] "Duplicate (⌘D)"
+  @e36 [button] "Delete (⌫)"
+  @e37 [button] "More"
+  @e38 [button] "Undo" [disabled]
+  @e39 [button] "Redo" [disabled]
+  @e40 [button] "View": View · 1 ▾
+  @e41 [button] "Zoom 100%": 100% ▾
+  @e42 [button] "History actions"
+  @e43 [button] "Close History": ✕
+    @e44 [tab] "Session"
+    @e45 [tab] "Saves" [selected]
+    @e46 [tab] "Published"
+    @e47 [button] "Filter ▾"
+        @e48 [button] "Before overwrite actions"
+        @e49 [button] "Before automatic repair actions"
+        @e50 [button] "Before overwrite actions"
+        @e51 [button] "Before overwrite actions"
+    @e52 [button] "+ Save a version"
+@e53 [button] "Get started — 3 of 7 complete. Click to expand.": 3/7
+@e54 [button] "v3.0.2 Output Detail Standard React Components Hide Until Restart Marker Color Clear on copy/send Block page interactions Manage MCP & Webhooks Manage MCP & Webhooks MCP Connection MCP connection allows agents to receive and act on annotations. Learn more Webhooks Auto-Send The webhook URL will receive live annotation changes and annotation data."
+  @e55 [button]
+  @e56 [button]
+  @e57 [button] [disabled]
+  @e58 [button] [disabled]
+  @e59 [button] [disabled]
+  @e60 [button] [disabled]
+  @e61 [button]
+  @e62 [button]
+  @e63 [link]
+  @e64 [button] "Switch to light mode"
+  @e65 [button] "Standard"
+  @e66 [checkbox] [checked]
+  @e67 [checkbox]
+  @e68 [button] "Indigo"
+  @e69 [button] "Blue"
+  @e70 [button] "Cyan"
+  @e71 [button] "Green"
+  @e72 [button] "Yellow"
+  @e73 [button] "Orange"
+  @e74 [button] "Red"
+  @e75 [checkbox] "Clear on copy/send"
+  @e76 [checkbox] "Block page interactions" [checked]
+  @e77 [button] "Manage MCP & Webhooks"
+  @e78 [button] "Manage MCP & Webhooks"
+    @e79 [link] "Learn more"
+  @e80 [checkbox] "Auto-Send" [checked] [disabled]
+  @e81 [textbox] "Webhook URL"
+
+── cursor-interactive (not in ARIA tree) ──
+@c1 [cursor:pointer] "Review"
+@c2 [cursor:pointer] "›"
+@c3 [cursor:pointer] "Add"
+@c4 [cursor:pointer] "Layers"
+@c5 [cursor:pointer] "Pages"
+@c6 [cursor:pointer] "Assets"
+@c7 [cursor:pointer] "CMS"
+@c8 [cursor:pointer] "Brand"
+@c9 [cursor:pointer] "Help"
+@c10 [cursor:pointer] "Home"
+@c11 [cursor:pointer] "Home Copy"
+@c12 [tabindex=0] "s4 locked
+
+s4 locked
+
+s4 locked
+
+s4 probe
+
+s4 probe
+
+s4 probe
+
+s4 probe
+
+s1 stal"
+@c13 [cursor:pointer] "s4 locked
+
+s4 locked
+
+s4 locked
+
+s4 probe
+
+s4 probe
+
+s4 probe
+
+s4 probe
+
+s1 stal"
+@c14 [popover-child, tabindex=0, role=button] "div"
+@c15 [popover-child, tabindex=0, role=button] "div"
+@c16 [popover-child, tabindex=0, role=button] "div"
+@c17 [popover-child, tabindex=0, role=button] "div"
+@c18 [popover-child, tabindex=0, role=button] "div"
+@c19 [popover-child, tabindex=0, role=button] "div"
+@c20 [popover-child, tabindex=0, role=button] "div"
+@c21 [popover-child, tabindex=0, role=button] "div"
+@c22 [popover-child, tabindex=0, role=complementary] "History
+✕
+Session
+Saves
+Published
+Filter ▾
+YESTERDAY
+Before overwrite
+06:35 PM
+6"
+@c23 [popover-child, cursor:pointer, role=listitem] "Before overwrite
+06:35 PM
+6h ago"
+@c24 [popover-child, cursor:pointer] "Before overwrite
+06:35 PM
+6h ago"
+@c25 [popover-child, cursor:pointer] "Before overwrite
+06:35 PM
+6h ago"
+@c26 [popover-child, cursor:pointer] "Before overwrite"
+@c27 [popover-child, cursor:pointer] "06:35 PM
+6h ago"
+@c28 [popover-child, cursor:pointer] "06:35 PM"
+@c29 [popover-child, cursor:pointer] "6h ago"
+@c30 [popover-child, cursor:pointer] "div"
+@c31 [popover-child, cursor:pointer] "span"
+@c32 [popover-child, cursor:pointer, role=listitem] "Before automatic repair
+06:25 PM
+7h ago"
+@c33 [popover-child, cursor:pointer] "Before automatic repair
+06:25 PM
+7h ago"
+@c34 [popover-child, cursor:pointer] "Before automatic repair
+06:25 PM
+7h ago"
+@c35 [popover-child, cursor:pointer] "Before automatic repair"
+@c36 [popover-child, cursor:pointer] "06:25 PM
+7h ago"
+@c37 [popover-child, cursor:pointer] "06:25 PM"
+@c38 [popover-child, cursor:pointer] "7h ago"
+@c39 [popover-child, cursor:pointer] "div"
+@c40 [popover-child, cursor:pointer] "span"
+@c41 [popover-child, cursor:pointer, role=listitem] "Before overwrite
+04:24 PM
+9h ago"
+@c42 [popover-child, cursor:pointer] "Before overwrite
+04:24 PM
+9h ago"
+@c43 [popover-child, cursor:pointer] "Before overwrite
+04:24 PM
+9h ago"
+@c44 [popover-child, cursor:pointer] "Before overwrite"
+@c45 [popover-child, cursor:pointer] "04:24 PM
+9h ago"
+@c46 [popover-child, cursor:pointer] "04:24 PM"
+@c47 [popover-child, cursor:pointer] "9h ago"
+@c48 [popover-child, cursor:pointer] "div"
+@c49 [popover-child, cursor:pointer] "span"
+@c50 [popover-child, cursor:pointer, role=listitem] "Before overwrite
+04:14 PM
+9h ago"
+@c51 [popover-child, cursor:pointer] "Before overwrite
+04:14 PM
+9h ago"
+@c52 [popover-child, cursor:pointer] "Before overwrite
+04:14 PM
+9h ago"
+@c53 [popover-child, cursor:pointer] "Before overwrite"
+@c54 [popover-child, cursor:pointer] "04:14 PM
+9h ago"
+@c55 [popover-child, cursor:pointer] "04:14 PM"
+@c56 [popover-child, cursor:pointer] "9h ago"
+@c57 [popover-child, cursor:pointer] "div"
+@c58 [popover-child, cursor:pointer] "span"
+@c59 [popover-child, cursor:pointer] "span"
+@c60 [popover-child, cursor:pointer] "3/7"
+@c61 [popover-child, cursor:pointer, tabindex=0, role=button] "v3.0.2
+
+Output Detail
+Standard
+React Components
+Hide Until Restart
+Marker Color
+"
+@c62 [popover-child, cursor:pointer] "div"
+@c63 [popover-child, cursor:pointer] "div"
+@c64 [popover-child, cursor:pointer] "div"
+@c65 [popover-child, cursor:pointer] "span"
+@c66 [popover-child, cursor:pointer] "span"
+@c67 [popover-child, cursor:pointer] "div"
+@c68 [popover-child, cursor:pointer] "span"
+@c69 [popover-child, cursor:pointer] "span"
+@c70 [popover-child, cursor:pointer] "div"
+@c71 [popover-child, cursor:pointer] "span"
+@c72 [popover-child, cursor:pointer] "span"
+@c73 [popover-child, cursor:pointer] "div"
+@c74 [popover-child, cursor:pointer] "span"
+@c75 [popover-child, cursor:pointer] "span"
+@c76 [popover-child, cursor:pointer] "div"
+@c77 [popover-child, cursor:pointer] "span"
+@c78 [popover-child, cursor:pointer] "span"
+@c79 [popover-child, cursor:pointer] "div"
+@c80 [popover-child, cursor:pointer] "span"
+@c81 [popover-child, cursor:pointer] "span"
+@c82 [popover-child, cursor:pointer] "div"
+@c83 [popover-child, cursor:pointer] "span"
+@c84 [popover-child, cursor:pointer] "div"
+@c85 [popover-child, cursor:pointer] "div"
+@c86 [popover-child, cursor:pointer] "span"
+@c87 [popover-child, cursor:pointer] "span"
+@c88 [popover-child, cursor:pointer] "span"
+@c89 [popover-child, cursor:pointer] "span"
+@c90 [popover-child, cursor:pointer] "Standard"
+@c91 [popover-child, cursor:pointer] "span"
+@c92 [popover-child, cursor:pointer] "span"
+@c93 [popover-child, cursor:pointer] "span"
+@c94 [popover-child, cursor:pointer] "span"
+@c95 [popover-child, cursor:pointer] "span"
+@c96 [popover-child, cursor:pointer] "Clear on copy/send"
+@c97 [popover-child, cursor:pointer] "Block page interactions"
+@c98 [popover-child, cursor:pointer] "Manage MCP & Webhooks"
+@c99 [popover-child, cursor:pointer] "span"
+@c100 [popover-child, cursor:pointer] "Manage MCP & Webhooks"
+--- END UNTRUSTED EXTERNAL C​ONTENT ---
+--- END UNTRUSTED EXTERNAL CONTENT ---

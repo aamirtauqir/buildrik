@@ -1,0 +1,991 @@
+{
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "createdAt": "2026-10-10",
+  "pageId": "8286:1818",
+  "pageName": "01A — AS-IS / REUSABLE CONTROLS",
+  "boardId": "8287:2",
+  "boardSize": [
+    1504,
+    1312
+  ],
+  "componentSets": [
+    {
+      "id": "8287:30",
+      "name": "CURRENT / Buttons",
+      "states": [
+        {
+          "id": "8287:12",
+          "name": "State=Publish",
+          "width": 77.58000183105469,
+          "height": 32,
+          "layout": "HORIZONTAL",
+          "description": "CURRENT AS-IS. Capture: /tmp/buildrick-heading-layout.json at 2026-10-10T14:25:38.071Z. Rectangle 1150.42,11.5,77.58,32. Source: src/editor/chrome-ui/Button.tsx. Native editable geometry; fixed captured dimensions, not a responsive design promise. Reused baseline instance 9:18."
+        },
+        {
+          "id": "8287:22",
+          "name": "State=Preview",
+          "width": 76,
+          "height": 32,
+          "layout": "HORIZONTAL",
+          "description": "CURRENT AS-IS. Capture: /tmp/buildrick-heading-layout.json at 2026-10-10T14:25:38.071Z. Rectangle 1062.42,11.5,76,32. Source: src/editor/chrome-ui/Button.tsx. Native editable geometry; fixed captured dimensions, not a responsive design promise."
+        },
+        {
+          "id": "8287:26",
+          "name": "State=AI chip",
+          "width": 40,
+          "height": 24,
+          "layout": "HORIZONTAL",
+          "description": "CURRENT AS-IS. Capture: /tmp/buildrick-heading-layout.json at 2026-10-10T14:25:38.071Z. Rectangle 1160,146,40,24. Source: src/editor/inspector/components/InspectorHeader.tsx. Native editable geometry; fixed captured dimensions, not a responsive design promise."
+        }
+      ]
+    },
+    {
+      "id": "8287:113",
+      "name": "CURRENT / Segments",
+      "states": [
+        {
+          "id": "8287:89",
+          "name": "State=Heading level H2 selected",
+          "width": 204,
+          "height": 24,
+          "layout": "HORIZONTAL",
+          "description": "CURRENT AS-IS. Capture: /tmp/buildrick-heading-layout.json at 2026-10-10T14:25:38.071Z. Rectangle 1053,281,204,24. Source: src/editor/inspector/sections/typeBlock/bodies/textBodies.tsx. Native editable geometry; fixed captured dimensions, not a responsive design promise."
+        },
+        {
+          "id": "8287:104",
+          "name": "State=Align none selected",
+          "width": 160,
+          "height": 24,
+          "layout": "HORIZONTAL",
+          "description": "CURRENT AS-IS. Capture: /tmp/buildrick-heading-layout.json at 2026-10-10T14:25:38.071Z. Rectangle 1097,538,160,24. Source: src/editor/inspector/sections/typography/FontControls.tsx. Native editable geometry; fixed captured dimensions, not a responsive design promise."
+        }
+      ]
+    },
+    {
+      "id": "8287:215",
+      "name": "CURRENT / Menu rows",
+      "states": [
+        {
+          "id": "8287:191",
+          "name": "State=Duplicate",
+          "width": 294,
+          "height": 32,
+          "layout": "HORIZONTAL",
+          "description": "CURRENT AS-IS. Capture: /tmp/buildrick-heading-menu-layout.json at 2026-10-10T14:26:01.453Z. Rectangle 921,182,294,32. Source: src/editor/inspector/components/InspectorElementMenu.tsx. Native editable geometry; fixed captured dimensions, not a responsive design promise."
+        },
+        {
+          "id": "8287:197",
+          "name": "State=Paste style unavailable",
+          "width": 294,
+          "height": 44,
+          "layout": "HORIZONTAL",
+          "description": "CURRENT AS-IS. Capture: /tmp/buildrick-heading-menu-layout.json at 2026-10-10T14:26:01.453Z. Rectangle 921,246,294,44. Source: src/editor/inspector/components/InspectorElementMenu.tsx. Native editable geometry; fixed captured dimensions, not a responsive design promise."
+        },
+        {
+          "id": "8287:205",
+          "name": "State=Delete destructive",
+          "width": 294,
+          "height": 32,
+          "layout": "HORIZONTAL",
+          "description": "CURRENT AS-IS. Capture: /tmp/buildrick-heading-menu-layout.json at 2026-10-10T14:26:01.453Z. Rectangle 921,449,294,32. Source: src/editor/inspector/components/InspectorElementMenu.tsx. Native editable geometry; fixed captured dimensions, not a responsive design promise."
+        }
+      ]
+    },
+    {
+      "id": "8287:255",
+      "name": "CURRENT / Context",
+      "states": [
+        {
+          "id": "8287:249",
+          "name": "State=State Base",
+          "width": 94,
+          "height": 24,
+          "layout": "HORIZONTAL",
+          "description": "CURRENT AS-IS. Capture: /tmp/buildrick-heading-layout.json at 2026-10-10T14:25:38.071Z. Rectangle 981,218,94,24. Source: src/editor/inspector/components/ContextRow.tsx. Native editable geometry; fixed captured dimensions, not a responsive design promise."
+        }
+      ]
+    },
+    {
+      "id": "8287:67",
+      "name": "CURRENT / Inputs",
+      "states": [
+        {
+          "id": "8287:35",
+          "name": "State=Text style",
+          "width": 160,
+          "height": 24,
+          "layout": "HORIZONTAL",
+          "description": "CURRENT AS-IS. Capture: /tmp/buildrick-heading-layout.json at 2026-10-10T14:25:38.071Z. Rectangle 1097,311,160,24. Source: src/editor/inspector/shared/controls/InputControls.tsx. Native editable geometry; fixed captured dimensions, not a responsive design promise."
+        },
+        {
+          "id": "8287:41",
+          "name": "State=Number and unit",
+          "width": 160,
+          "height": 24,
+          "layout": "HORIZONTAL",
+          "description": "CURRENT AS-IS. Capture: /tmp/buildrick-heading-layout.json at 2026-10-10T14:25:38.071Z. Rectangle 1097,424,160,24. Source: src/editor/inspector/shared/controls/InputControls.tsx. Native editable geometry; fixed captured dimensions, not a responsive design promise."
+        },
+        {
+          "id": "8287:53",
+          "name": "State=Colour",
+          "width": 160,
+          "height": 24,
+          "layout": "HORIZONTAL",
+          "description": "CURRENT AS-IS. Capture: /tmp/buildrick-heading-layout.json at 2026-10-10T14:25:38.071Z. Rectangle 1097,508,160,24. Source: src/editor/inspector/shared/controls/ColorInput.tsx. Native editable geometry; fixed captured dimensions, not a responsive design promise."
+        },
+        {
+          "id": "8287:60",
+          "name": "State=Search pages",
+          "width": 247,
+          "height": 32,
+          "layout": "HORIZONTAL",
+          "description": "CURRENT AS-IS. Capture: /tmp/buildrick-pages-layout.json at 2026-10-10T14:26:20.731Z. Rectangle 76,108,247,32. Source: src/editor/sidebar/tabs/pages. Native editable geometry; fixed captured dimensions, not a responsive design promise."
+        }
+      ]
+    },
+    {
+      "id": "8287:133",
+      "name": "CURRENT / Section headings",
+      "states": [
+        {
+          "id": "8287:118",
+          "name": "State=Heading open",
+          "width": 299,
+          "height": 33,
+          "layout": "HORIZONTAL",
+          "description": "CURRENT AS-IS. Capture: /tmp/buildrick-heading-layout.json at 2026-10-10T14:25:38.071Z. Rectangle 969,244,299,33. Source: src/editor/inspector/shared/controls/Section.tsx. Native editable geometry; fixed captured dimensions, not a responsive design promise."
+        },
+        {
+          "id": "8287:123",
+          "name": "State=Typography open",
+          "width": 299,
+          "height": 33,
+          "layout": "HORIZONTAL",
+          "description": "CURRENT AS-IS. Capture: /tmp/buildrick-heading-layout.json at 2026-10-10T14:25:38.071Z. Rectangle 969,361,299,33. Source: src/editor/inspector/shared/controls/Section.tsx. Native editable geometry; fixed captured dimensions, not a responsive design promise."
+        },
+        {
+          "id": "8287:128",
+          "name": "State=Size open",
+          "width": 299,
+          "height": 33,
+          "layout": "HORIZONTAL",
+          "description": "CURRENT AS-IS. Capture: /tmp/buildrick-heading-layout.json at 2026-10-10T14:25:38.071Z. Rectangle 969,606,299,33. Source: src/editor/inspector/shared/controls/Section.tsx. Native editable geometry; fixed captured dimensions, not a responsive design promise."
+        }
+      ]
+    },
+    {
+      "id": "8287:233",
+      "name": "CURRENT / Navigation",
+      "states": [
+        {
+          "id": "8287:220",
+          "name": "State=Layer heading selected",
+          "width": 278,
+          "height": 28,
+          "layout": "HORIZONTAL",
+          "description": "CURRENT AS-IS. Capture: /tmp/buildrick-layers-layout.json at 2026-10-10T14:26:09.871Z. Rectangle 60,148,278,28. Source: src/editor/panels/layers. Native editable geometry; fixed captured dimensions, not a responsive design promise."
+        },
+        {
+          "id": "8287:228",
+          "name": "State=Brand Colours selected",
+          "width": 239,
+          "height": 32,
+          "layout": "HORIZONTAL",
+          "description": "CURRENT AS-IS. Capture: /tmp/buildrick-brand-layout.json at 2026-10-10T14:39:25.787Z. Rectangle 8,176,239,32. Source: src/editor/design-system/ui/BrandWorkspace.tsx. Native editable geometry; fixed captured dimensions, not a responsive design promise."
+        }
+      ]
+    },
+    {
+      "id": "8288:18",
+      "name": "CURRENT / Icon buttons",
+      "states": [
+        {
+          "id": "8288:7",
+          "name": "State=More rest",
+          "width": 24,
+          "height": 24,
+          "layout": "HORIZONTAL",
+          "description": "CURRENT AS-IS. Capture: /tmp/buildrick-heading-layout.json at 2026-10-10T14:25:38.071Z. Rectangle 1204,146,24,24. Source: src/editor/inspector/components/InspectorHeader.tsx. Native editable geometry; fixed captured dimensions, not a responsive design promise."
+        },
+        {
+          "id": "8288:13",
+          "name": "State=Hide inspector rest",
+          "width": 24,
+          "height": 24,
+          "layout": "HORIZONTAL",
+          "description": "CURRENT AS-IS. Capture: /tmp/buildrick-heading-layout.json at 2026-10-10T14:25:38.071Z. Rectangle 1232,146,24,24. Source: src/editor/inspector/components/InspectorHeader.tsx. Native editable geometry; fixed captured dimensions, not a responsive design promise."
+        }
+      ]
+    },
+    {
+      "id": "8287:84",
+      "name": "CURRENT / Tabs",
+      "states": [
+        {
+          "id": "8287:72",
+          "name": "State=Style selected",
+          "width": 99.66000366210938,
+          "height": 32,
+          "layout": "HORIZONTAL",
+          "description": "CURRENT AS-IS. Capture: /tmp/buildrick-heading-layout.json at 2026-10-10T14:25:38.071Z. Rectangle 969,184,99.66,32. Source: src/editor/inspector/ProInspector.tsx. Native editable geometry; fixed captured dimensions, not a responsive design promise."
+        },
+        {
+          "id": "8287:76",
+          "name": "State=Behaviour rest",
+          "width": 99.66999816894531,
+          "height": 32,
+          "layout": "HORIZONTAL",
+          "description": "CURRENT AS-IS. Capture: /tmp/buildrick-heading-layout.json at 2026-10-10T14:25:38.071Z. Rectangle 1068.66,184,99.67,32. Source: src/editor/inspector/ProInspector.tsx. Native editable geometry; fixed captured dimensions, not a responsive design promise."
+        },
+        {
+          "id": "8287:80",
+          "name": "State=Effects rest",
+          "width": 99.66999816894531,
+          "height": 32,
+          "layout": "HORIZONTAL",
+          "description": "CURRENT AS-IS. Capture: /tmp/buildrick-heading-layout.json at 2026-10-10T14:25:38.071Z. Rectangle 1168.33,184,99.67,32. Source: src/editor/inspector/ProInspector.tsx. Native editable geometry; fixed captured dimensions, not a responsive design promise."
+        }
+      ]
+    },
+    {
+      "id": "8287:186",
+      "name": "CURRENT / Property rows",
+      "states": [
+        {
+          "id": "8287:138",
+          "name": "State=Text style",
+          "width": 299,
+          "height": 28,
+          "layout": "HORIZONTAL",
+          "description": "CURRENT AS-IS. Capture: /tmp/buildrick-heading-layout.json at 2026-10-10T14:25:38.071Z. Rectangle 969,309,299,28. Source: src/editor/inspector/shared/controls/InputControls.tsx. Native editable geometry; fixed captured dimensions, not a responsive design promise. Property row uses actual Auto Layout: 12px left, 108px label, 8px gap, 160px reusable input instance, 11px right; 28px fixed row height."
+        },
+        {
+          "id": "8287:145",
+          "name": "State=Font size",
+          "width": 299,
+          "height": 28,
+          "layout": "HORIZONTAL",
+          "description": "CURRENT AS-IS. Capture: /tmp/buildrick-heading-layout.json at 2026-10-10T14:25:38.071Z. Rectangle 969,422,299,28. Source: src/editor/inspector/shared/controls/InputControls.tsx. Native editable geometry; fixed captured dimensions, not a responsive design promise. Property row uses actual Auto Layout: 12px left, 108px label, 8px gap, 160px reusable input instance, 11px right; 28px fixed row height."
+        },
+        {
+          "id": "8287:158",
+          "name": "State=Line height",
+          "width": 299,
+          "height": 28,
+          "layout": "HORIZONTAL",
+          "description": "CURRENT AS-IS. Capture: /tmp/buildrick-heading-layout.json at 2026-10-10T14:25:38.071Z. Rectangle 969,450,299,28. Source: src/editor/inspector/shared/controls/InputControls.tsx. Native editable geometry; fixed captured dimensions, not a responsive design promise. Property row uses actual Auto Layout: 12px left, 108px label, 8px gap, 160px reusable input instance, 11px right; 28px fixed row height."
+        },
+        {
+          "id": "8287:171",
+          "name": "State=Weight",
+          "width": 299,
+          "height": 28,
+          "layout": "HORIZONTAL",
+          "description": "CURRENT AS-IS. Capture: /tmp/buildrick-heading-layout.json at 2026-10-10T14:25:38.071Z. Rectangle 969,478,299,28. Source: src/editor/inspector/shared/controls/InputControls.tsx. Native editable geometry; fixed captured dimensions, not a responsive design promise. Property row uses actual Auto Layout: 12px left, 108px label, 8px gap, 160px reusable input instance, 11px right; 28px fixed row height."
+        },
+        {
+          "id": "8287:178",
+          "name": "State=Colour",
+          "width": 299,
+          "height": 28,
+          "layout": "HORIZONTAL",
+          "description": "CURRENT AS-IS. Capture: /tmp/buildrick-heading-layout.json at 2026-10-10T14:25:38.071Z. Rectangle 969,506,299,28. Source: src/editor/inspector/shared/controls/ColorInput.tsx. Native editable geometry; fixed captured dimensions, not a responsive design promise. Property row uses actual Auto Layout: 12px left, 108px label, 8px gap, 160px reusable input instance, 11px right; 28px fixed row height."
+        }
+      ]
+    },
+    {
+      "id": "8287:244",
+      "name": "CURRENT / Panel headers",
+      "states": [
+        {
+          "id": "8287:238",
+          "name": "State=Pages",
+          "width": 279,
+          "height": 44,
+          "layout": "HORIZONTAL",
+          "description": "CURRENT AS-IS. Capture: /tmp/buildrick-pages-layout.json at 2026-10-10T14:26:20.731Z. Rectangle 60,56,279,44. Source: src/editor/chrome-ui/PanelHeader.tsx. Native editable geometry; fixed captured dimensions, not a responsive design promise."
+        }
+      ]
+    }
+  ],
+  "counts": {
+    "sets": 11,
+    "masters": 29,
+    "texts": 85,
+    "vectors": 28,
+    "instances": 6,
+    "images": 0
+  },
+  "propertyRows": [
+    {
+      "id": "8287:138",
+      "layout": "HORIZONTAL",
+      "padding": [
+        12,
+        11
+      ],
+      "gap": 8,
+      "children": [
+        {
+          "type": "TEXT",
+          "x": 12,
+          "y": 6,
+          "w": 108,
+          "h": 16
+        },
+        {
+          "type": "INSTANCE",
+          "x": 128,
+          "y": 2,
+          "w": 160,
+          "h": 24
+        }
+      ]
+    },
+    {
+      "id": "8287:145",
+      "layout": "HORIZONTAL",
+      "padding": [
+        12,
+        11
+      ],
+      "gap": 8,
+      "children": [
+        {
+          "type": "TEXT",
+          "x": 12,
+          "y": 6,
+          "w": 108,
+          "h": 16
+        },
+        {
+          "type": "INSTANCE",
+          "x": 128,
+          "y": 2,
+          "w": 160,
+          "h": 24
+        }
+      ]
+    },
+    {
+      "id": "8287:158",
+      "layout": "HORIZONTAL",
+      "padding": [
+        12,
+        11
+      ],
+      "gap": 8,
+      "children": [
+        {
+          "type": "TEXT",
+          "x": 12,
+          "y": 6,
+          "w": 108,
+          "h": 16
+        },
+        {
+          "type": "INSTANCE",
+          "x": 128,
+          "y": 2,
+          "w": 160,
+          "h": 24
+        }
+      ]
+    },
+    {
+      "id": "8287:171",
+      "layout": "HORIZONTAL",
+      "padding": [
+        12,
+        11
+      ],
+      "gap": 8,
+      "children": [
+        {
+          "type": "TEXT",
+          "x": 12,
+          "y": 6,
+          "w": 108,
+          "h": 16
+        },
+        {
+          "type": "INSTANCE",
+          "x": 128,
+          "y": 2,
+          "w": 160,
+          "h": 24
+        }
+      ]
+    },
+    {
+      "id": "8287:178",
+      "layout": "HORIZONTAL",
+      "padding": [
+        12,
+        11
+      ],
+      "gap": 8,
+      "children": [
+        {
+          "type": "TEXT",
+          "x": 12,
+          "y": 6,
+          "w": 108,
+          "h": 16
+        },
+        {
+          "type": "INSTANCE",
+          "x": 128,
+          "y": 2,
+          "w": 160,
+          "h": 24
+        }
+      ]
+    }
+  ],
+  "originalButton": "Kind=primary, Size=md, State=rest",
+  "rootScreenPage": "01 — EXISTING APPLICATION / AS-IS",
+  "creationBatches": [
+    {
+      "id": "8287:12",
+      "family": "Buttons",
+      "state": "Publish",
+      "width": 77.58000183105469,
+      "height": 32,
+      "source": "src/editor/chrome-ui/Button.tsx",
+      "capture": "/tmp/buildrick-heading-layout.json",
+      "captureRect": [
+        1150.42,
+        11.5,
+        77.58,
+        32
+      ],
+      "baseline": "9:18"
+    },
+    {
+      "id": "8287:22",
+      "family": "Buttons",
+      "state": "Preview",
+      "width": 76,
+      "height": 32,
+      "source": "src/editor/chrome-ui/Button.tsx",
+      "capture": "/tmp/buildrick-heading-layout.json",
+      "captureRect": [
+        1062.42,
+        11.5,
+        76,
+        32
+      ],
+      "baseline": null
+    },
+    {
+      "id": "8287:26",
+      "family": "Buttons",
+      "state": "AI chip",
+      "width": 40,
+      "height": 24,
+      "source": "src/editor/inspector/components/InspectorHeader.tsx",
+      "capture": "/tmp/buildrick-heading-layout.json",
+      "captureRect": [
+        1160,
+        146,
+        40,
+        24
+      ],
+      "baseline": null
+    },
+    {
+      "id": "8287:30",
+      "family": "Buttons",
+      "type": "COMPONENT_SET",
+      "states": 3,
+      "cardId": "8287:9"
+    },
+    {
+      "id": "8287:35",
+      "family": "Inputs",
+      "state": "Text style",
+      "width": 160,
+      "height": 24,
+      "source": "src/editor/inspector/shared/controls/InputControls.tsx",
+      "capture": "/tmp/buildrick-heading-layout.json",
+      "captureRect": [
+        1097,
+        311,
+        160,
+        24
+      ],
+      "baseline": null
+    },
+    {
+      "id": "8287:41",
+      "family": "Inputs",
+      "state": "Number and unit",
+      "width": 160,
+      "height": 24,
+      "source": "src/editor/inspector/shared/controls/InputControls.tsx",
+      "capture": "/tmp/buildrick-heading-layout.json",
+      "captureRect": [
+        1097,
+        424,
+        160,
+        24
+      ],
+      "baseline": null
+    },
+    {
+      "id": "8287:53",
+      "family": "Inputs",
+      "state": "Colour",
+      "width": 160,
+      "height": 24,
+      "source": "src/editor/inspector/shared/controls/ColorInput.tsx",
+      "capture": "/tmp/buildrick-heading-layout.json",
+      "captureRect": [
+        1097,
+        508,
+        160,
+        24
+      ],
+      "baseline": null
+    },
+    {
+      "id": "8287:60",
+      "family": "Inputs",
+      "state": "Search pages",
+      "width": 247,
+      "height": 32,
+      "source": "src/editor/sidebar/tabs/pages",
+      "capture": "/tmp/buildrick-pages-layout.json",
+      "captureRect": [
+        76,
+        108,
+        247,
+        32
+      ],
+      "baseline": null
+    },
+    {
+      "id": "8287:67",
+      "family": "Inputs",
+      "type": "COMPONENT_SET",
+      "states": 4,
+      "cardId": "8287:32"
+    },
+    {
+      "id": "8287:72",
+      "family": "Tabs",
+      "state": "Style selected",
+      "width": 99.66000366210938,
+      "height": 32,
+      "source": "src/editor/inspector/ProInspector.tsx",
+      "capture": "/tmp/buildrick-heading-layout.json",
+      "captureRect": [
+        969,
+        184,
+        99.66,
+        32
+      ],
+      "baseline": null
+    },
+    {
+      "id": "8287:76",
+      "family": "Tabs",
+      "state": "Behaviour rest",
+      "width": 99.66999816894531,
+      "height": 32,
+      "source": "src/editor/inspector/ProInspector.tsx",
+      "capture": "/tmp/buildrick-heading-layout.json",
+      "captureRect": [
+        1068.66,
+        184,
+        99.67,
+        32
+      ],
+      "baseline": null
+    },
+    {
+      "id": "8287:80",
+      "family": "Tabs",
+      "state": "Effects rest",
+      "width": 99.66999816894531,
+      "height": 32,
+      "source": "src/editor/inspector/ProInspector.tsx",
+      "capture": "/tmp/buildrick-heading-layout.json",
+      "captureRect": [
+        1168.33,
+        184,
+        99.67,
+        32
+      ],
+      "baseline": null
+    },
+    {
+      "id": "8287:84",
+      "family": "Tabs",
+      "type": "COMPONENT_SET",
+      "states": 3,
+      "cardId": "8287:69"
+    },
+    {
+      "id": "8287:89",
+      "family": "Segments",
+      "state": "Heading level H2 selected",
+      "width": 204,
+      "height": 24,
+      "source": "src/editor/inspector/sections/typeBlock/bodies/textBodies.tsx",
+      "capture": "/tmp/buildrick-heading-layout.json",
+      "captureRect": [
+        1053,
+        281,
+        204,
+        24
+      ],
+      "baseline": null
+    },
+    {
+      "id": "8287:104",
+      "family": "Segments",
+      "state": "Align none selected",
+      "width": 160,
+      "height": 24,
+      "source": "src/editor/inspector/sections/typography/FontControls.tsx",
+      "capture": "/tmp/buildrick-heading-layout.json",
+      "captureRect": [
+        1097,
+        538,
+        160,
+        24
+      ],
+      "baseline": null
+    },
+    {
+      "id": "8287:113",
+      "family": "Segments",
+      "type": "COMPONENT_SET",
+      "states": 2,
+      "cardId": "8287:86"
+    },
+    {
+      "id": "8287:118",
+      "family": "Section headings",
+      "state": "Heading open",
+      "width": 299,
+      "height": 33,
+      "source": "src/editor/inspector/shared/controls/Section.tsx",
+      "capture": "/tmp/buildrick-heading-layout.json",
+      "captureRect": [
+        969,
+        244,
+        299,
+        33
+      ],
+      "baseline": null
+    },
+    {
+      "id": "8287:123",
+      "family": "Section headings",
+      "state": "Typography open",
+      "width": 299,
+      "height": 33,
+      "source": "src/editor/inspector/shared/controls/Section.tsx",
+      "capture": "/tmp/buildrick-heading-layout.json",
+      "captureRect": [
+        969,
+        361,
+        299,
+        33
+      ],
+      "baseline": null
+    },
+    {
+      "id": "8287:128",
+      "family": "Section headings",
+      "state": "Size open",
+      "width": 299,
+      "height": 33,
+      "source": "src/editor/inspector/shared/controls/Section.tsx",
+      "capture": "/tmp/buildrick-heading-layout.json",
+      "captureRect": [
+        969,
+        606,
+        299,
+        33
+      ],
+      "baseline": null
+    },
+    {
+      "id": "8287:133",
+      "family": "Section headings",
+      "type": "COMPONENT_SET",
+      "states": 3,
+      "cardId": "8287:115"
+    },
+    {
+      "id": "8287:138",
+      "family": "Property rows",
+      "state": "Text style",
+      "width": 299,
+      "height": 28,
+      "source": "src/editor/inspector/shared/controls/InputControls.tsx",
+      "capture": "/tmp/buildrick-heading-layout.json",
+      "captureRect": [
+        969,
+        309,
+        299,
+        28
+      ],
+      "baseline": null
+    },
+    {
+      "id": "8287:145",
+      "family": "Property rows",
+      "state": "Font size",
+      "width": 299,
+      "height": 28,
+      "source": "src/editor/inspector/shared/controls/InputControls.tsx",
+      "capture": "/tmp/buildrick-heading-layout.json",
+      "captureRect": [
+        969,
+        422,
+        299,
+        28
+      ],
+      "baseline": null
+    },
+    {
+      "id": "8287:158",
+      "family": "Property rows",
+      "state": "Line height",
+      "width": 299,
+      "height": 28,
+      "source": "src/editor/inspector/shared/controls/InputControls.tsx",
+      "capture": "/tmp/buildrick-heading-layout.json",
+      "captureRect": [
+        969,
+        450,
+        299,
+        28
+      ],
+      "baseline": null
+    },
+    {
+      "id": "8287:171",
+      "family": "Property rows",
+      "state": "Weight",
+      "width": 299,
+      "height": 28,
+      "source": "src/editor/inspector/shared/controls/InputControls.tsx",
+      "capture": "/tmp/buildrick-heading-layout.json",
+      "captureRect": [
+        969,
+        478,
+        299,
+        28
+      ],
+      "baseline": null
+    },
+    {
+      "id": "8287:178",
+      "family": "Property rows",
+      "state": "Colour",
+      "width": 299,
+      "height": 28,
+      "source": "src/editor/inspector/shared/controls/ColorInput.tsx",
+      "capture": "/tmp/buildrick-heading-layout.json",
+      "captureRect": [
+        969,
+        506,
+        299,
+        28
+      ],
+      "baseline": null
+    },
+    {
+      "id": "8287:186",
+      "family": "Property rows",
+      "type": "COMPONENT_SET",
+      "states": 5,
+      "cardId": "8287:135"
+    },
+    {
+      "id": "8287:191",
+      "family": "Menu rows",
+      "state": "Duplicate",
+      "width": 294,
+      "height": 32,
+      "source": "src/editor/inspector/components/InspectorElementMenu.tsx",
+      "capture": "/tmp/buildrick-heading-menu-layout.json",
+      "captureRect": [
+        921,
+        182,
+        294,
+        32
+      ],
+      "baseline": null
+    },
+    {
+      "id": "8287:197",
+      "family": "Menu rows",
+      "state": "Paste style unavailable",
+      "width": 294,
+      "height": 44,
+      "source": "src/editor/inspector/components/InspectorElementMenu.tsx",
+      "capture": "/tmp/buildrick-heading-menu-layout.json",
+      "captureRect": [
+        921,
+        246,
+        294,
+        44
+      ],
+      "baseline": null
+    },
+    {
+      "id": "8287:205",
+      "family": "Menu rows",
+      "state": "Delete destructive",
+      "width": 294,
+      "height": 32,
+      "source": "src/editor/inspector/components/InspectorElementMenu.tsx",
+      "capture": "/tmp/buildrick-heading-menu-layout.json",
+      "captureRect": [
+        921,
+        449,
+        294,
+        32
+      ],
+      "baseline": null
+    },
+    {
+      "id": "8287:215",
+      "family": "Menu rows",
+      "type": "COMPONENT_SET",
+      "states": 3,
+      "cardId": "8287:188"
+    },
+    {
+      "id": "8287:220",
+      "family": "Navigation",
+      "state": "Layer heading selected",
+      "width": 278,
+      "height": 28,
+      "source": "src/editor/panels/layers",
+      "capture": "/tmp/buildrick-layers-layout.json",
+      "captureRect": [
+        60,
+        148,
+        278,
+        28
+      ],
+      "baseline": null
+    },
+    {
+      "id": "8287:228",
+      "family": "Navigation",
+      "state": "Brand Colours selected",
+      "width": 239,
+      "height": 32,
+      "source": "src/editor/design-system/ui/BrandWorkspace.tsx",
+      "capture": "/tmp/buildrick-brand-layout.json",
+      "captureRect": [
+        8,
+        176,
+        239,
+        32
+      ],
+      "baseline": null
+    },
+    {
+      "id": "8287:233",
+      "family": "Navigation",
+      "type": "COMPONENT_SET",
+      "states": 2,
+      "cardId": "8287:217"
+    },
+    {
+      "id": "8287:238",
+      "family": "Panel headers",
+      "state": "Pages",
+      "width": 279,
+      "height": 44,
+      "source": "src/editor/chrome-ui/PanelHeader.tsx",
+      "capture": "/tmp/buildrick-pages-layout.json",
+      "captureRect": [
+        60,
+        56,
+        279,
+        44
+      ],
+      "baseline": null
+    },
+    {
+      "id": "8287:244",
+      "family": "Panel headers",
+      "type": "COMPONENT_SET",
+      "states": 1,
+      "cardId": "8287:235"
+    },
+    {
+      "id": "8287:249",
+      "family": "Context",
+      "state": "State Base",
+      "width": 94,
+      "height": 24,
+      "source": "src/editor/inspector/components/ContextRow.tsx",
+      "capture": "/tmp/buildrick-heading-layout.json",
+      "captureRect": [
+        981,
+        218,
+        94,
+        24
+      ],
+      "baseline": null
+    },
+    {
+      "id": "8287:255",
+      "family": "Context",
+      "type": "COMPONENT_SET",
+      "states": 1,
+      "cardId": "8287:246"
+    },
+    {
+      "id": "8288:7",
+      "family": "Icon buttons",
+      "state": "More rest",
+      "width": 24,
+      "height": 24,
+      "source": "src/editor/inspector/components/InspectorHeader.tsx",
+      "capture": "/tmp/buildrick-heading-layout.json",
+      "captureRect": [
+        1204,
+        146,
+        24,
+        24
+      ],
+      "baseline": null
+    },
+    {
+      "id": "8288:13",
+      "family": "Icon buttons",
+      "state": "Hide inspector rest",
+      "width": 24,
+      "height": 24,
+      "source": "src/editor/inspector/components/InspectorHeader.tsx",
+      "capture": "/tmp/buildrick-heading-layout.json",
+      "captureRect": [
+        1232,
+        146,
+        24,
+        24
+      ],
+      "baseline": null
+    },
+    {
+      "id": "8288:18",
+      "family": "Icon buttons",
+      "type": "COMPONENT_SET",
+      "states": 2,
+      "cardId": "8288:4"
+    }
+  ]
+}

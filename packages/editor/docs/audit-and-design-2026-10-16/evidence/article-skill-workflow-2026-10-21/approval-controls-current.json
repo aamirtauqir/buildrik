@@ -1,0 +1,3889 @@
+[
+  {
+    "id": "307:14695",
+    "name": "PLAY · F5.01 · Designer · send next review round",
+    "controls": [
+      {
+        "id": "307:14698",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:23969",
+        "text": "Send Round 3 to Lena",
+        "x": 1203,
+        "y": 894,
+        "to": [
+          "307:15315"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "307:15315",
+    "name": "PLAY · F5.02 · Send Round 3",
+    "controls": [
+      {
+        "id": "307:15318",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:15323",
+        "text": "Exit | Atelier Nord | Site settings | In review · 2 | Preview | Publis",
+        "x": 720,
+        "y": 546,
+        "to": []
+      },
+      {
+        "id": "307:24241",
+        "text": "Cancel",
+        "x": 772,
+        "y": 712,
+        "to": [
+          "307:14695"
+        ]
+      },
+      {
+        "id": "307:24244",
+        "text": "Send for review",
+        "x": 896,
+        "y": 712,
+        "to": [
+          "307:15711"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "307:15711",
+    "name": "PLAY · F5.03 · Preparing frozen preview",
+    "controls": [
+      {
+        "id": "307:15714",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:24335",
+        "text": "Fixture: preview ready",
+        "x": 101,
+        "y": 68,
+        "to": [
+          "307:16503"
+        ]
+      },
+      {
+        "id": "307:24338",
+        "text": "Fixture: preview failed",
+        "x": 291,
+        "y": 68,
+        "to": [
+          "307:16107"
+        ]
+      },
+      {
+        "id": "307:15719",
+        "text": "Exit | Atelier Nord | Site settings | In review · 2 | Preview | Publis",
+        "x": 720,
+        "y": 546,
+        "to": []
+      },
+      {
+        "id": "307:24006",
+        "text": "Send Round 3 to Lena",
+        "x": 1203,
+        "y": 894,
+        "to": []
+      }
+    ]
+  },
+  {
+    "id": "307:16107",
+    "name": "PLAY · F5.04 · Preview failed · nothing sent",
+    "controls": [
+      {
+        "id": "307:16110",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:16115",
+        "text": "Exit | Atelier Nord | Site settings | In review · 2 | Preview | Publis",
+        "x": 720,
+        "y": 546,
+        "to": []
+      },
+      {
+        "id": "307:24025",
+        "text": "Send Round 3 to Lena",
+        "x": 1203,
+        "y": 894,
+        "to": []
+      },
+      {
+        "id": "307:24302",
+        "text": "Cancel",
+        "x": 669,
+        "y": 492,
+        "to": [
+          "307:15315"
+        ]
+      },
+      {
+        "id": "307:24305",
+        "text": "Try again",
+        "x": 757,
+        "y": 492,
+        "to": [
+          "307:15711"
+        ]
+      },
+      {
+        "id": "310:23409",
+        "text": "Send without preview",
+        "x": 892,
+        "y": 492,
+        "to": [
+          "310:23087"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "307:16503",
+    "name": "PLAY · F5.05 · Sending review",
+    "controls": [
+      {
+        "id": "307:16506",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:24341",
+        "text": "Fixture: round + invite acknowledged",
+        "x": 150,
+        "y": 68,
+        "to": [
+          "307:16899"
+        ]
+      },
+      {
+        "id": "307:24344",
+        "text": "Fixture: request rejected",
+        "x": 396,
+        "y": 68,
+        "to": [
+          "307:15315"
+        ]
+      },
+      {
+        "id": "307:16511",
+        "text": "Exit | Atelier Nord | Site settings | In review · 2 | Preview | Publis",
+        "x": 720,
+        "y": 546,
+        "to": []
+      },
+      {
+        "id": "307:24044",
+        "text": "Send Round 3 to Lena",
+        "x": 1203,
+        "y": 894,
+        "to": []
+      }
+    ]
+  },
+  {
+    "id": "307:16899",
+    "name": "PLAY · F5.06 · Round 3 sent",
+    "controls": [
+      {
+        "id": "307:16902",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:24347",
+        "text": "Switch role: open client review",
+        "x": 133,
+        "y": 68,
+        "to": [
+          "307:17295"
+        ]
+      },
+      {
+        "id": "307:16907",
+        "text": "Exit | Atelier Nord | Site settings | In review · 2 | Preview | Publis",
+        "x": 720,
+        "y": 546,
+        "to": []
+      },
+      {
+        "id": "307:24063",
+        "text": "Send Round 3 to Lena",
+        "x": 1203,
+        "y": 894,
+        "to": []
+      },
+      {
+        "id": "307:24324",
+        "text": "Done",
+        "x": 900,
+        "y": 512,
+        "to": [
+          "310:21940"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "307:17295",
+    "name": "PLAY · F5.07 · Client · frozen Round 3",
+    "controls": [
+      {
+        "id": "307:17298",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:17315",
+        "text": "＋ Add comment  C",
+        "x": 990,
+        "y": 198,
+        "to": [
+          "307:17363"
+        ]
+      },
+      {
+        "id": "307:17342",
+        "text": "Approve Round 3",
+        "x": 1332,
+        "y": 965,
+        "to": [
+          "312:22661"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "307:17363",
+    "name": "PLAY · F5.08 · Client comment draft",
+    "controls": [
+      {
+        "id": "307:17366",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:17392",
+        "text": "Cancel",
+        "x": 279,
+        "y": 375,
+        "to": [
+          "307:17295"
+        ]
+      },
+      {
+        "id": "307:17393",
+        "text": "Send ⌘↵",
+        "x": 375,
+        "y": 375,
+        "to": [
+          "307:17442"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "307:17442",
+    "name": "PLAY · F5.09 · Sending client comment",
+    "controls": [
+      {
+        "id": "307:17445",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:24534",
+        "text": "Fixture: comment acknowledged",
+        "x": 126,
+        "y": 68,
+        "to": [
+          "307:17572"
+        ]
+      },
+      {
+        "id": "307:24537",
+        "text": "Fixture: comment rejected",
+        "x": 347,
+        "y": 68,
+        "to": [
+          "307:17507"
+        ]
+      },
+      {
+        "id": "307:17450",
+        "text": "Fieldwork Studio is asking for your feedback | Atelier Nord · Home  ▾ ",
+        "x": 720,
+        "y": 546,
+        "to": []
+      },
+      {
+        "id": "307:17462",
+        "text": "＋ Add comment  C",
+        "x": 990,
+        "y": 192,
+        "to": []
+      }
+    ]
+  },
+  {
+    "id": "307:17507",
+    "name": "PLAY · F5.10 · Comment failed · draft retained",
+    "controls": [
+      {
+        "id": "307:17510",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:17515",
+        "text": "Fieldwork Studio is asking for your feedback | Atelier Nord · Home  ▾ ",
+        "x": 720,
+        "y": 546,
+        "to": []
+      },
+      {
+        "id": "307:17527",
+        "text": "＋ Add comment  C",
+        "x": 990,
+        "y": 192,
+        "to": []
+      },
+      {
+        "id": "307:24528",
+        "text": "Keep editing",
+        "x": 787,
+        "y": 492,
+        "to": [
+          "307:17363"
+        ]
+      },
+      {
+        "id": "307:24531",
+        "text": "Try again",
+        "x": 893,
+        "y": 492,
+        "to": [
+          "307:17442"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "307:17572",
+    "name": "PLAY · F5.11 · Client comment acknowledged",
+    "controls": [
+      {
+        "id": "307:17575",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:24540",
+        "text": "Switch role: designer opens Review",
+        "x": 143,
+        "y": 68,
+        "to": [
+          "307:17630"
+        ]
+      },
+      {
+        "id": "307:17592",
+        "text": "＋ Add comment  C",
+        "x": 990,
+        "y": 198,
+        "to": [
+          "377:25498"
+        ]
+      },
+      {
+        "id": "307:17619",
+        "text": "Approve Round 3",
+        "x": 1332,
+        "y": 965,
+        "to": [
+          "312:23762"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "307:17630",
+    "name": "PLAY · F5.12 · Designer · comment on Logo",
+    "controls": [
+      {
+        "id": "307:17633",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:24078",
+        "text": "Locate ›",
+        "x": 1141,
+        "y": 525,
+        "to": [
+          "307:18245"
+        ]
+      },
+      {
+        "id": "307:24081",
+        "text": "Resolve",
+        "x": 1253,
+        "y": 525,
+        "to": [
+          "310:22226"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "307:18245",
+    "name": "PLAY · F5.13 · Logo located · 24px",
+    "controls": [
+      {
+        "id": "307:18248",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:18321",
+        "text": "‹ Back to Review",
+        "x": 985,
+        "y": 216,
+        "to": [
+          "307:17630"
+        ]
+      },
+      {
+        "id": "307:24553",
+        "text": "24",
+        "x": 1291,
+        "y": 363,
+        "to": [
+          "307:19091"
+        ]
+      },
+      {
+        "id": "307:24558",
+        "text": "‹ Back to Review",
+        "x": 1243,
+        "y": 457,
+        "to": [
+          "307:17630"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "307:19091",
+    "name": "PLAY · F5.14 · Logo enlarged · 28px",
+    "controls": [
+      {
+        "id": "307:19094",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:19167",
+        "text": "‹ Back to Review",
+        "x": 985,
+        "y": 216,
+        "to": [
+          "307:19623"
+        ]
+      },
+      {
+        "id": "307:24625",
+        "text": "‹ Back to Review",
+        "x": 1243,
+        "y": 457,
+        "to": [
+          "307:19623"
+        ]
+      },
+      {
+        "id": "307:24628",
+        "text": "Undo logo size",
+        "x": 1233,
+        "y": 501,
+        "to": [
+          "307:18245"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "307:19623",
+    "name": "PLAY · F5.15 · Return to the same comment",
+    "controls": [
+      {
+        "id": "307:19626",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:24097",
+        "text": "Locate ›",
+        "x": 1141,
+        "y": 525,
+        "to": [
+          "307:19091"
+        ]
+      },
+      {
+        "id": "307:24100",
+        "text": "Resolve",
+        "x": 1253,
+        "y": 525,
+        "to": [
+          "307:20015"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "307:20015",
+    "name": "PLAY · F5.16 · Resolving comment",
+    "controls": [
+      {
+        "id": "307:20018",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:24705",
+        "text": "Fixture: resolve acknowledged",
+        "x": 126,
+        "y": 68,
+        "to": [
+          "307:20799"
+        ]
+      },
+      {
+        "id": "307:24708",
+        "text": "Fixture: resolve rejected",
+        "x": 347,
+        "y": 68,
+        "to": [
+          "307:20407"
+        ]
+      },
+      {
+        "id": "307:20023",
+        "text": "Exit | Atelier Nord | Site settings | In review · 2 | Preview | Publis",
+        "x": 720,
+        "y": 546,
+        "to": []
+      },
+      {
+        "id": "307:24116",
+        "text": "Locate ›",
+        "x": 1141,
+        "y": 525,
+        "to": []
+      }
+    ]
+  },
+  {
+    "id": "307:20407",
+    "name": "PLAY · F5.17 · Resolve failed · comment still open",
+    "controls": [
+      {
+        "id": "307:20410",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:20415",
+        "text": "Exit | Atelier Nord | Site settings | In review · 2 | Preview | Publis",
+        "x": 720,
+        "y": 546,
+        "to": []
+      },
+      {
+        "id": "307:24134",
+        "text": "Locate ›",
+        "x": 1141,
+        "y": 525,
+        "to": [
+          "307:19091"
+        ]
+      },
+      {
+        "id": "307:24137",
+        "text": "Resolve",
+        "x": 1253,
+        "y": 525,
+        "to": []
+      },
+      {
+        "id": "307:24699",
+        "text": "Back to Review",
+        "x": 780,
+        "y": 492,
+        "to": [
+          "307:19623"
+        ]
+      },
+      {
+        "id": "307:24702",
+        "text": "Try again",
+        "x": 893,
+        "y": 492,
+        "to": [
+          "307:20015"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "307:20799",
+    "name": "PLAY · F5.18 · Resolved · approval unchanged",
+    "controls": [
+      {
+        "id": "307:20802",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:24543",
+        "text": "Switch role: client reloads Round 3",
+        "x": 147,
+        "y": 68,
+        "to": [
+          "307:21191"
+        ]
+      },
+      {
+        "id": "307:24154",
+        "text": "Undo resolve",
+        "x": 1161,
+        "y": 558,
+        "to": [
+          "310:22798"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "307:21191",
+    "name": "PLAY · F5.19 · Client · resolved note on frozen snapshot",
+    "controls": [
+      {
+        "id": "307:21194",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:21211",
+        "text": "＋ Add comment  C",
+        "x": 990,
+        "y": 198,
+        "to": [
+          "377:25747"
+        ]
+      },
+      {
+        "id": "307:21238",
+        "text": "Approve Round 3",
+        "x": 1332,
+        "y": 965,
+        "to": [
+          "307:21249"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "307:21249",
+    "name": "PLAY · F5.20 · Approval code entry",
+    "controls": [
+      {
+        "id": "307:21252",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:24734",
+        "text": "Fixture: offline",
+        "x": 80,
+        "y": 68,
+        "to": [
+          "307:22265"
+        ]
+      },
+      {
+        "id": "307:21302",
+        "text": "",
+        "x": 720,
+        "y": 590,
+        "to": [
+          "307:21337"
+        ]
+      },
+      {
+        "id": "307:21304",
+        "text": "Cancel",
+        "x": 736,
+        "y": 650,
+        "to": [
+          "307:21191"
+        ]
+      },
+      {
+        "id": "307:21306",
+        "text": "Send a new code",
+        "x": 574,
+        "y": 710,
+        "to": [
+          "307:21799"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "307:21337",
+    "name": "PLAY · F5.21 · Approval code entered",
+    "controls": [
+      {
+        "id": "307:21340",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:24737",
+        "text": "Fixture: answered in another tab",
+        "x": 136,
+        "y": 68,
+        "to": [
+          "307:22109"
+        ]
+      },
+      {
+        "id": "307:21392",
+        "text": "Cancel",
+        "x": 736,
+        "y": 666,
+        "to": [
+          "307:21191"
+        ]
+      },
+      {
+        "id": "307:21393",
+        "text": "Approve Round 3",
+        "x": 868,
+        "y": 666,
+        "to": [
+          "307:21422"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "307:21422",
+    "name": "PLAY · F5.22 · Approval pending",
+    "controls": [
+      {
+        "id": "307:21425",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:24713",
+        "text": "Fixture: approval acknowledged",
+        "x": 129,
+        "y": 68,
+        "to": [
+          "307:21499"
+        ]
+      },
+      {
+        "id": "307:24716",
+        "text": "Fixture: incorrect code",
+        "x": 347,
+        "y": 68,
+        "to": [
+          "307:21634"
+        ]
+      },
+      {
+        "id": "307:24719",
+        "text": "Fixture: expired code",
+        "x": 533,
+        "y": 68,
+        "to": [
+          "307:21719"
+        ]
+      },
+      {
+        "id": "307:24722",
+        "text": "Fixture: approval failed",
+        "x": 722,
+        "y": 68,
+        "to": [
+          "307:22185"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "307:21499",
+    "name": "PLAY · F5.23 · Approval receipt",
+    "controls": [
+      {
+        "id": "307:21502",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:21552",
+        "text": "Return to review",
+        "x": 888,
+        "y": 646,
+        "to": [
+          "307:21571"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "307:21571",
+    "name": "PLAY · F5.24 · Round 3 approved",
+    "controls": [
+      {
+        "id": "307:21574",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:24740",
+        "text": "Switch role: designer sees stale approval",
+        "x": 168,
+        "y": 68,
+        "to": [
+          "307:22345"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "307:21634",
+    "name": "PLAY · F5.25 · Incorrect code",
+    "controls": [
+      {
+        "id": "307:21637",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:21689",
+        "text": "Cancel",
+        "x": 825,
+        "y": 650,
+        "to": [
+          "307:21191"
+        ]
+      },
+      {
+        "id": "307:21690",
+        "text": "Edit code",
+        "x": 913,
+        "y": 650,
+        "to": [
+          "307:21249"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "307:21719",
+    "name": "PLAY · F5.26 · Expired code",
+    "controls": [
+      {
+        "id": "307:21722",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:21773",
+        "text": "Cancel",
+        "x": 783,
+        "y": 590,
+        "to": [
+          "307:21191"
+        ]
+      },
+      {
+        "id": "307:21774",
+        "text": "Send a new code",
+        "x": 892,
+        "y": 590,
+        "to": [
+          "307:21799"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "307:21799",
+    "name": "PLAY · F5.27 · Sending new code",
+    "controls": [
+      {
+        "id": "307:21802",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:24725",
+        "text": "Fixture: code sent",
+        "x": 87,
+        "y": 68,
+        "to": [
+          "307:21875"
+        ]
+      },
+      {
+        "id": "307:24728",
+        "text": "Fixture: email failed",
+        "x": 256,
+        "y": 68,
+        "to": [
+          "307:21951"
+        ]
+      },
+      {
+        "id": "307:24731",
+        "text": "Fixture: rate limited",
+        "x": 435,
+        "y": 68,
+        "to": [
+          "307:22030"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "307:21875",
+    "name": "PLAY · F5.28 · New code sent",
+    "controls": [
+      {
+        "id": "307:21878",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:21928",
+        "text": "Enter code",
+        "x": 909,
+        "y": 518,
+        "to": [
+          "307:21249"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "307:21951",
+    "name": "PLAY · F5.29 · Code email failed",
+    "controls": [
+      {
+        "id": "307:21954",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:22004",
+        "text": "Cancel",
+        "x": 825,
+        "y": 498,
+        "to": [
+          "307:21249"
+        ]
+      },
+      {
+        "id": "307:22005",
+        "text": "Try again",
+        "x": 913,
+        "y": 498,
+        "to": [
+          "307:21799"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "307:22030",
+    "name": "PLAY · F5.30 · Code rate limited",
+    "controls": [
+      {
+        "id": "307:22033",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:22083",
+        "text": "Cancel",
+        "x": 736,
+        "y": 518,
+        "to": [
+          "307:21191"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "307:22109",
+    "name": "PLAY · F5.31 · Already answered",
+    "controls": [
+      {
+        "id": "307:22112",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:22162",
+        "text": "Reload result",
+        "x": 899,
+        "y": 518,
+        "to": [
+          "307:21499"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "307:22185",
+    "name": "PLAY · F5.32 · Approval failed",
+    "controls": [
+      {
+        "id": "307:22188",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:22239",
+        "text": "Cancel",
+        "x": 825,
+        "y": 590,
+        "to": [
+          "307:21191"
+        ]
+      },
+      {
+        "id": "307:22240",
+        "text": "Try again",
+        "x": 913,
+        "y": 590,
+        "to": [
+          "307:21422"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "307:22265",
+    "name": "PLAY · F5.33 · Approval offline",
+    "controls": [
+      {
+        "id": "307:22268",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:22319",
+        "text": "Cancel",
+        "x": 736,
+        "y": 606,
+        "to": [
+          "307:21191"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "307:22345",
+    "name": "PLAY · F5.34 · Approved · edited since sent snapshot",
+    "controls": [
+      {
+        "id": "307:22348",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:24174",
+        "text": "Request fresh review",
+        "x": 1203,
+        "y": 562,
+        "to": [
+          "307:22737"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "307:22737",
+    "name": "PLAY · F5.35 · Request fresh Round 4",
+    "controls": [
+      {
+        "id": "307:22740",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:22745",
+        "text": "Exit | Atelier Nord | Site settings | In review · 2 | Preview | Publis",
+        "x": 720,
+        "y": 546,
+        "to": []
+      },
+      {
+        "id": "307:24267",
+        "text": "Cancel",
+        "x": 772,
+        "y": 712,
+        "to": [
+          "307:22345"
+        ]
+      },
+      {
+        "id": "307:24270",
+        "text": "Send for review",
+        "x": 896,
+        "y": 712,
+        "to": [
+          "307:23133"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "307:23133",
+    "name": "PLAY · F5.36 · Sending fresh Round 4",
+    "controls": [
+      {
+        "id": "307:23136",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "307:24350",
+        "text": "Fixture: Round 4 acknowledged",
+        "x": 126,
+        "y": 68,
+        "to": [
+          "307:23529"
+        ]
+      },
+      {
+        "id": "307:24353",
+        "text": "Fixture: send rejected · draft kept",
+        "x": 382,
+        "y": 68,
+        "to": [
+          "307:22737"
+        ]
+      },
+      {
+        "id": "307:23141",
+        "text": "Exit | Atelier Nord | Site settings | In review · 2 | Preview | Publis",
+        "x": 720,
+        "y": 546,
+        "to": []
+      },
+      {
+        "id": "307:24213",
+        "text": "Request fresh review",
+        "x": 1203,
+        "y": 562,
+        "to": []
+      }
+    ]
+  },
+  {
+    "id": "307:23529",
+    "name": "PLAY · F5.37 · Round 4 sent · approval pending",
+    "controls": [
+      {
+        "id": "307:23532",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "310:21940",
+    "name": "PLAY · F5.38 · Round 3 sent · awaiting client response",
+    "controls": [
+      {
+        "id": "310:21943",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "310:22223",
+        "text": "Switch role: client opens Round 3",
+        "x": 140,
+        "y": 68,
+        "to": [
+          "307:17295"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "310:22226",
+    "name": "PLAY · F5.39 · Resolve without editing · pending",
+    "controls": [
+      {
+        "id": "310:22229",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "310:22792",
+        "text": "Fixture: resolve acknowledged",
+        "x": 126,
+        "y": 68,
+        "to": [
+          "310:22503"
+        ]
+      },
+      {
+        "id": "310:22795",
+        "text": "Fixture: resolve rejected",
+        "x": 347,
+        "y": 68,
+        "to": [
+          "307:17630"
+        ]
+      },
+      {
+        "id": "310:22234",
+        "text": "Exit | Atelier Nord | Site settings | In review · 2 | Preview | Publis",
+        "x": 720,
+        "y": 546,
+        "to": []
+      }
+    ]
+  },
+  {
+    "id": "310:22503",
+    "name": "PLAY · F5.40 · Resolved without changing Logo",
+    "controls": [
+      {
+        "id": "310:22506",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "310:22798",
+    "name": "PLAY · F5.41 · Undo resolve · pending",
+    "controls": [
+      {
+        "id": "310:22801",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "310:23081",
+        "text": "Fixture: reopen acknowledged",
+        "x": 122,
+        "y": 68,
+        "to": [
+          "307:19623"
+        ]
+      },
+      {
+        "id": "310:23084",
+        "text": "Fixture: reopen rejected",
+        "x": 336,
+        "y": 68,
+        "to": [
+          "307:20799"
+        ]
+      },
+      {
+        "id": "310:22806",
+        "text": "Exit | Atelier Nord | Site settings | In review · 2 | Preview | Publis",
+        "x": 720,
+        "y": 546,
+        "to": []
+      }
+    ]
+  },
+  {
+    "id": "310:23087",
+    "name": "PLAY · F5.42 · Sending without a preview",
+    "controls": [
+      {
+        "id": "310:23090",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "310:23412",
+        "text": "Fixture: no-preview round acknowledged",
+        "x": 157,
+        "y": 68,
+        "to": [
+          "310:23367"
+        ]
+      },
+      {
+        "id": "310:23415",
+        "text": "Fixture: send rejected",
+        "x": 399,
+        "y": 68,
+        "to": [
+          "307:16107"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "310:23367",
+    "name": "PLAY · F5.43 · Client · preview unavailable",
+    "controls": [
+      {
+        "id": "310:23370",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "310:23387",
+        "text": "＋ General note",
+        "x": 990,
+        "y": 198,
+        "to": [
+          "310:23418"
+        ]
+      },
+      {
+        "id": "310:23399",
+        "text": "Approve Round 3",
+        "x": 1332,
+        "y": 965,
+        "to": [
+          "312:24891"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "310:23418",
+    "name": "PLAY · F5.44 · General note · no preview",
+    "controls": [
+      {
+        "id": "310:23421",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "310:23426",
+        "text": "Fieldwork Studio is asking for your feedback | Atelier Nord · Home  ▾ ",
+        "x": 720,
+        "y": 546,
+        "to": []
+      },
+      {
+        "id": "310:23476",
+        "text": "Cancel",
+        "x": 845,
+        "y": 536,
+        "to": [
+          "310:23367"
+        ]
+      },
+      {
+        "id": "310:23479",
+        "text": "Send note",
+        "x": 933,
+        "y": 536,
+        "to": [
+          "310:23486"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "310:23486",
+    "name": "PLAY · F5.45 · Sending general note",
+    "controls": [
+      {
+        "id": "310:23489",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "310:23574",
+        "text": "Fixture: note acknowledged",
+        "x": 115,
+        "y": 68,
+        "to": [
+          "310:23531"
+        ]
+      },
+      {
+        "id": "310:23577",
+        "text": "Fixture: send failed · draft kept",
+        "x": 354,
+        "y": 68,
+        "to": [
+          "310:23418"
+        ]
+      },
+      {
+        "id": "310:23494",
+        "text": "Fieldwork Studio is asking for your feedback | Atelier Nord · Home  ▾ ",
+        "x": 720,
+        "y": 546,
+        "to": []
+      }
+    ]
+  },
+  {
+    "id": "310:23531",
+    "name": "PLAY · F5.46 · General note acknowledged",
+    "controls": [
+      {
+        "id": "310:23534",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "310:23562",
+        "text": "Approve Round 3",
+        "x": 1332,
+        "y": 965,
+        "to": [
+          "312:26022"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:22661",
+    "name": "PLAY · F5-EARLY.20 · Before any comment · F5.20",
+    "controls": [
+      {
+        "id": "312:22664",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:23478",
+        "text": "Fixture: offline",
+        "x": 80,
+        "y": 68,
+        "to": [
+          "312:23356"
+        ]
+      },
+      {
+        "id": "312:22704",
+        "text": "",
+        "x": 720,
+        "y": 590,
+        "to": [
+          "312:22721"
+        ]
+      },
+      {
+        "id": "312:22706",
+        "text": "Cancel",
+        "x": 736,
+        "y": 650,
+        "to": [
+          "307:17295"
+        ]
+      },
+      {
+        "id": "312:22708",
+        "text": "Send a new code",
+        "x": 574,
+        "y": 710,
+        "to": [
+          "312:23037"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:22721",
+    "name": "PLAY · F5-EARLY.21 · Before any comment · F5.21",
+    "controls": [
+      {
+        "id": "312:22724",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:23481",
+        "text": "Fixture: answered in another tab",
+        "x": 136,
+        "y": 68,
+        "to": [
+          "312:23249"
+        ]
+      },
+      {
+        "id": "312:22766",
+        "text": "Cancel",
+        "x": 736,
+        "y": 666,
+        "to": [
+          "307:17295"
+        ]
+      },
+      {
+        "id": "312:22767",
+        "text": "Approve Round 3",
+        "x": 868,
+        "y": 666,
+        "to": [
+          "312:22779"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:22779",
+    "name": "PLAY · F5-EARLY.22 · Before any comment · F5.22",
+    "controls": [
+      {
+        "id": "312:22782",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:23457",
+        "text": "Fixture: approval acknowledged",
+        "x": 129,
+        "y": 68,
+        "to": [
+          "312:22832"
+        ]
+      },
+      {
+        "id": "312:23460",
+        "text": "Fixture: incorrect code",
+        "x": 347,
+        "y": 68,
+        "to": [
+          "312:22924"
+        ]
+      },
+      {
+        "id": "312:23463",
+        "text": "Fixture: expired code",
+        "x": 533,
+        "y": 68,
+        "to": [
+          "312:22982"
+        ]
+      },
+      {
+        "id": "312:23466",
+        "text": "Fixture: approval failed",
+        "x": 722,
+        "y": 68,
+        "to": [
+          "312:23301"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:22832",
+    "name": "PLAY · F5-EARLY.23 · Before any comment · F5.23",
+    "controls": [
+      {
+        "id": "312:22835",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:22875",
+        "text": "Return to review",
+        "x": 888,
+        "y": 646,
+        "to": [
+          "312:22882"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:22882",
+    "name": "PLAY · F5-EARLY.24 · Before any comment · F5.24",
+    "controls": [
+      {
+        "id": "312:22885",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:23756",
+        "text": "Switch role: designer sees current approval",
+        "x": 175,
+        "y": 68,
+        "to": [
+          "312:23485"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:22924",
+    "name": "PLAY · F5-EARLY.25 · Before any comment · F5.25",
+    "controls": [
+      {
+        "id": "312:22927",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:22969",
+        "text": "Cancel",
+        "x": 825,
+        "y": 650,
+        "to": [
+          "307:17295"
+        ]
+      },
+      {
+        "id": "312:22970",
+        "text": "Edit code",
+        "x": 913,
+        "y": 650,
+        "to": [
+          "312:22661"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:22982",
+    "name": "PLAY · F5-EARLY.26 · Before any comment · F5.26",
+    "controls": [
+      {
+        "id": "312:22985",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:23026",
+        "text": "Cancel",
+        "x": 783,
+        "y": 590,
+        "to": [
+          "307:17295"
+        ]
+      },
+      {
+        "id": "312:23027",
+        "text": "Send a new code",
+        "x": 892,
+        "y": 590,
+        "to": [
+          "312:23037"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:23037",
+    "name": "PLAY · F5-EARLY.27 · Before any comment · F5.27",
+    "controls": [
+      {
+        "id": "312:23040",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:23469",
+        "text": "Fixture: code sent",
+        "x": 87,
+        "y": 68,
+        "to": [
+          "312:23089"
+        ]
+      },
+      {
+        "id": "312:23472",
+        "text": "Fixture: email failed",
+        "x": 256,
+        "y": 68,
+        "to": [
+          "312:23141"
+        ]
+      },
+      {
+        "id": "312:23475",
+        "text": "Fixture: rate limited",
+        "x": 435,
+        "y": 68,
+        "to": [
+          "312:23195"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:23089",
+    "name": "PLAY · F5-EARLY.28 · Before any comment · F5.28",
+    "controls": [
+      {
+        "id": "312:23092",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:23132",
+        "text": "Enter code",
+        "x": 909,
+        "y": 518,
+        "to": [
+          "312:22661"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:23141",
+    "name": "PLAY · F5-EARLY.29 · Before any comment · F5.29",
+    "controls": [
+      {
+        "id": "312:23144",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:23184",
+        "text": "Cancel",
+        "x": 825,
+        "y": 498,
+        "to": [
+          "312:22661"
+        ]
+      },
+      {
+        "id": "312:23185",
+        "text": "Try again",
+        "x": 913,
+        "y": 498,
+        "to": [
+          "312:23037"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:23195",
+    "name": "PLAY · F5-EARLY.30 · Before any comment · F5.30",
+    "controls": [
+      {
+        "id": "312:23198",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:23238",
+        "text": "Cancel",
+        "x": 736,
+        "y": 518,
+        "to": [
+          "307:17295"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:23249",
+    "name": "PLAY · F5-EARLY.31 · Before any comment · F5.31",
+    "controls": [
+      {
+        "id": "312:23252",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:23292",
+        "text": "Reload result",
+        "x": 899,
+        "y": 518,
+        "to": [
+          "312:22832"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:23301",
+    "name": "PLAY · F5-EARLY.32 · Before any comment · F5.32",
+    "controls": [
+      {
+        "id": "312:23304",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:23345",
+        "text": "Cancel",
+        "x": 825,
+        "y": 590,
+        "to": [
+          "307:17295"
+        ]
+      },
+      {
+        "id": "312:23346",
+        "text": "Try again",
+        "x": 913,
+        "y": 590,
+        "to": [
+          "312:22779"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:23356",
+    "name": "PLAY · F5-EARLY.33 · Before any comment · F5.33",
+    "controls": [
+      {
+        "id": "312:23359",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:23400",
+        "text": "Cancel",
+        "x": 736,
+        "y": 606,
+        "to": [
+          "307:17295"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:23485",
+    "name": "PLAY · F5-EARLY.34 · Designer · same snapshot approved",
+    "controls": [
+      {
+        "id": "312:23488",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:23759",
+        "text": "Return to approved client review",
+        "x": 136,
+        "y": 68,
+        "to": [
+          "312:22882"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:23762",
+    "name": "PLAY · F5-OPEN.20 · Open comment · no edit yet · F5.20",
+    "controls": [
+      {
+        "id": "312:23765",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:24607",
+        "text": "Fixture: offline",
+        "x": 80,
+        "y": 68,
+        "to": [
+          "312:24457"
+        ]
+      },
+      {
+        "id": "312:23805",
+        "text": "",
+        "x": 720,
+        "y": 590,
+        "to": [
+          "312:23822"
+        ]
+      },
+      {
+        "id": "312:23807",
+        "text": "Cancel",
+        "x": 736,
+        "y": 650,
+        "to": [
+          "307:17572"
+        ]
+      },
+      {
+        "id": "312:23809",
+        "text": "Send a new code",
+        "x": 574,
+        "y": 710,
+        "to": [
+          "312:24138"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:23822",
+    "name": "PLAY · F5-OPEN.21 · Open comment · no edit yet · F5.21",
+    "controls": [
+      {
+        "id": "312:23825",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:24610",
+        "text": "Fixture: answered in another tab",
+        "x": 136,
+        "y": 68,
+        "to": [
+          "312:24350"
+        ]
+      },
+      {
+        "id": "312:23867",
+        "text": "Cancel",
+        "x": 736,
+        "y": 666,
+        "to": [
+          "307:17572"
+        ]
+      },
+      {
+        "id": "312:23868",
+        "text": "Approve Round 3",
+        "x": 868,
+        "y": 666,
+        "to": [
+          "312:23880"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:23880",
+    "name": "PLAY · F5-OPEN.22 · Open comment · no edit yet · F5.22",
+    "controls": [
+      {
+        "id": "312:23883",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:24586",
+        "text": "Fixture: approval acknowledged",
+        "x": 129,
+        "y": 68,
+        "to": [
+          "312:23933"
+        ]
+      },
+      {
+        "id": "312:24589",
+        "text": "Fixture: incorrect code",
+        "x": 347,
+        "y": 68,
+        "to": [
+          "312:24025"
+        ]
+      },
+      {
+        "id": "312:24592",
+        "text": "Fixture: expired code",
+        "x": 533,
+        "y": 68,
+        "to": [
+          "312:24083"
+        ]
+      },
+      {
+        "id": "312:24595",
+        "text": "Fixture: approval failed",
+        "x": 722,
+        "y": 68,
+        "to": [
+          "312:24402"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:23933",
+    "name": "PLAY · F5-OPEN.23 · Open comment · no edit yet · F5.23",
+    "controls": [
+      {
+        "id": "312:23936",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:23976",
+        "text": "Return to review",
+        "x": 888,
+        "y": 646,
+        "to": [
+          "312:23983"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:23983",
+    "name": "PLAY · F5-OPEN.24 · Open comment · no edit yet · F5.24",
+    "controls": [
+      {
+        "id": "312:23986",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:24885",
+        "text": "Switch role: designer sees current approval",
+        "x": 175,
+        "y": 68,
+        "to": [
+          "312:24614"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:24025",
+    "name": "PLAY · F5-OPEN.25 · Open comment · no edit yet · F5.25",
+    "controls": [
+      {
+        "id": "312:24028",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:24070",
+        "text": "Cancel",
+        "x": 825,
+        "y": 650,
+        "to": [
+          "307:17572"
+        ]
+      },
+      {
+        "id": "312:24071",
+        "text": "Edit code",
+        "x": 913,
+        "y": 650,
+        "to": [
+          "312:23762"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:24083",
+    "name": "PLAY · F5-OPEN.26 · Open comment · no edit yet · F5.26",
+    "controls": [
+      {
+        "id": "312:24086",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:24127",
+        "text": "Cancel",
+        "x": 783,
+        "y": 590,
+        "to": [
+          "307:17572"
+        ]
+      },
+      {
+        "id": "312:24128",
+        "text": "Send a new code",
+        "x": 892,
+        "y": 590,
+        "to": [
+          "312:24138"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:24138",
+    "name": "PLAY · F5-OPEN.27 · Open comment · no edit yet · F5.27",
+    "controls": [
+      {
+        "id": "312:24141",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:24598",
+        "text": "Fixture: code sent",
+        "x": 87,
+        "y": 68,
+        "to": [
+          "312:24190"
+        ]
+      },
+      {
+        "id": "312:24601",
+        "text": "Fixture: email failed",
+        "x": 256,
+        "y": 68,
+        "to": [
+          "312:24242"
+        ]
+      },
+      {
+        "id": "312:24604",
+        "text": "Fixture: rate limited",
+        "x": 435,
+        "y": 68,
+        "to": [
+          "312:24296"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:24190",
+    "name": "PLAY · F5-OPEN.28 · Open comment · no edit yet · F5.28",
+    "controls": [
+      {
+        "id": "312:24193",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:24233",
+        "text": "Enter code",
+        "x": 909,
+        "y": 518,
+        "to": [
+          "312:23762"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:24242",
+    "name": "PLAY · F5-OPEN.29 · Open comment · no edit yet · F5.29",
+    "controls": [
+      {
+        "id": "312:24245",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:24285",
+        "text": "Cancel",
+        "x": 825,
+        "y": 498,
+        "to": [
+          "312:23762"
+        ]
+      },
+      {
+        "id": "312:24286",
+        "text": "Try again",
+        "x": 913,
+        "y": 498,
+        "to": [
+          "312:24138"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:24296",
+    "name": "PLAY · F5-OPEN.30 · Open comment · no edit yet · F5.30",
+    "controls": [
+      {
+        "id": "312:24299",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:24339",
+        "text": "Cancel",
+        "x": 736,
+        "y": 518,
+        "to": [
+          "307:17572"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:24350",
+    "name": "PLAY · F5-OPEN.31 · Open comment · no edit yet · F5.31",
+    "controls": [
+      {
+        "id": "312:24353",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:24393",
+        "text": "Reload result",
+        "x": 899,
+        "y": 518,
+        "to": [
+          "312:23933"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:24402",
+    "name": "PLAY · F5-OPEN.32 · Open comment · no edit yet · F5.32",
+    "controls": [
+      {
+        "id": "312:24405",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:24446",
+        "text": "Cancel",
+        "x": 825,
+        "y": 590,
+        "to": [
+          "307:17572"
+        ]
+      },
+      {
+        "id": "312:24447",
+        "text": "Try again",
+        "x": 913,
+        "y": 590,
+        "to": [
+          "312:23880"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:24457",
+    "name": "PLAY · F5-OPEN.33 · Open comment · no edit yet · F5.33",
+    "controls": [
+      {
+        "id": "312:24460",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:24501",
+        "text": "Cancel",
+        "x": 736,
+        "y": 606,
+        "to": [
+          "307:17572"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:24614",
+    "name": "PLAY · F5-OPEN.34 · Designer · same snapshot approved",
+    "controls": [
+      {
+        "id": "312:24617",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:24888",
+        "text": "Return to approved client review",
+        "x": 136,
+        "y": 68,
+        "to": [
+          "312:23983"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:24891",
+    "name": "PLAY · F5-NOPREVIEW.20 · No preview · no comments · F5.20",
+    "controls": [
+      {
+        "id": "312:24894",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:25738",
+        "text": "Fixture: offline",
+        "x": 80,
+        "y": 68,
+        "to": [
+          "312:25586"
+        ]
+      },
+      {
+        "id": "312:24934",
+        "text": "",
+        "x": 720,
+        "y": 590,
+        "to": [
+          "312:24951"
+        ]
+      },
+      {
+        "id": "312:24936",
+        "text": "Cancel",
+        "x": 736,
+        "y": 706,
+        "to": [
+          "310:23367"
+        ]
+      },
+      {
+        "id": "312:24938",
+        "text": "Send a new code",
+        "x": 574,
+        "y": 766,
+        "to": [
+          "312:25267"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:24951",
+    "name": "PLAY · F5-NOPREVIEW.21 · No preview · no comments · F5.21",
+    "controls": [
+      {
+        "id": "312:24954",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:25741",
+        "text": "Fixture: answered in another tab",
+        "x": 136,
+        "y": 68,
+        "to": [
+          "312:25479"
+        ]
+      },
+      {
+        "id": "312:24996",
+        "text": "Cancel",
+        "x": 736,
+        "y": 722,
+        "to": [
+          "310:23367"
+        ]
+      },
+      {
+        "id": "312:24997",
+        "text": "Approve Round 3",
+        "x": 868,
+        "y": 722,
+        "to": [
+          "312:25009"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:25009",
+    "name": "PLAY · F5-NOPREVIEW.22 · No preview · no comments · F5.22",
+    "controls": [
+      {
+        "id": "312:25012",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:25717",
+        "text": "Fixture: approval acknowledged",
+        "x": 129,
+        "y": 68,
+        "to": [
+          "312:25062"
+        ]
+      },
+      {
+        "id": "312:25720",
+        "text": "Fixture: incorrect code",
+        "x": 347,
+        "y": 68,
+        "to": [
+          "312:25154"
+        ]
+      },
+      {
+        "id": "312:25723",
+        "text": "Fixture: expired code",
+        "x": 533,
+        "y": 68,
+        "to": [
+          "312:25212"
+        ]
+      },
+      {
+        "id": "312:25726",
+        "text": "Fixture: approval failed",
+        "x": 722,
+        "y": 68,
+        "to": [
+          "312:25531"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:25062",
+    "name": "PLAY · F5-NOPREVIEW.23 · No preview · no comments · F5.23",
+    "controls": [
+      {
+        "id": "312:25065",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:25105",
+        "text": "Return to review",
+        "x": 888,
+        "y": 646,
+        "to": [
+          "312:25112"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:25112",
+    "name": "PLAY · F5-NOPREVIEW.24 · No preview · no comments · F5.24",
+    "controls": [
+      {
+        "id": "312:25115",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:26016",
+        "text": "Switch role: designer sees current approval",
+        "x": 175,
+        "y": 68,
+        "to": [
+          "312:25745"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:25154",
+    "name": "PLAY · F5-NOPREVIEW.25 · No preview · no comments · F5.25",
+    "controls": [
+      {
+        "id": "312:25157",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:25199",
+        "text": "Cancel",
+        "x": 825,
+        "y": 650,
+        "to": [
+          "310:23367"
+        ]
+      },
+      {
+        "id": "312:25200",
+        "text": "Edit code",
+        "x": 913,
+        "y": 650,
+        "to": [
+          "312:24891"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:25212",
+    "name": "PLAY · F5-NOPREVIEW.26 · No preview · no comments · F5.26",
+    "controls": [
+      {
+        "id": "312:25215",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:25256",
+        "text": "Cancel",
+        "x": 783,
+        "y": 590,
+        "to": [
+          "310:23367"
+        ]
+      },
+      {
+        "id": "312:25257",
+        "text": "Send a new code",
+        "x": 892,
+        "y": 590,
+        "to": [
+          "312:25267"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:25267",
+    "name": "PLAY · F5-NOPREVIEW.27 · No preview · no comments · F5.27",
+    "controls": [
+      {
+        "id": "312:25270",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:25729",
+        "text": "Fixture: code sent",
+        "x": 87,
+        "y": 68,
+        "to": [
+          "312:25319"
+        ]
+      },
+      {
+        "id": "312:25732",
+        "text": "Fixture: email failed",
+        "x": 256,
+        "y": 68,
+        "to": [
+          "312:25371"
+        ]
+      },
+      {
+        "id": "312:25735",
+        "text": "Fixture: rate limited",
+        "x": 435,
+        "y": 68,
+        "to": [
+          "312:25425"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:25319",
+    "name": "PLAY · F5-NOPREVIEW.28 · No preview · no comments · F5.28",
+    "controls": [
+      {
+        "id": "312:25322",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:25362",
+        "text": "Enter code",
+        "x": 909,
+        "y": 518,
+        "to": [
+          "312:24891"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:25371",
+    "name": "PLAY · F5-NOPREVIEW.29 · No preview · no comments · F5.29",
+    "controls": [
+      {
+        "id": "312:25374",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:25414",
+        "text": "Cancel",
+        "x": 825,
+        "y": 498,
+        "to": [
+          "312:24891"
+        ]
+      },
+      {
+        "id": "312:25415",
+        "text": "Try again",
+        "x": 913,
+        "y": 498,
+        "to": [
+          "312:25267"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:25425",
+    "name": "PLAY · F5-NOPREVIEW.30 · No preview · no comments · F5.30",
+    "controls": [
+      {
+        "id": "312:25428",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:25468",
+        "text": "Cancel",
+        "x": 736,
+        "y": 518,
+        "to": [
+          "310:23367"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:25479",
+    "name": "PLAY · F5-NOPREVIEW.31 · No preview · no comments · F5.31",
+    "controls": [
+      {
+        "id": "312:25482",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:25522",
+        "text": "Reload result",
+        "x": 899,
+        "y": 518,
+        "to": [
+          "312:25062"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:25531",
+    "name": "PLAY · F5-NOPREVIEW.32 · No preview · no comments · F5.32",
+    "controls": [
+      {
+        "id": "312:25534",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:25575",
+        "text": "Cancel",
+        "x": 825,
+        "y": 590,
+        "to": [
+          "310:23367"
+        ]
+      },
+      {
+        "id": "312:25576",
+        "text": "Try again",
+        "x": 913,
+        "y": 590,
+        "to": [
+          "312:25009"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:25586",
+    "name": "PLAY · F5-NOPREVIEW.33 · No preview · no comments · F5.33",
+    "controls": [
+      {
+        "id": "312:25589",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:25630",
+        "text": "Cancel",
+        "x": 736,
+        "y": 606,
+        "to": [
+          "310:23367"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:25745",
+    "name": "PLAY · F5-NOPREVIEW.34 · Designer · same snapshot approved",
+    "controls": [
+      {
+        "id": "312:25748",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:26019",
+        "text": "Return to approved client review",
+        "x": 136,
+        "y": 68,
+        "to": [
+          "312:25112"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:26022",
+    "name": "PLAY · F5-NOTE.20 · No preview · general note · F5.20",
+    "controls": [
+      {
+        "id": "312:26025",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:26897",
+        "text": "Fixture: offline",
+        "x": 80,
+        "y": 68,
+        "to": [
+          "312:26717"
+        ]
+      },
+      {
+        "id": "312:26065",
+        "text": "",
+        "x": 720,
+        "y": 590,
+        "to": [
+          "312:26082"
+        ]
+      },
+      {
+        "id": "312:26067",
+        "text": "Cancel",
+        "x": 736,
+        "y": 706,
+        "to": [
+          "310:23531"
+        ]
+      },
+      {
+        "id": "312:26069",
+        "text": "Send a new code",
+        "x": 574,
+        "y": 766,
+        "to": [
+          "312:26398"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:26082",
+    "name": "PLAY · F5-NOTE.21 · No preview · general note · F5.21",
+    "controls": [
+      {
+        "id": "312:26085",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:26900",
+        "text": "Fixture: answered in another tab",
+        "x": 136,
+        "y": 68,
+        "to": [
+          "312:26610"
+        ]
+      },
+      {
+        "id": "312:26127",
+        "text": "Cancel",
+        "x": 736,
+        "y": 722,
+        "to": [
+          "310:23531"
+        ]
+      },
+      {
+        "id": "312:26128",
+        "text": "Approve Round 3",
+        "x": 868,
+        "y": 722,
+        "to": [
+          "312:26140"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:26140",
+    "name": "PLAY · F5-NOTE.22 · No preview · general note · F5.22",
+    "controls": [
+      {
+        "id": "312:26143",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:26876",
+        "text": "Fixture: approval acknowledged",
+        "x": 129,
+        "y": 68,
+        "to": [
+          "312:26193"
+        ]
+      },
+      {
+        "id": "312:26879",
+        "text": "Fixture: incorrect code",
+        "x": 347,
+        "y": 68,
+        "to": [
+          "312:26285"
+        ]
+      },
+      {
+        "id": "312:26882",
+        "text": "Fixture: expired code",
+        "x": 533,
+        "y": 68,
+        "to": [
+          "312:26343"
+        ]
+      },
+      {
+        "id": "312:26885",
+        "text": "Fixture: approval failed",
+        "x": 722,
+        "y": 68,
+        "to": [
+          "312:26662"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:26193",
+    "name": "PLAY · F5-NOTE.23 · No preview · general note · F5.23",
+    "controls": [
+      {
+        "id": "312:26196",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:26236",
+        "text": "Return to review",
+        "x": 888,
+        "y": 646,
+        "to": [
+          "312:26243"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:26243",
+    "name": "PLAY · F5-NOTE.24 · No preview · general note · F5.24",
+    "controls": [
+      {
+        "id": "312:26246",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:27175",
+        "text": "Switch role: designer sees current approval",
+        "x": 175,
+        "y": 68,
+        "to": [
+          "312:26904"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:26285",
+    "name": "PLAY · F5-NOTE.25 · No preview · general note · F5.25",
+    "controls": [
+      {
+        "id": "312:26288",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:26330",
+        "text": "Cancel",
+        "x": 825,
+        "y": 650,
+        "to": [
+          "310:23531"
+        ]
+      },
+      {
+        "id": "312:26331",
+        "text": "Edit code",
+        "x": 913,
+        "y": 650,
+        "to": [
+          "312:26022"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:26343",
+    "name": "PLAY · F5-NOTE.26 · No preview · general note · F5.26",
+    "controls": [
+      {
+        "id": "312:26346",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:26387",
+        "text": "Cancel",
+        "x": 783,
+        "y": 590,
+        "to": [
+          "310:23531"
+        ]
+      },
+      {
+        "id": "312:26388",
+        "text": "Send a new code",
+        "x": 892,
+        "y": 590,
+        "to": [
+          "312:26398"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:26398",
+    "name": "PLAY · F5-NOTE.27 · No preview · general note · F5.27",
+    "controls": [
+      {
+        "id": "312:26401",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:26888",
+        "text": "Fixture: code sent",
+        "x": 87,
+        "y": 68,
+        "to": [
+          "312:26450"
+        ]
+      },
+      {
+        "id": "312:26891",
+        "text": "Fixture: email failed",
+        "x": 256,
+        "y": 68,
+        "to": [
+          "312:26502"
+        ]
+      },
+      {
+        "id": "312:26894",
+        "text": "Fixture: rate limited",
+        "x": 435,
+        "y": 68,
+        "to": [
+          "312:26556"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:26450",
+    "name": "PLAY · F5-NOTE.28 · No preview · general note · F5.28",
+    "controls": [
+      {
+        "id": "312:26453",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:26493",
+        "text": "Enter code",
+        "x": 909,
+        "y": 518,
+        "to": [
+          "312:26022"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:26502",
+    "name": "PLAY · F5-NOTE.29 · No preview · general note · F5.29",
+    "controls": [
+      {
+        "id": "312:26505",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:26545",
+        "text": "Cancel",
+        "x": 825,
+        "y": 498,
+        "to": [
+          "312:26022"
+        ]
+      },
+      {
+        "id": "312:26546",
+        "text": "Try again",
+        "x": 913,
+        "y": 498,
+        "to": [
+          "312:26398"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:26556",
+    "name": "PLAY · F5-NOTE.30 · No preview · general note · F5.30",
+    "controls": [
+      {
+        "id": "312:26559",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:26599",
+        "text": "Cancel",
+        "x": 736,
+        "y": 518,
+        "to": [
+          "310:23531"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:26610",
+    "name": "PLAY · F5-NOTE.31 · No preview · general note · F5.31",
+    "controls": [
+      {
+        "id": "312:26613",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:26653",
+        "text": "Reload result",
+        "x": 899,
+        "y": 518,
+        "to": [
+          "312:26193"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:26662",
+    "name": "PLAY · F5-NOTE.32 · No preview · general note · F5.32",
+    "controls": [
+      {
+        "id": "312:26665",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:26706",
+        "text": "Cancel",
+        "x": 825,
+        "y": 590,
+        "to": [
+          "310:23531"
+        ]
+      },
+      {
+        "id": "312:26707",
+        "text": "Try again",
+        "x": 913,
+        "y": 590,
+        "to": [
+          "312:26140"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:26717",
+    "name": "PLAY · F5-NOTE.33 · No preview · general note · F5.33",
+    "controls": [
+      {
+        "id": "312:26720",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:26761",
+        "text": "Cancel",
+        "x": 736,
+        "y": 606,
+        "to": [
+          "310:23531"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "312:26904",
+    "name": "PLAY · F5-NOTE.34 · Designer · same snapshot approved",
+    "controls": [
+      {
+        "id": "312:26907",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "312:27178",
+        "text": "Return to approved client review",
+        "x": 136,
+        "y": 68,
+        "to": [
+          "312:26243"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "377:25498",
+    "name": "PLAY · F5-SECOND-OPEN.1 · Second comment draft",
+    "controls": [
+      {
+        "id": "377:25501",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "377:25526",
+        "text": "Cancel",
+        "x": 279,
+        "y": 375,
+        "to": [
+          "307:17572"
+        ]
+      },
+      {
+        "id": "377:25527",
+        "text": "Send ⌘↵",
+        "x": 375,
+        "y": 375,
+        "to": [
+          "377:25549"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "377:25549",
+    "name": "PLAY · F5-SECOND-OPEN.2 · Sending second comment",
+    "controls": [
+      {
+        "id": "377:25552",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "377:25556",
+        "text": "Fixture: comment acknowledged",
+        "x": 126,
+        "y": 68,
+        "to": [
+          "377:25669"
+        ]
+      },
+      {
+        "id": "377:25557",
+        "text": "Fixture: comment rejected",
+        "x": 347,
+        "y": 68,
+        "to": [
+          "377:25609"
+        ]
+      },
+      {
+        "id": "377:25558",
+        "text": "Fieldwork Studio is asking for your feedback | Atelier Nord · Home  ▾ ",
+        "x": 720,
+        "y": 546,
+        "to": []
+      },
+      {
+        "id": "377:25570",
+        "text": "＋ Add comment  C",
+        "x": 990,
+        "y": 192,
+        "to": []
+      }
+    ]
+  },
+  {
+    "id": "377:25609",
+    "name": "PLAY · F5-SECOND-OPEN.3 · Second comment failed · draft retained",
+    "controls": [
+      {
+        "id": "377:25612",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "377:25616",
+        "text": "Fieldwork Studio is asking for your feedback | Atelier Nord · Home  ▾ ",
+        "x": 720,
+        "y": 546,
+        "to": []
+      },
+      {
+        "id": "377:25628",
+        "text": "＋ Add comment  C",
+        "x": 990,
+        "y": 192,
+        "to": []
+      },
+      {
+        "id": "377:25653",
+        "text": "Keep editing",
+        "x": 787,
+        "y": 492,
+        "to": [
+          "377:25498"
+        ]
+      },
+      {
+        "id": "377:25654",
+        "text": "Try again",
+        "x": 893,
+        "y": 492,
+        "to": [
+          "377:25549"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "377:25669",
+    "name": "PLAY · F5-SECOND-OPEN.4 · Second comment acknowledged · two threads",
+    "controls": [
+      {
+        "id": "377:25672",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "377:25747",
+    "name": "PLAY · F5-SECOND-RESOLVED.1 · Second comment draft",
+    "controls": [
+      {
+        "id": "377:25750",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "377:25775",
+        "text": "Cancel",
+        "x": 279,
+        "y": 375,
+        "to": [
+          "307:21191"
+        ]
+      },
+      {
+        "id": "377:25776",
+        "text": "Send ⌘↵",
+        "x": 375,
+        "y": 375,
+        "to": [
+          "377:25798"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "377:25798",
+    "name": "PLAY · F5-SECOND-RESOLVED.2 · Sending second comment",
+    "controls": [
+      {
+        "id": "377:25801",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "377:25805",
+        "text": "Fixture: comment acknowledged",
+        "x": 126,
+        "y": 68,
+        "to": [
+          "377:25918"
+        ]
+      },
+      {
+        "id": "377:25806",
+        "text": "Fixture: comment rejected",
+        "x": 347,
+        "y": 68,
+        "to": [
+          "377:25858"
+        ]
+      },
+      {
+        "id": "377:25807",
+        "text": "Fieldwork Studio is asking for your feedback | Atelier Nord · Home  ▾ ",
+        "x": 720,
+        "y": 546,
+        "to": []
+      },
+      {
+        "id": "377:25819",
+        "text": "＋ Add comment  C",
+        "x": 990,
+        "y": 192,
+        "to": []
+      }
+    ]
+  },
+  {
+    "id": "377:25858",
+    "name": "PLAY · F5-SECOND-RESOLVED.3 · Second comment failed · draft retained",
+    "controls": [
+      {
+        "id": "377:25861",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "377:25865",
+        "text": "Fieldwork Studio is asking for your feedback | Atelier Nord · Home  ▾ ",
+        "x": 720,
+        "y": 546,
+        "to": []
+      },
+      {
+        "id": "377:25877",
+        "text": "＋ Add comment  C",
+        "x": 990,
+        "y": 192,
+        "to": []
+      },
+      {
+        "id": "377:25902",
+        "text": "Keep editing",
+        "x": 787,
+        "y": 492,
+        "to": [
+          "377:25747"
+        ]
+      },
+      {
+        "id": "377:25903",
+        "text": "Try again",
+        "x": 893,
+        "y": 492,
+        "to": [
+          "377:25798"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "377:25918",
+    "name": "PLAY · F5-SECOND-RESOLVED.4 · Second comment acknowledged · two threads",
+    "controls": [
+      {
+        "id": "377:25921",
+        "text": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      }
+    ]
+  }
+]

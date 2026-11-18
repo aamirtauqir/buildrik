@@ -1,0 +1,46 @@
+[
+  {
+    "w": 300,
+    "h": 150,
+    "x": 0,
+    "y": 0,
+    "displayWidth": 300,
+    "displayHeight": 150,
+    "class": "styles-module__drawCanvas___7cG9U ",
+    "html": "<canvas class=\"styles-module__drawCanvas___7cG9U \" data-feedback-toolbar=\"true\" style=\"opacity: 0; transition: opacity 0.15s;\"></canvas>",
+    "parent": "<div data-agentation-theme=\"dark\" data-agentation-accent=\"blue\" data-agentation-root=\"\" style=\"display: contents;\"><div class=\"styles-module__toolbar___wNsdK\" data-feedback-toolbar=\"true\" data-agentation-toolbar=\"true\"><div class=\"styles-module__toolbarContainer___dIhma styles-module__collapsed___Rydsn   \" role=\"button\" tabindex=\"0\" title=\"Start feedback mode\"><div class=\"styles-module__toggleContent___0yfyP styles-module__visible___KHwEW\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\"><g clip-path=\"url(#clip0_list_sparkle)\"><path d=\"M11.5 12L5.5 12\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path><path d=\"M18.5 6.75L5.5 6.75\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path><path d=\"M9.25 17.25L5.5 17.25\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path><path d=\"M16 12.75L16.5179 13.9677C16.8078 14.6494 17.3506 15.1922 18.0323 15.4821L19.25 16L18.0323 16.5179C17.3506 16.8078 16.8078 17.3506 16.5179 18.0323L16 19.25L15.4821 18.0323C15.1922 17.3506 14.6494 16.8078 13.9677 16.5179L12.75 16L13.9677 15.4821C14.6494 15.1922 15.1922 14.6494 15.4821 13.9677L16 12.75Z\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linejoin=\"round\"></path></g><defs><clipPath id=\"clip0_list_sparkle\"><rect width=\"24\" height=\"24\" fill=\"white\"></rect></clipPath></defs></svg></div><div class=\"styles-module__controlsContent___9GJWU styles-module__hidden___Ae8H4   \"><div class=\"styles-module__buttonWrapper___rBcdv \"><button class=\"styles-module__controlButton___8Q0jc\" data-active=\"false\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\"><g class=\"icon-transitions-module__iconFadeFast___Ofb2t icon-transitions-module__visible___PlHsU\"><path d="
+  },
+  {
+    "w": 248,
+    "h": 120,
+    "x": 966,
+    "y": 364,
+    "displayWidth": 248,
+    "displayHeight": 120,
+    "class": "tw:block tw:h-30 tw:w-full tw:cursor-crosshair tw:rounded",
+    "html": "<canvas width=\"248\" height=\"120\" class=\"tw:block tw:h-30 tw:w-full tw:cursor-crosshair tw:rounded\" aria-label=\"Shade\"></canvas>",
+    "parent": "<div class=\"tw:relative\"><canvas width=\"248\" height=\"120\" class=\"tw:block tw:h-30 tw:w-full tw:cursor-crosshair tw:rounded\" aria-label=\"Shade\"></canvas><div class=\"tw:pointer-events-none tw:absolute tw:size-3 tw:-translate-x-1/2 tw:-translate-y-1/2 tw:rounded-full tw:border-2 tw:border-white\" aria-hidden=\"true\" style=\"left: 88.1%; top: 14.1%;\"></div></div>"
+  },
+  {
+    "w": 248,
+    "h": 8,
+    "x": 966,
+    "y": 496,
+    "displayWidth": 248,
+    "displayHeight": 8,
+    "class": "tw:block tw:h-2 tw:w-full tw:cursor-pointer tw:rounded-full",
+    "html": "<canvas width=\"248\" height=\"8\" class=\"tw:block tw:h-2 tw:w-full tw:cursor-pointer tw:rounded-full\" aria-label=\"Hue\"></canvas>",
+    "parent": "<div class=\"tw:relative tw:h-2\"><canvas width=\"248\" height=\"8\" class=\"tw:block tw:h-2 tw:w-full tw:cursor-pointer tw:rounded-full\" aria-label=\"Hue\"></canvas><div class=\"tw:pointer-events-none tw:absolute tw:top-1/2 tw:size-3.5 tw:-translate-x-1/2 tw:-translate-y-1/2 tw:rounded-full tw:border-2 tw:border-white tw:shadow-[var(--bk-shadow-raised)]\" aria-hidden=\"true\" style=\"left: 61.3889%; background: rgb(0, 81, 255);\"></div></div>"
+  },
+  {
+    "w": 248,
+    "h": 8,
+    "x": 966,
+    "y": 520.25,
+    "displayWidth": 204,
+    "displayHeight": 8,
+    "class": "tw:block tw:h-2 tw:w-full tw:cursor-pointer tw:rounded-full",
+    "html": "<canvas width=\"248\" height=\"8\" class=\"tw:block tw:h-2 tw:w-full tw:cursor-pointer tw:rounded-full\" aria-label=\"Opacity\"></canvas>",
+    "parent": "<div class=\"tw:relative tw:h-2 tw:flex-1\"><canvas width=\"248\" height=\"8\" class=\"tw:block tw:h-2 tw:w-full tw:cursor-pointer tw:rounded-full\" aria-label=\"Opacity\"></canvas><div class=\"tw:pointer-events-none tw:absolute tw:top-1/2 tw:size-3.5 tw:-translate-x-1/2 tw:-translate-y-1/2 tw:rounded-full tw:border-2 tw:border-white tw:shadow-[var(--bk-shadow-raised)] tw:bg-white\" aria-hidden=\"true\" style=\"left: 100%;\"></div></div>"
+  }
+]

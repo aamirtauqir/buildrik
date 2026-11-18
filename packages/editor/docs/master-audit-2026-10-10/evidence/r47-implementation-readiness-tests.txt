@@ -1,0 +1,12 @@
+2026-10-14 — existing production test verification; no production/test edits
+
+Command:
+npx vitest run src/editor/inspector/sections/typeBlock/__tests__/textBodies.test.tsx src/editor/inspector/hooks/__tests__/useFieldOverrides.test.ts src/editor/inspector/hooks/__tests__/useStyleHandlers.responsive.test.ts src/editor/inspector/config/__tests__/cssContext.effectiveStyles.test.ts
+
+Result: 4 files passed; 41 tests passed; exit code 0; duration 5.62 seconds.
+
+Scope: existing mocked/component/handler contracts only. This does not verify full runtime history, rendered Desktop/Tablet/Mobile cascade, Figma visual acceptance or complete implementation readiness.
+
+Fresh source finding: commandOperations.ts stylesAt merges base plus current breakpoint only. On Mobile this omits a Tablet-only declaration. TextStyleRow and useFieldOverrides already implement token binding/Custom and local override removal respectively; they should be reused and corrected where needed, not reimplemented from finite Figma variables.
+
+The r47-restore-shell.js Figma script has been saved but has NOT been executed. No R47 shell restoration is claimed.

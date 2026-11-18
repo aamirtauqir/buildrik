@@ -1,0 +1,528 @@
+{
+  "mutatedNodeIds": [
+    "423:96903",
+    "423:97866",
+    "423:97552",
+    "423:99224",
+    "423:97218",
+    "423:98182",
+    "423:98532",
+    "423:98884"
+  ],
+  "routes": [
+    [
+      "423:96903",
+      [
+        13
+      ],
+      "423:97218"
+    ],
+    [
+      "423:97866",
+      [
+        13
+      ],
+      "423:97218"
+    ],
+    [
+      "423:97552",
+      [
+        13
+      ],
+      "423:97218"
+    ],
+    [
+      "423:99224",
+      [
+        13
+      ],
+      "423:98884"
+    ],
+    [
+      "423:97218",
+      [
+        27
+      ],
+      "423:97552"
+    ],
+    [
+      "423:98182",
+      [
+        27
+      ],
+      "423:97218"
+    ],
+    [
+      "423:98532",
+      [
+        27
+      ],
+      "423:97218"
+    ],
+    [
+      "423:98884",
+      [
+        27
+      ],
+      "423:99224"
+    ],
+    [
+      "423:97552",
+      [
+        91,
+        90
+      ],
+      "423:97866"
+    ],
+    [
+      "423:97552",
+      [
+        17,
+        90
+      ],
+      "423:97866"
+    ],
+    [
+      "423:99224",
+      [
+        91,
+        90
+      ],
+      "423:97866"
+    ],
+    [
+      "423:99224",
+      [
+        17,
+        90
+      ],
+      "423:97866"
+    ]
+  ],
+  "out": [
+    {
+      "id": "423:96903",
+      "reactions": [
+        {
+          "action": null,
+          "actions": [],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        },
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "423:97218",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": false
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "423:97218",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": false
+            }
+          ],
+          "trigger": {
+            "type": "ON_KEY_DOWN",
+            "device": "KEYBOARD",
+            "keyCodes": [
+              13
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "423:97866",
+      "reactions": [
+        {
+          "action": null,
+          "actions": [],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        },
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "423:97218",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": false
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "423:97218",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": false
+            }
+          ],
+          "trigger": {
+            "type": "ON_KEY_DOWN",
+            "device": "KEYBOARD",
+            "keyCodes": [
+              13
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "423:97552",
+      "reactions": [
+        {
+          "action": null,
+          "actions": [],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        },
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "423:97218",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": false
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "423:97218",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": false
+            }
+          ],
+          "trigger": {
+            "type": "ON_KEY_DOWN",
+            "device": "KEYBOARD",
+            "keyCodes": [
+              13
+            ]
+          }
+        },
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "423:97866",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": false
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "423:97866",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": false
+            }
+          ],
+          "trigger": {
+            "type": "ON_KEY_DOWN",
+            "device": "KEYBOARD",
+            "keyCodes": [
+              91,
+              90
+            ]
+          }
+        },
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "423:97866",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": false
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "423:97866",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": false
+            }
+          ],
+          "trigger": {
+            "type": "ON_KEY_DOWN",
+            "device": "KEYBOARD",
+            "keyCodes": [
+              17,
+              90
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "423:99224",
+      "reactions": [
+        {
+          "action": null,
+          "actions": [],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        },
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "423:98884",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": false
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "423:98884",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": false
+            }
+          ],
+          "trigger": {
+            "type": "ON_KEY_DOWN",
+            "device": "KEYBOARD",
+            "keyCodes": [
+              13
+            ]
+          }
+        },
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "423:97866",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": false
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "423:97866",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": false
+            }
+          ],
+          "trigger": {
+            "type": "ON_KEY_DOWN",
+            "device": "KEYBOARD",
+            "keyCodes": [
+              91,
+              90
+            ]
+          }
+        },
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "423:97866",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": false
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "423:97866",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": false
+            }
+          ],
+          "trigger": {
+            "type": "ON_KEY_DOWN",
+            "device": "KEYBOARD",
+            "keyCodes": [
+              17,
+              90
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "423:97218",
+      "reactions": [
+        {
+          "action": null,
+          "actions": [],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        },
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "423:97552",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": false
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "423:97552",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": false
+            }
+          ],
+          "trigger": {
+            "type": "ON_KEY_DOWN",
+            "device": "KEYBOARD",
+            "keyCodes": [
+              27
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "423:98182",
+      "reactions": [
+        {
+          "action": null,
+          "actions": [],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        },
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "423:97218",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": false
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "423:97218",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": false
+            }
+          ],
+          "trigger": {
+            "type": "ON_KEY_DOWN",
+            "device": "KEYBOARD",
+            "keyCodes": [
+              27
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "423:98532",
+      "reactions": [
+        {
+          "action": null,
+          "actions": [],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        },
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "423:97218",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": false
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "423:97218",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": false
+            }
+          ],
+          "trigger": {
+            "type": "ON_KEY_DOWN",
+            "device": "KEYBOARD",
+            "keyCodes": [
+              27
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "423:98884",
+      "reactions": [
+        {
+          "action": null,
+          "actions": [],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        },
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "423:99224",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": false
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "423:99224",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": false
+            }
+          ],
+          "trigger": {
+            "type": "ON_KEY_DOWN",
+            "device": "KEYBOARD",
+            "keyCodes": [
+              27
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

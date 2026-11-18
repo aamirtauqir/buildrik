@@ -1,0 +1,1383 @@
+{
+  "date": "2026-09-27",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "pageId": "4418:45431",
+  "inspector": {
+    "createdNodeIds": [
+      "7980:198046",
+      "7980:198047",
+      "7980:198048",
+      "7980:198049",
+      "7980:198050",
+      "7980:198051",
+      "7980:198057",
+      "7980:198063",
+      "7980:198069",
+      "7980:198075",
+      "7980:198081",
+      "7980:198087",
+      "7980:198093",
+      "7980:198099",
+      "7980:198105",
+      "7980:198111",
+      "7980:198112",
+      "7980:198113",
+      "7980:198114",
+      "7980:198115",
+      "7980:198121",
+      "7980:198127",
+      "7980:198133",
+      "7980:198139",
+      "7980:198145",
+      "7980:198151",
+      "7980:198157",
+      "7980:198163",
+      "7980:198169",
+      "7980:198175",
+      "7980:198181",
+      "7980:198182",
+      "7980:198183",
+      "7980:198184",
+      "7980:198190",
+      "7980:198196",
+      "7980:198202",
+      "7980:198208",
+      "7980:198214",
+      "7980:198220",
+      "7980:198226",
+      "7980:198227",
+      "7980:198228",
+      "7980:198229",
+      "7980:198235",
+      "7980:198241",
+      "7980:198247",
+      "7980:198253",
+      "7980:198259",
+      "7980:198265",
+      "7980:198271",
+      "7980:198272",
+      "7980:198273",
+      "7980:198274",
+      "7980:198275",
+      "7980:198276",
+      "7980:198282",
+      "7980:198288",
+      "7980:198294",
+      "7980:198300",
+      "7980:198306",
+      "7980:198307",
+      "7980:198308",
+      "7980:198309",
+      "7980:198310",
+      "7980:198316",
+      "7980:198322",
+      "7980:198328",
+      "7980:198334",
+      "7980:198340",
+      "7980:198346",
+      "7980:198352",
+      "7980:198358",
+      "7980:198364",
+      "7980:198365",
+      "7980:198366",
+      "7980:198367",
+      "7980:198368",
+      "7980:198374",
+      "7980:198380",
+      "7980:198386",
+      "7980:198392",
+      "7980:198398",
+      "7980:198404",
+      "7980:198405",
+      "7980:198406",
+      "7980:198407",
+      "7980:198408",
+      "7980:198414",
+      "7980:198420",
+      "7980:198426",
+      "7980:198432",
+      "7980:198433",
+      "7980:198434",
+      "7980:198435",
+      "7980:198436",
+      "7980:198437",
+      "7980:198443",
+      "7980:198449",
+      "7980:198455",
+      "7980:198461",
+      "7980:198462",
+      "7980:198463",
+      "7980:198464",
+      "7980:198465",
+      "7980:198471",
+      "7980:198477",
+      "7980:198483",
+      "7980:198484",
+      "7980:198485",
+      "7980:198486",
+      "7980:198492",
+      "7980:198498",
+      "7980:198504",
+      "7980:198505",
+      "7980:198506",
+      "7980:198507",
+      "7980:198513",
+      "7980:198519",
+      "7980:198525",
+      "7980:198526",
+      "7980:198527",
+      "7980:198528",
+      "7980:198529",
+      "7980:198535",
+      "7980:198541",
+      "7980:198547",
+      "7980:198553",
+      "7980:198559",
+      "7980:198565",
+      "7980:198571",
+      "7980:198572",
+      "7980:198573",
+      "7980:198574",
+      "7980:198575",
+      "7980:198581",
+      "7980:198587",
+      "7980:198593",
+      "7980:198599",
+      "7980:198600",
+      "7980:198601",
+      "7980:198602",
+      "7980:198603",
+      "7980:198609",
+      "7980:198615",
+      "7980:198621",
+      "7980:198627",
+      "7980:198636",
+      "7980:198637",
+      "7980:198638",
+      "7980:198639",
+      "7980:198640",
+      "7980:198646",
+      "7980:198652",
+      "7980:198653",
+      "7980:198654",
+      "7980:198660",
+      "7980:198666",
+      "7980:198672",
+      "7980:198678",
+      "7980:198684",
+      "7980:198690",
+      "7980:198696"
+    ],
+    "mutatedNodeIds": [
+      "6883:75754",
+      "6883:76074",
+      "6918:74129",
+      "6883:76394",
+      "7063:79093"
+    ],
+    "boardId": "7980:198046",
+    "panels": [
+      {
+        "type": "input",
+        "id": "7980:198050",
+        "fieldCount": 8,
+        "fields": [
+          {
+            "id": "type",
+            "label": "Input Type",
+            "control": "select",
+            "options": [
+              {
+                "value": "text",
+                "label": "Text"
+              },
+              {
+                "value": "email",
+                "label": "Email"
+              },
+              {
+                "value": "password",
+                "label": "Password"
+              },
+              {
+                "value": "number",
+                "label": "Number"
+              },
+              {
+                "value": "tel",
+                "label": "Phone"
+              },
+              {
+                "value": "url",
+                "label": "URL"
+              },
+              {
+                "value": "date",
+                "label": "Date"
+              },
+              {
+                "value": "time",
+                "label": "Time"
+              },
+              {
+                "value": "datetime-local",
+                "label": "Date & Time"
+              },
+              {
+                "value": "search",
+                "label": "Search"
+              },
+              {
+                "value": "file",
+                "label": "File"
+              },
+              {
+                "value": "hidden",
+                "label": "Hidden"
+              },
+              {
+                "value": "checkbox",
+                "label": "Checkbox"
+              },
+              {
+                "value": "radio",
+                "label": "Radio"
+              },
+              {
+                "value": "range",
+                "label": "Range"
+              },
+              {
+                "value": "color",
+                "label": "Color"
+              }
+            ]
+          },
+          {
+            "id": "name",
+            "label": "Name",
+            "control": "text"
+          },
+          {
+            "id": "placeholder",
+            "label": "Placeholder",
+            "control": "text"
+          },
+          {
+            "id": "value",
+            "label": "Default Value",
+            "control": "text"
+          },
+          {
+            "id": "required",
+            "label": "Required",
+            "control": "checkbox"
+          },
+          {
+            "id": "disabled",
+            "label": "Disabled",
+            "control": "checkbox"
+          },
+          {
+            "id": "readonly",
+            "label": "Read Only",
+            "control": "checkbox"
+          },
+          {
+            "id": "autocomplete",
+            "label": "Autocomplete",
+            "control": "select",
+            "options": [
+              {
+                "value": "on",
+                "label": "On"
+              },
+              {
+                "value": "off",
+                "label": "Off"
+              },
+              {
+                "value": "name",
+                "label": "Name"
+              },
+              {
+                "value": "email",
+                "label": "Email"
+              },
+              {
+                "value": "tel",
+                "label": "Phone"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "textarea",
+        "id": "7980:198114",
+        "fieldCount": 9,
+        "fields": [
+          {
+            "id": "name",
+            "label": "Name",
+            "control": "text"
+          },
+          {
+            "id": "placeholder",
+            "label": "Placeholder",
+            "control": "text"
+          },
+          {
+            "id": "value",
+            "label": "Default Value",
+            "control": "textarea"
+          },
+          {
+            "id": "rows",
+            "label": "Rows",
+            "control": "text"
+          },
+          {
+            "id": "cols",
+            "label": "Columns",
+            "control": "text"
+          },
+          {
+            "id": "required",
+            "label": "Required",
+            "control": "checkbox"
+          },
+          {
+            "id": "disabled",
+            "label": "Disabled",
+            "control": "checkbox"
+          },
+          {
+            "id": "readonly",
+            "label": "Read Only",
+            "control": "checkbox"
+          },
+          {
+            "id": "maxlength",
+            "label": "Max Length",
+            "control": "text"
+          }
+        ]
+      },
+      {
+        "type": "select",
+        "id": "7980:198183",
+        "fieldCount": 5,
+        "fields": [
+          {
+            "id": "name",
+            "label": "Name",
+            "control": "text"
+          },
+          {
+            "id": "options",
+            "label": "Options (one per line)",
+            "control": "textarea"
+          },
+          {
+            "id": "required",
+            "label": "Required",
+            "control": "checkbox"
+          },
+          {
+            "id": "disabled",
+            "label": "Disabled",
+            "control": "checkbox"
+          },
+          {
+            "id": "multiple",
+            "label": "Multiple",
+            "control": "checkbox"
+          }
+        ]
+      },
+      {
+        "type": "form",
+        "id": "7980:198228",
+        "fieldCount": 5,
+        "fields": [
+          {
+            "id": "action",
+            "label": "Action URL",
+            "control": "text"
+          },
+          {
+            "id": "method",
+            "label": "Method",
+            "control": "select",
+            "options": [
+              {
+                "value": "POST",
+                "label": "POST"
+              },
+              {
+                "value": "GET",
+                "label": "GET"
+              }
+            ]
+          },
+          {
+            "id": "enctype",
+            "label": "Encoding",
+            "control": "select",
+            "options": [
+              {
+                "value": "application/x-www-form-urlencoded",
+                "label": "URL Encoded"
+              },
+              {
+                "value": "multipart/form-data",
+                "label": "Multipart (File Upload)"
+              },
+              {
+                "value": "text/plain",
+                "label": "Plain Text"
+              }
+            ]
+          },
+          {
+            "id": "novalidate",
+            "label": "Disable Validation",
+            "control": "checkbox"
+          },
+          {
+            "id": "autocomplete",
+            "label": "Autocomplete",
+            "control": "select",
+            "options": [
+              {
+                "value": "on",
+                "label": "On"
+              },
+              {
+                "value": "off",
+                "label": "Off"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "image",
+        "id": "7980:198275",
+        "fieldCount": 3,
+        "fields": [
+          {
+            "id": "alt",
+            "label": "Alt Text",
+            "control": "text"
+          },
+          {
+            "id": "loading",
+            "label": "Loading",
+            "control": "select",
+            "options": [
+              {
+                "value": "lazy",
+                "label": "Lazy"
+              },
+              {
+                "value": "eager",
+                "label": "Eager"
+              }
+            ]
+          },
+          {
+            "id": "decoding",
+            "label": "Decoding",
+            "control": "select",
+            "options": [
+              {
+                "value": "auto",
+                "label": "Auto"
+              },
+              {
+                "value": "sync",
+                "label": "Sync"
+              },
+              {
+                "value": "async",
+                "label": "Async"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "video",
+        "id": "7980:198309",
+        "fieldCount": 7,
+        "fields": [
+          {
+            "id": "poster",
+            "label": "Poster Image",
+            "control": "text"
+          },
+          {
+            "id": "autoplay",
+            "label": "Autoplay",
+            "control": "checkbox"
+          },
+          {
+            "id": "loop",
+            "label": "Loop",
+            "control": "checkbox"
+          },
+          {
+            "id": "muted",
+            "label": "Muted",
+            "control": "checkbox"
+          },
+          {
+            "id": "controls",
+            "label": "Show Controls",
+            "control": "checkbox"
+          },
+          {
+            "id": "playsinline",
+            "label": "Plays Inline",
+            "control": "checkbox"
+          },
+          {
+            "id": "preload",
+            "label": "Preload",
+            "control": "select",
+            "options": [
+              {
+                "value": "auto",
+                "label": "Auto"
+              },
+              {
+                "value": "metadata",
+                "label": "Metadata"
+              },
+              {
+                "value": "none",
+                "label": "None"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "button",
+        "id": "7980:198367",
+        "fieldCount": 4,
+        "fields": [
+          {
+            "id": "content",
+            "label": "Button Label",
+            "control": "textarea"
+          },
+          {
+            "id": "target",
+            "label": "Open In",
+            "control": "select",
+            "options": [
+              {
+                "value": "_self",
+                "label": "Same Window"
+              },
+              {
+                "value": "_blank",
+                "label": "New Tab"
+              }
+            ]
+          },
+          {
+            "id": "type",
+            "label": "Button Type",
+            "control": "select",
+            "options": [
+              {
+                "value": "button",
+                "label": "Button"
+              },
+              {
+                "value": "submit",
+                "label": "Submit"
+              },
+              {
+                "value": "reset",
+                "label": "Reset"
+              }
+            ]
+          },
+          {
+            "id": "disabled",
+            "label": "Disabled",
+            "control": "checkbox"
+          }
+        ]
+      },
+      {
+        "type": "link",
+        "id": "7980:198407",
+        "fieldCount": 2,
+        "fields": [
+          {
+            "id": "target",
+            "label": "Open In",
+            "control": "select",
+            "options": [
+              {
+                "value": "_self",
+                "label": "Same Window"
+              },
+              {
+                "value": "_blank",
+                "label": "New Tab"
+              },
+              {
+                "value": "_parent",
+                "label": "Parent Frame"
+              },
+              {
+                "value": "_top",
+                "label": "Top Frame"
+              }
+            ]
+          },
+          {
+            "id": "rel",
+            "label": "Rel",
+            "control": "text"
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "id": "7980:198436",
+        "fieldCount": 2,
+        "fields": [
+          {
+            "id": "content",
+            "label": "Heading Text",
+            "control": "textarea"
+          },
+          {
+            "id": "level",
+            "label": "Level",
+            "control": "select",
+            "options": [
+              {
+                "value": "h1",
+                "label": "H1"
+              },
+              {
+                "value": "h2",
+                "label": "H2"
+              },
+              {
+                "value": "h3",
+                "label": "H3"
+              },
+              {
+                "value": "h4",
+                "label": "H4"
+              },
+              {
+                "value": "h5",
+                "label": "H5"
+              },
+              {
+                "value": "h6",
+                "label": "H6"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "id": "7980:198464",
+        "fieldCount": 1,
+        "fields": [
+          {
+            "id": "content",
+            "label": "Text Content",
+            "control": "textarea"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "id": "7980:198485",
+        "fieldCount": 1,
+        "fields": [
+          {
+            "id": "content",
+            "label": "Paragraph Content",
+            "control": "textarea"
+          }
+        ]
+      },
+      {
+        "type": "label",
+        "id": "7980:198506",
+        "fieldCount": 1,
+        "fields": [
+          {
+            "id": "content",
+            "label": "Label Text",
+            "control": "textarea"
+          }
+        ]
+      },
+      {
+        "type": "iframe",
+        "id": "7980:198528",
+        "fieldCount": 5,
+        "fields": [
+          {
+            "id": "src",
+            "label": "URL",
+            "control": "text"
+          },
+          {
+            "id": "width",
+            "label": "Width",
+            "control": "text"
+          },
+          {
+            "id": "height",
+            "label": "Height",
+            "control": "text"
+          },
+          {
+            "id": "loading",
+            "label": "Loading",
+            "control": "select",
+            "options": [
+              {
+                "value": "lazy",
+                "label": "Lazy"
+              },
+              {
+                "value": "eager",
+                "label": "Eager"
+              }
+            ]
+          },
+          {
+            "id": "allowfullscreen",
+            "label": "Allow Fullscreen",
+            "control": "checkbox"
+          }
+        ]
+      },
+      {
+        "type": "columns",
+        "id": "7980:198574",
+        "fieldCount": 2,
+        "fields": [
+          {
+            "id": "data-columns",
+            "label": "Number of Columns",
+            "control": "select",
+            "options": [
+              {
+                "value": "2",
+                "label": "2 Columns"
+              },
+              {
+                "value": "3",
+                "label": "3 Columns"
+              },
+              {
+                "value": "4",
+                "label": "4 Columns"
+              },
+              {
+                "value": "5",
+                "label": "5 Columns"
+              },
+              {
+                "value": "6",
+                "label": "6 Columns"
+              }
+            ]
+          },
+          {
+            "id": "data-gap",
+            "label": "Gap Between Columns",
+            "control": "select",
+            "options": [
+              {
+                "value": "0",
+                "label": "None"
+              },
+              {
+                "value": "8px",
+                "label": "Small (8px)"
+              },
+              {
+                "value": "16px",
+                "label": "Medium (16px)"
+              },
+              {
+                "value": "24px",
+                "label": "Large (24px)"
+              },
+              {
+                "value": "32px",
+                "label": "Extra Large (32px)"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "icon",
+        "id": "7980:198602",
+        "fieldCount": 2,
+        "fields": [
+          {
+            "id": "data-icon-size",
+            "label": "Icon Size",
+            "control": "select",
+            "options": [
+              {
+                "value": "16",
+                "label": "16px (XS)"
+              },
+              {
+                "value": "20",
+                "label": "20px (S)"
+              },
+              {
+                "value": "24",
+                "label": "24px (M)"
+              },
+              {
+                "value": "32",
+                "label": "32px (L)"
+              },
+              {
+                "value": "48",
+                "label": "48px (XL)"
+              },
+              {
+                "value": "64",
+                "label": "64px (XXL)"
+              }
+            ]
+          },
+          {
+            "id": "data-icon-stroke",
+            "label": "Stroke Width",
+            "control": "select",
+            "options": [
+              {
+                "value": "1",
+                "label": "Thin (1)"
+              },
+              {
+                "value": "1.5",
+                "label": "Light (1.5)"
+              },
+              {
+                "value": "2",
+                "label": "Normal (2)"
+              },
+              {
+                "value": "2.5",
+                "label": "Medium (2.5)"
+              },
+              {
+                "value": "3",
+                "label": "Bold (3)"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "default",
+        "id": "7980:198639",
+        "fieldCount": 0,
+        "fields": []
+      }
+    ],
+    "applied": [
+      {
+        "id": "6883:75643",
+        "type": "text",
+        "status": "fields added",
+        "panelId": "6883:75754"
+      },
+      {
+        "id": "6883:75963",
+        "type": "image",
+        "status": "fields added",
+        "panelId": "6883:76074"
+      },
+      {
+        "id": "6883:76283",
+        "type": "button",
+        "status": "fields added",
+        "panelId": "6883:76394"
+      },
+      {
+        "id": "4428:141878",
+        "type": "form",
+        "status": "no expanded Advanced panel; inventory reference only"
+      }
+    ]
+  },
+  "cms": {
+    "createdNodeIds": [
+      "7978:197166",
+      "7978:197172",
+      "7978:197182",
+      "7978:197188",
+      "7978:197195",
+      "7978:197201",
+      "7978:197207",
+      "7978:197216",
+      "7978:197222",
+      "7978:197228",
+      "7978:197237",
+      "7978:197243",
+      "7978:197249",
+      "7978:197258",
+      "7978:197264",
+      "7978:197270",
+      "7978:197279",
+      "7978:197285",
+      "7978:197291",
+      "7978:197300",
+      "7978:197306",
+      "7978:197312",
+      "7978:197318",
+      "7978:197327",
+      "7978:197333",
+      "7978:197339",
+      "7978:197360",
+      "7978:197366",
+      "7978:197372",
+      "7978:197393",
+      "7978:197399",
+      "7978:197405"
+    ],
+    "mutatedNodeIds": [
+      "7978:197172",
+      "7978:197188",
+      "I7468:161903;7436:148739",
+      "I7468:161903;7436:148733",
+      "I7468:161903;7436:148734",
+      "4418:164219",
+      "6771:63385",
+      "6771:63386",
+      "6771:63387",
+      "I7468:161933;7436:148739",
+      "I7468:161933;7436:148733",
+      "I7468:161933;7436:148734",
+      "4418:164230",
+      "6771:63404",
+      "6771:63405",
+      "6771:63406",
+      "I7468:161963;7436:148739",
+      "I7468:161963;7436:148733",
+      "I7468:161963;7436:148734",
+      "4418:164236",
+      "6771:63414",
+      "6771:63415",
+      "6771:63416",
+      "I7468:161993;7436:148739",
+      "I7468:161993;7436:148733",
+      "I7468:161993;7436:148734",
+      "4418:164242",
+      "6771:63424",
+      "6771:63425",
+      "6771:63426",
+      "I7468:162023;7436:148739",
+      "I7468:162023;7436:148733",
+      "I7468:162023;7436:148734",
+      "4418:164248",
+      "6771:63456",
+      "6771:63457",
+      "6771:63458",
+      "I7468:162053;7436:148739",
+      "I7468:162053;7436:148733",
+      "I7468:162053;7436:148734",
+      "4418:164254",
+      "6771:63466",
+      "6771:63467",
+      "6771:63468",
+      "I7468:162083;7436:148739",
+      "I7468:162083;7436:148733",
+      "I7468:162083;7436:148734",
+      "4418:164260",
+      "6771:63476",
+      "6771:63477",
+      "6771:63478",
+      "I7978:197171;7436:148739",
+      "I7978:197171;7436:148733",
+      "I7978:197171;7436:148734",
+      "7978:197166",
+      "7978:197168",
+      "7978:197169",
+      "7978:197170",
+      "I7978:197187;7436:148739",
+      "I7978:197187;7436:148733",
+      "I7978:197187;7436:148734",
+      "7978:197182",
+      "7978:197184",
+      "7978:197185",
+      "7978:197186",
+      "6771:63370",
+      "7854:198170"
+    ],
+    "screens": [
+      {
+        "type": "Text",
+        "id": "4418:164219",
+        "fields": 3
+      },
+      {
+        "type": "Number",
+        "id": "4418:164230",
+        "fields": 3
+      },
+      {
+        "type": "Rich text",
+        "id": "4418:164236",
+        "fields": 3
+      },
+      {
+        "type": "Image",
+        "id": "4418:164242",
+        "fields": 3
+      },
+      {
+        "type": "Boolean",
+        "id": "4418:164248",
+        "fields": 3
+      },
+      {
+        "type": "Reference",
+        "id": "4418:164254",
+        "fields": 4
+      },
+      {
+        "type": "Slug",
+        "id": "4418:164260",
+        "fields": 3
+      },
+      {
+        "type": "Long text",
+        "id": "7978:197166",
+        "fields": 3
+      },
+      {
+        "type": "Date",
+        "id": "7978:197182",
+        "fields": 3
+      }
+    ],
+    "variables": [
+      "VariableID:7978:197164",
+      "VariableID:7978:197165"
+    ],
+    "pickerHeight": 558
+  },
+  "brand": {
+    "spacing": "7576:197036",
+    "radius": "7979:197331",
+    "shadow": "7979:197843",
+    "motion": "7979:198355",
+    "border": "7979:198867",
+    "opacity": "7979:199379",
+    "zindex": "7979:199891",
+    "breakpoint": "7979:200403",
+    "grid": "7979:200915",
+    "sizing": "7979:201427",
+    "icon": "7979:201939",
+    "imagery": "7979:202451"
+  },
+  "verification": {
+    "schemaChecks": [
+      {
+        "check": "Inspector input",
+        "pass": true,
+        "fields": 8
+      },
+      {
+        "check": "Inspector textarea",
+        "pass": true,
+        "fields": 9
+      },
+      {
+        "check": "Inspector select",
+        "pass": true,
+        "fields": 5
+      },
+      {
+        "check": "Inspector form",
+        "pass": true,
+        "fields": 5
+      },
+      {
+        "check": "Inspector image",
+        "pass": true,
+        "fields": 3
+      },
+      {
+        "check": "Inspector video",
+        "pass": true,
+        "fields": 7
+      },
+      {
+        "check": "Inspector button",
+        "pass": true,
+        "fields": 4
+      },
+      {
+        "check": "Inspector link",
+        "pass": true,
+        "fields": 2
+      },
+      {
+        "check": "Inspector heading",
+        "pass": true,
+        "fields": 2
+      },
+      {
+        "check": "Inspector text",
+        "pass": true,
+        "fields": 1
+      },
+      {
+        "check": "Inspector paragraph",
+        "pass": true,
+        "fields": 1
+      },
+      {
+        "check": "Inspector label",
+        "pass": true,
+        "fields": 1
+      },
+      {
+        "check": "Inspector iframe",
+        "pass": true,
+        "fields": 5
+      },
+      {
+        "check": "Inspector columns",
+        "pass": true,
+        "fields": 2
+      },
+      {
+        "check": "Inspector icon",
+        "pass": true,
+        "fields": 2
+      },
+      {
+        "check": "Inspector default",
+        "pass": true,
+        "fields": 0
+      },
+      {
+        "check": "CURRENT DESIGN · Configure text field",
+        "pass": true,
+        "fields": 3
+      },
+      {
+        "check": "CURRENT DESIGN · Configure Number field",
+        "pass": true,
+        "fields": 3
+      },
+      {
+        "check": "CURRENT DESIGN · Configure Rich text field",
+        "pass": true,
+        "fields": 3
+      },
+      {
+        "check": "CURRENT DESIGN · Configure Image field",
+        "pass": true,
+        "fields": 3
+      },
+      {
+        "check": "CURRENT DESIGN · Configure Boolean field",
+        "pass": true,
+        "fields": 3
+      },
+      {
+        "check": "CURRENT DESIGN · Configure Reference field",
+        "pass": true,
+        "fields": 4
+      },
+      {
+        "check": "CURRENT DESIGN · Configure Slug field",
+        "pass": true,
+        "fields": 3
+      },
+      {
+        "check": "CURRENT DESIGN · Configure Long text field",
+        "pass": true,
+        "fields": 3
+      },
+      {
+        "check": "CURRENT DESIGN · Configure Date field",
+        "pass": true,
+        "fields": 3
+      }
+    ],
+    "final": {
+      "checks": [
+        {
+          "check": "item/Spacing",
+          "pass": true
+        },
+        {
+          "check": "item/Radius",
+          "pass": true
+        },
+        {
+          "check": "item/Shadow",
+          "pass": true
+        },
+        {
+          "check": "item/Motion",
+          "pass": true
+        },
+        {
+          "check": "item/Border",
+          "pass": true
+        },
+        {
+          "check": "item/Opacity",
+          "pass": true
+        },
+        {
+          "check": "item/Z-index",
+          "pass": true
+        },
+        {
+          "check": "item/Breakpoint",
+          "pass": true
+        },
+        {
+          "check": "item/Grid",
+          "pass": true
+        },
+        {
+          "check": "item/Sizing",
+          "pass": true
+        },
+        {
+          "check": "item/Icon",
+          "pass": true
+        },
+        {
+          "check": "item/Imagery",
+          "pass": true
+        },
+        {
+          "check": "Spacing nine visible rows with three selection actions",
+          "pass": true
+        },
+        {
+          "check": "CURRENT DESIGN · Brand workspace · Radius row selection",
+          "pass": true
+        },
+        {
+          "check": "CURRENT DESIGN · Brand workspace · Shadow row selection",
+          "pass": true
+        },
+        {
+          "check": "CURRENT DESIGN · Brand workspace · Motion row selection",
+          "pass": true
+        },
+        {
+          "check": "CURRENT DESIGN · Brand workspace · Border row selection",
+          "pass": true
+        },
+        {
+          "check": "CURRENT DESIGN · Brand workspace · Opacity row selection",
+          "pass": true
+        },
+        {
+          "check": "CURRENT DESIGN · Brand workspace · Z-index row selection",
+          "pass": true
+        },
+        {
+          "check": "CURRENT DESIGN · Brand workspace · Breakpoint row selection",
+          "pass": true
+        },
+        {
+          "check": "CURRENT DESIGN · Brand workspace · Grid row selection",
+          "pass": true
+        },
+        {
+          "check": "CURRENT DESIGN · Brand workspace · Sizing row selection",
+          "pass": true
+        },
+        {
+          "check": "CURRENT DESIGN · Brand workspace · Icon row selection",
+          "pass": true
+        },
+        {
+          "check": "CURRENT DESIGN · Brand workspace · Imagery row selection",
+          "pass": true
+        },
+        {
+          "check": "Custom attributes reveal 7982:198714",
+          "pass": true
+        },
+        {
+          "check": "Custom attributes reveal 7982:198728",
+          "pass": true
+        },
+        {
+          "check": "Custom attributes reveal 7982:198742",
+          "pass": true
+        },
+        {
+          "check": "Custom attributes reveal 7982:198792",
+          "pass": true
+        },
+        {
+          "check": "Custom attributes reveal 7063:79090",
+          "pass": true
+        },
+        {
+          "check": "CMS nine field types",
+          "pass": true,
+          "types": [
+            "Text",
+            "Number",
+            "Rich text",
+            "Image",
+            "Boolean",
+            "Reference",
+            "Slug",
+            "Long text",
+            "Date"
+          ]
+        },
+        {
+          "check": "16 Inspector type/default panels",
+          "pass": true
+        },
+        {
+          "check": "Inspector reference captions contained",
+          "pass": true
+        }
+      ],
+      "passed": 32,
+      "failed": [],
+      "board": {
+        "id": "7980:198046",
+        "width": 1432,
+        "height": 1964
+      }
+    }
+  }
+}

@@ -1,0 +1,112 @@
+{
+  "createdNodeIds": [
+    "147:75914",
+    "147:76329",
+    "147:76773",
+    "147:77189",
+    "147:77668",
+    "147:78110",
+    "147:78484",
+    "147:78900",
+    "147:79328",
+    "147:79728"
+  ],
+  "mutatedNodeIds": [
+    "I147:78647;4:547",
+    "147:78647",
+    "147:76327",
+    "147:76771",
+    "147:76755",
+    "147:77664",
+    "147:79724",
+    "147:78098",
+    "147:78471",
+    "147:79322",
+    "147:75945"
+  ],
+  "frames": [
+    {
+      "id": "147:75914",
+      "name": "B3-L01 · Layers / stable tool with selection footer",
+      "w": 1440,
+      "h": 900,
+      "nodes": 409,
+      "images": []
+    },
+    {
+      "id": "147:76329",
+      "name": "B3-L02 · Layers / personal display preferences",
+      "w": 1440,
+      "h": 900,
+      "nodes": 439,
+      "images": []
+    },
+    {
+      "id": "147:76773",
+      "name": "B3-L03 · Layers / compact 28px rows",
+      "w": 1440,
+      "h": 900,
+      "nodes": 409,
+      "images": []
+    },
+    {
+      "id": "147:77189",
+      "name": "B3-L04 · Layers / search results with parent paths",
+      "w": 1440,
+      "h": 900,
+      "nodes": 389,
+      "images": []
+    },
+    {
+      "id": "147:77668",
+      "name": "B3-L05 · Layers / Text locked by Hero",
+      "w": 1440,
+      "h": 900,
+      "nodes": 337,
+      "images": []
+    },
+    {
+      "id": "147:78110",
+      "name": "B3-L06 · Layers / locking ancestor revealed",
+      "w": 1440,
+      "h": 900,
+      "nodes": 338,
+      "images": []
+    },
+    {
+      "id": "147:78484",
+      "name": "B3-L07 · Layers / Hero unlocked, Text available",
+      "w": 1440,
+      "h": 900,
+      "nodes": 406,
+      "images": []
+    },
+    {
+      "id": "147:78900",
+      "name": "B3-L08 · Layers / Text dimmed only in editor",
+      "w": 1440,
+      "h": 900,
+      "nodes": 421,
+      "images": []
+    },
+    {
+      "id": "147:79328",
+      "name": "B3-L09 · Layers / no search matches",
+      "w": 1440,
+      "h": 900,
+      "nodes": 330,
+      "images": []
+    },
+    {
+      "id": "147:79728",
+      "name": "B3-L10 · Layers / large search at 1440 × 600",
+      "w": 1440,
+      "h": 600,
+      "nodes": 389,
+      "images": []
+    }
+  ],
+  "allAffectedNodeIds": "affected-nodes.json (includes inherited instance descendants)",
+  "createdNodeCount": 3877,
+  "createdNodeIdsScope": "Root IDs only; full descendant IDs in artifact"
+}

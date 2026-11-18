@@ -1,0 +1,3738 @@
+{
+  "date": "2026-10-20",
+  "fileKey": "2L9OTGzBrL6kYmU18yA1c7",
+  "page": "3:5",
+  "authority": [
+    "PRODUCT-DESIGN-BRIEF.md",
+    "panels/06-INSPECTOR-DELTA.md",
+    "panels/00-SHARED-CONTRACTS.md"
+  ],
+  "counts": {
+    "m07_rows": 122,
+    "dispositions": {
+      "Current control semantics drawn": 99,
+      "Explicitly deferred by current contract": 4,
+      "Nonvisual implementation contract": 1,
+      "Superseded historical UI": 18
+    },
+    "blocks": 69,
+    "native_tags": 120,
+    "native_families": 12,
+    "added_workspace_states": 93,
+    "added_reference_boards": 16
+  },
+  "m07": [
+    {
+      "id": "M07-1",
+      "feature": "Tab strip Style \u00b7 Behaviour \u00b7 Effects",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Redesign",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Inspector \u2192 persistent header \u2192 tab strip",
+      "indexed_controls": "Content / Style / Behaviour / Effects; four labelled tabs; active state and per-tab active/error indicator",
+      "figma_node_ids": [
+        "161:8480",
+        "161:8940",
+        "161:13919",
+        "161:12525"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-2",
+      "feature": "Flat single scrolling section list (09-16 model)",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Superseded historical UI",
+      "current_decision": "Grouped Content/Style/Behavior/Effects tabs replace flat list",
+      "canonical_home": "Inspector \u2192 current tab \u2192 section list",
+      "indexed_controls": "Keep the current grouped-tab replacement; no restored flat all-section list; section disclosure and summaries",
+      "figma_node_ids": [
+        "161:8480",
+        "161:8940"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-3",
+      "feature": "Page panel (nothing selected, or the page root selected)",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Page appearance panel \u2192 Background / Max width / Font / Text colour / Spacing",
+      "indexed_controls": "Page-root fill; max-width px/%/rem/vw; font family and colour; padding/margin; current page and breakpoint shown",
+      "figma_node_ids": [
+        "255:84855"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-4",
+      "feature": "Empty-state prompt \"Select something on the canvas\u2026 / \u2726 Ask AI \u203a\"",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Superseded historical UI",
+      "current_decision": "Page appearance replaces old Select something prompt; AI removed by SC21",
+      "canonical_home": "Page appearance panel \u2192 page-owned controls",
+      "indexed_controls": "Keep PagePanel as replacement for retired Select something prompt; Page AI action remains in page header",
+      "figma_node_ids": [
+        "255:84855"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-5",
+      "feature": "Page panel header actions",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Page appearance header \u2192 Page actions / Ask AI / Hide; SEO \u2192 Pages \u2192 current Page settings \u2192 SEO",
+      "indexed_controls": "Preserve current menu actions; explicit page ID; internal-navigation label; exact source-return",
+      "figma_node_ids": [
+        "255:84855"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-6",
+      "feature": "Loading skeleton (site still arriving)",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Inspector body \u2192 Loading project",
+      "indexed_controls": "Skeleton with loading status; shell-owned failed load offers Retry; do not render default writable controls while loading",
+      "figma_node_ids": [
+        "255:82447",
+        "255:82909"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-7",
+      "feature": "\"Template applied!\" banner",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Page appearance \u2192 transient Template applied notice",
+      "indexed_controls": "Success notice only for confirmed applied template; dismiss/expiry; scope notice to relevant page/session",
+      "figma_node_ids": [
+        "255:85352"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-8",
+      "feature": "Error boundary",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Inspector body \u2192 Unable to display inspector",
+      "indexed_controls": "Try again; source context preserved; Retry rerenders, not a destructive document reset; render error distinct from save error",
+      "figma_node_ids": [
+        "255:83370",
+        "255:83852"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-9",
+      "feature": "AI-run takeover",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Redesign",
+      "current_disposition": "Explicitly deferred by current contract",
+      "current_decision": "SC21: AI takeover absent this release",
+      "canonical_home": "Inspector host \u2192 current AI task; return \u2192 original Inspector context",
+      "indexed_controls": "Preserve existing AI takeover/progress and supported cancel/review controls; name pinned target; no invented AI actions",
+      "figma_node_ids": [],
+      "evidence_scope": "SC21: AI takeover absent this release",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-10",
+      "feature": "Whole-site takeover (\"Whole site\" scope)",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Superseded historical UI",
+      "current_decision": "Global owners replace Whole-site takeover; owned outside B4",
+      "canonical_home": "Site tasks \u2192 their existing dedicated workspaces; Inspector \u2192 selected object/Page appearance",
+      "indexed_controls": "Keep current replacement for retired Whole site takeover; Site settings remains topbar, CMS/Brand/Assets rail",
+      "figma_node_ids": [],
+      "evidence_scope": "Global owners replace Whole-site takeover; owned outside B4",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-11",
+      "feature": "Theme-toggle block inspector",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Theme toggle special panel \u2192 site scope \u2192 Open Brand \u2192 Colour mode",
+      "indexed_controls": "Dark mode Off/Auto readout; published-hidden explanation when Off; shared header identity/hide/back; no local duplicate mode setting",
+      "figma_node_ids": [
+        "249:72006"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-12",
+      "feature": "Read-only status line",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Persistent target header \u2192 restriction status; fields/actions \u2192 same gate",
+      "indexed_controls": "Locked / conflict / denied-role reasons; supported Unlock or conflict resolution entry; legible permitted inspection",
+      "figma_node_ids": [
+        "255:92819",
+        "157:105715"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-13",
+      "feature": "Section display modes",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Each tab \u2192 section headers and active summaries",
+      "indexed_controls": "Retain always-open, default-open, collapsed, value-aware behavior; current open/closed preference; keyboard/Alt bulk disclosure where implemented",
+      "figma_node_ids": [
+        "255:83852",
+        "258:37744"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-14",
+      "feature": "Per-section error band",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Affected section \u2192 inline error region",
+      "indexed_controls": "Specific failure text, retained input, Retry/Revert where meaningful; no empty-state substitution",
+      "figma_node_ids": [
+        "255:84358"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-15",
+      "feature": "Scroll memory per element",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Redesign",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Inspector UI state \u2192 per-object, per-tab scroll restore",
+      "indexed_controls": "Remember scroll by page/object/tab in session; restore after layout; user scrolling cancels automatic restoration",
+      "figma_node_ids": [
+        "258:37744"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-16",
+      "feature": "Selection announcement (screen reader)",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Nonvisual implementation contract",
+      "current_decision": "Polite selection announcement requires runtime accessibility implementation; group identity/count visible in B01",
+      "canonical_home": "Inspector target header \u2192 assistive announcement",
+      "indexed_controls": "Type/name or N selected; locked/eligible count when material; concise polite selection announcement",
+      "figma_node_ids": [
+        "247:28097"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-17",
+      "feature": "Footer \"N of M sections apply\"",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Superseded historical UI",
+      "current_decision": "Meaningful eligibility reasons replace section-count footer",
+      "canonical_home": "Each applicable section \u2192 active summary; no applicability-count footer",
+      "indexed_controls": "Keep current replacement; expose applicable controls and specific restriction reasons rather than N of M footer",
+      "figma_node_ids": [
+        "247:28097",
+        "247:29578"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-18",
+      "feature": "Simplified density `?density=fewer` + \"Show all controls\"",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Defer",
+      "current_disposition": "Superseded historical UI",
+      "current_decision": "Full Pro controls plus disclosure/search replace density=fewer",
+      "canonical_home": "Current tabs \u2192 section disclosure / More settings / property search",
+      "indexed_controls": "Do not resurrect density=fewer mode; preserve current disclosure and search as equivalent complexity controls",
+      "figma_node_ids": [
+        "247:22310",
+        "255:90324"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-19",
+      "feature": "\"More settings\" disclosure",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Applicable section \u2192 More settings disclosure",
+      "indexed_controls": "Advanced fields; active-value count/summary; auto-reveal targeted field/error; preserve manual preference",
+      "figma_node_ids": [
+        "247:22310",
+        "247:23404",
+        "255:90822"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-20",
+      "feature": "\u2318K \"Jump to property\"",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Command palette \u2192 Jump to property \u2192 mapped tab/section/field",
+      "indexed_controls": "Search aliases retain old names; explicit unavailable reason; exact field focus and highlight",
+      "figma_node_ids": [
+        "255:90324",
+        "255:90822"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-21",
+      "feature": "Hide inspector",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Persistent header \u2192 Hide inspector; existing show command/shortcut",
+      "indexed_controls": "Hide/reveal; overlay close; focus to invoking control on reveal; preserve target/tab/draft",
+      "figma_node_ids": [
+        "258:36770"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-22",
+      "feature": "Breadcrumb path",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Persistent header \u2192 Element path breadcrumbs",
+      "indexed_controls": "Page/ancestor/current names; ancestor selects exact stable ID; overflow menu preserves full path",
+      "figma_node_ids": [
+        "258:37248"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-23",
+      "feature": "Type icon + editable element name",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Persistent header \u2192 type icon / Element name",
+      "indexed_controls": "Editable editor display name; Enter commits, Escape cancels; empty name restores type label; never changes DOM ID or tag",
+      "figma_node_ids": [
+        "258:35802",
+        "258:36291"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-24",
+      "feature": "\u2726 AI chip",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Explicitly deferred by current contract",
+      "current_decision": "SC21: AI entry absent this release",
+      "canonical_home": "Persistent header \u2192 Ask AI about selected element",
+      "indexed_controls": "Same AI entry and permitted actions; exact selection context; no extra engine capability assumed",
+      "figma_node_ids": [],
+      "evidence_scope": "SC21: AI entry absent this release",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-25",
+      "feature": "Pick element on canvas (crosshair)",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Superseded historical UI",
+      "current_decision": "Canvas selection replaces crosshair; no second picking mode",
+      "canonical_home": "Canvas \u2192 selection tools; Inspector \u2192 breadcrumbs",
+      "indexed_controls": "Retain current canvas-selection replacement for retired crosshair button; no duplicate picking mode",
+      "figma_node_ids": [
+        "161:8480"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-26",
+      "feature": "Select parent button",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Superseded historical UI",
+      "current_decision": "Ancestor breadcrumb replaces parent button",
+      "canonical_home": "Persistent header \u2192 breadcrumb ancestor navigation",
+      "indexed_controls": "Keep ancestor breadcrumb as parent-selection replacement; retain existing keyboard parent navigation",
+      "figma_node_ids": [
+        "258:37248"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-27",
+      "feature": "Header chain-link \"Bind to collection field\" popover + \"Bound\" chip",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Superseded historical UI",
+      "current_decision": "Property-row binding and Binding subview replace retired header popover",
+      "canonical_home": "Content \u2192 CMS binding; header \u2192 Bound status link",
+      "indexed_controls": "Keep full binding section as replacement for retired binding popover; Bound status jumps to same canonical section",
+      "figma_node_ids": [
+        "258:32482",
+        "258:32981"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-28",
+      "feature": "Status marks row",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Redesign",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Persistent target header \u2192 status marks",
+      "indexed_controls": "Component identity, Bound, locked/conflict status, current scope; status links route to exact section/resource",
+      "figma_node_ids": [
+        "241:16522",
+        "258:32482",
+        "255:92819"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-29",
+      "feature": "\u22ef Element actions menu",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Persistent header \u2192 Element actions menu",
+      "indexed_controls": "Keep registry actions: duplicate, copy/paste, style copy/reset/apply, component save, lock/unlock, delete and available hierarchy actions",
+      "figma_node_ids": [
+        "255:85835",
+        "255:86352",
+        "255:86840",
+        "255:91826"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-30",
+      "feature": "\"Apply style to all \u2026 on this page\" confirm",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Header \u2192 Element actions \u2192 Apply style to matching elements on this page",
+      "indexed_controls": "Source breakpoint/state; category selection; eligible/skipped count; authored-override summary; Apply/Cancel; no-op explanation",
+      "figma_node_ids": [
+        "255:87335",
+        "255:87841",
+        "255:91321"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-31",
+      "feature": "Inspector delete confirmation modal (\"Delete Text?\")",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Superseded historical UI",
+      "current_decision": "Shared reversible deletion with Undo replaces Inspector-only confirmation",
+      "canonical_home": "Header/keyboard \u2192 shared Delete command and existing impact handling",
+      "indexed_controls": "Keep shared command replacement for retired inspector-only delete modal; ordinary reversible deletion uses Undo; significant shared impact needs existing owner confirmation",
+      "figma_node_ids": [
+        "255:86352"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-32",
+      "feature": "Context row placement",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Move",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Persistent header \u2192 target scope; Style/Effects \u2192 compact layer context directly under tabs",
+      "indexed_controls": "Always identify current object; show breakpoint including Desktop and authored state for applicable style tasks; content notes All breakpoints when material",
+      "figma_node_ids": [
+        "255:88341",
+        "255:89334",
+        "258:32482"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-33",
+      "feature": "Scope pill This / All like this / Whole site + reach banner",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Superseded historical UI",
+      "current_decision": "Explicit Apply style categories replace scope switch",
+      "canonical_home": "Element actions \u2192 scoped Apply style dialog; global modules retain own homes",
+      "indexed_controls": "Keep current explicit bulk-action replacement for retired This/All like this/Whole site scope switch",
+      "figma_node_ids": [
+        "255:87335",
+        "255:87841",
+        "255:91321"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-34",
+      "feature": "State chip \"State: Base \u25be\"",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Style/Effects context \u2192 State selector",
+      "indexed_controls": "Base plus supported existing pseudo states; preserve unknown saved states as read-only/custom until supported; switching state is editor context",
+      "figma_node_ids": [
+        "255:88341",
+        "255:88837"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-35",
+      "feature": "State override line",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Merge",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Style/Effects context \u2192 source summary / state override action",
+      "indexed_controls": "One state override summary; Remove [state] overrides names layer and affected set; field reset remains authoritative detail",
+      "figma_node_ids": [
+        "255:88341",
+        "255:88837"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-36",
+      "feature": "Breakpoint picker inside the inspector",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Superseded historical UI",
+      "current_decision": "Canvas breakpoint control replaces Inspector picker",
+      "canonical_home": "Canvas toolbar \u2192 Breakpoint selector; Inspector \u2192 read-only breakpoint mirror",
+      "indexed_controls": "Keep current canvas-owned selector; Desktop/Tablet/Mobile mirror and exact source detail; no independent Inspector selector",
+      "figma_node_ids": [
+        "255:89334",
+        "241:18683"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-37",
+      "feature": "Breakpoint revert line",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Style/Effects context \u2192 Remove [breakpoint] overrides",
+      "indexed_controls": "Explain actual fallback; field-level reset removes own property only; layer reset explicitly names all affected properties",
+      "figma_node_ids": [
+        "255:89334",
+        "255:89827"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-38",
+      "feature": "Field override dot as a control",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Redesign",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Every style/effect field \u2192 Source details control",
+      "indexed_controls": "Distinct local/inherited/token/class/component/pseudo sources; Remove local override versus reset instance/unlink; accessible label not colour only",
+      "figma_node_ids": [
+        "39:9114"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-39",
+      "feature": "Override information shown several times",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Merge",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Header context + section summary + field Source details",
+      "indexed_controls": "Remove repeated prose through one authoritative detail; each level communicates target, active/error count or property provenance",
+      "figma_node_ids": [
+        "255:89334",
+        "241:18683"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-40",
+      "feature": "State banner \"Editing :hover \u2014 not Base\"",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Superseded historical UI",
+      "current_decision": "Persistent active state replaces separate hover banner",
+      "canonical_home": "Style/Effects context \u2192 State selector/readout",
+      "indexed_controls": "Keep existing state context as replacement for retired separate Editing hover banner; non-Base remains explicit",
+      "figma_node_ids": [
+        "255:88341"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-41",
+      "feature": "\"Detach instance\" pill in the context row (Pro only)",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Superseded historical UI",
+      "current_decision": "Component identity actions replace Detach context pill",
+      "canonical_home": "Persistent component identity \u2192 Component actions \u2192 Detach instance",
+      "indexed_controls": "Keep ComponentRow action as replacement for retired context pill; retain existing entitlement gate, impact and recovery",
+      "figma_node_ids": [
+        "241:16522",
+        "241:19230"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-42",
+      "feature": "Effective (inherited/computed) values in fields",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Every field \u2192 effective value + source readout",
+      "indexed_controls": "Actual resolved value, authored expression and winning layer; unknown resolution is explicit, not fake 16px/default",
+      "figma_node_ids": [
+        "161:8940",
+        "161:12005",
+        "255:89827"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-43",
+      "feature": "Multi header",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Redesign",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Persistent target header \u2192 N selected / eligible and locked counts",
+      "indexed_controls": "No primary-element identity masquerading as group; optional explicit inspect-one drill-in; common ancestor breadcrumbs",
+      "figma_node_ids": [
+        "247:28097"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-44",
+      "feature": "Align / Distribute / Group bar",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Persistent multi-selection actions \u2192 Align / Distribute / Group",
+      "indexed_controls": "Retain horizontal/vertical align and distribute; Group; expose coordinate/layer consequences; disabled reason for unsupported flow",
+      "figma_node_ids": [
+        "247:29578"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-45",
+      "feature": "Same panel, intersection of sections, \"Mixed\" fields",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Every tab \u2192 intersection by individual control",
+      "indexed_controls": "Mixed/indeterminate values for CSS and semantic fields; exact eligible count; one-target operations explicitly select one",
+      "figma_node_ids": [
+        "247:28097",
+        "247:28584"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-46",
+      "feature": "5-row batch style panel (Background / Text color / Radius / Padding / Font size)",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Superseded historical UI",
+      "current_decision": "Shared eligible Style controls replace five-row batch panel",
+      "canonical_home": "Style \u2192 normal grouped fields with multi-selection contract",
+      "indexed_controls": "Keep shared Style controls as replacement for retired five-row batch panel; background/colour/radius/padding/font size all preserved",
+      "figma_node_ids": [
+        "247:28097"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-47",
+      "feature": "Capability table drives presence",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Redesign",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Inspector registry \u2192 per-field capability / source metadata",
+      "indexed_controls": "Typed eligibility, meaningful disabled reason, structural restrictions, current authored values and mixed state",
+      "figma_node_ids": [
+        "247:28097",
+        "247:28584",
+        "247:29578"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-48a",
+      "feature": "Text types: heading, text, paragraph, link, label",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Move",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Content \u2192 Text; Style \u2192 Typography; Behaviour \u2192 Link where supported",
+      "indexed_controls": "Heading level H1\u2013H6 and Edit text; text/paragraph/link/label edit action; existing font-size token in Style; link semantics in Behaviour",
+      "figma_node_ids": [
+        "161:8480",
+        "247:27113",
+        "247:27602"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-48b",
+      "feature": "Button",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Move",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Content \u2192 Button; Style \u2192 Text inside; Behaviour \u2192 Link if supported",
+      "indexed_controls": "Edit text; Type Button/Submit/Reset; Disabled; visual text inheritance remains Style",
+      "figma_node_ids": [
+        "249:71716"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-48c",
+      "feature": "Form fields: input, textarea, select, upload; checkbox, radio, switch",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Move",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Content \u2192 Field / Choice; Content \u2192 Attributes \u2192 field advanced",
+      "indexed_controls": "Exact type/name/placeholder/default/options/flags; nested choice input represented once; advanced readonly/autocomplete/maxlength/cols preserved",
+      "figma_node_ids": [
+        "156:1316"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-48d",
+      "feature": "Media: image, video, audio, svg, icon, lottie, video-embed, map-embed",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Move",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Content \u2192 Media; Style \u2192 Media presentation; Behaviour \u2192 Playback",
+      "indexed_controls": "Image/audio/video/SVG/icon/embed/map/Lottie source; alt/loading; fit/ratio; player flags; icon size/stroke retain renderer contract",
+      "figma_node_ids": [
+        "258:38255",
+        "258:38731",
+        "258:39198"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-48e",
+      "feature": "Spacer, divider",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Style \u2192 Size / Spacing / Fill / Border; Content \u2192 Attributes",
+      "indexed_controls": "Spacer/divider keep applicable visual controls; no fake text/content block",
+      "figma_node_ids": [
+        "249:71968"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-48f",
+      "feature": "Widgets: countdown, progress, accordion",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Move",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Content \u2192 Countdown data / Progress data / Accordion items; Behaviour \u2192 completion/opening",
+      "indexed_controls": "Ends at/message, Value/Maximum/Show label, item content routes; When done/open states/multiple-open in Behaviour",
+      "figma_node_ids": [
+        "247:28584"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-48g",
+      "feature": "Layout primitives: flex, stack, grid, columns",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Redesign",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Style \u2192 Children layout / Placement / Size; Content \u2192 Columns structure",
+      "indexed_controls": "Flex/stack direction/alignment/wrap/gap; grid tracks; Columns count is structural Content; position/overflow own-element Style",
+      "figma_node_ids": [
+        "247:21216"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-48h",
+      "feature": "Containers: container, section, card, cta (+ Link); hero, features, header, footer, nav, navbar, pricing, social, testimonials, tabs, list, table, gallery, custom, product-*",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Style \u2192 Children layout / Placement / Text inside / Size / Spacing / Fill / Border; Content \u2192 child-edit entry / Attributes",
+      "indexed_controls": "Preserve generic container families including product-*; container/section/card/CTA links remain Behaviour where supported; child content through Canvas/Layers",
+      "figma_node_ids": [
+        "245:36832",
+        "245:37366",
+        "245:37877",
+        "245:38385",
+        "245:39899",
+        "245:40932",
+        "245:41419",
+        "252:46614",
+        "252:46927",
+        "245:42929",
+        "245:43495",
+        "245:44049",
+        "245:44573"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-48i",
+      "feature": "Structural child (list-item)",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Style \u2192 applicable structural-child presentation; Content \u2192 Attributes / Edit child content",
+      "indexed_controls": "Retain list-item restrictions and child editing; no inappropriate link/CMS root capability expansion",
+      "figma_node_ids": [
+        "245:43495"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-48j",
+      "feature": "form / slider / collection-list",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Move",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Content \u2192 Fields / Slides / Collection; Behaviour \u2192 After submit / Playback",
+      "indexed_controls": "Preserve existing list management, collection source/limit and behavior; only source-located filter/sort elsewhere get exact link if implemented",
+      "figma_node_ids": [
+        "156:716"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-48k",
+      "feature": "Component instance root",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Redesign",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Persistent header \u2192 Component instance; tabs \u2192 permitted instance fields",
+      "indexed_controls": "Definition identity, variant and override count; local fields only for permitted override; Edit definition exact entry",
+      "figma_node_ids": [
+        "241:16522"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-49",
+      "feature": "Component row (instances)",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Move",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Persistent header \u2192 Component identity and actions",
+      "indexed_controls": "Variant picker; Edit definition; Reset instance overrides; Detach; current override status; not a new workspace",
+      "figma_node_ids": [
+        "241:16522",
+        "241:17060",
+        "241:17608",
+        "241:18146",
+        "241:18683",
+        "241:19230"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-50",
+      "feature": "Type block frame",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Redesign",
+      "current_disposition": "Superseded historical UI",
+      "current_decision": "Property-owned sections replace mixed TypeBlock frame",
+      "canonical_home": "Content / Style / Behaviour \u2192 named type-specific groups",
+      "indexed_controls": "Split mixed TypeBlock frame by actual property owner; no unnamed Settings dumping area",
+      "figma_node_ids": [
+        "161:8480",
+        "247:21216",
+        "161:13919"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-51",
+      "feature": "Heading block",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Move",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Content \u2192 Text; Style \u2192 Typography \u2192 Font-size token",
+      "indexed_controls": "Level H1\u2013H6; Edit text on canvas; rename current Text style control Font-size token because it binds only font-size; Custom unlinks to resolved size",
+      "figma_node_ids": [
+        "161:8480"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-52",
+      "feature": "Text / Paragraph / Link / Label block",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Move",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Content \u2192 Text \u2192 Edit text on canvas; Style \u2192 Typography \u2192 Font-size token",
+      "indexed_controls": "Existing Edit text action; current token list/Custom; link destination stays Behaviour",
+      "figma_node_ids": [
+        "161:8480",
+        "247:23404"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-53",
+      "feature": "Button block",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Move",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Content \u2192 Button \u2192 Edit text / Type / Disabled",
+      "indexed_controls": "Type button/submit/reset; Disabled boolean; unset distinct from false/present; text remains canvas edited",
+      "figma_node_ids": [
+        "249:71716"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-54",
+      "feature": "Input / Textarea / Select / Upload block",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Redesign",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Content \u2192 Field \u2192 General / Options / Validation; Attributes \u2192 Advanced field attributes",
+      "indexed_controls": "Input types text/email/password/number/tel/url/date/time/datetime-local/search/file/hidden/range/color; Name/Placeholder/Default; textarea Rows; Select option label/value/default/disabled/optgroup preservation; Required/Disabled/Multiple only valid type",
+      "figma_node_ids": [
+        "156:1316"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-55",
+      "feature": "Checkbox / Radio / Switch block",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Redesign",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Content \u2192 Choice \u2192 Label / Name / Submission value / Checked by default / Required",
+      "indexed_controls": "Reuse nested input value as direct Submission value entry; label Edit text action; no duplicate wrapper value; empty value is intentional and separate from remove",
+      "figma_node_ids": [
+        "156:1316"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-56",
+      "feature": "Image block",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Move",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Content \u2192 Image \u2192 Source / Alt text / Loading; Style \u2192 Media presentation \u2192 Fit",
+      "indexed_controls": "Choose/replace source; alt supports intentional empty decorative text; Lazy/Eager; Fit Cover/Contain/Fill and preserve valid saved None/Scale-down as custom/readout",
+      "figma_node_ids": [
+        "249:72051"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-57",
+      "feature": "Video block",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Move",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Content \u2192 Video \u2192 Source / Poster; Behaviour \u2192 Playback; Content \u2192 Attributes \u2192 Preload",
+      "indexed_controls": "Source and Poster URL; Autoplay/Muted/Loop/Show controls/Plays inline; preload Auto/Metadata/None; autoplay-with-sound message",
+      "figma_node_ids": [
+        "249:72098"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-58",
+      "feature": "Audio block",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Move",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Content \u2192 Audio \u2192 Source; Behaviour \u2192 Playback",
+      "indexed_controls": "Choose audio; Show controls/Loop/Autoplay; preserve current source picker MIME constraints",
+      "figma_node_ids": [
+        "249:72158"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-59",
+      "feature": "SVG block",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Content \u2192 SVG \u2192 Source / Replace source",
+      "indexed_controls": "Preserve inline SVG as structured content; replacing with external image states tag/content conversion before Apply; retain valid existing source formats",
+      "figma_node_ids": [
+        "258:38731",
+        "258:39198"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-60",
+      "feature": "Icon block",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Content \u2192 Icon \u2192 Change icon; Style \u2192 Icon appearance \u2192 Size / Stroke width",
+      "indexed_controls": "Picker; size16/20/24/32/48/64px, stroke1/1.5/2/2.5/3 plus preserve custom saved values; metadata and renderer must agree",
+      "figma_node_ids": [
+        "249:72293"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-61",
+      "feature": "Video embed block",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Move",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Content \u2192 Video embed \u2192 Video URL; Style \u2192 Media presentation \u2192 Ratio; Behaviour \u2192 Playback",
+      "indexed_controls": "Supported YouTube/Vimeo parsing; existing ratio options from EMBED_RATIOS; Autoplay/Muted/Show controls; invalid draft keeps last valid URL",
+      "figma_node_ids": [
+        "258:38255"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-62",
+      "feature": "Map embed / Lottie blocks",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Move",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Content \u2192 Map \u2192 Location; Content \u2192 Lottie \u2192 Animation URL",
+      "indexed_controls": "Address/Google Maps link; currently supported Lottie URL parser; invalid/missing/loading distinct; preserve provider restrictions",
+      "figma_node_ids": [
+        "249:72432"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-63",
+      "feature": "Countdown block",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Content \u2192 Countdown \u2192 Ends at / Message; Behaviour \u2192 Countdown completion \u2192 When done",
+      "indexed_controls": "YYYY-MM-DD HH:mm local visitor time; blank removes end value explicitly; When done Show message/Hide; message string",
+      "figma_node_ids": [
+        "249:74072"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-64",
+      "feature": "Progress block",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Content \u2192 Progress \u2192 Value / Maximum / Show label",
+      "indexed_controls": "Finite Value>=0, Maximum>0; keep current native progress semantics; no forced clamping of valid saved value to max; checkbox label display",
+      "figma_node_ids": [
+        "247:28584",
+        "247:29083",
+        "251:77000"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-65",
+      "feature": "Accordion block",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Move",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Content \u2192 Accordion \u2192 Items / Edit item content; Behaviour \u2192 Accordion \u2192 Initial open states / Allow several open",
+      "indexed_controls": "Retain existing per-item Open/Closed and multiple-open; exact child link to Canvas/Layers; item CRUD stays existing hierarchy commands",
+      "figma_node_ids": [
+        "249:74117"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-66",
+      "feature": "Flex / Stack block",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Move",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Style \u2192 Children layout \u2192 Flex",
+      "indexed_controls": "Direction Row/Column with reverse; nine-point align plus justify/align-items/align-lines; Wrap; Gap/Row gap/Column gap",
+      "figma_node_ids": [
+        "247:21216"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-67",
+      "feature": "Grid block; Columns block",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Redesign",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Style \u2192 Children layout \u2192 Grid; Content \u2192 Columns \u2192 Structure; Style \u2192 Columns \u2192 Gap",
+      "indexed_controls": "Grid column count1\u201324 and raw tracks/rows/flow; Columns child count2\u20136 presets with truthful custom count; Gap0/8/16/24/32px presets and actual responsive value",
+      "figma_node_ids": [
+        "247:21762"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-68",
+      "feature": "Product type block",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Defer",
+      "current_disposition": "Explicitly deferred by current contract",
+      "current_decision": "P1: commerce engine deferred; existing text/media/attributes preserved with neutral note",
+      "canonical_home": "Existing product-* containers \u2192 generic Style/Content children; optional future Product authoring",
+      "indexed_controls": "Do not resurrect reserved type-block body or claim commerce engine complete; preserve saved product blocks and existing generic edit paths",
+      "figma_node_ids": [
+        "249:74496"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-69",
+      "feature": "Layout \u203a Display + flex controls",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Redesign",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Style \u2192 Children layout \u2192 Display / Flex",
+      "indexed_controls": "Block/Flex/Grid/None; Inline block/Inline/Inline flex/Inline grid; conditional flex controls; explicit impact of changing display",
+      "figma_node_ids": [
+        "247:21216"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-70",
+      "feature": "Layout \u203a grid controls",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Style \u2192 Children layout \u2192 Grid",
+      "indexed_controls": "Columns1\u201324 shortcut; Column tracks/Rows raw expressions; Flow row/column/dense; Justify/Align rows; Gap",
+      "figma_node_ids": [
+        "247:21762"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-71",
+      "feature": "Layout \u203a Position",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Redesign",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Style \u2192 Placement \u2192 Position / Insets / Z-index",
+      "indexed_controls": "Static/Relative/Absolute/Fixed/Sticky; contextual top/right/bottom/left; integer z-index or auto; show reference context",
+      "figma_node_ids": [
+        "247:22310"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-72",
+      "feature": "Layout \u203a More: Overflow, Visibility & Float",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Move",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Style \u2192 Placement \u2192 More \u2192 Overflow / Box sizing / Visibility / Float / Clear",
+      "indexed_controls": "X/Y overflow visible/hidden/scroll/auto; box content-box/border-box; CSS visibility; float/clear supported values; readable labels",
+      "figma_node_ids": [
+        "247:22310"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-73",
+      "feature": "Standalone Flexbox / Grid / Corner radius sections",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Superseded historical UI",
+      "current_decision": "Merged Layout/Border replace standalone Flexbox/Grid/radius",
+      "canonical_home": "Style \u2192 Children layout / Border \u2192 Corner radius",
+      "indexed_controls": "Keep merged Layout/Border replacements for retired standalone Flexbox/Grid/Corner radius sections",
+      "figma_node_ids": [
+        "247:21216",
+        "247:21762",
+        "247:24493"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-74",
+      "feature": "Typography (open, text types)",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Style \u2192 Typography \u2192 Font / Colour / Size / Line height / Weight / Align / More",
+      "indexed_controls": "Family; size and line-height existing units; weight100\u2013900/custom; align Left/Center/Right plus saved custom; transform/decoration/style/letter/word spacing/white-space/word-break/indent/vertical-align",
+      "figma_node_ids": [
+        "247:23404"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-75",
+      "feature": "Text inside (closed with summary)",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Style \u2192 Text inside \u2192 Typography controls",
+      "indexed_controls": "Same typography fields; collapsed family/size/colour summary; describes inherited descendant effect, not bulk rewriting all children",
+      "figma_node_ids": [
+        "247:23404"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-76",
+      "feature": "Font picker panel",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Style \u2192 Typography \u2192 Font family picker \u2192 Manage fonts",
+      "indexed_controls": "Search; uploaded/system/current supported families; Inherit; exact management entry; loading/error/retry and return",
+      "figma_node_ids": [
+        "247:30567",
+        "247:31047",
+        "247:32025",
+        "247:32505",
+        "247:32989",
+        "251:76342",
+        "251:76737",
+        "252:46432"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-77",
+      "feature": "Size \u203a Width / Height",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Style \u2192 Size \u2192 Width / Height",
+      "indexed_controls": "Fixed/Fill/Hug; px/%/rem/vw/vh; resolved rendered size identified as readout; current custom expressions preserved",
+      "figma_node_ids": [
+        "161:12005"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-78",
+      "feature": "Size \u203a spacing-token chain (Fixed)",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Style \u2192 Size \u2192 Width/Height \u2192 spacing token link",
+      "indexed_controls": "Pick compatible spacing token; bound name/source; Unlink to current resolved value; Reset removes selected layer separately",
+      "figma_node_ids": [
+        "247:22853"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-79",
+      "feature": "Size \u203a More: Min / Max width / height",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Style \u2192 Size \u2192 More \u2192 Min/Max width/height",
+      "indexed_controls": "Existing valid length/percent/keyword/custom values; meaningful unset vs none/auto; dimension-specific validation",
+      "figma_node_ids": [
+        "247:22310"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-80",
+      "feature": "Size \u203a flex/grid item controls",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Style \u2192 Size \u2192 Item in parent",
+      "indexed_controls": "Flex Grow/Shrink/Basis/Order/Align self; Grid Column span/Row span/Align self/Justify self; preserve custom track expressions",
+      "figma_node_ids": [
+        "247:22853"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-81",
+      "feature": "Size disabled-reason on inline elements",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Style \u2192 Size \u2192 disabled dimension explanation",
+      "indexed_controls": "Read-only dimensions with specific inline reason and intentional display-change route; no automatic display edit",
+      "figma_node_ids": [
+        "161:12005"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-82",
+      "feature": "Spacing box",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Style \u2192 Spacing \u2192 Padding / Margin box",
+      "indexed_controls": "Per-side values; link sides; current units; negative margin allowed where CSS valid, negative padding rejected; unitless0 distinct from unset; token links",
+      "figma_node_ids": [
+        "247:22853"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-83",
+      "feature": "Spacing face pair rows (vertical/horizontal) and Gap rows",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Superseded historical UI",
+      "current_decision": "Box and row/column Gap replace paired spacing rows",
+      "canonical_home": "Style \u2192 Spacing box; Style \u2192 Children layout \u2192 Gap",
+      "indexed_controls": "Keep current box/Gap replacements for retired pair rows; vertical/horizontal grouping and separate row/column gaps preserved",
+      "figma_node_ids": [
+        "247:22853"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-84",
+      "feature": "Fill \u203a Colour",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Style \u2192 Fill \u2192 Colour",
+      "indexed_controls": "Colour/custom valid CSS/token; None/transparent separate from inherited; switching paint kind explicitly commits scoped replacement",
+      "figma_node_ids": [
+        "247:23966"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-85",
+      "feature": "Fill \u203a Gradient",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Style \u2192 Fill \u2192 Gradient",
+      "indexed_controls": "Current two-stop colour/angle controls; rich/multi-stop saved gradient retained as Custom; lossless edits or explicit conversion",
+      "figma_node_ids": [
+        "247:23966"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-86",
+      "feature": "Fill \u203a Image",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Style \u2192 Fill \u2192 Image \u2192 Choose image / Image presentation / More",
+      "indexed_controls": "Asset picker; Size Auto/Cover/Contain/Stretch/custom; Position nine presets/custom; Repeat none/x/y/both; Attachment scroll/fixed/local; Blend supported current values",
+      "figma_node_ids": [
+        "247:23966"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-87",
+      "feature": "Border",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Style \u2192 Border \u2192 Radius / Border / More \u2192 Outline",
+      "indexed_controls": "Linked or independent corners px/%/em/rem; width px/em/rem; style none/solid/dashed/dotted/double/groove/ridge/inset/outset; colour; outline width/style/colour/offset",
+      "figma_node_ids": [
+        "247:24493"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-88",
+      "feature": "Colour row",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Style/Effects colour fields \u2192 Colour input / Source details",
+      "indexed_controls": "Validated colour expression/hex, transparent, token identity; distinct draft/committed; Escape restores interaction-start value not only text",
+      "figma_node_ids": [
+        "161:9467",
+        "247:30075"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-89",
+      "feature": "Colour popover (board 33)",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Colour field \u2192 picker \u2192 Local colour / Shared token actions",
+      "indexed_controls": "Local selection; existing token link/unlink; explicit Update shared token with mode/reach; confirmed owner operation before close/success",
+      "figma_node_ids": [
+        "247:30075"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-90",
+      "feature": "Number + unit field",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Numeric style field \u2192 Number + Unit + Source details",
+      "indexed_controls": "Finite valid CSS number and property units; existing custom expression readout; no universal bounds; blank draft distinct from Remove override",
+      "figma_node_ids": [
+        "161:8940",
+        "161:9467",
+        "161:11006",
+        "161:11470",
+        "161:12005"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-91",
+      "feature": "Live writes",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Shared style writer \u2192 field transaction lifecycle",
+      "indexed_controls": "Valid live preview/write to pinned target+layer; one undo per typing/scrub; discrete choices separate; flush before scope transition",
+      "figma_node_ids": [
+        "161:9467",
+        "161:10007",
+        "161:10541"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-92",
+      "feature": "Read-only + lock gate",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "All inspector mutation paths \u2192 shared eligibility gate",
+      "indexed_controls": "Field, native input, reset, list command, rename, picker, component/shared-resource callback all revalidate; no frontend-only security claim",
+      "figma_node_ids": [
+        "157:105715",
+        "255:92819",
+        "247:32989"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-93",
+      "feature": "Opacity",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Effects \u2192 Opacity",
+      "indexed_controls": "0\u2013100% control mapped to CSS0\u20131; slider convenience bounds; mixed/source/reset; unset differs from100%",
+      "figma_node_ids": [
+        "247:25554"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-94",
+      "feature": "Shadow",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Effects \u2192 Shadow \u2192 Outer / Inner / Custom CSS",
+      "indexed_controls": "Keep existing presets plus raw outer/inner CSS; preserve every layer/order and inset keyword regardless position",
+      "figma_node_ids": [
+        "247:25026"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-95",
+      "feature": "Filters",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Effects \u2192 Filters \u2192 Blur / Brightness / Contrast / Grayscale / Custom value",
+      "indexed_controls": "Convenience sliders Blur0\u201320px, Brightness/Contrast0\u2013200%, Grayscale0\u2013100%; saved valid out-of-range/custom functions retained; term/order lossless",
+      "figma_node_ids": [
+        "247:25554"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-96",
+      "feature": "Transform & motion",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Effects \u2192 Transform / Transition",
+      "indexed_controls": "Scale0\u2013200%, Rotate\u2212180\u2013180\u00b0, MoveX/Y CSS lengths/percent, Skew\u221245\u201345\u00b0 sliders; transition property, Duration/Delay s/ms, Easing; ranges not destructive storage limits",
+      "figma_node_ids": [
+        "247:25026"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-97",
+      "feature": "Advanced (Effects)",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Effects \u2192 Advanced \u2192 Cursor / Blend / Text shadow / Will change",
+      "indexed_controls": "Retain current cursor choices/custom; blend modes/custom; text-shadow raw CSS/source/mixed; will-change auto/transform/opacity/scroll-position/contents/custom",
+      "figma_node_ids": [
+        "247:25554"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-98",
+      "feature": "Link",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Behaviour \u2192 Link \u2192 Destination / Open in / Rel / Title where existing",
+      "indexed_controls": "None/Page/URL/Email/Phone/Anchor destinations; type-specific validation; target same/new tab only for Page/URL/Anchor; rel tokens; keep title owner exception",
+      "figma_node_ids": [
+        "249:71755"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-99",
+      "feature": "CMS binding",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Move",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "BD20: property-row binding, read-only Content summary and exact Binding subview",
+      "canonical_home": "Content \u2192 CMS binding \u2192 Collection / Field / Preview / Disconnect",
+      "indexed_controls": "Compatible collection/field mapping; existing binding controls; loading/empty/no match/deleted field/type mismatch/failure distinct; retain prior binding on failure",
+      "figma_node_ids": [
+        "255:93321",
+        "255:93677",
+        "255:94031",
+        "258:35441",
+        "258:31477",
+        "258:31982",
+        "258:32482",
+        "258:32981",
+        "258:33493",
+        "258:39679"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-100",
+      "feature": "CMS-conditional visibility (\"Visibility condition\")",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Defer",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current delta: Content Conditions editor; legacy rule remains inactive until explicit activation",
+      "canonical_home": "Behaviour \u2192 optional future CMS visibility condition; current device Visibility preserved",
+      "indexed_controls": "No new condition editor in closure; existing binding remains Content and device flags Behaviour; do not claim device flags replace data conditions",
+      "figma_node_ids": [
+        "255:94411",
+        "255:94775",
+        "255:95134",
+        "258:33994",
+        "258:34343",
+        "258:34707",
+        "258:35104"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-101",
+      "feature": "Visibility",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Behaviour \u2192 Visibility \u2192 Desktop / Tablet / Mobile",
+      "indexed_controls": "Existing show/hide device flags; explain this edits device-rule map independently of active style breakpoint; indeterminate multi state",
+      "figma_node_ids": [
+        "161:13919"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-102",
+      "feature": "Interactions",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Behaviour \u2192 Interactions \u2192 Add / interaction row / editor",
+      "indexed_controls": "Current trigger groups, animation preset/easing/duration/delay, Enable/Disable/Remove/Preview; retain supported runtime fields and custom saved values",
+      "figma_node_ids": [
+        "161:15179"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-103",
+      "feature": "Element CSS animation (inside Interactions)",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Behaviour \u2192 Interactions \u2192 Element CSS animation row \u2192 editor",
+      "indexed_controls": "Existing CSS AnimationConfig authoring, preview, clear; keep separate data model from trigger interactions; show saved unsupported trigger as legacy/read-only",
+      "figma_node_ids": [
+        "247:26063"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-104",
+      "feature": "CSS classes",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Move",
+      "current_disposition": "Explicitly deferred by current contract",
+      "current_decision": "SC23/P6: class selector deferred; stored class membership preserved",
+      "canonical_home": "Style \u2192 Classes \u2192 Attached classes / Add / Remove",
+      "indexed_controls": "Existing class membership tokens and search; exact shared-class source link only if actual authoring route exists; no fake class editor",
+      "figma_node_ids": [],
+      "evidence_scope": "SC23/P6: class selector deferred; stored class membership preserved",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-105",
+      "feature": "Attributes (closed with summary)",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Move",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Native attributes retained by type; form transport controls withdrawn because no writer exists",
+      "canonical_home": "Content \u2192 Attributes \u2192 Identity/accessibility; field/media advanced stay Content; form transport \u2192 Behaviour \u2192 Submission \u2192 Advanced",
+      "indexed_controls": "ID/Title/Tab index; image Decoding auto/sync/async; video Preload; input Read only/Autocomplete; textarea Read only/Max length/Columns; form Action URL/GET/POST/Encoding/No validate/Autocomplete in Behaviour",
+      "figma_node_ids": [
+        "247:26594",
+        "156:1316",
+        "245:43495"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-106",
+      "feature": "Custom data-* / aria-* attributes",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Redesign",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Content \u2192 Attributes \u2192 Custom attributes list",
+      "indexed_controls": "List/add/edit/remove existing data-*/aria-*; name/value; meaningful empty string; duplicate-key edit explicit; reserved internal keys read-only",
+      "figma_node_ids": [
+        "247:26594"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-107",
+      "feature": "Form \u203a Fields",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Move",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Content \u2192 Form \u2192 Fields \u2192 exact field editor",
+      "indexed_controls": "Add/duplicate/delete/reorder; Move up/down; Edit field; Placeholder correctly named; visible label linked to actual label content; safe type conversion",
+      "figma_node_ids": [
+        "156:716",
+        "156:1316",
+        "156:3109",
+        "156:3684",
+        "159:7279",
+        "159:7646",
+        "159:8041",
+        "170:121692",
+        "170:122069",
+        "170:123569",
+        "170:123968"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-108",
+      "feature": "Form \u203a After submit",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Keep",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Behaviour \u2192 Form \u2192 After submit / Delivery",
+      "indexed_controls": "Then Show message/Redirect; Message/Redirect to; Send to; Spam protection; current service limits and admin-only email gate preserved",
+      "figma_node_ids": [
+        "156:6055"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-109",
+      "feature": "Slider \u203a Slides",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Move",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Content \u2192 Slider \u2192 Slides",
+      "indexed_controls": "Existing add/duplicate/delete/reorder; named slide/child-edit entry; keyboard Move up/down; active slide content uses Canvas/Layers",
+      "figma_node_ids": [
+        "249:73891"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-110",
+      "feature": "Slider \u203a Playback",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Fix",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Behaviour \u2192 Slider \u2192 Playback / Controls",
+      "indexed_controls": "Autoplay default false; Interval1\u201360 seconds when on, inherited current fallback5 shown as default; Arrows/Dots default true; invalid input explicit not silent clamp",
+      "figma_node_ids": [
+        "249:73891"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-111",
+      "feature": "Collection list \u203a Collection",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Move",
+      "current_disposition": "Current control semantics drawn",
+      "current_decision": "Current owner retained; source controls remain acceptance requirements",
+      "canonical_home": "Content \u2192 Collection list \u2192 Data source / Display limit",
+      "indexed_controls": "Existing collection chooser/Create collection/Display limit; show All explicitly for existing nonpositive sentinel; no invented filter/sort engine",
+      "figma_node_ids": [
+        "249:72710"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    },
+    {
+      "id": "M07-112",
+      "feature": "All CSS (dev-mode raw inline style editor)",
+      "source_register": "inspector-preservation-map.json",
+      "source_disposition": "Defer",
+      "current_disposition": "Superseded historical UI",
+      "current_decision": "All CSS editor retired; preserved raw/custom values stay in property owners",
+      "canonical_home": "Current structured Style/Effects/custom-value controls; optional future developer Raw CSS surface",
+      "indexed_controls": "Do not restore retired All CSS panel solely because historical list mentions it; retain stored valid custom CSS and existing raw field routes",
+      "figma_node_ids": [
+        "161:12005",
+        "247:25026",
+        "247:25554"
+      ],
+      "evidence_scope": "Named visible control/state specimens. Dropdown enums and implementation-only behavior are acceptance requirements, not independently simulated by every linked frame.",
+      "runtime": "NOT RUN",
+      "prototype": "Authored selected reactions; playback NOT RUN"
+    }
+  ],
+  "blocks": [
+    {
+      "record": "B69-container",
+      "id": "249:71564",
+      "board": "249:71560",
+      "fields": [
+        "Tag",
+        "Children",
+        "Add child"
+      ],
+      "nativeTag": "div",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-text",
+      "id": "249:71602",
+      "board": "249:71560",
+      "fields": [
+        "Tag",
+        "Content",
+        "Binding"
+      ],
+      "nativeTag": "span",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-heading",
+      "id": "249:71640",
+      "board": "249:71560",
+      "fields": [
+        "Level",
+        "Content",
+        "ID"
+      ],
+      "nativeTag": "h2",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-paragraph",
+      "id": "249:71678",
+      "board": "249:71560",
+      "fields": [
+        "Tag",
+        "Content",
+        "Language"
+      ],
+      "nativeTag": "p",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-button",
+      "id": "249:71716",
+      "board": "249:71560",
+      "fields": [
+        "Text",
+        "Type",
+        "Disabled"
+      ],
+      "nativeTag": "button",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-link",
+      "id": "249:71755",
+      "board": "249:71560",
+      "fields": [
+        "Text",
+        "Destination",
+        "Target",
+        "Rel"
+      ],
+      "nativeTag": "a",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-list",
+      "id": "249:71801",
+      "board": "249:71797",
+      "fields": [
+        "List type",
+        "Items",
+        "Add item"
+      ],
+      "nativeTag": "ul",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-divider",
+      "id": "249:71842",
+      "board": "249:71797",
+      "fields": [
+        "Tag",
+        "Content",
+        "Thickness",
+        "Color"
+      ],
+      "nativeTag": "hr",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-row",
+      "id": "249:71884",
+      "board": "249:71797",
+      "fields": [
+        "Tag",
+        "Children",
+        "Direction",
+        "Gap"
+      ],
+      "nativeTag": "div",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-column",
+      "id": "249:71926",
+      "board": "249:71797",
+      "fields": [
+        "Tag",
+        "Children",
+        "Direction",
+        "Gap"
+      ],
+      "nativeTag": "div",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-spacer",
+      "id": "249:71968",
+      "board": "249:71797",
+      "fields": [
+        "Height",
+        "Width",
+        "Content"
+      ],
+      "nativeTag": "div",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-theme-toggle",
+      "id": "249:72006",
+      "board": "249:71797",
+      "fields": [
+        "Site color mode",
+        "Published state",
+        "Open Brand"
+      ],
+      "nativeTag": "div",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-image",
+      "id": "249:72051",
+      "board": "249:72047",
+      "fields": [
+        "Source",
+        "Alt",
+        "Loading",
+        "Decoding",
+        "Fit"
+      ],
+      "nativeTag": "img",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-video",
+      "id": "249:72098",
+      "board": "249:72047",
+      "fields": [
+        "Source",
+        "Poster",
+        "Preload",
+        "Autoplay",
+        "Muted",
+        "Loop",
+        "Controls",
+        "Plays inline"
+      ],
+      "nativeTag": "video",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-audio",
+      "id": "249:72158",
+      "board": "249:72047",
+      "fields": [
+        "Source",
+        "Controls",
+        "Loop",
+        "Autoplay"
+      ],
+      "nativeTag": "audio",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-svg",
+      "id": "249:72203",
+      "board": "249:72047",
+      "fields": [
+        "Representation",
+        "ViewBox",
+        "Role",
+        "Labelled by",
+        "Native shapes",
+        "Replace file"
+      ],
+      "nativeTag": "svg",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-lottie",
+      "id": "249:72253",
+      "board": "249:72047",
+      "fields": [
+        "Source",
+        "Status",
+        "Replacement"
+      ],
+      "nativeTag": "div",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-icon",
+      "id": "249:72293",
+      "board": "249:72047",
+      "fields": [
+        "Icon",
+        "Size",
+        "Stroke",
+        "Accessible name"
+      ],
+      "nativeTag": "span",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-gallery",
+      "id": "249:72339",
+      "board": "249:72335",
+      "fields": [
+        "Images",
+        "Edit image",
+        "Add image",
+        "Move image"
+      ],
+      "nativeTag": "div",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-video-embed",
+      "id": "249:72380",
+      "board": "249:72335",
+      "fields": [
+        "Provider",
+        "URL",
+        "Ratio",
+        "Autoplay",
+        "Muted",
+        "Controls"
+      ],
+      "nativeTag": "div",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-map-embed",
+      "id": "249:72432",
+      "board": "249:72335",
+      "fields": [
+        "Address",
+        "Map URL",
+        "Status"
+      ],
+      "nativeTag": "div",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-section",
+      "id": "249:72472",
+      "board": "249:72335",
+      "fields": [
+        "Tag",
+        "ID",
+        "Children"
+      ],
+      "nativeTag": "section",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-columns",
+      "id": "249:72511",
+      "board": "249:72335",
+      "fields": [
+        "Columns",
+        "Add column",
+        "Reduce count",
+        "Gap"
+      ],
+      "nativeTag": "div",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-columns3",
+      "id": "249:72554",
+      "board": "249:72335",
+      "fields": [
+        "Columns",
+        "Add column",
+        "Reduce count",
+        "Gap"
+      ],
+      "nativeTag": "div",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-grid",
+      "id": "249:72602",
+      "board": "249:72598",
+      "fields": [
+        "Display",
+        "Columns",
+        "Tracks",
+        "Rows",
+        "Flow",
+        "Gap"
+      ],
+      "nativeTag": "div",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-flex",
+      "id": "249:72656",
+      "board": "249:72598",
+      "fields": [
+        "Display",
+        "Direction",
+        "Wrap",
+        "Justify",
+        "Align items",
+        "Gap"
+      ],
+      "nativeTag": "div",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-collection-list",
+      "id": "249:72710",
+      "board": "249:72598",
+      "fields": [
+        "Collection",
+        "Display limit",
+        "Source status",
+        "Item template"
+      ],
+      "nativeTag": "div",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-form",
+      "id": "249:72753",
+      "board": "249:72598",
+      "fields": [
+        "Fields",
+        "Add field",
+        "Reorder",
+        "Delivery"
+      ],
+      "nativeTag": "form",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-input",
+      "id": "249:72797",
+      "board": "249:72598",
+      "fields": [
+        "Type",
+        "Name",
+        "Placeholder",
+        "Default",
+        "Required",
+        "Read only",
+        "Autocomplete"
+      ],
+      "nativeTag": "input",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-textarea",
+      "id": "249:72852",
+      "board": "249:72598",
+      "fields": [
+        "Name",
+        "Placeholder",
+        "Default",
+        "Rows",
+        "Columns",
+        "Max length",
+        "Read only"
+      ],
+      "nativeTag": "textarea",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-select",
+      "id": "249:72911",
+      "board": "249:72907",
+      "fields": [
+        "Name",
+        "Options",
+        "Selected",
+        "Multiple",
+        "Groups",
+        "Edit option"
+      ],
+      "nativeTag": "select",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-checkbox",
+      "id": "249:72964",
+      "board": "249:72907",
+      "fields": [
+        "Caption",
+        "Name",
+        "Submission value",
+        "Checked default",
+        "Required"
+      ],
+      "nativeTag": "label",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-radio",
+      "id": "249:73013",
+      "board": "249:72907",
+      "fields": [
+        "Caption",
+        "Group name",
+        "Submission value",
+        "Checked default",
+        "Required"
+      ],
+      "nativeTag": "label",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-file",
+      "id": "249:73062",
+      "board": "249:72907",
+      "fields": [
+        "Name",
+        "Accept",
+        "Multiple",
+        "Required",
+        "Default"
+      ],
+      "nativeTag": "input",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-date",
+      "id": "249:73108",
+      "board": "249:72907",
+      "fields": [
+        "Name",
+        "Default",
+        "Min",
+        "Max",
+        "Required"
+      ],
+      "nativeTag": "input",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-time",
+      "id": "249:73154",
+      "board": "249:72907",
+      "fields": [
+        "Name",
+        "Default",
+        "Min",
+        "Max",
+        "Step"
+      ],
+      "nativeTag": "input",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-email",
+      "id": "249:73205",
+      "board": "249:73201",
+      "fields": [
+        "Name",
+        "Placeholder",
+        "Default",
+        "Required",
+        "Autocomplete"
+      ],
+      "nativeTag": "input",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-password",
+      "id": "249:73252",
+      "board": "249:73201",
+      "fields": [
+        "Legacy field",
+        "Name",
+        "Published warning",
+        "Remove or change"
+      ],
+      "nativeTag": "input",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-number",
+      "id": "249:73294",
+      "board": "249:73201",
+      "fields": [
+        "Name",
+        "Default",
+        "Min",
+        "Max",
+        "Step"
+      ],
+      "nativeTag": "input",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-range",
+      "id": "249:73341",
+      "board": "249:73201",
+      "fields": [
+        "Name",
+        "Default",
+        "Min",
+        "Max",
+        "Step"
+      ],
+      "nativeTag": "input",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-color",
+      "id": "249:73388",
+      "board": "249:73201",
+      "fields": [
+        "Name",
+        "Default",
+        "Required",
+        "Disabled"
+      ],
+      "nativeTag": "input",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-label",
+      "id": "249:73431",
+      "board": "249:73201",
+      "fields": [
+        "Caption",
+        "For",
+        "Content"
+      ],
+      "nativeTag": "label",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-submit",
+      "id": "249:73473",
+      "board": "249:73469",
+      "fields": [
+        "Text",
+        "Type",
+        "Disabled",
+        "Form owner"
+      ],
+      "nativeTag": "button",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-hero",
+      "id": "249:73516",
+      "board": "249:73469",
+      "fields": [
+        "Headline",
+        "Supporting text",
+        "CTA",
+        "Media"
+      ],
+      "nativeTag": "section",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-features",
+      "id": "249:73556",
+      "board": "249:73469",
+      "fields": [
+        "Items",
+        "Title",
+        "Icon",
+        "Reorder"
+      ],
+      "nativeTag": "section",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-menu-grid",
+      "id": "249:73599",
+      "board": "249:73469",
+      "fields": [
+        "Items",
+        "Image",
+        "Label",
+        "Link"
+      ],
+      "nativeTag": "section",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-testimonials-section",
+      "id": "249:73641",
+      "board": "249:73469",
+      "fields": [
+        "Items",
+        "Quote",
+        "Author",
+        "Portrait"
+      ],
+      "nativeTag": "section",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-cta",
+      "id": "249:73683",
+      "board": "249:73469",
+      "fields": [
+        "Heading",
+        "Copy",
+        "Action",
+        "Root link"
+      ],
+      "nativeTag": "section",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-contact",
+      "id": "249:73729",
+      "board": "249:73725",
+      "fields": [
+        "Heading",
+        "Contact form",
+        "Details"
+      ],
+      "nativeTag": "section",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-footer",
+      "id": "249:73766",
+      "board": "249:73725",
+      "fields": [
+        "Tag",
+        "Navigation",
+        "Copyright",
+        "Social icons"
+      ],
+      "nativeTag": "footer",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-navbar",
+      "id": "249:73807",
+      "board": "249:73725",
+      "fields": [
+        "Tag",
+        "Brand",
+        "Navigation",
+        "Mobile control"
+      ],
+      "nativeTag": "nav",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-card",
+      "id": "249:73850",
+      "board": "249:73725",
+      "fields": [
+        "Title",
+        "Body",
+        "Image",
+        "Link"
+      ],
+      "nativeTag": "div",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-slider",
+      "id": "249:73891",
+      "board": "249:73725",
+      "fields": [
+        "Slides",
+        "Shown in editor",
+        "Add slide",
+        "Duplicate",
+        "Playback"
+      ],
+      "nativeTag": "div",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-testimonials",
+      "id": "249:73937",
+      "board": "249:73725",
+      "fields": [
+        "Quote",
+        "Author",
+        "Portrait"
+      ],
+      "nativeTag": "div",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-pricing",
+      "id": "249:73978",
+      "board": "249:73974",
+      "fields": [
+        "Plan name",
+        "Price text",
+        "Features",
+        "CTA",
+        "Billing engine"
+      ],
+      "nativeTag": "div",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-progress",
+      "id": "249:74023",
+      "board": "249:73974",
+      "fields": [
+        "Value",
+        "Maximum",
+        "Percentage label",
+        "Title",
+        "Numeric owner"
+      ],
+      "nativeTag": "div",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-countdown",
+      "id": "249:74072",
+      "board": "249:73974",
+      "fields": [
+        "Ends at",
+        "Time basis",
+        "When done",
+        "Message"
+      ],
+      "nativeTag": "div",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-accordion",
+      "id": "249:74117",
+      "board": "249:73974",
+      "fields": [
+        "Items",
+        "Edit closed item",
+        "Initial open",
+        "Multiple open",
+        "Repair"
+      ],
+      "nativeTag": "div",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-social-icons",
+      "id": "249:74165",
+      "board": "249:73974",
+      "fields": [
+        "Links",
+        "Icon",
+        "Destination",
+        "Accessible name"
+      ],
+      "nativeTag": "div",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-contact-form",
+      "id": "249:74209",
+      "board": "249:73974",
+      "fields": [
+        "Fields",
+        "Visible label",
+        "Submission name",
+        "Service settings"
+      ],
+      "nativeTag": "form",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-stack",
+      "id": "249:74256",
+      "board": "249:74252",
+      "fields": [
+        "Direction",
+        "Wrap",
+        "Justify",
+        "Align items",
+        "Gap"
+      ],
+      "nativeTag": "div",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-switch",
+      "id": "249:74305",
+      "board": "249:74252",
+      "fields": [
+        "Caption",
+        "Name",
+        "Submission value",
+        "Checked default",
+        "Required",
+        "Parts"
+      ],
+      "nativeTag": "label",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-tabs",
+      "id": "249:74358",
+      "board": "249:74252",
+      "fields": [
+        "Pairs",
+        "Initial tab",
+        "Edit panel",
+        "Unlinked nodes"
+      ],
+      "nativeTag": "div",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-modal",
+      "id": "249:74404",
+      "board": "249:74252",
+      "fields": [
+        "Trigger",
+        "Linked dialog",
+        "Dialog location",
+        "Shared component"
+      ],
+      "nativeTag": "button",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-table",
+      "id": "249:74448",
+      "board": "249:74252",
+      "fields": [
+        "Structure",
+        "Body rows",
+        "Columns",
+        "Cell",
+        "Scroll wrapper"
+      ],
+      "nativeTag": "table",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-product-card",
+      "id": "249:74496",
+      "board": "249:74252",
+      "fields": [
+        "Image",
+        "Name",
+        "Price text",
+        "Data marker",
+        "Commerce setup"
+      ],
+      "nativeTag": "div",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-product-grid",
+      "id": "249:74545",
+      "board": "249:74541",
+      "fields": [
+        "Items",
+        "Layout",
+        "CMS source",
+        "Checkout"
+      ],
+      "nativeTag": "div",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-product-detail",
+      "id": "249:74585",
+      "board": "249:74541",
+      "fields": [
+        "Media",
+        "Title",
+        "Price text",
+        "Action marker"
+      ],
+      "nativeTag": "article",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    },
+    {
+      "record": "B69-cart-button",
+      "id": "249:74627",
+      "board": "249:74541",
+      "fields": [
+        "Label",
+        "Action marker",
+        "Commerce setup",
+        "Link replacement"
+      ],
+      "nativeTag": "button",
+      "scope": "Block-specific Content entry and controls; flow examples separate"
+    }
+  ],
+  "native_routes": [
+    {
+      "tag": "abbr",
+      "contract": "N01",
+      "id": "249:74675",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "b",
+      "contract": "N01",
+      "id": "249:74675",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "bdi",
+      "contract": "N01",
+      "id": "249:74675",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "bdo",
+      "contract": "N01",
+      "id": "249:74675",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "cite",
+      "contract": "N01",
+      "id": "249:74675",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "code",
+      "contract": "N01",
+      "id": "249:74675",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "data",
+      "contract": "N01",
+      "id": "249:74675",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "del",
+      "contract": "N01",
+      "id": "249:74675",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "dfn",
+      "contract": "N01",
+      "id": "249:74675",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "em",
+      "contract": "N01",
+      "id": "249:74675",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "i",
+      "contract": "N01",
+      "id": "249:74675",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "ins",
+      "contract": "N01",
+      "id": "249:74675",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "kbd",
+      "contract": "N01",
+      "id": "249:74675",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "mark",
+      "contract": "N01",
+      "id": "249:74675",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "p",
+      "contract": "N01",
+      "id": "249:74675",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "pre",
+      "contract": "N01",
+      "id": "249:74675",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "q",
+      "contract": "N01",
+      "id": "249:74675",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "rp",
+      "contract": "N01",
+      "id": "249:74675",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "rt",
+      "contract": "N01",
+      "id": "249:74675",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "ruby",
+      "contract": "N01",
+      "id": "249:74675",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "s",
+      "contract": "N01",
+      "id": "249:74675",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "samp",
+      "contract": "N01",
+      "id": "249:74675",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "small",
+      "contract": "N01",
+      "id": "249:74675",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "span",
+      "contract": "N01",
+      "id": "249:74675",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "strong",
+      "contract": "N01",
+      "id": "249:74675",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "sub",
+      "contract": "N01",
+      "id": "249:74675",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "sup",
+      "contract": "N01",
+      "id": "249:74675",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "time",
+      "contract": "N01",
+      "id": "249:74675",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "u",
+      "contract": "N01",
+      "id": "249:74675",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "var",
+      "contract": "N01",
+      "id": "249:74675",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "h1",
+      "contract": "N02",
+      "id": "249:74709",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "h2",
+      "contract": "N02",
+      "id": "249:74709",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "h3",
+      "contract": "N02",
+      "id": "249:74709",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "h4",
+      "contract": "N02",
+      "id": "249:74709",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "h5",
+      "contract": "N02",
+      "id": "249:74709",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "h6",
+      "contract": "N02",
+      "id": "249:74709",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "address",
+      "contract": "N03",
+      "id": "249:74739",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "article",
+      "contract": "N03",
+      "id": "249:74739",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "aside",
+      "contract": "N03",
+      "id": "249:74739",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "blockquote",
+      "contract": "N03",
+      "id": "249:74739",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "div",
+      "contract": "N03",
+      "id": "249:74739",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "figcaption",
+      "contract": "N03",
+      "id": "249:74739",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "figure",
+      "contract": "N03",
+      "id": "249:74739",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "footer",
+      "contract": "N03",
+      "id": "249:74739",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "header",
+      "contract": "N03",
+      "id": "249:74739",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "hgroup",
+      "contract": "N03",
+      "id": "249:74739",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "main",
+      "contract": "N03",
+      "id": "249:74739",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "nav",
+      "contract": "N03",
+      "id": "249:74739",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "search",
+      "contract": "N03",
+      "id": "249:74739",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "section",
+      "contract": "N03",
+      "id": "249:74739",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "dd",
+      "contract": "N04",
+      "id": "249:74772",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "dl",
+      "contract": "N04",
+      "id": "249:74772",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "dt",
+      "contract": "N04",
+      "id": "249:74772",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "li",
+      "contract": "N04",
+      "id": "249:74772",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "menu",
+      "contract": "N04",
+      "id": "249:74772",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "ol",
+      "contract": "N04",
+      "id": "249:74772",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "ul",
+      "contract": "N04",
+      "id": "249:74772",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "button",
+      "contract": "N05",
+      "id": "249:74802",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "datalist",
+      "contract": "N05",
+      "id": "249:74802",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "fieldset",
+      "contract": "N05",
+      "id": "249:74802",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "form",
+      "contract": "N05",
+      "id": "249:74802",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "input",
+      "contract": "N05",
+      "id": "249:74802",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "label",
+      "contract": "N05",
+      "id": "249:74802",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "legend",
+      "contract": "N05",
+      "id": "249:74802",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "optgroup",
+      "contract": "N05",
+      "id": "249:74802",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "option",
+      "contract": "N05",
+      "id": "249:74802",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "output",
+      "contract": "N05",
+      "id": "249:74802",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "select",
+      "contract": "N05",
+      "id": "249:74802",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "textarea",
+      "contract": "N05",
+      "id": "249:74802",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "audio",
+      "contract": "N06",
+      "id": "249:74836",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "img",
+      "contract": "N06",
+      "id": "249:74836",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "picture",
+      "contract": "N06",
+      "id": "249:74836",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "source",
+      "contract": "N06",
+      "id": "249:74836",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "track",
+      "contract": "N06",
+      "id": "249:74836",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "video",
+      "contract": "N06",
+      "id": "249:74836",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "caption",
+      "contract": "N07",
+      "id": "249:74877",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "col",
+      "contract": "N07",
+      "id": "249:74877",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "colgroup",
+      "contract": "N07",
+      "id": "249:74877",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "table",
+      "contract": "N07",
+      "id": "249:74877",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "tbody",
+      "contract": "N07",
+      "id": "249:74877",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "td",
+      "contract": "N07",
+      "id": "249:74877",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "tfoot",
+      "contract": "N07",
+      "id": "249:74877",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "th",
+      "contract": "N07",
+      "id": "249:74877",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "thead",
+      "contract": "N07",
+      "id": "249:74877",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "tr",
+      "contract": "N07",
+      "id": "249:74877",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "details",
+      "contract": "N08",
+      "id": "249:74911",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "dialog",
+      "contract": "N08",
+      "id": "249:74911",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "summary",
+      "contract": "N08",
+      "id": "249:74911",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "meter",
+      "contract": "N09",
+      "id": "249:74941",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "progress",
+      "contract": "N09",
+      "id": "249:74941",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "br",
+      "contract": "N10",
+      "id": "249:74986",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "hr",
+      "contract": "N10",
+      "id": "249:74986",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "wbr",
+      "contract": "N10",
+      "id": "249:74986",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "svg",
+      "contract": "N11",
+      "id": "249:75012",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "circle",
+      "contract": "N11",
+      "id": "249:75012",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "ellipse",
+      "contract": "N11",
+      "id": "249:75012",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "line",
+      "contract": "N11",
+      "id": "249:75012",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "path",
+      "contract": "N11",
+      "id": "249:75012",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "polygon",
+      "contract": "N11",
+      "id": "249:75012",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "polyline",
+      "contract": "N11",
+      "id": "249:75012",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "rect",
+      "contract": "N11",
+      "id": "249:75012",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "g",
+      "contract": "N11",
+      "id": "249:75012",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "defs",
+      "contract": "N11",
+      "id": "249:75012",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "use",
+      "contract": "N11",
+      "id": "249:75012",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "symbol",
+      "contract": "N11",
+      "id": "249:75012",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "text",
+      "contract": "N11",
+      "id": "249:75012",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "tspan",
+      "contract": "N11",
+      "id": "249:75012",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "title",
+      "contract": "N11",
+      "id": "249:75012",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "desc",
+      "contract": "N11",
+      "id": "249:75012",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "lineargradient",
+      "contract": "N11",
+      "id": "249:75012",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "radialgradient",
+      "contract": "N11",
+      "id": "249:75012",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "stop",
+      "contract": "N11",
+      "id": "249:75012",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "mask",
+      "contract": "N11",
+      "id": "249:75012",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "clippath",
+      "contract": "N11",
+      "id": "249:75012",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "filter",
+      "contract": "N11",
+      "id": "249:75012",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "fegaussianblur",
+      "contract": "N11",
+      "id": "249:75012",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "feoffset",
+      "contract": "N11",
+      "id": "249:75012",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "femerge",
+      "contract": "N11",
+      "id": "249:75012",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "femergenode",
+      "contract": "N11",
+      "id": "249:75012",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    },
+    {
+      "tag": "a",
+      "contract": "N12",
+      "id": "249:75046",
+      "status": "Family-specific native route illustrated; not one tested workflow per tag"
+    }
+  ],
+  "remaining_acceptance": [
+    "Runtime save/reopen, keyboard/focus/announcements, live-write coalescing, permission revalidation and rendered output parity unrun.",
+    "69 blocks have distinct source-derived control references; every dropdown enum, native tag and interactive mutation sequence is not independently prototyped.",
+    "Binding loading/empty/no-match/type-mismatch/save-failure variants are owned in the CMS design; B4 draws exact-origin success, source deletion, unbind and current Conditions. No end-to-end playback claimed.",
+    "Inspector menu Copy/Paste style, Save as component and Add interaction are visible entries; current S08 frame does not simulate each outcome. Existing interaction owner I14\u2013I24 is separately drawn.",
+    "Page header global actions, full font resource CRUD and cross-owner context restoration need integrated owner/runtime validation."
+  ],
+  "limits": [
+    "Current dispositions replace stale source classifications for AI, Classes, Commerce, Conditions and form transport.",
+    "122-row classification is not a claim of 122 independently interactive workflows.",
+    "No application code changed."
+  ]
+}

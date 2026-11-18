@@ -1,0 +1,165 @@
+--- BEGIN UNTRUSTED EXTERNAL CONTENT (source: http://localhost:3000/edit/cmv8uviql000bucorbmjjol97) ---
+--- BEGIN UNTRUSTED EXTERNAL C​ONTENT (source: http://localhost:3000/edit/cmv8uviql000bucorbmjjol97) ---
+    @e1 [button] "‹ Exit"
+    @e2 [button] "s0-qa site"
+    @e3 [button] "CMS"
+    @e4 [button] "History ›"
+    @e5 [button] "Review"
+    @e6 [button] "Comments"
+    @e7 [button] "Notifications, 2 unread"
+    @e8 [button] "Preview"
+    @e9 [button] "Site menu"
+@e10 [link] "Skip to Canvas"
+    @e11 [tab] "Add elements, blocks and components to your page": Add
+    @e12 [tab] "View and reorder page structure": Layers
+    @e13 [tab] "Manage all pages in your site": Pages
+    @e14 [tab] "Upload and manage images, videos, and fonts": Assets
+    @e15 [tab] "Collections, records and data sources for dynamic content" [selected]: CMS
+    @e16 [tab] "Brand — global colors, fonts, spacing tokens": Brand
+    @e17 [button] "Help — keyboard shortcuts": Help
+    @e18 [button] "Close CMS": ✕
+    @e19 [button] "Create a collection"
+    @e20 [button] "Open Sources"
+    @e21 [button] "Open Variables"
+    @e22 [button] "Open Conditions"
+    @e23 [tab] "Home, Homepage" [selected]: Home
+    @e24 [tab] "Home Copy"
+  @e25 [button] "Add page"
+  @e26 [radio] "Small"
+  @e27 [radio] "Large"
+  @e28 [button] "Send"
+  @e29 [button] "Click Me"
+  @e30 [link] "Link"
+  @e31 [button] "Undo" [disabled]
+  @e32 [button] "Redo" [disabled]
+  @e33 [button] "View": View · 1 ▾
+  @e34 [button] "Zoom 100%": 100% ▾
+  @e35 [button] "+ New collection"
+@e36 [button] "Get started — 3 of 7 complete. Click to expand.": 3/7
+@e37 [button] "v3.0.2 Output Detail Standard React Components Hide Until Restart Marker Color Clear on copy/send Block page interactions Manage MCP & Webhooks Manage MCP & Webhooks MCP Connection MCP connection allows agents to receive and act on annotations. Learn more Webhooks Auto-Send The webhook URL will receive live annotation changes and annotation data."
+  @e38 [button]
+  @e39 [button]
+  @e40 [button] [disabled]
+  @e41 [button] [disabled]
+  @e42 [button] [disabled]
+  @e43 [button] [disabled]
+  @e44 [button]
+  @e45 [button]
+  @e46 [link]
+  @e47 [button] "Switch to light mode"
+  @e48 [button] "Standard"
+  @e49 [checkbox] [checked]
+  @e50 [checkbox]
+  @e51 [button] "Indigo"
+  @e52 [button] "Blue"
+  @e53 [button] "Cyan"
+  @e54 [button] "Green"
+  @e55 [button] "Yellow"
+  @e56 [button] "Orange"
+  @e57 [button] "Red"
+  @e58 [checkbox] "Clear on copy/send"
+  @e59 [checkbox] "Block page interactions" [checked]
+  @e60 [button] "Manage MCP & Webhooks"
+  @e61 [button] "Manage MCP & Webhooks"
+    @e62 [link] "Learn more"
+  @e63 [checkbox] "Auto-Send" [checked] [disabled]
+  @e64 [textbox] "Webhook URL"
+
+── cursor-interactive (not in ARIA tree) ──
+@c1 [cursor:pointer] "Review"
+@c2 [cursor:pointer] "›"
+@c3 [cursor:pointer] "Add"
+@c4 [cursor:pointer] "Layers"
+@c5 [cursor:pointer] "Pages"
+@c6 [cursor:pointer] "Assets"
+@c7 [cursor:pointer] "div"
+@c8 [cursor:pointer] "CMS"
+@c9 [cursor:pointer] "Brand"
+@c10 [cursor:pointer] "Help"
+@c11 [cursor:pointer] "Home"
+@c12 [cursor:pointer] "Home Copy"
+@c13 [tabindex=0] "s4 locked
+
+s4 locked
+
+s4 locked
+
+s4 probe
+
+s4 probe
+
+s4 probe
+
+s4 probe
+
+s1 stal"
+@c14 [popover-child, cursor:pointer] "Fill"
+@c15 [popover-child, cursor:pointer, tabindex=0, role=button] "Fill"
+@c16 [popover-child, cursor:pointer] "Fill"
+@c17 [popover-child, cursor:pointer] "span"
+@c18 [popover-child, cursor:pointer] "span"
+@c19 [popover-child, cursor:pointer] "Size"
+@c20 [popover-child, cursor:pointer, tabindex=0, role=button] "Size"
+@c21 [popover-child, cursor:pointer] "Size"
+@c22 [popover-child, cursor:pointer] "span"
+@c23 [popover-child, cursor:pointer] "span"
+@c24 [popover-child, cursor:pointer] "Typography"
+@c25 [popover-child, cursor:pointer, tabindex=0, role=button] "Typography"
+@c26 [popover-child, cursor:pointer] "Typography"
+@c27 [popover-child, cursor:pointer] "Inter"
+@c28 [popover-child, cursor:pointer] "span"
+@c29 [popover-child, cursor:pointer] "span"
+@c30 [popover-child, cursor:pointer] "Spacing"
+@c31 [popover-child, cursor:pointer, tabindex=0, role=button] "Spacing"
+@c32 [popover-child, cursor:pointer] "Spacing"
+@c33 [popover-child, cursor:pointer] "span"
+@c34 [popover-child, cursor:pointer] "3/7"
+@c35 [popover-child, cursor:pointer, tabindex=0, role=button] "v3.0.2
+
+Output Detail
+Standard
+React Components
+Hide Until Restart
+Marker Color
+"
+@c36 [popover-child, cursor:pointer] "div"
+@c37 [popover-child, cursor:pointer] "div"
+@c38 [popover-child, cursor:pointer] "div"
+@c39 [popover-child, cursor:pointer] "span"
+@c40 [popover-child, cursor:pointer] "span"
+@c41 [popover-child, cursor:pointer] "div"
+@c42 [popover-child, cursor:pointer] "span"
+@c43 [popover-child, cursor:pointer] "span"
+@c44 [popover-child, cursor:pointer] "div"
+@c45 [popover-child, cursor:pointer] "span"
+@c46 [popover-child, cursor:pointer] "span"
+@c47 [popover-child, cursor:pointer] "div"
+@c48 [popover-child, cursor:pointer] "span"
+@c49 [popover-child, cursor:pointer] "span"
+@c50 [popover-child, cursor:pointer] "div"
+@c51 [popover-child, cursor:pointer] "span"
+@c52 [popover-child, cursor:pointer] "span"
+@c53 [popover-child, cursor:pointer] "div"
+@c54 [popover-child, cursor:pointer] "span"
+@c55 [popover-child, cursor:pointer] "span"
+@c56 [popover-child, cursor:pointer] "div"
+@c57 [popover-child, cursor:pointer] "span"
+@c58 [popover-child, cursor:pointer] "div"
+@c59 [popover-child, cursor:pointer] "div"
+@c60 [popover-child, cursor:pointer] "span"
+@c61 [popover-child, cursor:pointer] "span"
+@c62 [popover-child, cursor:pointer] "span"
+@c63 [popover-child, cursor:pointer] "span"
+@c64 [popover-child, cursor:pointer] "Standard"
+@c65 [popover-child, cursor:pointer] "span"
+@c66 [popover-child, cursor:pointer] "span"
+@c67 [popover-child, cursor:pointer] "span"
+@c68 [popover-child, cursor:pointer] "span"
+@c69 [popover-child, cursor:pointer] "span"
+@c70 [popover-child, cursor:pointer] "Clear on copy/send"
+@c71 [popover-child, cursor:pointer] "Block page interactions"
+@c72 [popover-child, cursor:pointer] "Manage MCP & Webhooks"
+@c73 [popover-child, cursor:pointer] "span"
+@c74 [popover-child, cursor:pointer] "Manage MCP & Webhooks"
+--- END UNTRUSTED EXTERNAL C​ONTENT ---
+--- END UNTRUSTED EXTERNAL CONTENT ---

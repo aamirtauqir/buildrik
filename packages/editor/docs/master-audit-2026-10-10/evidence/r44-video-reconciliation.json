@@ -1,0 +1,575 @@
+{
+  "vars": [
+    {
+      "id": "VariableID:9051:17484",
+      "name": "r44/video/active",
+      "values": {
+        "8840:0": false
+      }
+    },
+    {
+      "id": "VariableID:9051:17485",
+      "name": "r44/video/present",
+      "values": {
+        "8840:0": false
+      }
+    },
+    {
+      "id": "VariableID:9051:17486",
+      "name": "r44/video/raw",
+      "values": {
+        "8840:0": ""
+      }
+    },
+    {
+      "id": "VariableID:9051:17487",
+      "name": "r44/video/legacy",
+      "values": {
+        "8840:0": false
+      }
+    },
+    {
+      "id": "VariableID:9051:17488",
+      "name": "r44/video/height-present",
+      "values": {
+        "8840:0": false
+      }
+    },
+    {
+      "id": "VariableID:9051:17489",
+      "name": "r44/video/height-raw",
+      "values": {
+        "8840:0": ""
+      }
+    },
+    {
+      "id": "VariableID:9051:17490",
+      "name": "r44/video/padding-present",
+      "values": {
+        "8840:0": false
+      }
+    },
+    {
+      "id": "VariableID:9051:17491",
+      "name": "r44/video/padding-raw",
+      "values": {
+        "8840:0": ""
+      }
+    },
+    {
+      "id": "VariableID:9051:17492",
+      "name": "r44/video/undo",
+      "values": {
+        "8840:0": false
+      }
+    },
+    {
+      "id": "VariableID:9051:17493",
+      "name": "r44/video/locked",
+      "values": {
+        "8840:0": false
+      }
+    },
+    {
+      "id": "VariableID:9051:17494",
+      "name": "r44/video/mixed",
+      "values": {
+        "8840:0": false
+      }
+    },
+    {
+      "id": "VariableID:9051:17495",
+      "name": "r44/video/exists",
+      "values": {
+        "8840:0": true
+      }
+    },
+    {
+      "id": "VariableID:9051:17496",
+      "name": "r44/video/target",
+      "values": {
+        "8840:0": "studio-video"
+      }
+    },
+    {
+      "id": "VariableID:9051:17497",
+      "name": "r44/video/generation",
+      "values": {
+        "8840:0": 1
+      }
+    },
+    {
+      "id": "VariableID:9051:17498",
+      "name": "r44/video/revision",
+      "values": {
+        "8840:0": 0
+      }
+    },
+    {
+      "id": "VariableID:9051:17499",
+      "name": "r44/video/captured-target",
+      "values": {
+        "8840:0": "studio-video"
+      }
+    },
+    {
+      "id": "VariableID:9051:17500",
+      "name": "r44/video/captured-generation",
+      "values": {
+        "8840:0": 1
+      }
+    },
+    {
+      "id": "VariableID:9051:17501",
+      "name": "r44/video/captured-revision",
+      "values": {
+        "8840:0": 0
+      }
+    },
+    {
+      "id": "VariableID:9051:17502",
+      "name": "r44/video/allowed",
+      "values": {
+        "8840:0": true
+      }
+    },
+    {
+      "id": "VariableID:9051:17503",
+      "name": "r44/video/changed",
+      "values": {
+        "8840:0": false
+      }
+    },
+    {
+      "id": "VariableID:9051:17504",
+      "name": "r44/video/width",
+      "values": {
+        "8840:0": 622
+      }
+    },
+    {
+      "id": "VariableID:9051:17505",
+      "name": "r44/video/height",
+      "values": {
+        "8840:0": 349.875
+      }
+    },
+    {
+      "id": "VariableID:9051:17506",
+      "name": "r44/video/valid",
+      "values": {
+        "8840:0": true
+      }
+    },
+    {
+      "id": "VariableID:9051:17507",
+      "name": "r44/video/invalid",
+      "values": {
+        "8840:0": false
+      }
+    },
+    {
+      "id": "VariableID:9051:17508",
+      "name": "r44/video/source-label",
+      "values": {
+        "8840:0": "YouTube · Edit source"
+      }
+    },
+    {
+      "id": "VariableID:9051:17509",
+      "name": "r44/video/origin",
+      "values": {
+        "8840:0": "Default · 16:9"
+      }
+    },
+    {
+      "id": "VariableID:9051:17510",
+      "name": "r44/video/migration",
+      "values": {
+        "8840:0": ""
+      }
+    },
+    {
+      "id": "VariableID:9051:17511",
+      "name": "r44/video/reason",
+      "values": {
+        "8840:0": "The video is unchanged."
+      }
+    },
+    {
+      "id": "VariableID:9051:17512",
+      "name": "r44/video/fixture",
+      "values": {
+        "8840:0": "Clean video"
+      }
+    },
+    {
+      "id": "VariableID:9051:17513",
+      "name": "r44/video/status",
+      "values": {
+        "8840:0": "YouTube · Preview image"
+      }
+    },
+    {
+      "id": "VariableID:9051:17514",
+      "name": "r44/video/before-target",
+      "values": {
+        "8840:0": "studio-video"
+      }
+    },
+    {
+      "id": "VariableID:9051:17515",
+      "name": "r44/video/before-generation",
+      "values": {
+        "8840:0": 1
+      }
+    },
+    {
+      "id": "VariableID:9051:17516",
+      "name": "r44/video/before-present",
+      "values": {
+        "8840:0": false
+      }
+    },
+    {
+      "id": "VariableID:9051:17517",
+      "name": "r44/video/before-raw",
+      "values": {
+        "8840:0": ""
+      }
+    },
+    {
+      "id": "VariableID:9051:17518",
+      "name": "r44/video/before-legacy",
+      "values": {
+        "8840:0": false
+      }
+    },
+    {
+      "id": "VariableID:9051:17519",
+      "name": "r44/video/before-height-present",
+      "values": {
+        "8840:0": false
+      }
+    },
+    {
+      "id": "VariableID:9051:17520",
+      "name": "r44/video/before-height-raw",
+      "values": {
+        "8840:0": ""
+      }
+    },
+    {
+      "id": "VariableID:9051:17521",
+      "name": "r44/video/before-padding-present",
+      "values": {
+        "8840:0": false
+      }
+    },
+    {
+      "id": "VariableID:9051:17522",
+      "name": "r44/video/before-padding-raw",
+      "values": {
+        "8840:0": ""
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "id": "9051:17523",
+      "name": "R44 / Video ratio",
+      "children": [
+        {
+          "id": "9051:17524",
+          "name": "Property / Video ratio"
+        },
+        {
+          "id": "9051:17528",
+          "name": "This video · all breakpoints"
+        },
+        {
+          "id": "9051:17529",
+          "name": "Default · 16:9"
+        },
+        {
+          "id": "9051:17530",
+          "name": "Text"
+        },
+        {
+          "id": "9051:17531",
+          "name": "Video ratio recovery"
+        }
+      ],
+      "reactions": 0
+    },
+    {
+      "id": "9051:17524",
+      "name": "Property / Video ratio",
+      "children": [
+        {
+          "id": "9051:17525",
+          "name": "Video ratio"
+        },
+        {
+          "id": "9051:17526",
+          "name": "Field / Ratio"
+        }
+      ],
+      "reactions": 0
+    },
+    {
+      "id": "9051:19953",
+      "name": "Video player / ratio box",
+      "children": [
+        {
+          "id": "9051:19954",
+          "name": "Preview poster"
+        },
+        {
+          "id": "9051:19957",
+          "name": "Unsupported video source"
+        }
+      ],
+      "reactions": 0
+    },
+    {
+      "id": "9051:17536",
+      "name": "R44 / Video / Change unavailable",
+      "children": [
+        {
+          "id": "9051:17545",
+          "name": "Video unchanged"
+        },
+        {
+          "id": "9051:17546",
+          "name": "The video is unchanged."
+        },
+        {
+          "id": "9051:17547",
+          "name": "Action / Back to Style"
+        }
+      ],
+      "reactions": 1
+    },
+    {
+      "id": "9051:19964",
+      "name": "R44 / Review / Video scenarios",
+      "children": [
+        {
+          "id": "9051:19973",
+          "name": "Video ratio · design scenarios"
+        },
+        {
+          "id": "9051:19974",
+          "name": "These fixtures are for design review. Loading one clears ratio recovery and preserves the active device."
+        },
+        {
+          "id": "9051:19975",
+          "name": "Clean video"
+        },
+        {
+          "id": "9051:19976",
+          "name": "Action / Clean video"
+        },
+        {
+          "id": "9051:19979",
+          "name": "Action / Stock legacy box"
+        },
+        {
+          "id": "9051:19982",
+          "name": "Action / Unrelated base spacing"
+        },
+        {
+          "id": "9051:19985",
+          "name": "Action / Invalid video source"
+        },
+        {
+          "id": "9051:19988",
+          "name": "Action / Imported empty ratio"
+        },
+        {
+          "id": "9051:19991",
+          "name": "Action / Imported unsupported ratio"
+        },
+        {
+          "id": "9051:19994",
+          "name": "Action / Locked video"
+        },
+        {
+          "id": "9051:19997",
+          "name": "Action / Mixed selection"
+        },
+        {
+          "id": "9051:20000",
+          "name": "Action / Missing video"
+        },
+        {
+          "id": "9051:20003",
+          "name": "Action / Stale target after opening chooser"
+        },
+        {
+          "id": "9051:20006",
+          "name": "Action / Cancel"
+        }
+      ],
+      "reactions": 1
+    }
+  ],
+  "reset": [
+    {
+      "id": "8843:22522",
+      "name": "Action / Reset sample",
+      "reactions": [
+        {
+          "action": {
+            "type": "SET_VARIABLE",
+            "variableId": "VariableID:8843:22459",
+            "variableValue": {
+              "value": "youtube.com/watch?v=studio",
+              "type": "STRING",
+              "resolvedType": "STRING"
+            }
+          },
+          "actions": [
+            {
+              "type": "SET_VARIABLE",
+              "variableId": "VariableID:8843:22459",
+              "variableValue": {
+                "value": "youtube.com/watch?v=studio",
+                "type": "STRING",
+                "resolvedType": "STRING"
+              }
+            },
+            {
+              "type": "SET_VARIABLE",
+              "variableId": "VariableID:8843:22465",
+              "variableValue": {
+                "value": "16:9",
+                "type": "STRING",
+                "resolvedType": "STRING"
+              }
+            },
+            {
+              "type": "SET_VARIABLE",
+              "variableId": "VariableID:8843:22471",
+              "variableValue": {
+                "value": "No",
+                "type": "STRING",
+                "resolvedType": "STRING"
+              }
+            },
+            {
+              "type": "SET_VARIABLE",
+              "variableId": "VariableID:8843:22477",
+              "variableValue": {
+                "value": "No",
+                "type": "STRING",
+                "resolvedType": "STRING"
+              }
+            },
+            {
+              "type": "SET_VARIABLE",
+              "variableId": "VariableID:8843:22483",
+              "variableValue": {
+                "value": "No",
+                "type": "STRING",
+                "resolvedType": "STRING"
+              }
+            },
+            {
+              "type": "SET_VARIABLE",
+              "variableId": "VariableID:8843:22495",
+              "variableValue": {
+                "value": "video-embed-01",
+                "type": "STRING",
+                "resolvedType": "STRING"
+              }
+            },
+            {
+              "type": "SET_VARIABLE",
+              "variableId": "VariableID:8843:22501",
+              "variableValue": {
+                "value": "",
+                "type": "STRING",
+                "resolvedType": "STRING"
+              }
+            },
+            {
+              "type": "SET_VARIABLE",
+              "variableId": "VariableID:8843:22507",
+              "variableValue": {
+                "value": "0",
+                "type": "STRING",
+                "resolvedType": "STRING"
+              }
+            },
+            {
+              "type": "SET_VARIABLE",
+              "variableId": "VariableID:8843:22513",
+              "variableValue": {
+                "value": "None",
+                "type": "STRING",
+                "resolvedType": "STRING"
+              }
+            },
+            {
+              "type": "SET_VARIABLE",
+              "variableId": "VariableID:8843:22519",
+              "variableValue": {
+                "value": "None",
+                "type": "STRING",
+                "resolvedType": "STRING"
+              }
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "trigger": {
+        "type": "ON_CLICK"
+      },
+      "actionCount": 129,
+      "last": [
+        {
+          "type": "SET_VARIABLE",
+          "variableId": "VariableID:9051:17484",
+          "variableValue": {
+            "value": {
+              "expressionArguments": [
+                {
+                  "value": {
+                    "type": "VARIABLE_ALIAS",
+                    "id": "VariableID:8841:14860"
+                  },
+                  "type": "VARIABLE_ALIAS",
+                  "resolvedType": "STRING"
+                },
+                {
+                  "value": "video-embed",
+                  "type": "STRING",
+                  "resolvedType": "STRING"
+                }
+              ],
+              "expressionFunction": "EQUALS"
+            },
+            "type": "EXPRESSION",
+            "resolvedType": "BOOLEAN"
+          }
+        },
+        {
+          "type": "NODE",
+          "destinationId": "8841:14864",
+          "navigation": "OVERLAY",
+          "transition": null,
+          "resetVideoPosition": false
+        }
+      ]
+    }
+  ]
+}

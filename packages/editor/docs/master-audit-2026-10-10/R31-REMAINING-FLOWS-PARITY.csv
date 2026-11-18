@@ -1,0 +1,21 @@
+Feature ID,Original source,Expected behavior,Improved destination,Shared pattern,Design status,Prototype status,Validation status,Remaining limitation
+R31-P01,PageContextMenu.tsx,Options belong to named page,8688:13080,Shared buttons/dialog,IMPLEMENTED,FINITE_CONNECTED,BROWSER_VISUAL_PASS,Authored page set
+R31-P02,PageRow.tsx and RenameUrlDecision,Rename preserves URL unless explicitly changed,8688:13101,Shared field and buttons,IMPLEMENTED,STATE_CONNECTED,BROWSER_VISUAL_PASS_KEEP_URL,Update URL native inspected; arbitrary names not simulated
+R31-P03,PageContextMenu.tsx and prior page audit,Duplicate creates a separate page,8688:13141 → 8688:13308,Page list and Editor shell,PARTIAL,STATE_CONNECTED,BROWSER_VISUAL_PASS,One copy and finite content
+R31-P04,PageContextMenu.tsx,Homepage deletion protected,8688:13133,Disabled button and reason,IMPLEMENTED,STATE_CONNECTED,BROWSER_VISUAL_PASS,Set-home branch native inspected
+R31-P05,Prior PAGES-HISTORY-AUDIT,Delete confirm cancel and Undo,8688:13124 → 8688:13117,Confirmation/recovery,IMPLEMENTED,STATE_CONNECTED,BROWSER_VISUAL_PASS,Finite draft state
+R31-P06,Pages existing search capability,Matching and no-result search,8688:13161 / 13170 / 13178,Shared search/results,PARTIAL,FINITE_CONNECTED,BROWSER_VISUAL_PASS,Sample query only
+R31-P07,Original Pages/folders inventory,Folder reorder and bulk actions,Existing original inventory retained,Page hierarchy,OPEN,NOT_EXTENDED,UNVERIFIED,Not silently discarded
+R31-S01,usePageSettings.ts,Independent page draft and persisted metadata,8539:10798 / 10865 / 10914,Shared settings workspace,IMPLEMENTED,STATE_CONNECTED,BROWSER_VISUAL_PASS,Prototype-local snapshots
+R31-S02,usePageSettings.ts,Social title description image add/remove,8689:13309 and 8539:10865,Shared field/sample selector,PARTIAL,STATE_CONNECTED,BROWSER_VISUAL_PASS_SELECTION,No upload; removal native connected
+R31-S03,usePageSettings.ts validateHeadCode,Invalid Head prevents save and supports correction,8689:13293,Validation/recovery,IMPLEMENTED,STATE_CONNECTED,BROWSER_VISUAL_PASS,Sample invalid/valid code
+R31-S04,usePageSettings.ts inheritedTitle,Page override has priority over site defaults,8689:13338 and 8539:10823,Shared settings fields,IMPLEMENTED,STATE_CONNECTED,BROWSER_VISUAL_PASS,Site default cancel native connected
+R31-T01,templatesData.ts and TemplatesTab.tsx,Every catalogue item has preview and relevant use action,8539:12186 → 8690:13131,Existing catalogue/shared preview,PARTIAL,FINITE_CONNECTED,REPRESENTATIVE_BROWSER_PASS,All eleven routes native inspected; representative content
+R31-T02,TemplatesTab.tsx premium gate,Premium item requires plan before use,8690:13185,Plan gate dialog,IMPLEMENTED,FINITE_CONNECTED,BROWSER_VISUAL_PASS,No purchase or subscription change
+R31-T03,TemplatesTab.tsx replaceCurrentPage,Failed backup blocks replacement and allows retry,8690:13145 / 13158 / 13171,Guarded confirmation/recovery,IMPLEMENTED,STATE_CONNECTED,BROWSER_VISUAL_PASS,No-backup alternative native inspected
+R31-T04,TemplatesTab.tsx replacement Undo,Undo restores previous fixture content,8690:13180 / 8691:261399,History backup and Undo,PARTIAL,STATE_CONNECTED,BROWSER_VISUAL_PASS,Heading fixture; full snapshot is runtime dependency
+R31-H01,Prior PAGES-HISTORY-AUDIT,Save rename delete version and show empty list,8666:13028 / 13048 / 13063 / 8539:9190,Shared History patterns,IMPLEMENTED,STATE_CONNECTED,BROWSER_VISUAL_PASS,Named Home checkpoint sample
+R31-N01,R28 caller ownership contract,Build returns to same page/breakpoint,Existing six Build return controls,Shared workspace navigation,IMPLEMENTED,STATE_CONNECTED,BROWSER_VISUAL_PASS,All conditional destinations native inspected
+R31-N02,R30 page identity contract,Journal and copy have matching Mobile and Preview,8697:13137 / 13257 / 13356 / 13461 / 13581 / 13680,Existing Editor/Preview shell,IMPLEMENTED,FINITE_CONNECTED,BROWSER_VISUAL_PASS,Finite desktop/mobile viewports
+R31-A01,src/editor/AGENTS.md,Escape closes innermost surface,26 R31 dialogs,Cancel/back interaction,IMPLEMENTED,NATIVE_CONNECTED,BROWSER_REPRESENTATIVE_PASS,Options Escape verified; remaining routes and focus unverified
+

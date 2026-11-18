@@ -1,0 +1,29 @@
+[
+  {
+    "x": 720,
+    "y": 493,
+    "shot": "r36-fit-mobile-override.png"
+  },
+  {
+    "x": 1264,
+    "y": 307,
+    "shot": "r36-fit-mobile-reset.png"
+  },
+  {
+    "x": 1391,
+    "y": 89
+  },
+  {
+    "x": 380,
+    "y": 96
+  },
+  {
+    "x": 1155,
+    "y": 117,
+    "shot": "r36-fit-desktop-unaffected.png"
+  },
+  {
+    "x": 1391,
+    "y": 89
+  }
+]

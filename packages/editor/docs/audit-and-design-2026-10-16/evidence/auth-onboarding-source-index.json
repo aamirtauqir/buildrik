@@ -1,0 +1,1071 @@
+[
+  {
+    "route": "/auth/2fa/backup",
+    "imports": [
+      "react",
+      "next/navigation",
+      "next/link",
+      "@/components/auth/auth-card",
+      "@/components/auth/auth-button",
+      "@/components/auth/auth-input",
+      "@/components/auth/form-banner",
+      "@lib/trpc/client",
+      "@lib/safe-return-url",
+      "@lib/constants/contact",
+      "lucide-react"
+    ],
+    "calls": [
+      "auth.verifyBackupCode.useMutation",
+      "push"
+    ],
+    "links": [
+      "/auth/error/2fa-locked"
+    ],
+    "labels": [
+      "Backup code",
+      "XXXX-XXXX-XXXX"
+    ]
+  },
+  {
+    "route": "/auth/2fa",
+    "imports": [
+      "react",
+      "next/navigation",
+      "next/link",
+      "@/components/auth/auth-card",
+      "@/components/auth/auth-button",
+      "@/components/auth/otp-input",
+      "@/components/auth/form-banner",
+      "@lib/trpc/client",
+      "@lib/safe-return-url",
+      "lucide-react"
+    ],
+    "calls": [
+      "auth.verify2FA.useMutation",
+      "push"
+    ],
+    "links": [
+      "/auth/error/2fa-locked",
+      "/auth"
+    ],
+    "labels": []
+  },
+  {
+    "route": "/auth/access-removed",
+    "imports": [
+      "react",
+      "next/navigation",
+      "lucide-react",
+      "@/components/auth/auth-message",
+      "@/components/auth/auth-button"
+    ],
+    "calls": [],
+    "links": [],
+    "labels": [
+      "Your access was removed"
+    ]
+  },
+  {
+    "route": "/auth/account-unlocked",
+    "imports": [
+      "next/link",
+      "lucide-react",
+      "@/components/auth/auth-message",
+      "@/components/auth/auth-button"
+    ],
+    "calls": [],
+    "links": [
+      "/auth"
+    ],
+    "labels": [
+      "Your account is unlocked",
+      "The lock has lifted. You can log in again \u2014 consider resetting your password if you never got in."
+    ]
+  },
+  {
+    "route": "/auth/callback",
+    "imports": [
+      "react",
+      "next/navigation",
+      "@/components/auth/auth-card",
+      "lucide-react",
+      "@lib/trpc/client"
+    ],
+    "calls": [
+      "auth.verifyMagicLink.useMutation",
+      "push",
+      "replace"
+    ],
+    "links": [
+      "/auth/error/expired-link?type=magic-link"
+    ],
+    "labels": []
+  },
+  {
+    "route": "/auth/change-email",
+    "imports": [
+      "react",
+      "next/navigation",
+      "@/components/auth/auth-card",
+      "@/components/auth/auth-back-link",
+      "@/components/auth/auth-input",
+      "@/components/auth/auth-button",
+      "@/components/auth/form-banner",
+      "@buildrik/shared/schemas/auth"
+    ],
+    "calls": [
+      "back",
+      "push"
+    ],
+    "links": [],
+    "labels": [
+      "New email",
+      "New work email"
+    ]
+  },
+  {
+    "route": "/auth/check-inbox",
+    "imports": [
+      "react",
+      "next/navigation",
+      "next/link",
+      "@/components/auth/auth-card",
+      "@/components/auth/auth-back-link",
+      "@/components/auth/resend-timer",
+      "@lib/trpc/client"
+    ],
+    "calls": [
+      "auth.forgotPassword.useMutation",
+      "auth.resendVerification.useMutation"
+    ],
+    "links": [],
+    "labels": [
+      "Resend email"
+    ]
+  },
+  {
+    "route": "/auth/device-alert",
+    "imports": [
+      "lucide-react",
+      "@/components/auth/auth-message",
+      "@/components/auth/auth-button"
+    ],
+    "calls": [],
+    "links": [],
+    "labels": [
+      "New sign-in detected",
+      "We noticed a sign-in from a device we don"
+    ]
+  },
+  {
+    "route": "/auth/email-exists",
+    "imports": [
+      "react",
+      "next/navigation",
+      "next/link",
+      "lucide-react",
+      "@/components/auth/auth-message",
+      "@/components/auth/auth-button"
+    ],
+    "calls": [
+      "service.signup"
+    ],
+    "links": [
+      "/auth/forgot-password"
+    ],
+    "labels": [
+      "This email is already in use"
+    ]
+  },
+  {
+    "route": "/auth/error/2fa-locked",
+    "imports": [
+      "next/link",
+      "lucide-react",
+      "@/components/auth/auth-message",
+      "@/components/auth/auth-button",
+      "@lib/constants/contact"
+    ],
+    "calls": [],
+    "links": [
+      "/auth"
+    ],
+    "labels": [
+      "Too many attempts",
+      "For your security we"
+    ]
+  },
+  {
+    "route": "/auth/error/captcha",
+    "imports": [
+      "@/components/auth/auth-message",
+      "@/components/auth/auth-back-link",
+      "@/components/auth/auth-button"
+    ],
+    "calls": [],
+    "links": [],
+    "labels": [
+      "Verify you",
+      "We detected unusual activity. Please complete the verification to continue."
+    ]
+  },
+  {
+    "route": "/auth/error/expired-link",
+    "imports": [
+      "react",
+      "next/navigation",
+      "@/components/auth/auth-message",
+      "@/components/auth/auth-button"
+    ],
+    "calls": [
+      "push",
+      "service"
+    ],
+    "links": [
+      "/auth"
+    ],
+    "labels": []
+  },
+  {
+    "route": "/auth/error/invite-expired",
+    "imports": [
+      "next/link",
+      "@/components/auth/auth-message",
+      "@/components/auth/auth-button"
+    ],
+    "calls": [],
+    "links": [
+      "/auth"
+    ],
+    "labels": [
+      "This invitation expired",
+      "Invitations are valid for 7 days. Ask the workspace owner to send a new one."
+    ]
+  },
+  {
+    "route": "/auth/error/locked",
+    "imports": [
+      "react",
+      "next/navigation",
+      "next/link",
+      "lucide-react",
+      "@/components/auth/auth-message",
+      "@/components/auth/auth-button"
+    ],
+    "calls": [
+      "replace",
+      "service"
+    ],
+    "links": [
+      "/auth/account-unlocked",
+      "/auth/forgot-password",
+      "/auth"
+    ],
+    "labels": [
+      "Account temporarily locked",
+      "Too many failed attempts. For your security, log-in is paused. Reset your password or try again shortly."
+    ]
+  },
+  {
+    "route": "/auth/error/rate-limited",
+    "imports": [
+      "react",
+      "next/navigation",
+      "@/components/auth/auth-message",
+      "@/components/auth/auth-back-link"
+    ],
+    "calls": [],
+    "links": [],
+    "labels": [
+      "Too many requests",
+      "You"
+    ]
+  },
+  {
+    "route": "/auth/error/session-expired",
+    "imports": [
+      "lucide-react",
+      "@/components/auth/auth-message",
+      "@/components/auth/auth-button"
+    ],
+    "calls": [],
+    "links": [],
+    "labels": [
+      "Your session expired",
+      "For your security you were logged out after a period of inactivity. Log in again to pick up where you left off."
+    ]
+  },
+  {
+    "route": "/auth/error/social-error",
+    "imports": [
+      "react",
+      "next/navigation",
+      "lucide-react",
+      "@/components/auth/auth-message",
+      "@/components/auth/auth-button"
+    ],
+    "calls": [],
+    "links": [],
+    "labels": [
+      "Couldn"
+    ]
+  },
+  {
+    "route": "/auth/error/suspicious",
+    "imports": [
+      "lucide-react",
+      "@/components/auth/auth-message",
+      "@/components/auth/auth-button"
+    ],
+    "calls": [],
+    "links": [],
+    "labels": [
+      "New sign-in detected",
+      "We noticed a sign-in from a device or location we don"
+    ]
+  },
+  {
+    "route": "/auth/forgot-password",
+    "imports": [
+      "react",
+      "next/navigation",
+      "next/link",
+      "@/components/auth/auth-card",
+      "@/components/auth/auth-input",
+      "@/components/auth/auth-button",
+      "@/components/auth/form-banner",
+      "@lib/trpc/client",
+      "@lib/rate-limit-redirect",
+      "@buildrik/shared/schemas/auth",
+      "@lib/utils",
+      "lucide-react"
+    ],
+    "calls": [
+      "auth.forgotPassword.useMutation",
+      "push"
+    ],
+    "links": [
+      "/auth",
+      "/auth"
+    ],
+    "labels": [
+      "Email",
+      "Your Email"
+    ]
+  },
+  {
+    "route": "/auth/invite",
+    "imports": [
+      "react",
+      "next/navigation",
+      "next/link",
+      "next-auth/react",
+      "lucide-react",
+      "@/components/auth/auth-card",
+      "@/components/auth/auth-message",
+      "@/components/auth/auth-button",
+      "@/components/auth/form-banner",
+      "@lib/trpc/client",
+      "@lib/constants/enums"
+    ],
+    "calls": [
+      "auth.acceptInvite.useMutation",
+      "auth.declineInvite.useMutation",
+      "auth.getInviteDetails.useQuery",
+      "auth.resendVerification.useMutation",
+      "config.ts",
+      "push"
+    ],
+    "links": [
+      "/auth/error/invite-expired",
+      "/auth/error/invite-expired",
+      "/auth",
+      "/dashboard",
+      "/dashboard",
+      "/auth/signup",
+      "/auth"
+    ],
+    "labels": [
+      "Loading invitation\u2026",
+      "Invitation not found",
+      "This invite link is invalid or has been revoked.",
+      "You",
+      "You",
+      "Verify your email to accept",
+      "Verification email sent",
+      "Check your inbox, then accept again.",
+      "This invite is for another email",
+      "Invitation declined",
+      "Decline this invitation?",
+      "You can always ask the workspace owner to invite you again later."
+    ]
+  },
+  {
+    "route": "/auth/join-workspace",
+    "imports": [
+      "react",
+      "next/navigation",
+      "next/link",
+      "@/components/auth/auth-card",
+      "@/components/auth/auth-message",
+      "@/components/auth/auth-input",
+      "@/components/auth/auth-button",
+      "@/components/auth/password-strength",
+      "@/components/auth/form-banner",
+      "@lib/trpc/client"
+    ],
+    "calls": [
+      "auth.acceptInvite.useMutation",
+      "auth.getInviteDetails.useQuery",
+      "auth.login.useMutation",
+      "auth.signup.useMutation",
+      "push"
+    ],
+    "links": [
+      "/auth/error/invite-expired",
+      "/auth"
+    ],
+    "labels": [
+      "Loading invitation\u2026",
+      "Invitation not found",
+      "This invite link is invalid or has been revoked.",
+      "Full name",
+      "Full name",
+      "Password",
+      "Create a password"
+    ]
+  },
+  {
+    "route": "/auth/login",
+    "imports": [
+      "next/navigation"
+    ],
+    "calls": [],
+    "links": [],
+    "labels": []
+  },
+  {
+    "route": "/auth/magic-link",
+    "imports": [
+      "react",
+      "next/navigation",
+      "next/link",
+      "@/components/auth/auth-card",
+      "@/components/auth/auth-input",
+      "@/components/auth/auth-button",
+      "@/components/auth/form-banner",
+      "@lib/trpc/client",
+      "@lib/rate-limit-redirect",
+      "@buildrik/shared/schemas/auth",
+      "@lib/utils",
+      "lucide-react"
+    ],
+    "calls": [
+      "auth.magicLink.useMutation",
+      "push"
+    ],
+    "links": [
+      "/auth",
+      "/auth"
+    ],
+    "labels": [
+      "Email",
+      "Your Email"
+    ]
+  },
+  {
+    "route": "/auth/magic-link/sent",
+    "imports": [
+      "react",
+      "next/navigation",
+      "next/link",
+      "@/components/auth/auth-card",
+      "@/components/auth/auth-back-link",
+      "@/components/auth/resend-timer",
+      "@lib/trpc/client"
+    ],
+    "calls": [
+      "auth.magicLink.useMutation"
+    ],
+    "links": [
+      "/auth/magic-link"
+    ],
+    "labels": [
+      "Resend link"
+    ]
+  },
+  {
+    "route": "/auth/oauth-conflict",
+    "imports": [
+      "react",
+      "next/navigation",
+      "lucide-react",
+      "@/components/auth/auth-message",
+      "@/components/auth/auth-button"
+    ],
+    "calls": [
+      "config.ts"
+    ],
+    "links": [],
+    "labels": [
+      "Account already exists"
+    ]
+  },
+  {
+    "route": "/auth",
+    "imports": [
+      "react",
+      "next/navigation",
+      "next/link",
+      "@/components/auth/auth-card",
+      "@/components/auth/auth-button",
+      "@/components/auth/auth-input",
+      "@/components/auth/auth-divider",
+      "@/components/auth/form-banner",
+      "@/components/auth/auth-social-buttons",
+      "@/components/auth/turnstile-widget",
+      "next-auth/react",
+      "@lib/trpc/client",
+      "@lib/safe-return-url",
+      "@lib/constants/contact",
+      "@lib/utils"
+    ],
+    "calls": [
+      "auth.login.useMutation",
+      "config.ts",
+      "push",
+      "service",
+      "service.login"
+    ],
+    "links": [
+      "/auth/magic-link",
+      "/auth/forgot-password",
+      "/auth/signup"
+    ],
+    "labels": [
+      "Something went wrong on our end. Please try again in a moment.",
+      "Email",
+      "Your Email",
+      "Password",
+      "Your Password"
+    ]
+  },
+  {
+    "route": "/auth/password-changed",
+    "imports": [
+      "next/navigation",
+      "@/components/auth/auth-card",
+      "@/components/auth/auth-button"
+    ],
+    "calls": [
+      "push"
+    ],
+    "links": [
+      "/auth"
+    ],
+    "labels": []
+  },
+  {
+    "route": "/auth/redirect",
+    "imports": [
+      "react",
+      "next/navigation",
+      "next-auth/react",
+      "@lib/hooks/use-onboarding-flow",
+      "@/components/auth/auth-card",
+      "lucide-react",
+      "@lib/trpc/client"
+    ],
+    "calls": [
+      "account.workspace.listMine.useQuery",
+      "replace"
+    ],
+    "links": [
+      "/auth?reason=session-required",
+      "/auth/access-removed",
+      "/auth/workspace-select"
+    ],
+    "labels": []
+  },
+  {
+    "route": "/auth/reset-password",
+    "imports": [
+      "react",
+      "next/navigation",
+      "@/components/auth/auth-card",
+      "@/components/auth/auth-back-link",
+      "@/components/auth/auth-input",
+      "@/components/auth/auth-button",
+      "@/components/auth/password-strength",
+      "@/components/auth/form-banner",
+      "@lib/trpc/client",
+      "@lib/rate-limit-redirect",
+      "@buildrik/shared/schemas/auth",
+      "@lib/utils"
+    ],
+    "calls": [
+      "auth.resetPassword.useMutation",
+      "push",
+      "replace"
+    ],
+    "links": [
+      "/auth/password-changed",
+      "/auth/error/expired-link?type=reset",
+      "/auth/error/expired-link?type=reset",
+      "/auth/error/expired-link?type=reset"
+    ],
+    "labels": [
+      "New password",
+      "New password",
+      "Confirm password",
+      "Confirm password"
+    ]
+  },
+  {
+    "route": "/auth/signup",
+    "imports": [
+      "react",
+      "next/navigation",
+      "next/link",
+      "@/components/auth/auth-card",
+      "@/components/auth/auth-button",
+      "@/components/auth/auth-input",
+      "@/components/auth/auth-divider",
+      "@/components/auth/form-banner",
+      "@/components/auth/auth-social-buttons",
+      "@/components/auth/password-strength",
+      "next-auth/react",
+      "@lib/trpc/client",
+      "@buildrik/shared/schemas/auth",
+      "@lib/utils",
+      "lucide-react",
+      "@/components/legal/legal-modal",
+      "@/components/legal/legal-content"
+    ],
+    "calls": [
+      "auth.checkEmail.useMutation",
+      "auth.signup.useMutation",
+      "push",
+      "service.signup"
+    ],
+    "links": [
+      "/auth"
+    ],
+    "labels": [
+      "Email",
+      "you@company.com",
+      "Full name",
+      "Full name",
+      "Work email",
+      "Password",
+      "Create password"
+    ]
+  },
+  {
+    "route": "/auth/verify-email",
+    "imports": [
+      "react",
+      "next/navigation",
+      "next/link",
+      "@/components/auth/auth-card",
+      "@/components/auth/auth-back-link",
+      "@/components/auth/auth-button",
+      "@/components/auth/resend-timer",
+      "@lib/trpc/client",
+      "lucide-react"
+    ],
+    "calls": [
+      "auth.resendVerification.useMutation",
+      "auth.verifyEmail.useMutation",
+      "push",
+      "replace"
+    ],
+    "links": [
+      "/auth",
+      "/auth",
+      "/auth"
+    ],
+    "labels": [
+      "Resend email"
+    ]
+  },
+  {
+    "route": "/auth/workspace-select",
+    "imports": [
+      "react",
+      "next/navigation",
+      "next-auth/react",
+      "next/link",
+      "lucide-react",
+      "@/components/auth/auth-card",
+      "@lib/trpc/client",
+      "@lib/constants/enums"
+    ],
+    "calls": [
+      "account.workspace.listMine.useQuery",
+      "push",
+      "refresh"
+    ],
+    "links": [
+      "/dashboard",
+      "/auth/workspace-setup"
+    ],
+    "labels": []
+  },
+  {
+    "route": "/auth/workspace-setup",
+    "imports": [
+      "react",
+      "next/navigation",
+      "next-auth/react",
+      "@lib/utils",
+      "@/components/auth/auth-card",
+      "@/components/auth/auth-input",
+      "@/components/auth/auth-button",
+      "@/components/auth/form-banner",
+      "@lib/trpc/client",
+      "lucide-react"
+    ],
+    "calls": [
+      "account.workspace.create.useMutation",
+      "push",
+      "refresh"
+    ],
+    "links": [
+      "/dashboard"
+    ],
+    "labels": [
+      "Workspace name",
+      "Workspace name"
+    ]
+  },
+  {
+    "route": "/onboarding/ai/basics",
+    "imports": [
+      "react",
+      "@/components/onboarding/wizard/wizard-shell",
+      "@/components/onboarding/wizard/onb-field",
+      "@/components/onboarding/wizard/onb-chips",
+      "@/components/onboarding/wizard/onb-button",
+      "@/components/onboarding/wizard/onb-back",
+      "@/components/onboarding/wizard/wizard-context",
+      "@/components/onboarding/wizard/use-onboarding-complete",
+      "@lib/onboarding/wizard-options"
+    ],
+    "calls": [],
+    "links": [],
+    "labels": [
+      "Business type / industry",
+      "Business name",
+      "Bright Events",
+      "One-line description",
+      "Event planning and coordination services",
+      "Location / service area (optional)",
+      "Lahore, Pakistan"
+    ]
+  },
+  {
+    "route": "/onboarding/ai/brand",
+    "imports": [
+      "react",
+      "lucide-react",
+      "@/components/onboarding/wizard/wizard-shell",
+      "@/components/onboarding/wizard/onb-field",
+      "@/components/onboarding/wizard/onb-chips",
+      "@/components/onboarding/wizard/onb-button",
+      "@/components/onboarding/wizard/onb-back",
+      "@/components/onboarding/wizard/wizard-context",
+      "@/components/onboarding/wizard/use-onboarding-complete",
+      "@lib/onboarding/wizard-options"
+    ],
+    "calls": [],
+    "links": [],
+    "labels": [
+      "Tone",
+      "Visual style",
+      "Color preference",
+      "Blue and slate",
+      "Reference websites (optional)",
+      "e.g. stripe.com, linear.app"
+    ]
+  },
+  {
+    "route": "/onboarding/ai/generating",
+    "imports": [
+      "react",
+      "next/navigation",
+      "lucide-react",
+      "@lib/trpc/client",
+      "@lib/utils",
+      "@/components/onboarding/wizard/wizard-shell",
+      "@/components/onboarding/wizard/onb-button",
+      "@/components/onboarding/wizard/onb-back",
+      "@/components/onboarding/wizard/wizard-context",
+      "@buildrik/shared/schemas/onboarding",
+      "@lib/onboarding/ai-input"
+    ],
+    "calls": [
+      "push",
+      "replace",
+      "templates.generate.cancel.useMutation",
+      "templates.generate.create.useMutation",
+      "templates.generate.status.useQuery"
+    ],
+    "links": [
+      "/onboarding/ai/basics",
+      "/onboarding/ai/brand",
+      "/onboarding/ai/brand"
+    ],
+    "labels": []
+  },
+  {
+    "route": "/onboarding/ai/goal",
+    "imports": [
+      "react",
+      "@/components/onboarding/wizard/wizard-shell",
+      "@/components/onboarding/wizard/onb-field",
+      "@/components/onboarding/wizard/onb-chips",
+      "@/components/onboarding/wizard/onb-button",
+      "@/components/onboarding/wizard/onb-back",
+      "@/components/onboarding/wizard/wizard-context",
+      "@/components/onboarding/wizard/use-onboarding-complete",
+      "@lib/onboarding/wizard-options"
+    ],
+    "calls": [],
+    "links": [],
+    "labels": [
+      "Main goal",
+      "Target audience",
+      "Small business owners and event planners",
+      "Main CTA text",
+      "Book a call",
+      "Pages (Home is always included)"
+    ]
+  },
+  {
+    "route": "/onboarding/ai/preview",
+    "imports": [
+      "react",
+      "next/navigation",
+      "@/components/onboarding/wizard/wizard-shell",
+      "@/components/onboarding/wizard/onb-button",
+      "@/components/onboarding/wizard/wizard-context",
+      "@/components/onboarding/wizard/use-onboarding-complete",
+      "@lib/trpc/client"
+    ],
+    "calls": [
+      "pages.list.useQuery",
+      "push",
+      "replace"
+    ],
+    "links": [
+      "/onboarding/ai/basics",
+      "/onboarding/ai/basics",
+      "/onboarding/ai/generating"
+    ],
+    "labels": [
+      "Pages created",
+      "Main CTA",
+      "Style"
+    ]
+  },
+  {
+    "route": "/onboarding/blank",
+    "imports": [
+      "react",
+      "@lib/utils",
+      "@/components/onboarding/wizard/wizard-shell",
+      "@/components/onboarding/wizard/onb-field",
+      "@/components/onboarding/wizard/onb-button",
+      "@/components/onboarding/wizard/onb-back",
+      "@/components/onboarding/wizard/wizard-context",
+      "@/components/onboarding/wizard/use-onboarding-complete"
+    ],
+    "calls": [],
+    "links": [],
+    "labels": [
+      "Site name",
+      "e.g. Bright Events Website",
+      "Starting page",
+      "Layout starter (optional)"
+    ]
+  },
+  {
+    "route": "/onboarding",
+    "imports": [
+      "react",
+      "next/navigation",
+      "flowbite-react",
+      "@/components/onboarding/wizard/wizard-context"
+    ],
+    "calls": [
+      "replace"
+    ],
+    "links": [],
+    "labels": []
+  },
+  {
+    "route": "/onboarding/path",
+    "imports": [
+      "lucide-react",
+      "@lib/utils",
+      "@/components/onboarding/wizard/wizard-shell",
+      "@/components/onboarding/wizard/onb-button",
+      "@/components/onboarding/wizard/onb-back",
+      "@/components/onboarding/wizard/wizard-context",
+      "@/components/onboarding/wizard/use-onboarding-complete"
+    ],
+    "calls": [],
+    "links": [],
+    "labels": []
+  },
+  {
+    "route": "/onboarding/ready",
+    "imports": [
+      "react",
+      "next/navigation",
+      "@/components/onboarding/wizard/wizard-shell",
+      "@/components/onboarding/wizard/onb-button",
+      "@/components/onboarding/wizard/onb-back",
+      "@/components/onboarding/wizard/wizard-context",
+      "@/components/onboarding/wizard/use-onboarding-complete"
+    ],
+    "calls": [
+      "replace"
+    ],
+    "links": [
+      "/onboarding/path"
+    ],
+    "labels": [
+      "Site",
+      "Client",
+      "Workspace",
+      "Starting method",
+      "Pages created"
+    ]
+  },
+  {
+    "route": "/onboarding/site",
+    "imports": [
+      "react",
+      "@lib/trpc/client",
+      "@/components/onboarding/wizard/wizard-shell",
+      "@/components/onboarding/wizard/onb-field",
+      "@/components/onboarding/wizard/onb-select",
+      "@/components/onboarding/wizard/onb-card",
+      "@/components/onboarding/wizard/onb-button",
+      "@/components/onboarding/wizard/onb-back",
+      "@/components/onboarding/wizard/onb-banner",
+      "@/components/onboarding/wizard/wizard-context",
+      "@/components/onboarding/wizard/use-onboarding-complete"
+    ],
+    "calls": [
+      "clients.list.useQuery",
+      "features.list.useQuery"
+    ],
+    "links": [],
+    "labels": [
+      "Site name",
+      "e.g. Bright Events Website",
+      "Client name",
+      "Enter client business name",
+      "Client email (optional)",
+      "client@example.com",
+      "Select client",
+      "Select a client"
+    ]
+  },
+  {
+    "route": "/onboarding/template",
+    "imports": [
+      "react",
+      "lucide-react",
+      "flowbite-react",
+      "@lib/trpc/client",
+      "@lib/utils",
+      "@/components/onboarding/wizard/wizard-shell",
+      "@/components/onboarding/wizard/onb-back",
+      "@/components/onboarding/wizard/onb-empty",
+      "@/components/onboarding/wizard/wizard-context",
+      "@/components/onboarding/wizard/use-onboarding-complete"
+    ],
+    "calls": [
+      "templates.list.useQuery"
+    ],
+    "links": [],
+    "labels": [
+      "Search templates...",
+      "No templates found"
+    ]
+  },
+  {
+    "route": "/onboarding/template/preview",
+    "imports": [
+      "react",
+      "next/navigation",
+      "lucide-react",
+      "flowbite-react",
+      "@lib/trpc/client",
+      "@/components/onboarding/wizard/onb-back",
+      "@/components/onboarding/wizard/onb-button",
+      "@/components/onboarding/wizard/wizard-context"
+    ],
+    "calls": [
+      "replace",
+      "templates.get.useQuery"
+    ],
+    "links": [
+      "/onboarding/template"
+    ],
+    "labels": []
+  },
+  {
+    "route": "/onboarding/template/selected",
+    "imports": [
+      "react",
+      "next/navigation",
+      "lucide-react",
+      "@lib/trpc/client",
+      "@/components/onboarding/wizard/wizard-shell",
+      "@/components/onboarding/wizard/onb-back",
+      "@/components/onboarding/wizard/onb-button",
+      "@/components/onboarding/wizard/wizard-context",
+      "@/components/onboarding/wizard/use-onboarding-complete"
+    ],
+    "calls": [
+      "replace",
+      "templates.get.useQuery"
+    ],
+    "links": [
+      "/onboarding/template"
+    ],
+    "labels": []
+  },
+  {
+    "route": "/onboarding/workspace",
+    "imports": [
+      "react",
+      "@trpc/client",
+      "@lib/trpc/client",
+      "@/components/onboarding/wizard/wizard-shell",
+      "@/components/onboarding/wizard/onb-field",
+      "@/components/onboarding/wizard/onb-select",
+      "@/components/onboarding/wizard/onb-button",
+      "@/components/onboarding/wizard/onb-banner",
+      "@/components/onboarding/wizard/wizard-context",
+      "@/components/onboarding/wizard/use-onboarding-complete",
+      "@lib/onboarding/wizard-options"
+    ],
+    "calls": [
+      "account.workspace.update.useMutation"
+    ],
+    "links": [],
+    "labels": [
+      "Workspace name",
+      "My Workspace",
+      "Your role",
+      "Select your role",
+      "Team size (optional)"
+    ]
+  }
+]

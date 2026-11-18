@@ -1,0 +1,20 @@
+{
+  "skill": "plan-design-review",
+  "status": "superseded_by_as_is_audit",
+  "initial_score": 7.5,
+  "final_score": null,
+  "focus": "all_seven_equally",
+  "application_changes": false,
+  "mockups_approved": 0,
+  "commit": "19f964d5e",
+  "pending": "Previous form-comparison feedback gate superseded by owner request to audit original AS-IS Figma first; see REPORT section15",
+  "board_url": "http://127.0.0.1:53554/boards/b-20261015-211313-oocoqq/",
+  "mockup_quality": {
+    "A": "automatic pass; manual pixel fidelity not established",
+    "B": "dimension check fail",
+    "C": "dimension check fail"
+  },
+  "rejected_initial_triptychs": 3,
+  "single_screen_images_including_retries": 5,
+  "figma_now_authorized": true
+}

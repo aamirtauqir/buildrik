@@ -1,0 +1,382 @@
+diff --git a/packages/editor/src/editor/canvas/menus/ElementContextMenu.tsx b/packages/editor/src/editor/canvas/menus/ElementContextMenu.tsx
+index cecb344e5..041f81788 100644
+--- a/packages/editor/src/editor/canvas/menus/ElementContextMenu.tsx
++++ b/packages/editor/src/editor/canvas/menus/ElementContextMenu.tsx
+@@ -50,9 +50,10 @@ const ContextMenuPanel: React.FC<ElementContextMenuProps> = ({
+   const menuRef = React.useRef<HTMLDivElement | null>(null);
+   const [activeSubmenu, setActiveSubmenu] = React.useState<string | null>(null);
+   const [focusedIndex, setFocusedIndex] = React.useState<number>(0);
++  const [submenuIndex, setSubmenuIndex] = React.useState(0);
+   const submenuTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+ 
+-  useClickOutside(menuRef, onClose, { closeOnEscape: true });
++  useClickOutside(menuRef, onClose);
+ 
+   // The registry already orders the rows; keyboard navigation walks them.
+   const allItems = actions;
+@@ -68,6 +69,8 @@ const ContextMenuPanel: React.FC<ElementContextMenuProps> = ({
+     if (submenuTimeoutRef.current) {
+       clearTimeout(submenuTimeoutRef.current);
+     }
++    menuRef.current?.focus();
++    setSubmenuIndex(0);
+     setActiveSubmenu(id);
+   }, []);
+ 
+@@ -92,64 +95,56 @@ const ContextMenuPanel: React.FC<ElementContextMenuProps> = ({
+     };
+   }, []);
+ 
+-  // Full keyboard navigation: Arrow keys, Enter, Escape
+-  const handleKeyDown = React.useCallback(
+-    (e: React.KeyboardEvent) => {
+-      const totalItems = allItems.length;
+-      if (totalItems === 0) return;
+-
+-      switch (e.key) {
+-        case "ArrowDown":
+-          e.preventDefault();
+-          setFocusedIndex((prev) => (prev + 1) % totalItems);
+-          setActiveSubmenu(null);
+-          break;
+-        case "ArrowUp":
+-          e.preventDefault();
+-          setFocusedIndex((prev) => (prev - 1 + totalItems) % totalItems);
+-          setActiveSubmenu(null);
+-          break;
+-        case "ArrowRight": {
+-          e.preventDefault();
+-          const focusedAction = allItems[focusedIndex];
+-          if (focusedAction?.submenu?.length) {
+-            handleSubmenuActivate(focusedAction.id);
+-          }
+-          break;
+-        }
+-        case "ArrowLeft":
+-          e.preventDefault();
+-          setActiveSubmenu(null);
+-          break;
+-        case "Enter": {
+-          e.preventDefault();
+-          const focusedAction = allItems[focusedIndex];
+-          if (!focusedAction) return;
+-          // If has submenu, open it
+-          if (focusedAction.submenu?.length) {
+-            handleSubmenuActivate(focusedAction.id);
+-          } else {
+-            // Execute standalone action
+-            const enabled = focusedAction.isEnabled ? focusedAction.isEnabled(context) : true;
+-            if (enabled && focusedAction.handler) {
+-              focusedAction.handler(context);
+-              onClose();
+-            }
+-          }
+-          break;
++  const childItems = allItems.find((action) => action.id === activeSubmenu)?.submenu;
++  const focusedAction = childItems ? childItems[submenuIndex] : allItems[focusedIndex];
++
++  // Keep DOM focus on the menu; aria-activedescendant follows the active level.
++  const handleKeyDown = (e: React.KeyboardEvent) => {
++    const items = childItems ?? allItems;
++    const index = childItems ? submenuIndex : focusedIndex;
++    const setIndex = childItems ? setSubmenuIndex : setFocusedIndex;
++    if (!items.length) return;
++    if (!["ArrowDown", "ArrowUp", "ArrowRight", "ArrowLeft", "Home", "End", "Enter", " ", "Escape", "Tab"].includes(e.key)) return;
++    e.stopPropagation();
++    if (e.key === "Tab") {
++      onClose();
++      return;
++    }
++    e.preventDefault();
++    switch (e.key) {
++      case "ArrowDown":
++        setIndex((index + 1) % items.length);
++        break;
++      case "ArrowUp":
++        setIndex((index - 1 + items.length) % items.length);
++        break;
++      case "Home":
++        setIndex(0);
++        break;
++      case "End":
++        setIndex(items.length - 1);
++        break;
++      case "ArrowLeft":
++        setActiveSubmenu(null);
++        break;
++      case "Escape":
++        if (activeSubmenu) setActiveSubmenu(null);
++        else onClose();
++        break;
++      case "ArrowRight":
++      case "Enter":
++      case " ": {
++        const action = items[index];
++        if (!action || (action.isEnabled && !action.isEnabled(context))) return;
++        if (action.submenu?.length) handleSubmenuActivate(action.id);
++        else if (e.key !== "ArrowRight" && action.handler) {
++          action.handler(context);
++          onClose();
+         }
+-        case "Escape":
+-          e.preventDefault();
+-          if (activeSubmenu) {
+-            setActiveSubmenu(null);
+-          } else {
+-            onClose();
+-          }
+-          break;
++        break;
+       }
+-    },
+-    [allItems, focusedIndex, activeSubmenu, context, onClose, handleSubmenuActivate]
+-  );
++    }
++  };
+ 
+   if (!actions.length) return null;
+ 
+@@ -181,7 +176,7 @@ const ContextMenuPanel: React.FC<ElementContextMenuProps> = ({
+       role="menu"
+       data-testid="canvas-ctx-menu"
+       aria-label="Element context menu"
+-      aria-activedescendant={allItems[focusedIndex]?.id}
++      aria-activedescendant={focusedAction?.id}
+     >
+       {/* Board 4428:43928: rows in registry order, a rule wherever the
+           group changes. */}
+@@ -199,7 +194,11 @@ const ContextMenuPanel: React.FC<ElementContextMenuProps> = ({
+                 context={context}
+                 isActive={activeSubmenu === action.id}
+                 isFocused={focusedIndex === index}
+-                onActivate={() => handleSubmenuActivate(action.id)}
++                focusedChildIndex={submenuIndex}
++                onActivate={() => {
++                  setFocusedIndex(index);
++                  handleSubmenuActivate(action.id);
++                }}
+                 onDeactivate={handleSubmenuDeactivate}
+                 onClose={onClose}
+               />
+diff --git a/packages/editor/src/editor/canvas/menus/MenuItem.tsx b/packages/editor/src/editor/canvas/menus/MenuItem.tsx
+index d4178ccac..dba6d1697 100644
+--- a/packages/editor/src/editor/canvas/menus/MenuItem.tsx
++++ b/packages/editor/src/editor/canvas/menus/MenuItem.tsx
+@@ -15,6 +15,7 @@ interface MenuItemProps {
+   enabled: boolean;
+   hasSubmenu?: boolean;
+   isHighlighted?: boolean;
++  isExpanded?: boolean;
+   onClick: () => void;
+ }
+ 
+@@ -23,6 +24,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
+   enabled,
+   hasSubmenu = false,
+   isHighlighted = false,
++  isExpanded = false,
+   onClick,
+ }) => {
+   const [isHovered, setIsHovered] = React.useState(false);
+@@ -36,7 +38,8 @@ export const MenuItem: React.FC<MenuItemProps> = ({
+       id={action.id}
+       data-testid={`canvas-ctx-item-${action.id}`}
+       onClick={onClick}
+-      disabled={!enabled && !hasSubmenu}
++      disabled={!enabled}
++      tabIndex={-1}
+       style={{
+         display: "flex",
+         alignItems: "center",
+@@ -67,7 +70,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
+       onMouseLeave={() => setIsHovered(false)}
+       role="menuitem"
+       aria-haspopup={hasSubmenu ? "menu" : undefined}
+-      aria-expanded={hasSubmenu ? isHighlighted : undefined}
++      aria-expanded={hasSubmenu ? isExpanded : undefined}
+     >
+       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+         {/* 4428:43928 draws text rows; only the AI row keeps its ✦ mark. */}
+diff --git a/packages/editor/src/editor/canvas/menus/SubmenuItem.tsx b/packages/editor/src/editor/canvas/menus/SubmenuItem.tsx
+index e3d9c8582..cda837e08 100644
+--- a/packages/editor/src/editor/canvas/menus/SubmenuItem.tsx
++++ b/packages/editor/src/editor/canvas/menus/SubmenuItem.tsx
+@@ -17,6 +17,7 @@ interface SubmenuItemProps {
+   context: ActionContext;
+   isActive: boolean;
+   isFocused?: boolean; // Keyboard navigation focus state
++  focusedChildIndex?: number;
+   onActivate: () => void;
+   onDeactivate: () => void;
+   onClose: () => void;
+@@ -27,6 +28,7 @@ export const SubmenuItem: React.FC<SubmenuItemProps> = ({
+   context,
+   isActive,
+   isFocused = false,
++  focusedChildIndex = 0,
+   onActivate,
+   onDeactivate,
+   onClose,
+@@ -35,34 +37,21 @@ export const SubmenuItem: React.FC<SubmenuItemProps> = ({
+   const [submenuPosition, setSubmenuPosition] = React.useState({ x: 0, y: 0 });
+   const activateTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+ 
+-  const handleMouseEnter = () => {
+-    // Clear any pending activation
+-    if (activateTimeoutRef.current) {
+-      clearTimeout(activateTimeoutRef.current);
+-    }
+-    // Short delay for activation - matches deactivation timeout (150ms) to prevent jitter
+-    activateTimeoutRef.current = setTimeout(() => {
+-      if (itemRef.current) {
+-        const rect = itemRef.current.getBoundingClientRect();
+-        const viewportWidth = window.innerWidth;
+-        const viewportHeight = window.innerHeight;
++  // Measure for every activation, including keyboard and click, before paint.
++  React.useLayoutEffect(() => {
++    if (!isActive || !itemRef.current) return;
++    const rect = itemRef.current.getBoundingClientRect();
++    const height = (action.submenu?.length ?? 0) * 30 + 12;
++    setSubmenuPosition({
++      x: Math.max(8, window.innerWidth - rect.right < MENU_WIDTH + 20
++        ? rect.left - MENU_WIDTH - SUBMENU_OFFSET : rect.right + SUBMENU_OFFSET),
++      y: Math.max(8, Math.min(rect.top - 6, window.innerHeight - height - 8)),
++    });
++  }, [isActive, action.submenu]);
+ 
+-        // Determine if submenu should appear on left or right
+-        const rightSpace = viewportWidth - rect.right;
+-        const shouldShowLeft = rightSpace < MENU_WIDTH + 20;
+-
+-        // Estimate submenu height and check bottom space
+-        const estimatedSubmenuHeight = 300;
+-        const bottomSpace = viewportHeight - rect.top;
+-        const shouldShowAbove = bottomSpace < estimatedSubmenuHeight;
+-
+-        setSubmenuPosition({
+-          x: shouldShowLeft ? rect.left - MENU_WIDTH - SUBMENU_OFFSET : rect.right + SUBMENU_OFFSET,
+-          y: shouldShowAbove ? Math.max(8, rect.bottom - estimatedSubmenuHeight) : rect.top - 6, // Align with padding
+-        });
+-        onActivate();
+-      }
+-    }, 150);
++  const handleMouseEnter = () => {
++    if (activateTimeoutRef.current) clearTimeout(activateTimeoutRef.current);
++    activateTimeoutRef.current = setTimeout(onActivate, 150);
+   };
+ 
+   const handleMouseLeave = () => {
+@@ -99,13 +88,15 @@ export const SubmenuItem: React.FC<SubmenuItemProps> = ({
+         enabled={enabled}
+         hasSubmenu={true}
+         isHighlighted={(isActive || isFocused) && enabled}
+-        onClick={() => {}} // Submenus open on hover
++        isExpanded={isActive}
++        onClick={enabled ? onActivate : () => {}}
+       />
+ 
+       {/* Submenu portal */}
+       {isActive && hasVisibleSubmenu && action.submenu && (
+         <Submenu
+           actions={action.submenu}
++          focusedIndex={focusedChildIndex}
+           context={context}
+           x={submenuPosition.x}
+           y={submenuPosition.y}
+diff --git a/packages/editor/src/editor/canvas/menus/SubmenuPanel.tsx b/packages/editor/src/editor/canvas/menus/SubmenuPanel.tsx
+index ef0c8a3d5..7c371a230 100644
+--- a/packages/editor/src/editor/canvas/menus/SubmenuPanel.tsx
++++ b/packages/editor/src/editor/canvas/menus/SubmenuPanel.tsx
+@@ -14,6 +14,7 @@ const MENU_WIDTH = 200;
+ interface SubmenuProps {
+   actions: ContextAction[];
+   context: ActionContext;
++  focusedIndex?: number;
+   x: number;
+   y: number;
+   onClose: () => void;
+@@ -24,6 +25,7 @@ interface SubmenuProps {
+ export const Submenu: React.FC<SubmenuProps> = ({
+   actions,
+   context,
++  focusedIndex,
+   x,
+   y,
+   onClose,
+@@ -57,13 +59,14 @@ export const Submenu: React.FC<SubmenuProps> = ({
+       onMouseEnter={onMouseEnter}
+       onMouseLeave={onMouseLeave}
+     >
+-      {actions.map((action) => {
++      {actions.map((action, index) => {
+         const enabled = action.isEnabled ? action.isEnabled(context) : true;
+         return (
+           <MenuItem
+             key={action.id}
+             action={action}
+             enabled={enabled}
++            isHighlighted={focusedIndex === index}
+             onClick={() => {
+               if (enabled && action.handler) {
+                 action.handler(context);
+diff --git a/packages/editor/src/editor/canvas/menus/__tests__/ElementContextMenu.overlay.test.tsx b/packages/editor/src/editor/canvas/menus/__tests__/ElementContextMenu.overlay.test.tsx
+index 5ea80a2f8..449f12b95 100644
+--- a/packages/editor/src/editor/canvas/menus/__tests__/ElementContextMenu.overlay.test.tsx
++++ b/packages/editor/src/editor/canvas/menus/__tests__/ElementContextMenu.overlay.test.tsx
+@@ -72,3 +72,56 @@ describe("ElementContextMenu — rendered above the chrome", () => {
+     expect(document.activeElement).toBe(screen.getByTestId("canvas-ctx-menu"));
+   });
+ });
++
++describe("ElementContextMenu — keyboard submenus", () => {
++  it("opens a positioned submenu, executes its action, and closes", () => {
++    const run = vi.fn();
++    const close = vi.fn();
++    render(<ElementContextMenu x={200} y={100} context={context} onClose={close} actions={[
++      { id: "style", label: "Style", group: "Style", submenu: [
++        { id: "copy", label: "Copy styles", group: "Style", handler: run },
++      ] },
++    ]} />);
++    const menu = screen.getByTestId("canvas-ctx-menu");
++    const item = screen.getByRole("menuitem", { name: /^Style/ });
++    vi.spyOn(item.parentElement!, "getBoundingClientRect").mockReturnValue({
++      left: 200, right: 400, top: 100, bottom: 130, width: 200, height: 30, x: 200, y: 100, toJSON() {},
++    });
++    expect(item.getAttribute("aria-expanded")).toBe("false");
++    fireEvent.keyDown(menu, { key: "ArrowRight" });
++    expect(screen.getByTestId("canvas-ctx-submenu").style.left).toBe("404px");
++    expect(menu.getAttribute("aria-activedescendant")).toBe("copy");
++    fireEvent.keyDown(menu, { key: "Enter" });
++    expect(run).toHaveBeenCalledOnce();
++    expect(close).toHaveBeenCalledOnce();
++  });
++
++  it("navigates children and closes only the submenu on the first Escape", () => {
++    const run = vi.fn();
++    const close = vi.fn();
++    render(<ElementContextMenu x={200} y={100} context={context} onClose={close} actions={[
++      { id: "style", label: "Style", group: "Style", submenu: [
++        { id: "unavailable", label: "Paste styles", group: "Style", isEnabled: () => false, handler: run },
++        { id: "copy", label: "Copy styles", group: "Style", handler: run },
++      ] },
++    ]} />);
++    const menu = screen.getByTestId("canvas-ctx-menu");
++    fireEvent.keyDown(menu, { key: "ArrowRight" });
++    fireEvent.keyDown(menu, { key: "Enter" });
++    expect(run).not.toHaveBeenCalled();
++    fireEvent.keyDown(menu, { key: "ArrowDown" });
++    expect(menu.getAttribute("aria-activedescendant")).toBe("copy");
++    fireEvent.keyDown(menu, { key: "Escape" });
++    expect(screen.queryByTestId("canvas-ctx-submenu")).toBeNull();
++    expect(close).not.toHaveBeenCalled();
++    expect(menu.getAttribute("aria-activedescendant")).toBe("style");
++    fireEvent.keyDown(menu, { key: "Escape" });
++    expect(close).toHaveBeenCalledOnce();
++  });
++
++  it("opens submenus by click for users without hover", () => {
++    renderInCanvas();
++    fireEvent.click(screen.getByRole("menuitem", { name: /^Style/ }));
++    expect(screen.getByTestId("canvas-ctx-submenu")).toBeTruthy();
++  });
++});

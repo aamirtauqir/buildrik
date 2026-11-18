@@ -1,0 +1,1431 @@
+[
+  {
+    "id": "8281:2",
+    "name": "AS-IS 01 · Review / empty · 1280",
+    "nativeNodes": 133,
+    "sourceItems": 80,
+    "errors": [],
+    "noteId": "8281:136"
+  },
+  {
+    "id": "8283:2",
+    "name": "AS-IS 02 · Heading / Style",
+    "nativeNodes": 294,
+    "sourceItems": 191,
+    "errors": [],
+    "noteId": "8283:297"
+  },
+  {
+    "id": "8283:299",
+    "name": "AS-IS 03 · Selected element actions",
+    "nativeNodes": 308,
+    "sourceItems": 206,
+    "errors": [],
+    "noteId": "8283:608"
+  },
+  {
+    "id": "8283:610",
+    "name": "AS-IS 04 · Layers",
+    "nativeNodes": 322,
+    "sourceItems": 210,
+    "errors": [],
+    "noteId": "8283:933"
+  },
+  {
+    "id": "8283:935",
+    "name": "AS-IS 05 · Pages",
+    "nativeNodes": 311,
+    "sourceItems": 208,
+    "errors": [],
+    "noteId": "8283:1247"
+  },
+  {
+    "id": "8283:1249",
+    "name": "AS-IS 06 · Add catalog",
+    "nativeNodes": 402,
+    "sourceItems": 249,
+    "errors": [],
+    "noteId": "8283:1652"
+  },
+  {
+    "id": "8283:1654",
+    "name": "AS-IS 07 · Saved components",
+    "nativeNodes": 341,
+    "sourceItems": 240,
+    "errors": [],
+    "noteId": "8283:1996"
+  },
+  {
+    "id": "8283:1998",
+    "name": "AS-IS 08 · Assets quick chooser",
+    "nativeNodes": 324,
+    "sourceItems": 217,
+    "errors": [],
+    "noteId": "8283:2323"
+  },
+  {
+    "id": "8283:2325",
+    "name": "AS-IS 09 · Full Media",
+    "nativeNodes": 195,
+    "sourceItems": 122,
+    "errors": [],
+    "noteId": "8283:2521"
+  },
+  {
+    "id": "8283:2523",
+    "name": "AS-IS 10 · CMS records",
+    "nativeNodes": 228,
+    "sourceItems": 140,
+    "errors": [],
+    "noteId": "8283:2752"
+  },
+  {
+    "id": "8286:2",
+    "name": "AS-IS 11 · CMS record / draft",
+    "nativeNodes": 267,
+    "sourceItems": 170,
+    "errors": [],
+    "noteId": "8286:270"
+  },
+  {
+    "id": "8286:272",
+    "name": "AS-IS 12 · CMS fields",
+    "nativeNodes": 236,
+    "sourceItems": 148,
+    "errors": [],
+    "noteId": "8286:509"
+  },
+  {
+    "id": "8286:511",
+    "name": "AS-IS 13 · Brand / colors",
+    "nativeNodes": 219,
+    "sourceItems": 174,
+    "errors": [],
+    "noteId": "8286:731"
+  },
+  {
+    "id": "8286:733",
+    "name": "AS-IS 14 · Brand color picker",
+    "nativeNodes": 249,
+    "sourceItems": 202,
+    "errors": [],
+    "noteId": "8286:983"
+  },
+  {
+    "id": "8286:985",
+    "name": "AS-IS 15 · Brand typography",
+    "nativeNodes": 172,
+    "sourceItems": 131,
+    "errors": [],
+    "noteId": "8286:1158"
+  },
+  {
+    "id": "8286:1160",
+    "name": "AS-IS 16 · Brand spacing",
+    "nativeNodes": 194,
+    "sourceItems": 149,
+    "errors": [],
+    "noteId": "8286:1355"
+  },
+  {
+    "id": "8286:1357",
+    "name": "AS-IS 17 · Site menu",
+    "nativeNodes": 253,
+    "sourceItems": 170,
+    "errors": [],
+    "noteId": "8286:1611"
+  },
+  {
+    "id": "8286:1613",
+    "name": "AS-IS 18 · Settings / General",
+    "nativeNodes": 202,
+    "sourceItems": 123,
+    "errors": [],
+    "noteId": "8286:1816"
+  },
+  {
+    "id": "8290:2",
+    "name": "AS-IS 19 · History / Session",
+    "nativeNodes": 173,
+    "sourceItems": 105,
+    "errors": [],
+    "noteId": "8290:176"
+  },
+  {
+    "id": "8290:178",
+    "name": "AS-IS 20 · History / Saves",
+    "nativeNodes": 183,
+    "sourceItems": 115,
+    "errors": [],
+    "noteId": "8290:362"
+  },
+  {
+    "id": "8290:364",
+    "name": "AS-IS 21 · Notifications / empty",
+    "nativeNodes": 293,
+    "sourceItems": 193,
+    "errors": [],
+    "noteId": "8290:658"
+  },
+  {
+    "id": "8290:660",
+    "name": "AS-IS 22 · Issues / six warnings",
+    "nativeNodes": 199,
+    "sourceItems": 129,
+    "errors": [],
+    "noteId": "8290:860"
+  },
+  {
+    "id": "8290:862",
+    "name": "AS-IS 23 · Activity / event",
+    "nativeNodes": 168,
+    "sourceItems": 103,
+    "errors": [],
+    "noteId": "8290:1031"
+  },
+  {
+    "id": "8290:1033",
+    "name": "AS-IS 24 · Command palette",
+    "nativeNodes": 197,
+    "sourceItems": 130,
+    "errors": [],
+    "noteId": "8290:1231"
+  },
+  {
+    "id": "8290:1233",
+    "name": "AS-IS 25 · Publish / checks and targets",
+    "nativeNodes": 227,
+    "sourceItems": 153,
+    "errors": [],
+    "noteId": "8290:1461"
+  },
+  {
+    "id": "8290:1463",
+    "name": "AS-IS 26 · AI / selected heading",
+    "nativeNodes": 163,
+    "sourceItems": 99,
+    "errors": [],
+    "noteId": "8290:1627"
+  },
+  {
+    "id": "8290:1629",
+    "name": "AS-IS 27 · Templates / gallery",
+    "nativeNodes": 179,
+    "sourceItems": 136,
+    "errors": [],
+    "noteId": "8290:1809"
+  },
+  {
+    "id": "8290:1811",
+    "name": "AS-IS 28 · Template preview",
+    "nativeNodes": 138,
+    "sourceItems": 96,
+    "errors": [],
+    "noteId": "8290:1950"
+  },
+  {
+    "id": "8290:1952",
+    "name": "AS-IS 29 · Components / manager empty",
+    "nativeNodes": 295,
+    "sourceItems": 198,
+    "errors": [],
+    "noteId": "8290:2248"
+  },
+  {
+    "id": "8290:2250",
+    "name": "AS-IS 30 · Preview / Desktop",
+    "nativeNodes": 265,
+    "sourceItems": 178,
+    "errors": [],
+    "noteId": "8290:2516"
+  },
+  {
+    "id": "8290:2518",
+    "name": "AS-IS 31 · Preview / Mobile 375",
+    "nativeNodes": 276,
+    "sourceItems": 186,
+    "errors": [],
+    "noteId": "8290:2795"
+  },
+  {
+    "id": "8290:2797",
+    "name": "AS-IS 32 · Pages / page Inspector",
+    "nativeNodes": 251,
+    "sourceItems": 163,
+    "errors": [],
+    "noteId": "8290:3049"
+  },
+  {
+    "id": "8290:3051",
+    "name": "AS-IS 33 · New page dialog",
+    "nativeNodes": 278,
+    "sourceItems": 183,
+    "errors": [],
+    "noteId": "8290:3330"
+  },
+  {
+    "id": "8290:3332",
+    "name": "AS-IS 34 · Export dialog",
+    "nativeNodes": 284,
+    "sourceItems": 194,
+    "errors": [],
+    "noteId": "8290:3617"
+  },
+  {
+    "id": "8290:3619",
+    "name": "AS-IS 35 · Keyboard shortcuts",
+    "nativeNodes": 296,
+    "sourceItems": 203,
+    "errors": [],
+    "noteId": "8290:3916"
+  },
+  {
+    "id": "8293:2",
+    "name": "AS-IS 36 · Heading Style — 1440px",
+    "nativeNodes": 368,
+    "sourceItems": 244,
+    "errors": [],
+    "noteId": "8293:371",
+    "key": "heading-wide"
+  },
+  {
+    "id": "8293:373",
+    "name": "AS-IS 37 · Image Style — 1440px",
+    "nativeNodes": 358,
+    "sourceItems": 234,
+    "errors": [],
+    "noteId": "8293:732",
+    "key": "image-wide"
+  },
+  {
+    "id": "8293:734",
+    "name": "AS-IS 38 · Image Behaviour — current controls",
+    "nativeNodes": 257,
+    "sourceItems": 159,
+    "errors": [],
+    "noteId": "8293:992",
+    "key": "behaviour-wide"
+  },
+  {
+    "id": "8293:994",
+    "name": "AS-IS 39 · Image Effects — current controls",
+    "nativeNodes": 242,
+    "sourceItems": 143,
+    "errors": [],
+    "noteId": "8293:1237",
+    "key": "effects-wide"
+  },
+  {
+    "id": "8293:1239",
+    "name": "AS-IS 40 · Page Inspector — selected root",
+    "nativeNodes": 286,
+    "sourceItems": 180,
+    "errors": [],
+    "noteId": "8293:1526",
+    "key": "page-wide"
+  },
+  {
+    "id": "8293:1528",
+    "name": "AS-IS 41 · Page settings — SEO",
+    "nativeNodes": 327,
+    "sourceItems": 219,
+    "errors": [],
+    "noteId": "8293:1856",
+    "key": "page-seo"
+  },
+  {
+    "id": "8293:1858",
+    "name": "AS-IS 42 · Page settings — Social",
+    "nativeNodes": 307,
+    "sourceItems": 202,
+    "errors": [],
+    "noteId": "8293:2166",
+    "key": "page-social"
+  },
+  {
+    "id": "8293:2168",
+    "name": "AS-IS 43 · Page settings — Advanced",
+    "nativeNodes": 311,
+    "sourceItems": 207,
+    "errors": [],
+    "noteId": "8293:2480",
+    "key": "page-advanced"
+  },
+  {
+    "id": "8302:2",
+    "name": "AS-IS 44 · Settings / Overview",
+    "nativeNodes": 229,
+    "sourceItems": 141,
+    "errors": [],
+    "noteId": "8302:232",
+    "key": "settings-overview"
+  },
+  {
+    "id": "8302:234",
+    "name": "AS-IS 45 · Settings / SEO",
+    "nativeNodes": 236,
+    "sourceItems": 147,
+    "errors": [],
+    "noteId": "8302:471",
+    "key": "settings-seo"
+  },
+  {
+    "id": "8302:473",
+    "name": "AS-IS 46 · Settings / Redirects",
+    "nativeNodes": 206,
+    "sourceItems": 118,
+    "errors": [],
+    "noteId": "8302:680",
+    "key": "settings-redirects"
+  },
+  {
+    "id": "8302:682",
+    "name": "AS-IS 47 · Settings / Domains — no custom domain",
+    "nativeNodes": 198,
+    "sourceItems": 110,
+    "errors": [],
+    "noteId": "8302:881",
+    "key": "settings-domains"
+  },
+  {
+    "id": "8302:883",
+    "name": "AS-IS 48 · Settings / Access",
+    "nativeNodes": 209,
+    "sourceItems": 120,
+    "errors": [],
+    "noteId": "8302:1093",
+    "key": "settings-access"
+  },
+  {
+    "id": "8302:1095",
+    "name": "AS-IS 49 · Settings / Analytics",
+    "nativeNodes": 229,
+    "sourceItems": 139,
+    "errors": [],
+    "noteId": "8302:1325",
+    "key": "settings-analytics"
+  },
+  {
+    "id": "8302:1327",
+    "name": "AS-IS 50 · Settings / Form submissions — empty",
+    "nativeNodes": 197,
+    "sourceItems": 109,
+    "errors": [],
+    "noteId": "8302:1525",
+    "key": "settings-forms"
+  },
+  {
+    "id": "8302:1527",
+    "name": "AS-IS 51 · Settings / Languages",
+    "nativeNodes": 218,
+    "sourceItems": 129,
+    "errors": [],
+    "noteId": "8302:1746",
+    "key": "settings-localization"
+  },
+  {
+    "id": "8302:1748",
+    "name": "AS-IS 52 · Settings / Custom code",
+    "nativeNodes": 215,
+    "sourceItems": 126,
+    "errors": [],
+    "noteId": "8302:1964",
+    "key": "settings-custom-code"
+  },
+  {
+    "id": "8302:1966",
+    "name": "AS-IS 53 · Settings / Security headers",
+    "nativeNodes": 225,
+    "sourceItems": 135,
+    "errors": [],
+    "noteId": "8302:2192",
+    "key": "settings-headers"
+  },
+  {
+    "id": "8302:2194",
+    "name": "AS-IS 54 · Settings / Danger zone",
+    "nativeNodes": 207,
+    "sourceItems": 119,
+    "errors": [],
+    "noteId": "8302:2402",
+    "key": "settings-danger-zone"
+  },
+  {
+    "id": "8302:2404",
+    "name": "AS-IS 55 · Settings / Members — workspace door",
+    "nativeNodes": 201,
+    "sourceItems": 113,
+    "errors": [],
+    "noteId": "8302:2606",
+    "key": "settings-members"
+  },
+  {
+    "id": "8302:2608",
+    "name": "AS-IS 56 · Settings / Billing — workspace door",
+    "nativeNodes": 201,
+    "sourceItems": 113,
+    "errors": [],
+    "noteId": "8302:2810",
+    "key": "settings-billing"
+  },
+  {
+    "id": "8302:2812",
+    "name": "AS-IS 57 · Settings / Integrations — workspace door",
+    "nativeNodes": 201,
+    "sourceItems": 113,
+    "errors": [],
+    "noteId": "8302:3014",
+    "key": "settings-webhooks"
+  },
+  {
+    "id": "8304:74",
+    "name": "AS-IS 58 · Brand / Colour mode",
+    "nativeNodes": 231,
+    "sourceItems": 150,
+    "errors": [],
+    "warnings": [],
+    "noteId": "8304:199",
+    "appended": false,
+    "indexOffset": 75,
+    "key": "brand-colour-mode"
+  },
+  {
+    "id": "8304:308",
+    "name": "AS-IS 59 · Brand / Styles",
+    "nativeNodes": 194,
+    "sourceItems": 141,
+    "errors": [],
+    "warnings": [],
+    "noteId": "8304:417",
+    "appended": false,
+    "indexOffset": 71,
+    "key": "brand-styles"
+  },
+  {
+    "id": "8304:505",
+    "name": "AS-IS 60 · Brand / Component styles",
+    "nativeNodes": 182,
+    "sourceItems": 114,
+    "errors": [],
+    "warnings": [],
+    "noteId": "8304:688",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "brand-component-styles"
+  },
+  {
+    "id": "8304:690",
+    "name": "AS-IS 61 · Brand / Classes — empty",
+    "nativeNodes": 143,
+    "sourceItems": 90,
+    "errors": [],
+    "warnings": [],
+    "noteId": "8304:834",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "brand-classes"
+  },
+  {
+    "id": "8304:836",
+    "name": "AS-IS 62 · Brand / Presets",
+    "nativeNodes": 195,
+    "sourceItems": 121,
+    "errors": [],
+    "warnings": [],
+    "noteId": "8304:1032",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "brand-presets"
+  },
+  {
+    "id": "8304:1034",
+    "name": "AS-IS 63 · Brand / Brand checks",
+    "nativeNodes": 147,
+    "sourceItems": 95,
+    "errors": [],
+    "warnings": [],
+    "noteId": "8304:1182",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "brand-brand-checks"
+  },
+  {
+    "id": "8304:1184",
+    "name": "AS-IS 64 · Brand / Starters",
+    "nativeNodes": 170,
+    "sourceItems": 106,
+    "errors": [],
+    "warnings": [],
+    "noteId": "8304:1355",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "brand-starters"
+  },
+  {
+    "id": "8304:1357",
+    "name": "AS-IS 65 · Brand / Import / export",
+    "nativeNodes": 161,
+    "sourceItems": 105,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "Preview format",
+        "reason": "Four-value SVG background position unsupported."
+      },
+      {
+        "name": "Preview format",
+        "reason": "Four-value SVG background position unsupported."
+      },
+      {
+        "name": "Drop tokens.json, or click to browse",
+        "reason": "Non-solid CSS border approximated as solid."
+      }
+    ],
+    "noteId": "8304:1449",
+    "appended": false,
+    "indexOffset": 53,
+    "key": "brand-export"
+  },
+  {
+    "id": "8306:241560",
+    "name": "AS-IS 66 · CMS / No collection selected",
+    "nativeNodes": 179,
+    "sourceItems": 117,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "capture",
+        "reason": "Legacy capture has no full stacking/background/ellipsis metadata; v2 renderer cannot infer it."
+      }
+    ],
+    "noteId": "8306:241740",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "cms-landing"
+  },
+  {
+    "id": "8307:241530",
+    "name": "AS-IS 67 · CMS / Title field settings",
+    "nativeNodes": 242,
+    "sourceItems": 167,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "capture",
+        "reason": "Legacy capture has no full stacking/background/ellipsis metadata; v2 renderer cannot infer it."
+      }
+    ],
+    "noteId": "8307:241773",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "cms-field-detail"
+  },
+  {
+    "id": "8307:241775",
+    "name": "AS-IS 68 · CMS / Dynamic pages",
+    "nativeNodes": 201,
+    "sourceItems": 133,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "capture",
+        "reason": "Legacy capture has no full stacking/background/ellipsis metadata; v2 renderer cannot infer it."
+      }
+    ],
+    "noteId": "8307:241977",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "cms-dynamic"
+  },
+  {
+    "id": "8307:241979",
+    "name": "AS-IS 69 · CMS / Collection settings",
+    "nativeNodes": 208,
+    "sourceItems": 137,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "capture",
+        "reason": "Legacy capture has no full stacking/background/ellipsis metadata; v2 renderer cannot infer it."
+      }
+    ],
+    "noteId": "8307:242188",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "cms-settings"
+  },
+  {
+    "id": "8307:242190",
+    "name": "AS-IS 70 · Media / Selected asset",
+    "nativeNodes": 218,
+    "sourceItems": 141,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "capture",
+        "reason": "Legacy capture has no full stacking/background/ellipsis metadata; v2 renderer cannot infer it."
+      }
+    ],
+    "noteId": "8307:242409",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "media-detail"
+  },
+  {
+    "id": "8308:2",
+    "name": "AS-IS 71 · Media / Asset properties",
+    "nativeNodes": 223,
+    "sourceItems": 146,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "capture",
+        "reason": "Legacy capture has no full stacking/background/ellipsis metadata; v2 renderer cannot infer it."
+      }
+    ],
+    "noteId": "8308:226",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "media-properties"
+  },
+  {
+    "id": "8308:228",
+    "name": "AS-IS 72 · Media / Crop editor",
+    "nativeNodes": 156,
+    "sourceItems": 197,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "capture",
+        "reason": "Legacy capture has no full stacking/background/ellipsis metadata; v2 renderer cannot infer it."
+      },
+      {
+        "name": "capture",
+        "reason": "Legacy capture has no full stacking/background/ellipsis metadata; v2 renderer cannot infer it."
+      }
+    ],
+    "noteId": "8308:385",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "media-edit"
+  },
+  {
+    "id": "8308:505",
+    "name": "AS-IS 73 · Media / Asset actions",
+    "nativeNodes": 229,
+    "sourceItems": 152,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "capture",
+        "reason": "Legacy capture has no full stacking/background/ellipsis metadata; v2 renderer cannot infer it."
+      }
+    ],
+    "noteId": "8308:735",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "media-menu"
+  },
+  {
+    "id": "8308:737",
+    "name": "AS-IS 74 · History / Published empty state",
+    "nativeNodes": 139,
+    "sourceItems": 86,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "capture",
+        "reason": "Legacy capture has no full stacking/background/ellipsis metadata; v2 renderer cannot infer it."
+      }
+    ],
+    "noteId": "8308:877",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "history-published"
+  },
+  {
+    "id": "8308:879",
+    "name": "AS-IS 75 · History / Version actions",
+    "nativeNodes": 166,
+    "sourceItems": 111,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "capture",
+        "reason": "Legacy capture has no full stacking/background/ellipsis metadata; v2 renderer cannot infer it."
+      }
+    ],
+    "noteId": "8308:1046",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "version-menu"
+  },
+  {
+    "id": "8308:1048",
+    "name": "AS-IS 76 · History / Compare with current",
+    "nativeNodes": 176,
+    "sourceItems": 121,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "capture",
+        "reason": "Legacy capture has no full stacking/background/ellipsis metadata; v2 renderer cannot infer it."
+      }
+    ],
+    "noteId": "8308:1225",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "history-compare"
+  },
+  {
+    "id": "8308:1227",
+    "name": "AS-IS 77 · Canvas / View menu",
+    "nativeNodes": 242,
+    "sourceItems": 167,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "capture",
+        "reason": "Legacy capture has no full stacking/background/ellipsis metadata; v2 renderer cannot infer it."
+      }
+    ],
+    "noteId": "8308:1470",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "view-menu"
+  },
+  {
+    "id": "8308:1472",
+    "name": "AS-IS 78 · Canvas / Breakpoint menu",
+    "nativeNodes": 226,
+    "sourceItems": 151,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "capture",
+        "reason": "Legacy capture has no full stacking/background/ellipsis metadata; v2 renderer cannot infer it."
+      }
+    ],
+    "noteId": "8308:1699",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "breakpoint-menu"
+  },
+  {
+    "id": "8308:1701",
+    "name": "AS-IS 79 · Canvas / Mobile viewport",
+    "nativeNodes": 223,
+    "sourceItems": 147,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "capture",
+        "reason": "Legacy capture has no full stacking/background/ellipsis metadata; v2 renderer cannot infer it."
+      }
+    ],
+    "noteId": "8308:1925",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "mobile-canvas"
+  },
+  {
+    "id": "8308:1927",
+    "name": "AS-IS 80 · Inspector / Multiple selected",
+    "nativeNodes": 180,
+    "sourceItems": 204,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "capture",
+        "reason": "Legacy capture has no full stacking/background/ellipsis metadata; v2 renderer cannot infer it."
+      },
+      {
+        "name": "capture",
+        "reason": "Legacy capture has no full stacking/background/ellipsis metadata; v2 renderer cannot infer it."
+      }
+    ],
+    "noteId": "8308:2108",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "multiselection"
+  },
+  {
+    "id": "8308:2246",
+    "name": "AS-IS 81 · Inspector / Locked element",
+    "nativeNodes": 226,
+    "sourceItems": 247,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "capture",
+        "reason": "Legacy capture has no full stacking/background/ellipsis metadata; v2 renderer cannot infer it."
+      },
+      {
+        "name": "capture",
+        "reason": "Legacy capture has no full stacking/background/ellipsis metadata; v2 renderer cannot infer it."
+      }
+    ],
+    "noteId": "8308:2473",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "locked-selection"
+  },
+  {
+    "id": "8308:2638",
+    "name": "AS-IS 82 · Inspector / Container",
+    "nativeNodes": 245,
+    "sourceItems": 258,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "capture",
+        "reason": "Legacy capture has no full stacking/background/ellipsis metadata; v2 renderer cannot infer it."
+      },
+      {
+        "name": "capture",
+        "reason": "Legacy capture has no full stacking/background/ellipsis metadata; v2 renderer cannot infer it."
+      }
+    ],
+    "noteId": "8308:2884",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "container-style"
+  },
+  {
+    "id": "8308:3082",
+    "name": "AS-IS 83 · Inspector / Form",
+    "nativeNodes": 285,
+    "sourceItems": 294,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "capture",
+        "reason": "Legacy capture has no full stacking/background/ellipsis metadata; v2 renderer cannot infer it."
+      },
+      {
+        "name": "capture",
+        "reason": "Legacy capture has no full stacking/background/ellipsis metadata; v2 renderer cannot infer it."
+      }
+    ],
+    "noteId": "8308:3368",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "form-style"
+  },
+  {
+    "id": "8308:3572",
+    "name": "AS-IS 84 · Pages / Empty page",
+    "nativeNodes": 235,
+    "sourceItems": 242,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "capture",
+        "reason": "Legacy capture has no full stacking/background/ellipsis metadata; v2 renderer cannot infer it."
+      },
+      {
+        "name": "capture",
+        "reason": "Legacy capture has no full stacking/background/ellipsis metadata; v2 renderer cannot infer it."
+      }
+    ],
+    "noteId": "8308:3808",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "empty-page"
+  },
+  {
+    "id": "8308:3973",
+    "name": "AS-IS 85 · Pages / Page actions",
+    "nativeNodes": 283,
+    "sourceItems": 182,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "capture",
+        "reason": "Legacy capture has no full stacking/background/ellipsis metadata; v2 renderer cannot infer it."
+      }
+    ],
+    "noteId": "8308:4257",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "page-menu"
+  },
+  {
+    "id": "8309:2",
+    "name": "AS-IS 86 · Components / Create dialog",
+    "nativeNodes": 136,
+    "sourceItems": 274,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "create-component-scope",
+        "reason": "Four-value SVG background position unsupported."
+      },
+      {
+        "name": "Design canvas::before",
+        "reason": "Sized/tiled CSS gradient unsupported: 20px 20px"
+      },
+      {
+        "name": "div",
+        "reason": "Sized/tiled CSS gradient unsupported: 24px 24px"
+      },
+      {
+        "name": "create-component-scope",
+        "reason": "Four-value SVG background position unsupported."
+      },
+      {
+        "name": "Choose Colour color::before",
+        "reason": "Sized/tiled CSS gradient unsupported: 6px 6px"
+      },
+      {
+        "name": "create-component-scope",
+        "reason": "Four-value SVG background position unsupported."
+      },
+      {
+        "name": "create-component-scope",
+        "reason": "Four-value SVG background position unsupported."
+      }
+    ],
+    "noteId": "8309:139",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "component-create"
+  },
+  {
+    "id": "8309:461",
+    "name": "AS-IS 87 · Components / Instance controls",
+    "nativeNodes": 126,
+    "sourceItems": 245,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "Design canvas::before",
+        "reason": "Sized/tiled CSS gradient unsupported: 20px 20px"
+      },
+      {
+        "name": "div",
+        "reason": "Sized/tiled CSS gradient unsupported: 24px 24px"
+      },
+      {
+        "name": "Choose Colour color::before",
+        "reason": "Sized/tiled CSS gradient unsupported: 6px 6px"
+      }
+    ],
+    "noteId": "8309:588",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "component-instance"
+  },
+  {
+    "id": "8309:887",
+    "name": "AS-IS 88 · Components / Instance actions",
+    "nativeNodes": 127,
+    "sourceItems": 249,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "Design canvas::before",
+        "reason": "Sized/tiled CSS gradient unsupported: 20px 20px"
+      },
+      {
+        "name": "div",
+        "reason": "Sized/tiled CSS gradient unsupported: 24px 24px"
+      },
+      {
+        "name": "Choose Colour color::before",
+        "reason": "Sized/tiled CSS gradient unsupported: 6px 6px"
+      }
+    ],
+    "noteId": "8309:1015",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "component-menu"
+  },
+  {
+    "id": "8309:242881",
+    "name": "AS-IS 89 · Components / Expanded manager",
+    "nativeNodes": 206,
+    "sourceItems": 238,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "Design canvas::before",
+        "reason": "Sized/tiled CSS gradient unsupported: 20px 20px"
+      },
+      {
+        "name": "div",
+        "reason": "Sized/tiled CSS gradient unsupported: 24px 24px"
+      },
+      {
+        "name": "Choose Colour color::before",
+        "reason": "Sized/tiled CSS gradient unsupported: 6px 6px"
+      }
+    ],
+    "noteId": "8309:243088",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "component-expanded"
+  },
+  {
+    "id": "8309:243286",
+    "name": "AS-IS 90 · Components / Master detail",
+    "nativeNodes": 119,
+    "sourceItems": 256,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      },
+      {
+        "name": "Design canvas::before",
+        "reason": "Sized/tiled CSS gradient unsupported: 20px 20px"
+      },
+      {
+        "name": "div",
+        "reason": "Sized/tiled CSS gradient unsupported: 24px 24px"
+      },
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      },
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      },
+      {
+        "name": "Choose Colour color::before",
+        "reason": "Sized/tiled CSS gradient unsupported: 6px 6px"
+      },
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      }
+    ],
+    "noteId": "8309:243406",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "component-detail"
+  },
+  {
+    "id": "8309:243704",
+    "name": "AS-IS 91 · Components / Back to instance",
+    "nativeNodes": 120,
+    "sourceItems": 257,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      },
+      {
+        "name": "Design canvas::before",
+        "reason": "Sized/tiled CSS gradient unsupported: 20px 20px"
+      },
+      {
+        "name": "div",
+        "reason": "Sized/tiled CSS gradient unsupported: 24px 24px"
+      },
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      },
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      },
+      {
+        "name": "Choose Colour color::before",
+        "reason": "Sized/tiled CSS gradient unsupported: 6px 6px"
+      },
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      }
+    ],
+    "noteId": "8309:243825",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "component-master"
+  },
+  {
+    "id": "8309:244123",
+    "name": "AS-IS 92 · Inspector / CMS binding chooser",
+    "nativeNodes": 160,
+    "sourceItems": 186,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      },
+      {
+        "name": "Design canvas::before",
+        "reason": "Sized/tiled CSS gradient unsupported: 20px 20px"
+      },
+      {
+        "name": "div",
+        "reason": "Sized/tiled CSS gradient unsupported: 24px 24px"
+      },
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      }
+    ],
+    "noteId": "8309:244284",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "cms-binding"
+  },
+  {
+    "id": "8309:244434",
+    "name": "AS-IS 93 · Inspector / Add interaction",
+    "nativeNodes": 193,
+    "sourceItems": 210,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      },
+      {
+        "name": "Design canvas::before",
+        "reason": "Sized/tiled CSS gradient unsupported: 20px 20px"
+      },
+      {
+        "name": "div",
+        "reason": "Sized/tiled CSS gradient unsupported: 24px 24px"
+      },
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      }
+    ],
+    "noteId": "8309:244628",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "interaction-add"
+  },
+  {
+    "id": "8309:244811",
+    "name": "AS-IS 94 · Inspector / Form behaviour",
+    "nativeNodes": 118,
+    "sourceItems": 231,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "Design canvas::before",
+        "reason": "Sized/tiled CSS gradient unsupported: 20px 20px"
+      },
+      {
+        "name": "div",
+        "reason": "Sized/tiled CSS gradient unsupported: 24px 24px"
+      }
+    ],
+    "noteId": "8309:244930",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "form-behaviour"
+  },
+  {
+    "id": "8309:245270",
+    "name": "AS-IS 95 · Inspector / Image chooser",
+    "nativeNodes": 213,
+    "sourceItems": 239,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      },
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      },
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      },
+      {
+        "name": "Design canvas::before",
+        "reason": "Sized/tiled CSS gradient unsupported: 20px 20px"
+      },
+      {
+        "name": "div",
+        "reason": "Sized/tiled CSS gradient unsupported: 24px 24px"
+      },
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      },
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      },
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      },
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      },
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      },
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      }
+    ],
+    "noteId": "8309:245484",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "property-image"
+  },
+  {
+    "id": "8309:245692",
+    "name": "AS-IS 96 · Inspector / Spacing token picker",
+    "nativeNodes": 138,
+    "sourceItems": 279,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      },
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      },
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      },
+      {
+        "name": "Design canvas::before",
+        "reason": "Sized/tiled CSS gradient unsupported: 20px 20px"
+      },
+      {
+        "name": "div",
+        "reason": "Sized/tiled CSS gradient unsupported: 24px 24px"
+      },
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      },
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      },
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      },
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      },
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      },
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      },
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      },
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      },
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      }
+    ],
+    "noteId": "8309:245831",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "token-picker"
+  },
+  {
+    "id": "8309:246171",
+    "name": "AS-IS 97 · Inspector / Heading at Mobile",
+    "nativeNodes": 119,
+    "sourceItems": 258,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "Design canvas::before",
+        "reason": "Sized/tiled CSS gradient unsupported: 20px 20px"
+      },
+      {
+        "name": "div",
+        "reason": "Sized/tiled CSS gradient unsupported: 24px 24px"
+      },
+      {
+        "name": "Choose Colour color::before",
+        "reason": "Sized/tiled CSS gradient unsupported: 6px 6px"
+      }
+    ],
+    "noteId": "8309:246291",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "heading-mobile"
+  },
+  {
+    "id": "8309:246610",
+    "name": "AS-IS 98 · Templates / Empty page replacement applied",
+    "nativeNodes": 182,
+    "sourceItems": 224,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "Design canvas::before",
+        "reason": "Sized/tiled CSS gradient unsupported: 20px 20px"
+      },
+      {
+        "name": "div",
+        "reason": "Sized/tiled CSS gradient unsupported: 24px 24px"
+      },
+      {
+        "name": "Choose Background color::before",
+        "reason": "Sized/tiled CSS gradient unsupported: 6px 6px"
+      },
+      {
+        "name": "Choose Text colour color::before",
+        "reason": "Sized/tiled CSS gradient unsupported: 6px 6px"
+      }
+    ],
+    "noteId": "8309:246793",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "template-empty-applied"
+  },
+  {
+    "id": "8309:247369",
+    "name": "AS-IS 99 · Templates / Replacement guard",
+    "nativeNodes": 97,
+    "sourceItems": 121,
+    "errors": [],
+    "warnings": [
+      {
+        "name": "Times",
+        "reason": "Font substitution → Tinos"
+      },
+      {
+        "name": "Arial",
+        "reason": "Font substitution → Arimo"
+      }
+    ],
+    "noteId": "8309:247467",
+    "appended": false,
+    "indexOffset": 0,
+    "key": "template-replace-guard"
+  }
+]

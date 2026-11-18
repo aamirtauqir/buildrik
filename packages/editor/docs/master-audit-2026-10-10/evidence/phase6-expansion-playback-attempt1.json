@@ -1,0 +1,106 @@
+{
+  "date": "2026-10-11T21:20:32.835Z",
+  "scope": "Figma expansion navigation playback only; no external product actions",
+  "steps": [
+    {
+      "from": "I01",
+      "label": "Typography",
+      "to": "I02",
+      "source": "8467:142",
+      "x": 1265,
+      "y": 829,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-3&starting-point-node-id=8465%3A2&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "I02",
+      "label": "Mobile override",
+      "to": "I06",
+      "source": "8468:196",
+      "x": 1265,
+      "y": 685,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-7&starting-point-node-id=8465%3A2&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "I06",
+      "label": "Reset font size",
+      "to": "I14",
+      "source": "8468:244426",
+      "x": 1265,
+      "y": 683,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-15&starting-point-node-id=8465%3A2&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "I14",
+      "label": "Undo reset",
+      "to": "I06",
+      "source": "8468:245476",
+      "x": 1265,
+      "y": 395,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-7&starting-point-node-id=8465%3A2&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "I06",
+      "label": "Desktop",
+      "to": "I02",
+      "source": "8468:244428",
+      "x": 1265,
+      "y": 723,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-3&starting-point-node-id=8465%3A2&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "I02",
+      "label": "Class manager",
+      "to": "I07",
+      "source": "8468:198",
+      "x": 1265,
+      "y": 725,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-8&starting-point-node-id=8465%3A2&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "I07",
+      "label": "Preview shared change",
+      "to": "I15",
+      "source": "8468:244564",
+      "x": 1265,
+      "y": 683,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-16&starting-point-node-id=8465%3A2&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "I15",
+      "label": "Apply class change",
+      "to": "I17",
+      "source": "8468:245600",
+      "x": 1265,
+      "y": 567,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-18&starting-point-node-id=8465%3A2&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "I17",
+      "label": "Undo shared change",
+      "to": "I07",
+      "source": "8468:245828",
+      "x": 1265,
+      "y": 379,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-8&starting-point-node-id=8465%3A2&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "I04",
+      "label": "Two columns",
+      "to": "I12",
+      "source": "8468:496",
+      "x": 1265,
+      "y": 727,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-5&starting-point-node-id=8465%3A5&hide-ui=1",
+      "pass": false
+    }
+  ]
+}

@@ -1,0 +1,771 @@
+{
+  "scope": "Read-only post-repair R45 native audit. Current authored default geometry only; no Figma state writes or browser traversal.",
+  "sourceScripts": [
+    "r45-workflow-repair.js",
+    "r45-visibility-native-qa.js"
+  ],
+  "referenceSummary": {
+    "roots": 7,
+    "nodes": 714,
+    "visibleNodes": 292,
+    "instances": 227,
+    "uniqueComponents": 5,
+    "uniqueDestinations": 52,
+    "referencedVariables": 4904,
+    "missing": 0,
+    "errors": 0
+  },
+  "layoutSummary": {
+    "geometryChecks": 285,
+    "expectedScrolling": 0,
+    "clippingCandidates": 0,
+    "unclippedOverflow": 0,
+    "skippedRotated": 0
+  },
+  "workflowChecks": {
+    "checks": 31,
+    "passed": 31,
+    "failed": [],
+    "assertions": [
+      {
+        "label": "Duplicate Image decorative row hidden",
+        "actual": false,
+        "expected": false,
+        "pass": true
+      },
+      {
+        "label": "Duplicate Image row has no removed action",
+        "actual": 0,
+        "expected": 0,
+        "pass": true
+      },
+      {
+        "label": "Actual selected row retains visible state 8843:16833",
+        "actual": true,
+        "expected": true,
+        "pass": true
+      },
+      {
+        "label": "Actual selected row has no canvas visibility binding 8843:16833",
+        "actual": false,
+        "expected": false,
+        "pass": true
+      },
+      {
+        "label": "Actual selected row has one reaction 8843:16833",
+        "actual": 1,
+        "expected": 1,
+        "pass": true
+      },
+      {
+        "label": "Actual row uses existing selected paint 8843:16833",
+        "actual": [
+          {
+            "type": "SOLID",
+            "visible": true,
+            "opacity": 1,
+            "blendMode": "NORMAL",
+            "color": {
+              "r": 0.10196078568696976,
+              "g": 0.33725491166114807,
+              "b": 0.8588235378265381
+            },
+            "boundVariables": {
+              "color": {
+                "type": "VARIABLE_ALIAS",
+                "id": "VariableID:8322:790"
+              }
+            }
+          }
+        ],
+        "expected": [
+          {
+            "type": "SOLID",
+            "visible": true,
+            "opacity": 1,
+            "blendMode": "NORMAL",
+            "color": {
+              "r": 0.10196078568696976,
+              "g": 0.33725491166114807,
+              "b": 0.8588235378265381
+            },
+            "boundVariables": {
+              "color": {
+                "type": "VARIABLE_ALIAS",
+                "id": "VariableID:8322:790"
+              }
+            }
+          }
+        ],
+        "pass": true
+      },
+      {
+        "label": "Actual row label uses existing selected text paint 8843:16833",
+        "actual": true,
+        "expected": true,
+        "pass": true
+      },
+      {
+        "label": "Actual selected row retains visible state 8843:20492",
+        "actual": true,
+        "expected": true,
+        "pass": true
+      },
+      {
+        "label": "Actual selected row has no canvas visibility binding 8843:20492",
+        "actual": false,
+        "expected": false,
+        "pass": true
+      },
+      {
+        "label": "Actual selected row has one reaction 8843:20492",
+        "actual": 1,
+        "expected": 1,
+        "pass": true
+      },
+      {
+        "label": "Actual row uses existing selected paint 8843:20492",
+        "actual": [
+          {
+            "type": "SOLID",
+            "visible": true,
+            "opacity": 1,
+            "blendMode": "NORMAL",
+            "color": {
+              "r": 0.10196078568696976,
+              "g": 0.33725491166114807,
+              "b": 0.8588235378265381
+            },
+            "boundVariables": {
+              "color": {
+                "type": "VARIABLE_ALIAS",
+                "id": "VariableID:8322:790"
+              }
+            }
+          }
+        ],
+        "expected": [
+          {
+            "type": "SOLID",
+            "visible": true,
+            "opacity": 1,
+            "blendMode": "NORMAL",
+            "color": {
+              "r": 0.10196078568696976,
+              "g": 0.33725491166114807,
+              "b": 0.8588235378265381
+            },
+            "boundVariables": {
+              "color": {
+                "type": "VARIABLE_ALIAS",
+                "id": "VariableID:8322:790"
+              }
+            }
+          }
+        ],
+        "pass": true
+      },
+      {
+        "label": "Actual row label uses existing selected text paint 8843:20492",
+        "actual": true,
+        "expected": true,
+        "pass": true
+      },
+      {
+        "label": "Result moved to shared Style panel",
+        "actual": "8841:14865",
+        "expected": "8841:14865",
+        "pass": true
+      },
+      {
+        "label": "Result follows Display immediately",
+        "actual": 4,
+        "expected": 4,
+        "pass": true
+      },
+      {
+        "label": "Result keeps finite active visibility gate",
+        "actual": "VariableID:9064:17499",
+        "expected": "VariableID:9064:17499",
+        "pass": true
+      },
+      {
+        "label": "Undo retains result parent",
+        "actual": "9064:17596",
+        "expected": "9064:17596",
+        "pass": true
+      },
+      {
+        "label": "Undo has no collapsed Visibility ancestor",
+        "actual": false,
+        "expected": false,
+        "pass": true
+      },
+      {
+        "label": "Undo keeps own undo-available binding",
+        "actual": "VariableID:9064:17504",
+        "expected": "VariableID:9064:17504",
+        "pass": true
+      },
+      {
+        "label": "Undo retains existing click action",
+        "actual": 1,
+        "expected": 1,
+        "pass": true
+      },
+      {
+        "label": "Helper moved into Visibility body",
+        "actual": "8841:15284",
+        "expected": "8841:15284",
+        "pass": true
+      },
+      {
+        "label": "Helper gated by active finite fixture",
+        "actual": "VariableID:9064:17499",
+        "expected": "VariableID:9064:17499",
+        "pass": true
+      },
+      {
+        "label": "Website width binding preserved 8843:17103",
+        "actual": "VariableID:8843:17104",
+        "expected": "VariableID:8843:17104",
+        "pass": true
+      },
+      {
+        "label": "Outer viewport uses local workspace paint 8843:16845",
+        "actual": [
+          {
+            "type": "SOLID",
+            "visible": true,
+            "opacity": 1,
+            "blendMode": "NORMAL",
+            "color": {
+              "r": 0.95686274766922,
+              "g": 0.9647058844566345,
+              "b": 0.9764705896377563
+            },
+            "boundVariables": {
+              "color": {
+                "type": "VARIABLE_ALIAS",
+                "id": "VariableID:8322:788"
+              }
+            }
+          }
+        ],
+        "expected": [
+          {
+            "type": "SOLID",
+            "visible": true,
+            "opacity": 1,
+            "blendMode": "NORMAL",
+            "color": {
+              "r": 0.95686274766922,
+              "g": 0.9647058844566345,
+              "b": 0.9764705896377563
+            },
+            "boundVariables": {
+              "color": {
+                "type": "VARIABLE_ALIAS",
+                "id": "VariableID:8322:788"
+              }
+            }
+          }
+        ],
+        "pass": true
+      },
+      {
+        "label": "Outer viewport centers website 8843:16845",
+        "actual": "CENTER",
+        "expected": "CENTER",
+        "pass": true
+      },
+      {
+        "label": "Website edge uses existing navigation border 8843:17103",
+        "actual": [
+          {
+            "type": "SOLID",
+            "visible": true,
+            "opacity": 1,
+            "blendMode": "NORMAL",
+            "color": {
+              "r": 0.8941176533699036,
+              "g": 0.9098039269447327,
+              "b": 0.9372549057006836
+            },
+            "boundVariables": {
+              "color": {
+                "type": "VARIABLE_ALIAS",
+                "id": "VariableID:8322:784"
+              }
+            }
+          }
+        ],
+        "expected": [
+          {
+            "type": "SOLID",
+            "visible": true,
+            "opacity": 1,
+            "blendMode": "NORMAL",
+            "color": {
+              "r": 0.8941176533699036,
+              "g": 0.9098039269447327,
+              "b": 0.9372549057006836
+            },
+            "boundVariables": {
+              "color": {
+                "type": "VARIABLE_ALIAS",
+                "id": "VariableID:8322:784"
+              }
+            }
+          }
+        ],
+        "pass": true
+      },
+      {
+        "label": "Website edge is 1px inside 8843:17103",
+        "actual": [
+          1,
+          "INSIDE"
+        ],
+        "expected": [
+          1,
+          "INSIDE"
+        ],
+        "pass": true
+      },
+      {
+        "label": "Website width binding preserved 8843:20774",
+        "actual": "VariableID:8843:20775",
+        "expected": "VariableID:8843:20775",
+        "pass": true
+      },
+      {
+        "label": "Outer viewport uses local workspace paint 8843:20504",
+        "actual": [
+          {
+            "type": "SOLID",
+            "visible": true,
+            "opacity": 1,
+            "blendMode": "NORMAL",
+            "color": {
+              "r": 0.95686274766922,
+              "g": 0.9647058844566345,
+              "b": 0.9764705896377563
+            },
+            "boundVariables": {
+              "color": {
+                "type": "VARIABLE_ALIAS",
+                "id": "VariableID:8322:788"
+              }
+            }
+          }
+        ],
+        "expected": [
+          {
+            "type": "SOLID",
+            "visible": true,
+            "opacity": 1,
+            "blendMode": "NORMAL",
+            "color": {
+              "r": 0.95686274766922,
+              "g": 0.9647058844566345,
+              "b": 0.9764705896377563
+            },
+            "boundVariables": {
+              "color": {
+                "type": "VARIABLE_ALIAS",
+                "id": "VariableID:8322:788"
+              }
+            }
+          }
+        ],
+        "pass": true
+      },
+      {
+        "label": "Outer viewport centers website 8843:20504",
+        "actual": "CENTER",
+        "expected": "CENTER",
+        "pass": true
+      },
+      {
+        "label": "Website edge uses existing navigation border 8843:20774",
+        "actual": [
+          {
+            "type": "SOLID",
+            "visible": true,
+            "opacity": 1,
+            "blendMode": "NORMAL",
+            "color": {
+              "r": 0.8941176533699036,
+              "g": 0.9098039269447327,
+              "b": 0.9372549057006836
+            },
+            "boundVariables": {
+              "color": {
+                "type": "VARIABLE_ALIAS",
+                "id": "VariableID:8322:784"
+              }
+            }
+          }
+        ],
+        "expected": [
+          {
+            "type": "SOLID",
+            "visible": true,
+            "opacity": 1,
+            "blendMode": "NORMAL",
+            "color": {
+              "r": 0.8941176533699036,
+              "g": 0.9098039269447327,
+              "b": 0.9372549057006836
+            },
+            "boundVariables": {
+              "color": {
+                "type": "VARIABLE_ALIAS",
+                "id": "VariableID:8322:784"
+              }
+            }
+          }
+        ],
+        "pass": true
+      },
+      {
+        "label": "Website edge is 1px inside 8843:20774",
+        "actual": [
+          1,
+          "INSIDE"
+        ],
+        "expected": [
+          1,
+          "INSIDE"
+        ],
+        "pass": true
+      }
+    ]
+  },
+  "missingRoots": [],
+  "missingComponents": [],
+  "componentErrors": [],
+  "missingDestinations": [],
+  "destinationErrors": [],
+  "missingVariables": [],
+  "variableErrors": [],
+  "clippingCandidates": [],
+  "unclippedOverflow": [],
+  "expectedScrolling": [],
+  "componentIds": [
+    "8627:621",
+    "8314:3",
+    "8314:7",
+    "8314:5",
+    "8531:318"
+  ],
+  "reactionDestinations": [
+    "8581:11856",
+    "8628:12749",
+    "8628:12592",
+    "8581:11797",
+    "8465:31",
+    "8581:11815",
+    "8465:46",
+    "8539:9190",
+    "8581:11846",
+    "8539:9339",
+    "8539:9433",
+    "8841:14864",
+    "8539:9579",
+    "8539:9786",
+    "8539:9881",
+    "8539:9974",
+    "8465:8",
+    "8465:2",
+    "8465:10",
+    "8465:9",
+    "8465:5",
+    "8844:16149",
+    "8841:14872",
+    "8844:264993",
+    "8465:3",
+    "9064:20058",
+    "8539:12728",
+    "8844:265209",
+    "9064:20114",
+    "8844:264650",
+    "9064:17601",
+    "8844:265290",
+    "9051:17536",
+    "8844:265268",
+    "8863:17177",
+    "8863:17140",
+    "8990:17560",
+    "8844:264670",
+    "8844:264690",
+    "8844:264710",
+    "8844:264727",
+    "8844:264744",
+    "8844:264764",
+    "8844:265243",
+    "8844:264784",
+    "8844:264801",
+    "8844:264818",
+    "8844:264838",
+    "8844:264855",
+    "8844:264872",
+    "8843:20467",
+    "8843:16808"
+  ],
+  "selectedBindings": [
+    {
+      "id": "8843:17107",
+      "name": "Selected / Heading",
+      "type": "FRAME",
+      "parentId": "8843:17103",
+      "width": 654,
+      "height": 77,
+      "visible": true,
+      "horizontal": "FILL",
+      "vertical": "HUG",
+      "layoutMode": "VERTICAL",
+      "boundVariables": {
+        "visible": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:9064:17517"
+        }
+      },
+      "expectedVisibilityVariable": "VariableID:9064:17517",
+      "matches": true
+    },
+    {
+      "id": "8843:20778",
+      "name": "Selected / Image",
+      "type": "FRAME",
+      "parentId": "8843:20774",
+      "width": 654,
+      "height": 200,
+      "visible": true,
+      "horizontal": "FILL",
+      "vertical": "FIXED",
+      "layoutMode": "VERTICAL",
+      "boundVariables": {
+        "visible": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:9064:17554"
+        }
+      },
+      "expectedVisibilityVariable": "VariableID:9064:17554",
+      "matches": true
+    }
+  ],
+  "tabletGates": [
+    {
+      "id": "8843:17018",
+      "name": "Action / Settings",
+      "binding": {
+        "type": "VARIABLE_ALIAS",
+        "id": "VariableID:9064:17519"
+      },
+      "expected": "VariableID:9064:17519",
+      "matches": true
+    },
+    {
+      "id": "8843:17020",
+      "name": "Action / Interactions",
+      "binding": {
+        "type": "VARIABLE_ALIAS",
+        "id": "VariableID:9064:17519"
+      },
+      "expected": "VariableID:9064:17519",
+      "matches": true
+    },
+    {
+      "id": "8843:20677",
+      "name": "Action / Settings",
+      "binding": {
+        "type": "VARIABLE_ALIAS",
+        "id": "VariableID:9064:17556"
+      },
+      "expected": "VariableID:9064:17556",
+      "matches": true
+    },
+    {
+      "id": "8843:20679",
+      "name": "Action / Interactions",
+      "binding": {
+        "type": "VARIABLE_ALIAS",
+        "id": "VariableID:9064:17556"
+      },
+      "expected": "VariableID:9064:17556",
+      "matches": true
+    }
+  ],
+  "affectedGeometry": [
+    {
+      "id": "8843:16833",
+      "name": "Action / Heading",
+      "parentId": "8843:16822",
+      "x": 17,
+      "y": 389,
+      "width": 184,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "id": "8843:20492",
+      "name": "Action / Image",
+      "parentId": "8843:20481",
+      "x": 17,
+      "y": 389,
+      "width": 184,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "id": "8912:17353",
+      "name": "Current selection / Image",
+      "parentId": "8843:20481",
+      "x": 17,
+      "y": 549,
+      "width": 184,
+      "height": 32,
+      "visible": false
+    },
+    {
+      "id": "8843:16845",
+      "name": "Canvas viewport",
+      "parentId": "8843:16839",
+      "x": 24,
+      "y": 76,
+      "width": 824,
+      "height": 762,
+      "visible": true
+    },
+    {
+      "id": "8843:20504",
+      "name": "Canvas viewport",
+      "parentId": "8843:20498",
+      "x": 24,
+      "y": 76,
+      "width": 824,
+      "height": 762,
+      "visible": true
+    },
+    {
+      "id": "8843:17103",
+      "name": "Website / Heading",
+      "parentId": "8843:16845",
+      "x": 52,
+      "y": 24,
+      "width": 720,
+      "height": 540,
+      "visible": true,
+      "widthBinding": {
+        "type": "VARIABLE_ALIAS",
+        "id": "VariableID:8843:17104"
+      }
+    },
+    {
+      "id": "8843:20774",
+      "name": "Website / Image",
+      "parentId": "8843:20504",
+      "x": 52,
+      "y": 24,
+      "width": 720,
+      "height": 540,
+      "visible": true,
+      "widthBinding": {
+        "type": "VARIABLE_ALIAS",
+        "id": "VariableID:8843:20775"
+      }
+    },
+    {
+      "id": "9064:17596",
+      "name": "R45 / Visibility status and Undo",
+      "parentId": "8841:14865",
+      "x": 0,
+      "y": 0,
+      "width": 318,
+      "height": 32,
+      "visible": false,
+      "visibilityBinding": {
+        "type": "VARIABLE_ALIAS",
+        "id": "VariableID:9064:17499"
+      }
+    },
+    {
+      "id": "9064:17597",
+      "name": "Each choice affects its named device, regardless of the preview. Display can still hide an enabled device.",
+      "parentId": "8841:15284",
+      "x": 0,
+      "y": 0,
+      "width": 318,
+      "height": 60,
+      "visible": false,
+      "visibilityBinding": {
+        "type": "VARIABLE_ALIAS",
+        "id": "VariableID:9064:17499"
+      }
+    },
+    {
+      "id": "9064:17599",
+      "name": "Action / Undo visibility or Display",
+      "parentId": "9064:17596",
+      "x": 24,
+      "y": 470,
+      "width": 318,
+      "height": 32,
+      "visible": false,
+      "visibilityBinding": {
+        "type": "VARIABLE_ALIAS",
+        "id": "VariableID:9064:17504"
+      }
+    },
+    {
+      "id": "9064:17586",
+      "name": "R45 / Display and origin",
+      "parentId": "8841:14865",
+      "x": 17,
+      "y": 153,
+      "width": 318,
+      "height": 32,
+      "visible": false,
+      "visibilityBinding": {
+        "type": "VARIABLE_ALIAS",
+        "id": "VariableID:9064:17500"
+      }
+    },
+    {
+      "id": "8841:15284",
+      "name": "Controls / Visibility",
+      "parentId": "8841:14865",
+      "x": 17,
+      "y": 537,
+      "width": 318,
+      "height": 10,
+      "visible": false,
+      "visibilityBinding": {
+        "type": "VARIABLE_ALIAS",
+        "id": "VariableID:8841:15285"
+      }
+    },
+    {
+      "id": "8841:14865",
+      "name": "Task panel / Style",
+      "parentId": "8841:14864",
+      "x": 1088,
+      "y": 56,
+      "width": 352,
+      "height": 920,
+      "visible": true
+    }
+  ],
+  "caveats": [
+    "Current authored default geometry only; no native variable mutation, browser state traversal or provider/source runtime testing.",
+    "Tablet tab/color gates are inspected bindings/actions, not newly browser-played interactions.",
+    "Older alternate routes are not assigned finite Heading/Image ownership by caller string alone.",
+    "Flex/Grid value changes do not establish actual Flex/Grid layout or dependent-control eligibility in this bounded visibility task."
+  ],
+  "mutatedNodeIds": [],
+  "mutatedVariableIds": [],
+  "checkpoint": "R45 targeted workflow repair; Buildrick UI retained",
+  "reviewedAt": "2026-10-14"
+}

@@ -1,0 +1,10 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"mutatedNodeIds\":[\"419:55254\",\"I419:55257;4:311\",\"I419:55259;4:269\",\"421:50003\",\"I421:50006;4:311\",\"I421:50008;4:269\"],\"managerColumns\":[{\"id\":\"419:51844\",\"name\":\"Class list\",\"w\":340,\"h\":348,\"children\":[{\"id\":\"419:51845\",\"name\":\"CLASSES\",\"w\":340,\"h\":16},{\"id\":\"419:51846\",\"name\":\".hero-heading\",\"w\":340,\"h\":76},{\"id\":\"419:51850\",\"name\":\".hero-heading + is-large\",\"w\":340,\"h\":76},{\"id\":\"419:51854\",\"name\":\".old-title\",\"w\":340,\"h\":76},{\"id\":\"419:51858\",\"name\":\"Clean up unused\",\"w\":340,\"h\":32},{\"id\":\"419:51860\",\"name\":\"Find matching local styles\",\"w\":340,\"h\":32}]},{\"id\":\"419:51862\",\"name\":\"Selected class detail\",\"w\":732,\"h\":532,\"children\":[{\"id\":\"419:51863\",\"name\":\".hero-heading\",\"w\":700,\"h\":24},{\"id\":\"419:51864\",\"name\":\"2 elements on Home and About\",\"w\":700,\"h\":16},{\"id\":\"419:51865\",\"name\":\"Tablet · Default state\",\"w\":700,\"h\":16},{\"id\":\"419:51866\",\"name\":\"font-size: 36px;\\nline-height: 1.2;\",\"w\":700,\"h\":32},{\"id\":\"419:51867\",\"name\":\"Read-only CSS preview. Local overrides may shadow these rules.\",\"w\":700,\"h\":16},{\"id\":\"419:51868\",\"name\":\"Edit shared styles\",\"w\":340,\"h\":32},{\"id\":\"421:52810\",\"name\":\"Manage class\",\"w\":700,\"h\":16},{\"id\":\"419:51870\",\"name\":\"Rename class\",\"w\":340,\"h\":32},{\"id\":\"419:51872\",\"name\":\"Duplicate for selected element\",\"w\":340,\"h\":32},{\"id\":\"419:51874\",\"name\":\"Delete class\",\"w\":340,\"h\":32},{\"id\":\"421:52811\",\"name\":\"Used on\",\"w\":700,\"h\":16},{\"id\":\"419:51876\",\"name\":\"Select Home / Hero heading\",\"w\":340,\"h\":32},{\"id\":\"419:51878\",\"name\":\"Locate About / About heading\",\"w\":340,\"h\":32},{\"id\":\"419:51880\",\"name\":\"Delete is unavailable while 2 elements use this class. Remove membership first.\",\"w\":700,\"h\":16}]}]}"
+    }
+  ],
+  "structuredContent": null,
+  "isError": false
+}

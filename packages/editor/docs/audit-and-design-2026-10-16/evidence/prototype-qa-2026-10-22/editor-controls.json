@@ -1,0 +1,1638 @@
+{
+  "page": "3:4",
+  "scope": "editor native graph updated from 2026-10-22 keyboard and hub write ledgers; not playback evidence",
+  "rootCount": 19,
+  "controlReactions": 85,
+  "invalidDestinations": [],
+  "frames": [
+    {
+      "id": "63:6393",
+      "name": "B3-P01 \u00b7 Pages / manage without switching",
+      "w": 1440,
+      "h": 900,
+      "controls": [
+        {
+          "id": "63:6932",
+          "name": "More page actions",
+          "text": "",
+          "visible": true,
+          "x": 273,
+          "y": 85,
+          "w": 32,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "65:17148"
+            }
+          ]
+        },
+        {
+          "id": "63:6907",
+          "name": "Close Pages \u00b7 5",
+          "text": "",
+          "visible": true,
+          "x": 313,
+          "y": 85,
+          "w": 32,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "7:20634"
+            }
+          ]
+        },
+        {
+          "id": "63:6927",
+          "name": "Button",
+          "text": "Listings",
+          "visible": true,
+          "x": 200.00000762939453,
+          "y": 180,
+          "w": 83.33332824707031,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "63:21262"
+            }
+          ]
+        },
+        {
+          "id": "63:6929",
+          "name": "Button",
+          "text": "Structure",
+          "visible": true,
+          "x": 285.3333206176758,
+          "y": 180,
+          "w": 83.33332824707031,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "63:21939"
+            }
+          ]
+        },
+        {
+          "id": "63:6956",
+          "name": "PageResourceRow",
+          "text": "About /about ",
+          "visible": true,
+          "x": 199,
+          "y": 282,
+          "w": 260,
+          "h": 40,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "94:12846"
+            }
+          ]
+        },
+        {
+          "id": "I63:6956;62:1585",
+          "name": "Page actions",
+          "text": "",
+          "visible": true,
+          "x": 305,
+          "y": 282,
+          "w": 32,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "63:13820"
+            }
+          ]
+        },
+        {
+          "id": "63:7055",
+          "name": "Button",
+          "text": "+ Add page",
+          "visible": true,
+          "x": 121,
+          "y": 807,
+          "w": 112,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "101:36828"
+            }
+          ]
+        },
+        {
+          "id": "63:7057",
+          "name": "Button",
+          "text": "From template",
+          "visible": true,
+          "x": 131,
+          "y": 843,
+          "w": 132,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "101:29978"
+            }
+          ]
+        },
+        {
+          "id": "63:7060",
+          "name": "New folder",
+          "text": "New folder",
+          "visible": true,
+          "x": 267,
+          "y": 843,
+          "w": 132,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "127:36696"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "101:29978",
+      "name": "B3-P54 \u00b7 New page / choose source",
+      "w": 1440,
+      "h": 900,
+      "controls": [
+        {
+          "id": "101:29978",
+          "name": "B3-P54 \u00b7 New page / choose source",
+          "text": "Exit Fieldwork Studio Site settings In review \u00b7 2 Preview Publish Add Layers Pages Assets CMS Brand Help Layers Search layers Home Navigation Hero Eyebrow Headl",
+          "visible": true,
+          "x": 720,
+          "y": 450,
+          "w": 1440,
+          "h": 900,
+          "trigger": "ON_KEY_DOWN",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "63:6393"
+            }
+          ]
+        },
+        {
+          "id": "101:30656",
+          "name": "Modal scrim / background inactive",
+          "text": "",
+          "visible": true,
+          "x": 720,
+          "y": 450,
+          "w": 1440,
+          "h": 900,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "63:6393"
+            }
+          ]
+        },
+        {
+          "id": "101:30674",
+          "name": "Source / Blank",
+          "text": "Blank",
+          "visible": true,
+          "x": 499,
+          "y": 440,
+          "w": 148,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "101:36828"
+            }
+          ]
+        },
+        {
+          "id": "101:30688",
+          "name": "Cancel",
+          "text": "Cancel",
+          "visible": true,
+          "x": 817,
+          "y": 596,
+          "w": 80,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "63:6393"
+            }
+          ]
+        },
+        {
+          "id": "101:30690",
+          "name": "Choose template",
+          "text": "Choose template",
+          "visible": true,
+          "x": 940,
+          "y": 596,
+          "w": 150,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "104:28892"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "101:36828",
+      "name": "B3-P55 \u00b7 New page / Blank default",
+      "w": 1440,
+      "h": 900,
+      "controls": [
+        {
+          "id": "101:36828",
+          "name": "B3-P55 \u00b7 New page / Blank default",
+          "text": "Exit Fieldwork Studio Site settings In review \u00b7 2 Preview Publish Add Layers Pages Assets CMS Brand Help Layers Search layers Home Navigation Hero Eyebrow Headl",
+          "visible": true,
+          "x": 720,
+          "y": 450,
+          "w": 1440,
+          "h": 900,
+          "trigger": "ON_KEY_DOWN",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "63:6393"
+            }
+          ]
+        },
+        {
+          "id": "101:37506",
+          "name": "Modal scrim / background inactive",
+          "text": "",
+          "visible": true,
+          "x": 720,
+          "y": 450,
+          "w": 1440,
+          "h": 900,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "63:6393"
+            }
+          ]
+        },
+        {
+          "id": "101:37526",
+          "name": "Source / From template",
+          "text": "From template",
+          "visible": true,
+          "x": 671,
+          "y": 440,
+          "w": 180,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "101:29978"
+            }
+          ]
+        },
+        {
+          "id": "101:37538",
+          "name": "Cancel",
+          "text": "Cancel",
+          "visible": true,
+          "x": 817,
+          "y": 596,
+          "w": 80,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "63:6393"
+            }
+          ]
+        },
+        {
+          "id": "101:37540",
+          "name": "Create page",
+          "text": "Create page",
+          "visible": true,
+          "x": 940,
+          "y": 596,
+          "w": 150,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "101:38980"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "101:38980",
+      "name": "B3-P58 \u00b7 New page / checking capacity",
+      "w": 1440,
+      "h": 900,
+      "controls": [
+        {
+          "id": "101:38980",
+          "name": "B3-P58 \u00b7 New page / checking capacity",
+          "text": "Exit Fieldwork Studio Site settings In review \u00b7 2 Preview Publish Add Layers Pages Assets CMS Brand Help Layers Search layers Home Navigation Hero Eyebrow Headl",
+          "visible": true,
+          "x": 720,
+          "y": 450,
+          "w": 1440,
+          "h": 900,
+          "trigger": "AFTER_TIMEOUT",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "101:41858"
+            }
+          ]
+        },
+        {
+          "id": "101:39658",
+          "name": "Modal scrim / background inactive",
+          "text": "",
+          "visible": true,
+          "x": 720,
+          "y": 450,
+          "w": 1440,
+          "h": 900,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "63:6393"
+            }
+          ]
+        },
+        {
+          "id": "101:39691",
+          "name": "Cancel",
+          "text": "Cancel",
+          "visible": true,
+          "x": 817,
+          "y": 614,
+          "w": 80,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "63:6393"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "423:96903",
+      "name": "TX01 \u00b7 Text selected / Enter edits",
+      "w": 1440,
+      "h": 900,
+      "controls": [
+        {
+          "id": "423:96966",
+          "name": "Thoughtful design. Lasting impact.",
+          "text": "Thoughtful design. Lasting impact.",
+          "visible": true,
+          "x": 740,
+          "y": 229,
+          "w": 688,
+          "h": 42,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:97218"
+            }
+          ]
+        },
+        {
+          "id": "423:97216",
+          "name": "Edit text",
+          "text": "Edit text",
+          "visible": true,
+          "x": 1291,
+          "y": 389,
+          "w": 276,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:97218"
+            }
+          ]
+        },
+        {
+          "id": "423:97005",
+          "name": "Prototype scenarios",
+          "text": "Review",
+          "visible": true,
+          "x": 1397,
+          "y": 883,
+          "w": 68,
+          "h": 28,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:100464"
+            }
+          ]
+        },
+        {
+          "id": "423:96903",
+          "name": "TX01 \u00b7 Text selected / Enter edits",
+          "visible": true,
+          "x": 720.0,
+          "y": 450.0,
+          "w": 1440,
+          "h": 900,
+          "trigger": "ON_KEY_DOWN",
+          "keyCodes": [
+            13
+          ],
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:97218"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "423:97218",
+      "name": "TX02 \u00b7 Inline editing / compact controls",
+      "w": 1440,
+      "h": 900,
+      "controls": [
+        {
+          "id": "423:97320",
+          "name": "Prototype scenarios",
+          "text": "Review",
+          "visible": true,
+          "x": 1397,
+          "y": 883,
+          "w": 68,
+          "h": 28,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:100464"
+            }
+          ]
+        },
+        {
+          "id": "423:97543",
+          "name": "Text / Link",
+          "text": "Link",
+          "visible": true,
+          "x": 824,
+          "y": 170,
+          "w": 48,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:98532"
+            }
+          ]
+        },
+        {
+          "id": "423:97545",
+          "name": "Text / More formatting",
+          "text": "\u2026",
+          "visible": true,
+          "x": 876,
+          "y": 170,
+          "w": 40,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:98182"
+            }
+          ]
+        },
+        {
+          "id": "423:97548",
+          "name": "Done",
+          "text": "Done",
+          "visible": true,
+          "x": 961,
+          "y": 170,
+          "w": 64,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:97552"
+            }
+          ]
+        },
+        {
+          "id": "423:97218",
+          "name": "TX02 \u00b7 Inline editing / compact controls",
+          "visible": true,
+          "x": 720.0,
+          "y": 450.0,
+          "w": 1440,
+          "h": 900,
+          "trigger": "ON_KEY_DOWN",
+          "keyCodes": [
+            27
+          ],
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:97552"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "423:97552",
+      "name": "TX03 \u00b7 Text committed / Escape and Done agree",
+      "w": 1440,
+      "h": 900,
+      "controls": [
+        {
+          "id": "423:97860",
+          "name": "Edit text",
+          "text": "Edit text",
+          "visible": true,
+          "x": 1291,
+          "y": 389,
+          "w": 276,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:97218"
+            }
+          ]
+        },
+        {
+          "id": "423:97654",
+          "name": "Prototype scenarios",
+          "text": "Review",
+          "visible": true,
+          "x": 1397,
+          "y": 883,
+          "w": 68,
+          "h": 28,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:100464"
+            }
+          ]
+        },
+        {
+          "id": "423:97864",
+          "name": "Undo",
+          "text": "Undo",
+          "visible": true,
+          "x": 1358,
+          "y": 836,
+          "w": 100,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:97866"
+            }
+          ]
+        },
+        {
+          "id": "423:97552",
+          "name": "TX03 \u00b7 Text committed / Escape and Done agree",
+          "visible": true,
+          "x": 720.0,
+          "y": 450.0,
+          "w": 1440,
+          "h": 900,
+          "trigger": "ON_KEY_DOWN",
+          "keyCodes": [
+            13
+          ],
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:97218"
+            }
+          ]
+        },
+        {
+          "id": "423:97552",
+          "name": "TX03 \u00b7 Text committed / Escape and Done agree",
+          "visible": true,
+          "x": 720.0,
+          "y": 450.0,
+          "w": 1440,
+          "h": 900,
+          "trigger": "ON_KEY_DOWN",
+          "keyCodes": [
+            91,
+            90
+          ],
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:97866"
+            }
+          ]
+        },
+        {
+          "id": "423:97552",
+          "name": "TX03 \u00b7 Text committed / Escape and Done agree",
+          "visible": true,
+          "x": 720.0,
+          "y": 450.0,
+          "w": 1440,
+          "h": 900,
+          "trigger": "ON_KEY_DOWN",
+          "keyCodes": [
+            17,
+            90
+          ],
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:97866"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "423:97866",
+      "name": "TX04 \u00b7 Undo text / previous content restored",
+      "w": 1440,
+      "h": 900,
+      "controls": [
+        {
+          "id": "423:98174",
+          "name": "Edit text",
+          "text": "Edit text",
+          "visible": true,
+          "x": 1291,
+          "y": 389,
+          "w": 276,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:97218"
+            }
+          ]
+        },
+        {
+          "id": "423:97968",
+          "name": "Prototype scenarios",
+          "text": "Review",
+          "visible": true,
+          "x": 1397,
+          "y": 883,
+          "w": 68,
+          "h": 28,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:100464"
+            }
+          ]
+        },
+        {
+          "id": "423:97866",
+          "name": "TX04 \u00b7 Undo text / previous content restored",
+          "visible": true,
+          "x": 720.0,
+          "y": 450.0,
+          "w": 1440,
+          "h": 900,
+          "trigger": "ON_KEY_DOWN",
+          "keyCodes": [
+            13
+          ],
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:97218"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "423:98182",
+      "name": "TX05 \u00b7 More formatting / preserve all existing tools",
+      "w": 1440,
+      "h": 900,
+      "controls": [
+        {
+          "id": "423:98284",
+          "name": "Prototype scenarios",
+          "text": "Review",
+          "visible": true,
+          "x": 1397,
+          "y": 883,
+          "w": 68,
+          "h": 28,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:100464"
+            }
+          ]
+        },
+        {
+          "id": "423:98512",
+          "name": "Done",
+          "text": "Done",
+          "visible": true,
+          "x": 961,
+          "y": 170,
+          "w": 64,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:97552"
+            }
+          ]
+        },
+        {
+          "id": "423:98527",
+          "name": "Close menu",
+          "text": "Close menu",
+          "visible": true,
+          "x": 876,
+          "y": 404,
+          "w": 216,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:97218"
+            }
+          ]
+        },
+        {
+          "id": "423:98182",
+          "name": "TX05 \u00b7 More formatting / preserve all existing tools",
+          "visible": true,
+          "x": 720.0,
+          "y": 450.0,
+          "w": 1440,
+          "h": 900,
+          "trigger": "ON_KEY_DOWN",
+          "keyCodes": [
+            27
+          ],
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:97218"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "423:98532",
+      "name": "TX06 \u00b7 Inline link / text selection retained",
+      "w": 1440,
+      "h": 900,
+      "controls": [
+        {
+          "id": "423:98634",
+          "name": "Prototype scenarios",
+          "text": "Review",
+          "visible": true,
+          "x": 1397,
+          "y": 883,
+          "w": 68,
+          "h": 28,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:100464"
+            }
+          ]
+        },
+        {
+          "id": "423:98875",
+          "name": "Cancel",
+          "text": "Cancel",
+          "visible": true,
+          "x": 798,
+          "y": 460,
+          "w": 72,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:97218"
+            }
+          ]
+        },
+        {
+          "id": "423:98878",
+          "name": "Apply link",
+          "text": "Apply link",
+          "visible": true,
+          "x": 889,
+          "y": 460,
+          "w": 94,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:98884"
+            }
+          ]
+        },
+        {
+          "id": "423:98532",
+          "name": "TX06 \u00b7 Inline link / text selection retained",
+          "visible": true,
+          "x": 720.0,
+          "y": 450.0,
+          "w": 1440,
+          "h": 900,
+          "trigger": "ON_KEY_DOWN",
+          "keyCodes": [
+            27
+          ],
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:97218"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "423:98884",
+      "name": "TX07 \u00b7 Inline link applied / draft remains",
+      "w": 1440,
+      "h": 900,
+      "controls": [
+        {
+          "id": "423:98986",
+          "name": "Prototype scenarios",
+          "text": "Review",
+          "visible": true,
+          "x": 1397,
+          "y": 883,
+          "w": 68,
+          "h": 28,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:100464"
+            }
+          ]
+        },
+        {
+          "id": "423:99214",
+          "name": "Done",
+          "text": "Done",
+          "visible": true,
+          "x": 961,
+          "y": 170,
+          "w": 64,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:99224"
+            }
+          ]
+        },
+        {
+          "id": "423:98884",
+          "name": "TX07 \u00b7 Inline link applied / draft remains",
+          "visible": true,
+          "x": 720.0,
+          "y": 450.0,
+          "w": 1440,
+          "h": 900,
+          "trigger": "ON_KEY_DOWN",
+          "keyCodes": [
+            27
+          ],
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:99224"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "423:99224",
+      "name": "TX11 \u00b7 Linked text committed / link preserved",
+      "w": 1440,
+      "h": 900,
+      "controls": [
+        {
+          "id": "423:99532",
+          "name": "Edit text",
+          "text": "Edit text",
+          "visible": true,
+          "x": 1291,
+          "y": 389,
+          "w": 276,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:98884"
+            }
+          ]
+        },
+        {
+          "id": "423:99326",
+          "name": "Prototype scenarios",
+          "text": "Review",
+          "visible": true,
+          "x": 1397,
+          "y": 883,
+          "w": 68,
+          "h": 28,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:100464"
+            }
+          ]
+        },
+        {
+          "id": "423:99541",
+          "name": "Undo",
+          "text": "Undo",
+          "visible": true,
+          "x": 1358,
+          "y": 836,
+          "w": 100,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:97866"
+            }
+          ]
+        },
+        {
+          "id": "423:99224",
+          "name": "TX11 \u00b7 Linked text committed / link preserved",
+          "visible": true,
+          "x": 720.0,
+          "y": 450.0,
+          "w": 1440,
+          "h": 900,
+          "trigger": "ON_KEY_DOWN",
+          "keyCodes": [
+            13
+          ],
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:98884"
+            }
+          ]
+        },
+        {
+          "id": "423:99224",
+          "name": "TX11 \u00b7 Linked text committed / link preserved",
+          "visible": true,
+          "x": 720.0,
+          "y": 450.0,
+          "w": 1440,
+          "h": 900,
+          "trigger": "ON_KEY_DOWN",
+          "keyCodes": [
+            91,
+            90
+          ],
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:97866"
+            }
+          ]
+        },
+        {
+          "id": "423:99224",
+          "name": "TX11 \u00b7 Linked text committed / link preserved",
+          "visible": true,
+          "x": 720.0,
+          "y": 450.0,
+          "w": 1440,
+          "h": 900,
+          "trigger": "ON_KEY_DOWN",
+          "keyCodes": [
+            17,
+            90
+          ],
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:97866"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "423:99545",
+      "name": "TX08 \u00b7 Text save failed / edited copy retained",
+      "w": 1440,
+      "h": 900,
+      "controls": [
+        {
+          "id": "423:99853",
+          "name": "Edit text",
+          "text": "Edit text",
+          "visible": true,
+          "x": 1291,
+          "y": 389,
+          "w": 276,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:97218"
+            }
+          ]
+        },
+        {
+          "id": "423:99855",
+          "name": "Retry site save",
+          "text": "Retry site save",
+          "visible": true,
+          "x": 1279,
+          "y": 433,
+          "w": 276,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:97552"
+            }
+          ]
+        },
+        {
+          "id": "423:99647",
+          "name": "Prototype scenarios",
+          "text": "Review",
+          "visible": true,
+          "x": 1397,
+          "y": 883,
+          "w": 68,
+          "h": 28,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:100464"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "423:99859",
+      "name": "TX09 \u00b7 Locked text / no inline edit",
+      "w": 1440,
+      "h": 900,
+      "controls": [
+        {
+          "id": "423:99961",
+          "name": "Prototype scenarios",
+          "text": "Review",
+          "visible": true,
+          "x": 1397,
+          "y": 883,
+          "w": 68,
+          "h": 28,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:100464"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "423:100171",
+      "name": "TX10 \u00b7 Inline toolbar / 1280 \u00d7 720",
+      "w": 1280,
+      "h": 720,
+      "controls": [
+        {
+          "id": "423:100267",
+          "name": "Prototype scenarios",
+          "text": "Review",
+          "visible": true,
+          "x": 1237,
+          "y": 703,
+          "w": 68,
+          "h": 28,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:100464"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "423:100464",
+      "name": "DE00 \u00b7 Design completion / start here",
+      "w": 1440,
+      "h": 900,
+      "controls": [
+        {
+          "id": "423:100469",
+          "name": "Class-first styling \u2192",
+          "text": "Class-first styling \u2192",
+          "visible": true,
+          "x": 238,
+          "y": 242,
+          "w": 380,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "URL",
+              "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick?node-id=415-50289&starting-point-node-id=415%3A50289&scaling=scale-down",
+              "openInNewTab": false
+            }
+          ]
+        },
+        {
+          "id": "423:100472",
+          "name": "All class and recovery states \u2192",
+          "text": "All class and recovery states \u2192",
+          "visible": true,
+          "x": 238,
+          "y": 298,
+          "w": 380,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "URL",
+              "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick?node-id=415-61494&starting-point-node-id=415%3A61494&scaling=scale-down",
+              "openInNewTab": false
+            }
+          ]
+        },
+        {
+          "id": "423:100475",
+          "name": "Inline text editing \u2192",
+          "text": "Inline text editing \u2192",
+          "visible": true,
+          "x": 238,
+          "y": 354,
+          "w": 380,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:96903"
+            }
+          ]
+        },
+        {
+          "id": "423:100478",
+          "name": "Original five connected journeys \u2192",
+          "text": "Original five connected journeys \u2192",
+          "visible": true,
+          "x": 238,
+          "y": 410,
+          "w": 380,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "URL",
+              "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick?node-id=302-3370&starting-point-node-id=302%3A3370&scaling=scale-down",
+              "openInNewTab": false
+            }
+          ]
+        },
+        {
+          "id": "425:99645",
+          "name": "H1 guidance",
+          "text": "H1 guidance",
+          "visible": true,
+          "x": 178,
+          "y": 506,
+          "w": 260,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "425:98763"
+            }
+          ]
+        },
+        {
+          "id": "425:99648",
+          "name": "New form labels",
+          "text": "New form labels",
+          "visible": true,
+          "x": 446,
+          "y": 506,
+          "w": 260,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "425:99342"
+            }
+          ]
+        },
+        {
+          "id": "425:99651",
+          "name": "Current-release CMS",
+          "text": "Current-release CMS",
+          "visible": true,
+          "x": 714,
+          "y": 506,
+          "w": 260,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "URL",
+              "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick?node-id=424-337803&starting-point-node-id=424%3A337803&scaling=scale-down",
+              "openInNewTab": false
+            }
+          ]
+        },
+        {
+          "id": "423:100483",
+          "name": "TX10 \u00b7 Inline toolbar",
+          "text": "TX10 \u00b7 Inline toolbar",
+          "visible": true,
+          "x": 212,
+          "y": 570,
+          "w": 328,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:100171"
+            }
+          ]
+        },
+        {
+          "id": "423:100486",
+          "name": "TX11 \u00b7 Linked text committed",
+          "text": "TX11 \u00b7 Linked text committed",
+          "visible": true,
+          "x": 548,
+          "y": 570,
+          "w": 328,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:99224"
+            }
+          ]
+        },
+        {
+          "id": "423:100489",
+          "name": "TX01 \u00b7 Text selected",
+          "text": "TX01 \u00b7 Text selected",
+          "visible": true,
+          "x": 884,
+          "y": 570,
+          "w": 328,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:96903"
+            }
+          ]
+        },
+        {
+          "id": "423:100492",
+          "name": "TX02 \u00b7 Inline editing",
+          "text": "TX02 \u00b7 Inline editing",
+          "visible": true,
+          "x": 1220,
+          "y": 570,
+          "w": 328,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:97218"
+            }
+          ]
+        },
+        {
+          "id": "423:100496",
+          "name": "TX03 \u00b7 Text committed",
+          "text": "TX03 \u00b7 Text committed",
+          "visible": true,
+          "x": 212,
+          "y": 634,
+          "w": 328,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:97552"
+            }
+          ]
+        },
+        {
+          "id": "423:100499",
+          "name": "TX04 \u00b7 Undo text",
+          "text": "TX04 \u00b7 Undo text",
+          "visible": true,
+          "x": 548,
+          "y": 634,
+          "w": 328,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:97866"
+            }
+          ]
+        },
+        {
+          "id": "423:100502",
+          "name": "TX05 \u00b7 More formatting",
+          "text": "TX05 \u00b7 More formatting",
+          "visible": true,
+          "x": 884,
+          "y": 634,
+          "w": 328,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:98182"
+            }
+          ]
+        },
+        {
+          "id": "423:100505",
+          "name": "TX06 \u00b7 Inline link",
+          "text": "TX06 \u00b7 Inline link",
+          "visible": true,
+          "x": 1220,
+          "y": 634,
+          "w": 328,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:98532"
+            }
+          ]
+        },
+        {
+          "id": "423:100509",
+          "name": "TX07 \u00b7 Inline link applied",
+          "text": "TX07 \u00b7 Inline link applied",
+          "visible": true,
+          "x": 212,
+          "y": 698,
+          "w": 328,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:98884"
+            }
+          ]
+        },
+        {
+          "id": "423:100512",
+          "name": "TX08 \u00b7 Text save failed",
+          "text": "TX08 \u00b7 Text save failed",
+          "visible": true,
+          "x": 548,
+          "y": 698,
+          "w": 328,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:99545"
+            }
+          ]
+        },
+        {
+          "id": "423:100515",
+          "name": "TX09 \u00b7 Locked text",
+          "text": "TX09 \u00b7 Locked text",
+          "visible": true,
+          "x": 884,
+          "y": 698,
+          "w": 328,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:99859"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "425:98763",
+      "name": "RE01 \u00b7 No H1 / non-blocking guidance",
+      "w": 1440,
+      "h": 900,
+      "controls": [
+        {
+          "id": "425:99049",
+          "name": "Make this H1",
+          "text": "Make this H1",
+          "visible": true,
+          "x": 1291,
+          "y": 405,
+          "w": 276,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "425:99052"
+            }
+          ]
+        },
+        {
+          "id": "425:98859",
+          "name": "Prototype scenarios",
+          "text": "Review",
+          "visible": true,
+          "x": 1397,
+          "y": 883,
+          "w": 68,
+          "h": 28,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:100464"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "425:99052",
+      "name": "RE02 \u00b7 H1 fixed / semantic change only",
+      "w": 1440,
+      "h": 900,
+      "controls": [
+        {
+          "id": "425:99148",
+          "name": "Prototype scenarios",
+          "text": "Review",
+          "visible": true,
+          "x": 1397,
+          "y": 883,
+          "w": 68,
+          "h": 28,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:100464"
+            }
+          ]
+        },
+        {
+          "id": "425:99338",
+          "name": "Undo",
+          "text": "Undo",
+          "visible": true,
+          "x": 1358,
+          "y": 836,
+          "w": 100,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "425:98763"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "425:99342",
+      "name": "RE03 \u00b7 New Form / visible labels",
+      "w": 1440,
+      "h": 900,
+      "controls": [
+        {
+          "id": "425:99438",
+          "name": "Prototype scenarios",
+          "text": "Review",
+          "visible": true,
+          "x": 1397,
+          "y": 883,
+          "w": 68,
+          "h": 28,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "423:100464"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

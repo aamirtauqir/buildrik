@@ -1,0 +1,54 @@
+{
+  "observedAt": "2026-10-10T13:06:10.045Z",
+  "tabs": [
+    "Add",
+    "Layers",
+    "Pages",
+    "Assets",
+    "CMS",
+    "Brand",
+    "Home",
+    "Audit persisted page",
+    "Audit after checkpoint",
+    "Session",
+    "Saves",
+    "Published"
+  ],
+  "pages.list": {
+    "status": 200,
+    "records": [
+      {
+        "id": "cmv1z8kc00004yulr7ow32htz",
+        "name": "Home",
+        "slug": "home"
+      },
+      {
+        "id": "page-mv1zbjmg-v10tmctm98",
+        "name": "Audit persisted page",
+        "slug": "audit-persisted-page"
+      },
+      {
+        "id": "page-mv2eg9pp-lf14xqozj9",
+        "name": "Audit after checkpoint",
+        "slug": "home-copy"
+      }
+    ]
+  },
+  "siteVersions.list": {
+    "status": 200,
+    "records": [
+      {
+        "name": "Before restoring \"Before restoring \"Audit checkpoint 1010\"\"",
+        "isAuto": false
+      },
+      {
+        "name": "Before restoring \"Audit checkpoint 1010\"",
+        "isAuto": false
+      },
+      {
+        "name": "Audit checkpoint 1010",
+        "isAuto": false
+      }
+    ]
+  }
+}

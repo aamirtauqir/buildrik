@@ -1,0 +1,8 @@
+[
+ {"label":"Select ready upload into source draft","x":720,"y":535,"shot":"r28-upload-selected.png"},
+ {"label":"Commit uploaded fixture","x":545,"y":556,"shot":"r28-upload-committed.png"},
+ {"label":"Open source for URL","x":1241,"y":261},
+ {"label":"Open URL method","x":1100,"y":353,"shot":"r28-url-form.png"},
+ {"label":"Fill sample URL","x":730,"y":488},
+ {"label":"Check sample URL","x":720,"y":535,"wait":2200,"shot":"r28-url-ready.png"}
+]

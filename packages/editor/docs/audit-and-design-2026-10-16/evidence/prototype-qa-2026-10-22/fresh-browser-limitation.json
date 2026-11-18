@@ -1,0 +1,36 @@
+{
+  "error": "cleanup_incomplete",
+  "message": "Browser scenario cleanup could not be confirmed: Analysis operation timed out after 30000ms: capture_browser_scenario. Collected steps and events are retained in partial_observation. Review the reported resources before retrying.",
+  "resources": [
+    "browser_transport",
+    "browser_profile"
+  ],
+  "steps": [
+    {
+      "step_id": "scenario_start",
+      "status": "completed",
+      "elapsed_ms": 10959,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=423-96903&starting-point-node-id=423%3A96903&scaling=scale-down",
+      "accessibility": {
+        "state": "not_requested"
+      },
+      "screenshot": "not_requested"
+    },
+    {
+      "step_id": "settle",
+      "status": "completed",
+      "elapsed_ms": 10210,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=423-96903&starting-point-node-id=423%3A96903&scaling=scale-down",
+      "accessibility": {
+        "state": "captured",
+        "value": {
+          "sha256": "27657b79beb378e8d6beb301826f0caf6a0b969f39a1f0f4403fd1789a9a62ac",
+          "bytes": 319,
+          "text": "- document:\n  - region \"Prototype controls\"\n  - main:\n    - paragraph: Screenreader support is currently disabled. To enable it, use the Accessibility settings from the Options menu.\n  - navigation \"Pages\":\n    - button \"Restart\":\n      - img\n      - text: Restart\n  - status: Loading\n  - group:\n    - alert\n    - alert"
+        }
+      },
+      "screenshot": "captured"
+    }
+  ],
+  "pointerTransitionsVerified": 0
+}

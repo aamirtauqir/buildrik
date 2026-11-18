@@ -1,0 +1,8 @@
+[
+ {"label":"Open image failure review fixture","goto":"8593:12598","shot":"r28-image-failure-console.png"},
+ {"label":"Enable failed image source fixture","x":720,"y":520,"expected":"8507:3011"},
+ {"label":"Open source chooser for failure","x":1241,"y":261},
+ {"label":"Open upload method","x":1100,"y":315},
+ {"label":"Choose sample file","x":720,"y":513},
+ {"label":"Upload enters expected failure","x":720,"y":557,"wait":2200,"shot":"r28-upload-failed.png"}
+]

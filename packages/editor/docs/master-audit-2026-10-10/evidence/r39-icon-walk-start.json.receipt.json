@@ -1,0 +1,17 @@
+[
+  {
+    "x": 475,
+    "y": 96,
+    "shot": "r39-mobile-inherited32.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-21669&starting-point-node-id=8843%3A21669",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 1331,
+    "y": 254,
+    "wait": 4000,
+    "shot": "r39-style-start.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-21669&starting-point-node-id=8843%3A21669",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

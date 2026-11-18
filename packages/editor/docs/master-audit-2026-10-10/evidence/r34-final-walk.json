@@ -1,0 +1,10 @@
+[
+ {"label":"Fresh MCP entry","goto":"8816:14125","wait":12000,"shot":"r34-mcp-disconnect-hidden.png"},
+ {"label":"Set server URL","x":720,"y":558},
+ {"label":"Review connection","x":902,"y":643},
+ {"label":"Authorize","x":902,"y":637,"shot":"r34-mcp-connected-final.png"},
+ {"label":"Disconnect","x":720,"y":691,"shot":"r34-mcp-disconnected-final.png"},
+ {"label":"Matching media search","goto":"8819:14287","wait":10000},
+ {"label":"Search gradient2","x":902,"y":583,"shot":"r34-media-matching-list.png"},
+ {"label":"Keep search in grid","x":313,"y":229,"shot":"r34-media-matching-grid.png"}
+]

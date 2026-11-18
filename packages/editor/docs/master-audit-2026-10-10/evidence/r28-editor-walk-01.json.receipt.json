@@ -1,0 +1,55 @@
+[
+  {
+    "label": "Padding baseline",
+    "goto": "8465:6",
+    "shot": "r28-padding-start.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-6&starting-point-node-id=8465%3A6&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Open linked top picker",
+    "x": 1239,
+    "y": 232,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-6&starting-point-node-id=8465%3A6&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Apply linked 32px token",
+    "x": 720,
+    "y": 622,
+    "shot": "r28-padding-linked32.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-6&starting-point-node-id=8465%3A6&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Unlink all sides",
+    "x": 1239,
+    "y": 334,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-6&starting-point-node-id=8465%3A6&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Open independent left side",
+    "x": 1149,
+    "y": 266,
+    "shot": "r28-padding-left-picker.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-6&starting-point-node-id=8465%3A6&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Apply left 8px without changing right",
+    "x": 720,
+    "y": 422,
+    "shot": "r28-padding-left8.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-6&starting-point-node-id=8465%3A6&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Open independent right side",
+    "x": 1330,
+    "y": 266,
+    "shot": "r28-padding-right-picker.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-6&starting-point-node-id=8465%3A6&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

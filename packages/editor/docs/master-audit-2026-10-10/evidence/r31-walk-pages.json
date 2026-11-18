@@ -1,0 +1,131 @@
+[
+  {
+    "label": "Page management entry",
+    "goto": "8690:13237"
+  },
+  {
+    "label": "Manage pages",
+    "x": 720,
+    "y": 282,
+    "shot": "r31-pages.png"
+  },
+  {
+    "label": "Home options",
+    "x": 970,
+    "y": 372
+  },
+  {
+    "label": "Delete home is guarded",
+    "x": 720,
+    "y": 701,
+    "shot": "r31-home-protected.png"
+  },
+  {
+    "label": "Back to options",
+    "x": 720,
+    "y": 575
+  },
+  {
+    "label": "Back to pages",
+    "x": 720,
+    "y": 749
+  },
+  {
+    "label": "About options",
+    "x": 970,
+    "y": 420
+  },
+  {
+    "label": "Rename",
+    "x": 720,
+    "y": 461
+  },
+  {
+    "label": "Sample name",
+    "x": 720,
+    "y": 511
+  },
+  {
+    "label": "Keep URL",
+    "x": 720,
+    "y": 559,
+    "shot": "r31-renamed.png"
+  },
+  {
+    "label": "About options after rename",
+    "x": 970,
+    "y": 420,
+    "shot": "r31-renamed-url-retained.png"
+  },
+  {
+    "label": "Duplicate",
+    "x": 720,
+    "y": 509
+  },
+  {
+    "label": "Manage copies",
+    "x": 720,
+    "y": 551,
+    "shot": "r31-copy-created.png"
+  },
+  {
+    "label": "About options delete",
+    "x": 970,
+    "y": 420
+  },
+  {
+    "label": "Delete",
+    "x": 720,
+    "y": 701
+  },
+  {
+    "label": "Cancel delete",
+    "x": 720,
+    "y": 598,
+    "shot": "r31-delete-cancel.png"
+  },
+  {
+    "label": "Delete again",
+    "x": 720,
+    "y": 701
+  },
+  {
+    "label": "Confirm delete",
+    "x": 720,
+    "y": 550,
+    "shot": "r31-deleted.png"
+  },
+  {
+    "label": "Undo delete",
+    "x": 720,
+    "y": 517,
+    "shot": "r31-delete-undone.png"
+  },
+  {
+    "label": "Find page",
+    "x": 720,
+    "y": 564
+  },
+  {
+    "label": "No result sample",
+    "x": 720,
+    "y": 541,
+    "shot": "r31-search-empty.png"
+  },
+  {
+    "label": "Clear search",
+    "x": 720,
+    "y": 541
+  },
+  {
+    "label": "Find again",
+    "x": 720,
+    "y": 564
+  },
+  {
+    "label": "About query",
+    "x": 720,
+    "y": 493,
+    "shot": "r31-search-match.png"
+  }
+]

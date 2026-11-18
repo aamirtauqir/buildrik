@@ -1,0 +1,59 @@
+{
+  "roots": 195,
+  "edges": 616,
+  "reachableFromHub": 195,
+  "invalidDestinations": [],
+  "withoutDirectHub": [],
+  "newRoots": [
+    {
+      "id": "376:25146",
+      "name": "PLAY · F3.13 · Cancel replacement · Work image stays locked",
+      "reachable": true
+    },
+    {
+      "id": "376:25424",
+      "name": "PLAY · F3.14 · Work image unlocked · Undo",
+      "reachable": true
+    },
+    {
+      "id": "377:25498",
+      "name": "PLAY · F5-SECOND-OPEN.1 · Second comment draft",
+      "reachable": true
+    },
+    {
+      "id": "377:25549",
+      "name": "PLAY · F5-SECOND-OPEN.2 · Sending second comment",
+      "reachable": true
+    },
+    {
+      "id": "377:25609",
+      "name": "PLAY · F5-SECOND-OPEN.3 · Second comment failed · draft retained",
+      "reachable": true
+    },
+    {
+      "id": "377:25669",
+      "name": "PLAY · F5-SECOND-OPEN.4 · Second comment acknowledged · two threads",
+      "reachable": true
+    },
+    {
+      "id": "377:25747",
+      "name": "PLAY · F5-SECOND-RESOLVED.1 · Second comment draft",
+      "reachable": true
+    },
+    {
+      "id": "377:25798",
+      "name": "PLAY · F5-SECOND-RESOLVED.2 · Sending second comment",
+      "reachable": true
+    },
+    {
+      "id": "377:25858",
+      "name": "PLAY · F5-SECOND-RESOLVED.3 · Second comment failed · draft retained",
+      "reachable": true
+    },
+    {
+      "id": "377:25918",
+      "name": "PLAY · F5-SECOND-RESOLVED.4 · Second comment acknowledged · two threads",
+      "reachable": true
+    }
+  ]
+}

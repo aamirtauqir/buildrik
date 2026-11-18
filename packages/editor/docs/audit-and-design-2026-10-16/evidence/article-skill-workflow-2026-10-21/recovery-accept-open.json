@@ -1,0 +1,52 @@
+[
+  {
+    "from": "307:17572",
+    "to": "377:25498",
+    "shot": "recovery-second-open-draft.png"
+  },
+  {
+    "from": "377:25498",
+    "to": "307:17572"
+  },
+  {
+    "from": "307:17572",
+    "to": "377:25498",
+    "shot": "recovery-second-open-draft.png"
+  },
+  {
+    "from": "377:25498",
+    "to": "377:25549"
+  },
+  {
+    "from": "377:25549",
+    "to": "377:25609",
+    "shot": "recovery-second-open-failed.png"
+  },
+  {
+    "from": "377:25609",
+    "to": "377:25498",
+    "shot": "recovery-second-open-draft.png"
+  },
+  {
+    "from": "377:25498",
+    "to": "377:25549"
+  },
+  {
+    "from": "377:25549",
+    "to": "377:25609",
+    "shot": "recovery-second-open-failed.png"
+  },
+  {
+    "from": "377:25609",
+    "to": "377:25549"
+  },
+  {
+    "from": "377:25549",
+    "to": "377:25669",
+    "shot": "recovery-second-open-ack.png"
+  },
+  {
+    "from": "377:25669",
+    "to": "302:3370"
+  }
+]

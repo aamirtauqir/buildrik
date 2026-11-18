@@ -1,0 +1,577 @@
+{
+  "date": "2026-10-16",
+  "kind": "coverage reconciliation, not individual-block design/runtime certification",
+  "counts": {
+    "registered_blocks": 69,
+    "element_types": 55,
+    "registered_root_types": 50,
+    "static_add_catalog_entries": 54,
+    "inspector_feature_rows": 122,
+    "specimen_scenarios": 13
+  },
+  "rows": [
+    {
+      "config": "containerBlockConfig",
+      "block_id": "container",
+      "type": "container",
+      "source": "src/blocks/Basic/Container.tsx",
+      "mapped_family": "M07-48h",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "textBlockConfig",
+      "block_id": "text",
+      "type": "text",
+      "source": "src/blocks/Basic/Text.tsx",
+      "mapped_family": "M07-48a",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "headingBlockConfig",
+      "block_id": "heading",
+      "type": "heading",
+      "source": "src/blocks/Basic/Heading.tsx",
+      "mapped_family": "M07-48a",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "paragraphBlockConfig",
+      "block_id": "paragraph",
+      "type": "paragraph",
+      "source": "src/blocks/Basic/Paragraph.tsx",
+      "mapped_family": "M07-48a",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "buttonBlockConfig",
+      "block_id": "button",
+      "type": "button",
+      "source": "src/blocks/Basic/Button.tsx",
+      "mapped_family": "M07-48b",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "linkBlockConfig",
+      "block_id": "link",
+      "type": "link",
+      "source": "src/blocks/Basic/Link.tsx",
+      "mapped_family": "M07-48a",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "listBlockConfig",
+      "block_id": "list",
+      "type": "list",
+      "source": "src/blocks/Basic/List.tsx",
+      "mapped_family": "M07-48h",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "dividerBlockConfig",
+      "block_id": "divider",
+      "type": "divider",
+      "source": "src/blocks/Basic/Divider.tsx",
+      "mapped_family": "M07-48e",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "rowBlockConfig",
+      "block_id": "row",
+      "type": "columns",
+      "source": "src/blocks/Basic/Row.tsx",
+      "mapped_family": "M07-48g",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "columnBlockConfig",
+      "block_id": "column",
+      "type": "container",
+      "source": "src/blocks/Basic/Column.tsx",
+      "mapped_family": "M07-48h",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "spacerBlockConfig",
+      "block_id": "spacer",
+      "type": "spacer",
+      "source": "src/blocks/Basic/Spacer.tsx",
+      "mapped_family": "M07-48e",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "themeToggleBlockConfig",
+      "block_id": "theme-toggle",
+      "type": "container",
+      "source": "src/blocks/Basic/ThemeToggle.ts",
+      "mapped_family": "M07-48h",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "imageBlockConfig",
+      "block_id": "image",
+      "type": "image",
+      "source": "src/blocks/Media/Image.tsx",
+      "mapped_family": "M07-48d",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "videoBlockConfig",
+      "block_id": "video",
+      "type": "video",
+      "source": "src/blocks/Media/Video.tsx",
+      "mapped_family": "M07-48d",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "audioBlockConfig",
+      "block_id": "audio",
+      "type": "audio",
+      "source": "src/blocks/Media/Audio.tsx",
+      "mapped_family": "M07-48d",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "svgBlockConfig",
+      "block_id": "svg",
+      "type": "svg",
+      "source": "src/blocks/Media/SVG.tsx",
+      "mapped_family": "M07-48d",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "lottieBlockConfig",
+      "block_id": "lottie",
+      "type": "lottie",
+      "source": "src/blocks/Media/Lottie.tsx",
+      "mapped_family": "M07-48d",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "iconBlockConfig",
+      "block_id": "icon",
+      "type": "icon",
+      "source": "src/blocks/Media/Icon.tsx",
+      "mapped_family": "M07-48d",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "galleryBlockConfig",
+      "block_id": "gallery",
+      "type": "gallery",
+      "source": "src/blocks/Media/ImageGallery.tsx",
+      "mapped_family": "M07-48h",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "videoEmbedBlockConfig",
+      "block_id": "video-embed",
+      "type": "video-embed",
+      "source": "src/blocks/Media/VideoEmbed.tsx",
+      "mapped_family": "M07-48d",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "mapEmbedBlockConfig",
+      "block_id": "map-embed",
+      "type": "map-embed",
+      "source": "src/blocks/Media/MapEmbed.tsx",
+      "mapped_family": "M07-48d",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "sectionBlockConfig",
+      "block_id": "section",
+      "type": "section",
+      "source": "src/blocks/Layout/Section.tsx",
+      "mapped_family": "M07-48h",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "columns2BlockConfig",
+      "block_id": "columns",
+      "type": "columns",
+      "source": "src/blocks/Layout/Columns.tsx",
+      "mapped_family": "M07-48g",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "columns3BlockConfig",
+      "block_id": "columns3",
+      "type": "columns",
+      "source": "src/blocks/Layout/Columns.tsx",
+      "mapped_family": "M07-48g",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "gridBlockConfig",
+      "block_id": "grid",
+      "type": "grid",
+      "source": "src/blocks/Layout/Grid.tsx",
+      "mapped_family": "M07-48g",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "flexBlockConfig",
+      "block_id": "flex",
+      "type": "flex",
+      "source": "src/blocks/Layout/Flex.tsx",
+      "mapped_family": "M07-48g",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "collectionListBlockConfig",
+      "block_id": "collection-list",
+      "type": "collection-list",
+      "source": "src/blocks/Layout/CollectionList.tsx",
+      "mapped_family": "M07-48j",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "formBlockConfig",
+      "block_id": "form",
+      "type": "form",
+      "source": "src/blocks/Forms/Form.tsx",
+      "mapped_family": "M07-48j",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "inputBlockConfig",
+      "block_id": "input",
+      "type": "input",
+      "source": "src/blocks/Forms/Input.tsx",
+      "mapped_family": "M07-48c",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "textareaBlockConfig",
+      "block_id": "textarea",
+      "type": "textarea",
+      "source": "src/blocks/Forms/Textarea.tsx",
+      "mapped_family": "M07-48c",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "selectBlockConfig",
+      "block_id": "select",
+      "type": "select",
+      "source": "src/blocks/Forms/Select.tsx",
+      "mapped_family": "M07-48c",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "checkboxBlockConfig",
+      "block_id": "checkbox",
+      "type": "checkbox",
+      "source": "src/blocks/Forms/Checkbox.tsx",
+      "mapped_family": "M07-48c",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "radioBlockConfig",
+      "block_id": "radio",
+      "type": "radio",
+      "source": "src/blocks/Forms/Radio.tsx",
+      "mapped_family": "M07-48c",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "fileInputBlockConfig",
+      "block_id": "file",
+      "type": "input",
+      "source": "src/blocks/Forms/FileInput.tsx",
+      "mapped_family": "M07-48c",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "dateInputBlockConfig",
+      "block_id": "date",
+      "type": "input",
+      "source": "src/blocks/Forms/DateInput.tsx",
+      "mapped_family": "M07-48c",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "timeInputBlockConfig",
+      "block_id": "time",
+      "type": "input",
+      "source": "src/blocks/Forms/TimeInput.tsx",
+      "mapped_family": "M07-48c",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "emailInputBlockConfig",
+      "block_id": "email",
+      "type": "input",
+      "source": "src/blocks/Forms/EmailInput.tsx",
+      "mapped_family": "M07-48c",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "passwordInputBlockConfig",
+      "block_id": "password",
+      "type": "input",
+      "source": "src/blocks/Forms/PasswordInput.tsx",
+      "mapped_family": "M07-48c",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "numberInputBlockConfig",
+      "block_id": "number",
+      "type": "input",
+      "source": "src/blocks/Forms/NumberInput.tsx",
+      "mapped_family": "M07-48c",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "rangeInputBlockConfig",
+      "block_id": "range",
+      "type": "input",
+      "source": "src/blocks/Forms/RangeInput.tsx",
+      "mapped_family": "M07-48c",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "colorInputBlockConfig",
+      "block_id": "color",
+      "type": "input",
+      "source": "src/blocks/Forms/ColorInput.tsx",
+      "mapped_family": "M07-48c",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "labelBlockConfig",
+      "block_id": "label",
+      "type": "label",
+      "source": "src/blocks/Forms/Label.tsx",
+      "mapped_family": "M07-48a",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "submitButtonBlockConfig",
+      "block_id": "submit",
+      "type": "button",
+      "source": "src/blocks/Forms/SubmitButton.tsx",
+      "mapped_family": "M07-48b",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "heroBlockConfig",
+      "block_id": "hero",
+      "type": "hero",
+      "source": "src/blocks/Sections/HeroSection.tsx",
+      "mapped_family": "M07-48h",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "featuresBlockConfig",
+      "block_id": "features",
+      "type": "features",
+      "source": "src/blocks/Sections/Features.tsx",
+      "mapped_family": "M07-48h",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "menuGridBlockConfig",
+      "block_id": "menu-grid",
+      "type": "section",
+      "source": "src/blocks/Sections/MenuGrid.tsx",
+      "mapped_family": "M07-48h",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "testimonialsSectionBlockConfig",
+      "block_id": "testimonials-section",
+      "type": "section",
+      "source": "src/blocks/Sections/TestimonialsSection.tsx",
+      "mapped_family": "M07-48h",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "ctaBlockConfig",
+      "block_id": "cta",
+      "type": "cta",
+      "source": "src/blocks/Sections/CTA.tsx",
+      "mapped_family": "M07-48h",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "contactBlockConfig",
+      "block_id": "contact",
+      "type": "section",
+      "source": "src/blocks/Sections/Contact.tsx",
+      "mapped_family": "M07-48h",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "footerBlockConfig",
+      "block_id": "footer",
+      "type": "footer",
+      "source": "src/blocks/Sections/Footer.tsx",
+      "mapped_family": "M07-48h",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "navbarBlockConfig",
+      "block_id": "navbar",
+      "type": "navbar",
+      "source": "src/blocks/Sections/Navbar.tsx",
+      "mapped_family": "M07-48h",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "cardBlockConfig",
+      "block_id": "card",
+      "type": "card",
+      "source": "src/blocks/Components/Card.tsx",
+      "mapped_family": "M07-48h",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "sliderBlockConfig",
+      "block_id": "slider",
+      "type": "slider",
+      "source": "src/blocks/Components/Slider.tsx",
+      "mapped_family": "M07-48j",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "testimonialsBlockConfig",
+      "block_id": "testimonials",
+      "type": "testimonials",
+      "source": "src/blocks/Components/Testimonials.tsx",
+      "mapped_family": "M07-48h",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "pricingBlockConfig",
+      "block_id": "pricing",
+      "type": "pricing",
+      "source": "src/blocks/Components/PricingTable.tsx",
+      "mapped_family": "M07-48h",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "progressBlockConfig",
+      "block_id": "progress",
+      "type": "progress",
+      "source": "src/blocks/Components/ProgressBar.tsx",
+      "mapped_family": "M07-48f",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "countdownBlockConfig",
+      "block_id": "countdown",
+      "type": "countdown",
+      "source": "src/blocks/Components/CountdownTimer.tsx",
+      "mapped_family": "M07-48f",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "accordionBlockConfig",
+      "block_id": "accordion",
+      "type": "accordion",
+      "source": "src/blocks/Components/Accordion.tsx",
+      "mapped_family": "M07-48f",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "socialIconsBlockConfig",
+      "block_id": "social-icons",
+      "type": "social",
+      "source": "src/blocks/Components/SocialIcons.tsx",
+      "mapped_family": "M07-48h",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "contactFormBlockConfig",
+      "block_id": "contact-form",
+      "type": "form",
+      "source": "src/blocks/Components/ContactForm.tsx",
+      "mapped_family": "M07-48j",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "stackBlockConfig",
+      "block_id": "stack",
+      "type": "stack",
+      "source": "src/blocks/Components/Stack.tsx",
+      "mapped_family": "M07-48g",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "switchBlockConfig",
+      "block_id": "switch",
+      "type": "switch",
+      "source": "src/blocks/Components/Switch.tsx",
+      "mapped_family": "M07-48c",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "tabsBlockConfig",
+      "block_id": "tabs",
+      "type": "tabs",
+      "source": "src/blocks/Components/Tabs.tsx",
+      "mapped_family": "M07-48h",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "modalBlockConfig",
+      "block_id": "modal",
+      "type": "button",
+      "source": "src/blocks/Components/Modal.tsx",
+      "mapped_family": "M07-48b",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "tableBlockConfig",
+      "block_id": "table",
+      "type": "table",
+      "source": "src/blocks/Components/Table.tsx",
+      "mapped_family": "M07-48h",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "productCardBlockConfig",
+      "block_id": "product-card",
+      "type": "product-card",
+      "source": "src/blocks/Ecommerce/ProductCard.tsx",
+      "mapped_family": "M07-48h",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "productGridBlockConfig",
+      "block_id": "product-grid",
+      "type": "product-grid",
+      "source": "src/blocks/Ecommerce/ProductGrid.tsx",
+      "mapped_family": "M07-48h",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "productDetailBlockConfig",
+      "block_id": "product-detail",
+      "type": "product-detail",
+      "source": "src/blocks/Ecommerce/ProductDetail.tsx",
+      "mapped_family": "M07-48h",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    },
+    {
+      "config": "cartButtonBlockConfig",
+      "block_id": "cart-button",
+      "type": "button",
+      "source": "src/blocks/Ecommerce/CartButton.tsx",
+      "mapped_family": "M07-48b",
+      "coverage": "Source registry/type-to-Inspector-family mapping only; individual composite/child workflow and runtime acceptance not established by this check"
+    }
+  ],
+  "closure": {
+    "record": "FD-INS-03 / BIC-01",
+    "status": "DESIGN READY for bounded written handoff; implementation NOT RUN",
+    "individual_records": 69,
+    "native_routes": 120,
+    "per_block_acceptance_cases": 229,
+    "runtime_boundary": "69 registry insert/select/default Inspector only",
+    "design_browser_records": 69,
+    "canonical_annex": "block-coverage.md",
+    "root_map_below": "Original source-only root-family mapping preserved; not retroactive runtime certification"
+  }
+}

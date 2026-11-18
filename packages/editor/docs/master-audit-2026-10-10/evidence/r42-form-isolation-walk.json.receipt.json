@@ -1,0 +1,67 @@
+[
+  {
+    "x": 720,
+    "y": 575,
+    "shot": "r42-form-discard-retains-saved.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-30589&starting-point-node-id=8843%3A30589&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 1320,
+    "y": 212,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-30589&starting-point-node-id=8843%3A30589&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 720,
+    "y": 403,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-30589&starting-point-node-id=8843%3A30589&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 720,
+    "y": 379,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-30589&starting-point-node-id=8843%3A30589&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 720,
+    "y": 609,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-30589&starting-point-node-id=8843%3A30589&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 850,
+    "y": 631,
+    "shot": "r42-form-before-remote-save-with-undo.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-30589&starting-point-node-id=8843%3A30589&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 1320,
+    "y": 321,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-30589&starting-point-node-id=8843%3A30589&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 720,
+    "y": 669,
+    "wait": 2600,
+    "shot": "r42-form-remote-saved-with-field-undo.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-30589&starting-point-node-id=8843%3A30589&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 720,
+    "y": 717,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-30589&starting-point-node-id=8843%3A30589&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 1240,
+    "y": 281,
+    "shot": "r42-form-undo-retains-remote-save.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-30589&starting-point-node-id=8843%3A30589&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

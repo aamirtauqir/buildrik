@@ -1,0 +1,81 @@
+
+await figma.setCurrentPageAsync(await figma.getNodeByIdAsync('8463:2'));
+const page=figma.currentPage, created=[], mutated=[], states={}, controls={};
+const get=id=>figma.getNodeByIdAsync(id), mark=n=>{mutated.push(n.id);return n;};
+for(const style of ['Regular','Medium','Semi Bold','Bold'])await figma.loadFontAsync({family:'Inter',style});
+const styles=await figma.getLocalTextStylesAsync(), variables=await figma.variables.getLocalVariablesAsync();
+const token=id=>variables.find(v=>v.id==='VariableID:8322:'+id);
+const paint=id=>[figma.variables.setBoundVariableForPaint({type:'SOLID',color:{r:1,g:1,b:1}},'color',token(id))];
+const bind=(n,p,id)=>n.setBoundVariable(p,token(id));
+function auto(name,dir='VERTICAL'){const n=figma.createAutoLayout(dir);created.push(n.id);n.name=name;n.fills=[];bind(n,'itemSpacing',814);return n;}
+async function textNode(parent,value,width=480,style='ui/13 · row label',color=778){const n=figma.createText();created.push(n.id);n.fontName={family:'Inter',style:'Regular'};await n.setTextStyleIdAsync(styles.find(s=>s.name===style).id);n.characters=value;n.fills=paint(color);parent.appendChild(n);n.resize(width,20);n.textAutoResize='HEIGHT';return n;}
+async function button(parent,label,kind='secondary',width=480){const main={primary:'8314:3',secondary:'8314:5',ghost:'8314:7',danger:'8314:9',disabled:'8314:11'}[kind];const n=(await get(main)).createInstance();created.push(n.id);n.name='Action / '+label;parent.appendChild(n);n.resize(width,32);for(const t of n.findAllWithCriteria({types:['TEXT']})){for(const s of t.getStyledTextSegments(['fontName']))await figma.loadFontAsync(s.fontName);t.characters=label;created.push(t.id);}return n;}
+async function field(parent,label,value,width=480){await textNode(parent,label,width,'ui/12 · small',780);const n=(await get('8531:318')).createInstance();created.push(n.id);n.name='Field / '+label;parent.appendChild(n);n.resize(width,34);for(const t of n.findAllWithCriteria({types:['TEXT']})){for(const s of t.getStyledTextSegments(['fontName']))await figma.loadFontAsync(s.fontName);t.characters=value;created.push(t.id);}return n;}
+const val=(value,type=typeof value==='boolean'?'BOOLEAN':'STRING')=>({type,resolvedType:type,value});
+const set=(id,value,type)=>({type:'SET_VARIABLE',variableId:id,variableValue:val(value,type)});
+const copy=(dest,src,type='STRING')=>({type:'SET_VARIABLE',variableId:dest,variableValue:{type:'VARIABLE_ALIAS',resolvedType:type,value:{type:'VARIABLE_ALIAS',id:src}}});
+const nav=(id,navigation='SWAP')=>({type:'NODE',destinationId:id,navigation,transition:null,resetVideoPosition:false});
+const eq=(id,value)=>({type:'EXPRESSION',resolvedType:'BOOLEAN',value:{expressionFunction:'EQUALS',expressionArguments:[{type:'VARIABLE_ALIAS',resolvedType:typeof value==='boolean'?'BOOLEAN':'STRING',value:{type:'VARIABLE_ALIAS',id}},val(value)]}});
+const cond=(id,value,yes,no=[])=>({type:'CONDITIONAL',conditionalBlocks:[{condition:eq(id,value),actions:yes},{actions:no}]});
+async function click(n,actions){mark(n);await n.setReactionsAsync([{trigger:{type:'ON_CLICK'},actions}]);}
+async function close(n){await click(n,[{type:'CLOSE'}]);}
+async function timeout(n,actions){mark(n);await n.setReactionsAsync([{trigger:{type:'AFTER_TIMEOUT',timeout:0.8},actions}]);}
+async function bindText(n,id){for(const t of n.type==='TEXT'?[n]:n.findAllWithCriteria({types:['TEXT']})){for(const s of t.getStyledTextSegments(['fontName']))await figma.loadFontAsync(s.fontName);t.setBoundVariable('characters',await figma.variables.getVariableByIdAsync(id));mark(t);}}
+let cursor=0;
+function position(n){n.x=78000+(cursor%7)*1600;n.y=120+Math.floor(cursor/7)*1200;cursor++;}
+async function dialog(key,title,desc,width=560){const n=auto('R30 / '+key);page.appendChild(n);position(n);n.resize(width,300);n.primaryAxisSizingMode='AUTO';n.counterAxisSizingMode='FIXED';n.fills=paint(789);bind(n,'cornerRadius',825);for(const p of ['paddingTop','paddingBottom','paddingLeft','paddingRight'])bind(n,p,816);await textNode(n,title,width-48,'ui/20 · heading lg');if(desc)await textNode(n,desc,width-48,'ui/13 · row label',780);states[key]=n;return n;}
+async function side(key,title,desc){const root=figma.createFrame();created.push(root.id);root.name='R30 / '+key;page.appendChild(root);position(root);root.resize(1440,1000);root.fills=[];const p=auto('Task panel / '+title);root.appendChild(p);p.resize(352,920);p.primaryAxisSizingMode='FIXED';p.counterAxisSizingMode='FIXED';p.x=1088;p.y=56;p.fills=paint(789);p.strokes=paint(784);for(const q of ['paddingTop','paddingBottom','paddingLeft','paddingRight'])bind(p,q,814);const h=auto('Panel header','HORIZONTAL');p.appendChild(h);h.resize(318,32);h.counterAxisAlignItems='CENTER';const t=await textNode(h,title,230,'ui/14 · panel title');t.layoutSizingHorizontal='FILL';const b=await button(h,'Close','ghost',64);await close(b);if(desc)await textNode(p,desc,318,'ui/12 · small',780);states[key]=root;return {root,body:p};}
+async function notice(parent,title,desc,width=318,tone=794){const n=auto(title);parent.appendChild(n);n.resize(width,80);n.primaryAxisSizingMode='AUTO';n.counterAxisSizingMode='FIXED';n.fills=paint(tone);bind(n,'cornerRadius',824);for(const p of ['paddingTop','paddingBottom','paddingLeft','paddingRight'])bind(n,p,813);bind(n,'itemSpacing',812);await textNode(n,title,width-24,'ui/13 · row label medium');await textNode(n,desc,width-24,'ui/12 · small',780);return n;}
+async function proto(parent,w=318){await textNode(parent,'Prototype scenario · sample data · no service writes',w,'ui/11 · caption',780);}
+
+cursor=10;const vars={"checks/outcome":"VariableID:8662:12972","deploy/error":"VariableID:8662:12973","deploy/published":"VariableID:8662:12974","page/created":"VariableID:8662:12975","page/nav":"VariableID:8662:12976","page/name":"VariableID:8662:12977","page/error":"VariableID:8662:12978","history/checkpoint":"VariableID:8662:12979","history/previous":"VariableID:8662:12980","history/version-name":"VariableID:8662:12981","history/error":"VariableID:8662:12982","seo/title":"VariableID:8662:12983","seo/description":"VariableID:8662:12984","seo/slug":"VariableID:8662:12985","seo/saved-title":"VariableID:8662:12986","seo/saved-description":"VariableID:8662:12987","seo/saved-slug":"VariableID:8662:12988","seo/error":"VariableID:8662:12989","seo/visibility":"VariableID:8662:12990","seo/indexing":"VariableID:8662:12991","seo/follow":"VariableID:8662:12992"};
+const collection=await figma.variables.getVariableCollectionByIdAsync('VariableCollectionId:8662:12971');
+const kind=figma.variables.createVariable('page/created-kind',collection,'STRING');kind.scopes=['TEXT_CONTENT'];kind.setValueForMode(collection.defaultModeId,'blank');vars['page/kind']=kind.id;
+const dialogs={};
+for(const [key,title,source] of [['new-template','New page','template'],['new-blank','New page','blank']]){
+ const d=await dialog('Pages · '+key,title,'Name your page and choose how to start.',640);const name=await field(d,'Page name','Contact',592);await bindText(name,vars['page/name']);
+ const row=auto('Starting point','HORIZONTAL');d.appendChild(row);const blank=await button(row,'Blank · Empty canvas',source==='blank'?'primary':'secondary',288);const template=await button(row,'From template',source==='template'?'primary':'secondary',288);
+ const navToggle=await button(d,'Add to site navigation · On','secondary',592);
+ const hint=await textNode(d,'Navigation links will be added when this page is created.',592,'ui/12 · small',780);
+ const create=await button(d,source==='template'?'Choose template':'Create page','primary',592);const cancel=await button(d,'Cancel','secondary',592);await click(cancel,[nav('8539:9579')]);await proto(d,592);
+ dialogs[key]={d,blank,template,create,name,navToggle,hint};
+ await click(navToggle,[cond(vars['page/nav'],true,[set(vars['page/nav'],false)],[set(vars['page/nav'],true)])]);
+}
+const navLabel=figma.variables.createVariable('page/nav-label',collection,'STRING');navLabel.scopes=['TEXT_CONTENT'];navLabel.setValueForMode(collection.defaultModeId,'Add to site navigation · On');
+for(const o of Object.values(dialogs)){await bindText(o.navToggle,navLabel.id);await click(o.navToggle,[cond(vars['page/nav'],true,[set(vars['page/nav'],false),set(navLabel.id,'Add to site navigation · Off')],[set(vars['page/nav'],true),set(navLabel.id,'Add to site navigation · On')])]);}
+const empty=await dialog('Pages · Required name','New page','Enter a page name to continue.',640);const emptyField=await field(empty,'Page name','',592);const fillName=await button(empty,'Use sample name: Contact','secondary',592);await button(empty,'Create page','disabled',592);const emptyCancel=await button(empty,'Cancel','secondary',592);await click(fillName,[set(vars['page/name'],'Contact'),nav(dialogs['new-template'].d.id)]);await click(emptyCancel,[nav('8539:9579')]);await proto(empty,592);
+for(const o of Object.values(dialogs)){if(o.d.id!==dialogs['new-blank'].d.id)await click(o.blank,[nav(dialogs['new-blank'].d.id)]);if(o.d.id!==dialogs['new-template'].d.id)await click(o.template,[nav(dialogs['new-template'].d.id)]);await click(o.name,[nav(empty.id)]);}
+const failed=await dialog('Pages · Creation failed','Could not create page','Your existing pages are unchanged. Retry or return to Pages.',560);const retry=await button(failed,'Retry','primary',512),cancelFailed=await button(failed,'Back to Pages','secondary',512);await click(cancelFailed,[nav('8539:9579')]);await proto(failed,512);
+const template=await dialog('Pages · Template preview','Portfolio template','Preview for Contact · A new page will be created only after you choose Use template.',760);await notice(template,'CONTACT','Start a conversation\nTell us about your next project.',712);const use=await button(template,'Use template · Create Contact','primary',712);const back=await button(template,'Back to templates','secondary',712);await click(back,[nav('8539:12186')]);await proto(template,712);
+const source=await get('8465:2');for(const t of source.findAllWithCriteria({types:['TEXT']}))for(const s of t.getStyledTextSegments(['fontName']))await figma.loadFontAsync(s.fontName);
+const editorResults={};
+for(const mode of ['blank','template','about']){
+ const root=source.clone();created.push(root.id,...root.findAll(()=>true).map(n=>n.id));page.appendChild(root);root.name='R30 / Editor / '+(mode==='about'?'About':mode==='blank'?'Contact blank':'Contact from template');position(root);states['Editor '+mode]=root;
+ const viewport=root.findOne(n=>n.name==='Canvas viewport');for(const c of viewport.children)c.visible=false;
+ const canvas=auto('Page canvas / '+mode);viewport.appendChild(canvas);canvas.resize(736,692);canvas.primaryAxisSizingMode='FIXED';canvas.counterAxisSizingMode='FIXED';canvas.fills=paint(789);for(const p of ['paddingTop','paddingBottom','paddingLeft','paddingRight'])bind(canvas,p,817);canvas.x=24;canvas.y=24;
+ const pageName=mode==='about'?'About':'Contact';await textNode(canvas,'STUDIO NORTH / '+pageName.toUpperCase(),672,'ui/12 · small medium');
+ if(mode==='blank'){await textNode(canvas,'Start with an empty page',672,'ui/24 · title');await textNode(canvas,'Add content or choose a template to get started.',672,'ui/14 · body',780);const browse=await button(canvas,'Browse templates','secondary',230);await click(browse,[nav('8539:12186','OVERLAY')]);}
+ else{await textNode(canvas,mode==='about'?'Spaces for people.\nDesigned with care.':'Start a conversation.',672,'ui/28 · page title');await textNode(canvas,mode==='about'?'We create thoughtful spaces through simple ideas and careful collaboration.':'Tell us about your next project.\nhello@studionorth.example',672,'ui/14 · body',780);}
+ const inspector=root.findOne(n=>n.name==='Inspector');for(const c of inspector.children)c.visible=false;
+ await textNode(inspector,pageName+' page',318,'ui/14 · panel title');await textNode(inspector,'No element selected',318,'ui/13 · row label',780);await textNode(inspector,'Choose an element on the canvas to inspect its properties.',318,'ui/12 · small',780);
+ const pagesBtn=await button(inspector,'Manage pages','secondary',318);await click(pagesBtn,[nav('8539:9579','OVERLAY')]);const home=await button(inspector,'Return to Home','ghost',318);await click(home,[nav('8465:3','NAVIGATE')]);
+ const layerNav=root.findOne(n=>n.name==='Workspace navigation'&&n.type==='FRAME');if(layerNav){for(const c of layerNav.children){if(c.type==='INSTANCE'&&/Body|Main section|Heading|Paragraph|Primary button|Project grid|selected elements/.test(c.name))c.visible=false;}await textNode(layerNav,pageName+' / Body',180,'ui/12 · small',780);}
+ const homeButton=root.findAllWithCriteria({types:['INSTANCE']}).find(n=>n.name==='Action / Home');if(homeButton){for(const t of homeButton.findAllWithCriteria({types:['TEXT']}))t.characters=pageName;await click(homeButton,[nav('8539:9579','OVERLAY')]);}
+ const context=root.findAllWithCriteria({types:['TEXT']}).find(t=>t.characters.includes('Main section  /'));if(context)context.characters=pageName+' / Desktop · Base · Page canvas';
+ const foot=root.findOne(n=>n.name==='Design review footer');for(const t of foot.findAllWithCriteria({types:['TEXT']}))t.characters='Prototype fixture · '+pageName+' '+mode+' · sample page content, no server write';
+ const build=root.findAllWithCriteria({types:['INSTANCE']}).find(n=>n.name==='Workspace navigation');if(build){const b=build.findAllWithCriteria({types:['INSTANCE']}).find(n=>n.findAllWithCriteria({types:['TEXT']}).some(t=>t.characters==='Build'));if(b)await click(b,[set('VariableID:8627:652',root.id),nav('8628:12592','NAVIGATE')]);}
+ editorResults[mode]=root;
+}
+for(const id of ['I8628:12611;8627:627','I8628:12693;8627:627','I8628:12768;8627:627','I8628:12845;8627:627','I8628:12934;8627:627','I8628:13011;8627:627']){const n=await get(id);const actions=[...n.reactions[0].actions,...Object.values(editorResults).map(n=>cond('VariableID:8627:652',n.id,[nav(n.id,'NAVIGATE')]))];await click(n,actions);}
+const createBlank=[cond(vars['page/error'],true,[nav(failed.id)],[set(vars['page/created'],true),set(kind.id,'blank'),nav(editorResults.blank.id,'NAVIGATE')])];
+const createTemplate=[cond(vars['page/error'],true,[nav(failed.id)],[set(vars['page/created'],true),set(kind.id,'template'),nav(editorResults.template.id,'NAVIGATE')])];
+await click(dialogs['new-blank'].create,createBlank);await click(use,createTemplate);await click(retry,[set(vars['page/error'],false),nav(dialogs['new-blank'].d.id)]);
+await click(dialogs['new-template'].create,[nav('8539:12186')]);
+await click(await get('8539:9657'),[set(vars['page/name'],'Contact'),set(vars['page/nav'],true),set(navLabel.id,'Add to site navigation · On'),nav(dialogs['new-template'].d.id)]);
+await click(await get('8539:12203'),[nav(template.id)]);
+for(const id of ['8539:12188','8539:12218'])await click(await get(id),[nav(dialogs['new-template'].d.id)]);
+await click(await get('8539:9633'),[nav('8465:3','NAVIGATE')]);await click(await get('8539:9638'),[nav(editorResults.about.id,'NAVIGATE')]);
+const drawerBody=await get('8655:12899');const contact=await button(drawerBody,'Contact','ghost',318);drawerBody.insertChild(4,contact);contact.setBoundVariable('visible',await figma.variables.getVariableByIdAsync(vars['page/created']));await click(contact,[cond(kind.id,'template',[nav(editorResults.template.id,'NAVIGATE')],[nav(editorResults.blank.id,'NAVIGATE')])]);
+const qa=await get('8662:13151');const start=await button(qa,'Pages: new page','secondary',632);await click(start,[set(vars['page/error'],false),nav(dialogs['new-template'].d.id,'OVERLAY')]);const fail=await button(qa,'Pages: creation fails','secondary',632);await click(fail,[set(vars['page/error'],true),nav(dialogs['new-blank'].d.id,'OVERLAY')]);
+return {createdNodeIds:created.join(','),mutatedNodeIds:[...new Set(mutated)].join(','),states:Object.fromEntries(Object.entries(states).map(([k,n])=>[k,n.id])),vars:{kind:kind.id,navLabel:navLabel.id},editors:Object.fromEntries(Object.entries(editorResults).map(([k,n])=>[k,n.id])),controls:Object.fromEntries(Object.entries(dialogs).map(([k,o])=>[k,{root:o.d.id,blank:o.blank.id,template:o.template.id,create:o.create.id,nav:o.navToggle.id}])),contact:contact.id,nextCursor:cursor};
+

@@ -1,0 +1,2436 @@
+[
+  {
+    "family": "Buttons",
+    "state": "Publish",
+    "file": "heading",
+    "capturedAt": "2026-10-10T14:25:38.071Z",
+    "rect": [
+      1150.42,
+      11.5,
+      77.58,
+      32
+    ],
+    "source": "src/editor/chrome-ui/Button.tsx",
+    "baseline": "9:18",
+    "items": [
+      {
+        "kind": "box",
+        "name": "topbar-publish",
+        "x": 0.0,
+        "y": 0.0,
+        "w": 77.58,
+        "h": 32,
+        "fill": "rgb(26, 86, 219)",
+        "radius": 8,
+        "borders": [
+          {
+            "width": 0,
+            "color": "rgb(255, 255, 255)"
+          },
+          {
+            "width": 0,
+            "color": "rgb(255, 255, 255)"
+          },
+          {
+            "width": 0,
+            "color": "rgb(255, 255, 255)"
+          },
+          {
+            "width": 0,
+            "color": "rgb(255, 255, 255)"
+          }
+        ],
+        "opacity": 1,
+        "shadow": "none"
+      },
+      {
+        "kind": "text",
+        "name": "Publish",
+        "x": 16.0,
+        "y": 8.0,
+        "w": 45.58,
+        "h": 16,
+        "text": "Publish",
+        "size": 13,
+        "weight": "500",
+        "color": "rgb(255, 255, 255)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "20px",
+        "align": "center"
+      }
+    ]
+  },
+  {
+    "family": "Buttons",
+    "state": "Preview",
+    "file": "heading",
+    "capturedAt": "2026-10-10T14:25:38.071Z",
+    "rect": [
+      1062.42,
+      11.5,
+      76,
+      32
+    ],
+    "source": "src/editor/chrome-ui/Button.tsx",
+    "baseline": null,
+    "items": [
+      {
+        "kind": "box",
+        "name": "topbar-preview",
+        "x": 0.0,
+        "y": 0.0,
+        "w": 76,
+        "h": 32,
+        "fill": "rgb(255, 255, 255)",
+        "radius": 8,
+        "borders": [
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          },
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          },
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          },
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          }
+        ],
+        "opacity": 1,
+        "shadow": "none"
+      },
+      {
+        "kind": "text",
+        "name": "Preview",
+        "x": 13.27,
+        "y": 7.25,
+        "w": 49.47,
+        "h": 16,
+        "text": "Preview",
+        "size": 13,
+        "weight": "500",
+        "color": "rgb(17, 24, 39)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "19.5px",
+        "align": "center"
+      }
+    ]
+  },
+  {
+    "family": "Buttons",
+    "state": "AI chip",
+    "file": "heading",
+    "capturedAt": "2026-10-10T14:25:38.071Z",
+    "rect": [
+      1160,
+      146,
+      40,
+      24
+    ],
+    "source": "src/editor/inspector/components/InspectorHeader.tsx",
+    "baseline": null,
+    "items": [
+      {
+        "kind": "box",
+        "name": "Ask AI about this element",
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 24,
+        "fill": "rgb(235, 245, 255)",
+        "radius": 6,
+        "borders": [
+          {
+            "width": 0,
+            "color": "rgb(26, 86, 219)"
+          },
+          {
+            "width": 0,
+            "color": "rgb(26, 86, 219)"
+          },
+          {
+            "width": 0,
+            "color": "rgb(26, 86, 219)"
+          },
+          {
+            "width": 0,
+            "color": "rgb(26, 86, 219)"
+          }
+        ],
+        "opacity": 1,
+        "shadow": "none"
+      },
+      {
+        "kind": "text",
+        "name": "\u2726 AI",
+        "x": 8.77,
+        "y": 5,
+        "w": 22.45,
+        "h": 14,
+        "text": "\u2726 AI",
+        "size": 11,
+        "weight": "500",
+        "color": "rgb(26, 86, 219)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "normal",
+        "align": "center"
+      }
+    ]
+  },
+  {
+    "family": "Inputs",
+    "state": "Text style",
+    "file": "heading",
+    "capturedAt": "2026-10-10T14:25:38.071Z",
+    "rect": [
+      1097,
+      311,
+      160,
+      24
+    ],
+    "source": "src/editor/inspector/shared/controls/InputControls.tsx",
+    "baseline": null,
+    "items": [
+      {
+        "kind": "box",
+        "name": "inspector-field-text-style",
+        "x": 0,
+        "y": 0,
+        "w": 160,
+        "h": 24,
+        "fill": "rgb(249, 250, 251)",
+        "radius": 4,
+        "borders": [
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          },
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          },
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          },
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          }
+        ],
+        "opacity": 1,
+        "shadow": "none"
+      },
+      {
+        "kind": "text",
+        "name": "Value / _r_22_",
+        "x": 9,
+        "y": 4.2,
+        "w": 122,
+        "h": 15.600000000000001,
+        "text": "Heading 1",
+        "size": 12,
+        "weight": "400",
+        "color": "rgb(75, 85, 99)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "16px",
+        "align": "start"
+      },
+      {
+        "kind": "svg",
+        "name": "svg",
+        "x": 139,
+        "y": 6,
+        "w": 12,
+        "h": 12,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"rgb(108, 112, 121)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-down bdi-c\" aria-hidden=\"true\" opacity=\"1\"><path d=\"m6 9 6 6 6-6\" fill=\"none\" stroke=\"rgb(108, 112, 121)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"1\"></path></svg>"
+      }
+    ]
+  },
+  {
+    "family": "Inputs",
+    "state": "Number and unit",
+    "file": "heading",
+    "capturedAt": "2026-10-10T14:25:38.071Z",
+    "rect": [
+      1097,
+      424,
+      160,
+      24
+    ],
+    "source": "src/editor/inspector/shared/controls/InputControls.tsx",
+    "baseline": null,
+    "items": [
+      {
+        "kind": "box",
+        "name": "inspector-field-font-size",
+        "x": 0,
+        "y": 0,
+        "w": 160,
+        "h": 24,
+        "fill": "rgb(249, 250, 251)",
+        "radius": 4,
+        "borders": [
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          },
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          },
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          },
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          }
+        ],
+        "opacity": 1,
+        "shadow": "none"
+      },
+      {
+        "kind": "text",
+        "name": "Value / _r_24_",
+        "x": 9,
+        "y": 4.2,
+        "w": 78,
+        "h": 15.600000000000001,
+        "text": "36",
+        "size": 12,
+        "weight": "400",
+        "color": "rgb(75, 85, 99)",
+        "font": "\"Geist Mono\", \"SF Mono\", Menlo, Consolas, monospace",
+        "lineHeight": "16px",
+        "align": "start"
+      },
+      {
+        "kind": "svg",
+        "name": "svg",
+        "x": 93,
+        "y": 2.5,
+        "w": 8,
+        "h": 8,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"8\" height=\"8\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"rgb(108, 112, 121)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-up\" aria-hidden=\"true\" opacity=\"1\"><path d=\"m18 15-6-6-6 6\" fill=\"none\" stroke=\"rgb(108, 112, 121)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"1\"></path></svg>"
+      },
+      {
+        "kind": "svg",
+        "name": "svg",
+        "x": 93,
+        "y": 13.5,
+        "w": 8,
+        "h": 8,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"8\" height=\"8\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"rgb(108, 112, 121)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-down\" aria-hidden=\"true\" opacity=\"1\"><path d=\"m6 9 6 6 6-6\" fill=\"none\" stroke=\"rgb(108, 112, 121)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"1\"></path></svg>"
+      },
+      {
+        "kind": "box",
+        "name": "span",
+        "x": 107,
+        "y": 1,
+        "w": 52,
+        "h": 22,
+        "fill": "rgb(243, 244, 246)",
+        "radius": 0,
+        "borders": [
+          {
+            "width": 0,
+            "color": "rgb(75, 85, 99)"
+          },
+          {
+            "width": 0,
+            "color": "rgb(75, 85, 99)"
+          },
+          {
+            "width": 0,
+            "color": "rgb(75, 85, 99)"
+          },
+          {
+            "width": 0,
+            "color": "rgb(75, 85, 99)"
+          }
+        ],
+        "opacity": 1,
+        "shadow": "none"
+      },
+      {
+        "kind": "text",
+        "name": "Value / Font size unit",
+        "x": 113,
+        "y": 4.2,
+        "w": 24,
+        "h": 15.600000000000001,
+        "text": "px",
+        "size": 12,
+        "weight": "400",
+        "color": "rgb(75, 85, 99)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "16px",
+        "align": "start"
+      },
+      {
+        "kind": "svg",
+        "name": "svg",
+        "x": 141,
+        "y": 6,
+        "w": 12,
+        "h": 12,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"rgb(108, 112, 121)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-down bdi-c\" aria-hidden=\"true\" opacity=\"1\"><path d=\"m6 9 6 6 6-6\" fill=\"none\" stroke=\"rgb(108, 112, 121)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"1\"></path></svg>"
+      }
+    ]
+  },
+  {
+    "family": "Inputs",
+    "state": "Colour",
+    "file": "heading",
+    "capturedAt": "2026-10-10T14:25:38.071Z",
+    "rect": [
+      1097,
+      508,
+      160,
+      24
+    ],
+    "source": "src/editor/inspector/shared/controls/ColorInput.tsx",
+    "baseline": null,
+    "items": [
+      {
+        "kind": "box",
+        "name": "inspector-field-colour",
+        "x": 0,
+        "y": 0,
+        "w": 160,
+        "h": 24,
+        "fill": "rgb(249, 250, 251)",
+        "radius": 4,
+        "borders": [
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          },
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          },
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          },
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          }
+        ],
+        "opacity": 1,
+        "shadow": "none"
+      },
+      {
+        "kind": "box",
+        "name": "span",
+        "x": 9,
+        "y": 4,
+        "w": 16,
+        "h": 16,
+        "fill": "rgb(26, 26, 26)",
+        "radius": 3,
+        "borders": [
+          {
+            "width": 0,
+            "color": "rgb(75, 85, 99)"
+          },
+          {
+            "width": 0,
+            "color": "rgb(75, 85, 99)"
+          },
+          {
+            "width": 0,
+            "color": "rgb(75, 85, 99)"
+          },
+          {
+            "width": 0,
+            "color": "rgb(75, 85, 99)"
+          }
+        ],
+        "opacity": 1,
+        "shadow": "rgba(17, 24, 39, 0.08) 0px 0px 0px 1px inset"
+      },
+      {
+        "kind": "text",
+        "name": "Value / Colour value",
+        "x": 33,
+        "y": 4.2,
+        "w": 98,
+        "h": 15.600000000000001,
+        "text": "1a1a1a",
+        "size": 12,
+        "weight": "400",
+        "color": "rgb(75, 85, 99)",
+        "font": "\"Geist Mono\", \"SF Mono\", Menlo, Consolas, monospace",
+        "lineHeight": "16px",
+        "align": "start"
+      },
+      {
+        "kind": "svg",
+        "name": "svg",
+        "x": 139,
+        "y": 6,
+        "w": 12,
+        "h": 12,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"rgb(108, 112, 121)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-down\" aria-hidden=\"true\" opacity=\"1\"><path d=\"m6 9 6 6 6-6\" fill=\"none\" stroke=\"rgb(108, 112, 121)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"1\"></path></svg>"
+      }
+    ]
+  },
+  {
+    "family": "Inputs",
+    "state": "Search pages",
+    "file": "pages",
+    "capturedAt": "2026-10-10T14:26:20.731Z",
+    "rect": [
+      76,
+      108,
+      247,
+      32
+    ],
+    "source": "src/editor/sidebar/tabs/pages",
+    "baseline": null,
+    "items": [
+      {
+        "kind": "svg",
+        "name": "svg",
+        "x": 12,
+        "y": 6,
+        "w": 20,
+        "h": 20,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"rgb(107, 114, 128)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-search tw:h-5 tw:w-5 tw:text-gray-500\" aria-hidden=\"true\" opacity=\"1\"><path d=\"m21 21-4.34-4.34\" fill=\"none\" stroke=\"rgb(107, 114, 128)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"1\"></path><circle cx=\"11\" cy=\"11\" r=\"8\" fill=\"none\" stroke=\"rgb(107, 114, 128)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"1\"></circle></svg>"
+      },
+      {
+        "kind": "box",
+        "name": "Search pages\u2026",
+        "x": 0,
+        "y": 0,
+        "w": 247,
+        "h": 32,
+        "fill": "rgb(255, 255, 255)",
+        "radius": 6,
+        "borders": [
+          {
+            "width": 1,
+            "color": "rgb(134, 140, 151)"
+          },
+          {
+            "width": 1,
+            "color": "rgb(134, 140, 151)"
+          },
+          {
+            "width": 1,
+            "color": "rgb(134, 140, 151)"
+          },
+          {
+            "width": 1,
+            "color": "rgb(134, 140, 151)"
+          }
+        ],
+        "opacity": 1,
+        "shadow": "none"
+      },
+      {
+        "kind": "text",
+        "name": "Value / Search pages\u2026",
+        "x": 40,
+        "y": 7.55,
+        "w": 197,
+        "h": 16.900000000000002,
+        "text": "Search pages\u2026",
+        "size": 13,
+        "weight": "400",
+        "color": "rgb(17, 24, 39)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "19.5px",
+        "align": "start"
+      }
+    ]
+  },
+  {
+    "family": "Tabs",
+    "state": "Style selected",
+    "file": "heading",
+    "capturedAt": "2026-10-10T14:25:38.071Z",
+    "rect": [
+      969,
+      184,
+      99.66,
+      32
+    ],
+    "source": "src/editor/inspector/ProInspector.tsx",
+    "baseline": null,
+    "items": [
+      {
+        "kind": "box",
+        "name": "inspector-tabpanel-tab-style",
+        "x": 0,
+        "y": 0,
+        "w": 99.66,
+        "h": 32,
+        "fill": "rgba(0, 0, 0, 0)",
+        "radius": 0,
+        "borders": [
+          {
+            "width": 0,
+            "color": "rgb(26, 86, 219)"
+          },
+          {
+            "width": 0,
+            "color": "rgb(26, 86, 219)"
+          },
+          {
+            "width": 2,
+            "color": "rgb(26, 86, 219)"
+          },
+          {
+            "width": 0,
+            "color": "rgb(26, 86, 219)"
+          }
+        ],
+        "opacity": 1,
+        "shadow": "none"
+      },
+      {
+        "kind": "text",
+        "name": "Style",
+        "x": 35.27,
+        "y": 7.5,
+        "w": 29.11,
+        "h": 15,
+        "text": "Style",
+        "size": 12,
+        "weight": "500",
+        "color": "rgb(26, 86, 219)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "normal",
+        "align": "center"
+      }
+    ]
+  },
+  {
+    "family": "Tabs",
+    "state": "Behaviour rest",
+    "file": "heading",
+    "capturedAt": "2026-10-10T14:25:38.071Z",
+    "rect": [
+      1068.66,
+      184,
+      99.67,
+      32
+    ],
+    "source": "src/editor/inspector/ProInspector.tsx",
+    "baseline": null,
+    "items": [
+      {
+        "kind": "box",
+        "name": "inspector-tabpanel-tab-behaviour",
+        "x": 0.0,
+        "y": 0,
+        "w": 99.67,
+        "h": 32,
+        "fill": "rgba(0, 0, 0, 0)",
+        "radius": 0,
+        "borders": [
+          {
+            "width": 0,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 0,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 0,
+            "color": "rgba(0, 0, 0, 0)"
+          }
+        ],
+        "opacity": 1,
+        "shadow": "none"
+      },
+      {
+        "kind": "text",
+        "name": "Behaviour",
+        "x": 21.34,
+        "y": 7.5,
+        "w": 56.97,
+        "h": 15,
+        "text": "Behaviour",
+        "size": 12,
+        "weight": "400",
+        "color": "rgb(108, 112, 121)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "normal",
+        "align": "center"
+      }
+    ]
+  },
+  {
+    "family": "Tabs",
+    "state": "Effects rest",
+    "file": "heading",
+    "capturedAt": "2026-10-10T14:25:38.071Z",
+    "rect": [
+      1168.33,
+      184,
+      99.67,
+      32
+    ],
+    "source": "src/editor/inspector/ProInspector.tsx",
+    "baseline": null,
+    "items": [
+      {
+        "kind": "box",
+        "name": "inspector-tabpanel-tab-effects",
+        "x": 0.0,
+        "y": 0,
+        "w": 99.67,
+        "h": 32,
+        "fill": "rgba(0, 0, 0, 0)",
+        "radius": 0,
+        "borders": [
+          {
+            "width": 0,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 0,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 0,
+            "color": "rgba(0, 0, 0, 0)"
+          }
+        ],
+        "opacity": 1,
+        "shadow": "none"
+      },
+      {
+        "kind": "text",
+        "name": "Effects",
+        "x": 30.19,
+        "y": 7.5,
+        "w": 39.28,
+        "h": 15,
+        "text": "Effects",
+        "size": 12,
+        "weight": "400",
+        "color": "rgb(108, 112, 121)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "normal",
+        "align": "center"
+      }
+    ]
+  },
+  {
+    "family": "Segments",
+    "state": "Heading level H2 selected",
+    "file": "heading",
+    "capturedAt": "2026-10-10T14:25:38.071Z",
+    "rect": [
+      1053,
+      281,
+      204,
+      24
+    ],
+    "source": "src/editor/inspector/sections/typeBlock/bodies/textBodies.tsx",
+    "baseline": null,
+    "items": [
+      {
+        "kind": "box",
+        "name": "Level",
+        "x": 0,
+        "y": 0,
+        "w": 204,
+        "h": 24,
+        "fill": "rgb(243, 244, 246)",
+        "radius": 4,
+        "borders": [
+          {
+            "width": 0,
+            "color": "rgb(17, 24, 39)"
+          },
+          {
+            "width": 0,
+            "color": "rgb(17, 24, 39)"
+          },
+          {
+            "width": 0,
+            "color": "rgb(17, 24, 39)"
+          },
+          {
+            "width": 0,
+            "color": "rgb(17, 24, 39)"
+          }
+        ],
+        "opacity": 1,
+        "shadow": "none"
+      },
+      {
+        "kind": "box",
+        "name": "H1",
+        "x": 2,
+        "y": 0,
+        "w": 33.33,
+        "h": 24,
+        "fill": "rgba(0, 0, 0, 0)",
+        "radius": 5,
+        "borders": [
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          }
+        ],
+        "opacity": 1,
+        "shadow": "none"
+      },
+      {
+        "kind": "text",
+        "name": "H1",
+        "x": 11.75,
+        "y": 4,
+        "w": 13.81,
+        "h": 15,
+        "text": "H1",
+        "size": 12,
+        "weight": "400",
+        "color": "rgb(75, 85, 99)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "16px",
+        "align": "center"
+      },
+      {
+        "kind": "box",
+        "name": "H2",
+        "x": 35.33,
+        "y": 0,
+        "w": 33.33,
+        "h": 24,
+        "fill": "rgb(255, 255, 255)",
+        "radius": 5,
+        "borders": [
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          }
+        ],
+        "opacity": 1,
+        "shadow": "rgb(229, 231, 235) 0px 0px 0px 1px inset"
+      },
+      {
+        "kind": "text",
+        "name": "H2",
+        "x": 43.81,
+        "y": 4,
+        "w": 16.34,
+        "h": 15,
+        "text": "H2",
+        "size": 12,
+        "weight": "500",
+        "color": "rgb(26, 86, 219)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "16px",
+        "align": "center"
+      },
+      {
+        "kind": "box",
+        "name": "H3",
+        "x": 68.66,
+        "y": 0,
+        "w": 33.33,
+        "h": 24,
+        "fill": "rgba(0, 0, 0, 0)",
+        "radius": 5,
+        "borders": [
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          }
+        ],
+        "opacity": 1,
+        "shadow": "none"
+      },
+      {
+        "kind": "text",
+        "name": "H3",
+        "x": 77.14,
+        "y": 4,
+        "w": 16.34,
+        "h": 15,
+        "text": "H3",
+        "size": 12,
+        "weight": "400",
+        "color": "rgb(75, 85, 99)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "16px",
+        "align": "center"
+      },
+      {
+        "kind": "box",
+        "name": "H4",
+        "x": 101.98,
+        "y": 0,
+        "w": 33.34,
+        "h": 24,
+        "fill": "rgba(0, 0, 0, 0)",
+        "radius": 5,
+        "borders": [
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          }
+        ],
+        "opacity": 1,
+        "shadow": "none"
+      },
+      {
+        "kind": "text",
+        "name": "H4",
+        "x": 110.31,
+        "y": 4,
+        "w": 16.67,
+        "h": 15,
+        "text": "H4",
+        "size": 12,
+        "weight": "400",
+        "color": "rgb(75, 85, 99)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "16px",
+        "align": "center"
+      },
+      {
+        "kind": "box",
+        "name": "H5",
+        "x": 135.33,
+        "y": 0,
+        "w": 33.33,
+        "h": 24,
+        "fill": "rgba(0, 0, 0, 0)",
+        "radius": 5,
+        "borders": [
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          }
+        ],
+        "opacity": 1,
+        "shadow": "none"
+      },
+      {
+        "kind": "text",
+        "name": "H5",
+        "x": 143.97,
+        "y": 4,
+        "w": 16.05,
+        "h": 15,
+        "text": "H5",
+        "size": 12,
+        "weight": "400",
+        "color": "rgb(75, 85, 99)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "16px",
+        "align": "center"
+      },
+      {
+        "kind": "box",
+        "name": "H6",
+        "x": 168.66,
+        "y": 0,
+        "w": 33.33,
+        "h": 24,
+        "fill": "rgba(0, 0, 0, 0)",
+        "radius": 5,
+        "borders": [
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          }
+        ],
+        "opacity": 1,
+        "shadow": "none"
+      },
+      {
+        "kind": "text",
+        "name": "H6",
+        "x": 177.14,
+        "y": 4,
+        "w": 16.36,
+        "h": 15,
+        "text": "H6",
+        "size": 12,
+        "weight": "400",
+        "color": "rgb(75, 85, 99)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "16px",
+        "align": "center"
+      }
+    ]
+  },
+  {
+    "family": "Segments",
+    "state": "Align none selected",
+    "file": "heading",
+    "capturedAt": "2026-10-10T14:25:38.071Z",
+    "rect": [
+      1097,
+      538,
+      160,
+      24
+    ],
+    "source": "src/editor/inspector/sections/typography/FontControls.tsx",
+    "baseline": null,
+    "items": [
+      {
+        "kind": "box",
+        "name": "Align",
+        "x": 0,
+        "y": 0,
+        "w": 160,
+        "h": 24,
+        "fill": "rgb(243, 244, 246)",
+        "radius": 4,
+        "borders": [
+          {
+            "width": 0,
+            "color": "rgb(17, 24, 39)"
+          },
+          {
+            "width": 0,
+            "color": "rgb(17, 24, 39)"
+          },
+          {
+            "width": 0,
+            "color": "rgb(17, 24, 39)"
+          },
+          {
+            "width": 0,
+            "color": "rgb(17, 24, 39)"
+          }
+        ],
+        "opacity": 1,
+        "shadow": "none"
+      },
+      {
+        "kind": "box",
+        "name": "Left",
+        "x": 2,
+        "y": 0,
+        "w": 52,
+        "h": 24,
+        "fill": "rgba(0, 0, 0, 0)",
+        "radius": 5,
+        "borders": [
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          }
+        ],
+        "opacity": 1,
+        "shadow": "none"
+      },
+      {
+        "kind": "text",
+        "name": "Left",
+        "x": 17.13,
+        "y": 4,
+        "w": 21.75,
+        "h": 15,
+        "text": "Left",
+        "size": 12,
+        "weight": "400",
+        "color": "rgb(75, 85, 99)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "16px",
+        "align": "center"
+      },
+      {
+        "kind": "box",
+        "name": "Center",
+        "x": 54,
+        "y": 0,
+        "w": 52,
+        "h": 24,
+        "fill": "rgba(0, 0, 0, 0)",
+        "radius": 5,
+        "borders": [
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          }
+        ],
+        "opacity": 1,
+        "shadow": "none"
+      },
+      {
+        "kind": "text",
+        "name": "Center",
+        "x": 60.91,
+        "y": 4,
+        "w": 38.19,
+        "h": 15,
+        "text": "Center",
+        "size": 12,
+        "weight": "400",
+        "color": "rgb(75, 85, 99)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "16px",
+        "align": "center"
+      },
+      {
+        "kind": "box",
+        "name": "Right",
+        "x": 106,
+        "y": 0,
+        "w": 52,
+        "h": 24,
+        "fill": "rgba(0, 0, 0, 0)",
+        "radius": 5,
+        "borders": [
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 2,
+            "color": "rgba(0, 0, 0, 0)"
+          }
+        ],
+        "opacity": 1,
+        "shadow": "none"
+      },
+      {
+        "kind": "text",
+        "name": "Right",
+        "x": 117.48,
+        "y": 4,
+        "w": 29.02,
+        "h": 15,
+        "text": "Right",
+        "size": 12,
+        "weight": "400",
+        "color": "rgb(75, 85, 99)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "16px",
+        "align": "center"
+      }
+    ]
+  },
+  {
+    "family": "Section headings",
+    "state": "Heading open",
+    "file": "heading",
+    "capturedAt": "2026-10-10T14:25:38.071Z",
+    "rect": [
+      969,
+      244,
+      299,
+      33
+    ],
+    "source": "src/editor/inspector/shared/controls/Section.tsx",
+    "baseline": null,
+    "items": [
+      {
+        "kind": "svg",
+        "name": "svg",
+        "x": 12,
+        "y": 11,
+        "w": 12,
+        "h": 12,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"rgb(108, 112, 121)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-down bdi-chev tw:shrink-0 tw:text-[var(--bk-ink-muted)]\" aria-hidden=\"true\" opacity=\"1\"><path d=\"m6 9 6 6 6-6\" fill=\"none\" stroke=\"rgb(108, 112, 121)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"1\"></path></svg>"
+      },
+      {
+        "kind": "text",
+        "name": "Heading",
+        "x": 32,
+        "y": 9,
+        "w": 48.02,
+        "h": 15,
+        "text": "Heading",
+        "size": 12,
+        "weight": "500",
+        "color": "rgb(75, 85, 99)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "16px",
+        "align": "left"
+      }
+    ]
+  },
+  {
+    "family": "Section headings",
+    "state": "Typography open",
+    "file": "heading",
+    "capturedAt": "2026-10-10T14:25:38.071Z",
+    "rect": [
+      969,
+      361,
+      299,
+      33
+    ],
+    "source": "src/editor/inspector/shared/controls/Section.tsx",
+    "baseline": null,
+    "items": [
+      {
+        "kind": "svg",
+        "name": "svg",
+        "x": 12,
+        "y": 11,
+        "w": 12,
+        "h": 12,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"rgb(108, 112, 121)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-down bdi-chev tw:shrink-0 tw:text-[var(--bk-ink-muted)]\" aria-hidden=\"true\" opacity=\"1\"><path d=\"m6 9 6 6 6-6\" fill=\"none\" stroke=\"rgb(108, 112, 121)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"1\"></path></svg>"
+      },
+      {
+        "kind": "text",
+        "name": "Typography",
+        "x": 32,
+        "y": 9,
+        "w": 68.84,
+        "h": 15,
+        "text": "Typography",
+        "size": 12,
+        "weight": "500",
+        "color": "rgb(75, 85, 99)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "16px",
+        "align": "left"
+      }
+    ]
+  },
+  {
+    "family": "Section headings",
+    "state": "Size open",
+    "file": "heading",
+    "capturedAt": "2026-10-10T14:25:38.071Z",
+    "rect": [
+      969,
+      606,
+      299,
+      33
+    ],
+    "source": "src/editor/inspector/shared/controls/Section.tsx",
+    "baseline": null,
+    "items": [
+      {
+        "kind": "svg",
+        "name": "svg",
+        "x": 12,
+        "y": 11,
+        "w": 12,
+        "h": 12,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"rgb(108, 112, 121)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-down bdi-chev tw:shrink-0 tw:text-[var(--bk-ink-muted)]\" aria-hidden=\"true\" opacity=\"1\"><path d=\"m6 9 6 6 6-6\" fill=\"none\" stroke=\"rgb(108, 112, 121)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"1\"></path></svg>"
+      },
+      {
+        "kind": "text",
+        "name": "Size",
+        "x": 32,
+        "y": 9,
+        "w": 24.34,
+        "h": 15,
+        "text": "Size",
+        "size": 12,
+        "weight": "500",
+        "color": "rgb(75, 85, 99)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "16px",
+        "align": "left"
+      }
+    ]
+  },
+  {
+    "family": "Property rows",
+    "state": "Text style",
+    "file": "heading",
+    "capturedAt": "2026-10-10T14:25:38.071Z",
+    "rect": [
+      969,
+      309,
+      299,
+      28
+    ],
+    "source": "src/editor/inspector/shared/controls/InputControls.tsx",
+    "baseline": null,
+    "items": [
+      {
+        "kind": "text",
+        "name": "Text style",
+        "x": 12,
+        "y": 6,
+        "w": 54.83,
+        "h": 15,
+        "text": "Text style",
+        "size": 12,
+        "weight": "400",
+        "color": "rgb(108, 112, 121)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "16px",
+        "align": "left"
+      },
+      {
+        "kind": "box",
+        "name": "inspector-field-text-style",
+        "x": 128,
+        "y": 2,
+        "w": 160,
+        "h": 24,
+        "fill": "rgb(249, 250, 251)",
+        "radius": 4,
+        "borders": [
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          },
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          },
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          },
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          }
+        ],
+        "opacity": 1,
+        "shadow": "none"
+      },
+      {
+        "kind": "text",
+        "name": "Value / _r_22_",
+        "x": 137,
+        "y": 6.2,
+        "w": 122,
+        "h": 15.600000000000001,
+        "text": "Heading 1",
+        "size": 12,
+        "weight": "400",
+        "color": "rgb(75, 85, 99)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "16px",
+        "align": "start"
+      },
+      {
+        "kind": "svg",
+        "name": "svg",
+        "x": 267,
+        "y": 8,
+        "w": 12,
+        "h": 12,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"rgb(108, 112, 121)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-down bdi-c\" aria-hidden=\"true\" opacity=\"1\"><path d=\"m6 9 6 6 6-6\" fill=\"none\" stroke=\"rgb(108, 112, 121)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"1\"></path></svg>"
+      }
+    ]
+  },
+  {
+    "family": "Property rows",
+    "state": "Font size",
+    "file": "heading",
+    "capturedAt": "2026-10-10T14:25:38.071Z",
+    "rect": [
+      969,
+      422,
+      299,
+      28
+    ],
+    "source": "src/editor/inspector/shared/controls/InputControls.tsx",
+    "baseline": null,
+    "items": [
+      {
+        "kind": "text",
+        "name": "Font size",
+        "x": 12,
+        "y": 6,
+        "w": 50.89,
+        "h": 15,
+        "text": "Font size",
+        "size": 12,
+        "weight": "400",
+        "color": "rgb(108, 112, 121)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "16px",
+        "align": "left"
+      },
+      {
+        "kind": "box",
+        "name": "inspector-field-font-size",
+        "x": 128,
+        "y": 2,
+        "w": 160,
+        "h": 24,
+        "fill": "rgb(249, 250, 251)",
+        "radius": 4,
+        "borders": [
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          },
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          },
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          },
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          }
+        ],
+        "opacity": 1,
+        "shadow": "none"
+      },
+      {
+        "kind": "text",
+        "name": "Value / _r_24_",
+        "x": 137,
+        "y": 6.2,
+        "w": 78,
+        "h": 15.600000000000001,
+        "text": "36",
+        "size": 12,
+        "weight": "400",
+        "color": "rgb(75, 85, 99)",
+        "font": "\"Geist Mono\", \"SF Mono\", Menlo, Consolas, monospace",
+        "lineHeight": "16px",
+        "align": "start"
+      },
+      {
+        "kind": "svg",
+        "name": "svg",
+        "x": 221,
+        "y": 4.5,
+        "w": 8,
+        "h": 8,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"8\" height=\"8\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"rgb(108, 112, 121)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-up\" aria-hidden=\"true\" opacity=\"1\"><path d=\"m18 15-6-6-6 6\" fill=\"none\" stroke=\"rgb(108, 112, 121)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"1\"></path></svg>"
+      },
+      {
+        "kind": "svg",
+        "name": "svg",
+        "x": 221,
+        "y": 15.5,
+        "w": 8,
+        "h": 8,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"8\" height=\"8\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"rgb(108, 112, 121)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-down\" aria-hidden=\"true\" opacity=\"1\"><path d=\"m6 9 6 6 6-6\" fill=\"none\" stroke=\"rgb(108, 112, 121)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"1\"></path></svg>"
+      },
+      {
+        "kind": "box",
+        "name": "span",
+        "x": 235,
+        "y": 3,
+        "w": 52,
+        "h": 22,
+        "fill": "rgb(243, 244, 246)",
+        "radius": 0,
+        "borders": [
+          {
+            "width": 0,
+            "color": "rgb(75, 85, 99)"
+          },
+          {
+            "width": 0,
+            "color": "rgb(75, 85, 99)"
+          },
+          {
+            "width": 0,
+            "color": "rgb(75, 85, 99)"
+          },
+          {
+            "width": 0,
+            "color": "rgb(75, 85, 99)"
+          }
+        ],
+        "opacity": 1,
+        "shadow": "none"
+      },
+      {
+        "kind": "text",
+        "name": "Value / Font size unit",
+        "x": 241,
+        "y": 6.2,
+        "w": 24,
+        "h": 15.600000000000001,
+        "text": "px",
+        "size": 12,
+        "weight": "400",
+        "color": "rgb(75, 85, 99)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "16px",
+        "align": "start"
+      },
+      {
+        "kind": "svg",
+        "name": "svg",
+        "x": 269,
+        "y": 8,
+        "w": 12,
+        "h": 12,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"rgb(108, 112, 121)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-down bdi-c\" aria-hidden=\"true\" opacity=\"1\"><path d=\"m6 9 6 6 6-6\" fill=\"none\" stroke=\"rgb(108, 112, 121)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"1\"></path></svg>"
+      }
+    ]
+  },
+  {
+    "family": "Property rows",
+    "state": "Line height",
+    "file": "heading",
+    "capturedAt": "2026-10-10T14:25:38.071Z",
+    "rect": [
+      969,
+      450,
+      299,
+      28
+    ],
+    "source": "src/editor/inspector/shared/controls/InputControls.tsx",
+    "baseline": null,
+    "items": [
+      {
+        "kind": "text",
+        "name": "Line height",
+        "x": 12,
+        "y": 6,
+        "w": 62.53,
+        "h": 15,
+        "text": "Line height",
+        "size": 12,
+        "weight": "400",
+        "color": "rgb(108, 112, 121)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "16px",
+        "align": "left"
+      },
+      {
+        "kind": "box",
+        "name": "inspector-field-line-height",
+        "x": 128,
+        "y": 2,
+        "w": 160,
+        "h": 24,
+        "fill": "rgb(249, 250, 251)",
+        "radius": 4,
+        "borders": [
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          },
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          },
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          },
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          }
+        ],
+        "opacity": 1,
+        "shadow": "none"
+      },
+      {
+        "kind": "text",
+        "name": "Value / _r_28_",
+        "x": 137,
+        "y": 6.2,
+        "w": 78,
+        "h": 15.600000000000001,
+        "text": "1.2",
+        "size": 12,
+        "weight": "400",
+        "color": "rgb(75, 85, 99)",
+        "font": "\"Geist Mono\", \"SF Mono\", Menlo, Consolas, monospace",
+        "lineHeight": "16px",
+        "align": "start"
+      },
+      {
+        "kind": "svg",
+        "name": "svg",
+        "x": 221,
+        "y": 4.5,
+        "w": 8,
+        "h": 8,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"8\" height=\"8\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"rgb(108, 112, 121)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-up\" aria-hidden=\"true\" opacity=\"1\"><path d=\"m18 15-6-6-6 6\" fill=\"none\" stroke=\"rgb(108, 112, 121)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"1\"></path></svg>"
+      },
+      {
+        "kind": "svg",
+        "name": "svg",
+        "x": 221,
+        "y": 15.5,
+        "w": 8,
+        "h": 8,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"8\" height=\"8\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"rgb(108, 112, 121)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-down\" aria-hidden=\"true\" opacity=\"1\"><path d=\"m6 9 6 6 6-6\" fill=\"none\" stroke=\"rgb(108, 112, 121)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"1\"></path></svg>"
+      },
+      {
+        "kind": "box",
+        "name": "span",
+        "x": 235,
+        "y": 3,
+        "w": 52,
+        "h": 22,
+        "fill": "rgb(243, 244, 246)",
+        "radius": 0,
+        "borders": [
+          {
+            "width": 0,
+            "color": "rgb(75, 85, 99)"
+          },
+          {
+            "width": 0,
+            "color": "rgb(75, 85, 99)"
+          },
+          {
+            "width": 0,
+            "color": "rgb(75, 85, 99)"
+          },
+          {
+            "width": 0,
+            "color": "rgb(75, 85, 99)"
+          }
+        ],
+        "opacity": 1,
+        "shadow": "none"
+      },
+      {
+        "kind": "text",
+        "name": "Value / Line height unit",
+        "x": 241,
+        "y": 6.2,
+        "w": 24,
+        "h": 15.600000000000001,
+        "text": "\u00d7",
+        "size": 12,
+        "weight": "400",
+        "color": "rgb(75, 85, 99)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "16px",
+        "align": "start"
+      },
+      {
+        "kind": "svg",
+        "name": "svg",
+        "x": 269,
+        "y": 8,
+        "w": 12,
+        "h": 12,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"rgb(108, 112, 121)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-down bdi-c\" aria-hidden=\"true\" opacity=\"1\"><path d=\"m6 9 6 6 6-6\" fill=\"none\" stroke=\"rgb(108, 112, 121)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"1\"></path></svg>"
+      }
+    ]
+  },
+  {
+    "family": "Property rows",
+    "state": "Weight",
+    "file": "heading",
+    "capturedAt": "2026-10-10T14:25:38.071Z",
+    "rect": [
+      969,
+      478,
+      299,
+      28
+    ],
+    "source": "src/editor/inspector/shared/controls/InputControls.tsx",
+    "baseline": null,
+    "items": [
+      {
+        "kind": "text",
+        "name": "Weight",
+        "x": 12,
+        "y": 6,
+        "w": 39.5,
+        "h": 15,
+        "text": "Weight",
+        "size": 12,
+        "weight": "400",
+        "color": "rgb(108, 112, 121)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "16px",
+        "align": "left"
+      },
+      {
+        "kind": "box",
+        "name": "inspector-field-weight",
+        "x": 128,
+        "y": 2,
+        "w": 160,
+        "h": 24,
+        "fill": "rgb(249, 250, 251)",
+        "radius": 4,
+        "borders": [
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          },
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          },
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          },
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          }
+        ],
+        "opacity": 1,
+        "shadow": "none"
+      },
+      {
+        "kind": "text",
+        "name": "Value / _r_2b_",
+        "x": 137,
+        "y": 6.2,
+        "w": 122,
+        "h": 15.600000000000001,
+        "text": "700",
+        "size": 12,
+        "weight": "400",
+        "color": "rgb(75, 85, 99)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "16px",
+        "align": "start"
+      },
+      {
+        "kind": "svg",
+        "name": "svg",
+        "x": 267,
+        "y": 8,
+        "w": 12,
+        "h": 12,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"rgb(108, 112, 121)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-down bdi-c\" aria-hidden=\"true\" opacity=\"1\"><path d=\"m6 9 6 6 6-6\" fill=\"none\" stroke=\"rgb(108, 112, 121)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"1\"></path></svg>"
+      }
+    ]
+  },
+  {
+    "family": "Property rows",
+    "state": "Colour",
+    "file": "heading",
+    "capturedAt": "2026-10-10T14:25:38.071Z",
+    "rect": [
+      969,
+      506,
+      299,
+      28
+    ],
+    "source": "src/editor/inspector/shared/controls/ColorInput.tsx",
+    "baseline": null,
+    "items": [
+      {
+        "kind": "text",
+        "name": "Colour",
+        "x": 12,
+        "y": 6,
+        "w": 37.69,
+        "h": 15,
+        "text": "Colour",
+        "size": 12,
+        "weight": "400",
+        "color": "rgb(108, 112, 121)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "16px",
+        "align": "left"
+      },
+      {
+        "kind": "box",
+        "name": "inspector-field-colour",
+        "x": 128,
+        "y": 2,
+        "w": 160,
+        "h": 24,
+        "fill": "rgb(249, 250, 251)",
+        "radius": 4,
+        "borders": [
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          },
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          },
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          },
+          {
+            "width": 1,
+            "color": "rgb(229, 231, 235)"
+          }
+        ],
+        "opacity": 1,
+        "shadow": "none"
+      },
+      {
+        "kind": "box",
+        "name": "span",
+        "x": 137,
+        "y": 6,
+        "w": 16,
+        "h": 16,
+        "fill": "rgb(26, 26, 26)",
+        "radius": 3,
+        "borders": [
+          {
+            "width": 0,
+            "color": "rgb(75, 85, 99)"
+          },
+          {
+            "width": 0,
+            "color": "rgb(75, 85, 99)"
+          },
+          {
+            "width": 0,
+            "color": "rgb(75, 85, 99)"
+          },
+          {
+            "width": 0,
+            "color": "rgb(75, 85, 99)"
+          }
+        ],
+        "opacity": 1,
+        "shadow": "rgba(17, 24, 39, 0.08) 0px 0px 0px 1px inset"
+      },
+      {
+        "kind": "text",
+        "name": "Value / Colour value",
+        "x": 161,
+        "y": 6.2,
+        "w": 98,
+        "h": 15.600000000000001,
+        "text": "1a1a1a",
+        "size": 12,
+        "weight": "400",
+        "color": "rgb(75, 85, 99)",
+        "font": "\"Geist Mono\", \"SF Mono\", Menlo, Consolas, monospace",
+        "lineHeight": "16px",
+        "align": "start"
+      },
+      {
+        "kind": "svg",
+        "name": "svg",
+        "x": 267,
+        "y": 8,
+        "w": 12,
+        "h": 12,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"rgb(108, 112, 121)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-down\" aria-hidden=\"true\" opacity=\"1\"><path d=\"m6 9 6 6 6-6\" fill=\"none\" stroke=\"rgb(108, 112, 121)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"1\"></path></svg>"
+      }
+    ]
+  },
+  {
+    "family": "Menu rows",
+    "state": "Duplicate",
+    "file": "heading-menu",
+    "capturedAt": "2026-10-10T14:26:01.453Z",
+    "rect": [
+      921,
+      182,
+      294,
+      32
+    ],
+    "source": "src/editor/inspector/components/InspectorElementMenu.tsx",
+    "baseline": null,
+    "items": [
+      {
+        "kind": "text",
+        "name": "Duplicate",
+        "x": 10,
+        "y": 9,
+        "w": 53.44,
+        "h": 15,
+        "text": "Duplicate",
+        "size": 12,
+        "weight": "400",
+        "color": "rgb(17, 24, 39)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "16px",
+        "align": "left"
+      },
+      {
+        "kind": "text",
+        "name": "\u2318D",
+        "x": 265.05,
+        "y": 10,
+        "w": 18.95,
+        "h": 14,
+        "text": "\u2318D",
+        "size": 11,
+        "weight": "400",
+        "color": "rgb(108, 112, 121)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "16px",
+        "align": "left"
+      }
+    ]
+  },
+  {
+    "family": "Menu rows",
+    "state": "Paste style unavailable",
+    "file": "heading-menu",
+    "capturedAt": "2026-10-10T14:26:01.453Z",
+    "rect": [
+      921,
+      246,
+      294,
+      44
+    ],
+    "source": "src/editor/inspector/components/InspectorElementMenu.tsx",
+    "baseline": null,
+    "items": [
+      {
+        "kind": "text",
+        "name": "Paste style",
+        "x": 10,
+        "y": 7,
+        "w": 62.13,
+        "h": 15,
+        "text": "Paste style",
+        "size": 12,
+        "weight": "400",
+        "color": "rgb(209, 213, 219)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "16px",
+        "align": "left"
+      },
+      {
+        "kind": "text",
+        "name": "Copy a style first",
+        "x": 10,
+        "y": 24,
+        "w": 88.02,
+        "h": 14,
+        "text": "Copy a style first",
+        "size": 11,
+        "weight": "400",
+        "color": "rgb(108, 112, 121)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "16px",
+        "align": "left"
+      },
+      {
+        "kind": "text",
+        "name": "\u2318\u2325V",
+        "x": 254.41,
+        "y": 16,
+        "w": 29.59,
+        "h": 14,
+        "text": "\u2318\u2325V",
+        "size": 11,
+        "weight": "400",
+        "color": "rgb(108, 112, 121)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "16px",
+        "align": "left"
+      }
+    ]
+  },
+  {
+    "family": "Menu rows",
+    "state": "Delete destructive",
+    "file": "heading-menu",
+    "capturedAt": "2026-10-10T14:26:01.453Z",
+    "rect": [
+      921,
+      449,
+      294,
+      32
+    ],
+    "source": "src/editor/inspector/components/InspectorElementMenu.tsx",
+    "baseline": null,
+    "items": [
+      {
+        "kind": "text",
+        "name": "Delete",
+        "x": 10,
+        "y": 8,
+        "w": 36.38,
+        "h": 15,
+        "text": "Delete",
+        "size": 12,
+        "weight": "400",
+        "color": "rgb(200, 30, 30)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "16px",
+        "align": "left"
+      },
+      {
+        "kind": "text",
+        "name": "\u232b",
+        "x": 270.64,
+        "y": 9,
+        "w": 13.36,
+        "h": 14,
+        "text": "\u232b",
+        "size": 11,
+        "weight": "400",
+        "color": "rgb(108, 112, 121)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "16px",
+        "align": "left"
+      }
+    ]
+  },
+  {
+    "family": "Navigation",
+    "state": "Layer heading selected",
+    "file": "layers",
+    "capturedAt": "2026-10-10T14:26:09.871Z",
+    "rect": [
+      60,
+      148,
+      278,
+      28
+    ],
+    "source": "src/editor/panels/layers",
+    "baseline": null,
+    "items": [
+      {
+        "kind": "box",
+        "name": "Heading, heading element",
+        "x": 0,
+        "y": 0,
+        "w": 278,
+        "h": 28,
+        "fill": "rgb(235, 245, 255)",
+        "radius": 4,
+        "borders": [
+          {
+            "width": 0,
+            "color": "rgb(17, 24, 39)"
+          },
+          {
+            "width": 0,
+            "color": "rgb(17, 24, 39)"
+          },
+          {
+            "width": 0,
+            "color": "rgb(17, 24, 39)"
+          },
+          {
+            "width": 0,
+            "color": "rgb(17, 24, 39)"
+          }
+        ],
+        "opacity": 1,
+        "shadow": "none"
+      },
+      {
+        "kind": "svg",
+        "name": "svg",
+        "x": 36,
+        "y": 7.5,
+        "w": 12,
+        "h": 13,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"13\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"rgb(17, 24, 39)\" stroke-width=\"1.5px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-type\" aria-hidden=\"true\" opacity=\"1\"><path d=\"M12 4v16\" fill=\"none\" stroke=\"rgb(17, 24, 39)\" stroke-width=\"1.5px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"1\"></path><path d=\"M4 7V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2\" fill=\"none\" stroke=\"rgb(17, 24, 39)\" stroke-width=\"1.5px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"1\"></path><path d=\"M9 20h6\" fill=\"none\" stroke=\"rgb(17, 24, 39)\" stroke-width=\"1.5px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"1\"></path></svg>"
+      },
+      {
+        "kind": "text",
+        "name": "Heading",
+        "x": 52,
+        "y": 6,
+        "w": 51.44,
+        "h": 16,
+        "text": "Heading",
+        "size": 13,
+        "weight": "400",
+        "color": "rgb(17, 24, 39)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "20px",
+        "align": "start"
+      }
+    ]
+  },
+  {
+    "family": "Navigation",
+    "state": "Brand Colours selected",
+    "file": "brand",
+    "capturedAt": "2026-10-10T14:39:25.787Z",
+    "rect": [
+      8,
+      176,
+      239,
+      32
+    ],
+    "source": "src/editor/design-system/ui/BrandWorkspace.tsx",
+    "baseline": null,
+    "items": [
+      {
+        "kind": "box",
+        "name": "brand-row-colours",
+        "x": 0,
+        "y": 0,
+        "w": 239,
+        "h": 32,
+        "fill": "rgb(235, 245, 255)",
+        "radius": 6,
+        "borders": [
+          {
+            "width": 0,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 0,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 0,
+            "color": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 0,
+            "color": "rgba(0, 0, 0, 0)"
+          }
+        ],
+        "opacity": 1,
+        "shadow": "none"
+      },
+      {
+        "kind": "text",
+        "name": "Colours",
+        "x": 12,
+        "y": 7,
+        "w": 52.09,
+        "h": 17,
+        "text": "Colours",
+        "letterSpacing": "normal",
+        "size": 14,
+        "weight": "500",
+        "color": "rgb(26, 86, 219)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "20px",
+        "align": "left"
+      },
+      {
+        "kind": "text",
+        "name": "58",
+        "x": 208.84,
+        "y": 7,
+        "w": 18.16,
+        "h": 17,
+        "text": "58",
+        "letterSpacing": "normal",
+        "size": 14,
+        "weight": "400",
+        "color": "rgb(108, 112, 121)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "20px",
+        "align": "left"
+      }
+    ]
+  },
+  {
+    "family": "Panel headers",
+    "state": "Pages",
+    "file": "pages",
+    "capturedAt": "2026-10-10T14:26:20.731Z",
+    "rect": [
+      60,
+      56,
+      279,
+      44
+    ],
+    "source": "src/editor/chrome-ui/PanelHeader.tsx",
+    "baseline": null,
+    "items": [
+      {
+        "kind": "box",
+        "name": "panel-header",
+        "x": 0,
+        "y": 0,
+        "w": 279,
+        "h": 44,
+        "fill": "rgb(255, 255, 255)",
+        "radius": 0,
+        "borders": [
+          {
+            "width": 0,
+            "color": "rgb(243, 244, 246)"
+          },
+          {
+            "width": 0,
+            "color": "rgb(243, 244, 246)"
+          },
+          {
+            "width": 1,
+            "color": "rgb(243, 244, 246)"
+          },
+          {
+            "width": 0,
+            "color": "rgb(243, 244, 246)"
+          }
+        ],
+        "opacity": 1,
+        "shadow": "none"
+      },
+      {
+        "kind": "text",
+        "name": "Pages",
+        "x": 16,
+        "y": 12.5,
+        "w": 41.31,
+        "h": 17,
+        "text": "Pages",
+        "size": 14,
+        "weight": "500",
+        "color": "rgb(17, 24, 39)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "20px",
+        "align": "start"
+      },
+      {
+        "kind": "text",
+        "name": "\u22ef",
+        "x": 208,
+        "y": 12.5,
+        "w": 14,
+        "h": 17,
+        "text": "\u22ef",
+        "size": 14,
+        "weight": "500",
+        "color": "rgb(75, 85, 99)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "20px",
+        "align": "center"
+      },
+      {
+        "kind": "text",
+        "name": "\u2715",
+        "x": 245.66,
+        "y": 12.5,
+        "w": 10.67,
+        "h": 17,
+        "text": "\u2715",
+        "size": 14,
+        "weight": "500",
+        "color": "rgb(75, 85, 99)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "20px",
+        "align": "center"
+      }
+    ]
+  },
+  {
+    "family": "Context",
+    "state": "State Base",
+    "file": "heading",
+    "capturedAt": "2026-10-10T14:25:38.071Z",
+    "rect": [
+      981,
+      218,
+      94,
+      24
+    ],
+    "source": "src/editor/inspector/components/ContextRow.tsx",
+    "baseline": null,
+    "items": [
+      {
+        "kind": "text",
+        "name": "State:",
+        "x": 6,
+        "y": 4,
+        "w": 36.06,
+        "h": 15,
+        "text": "State: ",
+        "size": 12,
+        "weight": "400",
+        "color": "rgb(75, 85, 99)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "16px",
+        "align": "center"
+      },
+      {
+        "kind": "text",
+        "name": "Base",
+        "x": 42.06,
+        "y": 4,
+        "w": 27.92,
+        "h": 15,
+        "text": "Base",
+        "size": 12,
+        "weight": "400",
+        "color": "rgb(75, 85, 99)",
+        "font": "Inter, sans-serif",
+        "lineHeight": "16px",
+        "align": "center"
+      },
+      {
+        "kind": "svg",
+        "name": "svg",
+        "x": 75.98,
+        "y": 6,
+        "w": 12,
+        "h": 12,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"rgb(75, 85, 99)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-down\" aria-hidden=\"true\" opacity=\"1\"><path d=\"m6 9 6 6 6-6\" fill=\"none\" stroke=\"rgb(75, 85, 99)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"1\"></path></svg>"
+      }
+    ]
+  },
+  {
+    "family": "Icon buttons",
+    "state": "More rest",
+    "file": "heading",
+    "capturedAt": "2026-10-10T14:25:38.071Z",
+    "rect": [
+      1204,
+      146,
+      24,
+      24
+    ],
+    "source": "src/editor/inspector/components/InspectorHeader.tsx",
+    "baseline": null,
+    "items": [
+      {
+        "kind": "svg",
+        "name": "svg",
+        "x": 4,
+        "y": 4,
+        "w": 16,
+        "h": 16,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"rgb(75, 85, 99)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-ellipsis\" aria-hidden=\"true\" opacity=\"1\"><circle cx=\"12\" cy=\"12\" r=\"1\" fill=\"none\" stroke=\"rgb(75, 85, 99)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"1\"></circle><circle cx=\"19\" cy=\"12\" r=\"1\" fill=\"none\" stroke=\"rgb(75, 85, 99)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"1\"></circle><circle cx=\"5\" cy=\"12\" r=\"1\" fill=\"none\" stroke=\"rgb(75, 85, 99)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"1\"></circle></svg>"
+      }
+    ]
+  },
+  {
+    "family": "Icon buttons",
+    "state": "Hide inspector rest",
+    "file": "heading",
+    "capturedAt": "2026-10-10T14:25:38.071Z",
+    "rect": [
+      1232,
+      146,
+      24,
+      24
+    ],
+    "source": "src/editor/inspector/components/InspectorHeader.tsx",
+    "baseline": null,
+    "items": [
+      {
+        "kind": "svg",
+        "name": "svg",
+        "x": 4,
+        "y": 4,
+        "w": 16,
+        "h": 16,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"rgb(75, 85, 99)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-x\" aria-hidden=\"true\" opacity=\"1\"><path d=\"M18 6 6 18\" fill=\"none\" stroke=\"rgb(75, 85, 99)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"1\"></path><path d=\"m6 6 12 12\" fill=\"none\" stroke=\"rgb(75, 85, 99)\" stroke-width=\"2px\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"1\"></path></svg>"
+      }
+    ]
+  }
+]

@@ -1,0 +1,1060 @@
+{
+  "coords": [
+    {
+      "id": "8798:13987",
+      "controls": [
+        [
+          "8798:13989",
+          "Buildrick / Studio North",
+          139,
+          28
+        ],
+        [
+          "I8798:13990;8627:624",
+          "Action / Build",
+          411,
+          28
+        ],
+        [
+          "8798:13992",
+          "Action / Selected AI",
+          515,
+          28
+        ],
+        [
+          "8798:13993",
+          "Action / Agents",
+          527,
+          28
+        ],
+        [
+          "8798:13994",
+          "Action / Review",
+          507,
+          28
+        ],
+        [
+          "8798:13995",
+          "You · Sara +1",
+          683,
+          28
+        ],
+        [
+          "8798:13996",
+          "Action / History",
+          601,
+          28
+        ],
+        [
+          "8798:13997",
+          "Action / Share preview link",
+          703,
+          28
+        ],
+        [
+          "8798:13998",
+          "Action / Preview",
+          805,
+          28
+        ],
+        [
+          "8798:13999",
+          "Action / Publish",
+          897,
+          28
+        ],
+        [
+          "8798:14209",
+          "Action / Hero",
+          108,
+          158
+        ],
+        [
+          "8798:14223",
+          "Action / Features",
+          108,
+          206
+        ],
+        [
+          "8798:14238",
+          "Action / Menu grid",
+          108,
+          254
+        ],
+        [
+          "8798:14250",
+          "Action / Testimonials",
+          108,
+          302
+        ],
+        [
+          "8798:14258",
+          "Action / CTA",
+          108,
+          350
+        ],
+        [
+          "8798:14266",
+          "Action / Contact",
+          108,
+          398
+        ],
+        [
+          "8798:14271",
+          "Action / Footer",
+          108,
+          446
+        ],
+        [
+          "8798:14277",
+          "Action / Navbar",
+          108,
+          494
+        ],
+        [
+          "8798:14281",
+          "Action / Undo insertion",
+          108,
+          594
+        ],
+        [
+          "8798:14284",
+          "Action / Back to Brand",
+          108,
+          642
+        ],
+        [
+          "8798:14020",
+          "Action / Home",
+          284,
+          96
+        ],
+        [
+          "8798:14022",
+          "Action / Mobile",
+          476,
+          96
+        ],
+        [
+          "8798:14056",
+          "Action / Settings",
+          1253,
+          117
+        ],
+        [
+          "8798:14057",
+          "Action / Interactions",
+          1360,
+          117
+        ],
+        [
+          "8798:14062",
+          "Property / Class",
+          1241,
+          229
+        ],
+        [
+          "8798:14065",
+          "Property / Text style",
+          1241,
+          315
+        ],
+        [
+          "8798:14068",
+          "Property / Font size",
+          1241,
+          441
+        ],
+        [
+          "8798:14075",
+          "Action / Mobile override",
+          1265,
+          685
+        ],
+        [
+          "8798:14076",
+          "Action / Class manager",
+          1265,
+          725
+        ],
+        [
+          "8798:14077",
+          "Action / Layout",
+          1265,
+          765
+        ],
+        [
+          "8798:14078",
+          "Action / Ask AI",
+          1265,
+          805
+        ]
+      ]
+    },
+    {
+      "id": "8771:13537",
+      "controls": [
+        [
+          "8771:13540",
+          "Action / Return / Home",
+          94,
+          28
+        ],
+        [
+          "8771:13558",
+          "Action / Open Team",
+          120,
+          216
+        ],
+        [
+          "8771:13562",
+          "Action / Open New collection",
+          120,
+          252
+        ],
+        [
+          "8771:13566",
+          "Action / Open Sources",
+          120,
+          288
+        ],
+        [
+          "8771:13570",
+          "Action / Open Variables",
+          120,
+          324
+        ],
+        [
+          "8771:13574",
+          "Action / Open Conditions",
+          120,
+          360
+        ],
+        [
+          "8771:13580",
+          "Action / Return to caller",
+          114,
+          967
+        ],
+        [
+          "8771:13586",
+          "Action / Add field",
+          342,
+          186
+        ],
+        [
+          "8785:14044",
+          "Schema row / existing / title",
+          841,
+          283
+        ],
+        [
+          "8785:14050",
+          "Schema row / existing / body",
+          841,
+          335
+        ],
+        [
+          "8785:14056",
+          "Schema row / existing / slug",
+          841,
+          387
+        ],
+        [
+          "8785:14062",
+          "Schema row / new / text",
+          841,
+          439
+        ],
+        [
+          "8785:14068",
+          "Schema row / new / number",
+          841,
+          439
+        ],
+        [
+          "8785:14074",
+          "Schema row / new / richtext",
+          841,
+          439
+        ],
+        [
+          "8785:14080",
+          "Schema row / new / image",
+          841,
+          439
+        ],
+        [
+          "8785:14086",
+          "Schema row / new / boolean",
+          841,
+          439
+        ],
+        [
+          "8785:14092",
+          "Schema row / new / reference",
+          841,
+          439
+        ],
+        [
+          "8785:14098",
+          "Schema row / new / slug",
+          841,
+          439
+        ],
+        [
+          "8785:14104",
+          "Schema row / new / textarea",
+          841,
+          439
+        ],
+        [
+          "8785:14110",
+          "Schema row / new / date",
+          841,
+          439
+        ],
+        [
+          "8785:14116",
+          "Schema row / new / multiselect",
+          841,
+          439
+        ],
+        [
+          "8771:13589",
+          "Action / Title · Text · Required",
+          824,
+          290
+        ],
+        [
+          "8771:13592",
+          "Action / Body · Rich text",
+          824,
+          338
+        ],
+        [
+          "8771:13595",
+          "Action / Slug · Slug",
+          824,
+          386
+        ],
+        [
+          "8771:13659",
+          "Action / Summary · Text",
+          824,
+          378
+        ],
+        [
+          "8771:13720",
+          "Action / Reading time · Number",
+          824,
+          378
+        ],
+        [
+          "8771:13781",
+          "Action / Story · Rich text",
+          824,
+          378
+        ],
+        [
+          "8771:13827",
+          "Action / Cover · Image",
+          824,
+          378
+        ],
+        [
+          "8771:13873",
+          "Action / Featured · Boolean",
+          824,
+          378
+        ],
+        [
+          "8771:13925",
+          "Action / Author · Reference",
+          824,
+          378
+        ],
+        [
+          "8771:13986",
+          "Action / Path · Slug",
+          824,
+          378
+        ],
+        [
+          "8771:14047",
+          "Action / Excerpt · Long text",
+          824,
+          378
+        ],
+        [
+          "8771:14093",
+          "Action / Published date · Date",
+          824,
+          378
+        ],
+        [
+          "8771:14145",
+          "Action / Topics · Multi-select",
+          824,
+          378
+        ]
+      ]
+    },
+    {
+      "id": "8776:13852",
+      "controls": [
+        [
+          "8776:13879",
+          "Action / Change role",
+          720,
+          487
+        ],
+        [
+          "8776:13882",
+          "Action / Suspend / restore access",
+          720,
+          535
+        ],
+        [
+          "8776:13895",
+          "Action / Remove member…",
+          720,
+          583
+        ],
+        [
+          "8776:13898",
+          "Action / Back to members",
+          720,
+          631
+        ]
+      ]
+    },
+    {
+      "id": "8777:14126",
+      "controls": [
+        [
+          "8777:14130",
+          "Action / Cancel",
+          588,
+          541
+        ],
+        [
+          "8777:14133",
+          "Action / Transfer ownership",
+          852,
+          541
+        ]
+      ]
+    },
+    {
+      "id": "8777:14083",
+      "controls": [
+        [
+          "8777:14087",
+          "Action / Cancel",
+          588,
+          551
+        ],
+        [
+          "8777:14090",
+          "Action / Revoke",
+          852,
+          551
+        ]
+      ]
+    }
+  ],
+  "scope": [
+    [
+      "8539:9786",
+      "R33 / Media / Grid"
+    ],
+    [
+      "8539:10714",
+      "R33 / Workspace / Members"
+    ],
+    [
+      "8539:10742",
+      "R33 / Workspace / Billing"
+    ],
+    [
+      "8539:10770",
+      "R33 / Workspace / Integrations"
+    ],
+    [
+      "8690:13237",
+      "R33 / Remaining flows review"
+    ],
+    [
+      "8771:13537",
+      "R33 / CMS / Fields"
+    ],
+    [
+      "8771:13598",
+      "R33 / CMS / Add field"
+    ],
+    [
+      "8771:13615",
+      "R33 / CMS / Text field"
+    ],
+    [
+      "8771:13618",
+      "R33 / CMS / Text key conflict"
+    ],
+    [
+      "8771:13676",
+      "R33 / CMS / Number field"
+    ],
+    [
+      "8771:13679",
+      "R33 / CMS / Number key conflict"
+    ],
+    [
+      "8771:13737",
+      "R33 / CMS / Rich text field"
+    ],
+    [
+      "8771:13740",
+      "R33 / CMS / Rich text key conflict"
+    ],
+    [
+      "8771:13794",
+      "R33 / CMS / Image field"
+    ],
+    [
+      "8771:13797",
+      "R33 / CMS / Image key conflict"
+    ],
+    [
+      "8771:13840",
+      "R33 / CMS / Boolean field"
+    ],
+    [
+      "8771:13843",
+      "R33 / CMS / Boolean key conflict"
+    ],
+    [
+      "8771:13888",
+      "R33 / CMS / Reference field"
+    ],
+    [
+      "8771:13891",
+      "R33 / CMS / Reference key conflict"
+    ],
+    [
+      "8771:13942",
+      "R33 / CMS / Slug field"
+    ],
+    [
+      "8771:13945",
+      "R33 / CMS / Slug key conflict"
+    ],
+    [
+      "8771:14003",
+      "R33 / CMS / Long text field"
+    ],
+    [
+      "8771:14006",
+      "R33 / CMS / Long text key conflict"
+    ],
+    [
+      "8771:14060",
+      "R33 / CMS / Date field"
+    ],
+    [
+      "8771:14063",
+      "R33 / CMS / Date key conflict"
+    ],
+    [
+      "8771:14108",
+      "R33 / CMS / Multi-select field"
+    ],
+    [
+      "8771:14111",
+      "R33 / CMS / Multi-select key conflict"
+    ],
+    [
+      "8772:16083",
+      "R33 / Brand / button-primary"
+    ],
+    [
+      "8772:16092",
+      "R33 / Brand / Review button-primary"
+    ],
+    [
+      "8772:16190",
+      "R33 / Brand / button-secondary"
+    ],
+    [
+      "8772:16199",
+      "R33 / Brand / Review button-secondary"
+    ],
+    [
+      "8772:16275",
+      "R33 / Brand / button-ghost"
+    ],
+    [
+      "8772:16284",
+      "R33 / Brand / Review button-ghost"
+    ],
+    [
+      "8772:16349",
+      "R33 / Brand / card-elevated"
+    ],
+    [
+      "8772:16358",
+      "R33 / Brand / Review card-elevated"
+    ],
+    [
+      "8772:16412",
+      "R33 / Brand / card-flat"
+    ],
+    [
+      "8772:16421",
+      "R33 / Brand / Review card-flat"
+    ],
+    [
+      "8772:16475",
+      "R33 / Brand / form-input-default"
+    ],
+    [
+      "8772:16484",
+      "R33 / Brand / Review form-input-default"
+    ],
+    [
+      "8772:16560",
+      "R33 / Brand / link-default"
+    ],
+    [
+      "8772:16569",
+      "R33 / Brand / Review link-default"
+    ],
+    [
+      "8772:16601",
+      "R33 / Brand / link-muted"
+    ],
+    [
+      "8772:16610",
+      "R33 / Brand / Review link-muted"
+    ],
+    [
+      "8772:16642",
+      "R33 / Brand / badge-success"
+    ],
+    [
+      "8772:16651",
+      "R33 / Brand / Review badge-success"
+    ],
+    [
+      "8772:16705",
+      "R33 / Brand / badge-error"
+    ],
+    [
+      "8772:16714",
+      "R33 / Brand / Review badge-error"
+    ],
+    [
+      "8772:16768",
+      "R33 / Brand / alert-info"
+    ],
+    [
+      "8772:16777",
+      "R33 / Brand / Review alert-info"
+    ],
+    [
+      "8772:16842",
+      "R33 / Brand / alert-error"
+    ],
+    [
+      "8772:16851",
+      "R33 / Brand / Review alert-error"
+    ],
+    [
+      "8772:16905",
+      "R33 / Brand / tooltip-default"
+    ],
+    [
+      "8772:16914",
+      "R33 / Brand / Review tooltip-default"
+    ],
+    [
+      "8772:16979",
+      "R33 / Brand / modal-default"
+    ],
+    [
+      "8772:16988",
+      "R33 / Brand / Review modal-default"
+    ],
+    [
+      "8772:17053",
+      "R33 / Brand / nav-topbar"
+    ],
+    [
+      "8772:17062",
+      "R33 / Brand / Review nav-topbar"
+    ],
+    [
+      "8772:17116",
+      "R33 / Brand / table-default"
+    ],
+    [
+      "8772:17125",
+      "R33 / Brand / Review table-default"
+    ],
+    [
+      "8772:17179",
+      "R33 / Brand / layout-section"
+    ],
+    [
+      "8772:17188",
+      "R33 / Brand / Review layout-section"
+    ],
+    [
+      "8772:17231",
+      "R33 / Brand / layout-container"
+    ],
+    [
+      "8772:17240",
+      "R33 / Brand / Review layout-container"
+    ],
+    [
+      "8773:13784",
+      "R33 / Media / Delete unused asset"
+    ],
+    [
+      "8773:13788",
+      "R33 / Media / Deleted"
+    ],
+    [
+      "8773:13794",
+      "R33 / Media / List"
+    ],
+    [
+      "8776:13821",
+      "R33 / Workspace / Invite"
+    ],
+    [
+      "8776:13837",
+      "R33 / Workspace / Invite invalid"
+    ],
+    [
+      "8776:13852",
+      "R33 / Workspace / Member"
+    ],
+    [
+      "8776:13856",
+      "R33 / Workspace / Change role"
+    ],
+    [
+      "8776:13885",
+      "R33 / Workspace / Remove member"
+    ],
+    [
+      "8776:13903",
+      "R33 / Workspace / Pending invitation"
+    ],
+    [
+      "8776:13942",
+      "R33 / Workspace / Plan review"
+    ],
+    [
+      "8776:13955",
+      "R33 / Workspace / Billing portal"
+    ],
+    [
+      "8776:13969",
+      "R33 / Workspace / Cancel plan"
+    ],
+    [
+      "8776:13983",
+      "R33 / Workspace / Invoices"
+    ],
+    [
+      "8777:13843",
+      "R33 / Workspace / Vercel"
+    ],
+    [
+      "8777:13851",
+      "R33 / Workspace / Vercel error"
+    ],
+    [
+      "8777:13858",
+      "R33 / Workspace / Disconnect Vercel"
+    ],
+    [
+      "8777:13887",
+      "R33 / Workspace / Mailchimp"
+    ],
+    [
+      "8777:13899",
+      "R33 / Workspace / Mailchimp error"
+    ],
+    [
+      "8777:13906",
+      "R33 / Workspace / Disconnect Mailchimp"
+    ],
+    [
+      "8777:13934",
+      "R33 / Workspace / Zapier"
+    ],
+    [
+      "8777:13942",
+      "R33 / Workspace / Zapier error"
+    ],
+    [
+      "8777:13949",
+      "R33 / Workspace / Disconnect Zapier"
+    ],
+    [
+      "8777:13977",
+      "R33 / Workspace / Slack"
+    ],
+    [
+      "8777:13985",
+      "R33 / Workspace / Slack error"
+    ],
+    [
+      "8777:13992",
+      "R33 / Workspace / Disconnect Slack"
+    ],
+    [
+      "8777:14018",
+      "R33 / Workspace / Webhook"
+    ],
+    [
+      "8777:14042",
+      "R33 / Site / Draft sharing"
+    ],
+    [
+      "8777:14070",
+      "R33 / Site / Draft link"
+    ],
+    [
+      "8777:14083",
+      "R33 / Site / Revoke link"
+    ],
+    [
+      "8777:14104",
+      "R33 / Site / Administration"
+    ],
+    [
+      "8777:14109",
+      "R33 / Site / Archive"
+    ],
+    [
+      "8777:14119",
+      "R33 / Site / Transfer"
+    ],
+    [
+      "8777:14126",
+      "R33 / Site / Transfer confirmation"
+    ],
+    [
+      "8777:14136",
+      "R33 / Site / Transfer missing target"
+    ],
+    [
+      "8777:14150",
+      "R33 / Site / Permission required"
+    ],
+    [
+      "8777:14157",
+      "R33 / Site / Delete"
+    ],
+    [
+      "8777:14164",
+      "R33 / Site / Delete invalid"
+    ],
+    [
+      "8777:14171",
+      "R33 / Site / Deleted"
+    ],
+    [
+      "8779:13900",
+      "R33 / Workspace / Invite role"
+    ],
+    [
+      "8779:13930",
+      "R33 / Workspace / Cancellation reason"
+    ],
+    [
+      "8779:13950",
+      "R33 / CMS / Existing Title"
+    ],
+    [
+      "8779:14010",
+      "R33 / CMS / Existing Body"
+    ],
+    [
+      "8779:14024",
+      "R33 / CMS / Convert Body"
+    ],
+    [
+      "8779:14097",
+      "R33 / CMS / Existing Slug"
+    ],
+    [
+      "8779:14111",
+      "R33 / CMS / Convert Slug"
+    ],
+    [
+      "8783:13999",
+      "R33 / Brand / Type / Heading 1"
+    ],
+    [
+      "8783:14040",
+      "R33 / Brand / Type / Heading 2"
+    ],
+    [
+      "8783:14081",
+      "R33 / Brand / Type / Heading 3"
+    ],
+    [
+      "8783:14122",
+      "R33 / Brand / Type / Body text"
+    ],
+    [
+      "8783:14163",
+      "R33 / Brand / Type / Caption"
+    ],
+    [
+      "8785:13992",
+      "R33 / Workspace / Mailchimp validation"
+    ],
+    [
+      "8798:13987",
+      "R33 / Add / Blocks"
+    ]
+  ],
+  "instances": 624,
+  "masters": {
+    "8314:7": 147,
+    "8314:5": 146,
+    "8314:3": 113,
+    "8314:9": 19,
+    "8531:318": 168,
+    "8627:621": 1,
+    "8316:11": 9,
+    "8531:330": 2,
+    "8531:312": 6,
+    "8531:320": 4,
+    "8531:314": 4,
+    "8531:316": 4,
+    "8316:16": 1
+  },
+  "destinations": 152,
+  "missing": [],
+  "overflow": [],
+  "tall": [],
+  "badFonts": [],
+  "media": [
+    {
+      "id": "8539:9786",
+      "labels": [
+        {
+          "id": "8539:9839",
+          "name": "studio-gradient1.webp",
+          "text": "studio-gradient1.webp",
+          "b": {
+            "characters": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:8796:13988"
+            }
+          },
+          "par": "Action / Select media / 0"
+        },
+        {
+          "id": "8539:9843",
+          "name": "studio-gradient2.webp",
+          "text": "studio-gradient2.webp",
+          "b": {
+            "characters": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:8796:13989"
+            }
+          },
+          "par": "Action / Select media / 1"
+        },
+        {
+          "id": "8539:9847",
+          "name": "studio-gradient3.webp",
+          "text": "studio-gradient3.webp",
+          "b": {
+            "characters": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:8796:13990"
+            }
+          },
+          "par": "Action / Select media / 2"
+        },
+        {
+          "id": "8539:9850",
+          "name": "studio-gradient1.webp",
+          "text": "studio-gradient1.webp",
+          "b": {
+            "characters": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:8727:13262"
+            }
+          },
+          "par": "Asset detail"
+        }
+      ],
+      "cards": []
+    },
+    {
+      "id": "8773:13794",
+      "labels": [
+        {
+          "id": "8773:13847",
+          "name": "studio-gradient1.webp",
+          "text": "studio-gradient1.webp",
+          "b": {
+            "characters": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:8796:13988"
+            }
+          },
+          "par": "Action / Select media / 0"
+        },
+        {
+          "id": "8773:13851",
+          "name": "studio-gradient2.webp",
+          "text": "studio-gradient2.webp",
+          "b": {
+            "characters": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:8796:13989"
+            }
+          },
+          "par": "Action / Select media / 1"
+        },
+        {
+          "id": "8773:13855",
+          "name": "studio-gradient3.webp",
+          "text": "studio-gradient3.webp",
+          "b": {
+            "characters": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:8796:13990"
+            }
+          },
+          "par": "Action / Select media / 2"
+        },
+        {
+          "id": "8773:13858",
+          "name": "studio-gradient1.webp",
+          "text": "studio-gradient1.webp",
+          "b": {
+            "characters": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:8727:13262"
+            }
+          },
+          "par": "Asset detail"
+        }
+      ],
+      "cards": []
+    }
+  ]
+}

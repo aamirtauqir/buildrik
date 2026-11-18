@@ -1,0 +1,9 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"frame\":\"8293:734\",\"checks\":[{\"node\":\"8307:2\",\"index\":135,\"geometry\":\"visible browser glyph approximation; checked state evidenced\"},{\"node\":\"8307:4\",\"index\":137,\"geometry\":\"visible browser glyph approximation; checked state evidenced\"},{\"node\":\"8307:6\",\"index\":139,\"geometry\":\"visible browser glyph approximation; checked state evidenced\"}]}"
+    }
+  ],
+  "isError": false
+}

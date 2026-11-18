@@ -1,0 +1,310 @@
+{
+  "scope": "Read-only interpreter of live authored R45 actions against an independent finite oracle. Local Map writes only; no native mutations. Not browser reflow, runtime CSS/export, accessibility or full module acceptance.",
+  "phase": "LIVE_ACTION_INTERPRETATION",
+  "correctionProbe": {
+    "tabletColorVariables": [
+      {
+        "id": "VariableID:9065:19911",
+        "name": "r45/visibility/heading/tablet-bg",
+        "type": "COLOR"
+      },
+      {
+        "id": "VariableID:9065:19912",
+        "name": "r45/visibility/heading/tablet-fg",
+        "type": "COLOR"
+      },
+      {
+        "id": "VariableID:9065:19916",
+        "name": "r45/visibility/image/tablet-bg",
+        "type": "COLOR"
+      },
+      {
+        "id": "VariableID:9065:19917",
+        "name": "r45/visibility/image/tablet-fg",
+        "type": "COLOR"
+      }
+    ],
+    "tabBindings": [
+      {
+        "target": "heading",
+        "id": "8843:17018",
+        "visibleVariable": "VariableID:9064:17519",
+        "expected": "VariableID:9064:17519"
+      },
+      {
+        "target": "heading",
+        "id": "8843:17020",
+        "visibleVariable": "VariableID:9064:17519",
+        "expected": "VariableID:9064:17519"
+      },
+      {
+        "target": "image",
+        "id": "8843:20677",
+        "visibleVariable": "VariableID:9064:17556",
+        "expected": "VariableID:9064:17556"
+      },
+      {
+        "target": "image",
+        "id": "8843:20679",
+        "visibleVariable": "VariableID:9064:17556",
+        "expected": "VariableID:9064:17556"
+      }
+    ]
+  },
+  "sourceManifest": [
+    "r45-visibility-mutation.json",
+    "r45-visibility-owner-correction.js"
+  ],
+  "oracleSelfChecks": {
+    "cases": 1296,
+    "passed": 1296,
+    "failed": []
+  },
+  "matrixCases": 1296,
+  "checks": 3860,
+  "passed": 3842,
+  "failed": [
+    {
+      "category": "other_family_fallback",
+      "label": "Other family Display fallback works heading/otherParagraph/Flex",
+      "actual": "Block",
+      "expected": "Flex",
+      "pass": false
+    },
+    {
+      "category": "other_family_fallback",
+      "label": "Other family Display fallback works heading/otherParagraph/Grid",
+      "actual": "Block",
+      "expected": "Grid",
+      "pass": false
+    },
+    {
+      "category": "other_family_fallback",
+      "label": "Other family Display fallback works heading/otherParagraph/None",
+      "actual": "Block",
+      "expected": "None",
+      "pass": false
+    },
+    {
+      "category": "other_family_fallback",
+      "label": "Other family Display fallback works heading/otherFlex/Flex",
+      "actual": "Block",
+      "expected": "Flex",
+      "pass": false
+    },
+    {
+      "category": "other_family_fallback",
+      "label": "Other family Display fallback works heading/otherFlex/Grid",
+      "actual": "Block",
+      "expected": "Grid",
+      "pass": false
+    },
+    {
+      "category": "other_family_fallback",
+      "label": "Other family Display fallback works heading/otherFlex/None",
+      "actual": "Block",
+      "expected": "None",
+      "pass": false
+    },
+    {
+      "category": "other_family_fallback",
+      "label": "Other family Display fallback works heading/otherGrid/Flex",
+      "actual": "Block",
+      "expected": "Flex",
+      "pass": false
+    },
+    {
+      "category": "other_family_fallback",
+      "label": "Other family Display fallback works heading/otherGrid/Grid",
+      "actual": "Block",
+      "expected": "Grid",
+      "pass": false
+    },
+    {
+      "category": "other_family_fallback",
+      "label": "Other family Display fallback works heading/otherGrid/None",
+      "actual": "Block",
+      "expected": "None",
+      "pass": false
+    },
+    {
+      "category": "other_family_fallback",
+      "label": "Other family Display fallback works image/otherParagraph/Flex",
+      "actual": "Block",
+      "expected": "Flex",
+      "pass": false
+    },
+    {
+      "category": "other_family_fallback",
+      "label": "Other family Display fallback works image/otherParagraph/Grid",
+      "actual": "Block",
+      "expected": "Grid",
+      "pass": false
+    },
+    {
+      "category": "other_family_fallback",
+      "label": "Other family Display fallback works image/otherParagraph/None",
+      "actual": "Block",
+      "expected": "None",
+      "pass": false
+    },
+    {
+      "category": "other_family_fallback",
+      "label": "Other family Display fallback works image/otherFlex/Flex",
+      "actual": "Block",
+      "expected": "Flex",
+      "pass": false
+    },
+    {
+      "category": "other_family_fallback",
+      "label": "Other family Display fallback works image/otherFlex/Grid",
+      "actual": "Block",
+      "expected": "Grid",
+      "pass": false
+    },
+    {
+      "category": "other_family_fallback",
+      "label": "Other family Display fallback works image/otherFlex/None",
+      "actual": "Block",
+      "expected": "None",
+      "pass": false
+    },
+    {
+      "category": "other_family_fallback",
+      "label": "Other family Display fallback works image/otherGrid/Flex",
+      "actual": "Block",
+      "expected": "Flex",
+      "pass": false
+    },
+    {
+      "category": "other_family_fallback",
+      "label": "Other family Display fallback works image/otherGrid/Grid",
+      "actual": "Block",
+      "expected": "Grid",
+      "pass": false
+    },
+    {
+      "category": "other_family_fallback",
+      "label": "Other family Display fallback works image/otherGrid/None",
+      "actual": "Block",
+      "expected": "None",
+      "pass": false
+    }
+  ],
+  "categories": {
+    "oracle_crosscheck": {
+      "checks": 1,
+      "passed": 1
+    },
+    "correction_commit_probe": {
+      "checks": 6,
+      "passed": 6
+    },
+    "live_sync_oracle_matrix": {
+      "checks": 2592,
+      "passed": 2592
+    },
+    "display_cascade_reset_history": {
+      "checks": 86,
+      "passed": 86
+    },
+    "flags_named_scope_and_combined_causes": {
+      "checks": 210,
+      "passed": 210
+    },
+    "raw_flag_recovery_and_device_navigation": {
+      "checks": 90,
+      "passed": 90
+    },
+    "undo_property_ownership": {
+      "checks": 132,
+      "passed": 132
+    },
+    "captured_scope_identity_and_eligibility": {
+      "checks": 128,
+      "passed": 128
+    },
+    "independent_targets_layers_and_returns": {
+      "checks": 133,
+      "passed": 133
+    },
+    "fixture_ownership_and_legacy_routes": {
+      "checks": 340,
+      "passed": 340
+    },
+    "other_family_fallback": {
+      "checks": 120,
+      "passed": 102
+    },
+    "bindings_and_existing_workflow_isolation": {
+      "checks": 22,
+      "passed": 22
+    }
+  },
+  "inspectedNodeIds": [
+    "8841:14864",
+    "8844:264650",
+    "8841:14889",
+    "8844:264653",
+    "8844:264656",
+    "8844:264659",
+    "8844:264662",
+    "8841:15289",
+    "8841:15294",
+    "8841:15299",
+    "9064:17591",
+    "9064:17599",
+    "9064:17621",
+    "9064:17627",
+    "9064:17631",
+    "9064:17601",
+    "9064:17611",
+    "9064:17586",
+    "9064:17593",
+    "9064:17596",
+    "8844:264665",
+    "9064:20068",
+    "9064:20071",
+    "9064:20074",
+    "9064:20077",
+    "9064:20080",
+    "9064:20083",
+    "9064:20124",
+    "9064:20127",
+    "9064:20130",
+    "9064:20133",
+    "9064:20136",
+    "9064:20139",
+    "8841:14868",
+    "8841:15383",
+    "8468:244789",
+    "8468:244842",
+    "8507:2858",
+    "8843:17034",
+    "8905:18143",
+    "8843:17320",
+    "8843:24418",
+    "8843:24954",
+    "8843:17016",
+    "8843:16842",
+    "9064:20045",
+    "8843:16843",
+    "8843:16833",
+    "8843:16824",
+    "8843:16837",
+    "8843:17097",
+    "8843:17107",
+    "8843:20675",
+    "8843:20501",
+    "9064:20101",
+    "8843:20502",
+    "8843:20492",
+    "8843:20483",
+    "8843:20496",
+    "8843:20768",
+    "8843:20778"
+  ],
+  "mutatedNodeIds": [],
+  "mutatedVariableIds": [],
+  "checkpoint": "Historical checkpoint before chooser captured-active correction: 18 other-family Display fallback failures confirmed."
+}

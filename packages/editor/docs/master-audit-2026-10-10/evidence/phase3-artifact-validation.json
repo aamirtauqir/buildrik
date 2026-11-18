@@ -1,0 +1,21 @@
+{
+  "ia_rows": 81,
+  "unique_ids": 81,
+  "inventory_ids_match": true,
+  "blank_ia_fields": [],
+  "decisions": {
+    "IMPROVE": 45,
+    "KEEP": 33,
+    "RELOCATE": 3
+  },
+  "tracking_rows": 60,
+  "findings_without_direct_ia_row": [
+    "UX-01",
+    "UX-12",
+    "IA-01",
+    "IA-16",
+    "UX-26"
+  ],
+  "competitor_source_count": 30,
+  "production_code_changes": false
+}

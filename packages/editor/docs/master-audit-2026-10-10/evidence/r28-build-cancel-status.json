@@ -1,0 +1,8 @@
+{
+  "check": "Cancel during B02 processing",
+  "status": "BROWSER_UNVERIFIED",
+  "attempts": 2,
+  "reason": "Browser daemon did not answer its health check before either timed JavaScript click sequence. No successful cancellation receipt was produced.",
+  "nativeBehavior": "Cancel sets draft/is-pending=false and navigates to B01 without changing committed content.",
+  "screenshotCaveat": "r28-build-cancelled.png is a diagnostic filename; it is not evidence of a completed cancellation."
+}

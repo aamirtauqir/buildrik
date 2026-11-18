@@ -1,0 +1,1385 @@
+[
+  {
+    "file": "src/editor/inspector/ProInspector.tsx",
+    "components": [
+      "BindingBanner",
+      "BreakpointOverrides",
+      "Button",
+      "Element",
+      "ElementIcon",
+      "ElementNameField",
+      "HTMLDivElement",
+      "InspectorElementMenu",
+      "InspectorEmptyState",
+      "InspectorErrorBoundary",
+      "InspectorLoading",
+      "InspectorTabContent",
+      "Link",
+      "LockedBanner",
+      "Map",
+      "MediaSourceRow",
+      "MultiSelectToolbar",
+      "ProInspectorProps",
+      "PseudoStateId",
+      "ScopeDropdown",
+      "Set",
+      "StateDropdown",
+      "TabId",
+      "Tabs",
+      "TextContentRow",
+      "VariantSection"
+    ],
+    "labels": [
+      "Ask AI about this element",
+      "Element properties",
+      "Inspector tabs",
+      "Inspector tier"
+    ],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/components/BatchStylePanel.tsx",
+    "components": [
+      "BatchStylePanelProps",
+      "ColorInput",
+      "InputWithUnit"
+    ],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/components/BindingBanner.tsx",
+    "components": [
+      "BindingBannerProps",
+      "Button"
+    ],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/components/BreakpointOverrides.tsx",
+    "components": [
+      "BreakpointOverridesProps",
+      "Button",
+      "RotateCcw"
+    ],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/components/DeleteConfirmModal.tsx",
+    "components": [
+      "Button",
+      "DeleteConfirmModalProps",
+      "Kbd",
+      "ModalBody",
+      "ModalClose",
+      "ModalContent",
+      "ModalFooter",
+      "ModalRoot",
+      "ModalTitle"
+    ],
+    "labels": [
+      "Close modal"
+    ],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/components/ElementNameField.tsx",
+    "components": [
+      "TextInput"
+    ],
+    "labels": [
+      "Double-click to rename",
+      "Element name"
+    ],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/components/InspectorElementMenu.tsx",
+    "components": [
+      "Button",
+      "ChevronsDownUp",
+      "ChevronsUpDown",
+      "ClipboardPaste",
+      "Copy",
+      "CopyPlus",
+      "CornerLeftUp",
+      "Crosshair",
+      "HTMLButtonElement",
+      "HTMLDivElement",
+      "InspectorElementMenuProps",
+      "MoreHorizontal",
+      "Package",
+      "PanelRightClose",
+      "React.Fragment",
+      "RotateCcw",
+      "Sparkles",
+      "Trash2"
+    ],
+    "labels": [
+      "Element actions"
+    ],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/components/InspectorEmptyState.tsx",
+    "components": [
+      "Button",
+      "InspectorEmptyStateProps"
+    ],
+    "labels": [
+      "No element selected",
+      "Set brand colors in Global Styles"
+    ],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/components/InspectorErrorBoundary.tsx",
+    "components": [
+      "Button"
+    ],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/components/InspectorLoading.tsx",
+    "components": [
+      "SkeletonBlock"
+    ],
+    "labels": [
+      "Loading"
+    ],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/components/LockedBanner.tsx",
+    "components": [
+      "Button",
+      "Lock"
+    ],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/components/MultiSelectToolbar.tsx",
+    "components": [
+      "AlignCenter",
+      "AlignCenterVertical",
+      "AlignEndVertical",
+      "AlignLeft",
+      "AlignRight",
+      "AlignStartVertical",
+      "BatchStylePanel",
+      "Button",
+      "DeleteConfirmModal",
+      "Icon",
+      "MultiSelectToolbarProps",
+      "Tooltip"
+    ],
+    "labels": [
+      "Align elements to bottom",
+      "Align elements to center horizontally",
+      "Align elements to left",
+      "Align elements to middle vertically",
+      "Align elements to right",
+      "Align elements to top",
+      "Ask AI about this selection",
+      "Distribute elements horizontally with equal spacing",
+      "Distribute elements vertically with equal spacing"
+    ],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/components/ScopeDropdown.tsx",
+    "components": [
+      "Button",
+      "ChevronDown",
+      "HTMLDivElement"
+    ],
+    "labels": [
+      "Just this element",
+      "Site-wide colours & fonts live in Brand"
+    ],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/components/StateDropdown.tsx",
+    "components": [
+      "Button",
+      "ChevronDown",
+      "HTMLDivElement",
+      "PseudoStateId",
+      "StateDropdownProps"
+    ],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/BackgroundSection.tsx",
+    "components": [
+      "BackgroundSectionProps",
+      "Button",
+      "ColorInput",
+      "InputRow",
+      "MixedValueIndicator",
+      "MoreSettingsToggle",
+      "Section",
+      "SelectRow",
+      "TextInput"
+    ],
+    "labels": [
+      "Add background image",
+      "Attachment",
+      "Background",
+      "Blend Mode",
+      "Browse media library",
+      "Color 1",
+      "Color 2",
+      "Fill",
+      "Image URL",
+      "Position",
+      "Repeat",
+      "Size"
+    ],
+    "styles": [
+      "background",
+      "background-attachment",
+      "background-blend-mode",
+      "background-color",
+      "background-image",
+      "background-position",
+      "background-repeat",
+      "background-size"
+    ]
+  },
+  {
+    "file": "src/editor/inspector/sections/BorderSection.tsx",
+    "components": [
+      "BorderSectionProps",
+      "ColorInput",
+      "CornerRadiusInput",
+      "InputField",
+      "InputWithUnit",
+      "MixedValueIndicator",
+      "MoreSettingsToggle",
+      "Section",
+      "SelectRow"
+    ],
+    "labels": [
+      "Border",
+      "Color",
+      "Offset",
+      "Radius",
+      "Style",
+      "Width"
+    ],
+    "styles": [
+      "border",
+      "border-bottom-left-radius",
+      "border-bottom-right-radius",
+      "border-color",
+      "border-radius",
+      "border-style",
+      "border-top-left-radius",
+      "border-top-right-radius",
+      "border-width",
+      "outline-color",
+      "outline-offset",
+      "outline-style",
+      "outline-width"
+    ]
+  },
+  {
+    "file": "src/editor/inspector/sections/CSSClassesSection.tsx",
+    "components": [
+      "Button",
+      "CSSClassesSectionProps",
+      "HTMLInputElement",
+      "Section",
+      "TextInput"
+    ],
+    "labels": [
+      "Add CSS class",
+      "Add class",
+      "CSS classes",
+      "Class suggestions"
+    ],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/CollectionListSection.tsx",
+    "components": [
+      "CollectionListSectionProps",
+      "InputRow",
+      "Section",
+      "SelectRow"
+    ],
+    "labels": [
+      "Collection",
+      "Show",
+      "Source"
+    ],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/ConstraintControl.tsx",
+    "components": [
+      "Button",
+      "ConstraintControlProps",
+      "TextInput"
+    ],
+    "labels": [
+      "Fill - element expands to fill available space (100%)",
+      "Fixed size - element has a specific pixel or unit value",
+      "Hug content - element shrinks to fit its content (fit-content)"
+    ],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/ContentSection.tsx",
+    "components": [
+      "Button",
+      "ContentSectionProps",
+      "Dot",
+      "Field",
+      "Section",
+      "SelectRow"
+    ],
+    "labels": [
+      "Collection",
+      "Content",
+      "Content source",
+      "Field"
+    ],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/DSBindingChip.tsx",
+    "components": [
+      "DSBindingChipProps",
+      "Tag"
+    ],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/EffectsBasicSections.tsx",
+    "components": [
+      "BasicEffectProps",
+      "EffectsSectionProps",
+      "MixedValueIndicator",
+      "Section",
+      "SelectRow",
+      "SliderInput"
+    ],
+    "labels": [
+      "Blur",
+      "Opacity",
+      "Shadow"
+    ],
+    "styles": [
+      "box-shadow",
+      "filter",
+      "opacity"
+    ]
+  },
+  {
+    "file": "src/editor/inspector/sections/EffectsSection.tsx",
+    "components": [
+      "EffectsSectionProps",
+      "InputField",
+      "MixedValueBadge",
+      "PresetButtonGrid",
+      "RangeSlider",
+      "Section",
+      "SectionLabel",
+      "SelectRow",
+      "TextInputRow"
+    ],
+    "labels": [
+      "Blend Mode",
+      "Brightness",
+      "Contrast",
+      "Cursor",
+      "Custom box shadow",
+      "Custom inner shadow",
+      "Delay",
+      "Duration",
+      "Easing",
+      "Grayscale",
+      "More effects",
+      "Move X",
+      "Move Y",
+      "Property",
+      "Rotate",
+      "Scale",
+      "Skew",
+      "Text Shadow",
+      "Will Change"
+    ],
+    "styles": [
+      "box-shadow",
+      "cursor",
+      "filter",
+      "mix-blend-mode",
+      "text-shadow",
+      "transform",
+      "transition-delay",
+      "transition-duration",
+      "transition-property",
+      "transition-timing-function",
+      "will-change"
+    ]
+  },
+  {
+    "file": "src/editor/inspector/sections/FormAfterSubmitSection.tsx",
+    "components": [
+      "FormAfterSubmitSectionProps",
+      "Section",
+      "Select",
+      "Settings",
+      "TextInput",
+      "ToggleSwitch"
+    ],
+    "labels": [
+      "After submit",
+      "After-submit action",
+      "Notification email",
+      "Redirect URL",
+      "Success message"
+    ],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/FormFieldsSection.tsx",
+    "components": [
+      "Button",
+      "FormFieldsSectionProps",
+      "Section",
+      "Select"
+    ],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/GridSection.tsx",
+    "components": [
+      "AlignmentGrid",
+      "CompactButtonGroup",
+      "GridSectionProps",
+      "InlineInput",
+      "InputField",
+      "MixedValueBadge",
+      "MixedValueIndicator",
+      "Section",
+      "SectionLabel",
+      "SubSectionTitle",
+      "TemplateButtonGrid"
+    ],
+    "labels": [
+      "A-Content",
+      "A-Self",
+      "Col",
+      "Col Span",
+      "Columns",
+      "Flow",
+      "Gap",
+      "Grid",
+      "J-Content",
+      "J-Self",
+      "Row",
+      "Row Span",
+      "Rows"
+    ],
+    "styles": [
+      "align-content",
+      "align-items",
+      "align-self",
+      "column-gap",
+      "gap",
+      "grid-auto-flow",
+      "grid-column",
+      "grid-row",
+      "grid-template-columns",
+      "grid-template-rows",
+      "justify-content",
+      "justify-items",
+      "justify-self",
+      "row-gap"
+    ]
+  },
+  {
+    "file": "src/editor/inspector/sections/LinkSection.tsx",
+    "components": [
+      "ErrorText",
+      "InputRow",
+      "LinkSectionProps",
+      "LinkType",
+      "PageData",
+      "Section",
+      "SelectRow"
+    ],
+    "labels": [
+      "Anchor ID",
+      "Email",
+      "Link",
+      "Open In",
+      "Phone",
+      "Target Page",
+      "URL"
+    ],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/MediaSourceRow.tsx",
+    "components": [
+      "Button"
+    ],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/SizeSection.tsx",
+    "components": [
+      "Button",
+      "ChainButton",
+      "ChainButtonProps",
+      "ConstraintControl",
+      "InputWithUnit",
+      "Link2",
+      "Link2Off",
+      "MixedValueIndicator",
+      "MoreSettingsToggle",
+      "Popover",
+      "Section",
+      "Select",
+      "SizeSectionProps",
+      "TokenPickerPopover"
+    ],
+    "labels": [
+      "Height",
+      "Height constraints",
+      "Link to spacing token",
+      "Object fit",
+      "Size",
+      "Spacing tokens",
+      "Width",
+      "Width constraints"
+    ],
+    "styles": [
+      "height",
+      "max-height",
+      "max-width",
+      "min-height",
+      "min-width",
+      "object-fit",
+      "width"
+    ]
+  },
+  {
+    "file": "src/editor/inspector/sections/SliderPlaybackSection.tsx",
+    "components": [
+      "Section",
+      "SliderPlaybackSectionProps",
+      "TextInput",
+      "ToggleSwitch"
+    ],
+    "labels": [
+      "Autoplay interval, seconds",
+      "Playback"
+    ],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/SlidesSection.tsx",
+    "components": [
+      "Button",
+      "Menu",
+      "MenuItem",
+      "Popover",
+      "Section",
+      "SlideMenu",
+      "SlidesSectionProps"
+    ],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/SpacingSection.tsx",
+    "components": [
+      "Button",
+      "InputWithUnit",
+      "Link",
+      "Link2Off",
+      "MixedValueBadge",
+      "MixedValueIndicator",
+      "MoreSettingsToggle",
+      "Section",
+      "SpacingBox",
+      "SpacingSectionProps"
+    ],
+    "labels": [
+      "Column gap",
+      "Gap",
+      "Margin",
+      "Padding",
+      "Row gap",
+      "Spacing"
+    ],
+    "styles": [
+      "column-gap",
+      "gap",
+      "margin-bottom",
+      "margin-left",
+      "margin-right",
+      "margin-top",
+      "padding-bottom",
+      "padding-left",
+      "padding-right",
+      "padding-top",
+      "row-gap"
+    ]
+  },
+  {
+    "file": "src/editor/inspector/sections/TextContentRow.tsx",
+    "components": [
+      "Button"
+    ],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/VariantSection.tsx",
+    "components": [
+      "Button",
+      "ConfirmDialog",
+      "InstanceInfo",
+      "Menu",
+      "MenuItem",
+      "MenuSeparator",
+      "Popover",
+      "VariantSectionProps"
+    ],
+    "labels": [
+      "Variant"
+    ],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/VisibilitySection.tsx",
+    "components": [
+      "Button",
+      "Section",
+      "VisibilitySectionProps"
+    ],
+    "labels": [
+      "Visibility"
+    ],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/elementProperties/DataAttributeEditor.tsx",
+    "components": [
+      "Button",
+      "DataAttributeEditorProps",
+      "TextInput"
+    ],
+    "labels": [
+      "Add attribute"
+    ],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/elementProperties/PropertyField.tsx",
+    "components": [
+      "Checkbox",
+      "InputRow",
+      "PropertyFieldProps",
+      "SelectRow"
+    ],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/elementProperties/index.tsx",
+    "components": [
+      "Button",
+      "DataAttributeEditor",
+      "ElementPropertiesSectionProps",
+      "IconPickerButton",
+      "IconPickerButtonProps",
+      "IdClassRow",
+      "PropertyField",
+      "Record",
+      "Section",
+      "TextInput"
+    ],
+    "labels": [
+      "Advanced",
+      "Element ID",
+      "Element classes",
+      "Open icon picker"
+    ],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/flexbox/AlignmentSection.tsx",
+    "components": [
+      "AlignmentSectionProps",
+      "Button",
+      "FlexAlignmentGrid",
+      "MixedValueBadge"
+    ],
+    "labels": [],
+    "styles": [
+      "align-items",
+      "flex-direction",
+      "justify-content"
+    ]
+  },
+  {
+    "file": "src/editor/inspector/sections/flexbox/DirectionControls.tsx",
+    "components": [
+      "Button",
+      "DirectionControlsProps",
+      "DirectionIcon",
+      "MixedValueBadge"
+    ],
+    "labels": [],
+    "styles": [
+      "flex-direction"
+    ]
+  },
+  {
+    "file": "src/editor/inspector/sections/flexbox/EnableFlexPrompt.tsx",
+    "components": [
+      "Button",
+      "EnableFlexPromptProps"
+    ],
+    "labels": [],
+    "styles": [
+      "display"
+    ]
+  },
+  {
+    "file": "src/editor/inspector/sections/flexbox/FlexItemControls.tsx",
+    "components": [
+      "Button",
+      "FlexItemControlsProps",
+      "MixedValueBadge",
+      "TextInput"
+    ],
+    "labels": [],
+    "styles": [
+      "align-self",
+      "flex-basis",
+      "flex-grow",
+      "flex-shrink",
+      "order"
+    ]
+  },
+  {
+    "file": "src/editor/inspector/sections/flexbox/GapControls.tsx",
+    "components": [
+      "GapControlsProps",
+      "LinkedGapInput",
+      "MixedValueBadge"
+    ],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/flexbox/controls.tsx",
+    "components": [
+      "Button",
+      "FlexAlignmentGridProps",
+      "GapSliderProps",
+      "TextInput"
+    ],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/flexbox/icons.tsx",
+    "components": [],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/flexbox/index.tsx",
+    "components": [
+      "AlignmentSection",
+      "Button",
+      "DirectionControls",
+      "EnableFlexPrompt",
+      "FlexItemControls",
+      "FlexboxSectionProps",
+      "GapControls",
+      "MixedValueBadge",
+      "Section"
+    ],
+    "labels": [
+      "Flexbox"
+    ],
+    "styles": [
+      "align-content",
+      "align-self",
+      "flex-direction",
+      "flex-grow",
+      "flex-wrap",
+      "justify-content"
+    ]
+  },
+  {
+    "file": "src/editor/inspector/sections/interactions/AddInteractionPanel.tsx",
+    "components": [
+      "AddInteractionPanelProps",
+      "Button",
+      "TriggerGroup",
+      "TriggerGroupProps"
+    ],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/interactions/ElementAnimationRow.tsx",
+    "components": [
+      "AnimationEditor",
+      "AnimationTrigger",
+      "Button"
+    ],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/interactions/InteractionEditor.tsx",
+    "components": [
+      "Button",
+      "HTMLInputElement",
+      "Interaction",
+      "InteractionEditorProps",
+      "SelectField",
+      "TextInput"
+    ],
+    "labels": [
+      "Animation",
+      "Easing"
+    ],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/interactions/InteractionItem.tsx",
+    "components": [
+      "InteractionItemProps"
+    ],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/interactions/index.tsx",
+    "components": [
+      "AddInteractionPanel",
+      "AnimationConfig",
+      "Button",
+      "ElementAnimationEditor",
+      "ElementAnimationRow",
+      "Interaction",
+      "InteractionEditor",
+      "InteractionItem",
+      "InteractionsSectionProps",
+      "Section"
+    ],
+    "labels": [
+      "Interactions"
+    ],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/layout/DisplayControls.tsx",
+    "components": [
+      "Button",
+      "DisplayControlsProps",
+      "DisplayPreview",
+      "MixedValueBadge",
+      "Select"
+    ],
+    "labels": [
+      "Display",
+      "More display modes"
+    ],
+    "styles": [
+      "display"
+    ]
+  },
+  {
+    "file": "src/editor/inspector/sections/layout/OverflowVisibilityControls.tsx",
+    "components": [
+      "Button",
+      "MixedValueBadge",
+      "OverflowVisibilityControlsProps",
+      "OverflowXYControls",
+      "OverflowXYControlsProps",
+      "Select"
+    ],
+    "labels": [],
+    "styles": [
+      "box-sizing",
+      "clear",
+      "float",
+      "overflow",
+      "overflow-x",
+      "overflow-y",
+      "visibility"
+    ]
+  },
+  {
+    "file": "src/editor/inspector/sections/layout/PositionControls.tsx",
+    "components": [
+      "InputRow",
+      "MixedValueBadge",
+      "PositionControlsProps",
+      "PositionOffsetControls",
+      "PositionOffsetControlsProps",
+      "SelectRow",
+      "TextInput"
+    ],
+    "labels": [
+      "Position",
+      "Z-Index"
+    ],
+    "styles": [
+      "bottom",
+      "left",
+      "position",
+      "right",
+      "top",
+      "z-index"
+    ]
+  },
+  {
+    "file": "src/editor/inspector/sections/layout/index.tsx",
+    "components": [
+      "DisplayControls",
+      "LayoutSectionProps",
+      "MoreSettingsToggle",
+      "OverflowControls",
+      "PositionControls",
+      "Section",
+      "Select",
+      "SizeModeSelect",
+      "VisibilityFloatControls"
+    ],
+    "labels": [
+      "Layout",
+      "Overflow & visibility",
+      "Position, overflow & visibility",
+      "Size"
+    ],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/layout/previews.tsx",
+    "components": [],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/registry/_shared.tsx",
+    "components": [
+      "Component",
+      "P",
+      "SectionId",
+      "T"
+    ],
+    "labels": [],
+    "styles": [
+      "foo"
+    ]
+  },
+  {
+    "file": "src/editor/inspector/sections/registry/effects.tsx",
+    "components": [],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/registry/element.tsx",
+    "components": [],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/registry/index.tsx",
+    "components": [
+      "SectionId"
+    ],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/registry/layout.tsx",
+    "components": [],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/registry/typography.tsx",
+    "components": [],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/registry/visual.tsx",
+    "components": [],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/typography/FontControls.tsx",
+    "components": [
+      "Button",
+      "ButtonGroup",
+      "ColorInput",
+      "FontControlsProps",
+      "InputWithUnit",
+      "Link2",
+      "Link2Off",
+      "MixedValueIndicator",
+      "Popover",
+      "SelectRow",
+      "TokenPickerPopover",
+      "TypeChainButton",
+      "TypeChainButtonProps"
+    ],
+    "labels": [
+      "Align",
+      "Color",
+      "Decoration",
+      "Font size",
+      "Letter",
+      "Line height",
+      "Link to type token",
+      "Size and line height",
+      "Transform",
+      "Type tokens",
+      "Weight",
+      "Word"
+    ],
+    "styles": [
+      "color",
+      "font-size",
+      "font-weight",
+      "letter-spacing",
+      "line-height",
+      "text-align",
+      "text-decoration",
+      "text-transform",
+      "word-spacing"
+    ]
+  },
+  {
+    "file": "src/editor/inspector/sections/typography/FontPicker.tsx",
+    "components": [
+      "Button",
+      "ChevronDown",
+      "FontPickerPanel",
+      "FontPickerProps",
+      "SystemFont"
+    ],
+    "labels": [
+      "Font family"
+    ],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/typography/FontPickerDropdown.tsx",
+    "components": [
+      "Button",
+      "CategoryTabs",
+      "CategoryTabsProps",
+      "FontCategory",
+      "FontList",
+      "FontListProps",
+      "FontPickerPanelProps",
+      "FontSearchInput",
+      "FontSearchInputProps",
+      "PresetFontGroup",
+      "TextInput"
+    ],
+    "labels": [
+      "Font family selection",
+      "System",
+      "Uploaded"
+    ],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/sections/typography/TypographyControls.tsx",
+    "components": [
+      "ButtonGroup",
+      "InputWithUnit",
+      "MixedValueIndicator",
+      "SelectRow",
+      "TextControlsProps"
+    ],
+    "labels": [
+      "Style",
+      "Text Indent",
+      "Vertical Align",
+      "White Space",
+      "Word Break"
+    ],
+    "styles": [
+      "font-style",
+      "text-indent",
+      "vertical-align",
+      "white-space",
+      "word-break"
+    ]
+  },
+  {
+    "file": "src/editor/inspector/sections/typography/index.tsx",
+    "components": [
+      "FontControls",
+      "FontPicker",
+      "MixedValueIndicator",
+      "MoreSettingsToggle",
+      "Section",
+      "TypographyControls",
+      "TypographySectionProps"
+    ],
+    "labels": [
+      "Typography"
+    ],
+    "styles": [
+      "font-family",
+      "font-size"
+    ]
+  },
+  {
+    "file": "src/editor/inspector/shared/ColorFillPopover.tsx",
+    "components": [
+      "Button",
+      "ChevronLeft",
+      "ColorFillPopoverProps",
+      "ColorPicker",
+      "IconButton",
+      "Pencil",
+      "TextInput",
+      "X"
+    ],
+    "labels": [
+      "Back",
+      "Brand colours",
+      "Close",
+      "Open the colour picker",
+      "Search colours"
+    ],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/shared/MixedValueBadge.tsx",
+    "components": [],
+    "labels": [
+      "Mixed value",
+      "Mixed \u2014 values differ across selected elements"
+    ],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/shared/TokenPickerPopover.tsx",
+    "components": [
+      "Button",
+      "HTMLDivElement",
+      "HTMLInputElement",
+      "TextInput",
+      "TokenPickerPopoverProps"
+    ],
+    "labels": [
+      "Search tokens"
+    ],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/shared/controls/AlignmentGrid.tsx",
+    "components": [
+      "AlignmentGridProps",
+      "Button"
+    ],
+    "labels": [
+      "Align items \u00b7 justify-content"
+    ],
+    "styles": [
+      "align-items",
+      "justify-items"
+    ]
+  },
+  {
+    "file": "src/editor/inspector/shared/controls/ButtonControls.tsx",
+    "components": [
+      "Button",
+      "ButtonGroupProps",
+      "CompactButtonGroupProps"
+    ],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/shared/controls/ColorInput.tsx",
+    "components": [
+      "Button",
+      "ColorFillPopover",
+      "ColorInputProps",
+      "DSBindingChip",
+      "Link2",
+      "Link2Off",
+      "Popover",
+      "TextField"
+    ],
+    "labels": [
+      "Unlink token"
+    ],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/shared/controls/ControlRow.tsx",
+    "components": [
+      "ControlRow",
+      "ControlRowProps",
+      "Omit",
+      "SubTitleProps"
+    ],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/shared/controls/InputControls.tsx",
+    "components": [
+      "Button",
+      "HTMLInputElement",
+      "HelperIcon",
+      "Info",
+      "InputRowProps",
+      "InputWithUnitProps",
+      "OverrideDot",
+      "Select",
+      "SelectRowProps",
+      "TextField",
+      "TextInput",
+      "Textarea",
+      "Tooltip",
+      "X"
+    ],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/shared/controls/LinkedGapInput.tsx",
+    "components": [
+      "Button",
+      "GapIcon",
+      "Link",
+      "Link2Off",
+      "LinkedGapInputProps",
+      "NumField",
+      "TextInput"
+    ],
+    "labels": [],
+    "styles": [
+      "column-gap",
+      "row-gap"
+    ]
+  },
+  {
+    "file": "src/editor/inspector/shared/controls/MixedValueIndicator.tsx",
+    "components": [
+      "MixedValueBadge",
+      "MixedValueIndicatorProps"
+    ],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/shared/controls/MoreSettingsToggle.tsx",
+    "components": [
+      "Button",
+      "ChevronDown",
+      "ChevronRight",
+      "MoreSettingsToggleProps"
+    ],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/shared/controls/PresetGrids.tsx",
+    "components": [
+      "Button",
+      "PresetButtonGridProps",
+      "TemplateButtonGridProps"
+    ],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/shared/controls/Section.tsx",
+    "components": [
+      "ChevronDown",
+      "SectionProps"
+    ],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/shared/controls/SliderControls.tsx",
+    "components": [
+      "RangeSliderProps",
+      "SliderInputProps",
+      "TextInput"
+    ],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/shared/controls/SpacingControls.tsx",
+    "components": [
+      "AxisInput",
+      "AxisInputProps",
+      "Button",
+      "CornerRadiusInputProps",
+      "DSBindingChip",
+      "Link",
+      "Record",
+      "Side",
+      "SpacingBoxProps",
+      "TextField",
+      "TextInput",
+      "Unlink"
+    ],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/shared/controls/TextControls.tsx",
+    "components": [
+      "InlineInputProps",
+      "SectionLabelProps",
+      "SubSectionTitleProps",
+      "TextField",
+      "TextInputRowProps"
+    ],
+    "labels": [],
+    "styles": []
+  },
+  {
+    "file": "src/editor/inspector/tabs/InspectorTabContent.tsx",
+    "components": [
+      "Button",
+      "InspectorTabContentProps",
+      "React.Fragment",
+      "SectionId"
+    ],
+    "labels": [],
+    "styles": []
+  }
+]

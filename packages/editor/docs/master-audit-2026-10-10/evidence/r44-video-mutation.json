@@ -1,0 +1,136 @@
+{
+  "createdVariables": [
+    "VariableID:9052:17496"
+  ],
+  "mutatedNodeIds": [
+    "8844:265293",
+    "8844:265296",
+    "8844:265299",
+    "9051:17532",
+    "9051:17534",
+    "8843:22522"
+  ],
+  "nodes": {
+    "reset": "9051:17532",
+    "undo": "9051:17534",
+    "section": "9051:17523",
+    "field": "9051:17526",
+    "row": "9051:17524",
+    "root": "8843:22237",
+    "style": "8841:14864",
+    "chooser": "8844:265290",
+    "blocked": "9051:17536",
+    "blockedBack": "9051:17547",
+    "player": "9051:19953",
+    "poster": "9051:19954",
+    "error": "9051:19957",
+    "qa": "9051:19964",
+    "settings": "8843:22463",
+    "source": "8843:22457",
+    "resetSample": "8843:22522"
+  },
+  "fixtures": [
+    {
+      "id": "9051:19976",
+      "name": "Action / Clean video"
+    },
+    {
+      "id": "9051:19979",
+      "name": "Action / Stock legacy box"
+    },
+    {
+      "id": "9051:19982",
+      "name": "Action / Unrelated base spacing"
+    },
+    {
+      "id": "9051:19985",
+      "name": "Action / Invalid video source"
+    },
+    {
+      "id": "9051:19988",
+      "name": "Action / Imported empty ratio"
+    },
+    {
+      "id": "9051:19991",
+      "name": "Action / Imported unsupported ratio"
+    },
+    {
+      "id": "9051:19994",
+      "name": "Action / Locked video"
+    },
+    {
+      "id": "9051:19997",
+      "name": "Action / Mixed selection"
+    },
+    {
+      "id": "9051:20000",
+      "name": "Action / Missing video"
+    },
+    {
+      "id": "9051:20003",
+      "name": "Action / Stale target after opening chooser"
+    },
+    {
+      "id": "9051:20006",
+      "name": "Action / Cancel"
+    }
+  ],
+  "variables": {
+    "active": "VariableID:9051:17484",
+    "present": "VariableID:9051:17485",
+    "raw": "VariableID:9051:17486",
+    "legacy": "VariableID:9051:17487",
+    "height-present": "VariableID:9051:17488",
+    "height-raw": "VariableID:9051:17489",
+    "padding-present": "VariableID:9051:17490",
+    "padding-raw": "VariableID:9051:17491",
+    "undo": "VariableID:9051:17492",
+    "locked": "VariableID:9051:17493",
+    "mixed": "VariableID:9051:17494",
+    "exists": "VariableID:9051:17495",
+    "target": "VariableID:9051:17496",
+    "generation": "VariableID:9051:17497",
+    "revision": "VariableID:9051:17498",
+    "captured-target": "VariableID:9051:17499",
+    "captured-generation": "VariableID:9051:17500",
+    "captured-revision": "VariableID:9051:17501",
+    "allowed": "VariableID:9051:17502",
+    "changed": "VariableID:9051:17503",
+    "width": "VariableID:9051:17504",
+    "height": "VariableID:9051:17505",
+    "valid": "VariableID:9051:17506",
+    "invalid": "VariableID:9051:17507",
+    "source-label": "VariableID:9051:17508",
+    "origin": "VariableID:9051:17509",
+    "migration": "VariableID:9051:17510",
+    "reason": "VariableID:9051:17511",
+    "fixture": "VariableID:9051:17512",
+    "status": "VariableID:9051:17513",
+    "before-target": "VariableID:9051:17514",
+    "before-generation": "VariableID:9051:17515",
+    "before-present": "VariableID:9051:17516",
+    "before-raw": "VariableID:9051:17517",
+    "before-legacy": "VariableID:9051:17518",
+    "before-height-present": "VariableID:9051:17519",
+    "before-height-raw": "VariableID:9051:17520",
+    "before-padding-present": "VariableID:9051:17521",
+    "before-padding-raw": "VariableID:9051:17522",
+    "undo-revision": "VariableID:9052:17496"
+  },
+  "saved": [
+    "present",
+    "raw",
+    "legacy",
+    "height-present",
+    "height-raw",
+    "padding-present",
+    "padding-raw"
+  ],
+  "externalVariables": {
+    "ratio": "VariableID:8843:22465",
+    "url": "VariableID:8843:22459",
+    "viewport": "VariableID:8843:22529",
+    "caller": "VariableID:8841:14860"
+  },
+  "note": "Author call timed out after committing; reconciled via r44-video-reconciliation.json. This receipt includes subsequent Reset sample and Undo revision corrections. Do not rerun author."
+}

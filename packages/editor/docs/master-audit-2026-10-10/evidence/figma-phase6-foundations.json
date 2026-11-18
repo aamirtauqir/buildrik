@@ -1,0 +1,604 @@
+{
+  "pageId": "8322:855",
+  "boardId": "8322:856",
+  "collections": {
+    "primitives": "VariableCollectionId:8322:775",
+    "semantic": "VariableCollectionId:8322:776"
+  },
+  "tokens": {
+    "color/ink": {
+      "id": "VariableID:8322:778",
+      "value": "#172033",
+      "css": "var(--bk-ink)",
+      "scope": "TEXT_FILL"
+    },
+    "color/muted": {
+      "id": "VariableID:8322:780",
+      "value": "#667085",
+      "css": "var(--bk-ink-muted)",
+      "scope": "TEXT_FILL"
+    },
+    "color/inactive": {
+      "id": "VariableID:8322:782",
+      "value": "#98A2B3",
+      "css": "var(--bk-ink-disabled)",
+      "scope": "TEXT_FILL"
+    },
+    "color/divider": {
+      "id": "VariableID:8322:784",
+      "value": "#E4E8EF",
+      "css": "var(--bk-border)",
+      "scope": "STROKE_COLOR"
+    },
+    "color/control-border": {
+      "id": "VariableID:8322:786",
+      "value": "#8591A3",
+      "css": "var(--bk-border-input)",
+      "scope": "STROKE_COLOR"
+    },
+    "color/background": {
+      "id": "VariableID:8322:788",
+      "value": "#F4F6F9",
+      "css": "var(--bk-bg-subtle)",
+      "scope": "FRAME_FILL"
+    },
+    "color/panel": {
+      "id": "VariableID:8322:789",
+      "value": "#FFFFFF",
+      "css": "var(--bk-bg-panel)",
+      "scope": "FRAME_FILL"
+    },
+    "color/accent": {
+      "id": "VariableID:8322:790",
+      "value": "#1A56DB",
+      "css": "var(--bk-accent)",
+      "scope": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ]
+    },
+    "color/accent-hover": {
+      "id": "VariableID:8322:791",
+      "value": "#1E429F",
+      "css": "var(--bk-accent-hover)",
+      "scope": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ]
+    },
+    "color/accent-pressed": {
+      "id": "VariableID:8322:792",
+      "value": "#233876",
+      "css": "var(--bk-accent-pressed)",
+      "scope": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ]
+    },
+    "color/accent-tint": {
+      "id": "VariableID:8322:794",
+      "value": "#EFF6FF",
+      "css": "var(--bk-accent-tint)",
+      "scope": "FRAME_FILL"
+    },
+    "color/on-accent": {
+      "id": "VariableID:8322:795",
+      "value": "#FFFFFF",
+      "css": "var(--bk-accent-on)",
+      "scope": "TEXT_FILL"
+    },
+    "color/success": {
+      "id": "VariableID:8322:797",
+      "value": "#087A55",
+      "css": "var(--bk-success-text)",
+      "scope": "TEXT_FILL"
+    },
+    "color/success-tint": {
+      "id": "VariableID:8322:799",
+      "value": "#ECFDF3",
+      "css": "var(--bk-success-tint)",
+      "scope": "FRAME_FILL"
+    },
+    "color/error": {
+      "id": "VariableID:8322:801",
+      "value": "#B42318",
+      "css": "var(--bk-error-text)",
+      "scope": "TEXT_FILL"
+    },
+    "color/error-tint": {
+      "id": "VariableID:8322:803",
+      "value": "#FEF3F2",
+      "css": "var(--bk-error-tint)",
+      "scope": "FRAME_FILL"
+    },
+    "color/warning": {
+      "id": "VariableID:8322:805",
+      "value": "#925C00",
+      "css": "var(--bk-warning-text)",
+      "scope": "TEXT_FILL"
+    },
+    "color/warning-tint": {
+      "id": "VariableID:8322:807",
+      "value": "#FFFAEB",
+      "css": "var(--bk-warning-tint)",
+      "scope": "FRAME_FILL"
+    },
+    "color/component": {
+      "id": "VariableID:8322:809",
+      "value": "#6941C6",
+      "css": "var(--bk-p5-component)",
+      "scope": "TEXT_FILL"
+    },
+    "space/2": {
+      "id": "VariableID:8322:810",
+      "value": 2,
+      "css": "var(--bk-space-2)",
+      "scope": "GAP"
+    },
+    "space/4": {
+      "id": "VariableID:8322:811",
+      "value": 4,
+      "css": "var(--bk-space-4)",
+      "scope": "GAP"
+    },
+    "space/8": {
+      "id": "VariableID:8322:812",
+      "value": 8,
+      "css": "var(--bk-space-8)",
+      "scope": "GAP"
+    },
+    "space/12": {
+      "id": "VariableID:8322:813",
+      "value": 12,
+      "css": "var(--bk-space-12)",
+      "scope": "GAP"
+    },
+    "space/16": {
+      "id": "VariableID:8322:814",
+      "value": 16,
+      "css": "var(--bk-space-16)",
+      "scope": "GAP"
+    },
+    "space/20": {
+      "id": "VariableID:8322:815",
+      "value": 20,
+      "css": "var(--bk-space-20)",
+      "scope": "GAP"
+    },
+    "space/24": {
+      "id": "VariableID:8322:816",
+      "value": 24,
+      "css": "var(--bk-space-24)",
+      "scope": "GAP"
+    },
+    "space/28": {
+      "id": "VariableID:8322:817",
+      "value": 28,
+      "css": "var(--bk-space-28)",
+      "scope": "GAP"
+    },
+    "space/32": {
+      "id": "VariableID:8322:818",
+      "value": 32,
+      "css": "var(--bk-space-32)",
+      "scope": "GAP"
+    },
+    "space/40": {
+      "id": "VariableID:8322:819",
+      "value": 40,
+      "css": "var(--bk-space-40)",
+      "scope": "GAP"
+    },
+    "space/48": {
+      "id": "VariableID:8322:820",
+      "value": 48,
+      "css": "var(--bk-space-48)",
+      "scope": "GAP"
+    },
+    "space/64": {
+      "id": "VariableID:8322:821",
+      "value": 64,
+      "css": "var(--bk-space-64)",
+      "scope": "GAP"
+    },
+    "radius/xs": {
+      "id": "VariableID:8322:822",
+      "value": 2,
+      "css": "var(--bk-radius-xs)",
+      "scope": "CORNER_RADIUS"
+    },
+    "radius/sm": {
+      "id": "VariableID:8322:823",
+      "value": 4,
+      "css": "var(--bk-radius-sm)",
+      "scope": "CORNER_RADIUS"
+    },
+    "radius/md": {
+      "id": "VariableID:8322:824",
+      "value": 6,
+      "css": "var(--bk-radius-md)",
+      "scope": "CORNER_RADIUS"
+    },
+    "radius/lg": {
+      "id": "VariableID:8322:825",
+      "value": 8,
+      "css": "var(--bk-radius-lg)",
+      "scope": "CORNER_RADIUS"
+    },
+    "radius/xl": {
+      "id": "VariableID:8322:826",
+      "value": 12,
+      "css": "var(--bk-radius-xl)",
+      "scope": "CORNER_RADIUS"
+    },
+    "radius/2xl": {
+      "id": "VariableID:8322:827",
+      "value": 16,
+      "css": "var(--bk-radius-2xl)",
+      "scope": "CORNER_RADIUS"
+    },
+    "radius/full": {
+      "id": "VariableID:8322:828",
+      "value": 9999,
+      "css": "var(--bk-radius-full)",
+      "scope": "CORNER_RADIUS"
+    },
+    "size/rail": {
+      "id": "VariableID:8322:829",
+      "value": 60,
+      "css": "var(--bk-size-rail)",
+      "scope": "WIDTH_HEIGHT"
+    },
+    "size/drawer": {
+      "id": "VariableID:8322:830",
+      "value": 280,
+      "css": "var(--bk-size-drawer)",
+      "scope": "WIDTH_HEIGHT"
+    },
+    "size/inspector": {
+      "id": "VariableID:8322:831",
+      "value": 300,
+      "css": "var(--bk-size-inspector)",
+      "scope": "WIDTH_HEIGHT"
+    },
+    "size/topbar": {
+      "id": "VariableID:8322:832",
+      "value": 56,
+      "css": "var(--bk-size-topbar)",
+      "scope": "WIDTH_HEIGHT"
+    },
+    "size/context": {
+      "id": "VariableID:8322:833",
+      "value": 40,
+      "css": "var(--bk-p5-size-context)",
+      "scope": "WIDTH_HEIGHT"
+    },
+    "size/footer": {
+      "id": "VariableID:8322:834",
+      "value": 36,
+      "css": "var(--bk-p5-size-footer)",
+      "scope": "WIDTH_HEIGHT"
+    },
+    "size/control": {
+      "id": "VariableID:8322:835",
+      "value": 30,
+      "css": "var(--bk-p5-size-control)",
+      "scope": "WIDTH_HEIGHT"
+    },
+    "size/row": {
+      "id": "VariableID:8322:836",
+      "value": 32,
+      "css": "var(--bk-size-row)",
+      "scope": "WIDTH_HEIGHT"
+    },
+    "size/icon-xs": {
+      "id": "VariableID:8322:837",
+      "value": 12,
+      "css": "var(--bk-size-icon-xs)",
+      "scope": "WIDTH_HEIGHT"
+    },
+    "size/icon-sm": {
+      "id": "VariableID:8322:838",
+      "value": 16,
+      "css": "var(--bk-size-icon-sm)",
+      "scope": "WIDTH_HEIGHT"
+    },
+    "size/icon-md": {
+      "id": "VariableID:8322:839",
+      "value": 20,
+      "css": "var(--bk-size-icon-md)",
+      "scope": "WIDTH_HEIGHT"
+    },
+    "size/dialog": {
+      "id": "VariableID:8322:840",
+      "value": 640,
+      "css": "var(--bk-size-dialog-lg)",
+      "scope": "WIDTH_HEIGHT"
+    },
+    "font/size/11": {
+      "id": "VariableID:8322:842",
+      "value": 11,
+      "css": "var(--bk-text-11)",
+      "scope": "FONT_SIZE"
+    },
+    "font/size/12": {
+      "id": "VariableID:8322:843",
+      "value": 12,
+      "css": "var(--bk-text-12)",
+      "scope": "FONT_SIZE"
+    },
+    "font/size/13": {
+      "id": "VariableID:8322:845",
+      "value": 13,
+      "css": "var(--bk-text-13)",
+      "scope": "FONT_SIZE"
+    },
+    "font/size/14": {
+      "id": "VariableID:8322:846",
+      "value": 14,
+      "css": "var(--bk-text-14)",
+      "scope": "FONT_SIZE"
+    },
+    "font/size/16": {
+      "id": "VariableID:8322:847",
+      "value": 16,
+      "css": "var(--bk-text-16)",
+      "scope": "FONT_SIZE"
+    },
+    "font/size/20": {
+      "id": "VariableID:8322:848",
+      "value": 20,
+      "css": "var(--bk-text-20)",
+      "scope": "FONT_SIZE"
+    },
+    "font/size/24": {
+      "id": "VariableID:8322:849",
+      "value": 24,
+      "css": "var(--bk-text-24)",
+      "scope": "FONT_SIZE"
+    },
+    "font/size/28": {
+      "id": "VariableID:8322:850",
+      "value": 28,
+      "css": "var(--bk-text-28)",
+      "scope": "FONT_SIZE"
+    },
+    "motion/fast": {
+      "id": "VariableID:8322:851",
+      "value": 100,
+      "css": "var(--bk-motion-fast)",
+      "scope": []
+    },
+    "motion/base": {
+      "id": "VariableID:8322:852",
+      "value": 160,
+      "css": "var(--bk-motion-base)",
+      "scope": []
+    },
+    "motion/slow": {
+      "id": "VariableID:8322:853",
+      "value": 240,
+      "css": "var(--bk-motion-slow)",
+      "scope": []
+    },
+    "motion/reduced": {
+      "id": "VariableID:8322:854",
+      "value": 0,
+      "css": "var(--bk-p5-motion-reduced)",
+      "scope": []
+    }
+  },
+  "createdVariableIds": [
+    "VariableID:8322:777",
+    "VariableID:8322:778",
+    "VariableID:8322:779",
+    "VariableID:8322:780",
+    "VariableID:8322:781",
+    "VariableID:8322:782",
+    "VariableID:8322:783",
+    "VariableID:8322:784",
+    "VariableID:8322:785",
+    "VariableID:8322:786",
+    "VariableID:8322:787",
+    "VariableID:8322:788",
+    "VariableID:8322:789",
+    "VariableID:8322:790",
+    "VariableID:8322:791",
+    "VariableID:8322:792",
+    "VariableID:8322:793",
+    "VariableID:8322:794",
+    "VariableID:8322:795",
+    "VariableID:8322:796",
+    "VariableID:8322:797",
+    "VariableID:8322:798",
+    "VariableID:8322:799",
+    "VariableID:8322:800",
+    "VariableID:8322:801",
+    "VariableID:8322:802",
+    "VariableID:8322:803",
+    "VariableID:8322:804",
+    "VariableID:8322:805",
+    "VariableID:8322:806",
+    "VariableID:8322:807",
+    "VariableID:8322:808",
+    "VariableID:8322:809",
+    "VariableID:8322:810",
+    "VariableID:8322:811",
+    "VariableID:8322:812",
+    "VariableID:8322:813",
+    "VariableID:8322:814",
+    "VariableID:8322:815",
+    "VariableID:8322:816",
+    "VariableID:8322:817",
+    "VariableID:8322:818",
+    "VariableID:8322:819",
+    "VariableID:8322:820",
+    "VariableID:8322:821",
+    "VariableID:8322:822",
+    "VariableID:8322:823",
+    "VariableID:8322:824",
+    "VariableID:8322:825",
+    "VariableID:8322:826",
+    "VariableID:8322:827",
+    "VariableID:8322:828",
+    "VariableID:8322:829",
+    "VariableID:8322:830",
+    "VariableID:8322:831",
+    "VariableID:8322:832",
+    "VariableID:8322:833",
+    "VariableID:8322:834",
+    "VariableID:8322:835",
+    "VariableID:8322:836",
+    "VariableID:8322:837",
+    "VariableID:8322:838",
+    "VariableID:8322:839",
+    "VariableID:8322:840",
+    "VariableID:8322:841",
+    "VariableID:8322:842",
+    "VariableID:8322:843",
+    "VariableID:8322:844",
+    "VariableID:8322:845",
+    "VariableID:8322:846",
+    "VariableID:8322:847",
+    "VariableID:8322:848",
+    "VariableID:8322:849",
+    "VariableID:8322:850",
+    "VariableID:8322:851",
+    "VariableID:8322:852",
+    "VariableID:8322:853",
+    "VariableID:8322:854"
+  ],
+  "reusedPrimitiveIds": [
+    "VariableID:2:10",
+    "VariableID:524:56",
+    "VariableID:524:57",
+    "VariableID:524:58",
+    "VariableID:2:24",
+    "VariableID:2:25",
+    "VariableID:2:26",
+    "VariableID:2:27",
+    "VariableID:2:28",
+    "VariableID:481:10",
+    "VariableID:2:29",
+    "VariableID:2:37",
+    "VariableID:2:30",
+    "VariableID:481:12",
+    "VariableID:2:31",
+    "VariableID:2:32",
+    "VariableID:2:34",
+    "VariableID:2:36",
+    "VariableID:2:42",
+    "VariableID:2:43",
+    "VariableID:2:45",
+    "VariableID:2:40",
+    "VariableID:1044:5239",
+    "VariableID:481:11",
+    "VariableID:7194:78878",
+    "VariableID:1044:5228",
+    "VariableID:481:5",
+    "VariableID:481:6",
+    "VariableID:481:7",
+    "VariableID:481:8"
+  ],
+  "createdNodeIds": [
+    "8322:856",
+    "8322:857",
+    "8322:858",
+    "8322:859",
+    "8322:860",
+    "8322:861",
+    "8322:862",
+    "8322:863",
+    "8322:864",
+    "8322:865",
+    "8322:866",
+    "8322:867",
+    "8322:868",
+    "8322:869",
+    "8322:870",
+    "8322:871",
+    "8322:872",
+    "8322:873",
+    "8322:874",
+    "8322:875",
+    "8322:876",
+    "8322:877",
+    "8322:878",
+    "8322:879",
+    "8322:880",
+    "8322:881",
+    "8322:882",
+    "8322:883",
+    "8322:884",
+    "8322:885",
+    "8322:886",
+    "8322:887",
+    "8322:888",
+    "8322:889",
+    "8322:890",
+    "8322:891",
+    "8322:892",
+    "8322:893",
+    "8322:894",
+    "8322:895",
+    "8322:896",
+    "8322:897",
+    "8322:898",
+    "8322:899",
+    "8322:900",
+    "8322:901",
+    "8322:902",
+    "8322:903",
+    "8322:904",
+    "8322:905",
+    "8322:906",
+    "8322:907",
+    "8322:908",
+    "8322:909",
+    "8322:910",
+    "8322:911",
+    "8322:912",
+    "8322:913",
+    "8322:914",
+    "8322:915",
+    "8322:916",
+    "8322:917",
+    "8322:918",
+    "8322:919",
+    "8322:920",
+    "8322:921",
+    "8322:922",
+    "8322:923",
+    "8322:924",
+    "8322:925",
+    "8322:926",
+    "8322:927",
+    "8322:928",
+    "8322:929",
+    "8322:930",
+    "8322:931",
+    "8322:932",
+    "8322:933",
+    "8322:934",
+    "8322:935",
+    "8322:936",
+    "8322:937",
+    "8322:938",
+    "8322:939",
+    "8322:940",
+    "8322:941",
+    "8322:942",
+    "8322:943",
+    "8322:944",
+    "8322:945",
+    "8322:946",
+    "8322:947"
+  ],
+  "tokenCount": 62
+}

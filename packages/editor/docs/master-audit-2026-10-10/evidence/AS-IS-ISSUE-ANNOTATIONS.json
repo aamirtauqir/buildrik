@@ -1,0 +1,1454 @@
+[
+  {
+    "findingID": "UX-01",
+    "priority": "P1",
+    "currentIssue": "Empty-page introduction clips at laptop size (High, observed)",
+    "sourceEvidence": "docs/ui-ux-audit-2026-10-10/REPORT.md#ux-01; screenshot/runtime evidence there",
+    "asisNodes": [
+      {
+        "id": "8308:3572",
+        "frame": 84,
+        "name": "AS-IS 84 · Pages / Empty page",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8308-3572"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "The 1440 px empty page is context; earlier laptop clipping/onboarding screenshot is the issue evidence, not reproduced here. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "UX-02",
+    "priority": "P1",
+    "currentIssue": "Two onboarding tips compete with the first task (Medium, observed design issue)",
+    "sourceEvidence": "docs/ui-ux-audit-2026-10-10/REPORT.md#ux-02; screenshot/runtime evidence there",
+    "asisNodes": [
+      {
+        "id": "8308:3572",
+        "frame": 84,
+        "name": "AS-IS 84 · Pages / Empty page",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8308-3572"
+      },
+      {
+        "id": "8283:1249",
+        "frame": 6,
+        "name": "AS-IS 06 · Add catalog",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8283-1249"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Current empty/Add surfaces; two simultaneous first-user tips are not present as a native captured state. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "UX-03",
+    "priority": "P1",
+    "currentIssue": "Named starter does not lead directly to that template (Medium, observed)",
+    "sourceEvidence": "docs/ui-ux-audit-2026-10-10/REPORT.md#ux-03; screenshot/runtime evidence there",
+    "asisNodes": [
+      {
+        "id": "8308:3572",
+        "frame": 84,
+        "name": "AS-IS 84 · Pages / Empty page",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8308-3572"
+      },
+      {
+        "id": "8290:1629",
+        "frame": 27,
+        "name": "AS-IS 27 · Templates / gallery",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8290-1629"
+      },
+      {
+        "id": "8290:1811",
+        "frame": 28,
+        "name": "AS-IS 28 · Template preview",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8290-1811"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Starter/gallery/preview context; the wrong initial target is a navigation sequence, not proved by these static states. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "UX-04",
+    "priority": "P1",
+    "currentIssue": "Page creation stacks several blocking surfaces (High, observed)",
+    "sourceEvidence": "docs/ui-ux-audit-2026-10-10/REPORT.md#ux-04; screenshot/runtime evidence there",
+    "asisNodes": [
+      {
+        "id": "8290:3051",
+        "frame": 33,
+        "name": "AS-IS 33 · New page dialog",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8290-3051"
+      },
+      {
+        "id": "8290:1629",
+        "frame": 27,
+        "name": "AS-IS 27 · Templates / gallery",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8290-1629"
+      },
+      {
+        "id": "8309:247369",
+        "frame": 99,
+        "name": "AS-IS 99 · Templates / Replacement guard",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8309-247369"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Distinct creation/template/guard surfaces; original stacked sequence is not claimed fully reproduced. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "UX-05",
+    "priority": "P1",
+    "currentIssue": "Advanced typography dominates the initial heading inspector (Medium, observed design issue)",
+    "sourceEvidence": "docs/ui-ux-audit-2026-10-10/REPORT.md#ux-05; screenshot/runtime evidence there",
+    "asisNodes": [
+      {
+        "id": "8283:2",
+        "frame": 2,
+        "name": "AS-IS 02 · Heading / Style",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8283-2"
+      },
+      {
+        "id": "8293:2",
+        "frame": 36,
+        "name": "AS-IS 36 · Heading Style — 1440px",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8293-2"
+      }
+    ],
+    "representationType": "Captured issue characteristic",
+    "representationLimit": "Captured expanded heading typography is represented; disclosure state is fixture-specific and does not apply to every heading. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "UX-06",
+    "priority": "P1",
+    "currentIssue": "Responsive editing is hidden inside a generic View submenu (High, observed design issue)",
+    "sourceEvidence": "docs/ui-ux-audit-2026-10-10/REPORT.md#ux-06; screenshot/runtime evidence there",
+    "asisNodes": [
+      {
+        "id": "8308:1227",
+        "frame": 77,
+        "name": "AS-IS 77 · Canvas / View menu",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8308-1227"
+      },
+      {
+        "id": "8308:1472",
+        "frame": 78,
+        "name": "AS-IS 78 · Canvas / Breakpoint menu",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8308-1472"
+      }
+    ],
+    "representationType": "Captured issue characteristic",
+    "representationLimit": "View and Breakpoint submenu capture the current nested entry; screenshots do not certify navigation usability. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "UX-07",
+    "priority": "P1",
+    "currentIssue": "Selection toolbar and shortcut hint overlap content (Medium, observed)",
+    "sourceEvidence": "docs/ui-ux-audit-2026-10-10/REPORT.md#ux-07; screenshot/runtime evidence there",
+    "asisNodes": [
+      {
+        "id": "8283:2",
+        "frame": 2,
+        "name": "AS-IS 02 · Heading / Style",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8283-2"
+      },
+      {
+        "id": "8308:3082",
+        "frame": 83,
+        "name": "AS-IS 83 · Inspector / Form",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8308-3082"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Selected-element overlays are present; exact earlier overlap depends on target, zoom and transient hint. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "UX-08",
+    "priority": "P1",
+    "currentIssue": "Layer names lose useful meaning in a narrow fixed panel (Medium, observed design issue)",
+    "sourceEvidence": "docs/ui-ux-audit-2026-10-10/REPORT.md#ux-08; screenshot/runtime evidence there",
+    "asisNodes": [
+      {
+        "id": "8283:610",
+        "frame": 4,
+        "name": "AS-IS 04 · Layers",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8283-610"
+      },
+      {
+        "id": "8308:1927",
+        "frame": 80,
+        "name": "AS-IS 80 · Inspector / Multiple selected",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8308-1927"
+      }
+    ],
+    "representationType": "Captured issue characteristic",
+    "representationLimit": "Captured narrow Layers tree and truncated labels represent the current condition; other labels/tree depths vary. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "UX-09",
+    "priority": "P0",
+    "currentIssue": "Mobile font override is absent from site preview (High, reproduced twice)",
+    "sourceEvidence": "docs/ui-ux-audit-2026-10-10/REPORT.md#ux-09; screenshot/runtime evidence there",
+    "asisNodes": [
+      {
+        "id": "8309:246171",
+        "frame": 97,
+        "name": "AS-IS 97 · Inspector / Heading at Mobile",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8309-246171"
+      },
+      {
+        "id": "8290:2250",
+        "frame": 30,
+        "name": "AS-IS 30 · Preview / Desktop",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8290-2250"
+      },
+      {
+        "id": "8290:2518",
+        "frame": 31,
+        "name": "AS-IS 31 · Preview / Mobile 375",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8290-2518"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Selected Mobile and Preview contexts differ in time/fixture; no matched override-parity test is established by these nodes. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "UX-10",
+    "priority": "P0",
+    "currentIssue": "Line-height field disagrees with rendered typography (High, measured)",
+    "sourceEvidence": "docs/ui-ux-audit-2026-10-10/REPORT.md#ux-10; screenshot/runtime evidence there",
+    "asisNodes": [
+      {
+        "id": "8283:2",
+        "frame": 2,
+        "name": "AS-IS 02 · Heading / Style",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8283-2"
+      },
+      {
+        "id": "8293:2",
+        "frame": 36,
+        "name": "AS-IS 36 · Heading Style — 1440px",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8293-2"
+      },
+      {
+        "id": "8309:246171",
+        "frame": 97,
+        "name": "AS-IS 97 · Inspector / Heading at Mobile",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8309-246171"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Typography fields are contextual. Original 1.1 x versus computed 1.5 x measurement is not reproduced by the later 36 px/1.2 x fixture. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "UX-11",
+    "priority": "P1",
+    "currentIssue": "Preview resets device context to Desktop (Medium, observed)",
+    "sourceEvidence": "docs/ui-ux-audit-2026-10-10/REPORT.md#ux-11; screenshot/runtime evidence there",
+    "asisNodes": [
+      {
+        "id": "8309:246171",
+        "frame": 97,
+        "name": "AS-IS 97 · Inspector / Heading at Mobile",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8309-246171"
+      },
+      {
+        "id": "8290:2250",
+        "frame": 30,
+        "name": "AS-IS 30 · Preview / Desktop",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8290-2250"
+      },
+      {
+        "id": "8290:2518",
+        "frame": 31,
+        "name": "AS-IS 31 · Preview / Mobile 375",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8290-2518"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Device views exist; static states do not prove the transition reset or preserved selection. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "UX-12",
+    "priority": "P1",
+    "currentIssue": "Starter navigation does not adapt adequately at 375px (High, observed)",
+    "sourceEvidence": "docs/ui-ux-audit-2026-10-10/REPORT.md#ux-12; screenshot/runtime evidence there",
+    "asisNodes": [
+      {
+        "id": "8290:1811",
+        "frame": 28,
+        "name": "AS-IS 28 · Template preview",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8290-1811"
+      },
+      {
+        "id": "8290:2518",
+        "frame": 31,
+        "name": "AS-IS 31 · Preview / Mobile 375",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8290-2518"
+      },
+      {
+        "id": "8309:246610",
+        "frame": 98,
+        "name": "AS-IS 98 · Templates / Empty page replacement applied",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8309-246610"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Template/Preview/applied-page context; these frames do not reproduce the exact starter navigation at 375 px. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "UX-13",
+    "priority": "P1",
+    "currentIssue": "Onboarding blocks the first preview with unrelated next-task UI (Medium, observed)",
+    "sourceEvidence": "docs/ui-ux-audit-2026-10-10/REPORT.md#ux-13; screenshot/runtime evidence there",
+    "asisNodes": [
+      {
+        "id": "8308:3572",
+        "frame": 84,
+        "name": "AS-IS 84 · Pages / Empty page",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8308-3572"
+      },
+      {
+        "id": "8290:2250",
+        "frame": 30,
+        "name": "AS-IS 30 · Preview / Desktop",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8290-2250"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Empty and Preview surfaces; onboarding interruption itself is earlier runtime evidence, not a reconstructed overlay here. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "UX-14",
+    "priority": "P1",
+    "currentIssue": "Override information is repeated and mislocated (Medium, observed)",
+    "sourceEvidence": "docs/ui-ux-audit-2026-10-10/REPORT.md#ux-14; screenshot/runtime evidence there",
+    "asisNodes": [
+      {
+        "id": "8309:246171",
+        "frame": 97,
+        "name": "AS-IS 97 · Inspector / Heading at Mobile",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8309-246171"
+      },
+      {
+        "id": "8309:245692",
+        "frame": 96,
+        "name": "AS-IS 96 · Inspector / Spacing token picker",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8309-245692"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Mobile context and token chooser captured; frame 97 has no override-count/Revert line, so repeated override marks are not reproduced. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "UX-15",
+    "priority": "P1",
+    "currentIssue": "CMS empty state leaves its main work area unused (Medium, observed design issue)",
+    "sourceEvidence": "docs/ui-ux-audit-2026-10-10/REPORT.md#ux-15; screenshot/runtime evidence there",
+    "asisNodes": [
+      {
+        "id": "8306:241560",
+        "frame": 66,
+        "name": "AS-IS 66 · CMS / No collection selected",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8306-241560"
+      }
+    ],
+    "representationType": "Captured issue characteristic",
+    "representationLimit": "No-selected-collection workspace and unused main-space guidance are captured; this is one collection, not zero collections. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "UX-16",
+    "priority": "P1",
+    "currentIssue": "CMS onboarding explanation conflicts with creation form (Medium, observed)",
+    "sourceEvidence": "docs/ui-ux-audit-2026-10-10/REPORT.md#ux-16; screenshot/runtime evidence there",
+    "asisNodes": [
+      {
+        "id": "8306:241560",
+        "frame": 66,
+        "name": "AS-IS 66 · CMS / No collection selected",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8306-241560"
+      },
+      {
+        "id": "8283:2523",
+        "frame": 10,
+        "name": "AS-IS 10 · CMS records",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8283-2523"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "CMS landing/record context; the conflicting new-collection explanation/form pair is not reconstructed. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "UX-17",
+    "priority": "P1",
+    "currentIssue": "New collection opens on step 2 with step 1 marked complete (Medium, observed)",
+    "sourceEvidence": "docs/ui-ux-audit-2026-10-10/REPORT.md#ux-17; screenshot/runtime evidence there",
+    "asisNodes": [
+      {
+        "id": "8306:241560",
+        "frame": 66,
+        "name": "AS-IS 66 · CMS / No collection selected",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8306-241560"
+      },
+      {
+        "id": "8286:272",
+        "frame": 12,
+        "name": "AS-IS 12 · CMS fields",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8286-272"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "CMS landing/fields context; creation wizard step 2/step 1-complete is not a native state in this set. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "UX-18",
+    "priority": "P1",
+    "currentIssue": "Brand starts with a technical token inventory instead of a usable palette (Medium, observed design issue)",
+    "sourceEvidence": "docs/ui-ux-audit-2026-10-10/REPORT.md#ux-18; screenshot/runtime evidence there",
+    "asisNodes": [
+      {
+        "id": "8286:511",
+        "frame": 13,
+        "name": "AS-IS 13 · Brand / colors",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8286-511"
+      },
+      {
+        "id": "8286:985",
+        "frame": 15,
+        "name": "AS-IS 15 · Brand typography",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8286-985"
+      },
+      {
+        "id": "8286:1160",
+        "frame": 16,
+        "name": "AS-IS 16 · Brand spacing",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8286-1160"
+      }
+    ],
+    "representationType": "Captured issue characteristic",
+    "representationLimit": "Current token inventories are represented; design interpretation is a finding, not a failed service contract. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "UX-19",
+    "priority": "P1",
+    "currentIssue": "Global-change promise is broader than the visible usage evidence (Medium, observed copy issue)",
+    "sourceEvidence": "docs/ui-ux-audit-2026-10-10/REPORT.md#ux-19; screenshot/runtime evidence there",
+    "asisNodes": [
+      {
+        "id": "8286:511",
+        "frame": 13,
+        "name": "AS-IS 13 · Brand / colors",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8286-511"
+      },
+      {
+        "id": "8304:308",
+        "frame": 59,
+        "name": "AS-IS 59 · Brand / Styles",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8304-308"
+      },
+      {
+        "id": "8304:505",
+        "frame": 60,
+        "name": "AS-IS 60 · Brand / Component styles",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8304-505"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Token/style scope and usage context; screenshot wording does not establish actual global propagation breadth. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "UX-20",
+    "priority": "P2",
+    "currentIssue": "Asset manager has weak primary-action consistency and redundant view wording (Low, observed design issue)",
+    "sourceEvidence": "docs/ui-ux-audit-2026-10-10/REPORT.md#ux-20; screenshot/runtime evidence there",
+    "asisNodes": [
+      {
+        "id": "8283:2325",
+        "frame": 9,
+        "name": "AS-IS 09 · Full Media",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8283-2325"
+      },
+      {
+        "id": "8307:242190",
+        "frame": 70,
+        "name": "AS-IS 70 · Media / Selected asset",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8307-242190"
+      },
+      {
+        "id": "8308:2",
+        "frame": 71,
+        "name": "AS-IS 71 · Media / Asset properties",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8308-2"
+      }
+    ],
+    "representationType": "Captured issue characteristic",
+    "representationLimit": "Full manager actions and repeated Grid/view wording are captured; no action-result consistency test is implied. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "UX-21",
+    "priority": "P1",
+    "currentIssue": "General settings opens with premature validation styling (Medium, observed)",
+    "sourceEvidence": "docs/ui-ux-audit-2026-10-10/REPORT.md#ux-21; screenshot/runtime evidence there",
+    "asisNodes": [
+      {
+        "id": "8286:1613",
+        "frame": 18,
+        "name": "AS-IS 18 · Settings / General",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8286-1613"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Current loaded General state is contextual; original premature-validation styling is not certified reproduced. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "UX-22",
+    "priority": "P0",
+    "currentIssue": "Full-page settings leaves covered editor controls in keyboard/accessibility navigation (High, reproduced)",
+    "sourceEvidence": "docs/ui-ux-audit-2026-10-10/REPORT.md#ux-22; screenshot/runtime evidence there",
+    "asisNodes": [
+      {
+        "id": "8286:1613",
+        "frame": 18,
+        "name": "AS-IS 18 · Settings / General",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8286-1613"
+      },
+      {
+        "id": "8302:2",
+        "frame": 44,
+        "name": "AS-IS 44 · Settings / Overview",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8302-2"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Full Settings coverage is visible; keyboard/accessibility reach into covered chrome requires runtime evidence. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "UX-23",
+    "priority": "P1",
+    "currentIssue": "Command palette opens as an oversized catalogue (Medium, observed design issue)",
+    "sourceEvidence": "docs/ui-ux-audit-2026-10-10/REPORT.md#ux-23; screenshot/runtime evidence there",
+    "asisNodes": [
+      {
+        "id": "8290:1033",
+        "frame": 24,
+        "name": "AS-IS 24 · Command palette",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8290-1033"
+      }
+    ],
+    "representationType": "Captured issue characteristic",
+    "representationLimit": "Captured command catalogue reproduces the broad initial surface; no keyboard/focus behavior certified. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "UX-24",
+    "priority": "P2",
+    "currentIssue": "Navigation and control presentation vary between full-page tools (Low, observed design issue)",
+    "sourceEvidence": "docs/ui-ux-audit-2026-10-10/REPORT.md#ux-24; screenshot/runtime evidence there",
+    "asisNodes": [
+      {
+        "id": "8283:2325",
+        "frame": 9,
+        "name": "AS-IS 09 · Full Media",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8283-2325"
+      },
+      {
+        "id": "8290:1629",
+        "frame": 27,
+        "name": "AS-IS 27 · Templates / gallery",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8290-1629"
+      },
+      {
+        "id": "8302:2",
+        "frame": 44,
+        "name": "AS-IS 44 · Settings / Overview",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8302-2"
+      },
+      {
+        "id": "8304:308",
+        "frame": 59,
+        "name": "AS-IS 59 · Brand / Styles",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8304-308"
+      }
+    ],
+    "representationType": "Captured issue characteristic",
+    "representationLimit": "Distinct manager/workspace navigation and control treatments are represented; not every tool transition was replayed. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "UX-25",
+    "priority": "P1",
+    "currentIssue": "Effective text alignment is not selected in inspector (Medium, observed)",
+    "sourceEvidence": "docs/ui-ux-audit-2026-10-10/REPORT.md#ux-25; screenshot/runtime evidence there",
+    "asisNodes": [
+      {
+        "id": "8283:2",
+        "frame": 2,
+        "name": "AS-IS 02 · Heading / Style",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8283-2"
+      },
+      {
+        "id": "8293:2",
+        "frame": 36,
+        "name": "AS-IS 36 · Heading Style — 1440px",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8293-2"
+      },
+      {
+        "id": "8309:246171",
+        "frame": 97,
+        "name": "AS-IS 97 · Inspector / Heading at Mobile",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8309-246171"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Alignment controls are represented; original computed-center/unselected-radio mismatch remains the earlier measurement. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "IA-01",
+    "priority": "P1",
+    "currentIssue": "Keyboard cannot operate submenu actions (High; regression reproduced, corrected)",
+    "sourceEvidence": "docs/product-audit-2026-10-10/FINDINGS.md section IA-01",
+    "asisNodes": [
+      {
+        "id": "8283:299",
+        "frame": 3,
+        "name": "AS-IS 03 · Selected element actions",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8283-299"
+      },
+      {
+        "id": "8308:3973",
+        "frame": 85,
+        "name": "AS-IS 85 · Pages / Page actions",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8308-3973"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Menu context only; keyboard regression/correction evidence remains in source/runtime report and existing status is preserved. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "IA-02",
+    "priority": "P1",
+    "currentIssue": "Action grouping mixes different intentions (Medium; design recommendation)",
+    "sourceEvidence": "docs/product-audit-2026-10-10/FINDINGS.md section IA-02",
+    "asisNodes": [
+      {
+        "id": "8283:299",
+        "frame": 3,
+        "name": "AS-IS 03 · Selected element actions",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8283-299"
+      },
+      {
+        "id": "8308:505",
+        "frame": 73,
+        "name": "AS-IS 73 · Media / Asset actions",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8308-505"
+      },
+      {
+        "id": "8308:3973",
+        "frame": 85,
+        "name": "AS-IS 85 · Pages / Page actions",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8308-3973"
+      }
+    ],
+    "representationType": "Captured issue characteristic",
+    "representationLimit": "Current action grouping is represented; different menu owners remain distinct. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "IA-03",
+    "priority": "P1",
+    "currentIssue": "Disabled-action reasons disappear at the menu adapter (Medium; source confirmed)",
+    "sourceEvidence": "docs/product-audit-2026-10-10/FINDINGS.md section IA-03",
+    "asisNodes": [
+      {
+        "id": "8283:299",
+        "frame": 3,
+        "name": "AS-IS 03 · Selected element actions",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8283-299"
+      },
+      {
+        "id": "8308:3973",
+        "frame": 85,
+        "name": "AS-IS 85 · Pages / Page actions",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8308-3973"
+      },
+      {
+        "id": "8308:2246",
+        "frame": 81,
+        "name": "AS-IS 81 · Inspector / Locked element",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8308-2246"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Menu/locked context; missing adapter reasons are source-confirmed, not every disabled reason reproduced. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "IA-04",
+    "priority": "P1",
+    "currentIssue": "Group eligibility does not match engine eligibility (Medium; source confirmed)",
+    "sourceEvidence": "docs/product-audit-2026-10-10/FINDINGS.md section IA-04",
+    "asisNodes": [
+      {
+        "id": "8283:299",
+        "frame": 3,
+        "name": "AS-IS 03 · Selected element actions",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8283-299"
+      },
+      {
+        "id": "8308:1927",
+        "frame": 80,
+        "name": "AS-IS 80 · Inspector / Multiple selected",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8308-1927"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Group controls/menu context; engine eligibility and refusal cannot be inferred from the drawn affordance. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "IA-05",
+    "priority": "P1",
+    "currentIssue": "Arrange labels imply stacking while commands reorder siblings (Medium; source/design mismatch)",
+    "sourceEvidence": "docs/product-audit-2026-10-10/FINDINGS.md section IA-05",
+    "asisNodes": [
+      {
+        "id": "8283:299",
+        "frame": 3,
+        "name": "AS-IS 03 · Selected element actions",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8283-299"
+      },
+      {
+        "id": "8283:610",
+        "frame": 4,
+        "name": "AS-IS 04 · Layers",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8283-610"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Action/tree context; sibling-order versus visual stacking outcome was not executed for this reconstruction. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "IA-06",
+    "priority": "P1",
+    "currentIssue": "Surface routing has multiple sources of truth (Medium; source confirmed architecture risk)",
+    "sourceEvidence": "docs/product-audit-2026-10-10/FINDINGS.md section IA-06",
+    "asisNodes": [
+      {
+        "id": "8290:660",
+        "frame": 22,
+        "name": "AS-IS 22 · Issues / six warnings",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8290-660"
+      },
+      {
+        "id": "8290:862",
+        "frame": 23,
+        "name": "AS-IS 23 · Activity / event",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8290-862"
+      },
+      {
+        "id": "8286:1357",
+        "frame": 17,
+        "name": "AS-IS 17 · Site menu",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8286-1357"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Issues/Activity/site menu are separate static captures; observed hidden-Activity sequence is in EXTENDED-RUNTIME-AUDIT. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "IA-07",
+    "priority": "P0",
+    "currentIssue": "Full-page coverage is visually stronger than focus isolation (High; runtime + source confirmed)",
+    "sourceEvidence": "docs/product-audit-2026-10-10/FINDINGS.md section IA-07",
+    "asisNodes": [
+      {
+        "id": "8286:1613",
+        "frame": 18,
+        "name": "AS-IS 18 · Settings / General",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8286-1613"
+      },
+      {
+        "id": "8302:2",
+        "frame": 44,
+        "name": "AS-IS 44 · Settings / Overview",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8302-2"
+      },
+      {
+        "id": "8290:1629",
+        "frame": 27,
+        "name": "AS-IS 27 · Templates / gallery",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8290-1629"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Full workspaces are visible; actual focus isolation/inert/return behavior needs runtime validation. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "IA-08",
+    "priority": "P1",
+    "currentIssue": "Preview is not a full interaction runtime (High validation gap; source confirmed)",
+    "sourceEvidence": "docs/product-audit-2026-10-10/FINDINGS.md section IA-08",
+    "asisNodes": [
+      {
+        "id": "8290:2250",
+        "frame": 30,
+        "name": "AS-IS 30 · Preview / Desktop",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8290-2250"
+      },
+      {
+        "id": "8290:2518",
+        "frame": 31,
+        "name": "AS-IS 31 · Preview / Mobile 375",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8290-2518"
+      },
+      {
+        "id": "8309:244434",
+        "frame": 93,
+        "name": "AS-IS 93 · Inspector / Add interaction",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8309-244434"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Preview and trigger-authoring surfaces are represented; scripts remain disabled in Preview and no playback success is claimed. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "IA-09",
+    "priority": "P1",
+    "currentIssue": "Preview loses editing context (Medium; runtime + source confirmed)",
+    "sourceEvidence": "docs/product-audit-2026-10-10/FINDINGS.md section IA-09",
+    "asisNodes": [
+      {
+        "id": "8309:246171",
+        "frame": 97,
+        "name": "AS-IS 97 · Inspector / Heading at Mobile",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8309-246171"
+      },
+      {
+        "id": "8290:2250",
+        "frame": 30,
+        "name": "AS-IS 30 · Preview / Desktop",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8290-2250"
+      },
+      {
+        "id": "8290:2518",
+        "frame": 31,
+        "name": "AS-IS 31 · Preview / Mobile 375",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8290-2518"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Editing/Preview device states; transition context retention is not proved by disconnected snapshots. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "IA-10",
+    "priority": "P0",
+    "currentIssue": "Inspector architecture is capability-aware, but effective state is not reliably communicated (High; mixed evidence)",
+    "sourceEvidence": "docs/product-audit-2026-10-10/FINDINGS.md section IA-10",
+    "asisNodes": [
+      {
+        "id": "8293:2",
+        "frame": 36,
+        "name": "AS-IS 36 · Heading Style — 1440px",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8293-2"
+      },
+      {
+        "id": "8293:373",
+        "frame": 37,
+        "name": "AS-IS 37 · Image Style — 1440px",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8293-373"
+      },
+      {
+        "id": "8308:1927",
+        "frame": 80,
+        "name": "AS-IS 80 · Inspector / Multiple selected",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8308-1927"
+      },
+      {
+        "id": "8309:246171",
+        "frame": 97,
+        "name": "AS-IS 97 · Inspector / Heading at Mobile",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8309-246171"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Capability/type/mixed/mobile context shown; effective-value agreement still requires computed/runtime evidence. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "IA-11",
+    "priority": "P1",
+    "currentIssue": "CMS takes broad space without broad-task guidance (Medium; runtime + source confirmed)",
+    "sourceEvidence": "docs/product-audit-2026-10-10/FINDINGS.md section IA-11",
+    "asisNodes": [
+      {
+        "id": "8306:241560",
+        "frame": 66,
+        "name": "AS-IS 66 · CMS / No collection selected",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8306-241560"
+      },
+      {
+        "id": "8283:2523",
+        "frame": 10,
+        "name": "AS-IS 10 · CMS records",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8283-2523"
+      },
+      {
+        "id": "8307:241530",
+        "frame": 67,
+        "name": "AS-IS 67 · CMS / Title field settings",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8307-241530"
+      }
+    ],
+    "representationType": "Captured issue characteristic",
+    "representationLimit": "CMS takeover, no-selection guidance and selected-field destination are represented; task guidance interpretation remains a design finding. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "IA-12",
+    "priority": "P1",
+    "currentIssue": "Fixed responsive overlay policy needs content-based validation (Medium; source confirmed risk)",
+    "sourceEvidence": "docs/product-audit-2026-10-10/FINDINGS.md section IA-12",
+    "asisNodes": [
+      {
+        "id": "8283:2",
+        "frame": 2,
+        "name": "AS-IS 02 · Heading / Style",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8283-2"
+      },
+      {
+        "id": "8293:2",
+        "frame": 36,
+        "name": "AS-IS 36 · Heading Style — 1440px",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8293-2"
+      },
+      {
+        "id": "8308:3973",
+        "frame": 85,
+        "name": "AS-IS 85 · Pages / Page actions",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8308-3973"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "1280 and 1440 contexts represented; not equivalent fixtures or proof that all intermediate viewport content fits. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "IA-13",
+    "priority": "P1",
+    "currentIssue": "Settings mixes authored state and server state, so save semantics must be explicit (Medium; runtime issue + source review)",
+    "sourceEvidence": "docs/product-audit-2026-10-10/FINDINGS.md section IA-13",
+    "asisNodes": [
+      {
+        "id": "8286:1613",
+        "frame": 18,
+        "name": "AS-IS 18 · Settings / General",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8286-1613"
+      },
+      {
+        "id": "8302:473",
+        "frame": 46,
+        "name": "AS-IS 46 · Settings / Redirects",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8302-473"
+      },
+      {
+        "id": "8309:244811",
+        "frame": 94,
+        "name": "AS-IS 94 · Inspector / Form behaviour",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8309-244811"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Footer, immediate-object and immediate-form settings are represented; durability/Undo scope comes from source/service evidence. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "IA-14",
+    "priority": "P1",
+    "currentIssue": "Feature richness exceeds verified workflow coverage (High release risk; coverage finding)",
+    "sourceEvidence": "docs/product-audit-2026-10-10/FINDINGS.md section IA-14",
+    "asisNodes": [
+      {
+        "id": "8290:3332",
+        "frame": 34,
+        "name": "AS-IS 34 · Export dialog",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8290-3332"
+      },
+      {
+        "id": "8302:1095",
+        "frame": 49,
+        "name": "AS-IS 49 · Settings / Analytics",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8302-1095"
+      },
+      {
+        "id": "8309:244434",
+        "frame": 93,
+        "name": "AS-IS 93 · Inspector / Add interaction",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8309-244434"
+      },
+      {
+        "id": "8309:247369",
+        "frame": 99,
+        "name": "AS-IS 99 · Templates / Replacement guard",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8309-247369"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Representative feature surfaces only;99 frames do not certify all workflows, service endpoints or lower-level variants. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "IA-15",
+    "priority": "P1",
+    "currentIssue": "Top-level menu lacks viewport-bound positioning (Medium; source confirmed)",
+    "sourceEvidence": "docs/product-audit-2026-10-10/FINDINGS.md section IA-15",
+    "asisNodes": [
+      {
+        "id": "8283:299",
+        "frame": 3,
+        "name": "AS-IS 03 · Selected element actions",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8283-299"
+      },
+      {
+        "id": "8308:3973",
+        "frame": 85,
+        "name": "AS-IS 85 · Pages / Page actions",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8308-3973"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Menu examples shown; edge overflow geometry/native right-click triggering remains bounded by earlier evidence/tool limits. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "IA-16",
+    "priority": "P1",
+    "currentIssue": "Passing design gates do not establish whole-product visual parity (Medium; tooling evidence)",
+    "sourceEvidence": "docs/product-audit-2026-10-10/FINDINGS.md section IA-16",
+    "asisNodes": [
+      {
+        "id": "8293:2",
+        "frame": 36,
+        "name": "AS-IS 36 · Heading Style — 1440px",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8293-2"
+      },
+      {
+        "id": "8304:308",
+        "frame": 59,
+        "name": "AS-IS 59 · Brand / Styles",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8304-308"
+      },
+      {
+        "id": "8307:242190",
+        "frame": 70,
+        "name": "AS-IS 70 · Media / Selected asset",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8307-242190"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Examples from independently tracked reconstruction; creation count/editability is not complete visual or runtime parity. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "CAN-01",
+    "priority": "P0",
+    "currentIssue": "Resize at 50% zoom stores220×40 after +20px right-edge gesture from400×80;100% stores420×80",
+    "sourceEvidence": "docs/master-audit-2026-10-10/evidence/resize-runtime.json",
+    "asisNodes": [
+      {
+        "id": "8293:2",
+        "frame": 36,
+        "name": "AS-IS 36 · Heading Style — 1440px",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8293-2"
+      },
+      {
+        "id": "8308:1227",
+        "frame": 77,
+        "name": "AS-IS 77 · Canvas / View menu",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8308-1227"
+      },
+      {
+        "id": "8309:246171",
+        "frame": 97,
+        "name": "AS-IS 97 · Inspector / Heading at Mobile",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8309-246171"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Static selection/zoom context only; no resize gesture or 50% versus 100% geometry reproduction in native Figma. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "CAN-02",
+    "priority": "P0",
+    "currentIssue": "Enter on resize handle followed by pointer move/release stores width NaNpx",
+    "sourceEvidence": "docs/master-audit-2026-10-10/evidence/resize-runtime.json; keyboard-resize-invalid.png",
+    "asisNodes": [
+      {
+        "id": "8293:2",
+        "frame": 36,
+        "name": "AS-IS 36 · Heading Style — 1440px",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8293-2"
+      },
+      {
+        "id": "8293:373",
+        "frame": 37,
+        "name": "AS-IS 37 · Image Style — 1440px",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8293-373"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Static Inspector/selection context only; NaN from keyboard-to-pointer resize is recorded in runtime evidence, not drawn as a successful action. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "CAN-03",
+    "priority": "P0",
+    "currentIssue": "Cancel affects unrelated prior document mutation",
+    "sourceEvidence": "evidence/resize-cancel-runtime.json",
+    "asisNodes": [
+      {
+        "id": "8293:2",
+        "frame": 36,
+        "name": "AS-IS 36 · Heading Style — 1440px",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8293-2"
+      },
+      {
+        "id": "8290:2",
+        "frame": 19,
+        "name": "AS-IS 19 · History / Session",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8290-2"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Selection/history context only; cancellation transaction and unrelated-edit loss require runtime evidence. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "MENU-01",
+    "priority": "P1",
+    "currentIssue": "Menu keyboard behavior inconsistent with Pages",
+    "sourceEvidence": "evidence/layers-menu-keyboard.json; layers-menu.png",
+    "asisNodes": [
+      {
+        "id": "8283:299",
+        "frame": 3,
+        "name": "AS-IS 03 · Selected element actions",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8283-299"
+      },
+      {
+        "id": "8308:3973",
+        "frame": 85,
+        "name": "AS-IS 85 · Pages / Page actions",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8308-3973"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Different menu owners represented; native Layers/quickMedia right-click was tool-denied and keyboard behavior is not inferred. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "UX-26",
+    "priority": "P2",
+    "currentIssue": "Primary action label does not describe next step",
+    "sourceEvidence": "RESUMED-FINDINGS.md; NewPageModal.tsx:44,64-74",
+    "asisNodes": [
+      {
+        "id": "8290:3051",
+        "frame": 33,
+        "name": "AS-IS 33 · New page dialog",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8290-3051"
+      },
+      {
+        "id": "8290:1629",
+        "frame": 27,
+        "name": "AS-IS 27 · Templates / gallery",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8290-1629"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "New-page/template surfaces represented; primary-action label versus next transition remains source/runtime sequence evidence. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "PAGE-01",
+    "priority": "P1",
+    "currentIssue": "Advertised page shortcut has no page handler",
+    "sourceEvidence": "PAGES-HISTORY-AUDIT.md; PageContextMenu.tsx:114; PageRow.tsx:247",
+    "asisNodes": [
+      {
+        "id": "8308:3973",
+        "frame": 85,
+        "name": "AS-IS 85 · Pages / Page actions",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8308-3973"
+      },
+      {
+        "id": "8283:935",
+        "frame": 5,
+        "name": "AS-IS 05 · Pages",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8283-935"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Displayed page shortcuts/menu exist; lack of page-key handler is source/runtime evidence, not visual proof. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "HIST-01",
+    "priority": "P1",
+    "currentIssue": "Comparison equality message omits restorable metadata difference",
+    "sourceEvidence": "PAGES-HISTORY-AUDIT.md; history-rename-compare.png; VersionTimelineManager.ts:714",
+    "asisNodes": [
+      {
+        "id": "8308:1048",
+        "frame": 76,
+        "name": "AS-IS 76 · History / Compare with current",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8308-1048"
+      },
+      {
+        "id": "8308:879",
+        "frame": 75,
+        "name": "AS-IS 75 · History / Version actions",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8308-879"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Inline compare and version actions represented; frame 76 shows content differences, not the original metadata-only false-equality case. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "CI-01",
+    "priority": "P1",
+    "currentIssue": "Alignment bypasses shared lock and breakpoint-aware write contracts",
+    "sourceEvidence": "CANVAS-INSPECTOR-COVERAGE.md#ci-01; src/editor/inspector/components/MultiSelectBar.tsx:48; src/engine/canvas/AlignmentHandler.ts:45; src/engine/canvas/AlignmentHandler.ts:216; src/engine/elements/ElementStyles.ts:131",
+    "asisNodes": [
+      {
+        "id": "8308:1927",
+        "frame": 80,
+        "name": "AS-IS 80 · Inspector / Multiple selected",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8308-1927"
+      },
+      {
+        "id": "8308:2246",
+        "frame": 81,
+        "name": "AS-IS 81 · Inspector / Locked element",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8308-2246"
+      },
+      {
+        "id": "8309:246171",
+        "frame": 97,
+        "name": "AS-IS 97 · Inspector / Heading at Mobile",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8309-246171"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Multiselect/locked/Mobile controls shown separately; no unsafe alignment was executed and guard correctness is not established. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "CI-02",
+    "priority": "P1",
+    "currentIssue": "Known unimplemented reverse and listener-cleanup gaps",
+    "sourceEvidence": "CANVAS-INSPECTOR-COVERAGE.md#ci-02; src/engine/interactions/InteractionRuntime.ts:98; :216; :224; :247; :333; __tests__/InteractionRuntime.test.ts:624",
+    "asisNodes": [
+      {
+        "id": "8309:244434",
+        "frame": 93,
+        "name": "AS-IS 93 · Inspector / Add interaction",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8309-244434"
+      },
+      {
+        "id": "8293:994",
+        "frame": 39,
+        "name": "AS-IS 39 · Image Effects — current controls",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8293-994"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Trigger choices and Effects context only; listener cleanup/reverse-on-exit defect is source-confirmed, not live playback. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "WS-01",
+    "priority": "P1",
+    "currentIssue": "Failed rename/alt/tags/move can appear successful and be overwritten on hydration",
+    "sourceEvidence": "WORKSPACES-SERVICES-COVERAGE.md#ws-01; src/engine/media/MediaManager.ts:1359; src/services/AssetUploadService.ts:242",
+    "asisNodes": [
+      {
+        "id": "8307:242190",
+        "frame": 70,
+        "name": "AS-IS 70 · Media / Selected asset",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8307-242190"
+      },
+      {
+        "id": "8308:2",
+        "frame": 71,
+        "name": "AS-IS 71 · Media / Asset properties",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8308-2"
+      },
+      {
+        "id": "8308:505",
+        "frame": 73,
+        "name": "AS-IS 73 · Media / Asset actions",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8308-505"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Metadata/action surfaces; failed persistence and later hydration overwrite were not triggered in these captures. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "WS-02",
+    "priority": "P1",
+    "currentIssue": "Queued component changes do not survive reload as retry work",
+    "sourceEvidence": "WORKSPACES-SERVICES-COVERAGE.md#ws-02; src/services/componentSync.ts:37; src/services/syncRetryQueue.ts:58; evidence/workspaces-services-tests.json",
+    "asisNodes": [
+      {
+        "id": "8309:461",
+        "frame": 87,
+        "name": "AS-IS 87 · Components / Instance controls",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8309-461"
+      },
+      {
+        "id": "8309:242881",
+        "frame": 89,
+        "name": "AS-IS 89 · Components / Expanded manager",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8309-242881"
+      },
+      {
+        "id": "8309:243286",
+        "frame": 90,
+        "name": "AS-IS 90 · Components / Master detail",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8309-243286"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Real local component fixture; queued remote retry loss across reload is source-confirmed, not demonstrated by these screens. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "WS-03",
+    "priority": "P2",
+    "currentIssue": "From Library cannot distinguish empty library from read failure",
+    "sourceEvidence": "WORKSPACES-SERVICES-COVERAGE.md#ws-03; src/services/componentSync.ts:216; src/editor/sidebar/tabs/component-library/useComponentList.ts:55; evidence/workspaces-services-tests.json",
+    "asisNodes": [
+      {
+        "id": "8290:1952",
+        "frame": 29,
+        "name": "AS-IS 29 · Components / manager empty",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8290-1952"
+      },
+      {
+        "id": "8309:242881",
+        "frame": 89,
+        "name": "AS-IS 89 · Components / Expanded manager",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8309-242881"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Empty and populated manager context; From Library read-failure-versus-empty branch is not independently captured. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "WS-04",
+    "priority": "P2",
+    "currentIssue": "Provider-specific connection assurance exceeds collected evidence",
+    "sourceEvidence": "WORKSPACES-SERVICES-COVERAGE.md#ws-04; AnalyticsScreen verify; ConnectionVerifiedDialog.tsx:45; server/services/analytics.service.ts:101",
+    "asisNodes": [
+      {
+        "id": "8302:1095",
+        "frame": 49,
+        "name": "AS-IS 49 · Settings / Analytics",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8302-1095"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Provider-off/NOT VERIFIED state captured; misleading positive verification behavior remains source evidence. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "WS-05",
+    "priority": "P1",
+    "currentIssue": "Generic Mailchimp API key lacks Vercel application encryption/write-only boundary",
+    "sourceEvidence": "WORKSPACES-SERVICES-COVERAGE.md#ws-05; server/services/integrations.service.ts:62; account.ts:280; dashboard integrations forms",
+    "asisNodes": [
+      {
+        "id": "8302:2812",
+        "frame": 57,
+        "name": "AS-IS 57 · Settings / Integrations — workspace door",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8302-2812"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Workspace Integrations door only; credential storage/encryption is backend source evidence, no secrets inspected or drawn. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "RR-01",
+    "priority": "P1",
+    "currentIssue": "Review revoke target can differ from authorized site within workspace",
+    "sourceEvidence": "server/trpc/routers/reviews.ts:278; server/services/review.service.ts:461",
+    "asisNodes": [
+      {
+        "id": "8281:2",
+        "frame": 1,
+        "name": "AS-IS 01 · Review / empty · 1280",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8281-2"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Empty Review surface only; mismatched revoke target authorization is source-confirmed and was not exploited. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "RR-02",
+    "priority": "P1",
+    "currentIssue": "AI publish bypasses normal freshness and loaded-state guards",
+    "sourceEvidence": "src/editor/sidebar/tabs/ai/hooks/useAiActionGate.ts:68; server/services/ai-actions.service.ts:66; server/services/publish.service.ts:393",
+    "asisNodes": [
+      {
+        "id": "8290:1463",
+        "frame": 26,
+        "name": "AS-IS 26 · AI / selected heading",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8290-1463"
+      },
+      {
+        "id": "8290:1233",
+        "frame": 25,
+        "name": "AS-IS 25 · Publish / checks and targets",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8290-1233"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "AI and Publish checks are separate contexts; privileged AI publishing/freshness bypass was not executed. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "RR-03",
+    "priority": "P2",
+    "currentIssue": "Issues can show No issues after server checks reject",
+    "sourceEvidence": "src/editor/shell/hooks/useIssuesFeed.ts:127; src/editor/shell/IssuesPanel.tsx:246",
+    "asisNodes": [
+      {
+        "id": "8290:660",
+        "frame": 22,
+        "name": "AS-IS 22 · Issues / six warnings",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8290-660"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Frame 22 has six real warnings, not false-clean output; rejected remote checks producing No issues remains source-confirmed. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "RR-04",
+    "priority": "P2",
+    "currentIssue": "Viewer Review entry combines allowed comments with forbidden currentRound",
+    "sourceEvidence": "src/editor/sidebar/tabs/review/ReviewTab.tsx:233; server/trpc/routers/reviews.ts:205; server/trpc/routers/comments.ts:64",
+    "asisNodes": [
+      {
+        "id": "8281:2",
+        "frame": 1,
+        "name": "AS-IS 01 · Review / empty · 1280",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8281-2"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Owner empty Review context, not a viewer denial; comments/currentRound role coupling remains source-confirmed. Reconstruction is not a product fix; TO-BE pending."
+  },
+  {
+    "findingID": "RT-01",
+    "priority": "P1",
+    "currentIssue": "Local asset retained but document image missing after reload",
+    "sourceEvidence": "EXTENDED-RUNTIME-AUDIT.md; evidence/extended-media-runtime.json",
+    "asisNodes": [
+      {
+        "id": "8293:373",
+        "frame": 37,
+        "name": "AS-IS 37 · Image Style — 1440px",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8293-373"
+      },
+      {
+        "id": "8307:242190",
+        "frame": 70,
+        "name": "AS-IS 70 · Media / Selected asset",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8307-242190"
+      },
+      {
+        "id": "8309:245270",
+        "frame": 95,
+        "name": "AS-IS 95 · Inspector / Image chooser",
+        "url": "https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8309-245270"
+      }
+    ],
+    "representationType": "Contextual representative, not visual reproduction of failure",
+    "representationLimit": "Missing image source and retained local asset are represented; exact upload/registration/reload chain is historical runtime and root cause remains unisolated. Reconstruction is not a product fix; TO-BE pending."
+  }
+]

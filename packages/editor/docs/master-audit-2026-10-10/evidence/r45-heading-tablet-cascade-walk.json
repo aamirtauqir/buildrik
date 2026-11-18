@@ -1,0 +1,10 @@
+[
+  {"x":720,"y":573,"shot":"r45-heading-tablet-display-none.png"},
+  {"x":1390,"y":88},
+  {"x":573,"y":96},
+  {"x":1154,"y":117,"shot":"r45-heading-mobile-inherits-tablet-none.png"},
+  {"x":1260,"y":252},
+  {"x":720,"y":453,"shot":"r45-heading-mobile-explicit-block.png"},
+  {"x":1260,"y":369,"shot":"r45-heading-mobile-reset-reveals-tablet.png"},
+  {"x":1260,"y":561,"shot":"r45-heading-mobile-undo-restores-block.png"}
+]

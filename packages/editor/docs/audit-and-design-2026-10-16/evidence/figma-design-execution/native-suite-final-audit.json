@@ -1,0 +1,52 @@
+{
+  "page": "3:10",
+  "roots": 179,
+  "nodes": 38396,
+  "edges": 563,
+  "types": {
+    "FRAME": 10927,
+    "TEXT": 9334,
+    "INSTANCE": 9511,
+    "VECTOR": 7893,
+    "RECTANGLE": 659,
+    "ELLIPSE": 72
+  },
+  "fonts": {
+    "Inter": 9115,
+    "Geist Mono": 219
+  },
+  "images": [],
+  "bad": [],
+  "urls": [],
+  "timers": [],
+  "unreachable": [],
+  "controllerOverflows": [],
+  "starts": [
+    {
+      "nodeId": "302:3370",
+      "name": "Start here · All five journeys"
+    },
+    {
+      "nodeId": "302:3396",
+      "name": "F1 · Edit, undo and preview"
+    },
+    {
+      "nodeId": "302:11636",
+      "name": "F2 · Bind content and edit a record"
+    },
+    {
+      "nodeId": "302:19069",
+      "name": "F3 · Replace an image"
+    },
+    {
+      "nodeId": "303:32296",
+      "name": "F4 · Fix issues and publish"
+    },
+    {
+      "nodeId": "307:14695",
+      "name": "F5 · Client review and approval"
+    }
+  ],
+  "rootsWithoutHubReturn": [],
+  "graphArtifact": "native-suite-final-graph-refreshed.json"
+}

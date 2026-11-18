@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-10",
+  "host": "http://127.0.0.1:5050/",
+  "method": "All mutations through rendered UI; existing Composer probe and computed styles used for read-only verification.",
+  "steps": [
+    "Add panel: insert Heading",
+    "Inspector Element actions: Save as component; name Audit heading 1010; Create component",
+    "Open component details: Insert from saved components",
+    "Verify two linked instances at master version 1",
+    "Change selected instance font size from 36 to 44 in inspector",
+    "Update from selection; confirm Update component",
+    "Verify master version 2; both instances syncedVersion 2; both model and computed font sizes 44px",
+    "Meta+S: Saved / Project saved successfully",
+    "Reload; confirm navigation type reload and persisted master/instances/computed styles"
+  ],
+  "afterReload": {
+    "navigation": ["reload"],
+    "components": [{"name":"Audit heading 1010","version":2,"instances":2}],
+    "headings": [{"text":"Heading","fontSize":"44px"},{"text":"Heading","fontSize":"44px"}]
+  },
+  "limits": "Single heading master, same page, local demo persistence. Cross-page propagation, overrides retained across structural changes, server library sharing, offline conflicts and component undo remain unverified in browser."
+}

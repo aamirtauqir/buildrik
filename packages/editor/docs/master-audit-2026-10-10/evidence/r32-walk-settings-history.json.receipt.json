@@ -1,0 +1,228 @@
+[
+  {
+    "label": "Reset at review",
+    "goto": "8690:13237",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8690-13237&starting-point-node-id=8690%3A13237&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Remaining flows review → Settings / site management",
+    "x": 720,
+    "y": 702,
+    "wait": 1000,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8690-13237&starting-point-node-id=8690%3A13237&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "8539:10160 → General",
+    "x": 538,
+    "y": 224,
+    "wait": 1000,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8690-13237&starting-point-node-id=8690%3A13237&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "8539:10085 → Field / Author",
+    "x": 538,
+    "y": 343,
+    "wait": 1000,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8690-13237&starting-point-node-id=8690%3A13237&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Settings / field → Use sample value",
+    "x": 720,
+    "y": 568,
+    "wait": 1000,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8690-13237&starting-point-node-id=8690%3A13237&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Settings / field → Use value",
+    "x": 720,
+    "y": 616,
+    "wait": 1000,
+    "shot": "r32-settings-author-draft.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8690-13237&starting-point-node-id=8690%3A13237&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "8539:10085 → Save",
+    "x": 546,
+    "y": 634,
+    "wait": 1000,
+    "shot": "r32-settings-saved.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8690-13237&starting-point-node-id=8690%3A13237&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Settings / saved → Back to settings",
+    "x": 720,
+    "y": 574,
+    "wait": 1000,
+    "shot": "r32-settings-author-retained.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8690-13237&starting-point-node-id=8690%3A13237&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Reset at review",
+    "goto": "8690:13237",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8690-13237&starting-point-node-id=8690%3A13237&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Remaining flows review → Settings / site management",
+    "x": 720,
+    "y": 702,
+    "wait": 1000,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8690-13237&starting-point-node-id=8690%3A13237&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "8539:10160 → Domains",
+    "x": 538,
+    "y": 338,
+    "wait": 1000,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8690-13237&starting-point-node-id=8690%3A13237&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "8539:10288 → Add a domain",
+    "x": 538,
+    "y": 316,
+    "wait": 1000,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8690-13237&starting-point-node-id=8690%3A13237&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Settings / domain → Connect domain",
+    "x": 720,
+    "y": 527,
+    "wait": 1000,
+    "shot": "r32-dns-pending.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8690-13237&starting-point-node-id=8690%3A13237&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Settings / domain pending → Check again — verified sample",
+    "x": 720,
+    "y": 503,
+    "wait": 1000,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8690-13237&starting-point-node-id=8690%3A13237&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Settings / domain verified → Make primary…",
+    "x": 720,
+    "y": 527,
+    "wait": 1000,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8690-13237&starting-point-node-id=8690%3A13237&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Settings / primary domain → Make primary",
+    "x": 720,
+    "y": 537,
+    "wait": 1000,
+    "shot": "r32-domain-primary.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8690-13237&starting-point-node-id=8690%3A13237&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Reset at review",
+    "goto": "8690:13237",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8690-13237&starting-point-node-id=8690%3A13237&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Remaining flows review → Settings / site management",
+    "x": 720,
+    "y": 702,
+    "wait": 1000,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8690-13237&starting-point-node-id=8690%3A13237&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "8539:10160 → Redirects",
+    "x": 538,
+    "y": 376,
+    "wait": 1000,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8690-13237&starting-point-node-id=8690%3A13237&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "8539:10234 → Add redirect",
+    "x": 538,
+    "y": 300,
+    "wait": 1000,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8690-13237&starting-point-node-id=8690%3A13237&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Settings / redirect → Review invalid-path case",
+    "x": 720,
+    "y": 551,
+    "wait": 1000,
+    "shot": "r32-redirect-invalid.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8690-13237&starting-point-node-id=8690%3A13237&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Settings / redirect invalid → Correct redirect",
+    "x": 720,
+    "y": 551,
+    "wait": 1000,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8690-13237&starting-point-node-id=8690%3A13237&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Settings / redirect → Save redirect",
+    "x": 720,
+    "y": 503,
+    "wait": 1000,
+    "shot": "r32-redirect-saved.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8690-13237&starting-point-node-id=8690%3A13237&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Reset at review",
+    "goto": "8690:13237",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8690-13237&starting-point-node-id=8690%3A13237&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Remaining flows review → History / metadata comparison",
+    "x": 720,
+    "y": 750,
+    "wait": 1000,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8690-13237&starting-point-node-id=8690%3A13237&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "History / compare metadata → Review restore scope",
+    "x": 720,
+    "y": 517,
+    "wait": 1000,
+    "shot": "r32-history-scope.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8690-13237&starting-point-node-id=8690%3A13237&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "History / restore page snapshot → Restore to draft",
+    "x": 720,
+    "y": 527,
+    "wait": 1000,
+    "shot": "r32-history-restored.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8690-13237&starting-point-node-id=8690%3A13237&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "History / restored metadata → Undo restore",
+    "x": 720,
+    "y": 527,
+    "wait": 1000,
+    "shot": "r32-history-undo.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8690-13237&starting-point-node-id=8690%3A13237&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

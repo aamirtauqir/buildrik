@@ -1,0 +1,392 @@
+{
+  "createdNodeIds": [
+    "254:74075",
+    "254:74310",
+    "254:74551",
+    "254:75060",
+    "254:75572",
+    "254:76081",
+    "254:76593",
+    "254:77105",
+    "254:77338",
+    "254:77544",
+    "254:77717",
+    "254:77963",
+    "254:78146",
+    "254:78324",
+    "254:78534",
+    "254:78740",
+    "254:78920",
+    "254:79102",
+    "254:79282",
+    "254:79464",
+    "254:79645",
+    "254:79829",
+    "254:80011",
+    "254:80193",
+    "254:80371",
+    "254:80553",
+    "254:80790",
+    "254:81032",
+    "254:81264",
+    "254:81490",
+    "254:81738",
+    "254:81923",
+    "254:82143",
+    "254:82329"
+  ],
+  "mutatedNodeIds": [
+    "I254:74154;4:547",
+    "254:74154",
+    "I254:74389;4:547",
+    "254:74389",
+    "I254:77184;4:547",
+    "254:77184",
+    "I254:77796;4:547",
+    "254:77796",
+    "254:75008",
+    "254:76538",
+    "254:75055",
+    "254:77050",
+    "254:75006",
+    "254:75515",
+    "254:76536",
+    "254:77048",
+    "254:77336",
+    "254:77511",
+    "254:77513",
+    "254:74290",
+    "254:74523",
+    "165:200",
+    "I254:80632;4:547",
+    "254:80632",
+    "I254:80869;4:547",
+    "254:80869",
+    "I254:81111;4:547",
+    "254:81111",
+    "I254:81343;4:547",
+    "254:81343",
+    "I254:81569;4:547",
+    "254:81569",
+    "I254:81813;4:547",
+    "254:81813",
+    "254:82115",
+    "254:82111",
+    "254:82113",
+    "254:81734",
+    "254:81736",
+    "254:74304",
+    "254:74283",
+    "254:74306",
+    "254:74308",
+    "254:78142",
+    "254:78503",
+    "254:79097",
+    "254:79279",
+    "254:80548",
+    "254:79824",
+    "254:78140",
+    "254:78501",
+    "254:78711",
+    "254:79822",
+    "254:79459",
+    "254:79461",
+    "254:80006",
+    "254:80008",
+    "254:80188",
+    "254:80190",
+    "254:79641",
+    "254:82318",
+    "254:82321",
+    "254:74285",
+    "254:82332",
+    "254:82335",
+    "254:82338",
+    "254:82341",
+    "254:82345",
+    "254:82348",
+    "254:82351",
+    "254:82354",
+    "254:82358",
+    "254:82361",
+    "254:82364",
+    "254:82367"
+  ],
+  "frames": [
+    {
+      "id": "254:74075",
+      "name": "B5-N01 · CMS / New Events collection / empty records",
+      "w": 1440,
+      "h": 900,
+      "nodes": 166,
+      "images": []
+    },
+    {
+      "id": "254:74310",
+      "name": "B5-N02 · CMS / New Events collection / starter fields",
+      "w": 1440,
+      "h": 900,
+      "nodes": 172,
+      "images": []
+    },
+    {
+      "id": "254:74551",
+      "name": "B5-N03 · New collection / name and starter schema",
+      "w": 1440,
+      "h": 900,
+      "nodes": 493,
+      "images": []
+    },
+    {
+      "id": "254:75060",
+      "name": "B5-N04 · New collection / name already used",
+      "w": 1440,
+      "h": 900,
+      "nodes": 494,
+      "images": []
+    },
+    {
+      "id": "254:75572",
+      "name": "B5-N05 · New collection / creating",
+      "w": 1440,
+      "h": 900,
+      "nodes": 493,
+      "images": []
+    },
+    {
+      "id": "254:76081",
+      "name": "B5-N06 · New collection / failure retains inputs",
+      "w": 1440,
+      "h": 900,
+      "nodes": 494,
+      "images": []
+    },
+    {
+      "id": "254:76593",
+      "name": "B5-N07 · New collection / page per record selected",
+      "w": 1440,
+      "h": 900,
+      "nodes": 496,
+      "images": []
+    },
+    {
+      "id": "254:77105",
+      "name": "B5-N08 · CMS / Collection created / page template still missing",
+      "w": 1440,
+      "h": 900,
+      "nodes": 164,
+      "images": []
+    },
+    {
+      "id": "254:77338",
+      "name": "B5-N09 · Events created / collection page setup",
+      "w": 1440,
+      "h": 900,
+      "nodes": 202,
+      "images": []
+    },
+    {
+      "id": "254:77544",
+      "name": "B5-N10 · Events collection page / page creation pending",
+      "w": 1440,
+      "h": 900,
+      "nodes": 169,
+      "images": []
+    },
+    {
+      "id": "254:77717",
+      "name": "B5-N11 · CMS / Events / collection page linked",
+      "w": 1440,
+      "h": 900,
+      "nodes": 163,
+      "images": []
+    },
+    {
+      "id": "254:77963",
+      "name": "B5-M01 · CSV import / choose file",
+      "w": 1440,
+      "h": 900,
+      "nodes": 177,
+      "images": []
+    },
+    {
+      "id": "254:78146",
+      "name": "B5-M02 · CSV import / server preview pending",
+      "w": 1440,
+      "h": 900,
+      "nodes": 172,
+      "images": []
+    },
+    {
+      "id": "254:78324",
+      "name": "B5-M03 · CSV import / preview and column mapping",
+      "w": 1440,
+      "h": 900,
+      "nodes": 204,
+      "images": []
+    },
+    {
+      "id": "254:78534",
+      "name": "B5-M04 · CSV import / no fields mapped",
+      "w": 1440,
+      "h": 900,
+      "nodes": 200,
+      "images": []
+    },
+    {
+      "id": "254:78740",
+      "name": "B5-M05 · CSV import / rows submitted",
+      "w": 1440,
+      "h": 900,
+      "nodes": 174,
+      "images": []
+    },
+    {
+      "id": "254:78920",
+      "name": "B5-M06 · CSV import / 2 saved, 1 refused",
+      "w": 1440,
+      "h": 900,
+      "nodes": 176,
+      "images": []
+    },
+    {
+      "id": "254:79102",
+      "name": "B5-M07 · CSV import / all 3 acknowledged",
+      "w": 1440,
+      "h": 900,
+      "nodes": 174,
+      "images": []
+    },
+    {
+      "id": "254:79282",
+      "name": "B5-M08 · CSV preview / file refused before import",
+      "w": 1440,
+      "h": 900,
+      "nodes": 176,
+      "images": []
+    },
+    {
+      "id": "254:79464",
+      "name": "B5-M09 · CSV import / response lost, inspect records",
+      "w": 1440,
+      "h": 900,
+      "nodes": 175,
+      "images": []
+    },
+    {
+      "id": "254:79645",
+      "name": "B5-M10 · JSON records import / choose file",
+      "w": 1440,
+      "h": 900,
+      "nodes": 178,
+      "images": []
+    },
+    {
+      "id": "254:79829",
+      "name": "B5-M11 · JSON records import / invalid syntax",
+      "w": 1440,
+      "h": 900,
+      "nodes": 176,
+      "images": []
+    },
+    {
+      "id": "254:80011",
+      "name": "B5-M12 · JSON records import / wrong top-level shape",
+      "w": 1440,
+      "h": 900,
+      "nodes": 176,
+      "images": []
+    },
+    {
+      "id": "254:80193",
+      "name": "B5-M13 · JSON records import / per-row progress",
+      "w": 1440,
+      "h": 900,
+      "nodes": 172,
+      "images": []
+    },
+    {
+      "id": "254:80371",
+      "name": "B5-M14 · JSON records import / skipped rows named",
+      "w": 1440,
+      "h": 900,
+      "nodes": 176,
+      "images": []
+    },
+    {
+      "id": "254:80553",
+      "name": "B5-M15 · CMS / Events / imported records acknowledged",
+      "w": 1440,
+      "h": 900,
+      "nodes": 168,
+      "images": []
+    },
+    {
+      "id": "254:80790",
+      "name": "B5-M16 · CMS / Events / imported records acknowledged",
+      "w": 1440,
+      "h": 900,
+      "nodes": 173,
+      "images": []
+    },
+    {
+      "id": "254:81032",
+      "name": "B5-M17 · CMS / Events / imported records acknowledged",
+      "w": 1440,
+      "h": 900,
+      "nodes": 163,
+      "images": []
+    },
+    {
+      "id": "254:81264",
+      "name": "B5-M19 · CMS / Events / checking records after unknown import",
+      "w": 1440,
+      "h": 900,
+      "nodes": 157,
+      "images": []
+    },
+    {
+      "id": "254:81490",
+      "name": "B5-N12 · CMS / Events / new draft record",
+      "w": 1440,
+      "h": 900,
+      "nodes": 179,
+      "images": []
+    },
+    {
+      "id": "254:81738",
+      "name": "B5-N13 · Events / new record awaiting acknowledgment",
+      "w": 1440,
+      "h": 900,
+      "nodes": 179,
+      "images": []
+    },
+    {
+      "id": "254:81923",
+      "name": "B5-N14 · Events / new record leave guard",
+      "w": 1440,
+      "h": 900,
+      "nodes": 190,
+      "images": []
+    },
+    {
+      "id": "254:82143",
+      "name": "B5-M18 · Events collection menu / imports and planned providers",
+      "w": 1440,
+      "h": 900,
+      "nodes": 175,
+      "images": []
+    },
+    {
+      "id": "254:82329",
+      "name": "B5 · Collection creation and record import outcomes · 2026-10-20",
+      "w": 1440,
+      "h": 262,
+      "nodes": 29,
+      "images": []
+    }
+  ],
+  "allAffectedNodeIds": "affected-nodes.json (includes inherited instance descendants)",
+  "createdNodeCount": 7459,
+  "createdNodeIdsScope": "Root IDs only; full descendant IDs in artifact"
+}

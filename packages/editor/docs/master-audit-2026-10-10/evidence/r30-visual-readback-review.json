@@ -1,0 +1,16 @@
+{
+  "status": "PASS_BOUNDED_VISUAL_REVIEW",
+  "date": "2026-10-13",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "page": "8463:2",
+  "readbacks": {
+    "r30-home-before-restore.png": "Spaces for better living.",
+    "r30-home-after-restore.png": "Make space for what matters.",
+    "r30-home-after-undo.png": "Spaces for better living.",
+    "r30-indexing-shared-off.png": "Allow search indexing Off",
+    "r30-seo-error.png": "Could not save page settings; Retry save",
+    "r30-seo-retry.png": "Page settings saved"
+  },
+  "scope": "Finite prototype state; no backend persistence or production publish certified",
+  "open_items": "../R30-REMAINING-FLOWS.md"
+}

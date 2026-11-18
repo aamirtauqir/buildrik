@@ -1,0 +1,40 @@
+[
+  {
+    "label": "Connections",
+    "x": 201,
+    "y": 872,
+    "shot": "r34-mcp-entry-retry.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8628-12592&starting-point-node-id=8628%3A12592&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Set server URL",
+    "x": 720,
+    "y": 534,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8628-12592&starting-point-node-id=8628%3A12592&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Review tools",
+    "x": 902,
+    "y": 619,
+    "shot": "r34-mcp-authorize-retry.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8628-12592&starting-point-node-id=8628%3A12592&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Allow proposal scope",
+    "x": 720,
+    "y": 552,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8628-12592&starting-point-node-id=8628%3A12592&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Authorize",
+    "x": 902,
+    "y": 637,
+    "shot": "r34-mcp-connected-retry.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8628-12592&starting-point-node-id=8628%3A12592&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

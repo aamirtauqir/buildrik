@@ -1,0 +1,60 @@
+{
+  "date": "2026-10-11",
+  "initialEntry": {
+    "from": "8317:243462",
+    "control": "8317:243585",
+    "to": "8384:1597",
+    "verified": true
+  },
+  "steps": [
+    {
+      "action": "open submenu",
+      "expected": "8317-247616",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8317-247616&starting-point-node-id=8317%3A243462&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "close submenu",
+      "expected": "8384-1597",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8384-1597&starting-point-node-id=8317%3A243462&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "cancel main",
+      "expected": "8317-243462",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8317-243462&starting-point-node-id=8317%3A243462&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "reopen",
+      "expected": "8384-1597",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8384-1597&starting-point-node-id=8317%3A243462&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "open submenu",
+      "expected": "8317-247616",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8317-247616&starting-point-node-id=8317%3A243462&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "cancel submenu",
+      "expected": "8317-243462",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8317-243462&starting-point-node-id=8317%3A243462&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "reopen",
+      "expected": "8384-1597",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8384-1597&starting-point-node-id=8317%3A243462&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "outside canvas",
+      "expected": "8317-243462",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8317-243462&starting-point-node-id=8317%3A243462&hide-ui=1",
+      "pass": true
+    }
+  ],
+  "method": "Synthetic pointer/mouse events on visible Figma presentation canvas; Escape keyboard; URL readback and screenshots. Not OS right-click or accessibility verification."
+}

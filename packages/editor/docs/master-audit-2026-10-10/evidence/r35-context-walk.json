@@ -1,0 +1,37 @@
+[
+  {
+    "x": 720,
+    "y": 293,
+    "shot": "r35-input-email.png"
+  },
+  {
+    "x": 1155,
+    "y": 117,
+    "shot": "r35-input-style-final.png"
+  },
+  {
+    "x": 1390,
+    "y": 90,
+    "shot": "r35-input-context-retained.png"
+  },
+  {
+    "goto": "8850:17366",
+    "wait": 5000,
+    "shot": "r35-media-1024-start.png"
+  },
+  {
+    "x": 600,
+    "y": 315,
+    "shot": "r35-media-1024-details.png"
+  },
+  {
+    "x": 1050,
+    "y": 72,
+    "shot": "r35-media-1024-return.png"
+  },
+  {
+    "goto": "8884:17236",
+    "wait": 5000,
+    "shot": "r35-layers-start.png"
+  }
+]

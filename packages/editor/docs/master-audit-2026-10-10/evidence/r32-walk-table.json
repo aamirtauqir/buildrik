@@ -1,0 +1,47 @@
+[
+  {
+    "label": "Reset at review",
+    "goto": "8690:13237",
+    "wait": 2000
+  },
+  {
+    "label": "Remaining flows review → CMS / records, schema and dynamic pages",
+    "x": 720,
+    "y": 558,
+    "wait": 2000
+  },
+  {
+    "label": "8539:9881 → Add record",
+    "x": 1348,
+    "y": 329,
+    "wait": 2000
+  },
+  {
+    "label": "Edit new article title",
+    "x": 720,
+    "y": 227,
+    "wait": 1500,
+    "shot": "r32-cms-title-table-final.png"
+  },
+  {
+    "label": "CMS / record → Save draft",
+    "x": 720,
+    "y": 480,
+    "shot": "r32-cms-saved-table-final.png",
+    "wait": 2000
+  },
+  {
+    "label": "CMS / record saved → Back to records",
+    "x": 720,
+    "y": 569,
+    "shot": "r32-cms-new-record-table-final.png",
+    "wait": 2000
+  },
+  {
+    "label": "Reopen saved new record",
+    "x": 610,
+    "y": 588,
+    "wait": 1500,
+    "shot": "r32-cms-reopened-table-final.png"
+  }
+]

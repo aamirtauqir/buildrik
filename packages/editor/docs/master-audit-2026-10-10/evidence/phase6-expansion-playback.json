@@ -1,0 +1,446 @@
+{
+  "date": "2026-10-11T21:23:56.850Z",
+  "scope": "Figma expansion navigation playback only; no external product actions",
+  "steps": [
+    {
+      "from": "I01",
+      "label": "Typography",
+      "to": "I02",
+      "source": "8467:142",
+      "x": 1265,
+      "y": 829,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-3&starting-point-node-id=8465%3A2&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "I02",
+      "label": "Mobile override",
+      "to": "I06",
+      "source": "8468:196",
+      "x": 1265,
+      "y": 685,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-7&starting-point-node-id=8465%3A2&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "I06",
+      "label": "Reset font size",
+      "to": "I14",
+      "source": "8468:244426",
+      "x": 1265,
+      "y": 683,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-15&starting-point-node-id=8465%3A2&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "I14",
+      "label": "Undo reset",
+      "to": "I06",
+      "source": "8468:245476",
+      "x": 1265,
+      "y": 395,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-7&starting-point-node-id=8465%3A2&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "I06",
+      "label": "Desktop",
+      "to": "I02",
+      "source": "8468:244428",
+      "x": 1265,
+      "y": 723,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-3&starting-point-node-id=8465%3A2&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "I02",
+      "label": "Class manager",
+      "to": "I07",
+      "source": "8468:198",
+      "x": 1265,
+      "y": 725,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-8&starting-point-node-id=8465%3A2&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "I07",
+      "label": "Preview shared change",
+      "to": "I15",
+      "source": "8468:244564",
+      "x": 1265,
+      "y": 683,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-16&starting-point-node-id=8465%3A2&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "I15",
+      "label": "Apply class change",
+      "to": "I17",
+      "source": "8468:245600",
+      "x": 1265,
+      "y": 567,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-18&starting-point-node-id=8465%3A2&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "I17",
+      "label": "Undo shared change",
+      "to": "I07",
+      "source": "8468:245828",
+      "x": 1265,
+      "y": 379,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-8&starting-point-node-id=8465%3A2&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "I04",
+      "label": "Two columns",
+      "to": "I12",
+      "source": "8468:496",
+      "x": 1265,
+      "y": 727,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-13&starting-point-node-id=8465%3A5&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "I12",
+      "label": "Undo columns",
+      "to": "I04",
+      "source": "8468:245243",
+      "x": 1265,
+      "y": 423,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-5&starting-point-node-id=8465%3A5&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "I05",
+      "label": "Apply 32px padding",
+      "to": "I13",
+      "source": "8468:633",
+      "x": 1265,
+      "y": 753,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-14&starting-point-node-id=8465%3A6&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "I13",
+      "label": "Undo spacing",
+      "to": "I05",
+      "source": "8468:245356",
+      "x": 1265,
+      "y": 491,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-6&starting-point-node-id=8465%3A6&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "A01",
+      "label": "Generate proposal",
+      "to": "A03",
+      "source": "8468:245909",
+      "x": 1265,
+      "y": 420,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-21&starting-point-node-id=8465%3A19&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "A03",
+      "label": "View proposal",
+      "to": "A04",
+      "source": "8468:246077",
+      "x": 1265,
+      "y": 420,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-22&starting-point-node-id=8465%3A19&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "A04",
+      "label": "Apply change",
+      "to": "A05",
+      "source": "8468:246161",
+      "x": 1265,
+      "y": 420,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-23&starting-point-node-id=8465%3A19&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "A05",
+      "label": "Undo AI change",
+      "to": "A04",
+      "source": "8468:246241",
+      "x": 1265,
+      "y": 420,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-22&starting-point-node-id=8465%3A19&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "A04",
+      "label": "Stale scenario",
+      "to": "A06",
+      "source": "8468:246165",
+      "x": 1265,
+      "y": 500,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-24&starting-point-node-id=8465%3A19&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "A06",
+      "label": "Regenerate",
+      "to": "A03",
+      "source": "8468:246325",
+      "x": 1265,
+      "y": 420,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-21&starting-point-node-id=8465%3A19&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "A03",
+      "label": "Cancel generation",
+      "to": "A01",
+      "source": "8468:246079",
+      "x": 1265,
+      "y": 460,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-19&starting-point-node-id=8465%3A19&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "A01",
+      "label": "Change scope",
+      "to": "A02",
+      "source": "8468:245911",
+      "x": 1265,
+      "y": 460,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-20&starting-point-node-id=8465%3A19&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "A02",
+      "label": "Use page scope",
+      "to": "A09",
+      "source": "8468:245993",
+      "x": 1265,
+      "y": 420,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-27&starting-point-node-id=8465%3A19&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "A09",
+      "label": "Plan as agent task",
+      "to": "G02",
+      "source": "8468:246574",
+      "x": 1265,
+      "y": 420,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-32&starting-point-node-id=8465%3A19&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "G01",
+      "label": "New task",
+      "to": "G02",
+      "source": "8468:246901",
+      "x": 1265,
+      "y": 420,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-32&starting-point-node-id=8465%3A31&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "G02",
+      "label": "Generate plan",
+      "to": "G03",
+      "source": "8468:246984",
+      "x": 1265,
+      "y": 420,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-33&starting-point-node-id=8465%3A31&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "G03",
+      "label": "Approve & run",
+      "to": "G04",
+      "source": "8468:247068",
+      "x": 1265,
+      "y": 420,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-34&starting-point-node-id=8465%3A31&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "G04",
+      "label": "Review result",
+      "to": "G05",
+      "source": "8468:247152",
+      "x": 1265,
+      "y": 420,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-35&starting-point-node-id=8465%3A31&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "G05",
+      "label": "Review 2 changes",
+      "to": "G10",
+      "source": "8468:247238",
+      "x": 1265,
+      "y": 460,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-40&starting-point-node-id=8465%3A31&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "G10",
+      "label": "Apply selected 2",
+      "to": "G13",
+      "source": "8468:247650",
+      "x": 1265,
+      "y": 420,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-43&starting-point-node-id=8465%3A31&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "G13",
+      "label": "Undo selected edits",
+      "to": "G10",
+      "source": "8468:247888",
+      "x": 1265,
+      "y": 420,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-40&starting-point-node-id=8465%3A31&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "G11",
+      "label": "Review audit plan",
+      "to": "G14",
+      "source": "8468:247730",
+      "x": 1265,
+      "y": 420,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-44&starting-point-node-id=8465%3A41&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "G14",
+      "label": "Run audit",
+      "to": "G15",
+      "source": "8468:247972",
+      "x": 1265,
+      "y": 420,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-45&starting-point-node-id=8465%3A41&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "C01",
+      "label": "Open comments",
+      "to": "C03",
+      "source": "8468:248138",
+      "x": 1265,
+      "y": 460,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-48&starting-point-node-id=8465%3A46&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "C03",
+      "label": "Open thread",
+      "to": "C04",
+      "source": "8468:248302",
+      "x": 1265,
+      "y": 420,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-49&starting-point-node-id=8465%3A46&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "C04",
+      "label": "Resolve thread",
+      "to": "C10",
+      "source": "8468:248384",
+      "x": 1265,
+      "y": 420,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-55&starting-point-node-id=8465%3A46&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "C10",
+      "label": "Reopen thread",
+      "to": "C04",
+      "source": "8468:248866",
+      "x": 1265,
+      "y": 420,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-49&starting-point-node-id=8465%3A46&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "C01",
+      "label": "Connection lost",
+      "to": "C07",
+      "source": "8468:248142",
+      "x": 1265,
+      "y": 540,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-52&starting-point-node-id=8465%3A46&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "C07",
+      "label": "Reconnect · conflict",
+      "to": "C08",
+      "source": "8468:248628",
+      "x": 1265,
+      "y": 420,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-53&starting-point-node-id=8465%3A46&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "C08",
+      "label": "Use server 32px",
+      "to": "C12",
+      "source": "8468:248708",
+      "x": 1265,
+      "y": 420,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-57&starting-point-node-id=8465%3A46&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "C08",
+      "label": "Reapply my 24px",
+      "to": "C13",
+      "source": "8468:248710",
+      "x": 1265,
+      "y": 460,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-58&starting-point-node-id=8465%3A53&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "C02",
+      "label": "Review invitation",
+      "to": "C09",
+      "source": "8468:248220",
+      "x": 1265,
+      "y": 420,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-54&starting-point-node-id=8465%3A47&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "C09",
+      "label": "Send invitation",
+      "to": "C14",
+      "source": "8468:248790",
+      "x": 1265,
+      "y": 420,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-59&starting-point-node-id=8465%3A47&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "C06",
+      "label": "Preview reviewer view",
+      "to": "C11",
+      "source": "8468:248548",
+      "x": 1265,
+      "y": 420,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-56&starting-point-node-id=8465%3A51&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "C11",
+      "label": "Approve version",
+      "to": "C15",
+      "source": "8468:248946",
+      "x": 1265,
+      "y": 420,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-60&starting-point-node-id=8465%3A51&hide-ui=1",
+      "pass": true
+    }
+  ]
+}

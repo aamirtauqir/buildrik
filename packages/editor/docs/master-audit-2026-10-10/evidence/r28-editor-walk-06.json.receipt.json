@@ -1,0 +1,70 @@
+[
+  {
+    "label": "Retry failed upload",
+    "x": 720,
+    "y": 535,
+    "wait": 2200,
+    "shot": "r28-upload-retried.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8593%3A12598&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Select recovered upload",
+    "x": 720,
+    "y": 535,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8593%3A12598&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Commit with single-line source label",
+    "x": 545,
+    "y": 556,
+    "shot": "r28-upload-committed-truncated.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8593%3A12598&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Reset forced failure for URL",
+    "goto": "8593:12598",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8593-12598&starting-point-node-id=8593%3A12598&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Enable failed URL source fixture",
+    "x": 720,
+    "y": 520,
+    "expected": "8507:3011",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8593%3A12598&hide-ui=1",
+    "verification": "URL_MATCH"
+  },
+  {
+    "label": "Open source chooser",
+    "x": 1241,
+    "y": 261,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8593%3A12598&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Open URL method",
+    "x": 1100,
+    "y": 353,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8593%3A12598&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Fill URL sample",
+    "x": 730,
+    "y": 488,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8593%3A12598&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "URL check reaches failure",
+    "x": 720,
+    "y": 535,
+    "wait": 2200,
+    "shot": "r28-url-failed.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8593%3A12598&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

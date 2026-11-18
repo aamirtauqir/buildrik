@@ -1,0 +1,208 @@
+[
+  {
+    "fixtureLoad": "424:337006",
+    "at": 1792630530.433258
+  },
+  {
+    "origin": "424:337006",
+    "control": "424:337045",
+    "label": "Site variables",
+    "to": "424:337452",
+    "x": 176,
+    "y": 328,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "424:337452",
+    "clientX": 256,
+    "clientY": 428,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630531061
+  },
+  {
+    "origin": "424:337452",
+    "control": "424:337485",
+    "label": "Blog   1,000",
+    "to": "424:337006",
+    "x": 176,
+    "y": 160,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "424:337006",
+    "clientX": 256,
+    "clientY": 260,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630532159
+  },
+  {
+    "origin": "424:337006",
+    "control": "424:337046",
+    "label": "Conditions",
+    "to": "424:337627",
+    "x": 176,
+    "y": 368,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "424:337627",
+    "clientX": 256,
+    "clientY": 468,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630532738
+  },
+  {
+    "origin": "424:337627",
+    "control": "424:337660",
+    "label": "Blog   1,000",
+    "to": "424:337006",
+    "x": 176,
+    "y": 160,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "424:337006",
+    "clientX": 256,
+    "clientY": 260,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630533634
+  },
+  {
+    "origin": "424:337006",
+    "control": "424:337045",
+    "label": "Site variables",
+    "to": "424:337452",
+    "x": 176,
+    "y": 328,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "424:337452",
+    "clientX": 256,
+    "clientY": 428,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630534140
+  },
+  {
+    "origin": "424:337452",
+    "control": "424:337492",
+    "label": "Conditions",
+    "to": "424:337627",
+    "x": 176,
+    "y": 368,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "424:337627",
+    "clientX": 256,
+    "clientY": 468,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630534551
+  },
+  {
+    "origin": "424:337627",
+    "control": "424:337666",
+    "label": "Site variables",
+    "to": "424:337452",
+    "x": 176,
+    "y": 328,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "424:337452",
+    "clientX": 256,
+    "clientY": 428,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630535720
+  },
+  {
+    "fixtureLoad": "424:337803",
+    "at": 1792630547.2488801
+  },
+  {
+    "origin": "424:337803",
+    "control": "424:337806",
+    "label": "RL01 \u00b7 CMS / current-release navigation",
+    "to": "424:337006",
+    "x": 348,
+    "y": 162,
+    "w": 1440,
+    "h": 700,
+    "pass": true,
+    "actual": "424:337006",
+    "clientX": 428,
+    "clientY": 362,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630547974
+  },
+  {
+    "fixtureLoad": "424:337803",
+    "at": 1792630563.9232378
+  },
+  {
+    "origin": "424:337803",
+    "control": "424:337809",
+    "label": "RL02 \u00b7 Site variables / Sources hidden",
+    "to": "424:337452",
+    "x": 348,
+    "y": 218,
+    "w": 1440,
+    "h": 700,
+    "pass": true,
+    "actual": "424:337452",
+    "clientX": 428,
+    "clientY": 418,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630564767
+  },
+  {
+    "fixtureLoad": "424:337803",
+    "at": 1792630576.0385652
+  },
+  {
+    "origin": "424:337803",
+    "control": "424:337812",
+    "label": "RL03 \u00b7 Conditions / current-release index",
+    "to": "424:337627",
+    "x": 348,
+    "y": 274,
+    "w": 1440,
+    "h": 700,
+    "pass": true,
+    "actual": "424:337627",
+    "clientX": 428,
+    "clientY": 474,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630576945
+  }
+]

@@ -1,0 +1,24 @@
+[
+  {
+    "label": "Editor",
+    "goto": "8465:3"
+  },
+  {
+    "label": "Open Pages",
+    "x": 109,
+    "y": 157,
+    "shot": "r31-direct-pages.png"
+  },
+  {
+    "label": "About direct Options",
+    "x": 286,
+    "y": 231,
+    "shot": "r31-direct-options.png"
+  },
+  {
+    "label": "About direct Settings",
+    "x": 720,
+    "y": 413,
+    "shot": "r31-direct-settings.png"
+  }
+]

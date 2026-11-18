@@ -1,0 +1,41 @@
+[
+  {
+    "label": "Cancel pending upload",
+    "x": 720,
+    "y": 557,
+    "shot": "walk-upload-cancel.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8507%3A3011&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Choose actual bottom alternate asset",
+    "x": 603,
+    "y": 499,
+    "shot": "walk-image-real-draft.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8507%3A3011&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Commit bottom asset selection",
+    "x": 545,
+    "y": 596,
+    "shot": "walk-image-real-applied.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8507%3A3011&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Reopen source",
+    "x": 1241,
+    "y": 261,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8507%3A3011&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Open URL method",
+    "x": 1100,
+    "y": 353,
+    "shot": "walk-url-open.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8507%3A3011&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

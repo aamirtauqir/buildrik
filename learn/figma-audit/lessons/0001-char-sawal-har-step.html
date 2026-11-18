@@ -1,0 +1,153 @@
+<title>Lesson 01 · Char sawal, har step par</title>
+<link rel="stylesheet" href="../assets/lesson.css" />
+
+<div class="wrap">
+
+<p class="eyebrow">Lesson 01 · Figma audit · ~20 min</p>
+<h1>Char sawal, har step par</h1>
+<p class="lede">
+  "Messy hai", "discoverable nahi" — ye feelings hain, findings nahi. Ye lesson
+  ek flow ko steps mein todta hai aur har step par <strong>char sawal</strong>
+  poochta hai. Jawab Pass/Fail nikalta hai, evidence ke saath — wahi jo aap
+  agent ki QA report mein dekh chuke hain, ab aap ke haath mein.
+</p>
+
+<h2>Method — teen cheezein pehle likho</h2>
+<p>NN/g ka <a href="https://www.nngroup.com/articles/cognitive-walkthroughs/">cognitive walkthrough</a>. Shuru karne se pehle:</p>
+<ol>
+  <li><strong>Persona</strong> — agency designer, Webflow jaanta hai, Buildrick pehli baar khola.</li>
+  <li><strong>Task</strong> — ek jumla, user ki zabaan: "Site ka primary colour badlo."</li>
+  <li><strong>Action sequence</strong> — har click ek step. Jo raasta <em>aap</em> chahte hain ke user le, wahi likho.</li>
+</ol>
+<p>Phir har step par ye char sawal, isi order mein:</p>
+<div class="tbl-scroll"><table>
+<thead><tr><th>#</th><th>Sawal</th><th>Haan ka matlab</th></tr></thead>
+<tbody>
+<tr><td>Q1</td><td>User ko pata hai yahan kya karna hai?</td><td>Goal ke liye ye step zaroori lagta hai</td></tr>
+<tr><td>Q2</td><td>Sahi control nazar aata hai?</td><td>Bina dhoonde, bina hover ke</td></tr>
+<tr><td>Q3</td><td>Label dekh kar samajh aata hai ke yehi karna hai?</td><td>Naam = user ka irada</td></tr>
+<tr><td>Q4</td><td>Karne ke baad progress dikhti hai?</td><td>Kuch badla, aur user ne dekha</td></tr>
+</tbody></table></div>
+<div class="note">
+  <span class="note-label">Rule</span>
+  Charon Haan = <span class="pf pass">PASS</span>. Ek bhi Nahi = <span class="pf fail">FAIL</span>, aur wo step issue-table ki ek row ban jaata hai. Ye NN/g ka literal rule hai, meri sakhti nahi.
+</div>
+
+<h2>Worked example — "Primary colour badlo"</h2>
+<p>Wahi flow jo aap ke file mein do baar maujood hai: purane page par aur v3 par. Dono ko score karte hain, taake aap dekhein method kya pakadta hai.</p>
+
+<h3>Purana page (Editor v1 Clone) — 6 steps</h3>
+<p>Kholein: <a href="https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick?page-id=3397%3A13062&node-id=3397-34765&scaling=min-zoom&content-scaling=fixed">Clone · Home</a></p>
+<div class="tbl-scroll"><table class="steps-table">
+<thead><tr><th>Step</th><th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th><th>Verdict · evidence</th></tr></thead>
+<tbody>
+<tr><td>1 Rail › Brand</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><span class="pf pass">PASS</span> label visible, panel khulta hai</td></tr>
+<tr><td>2 "Colours &amp; type" row</td><td>✓</td><td>✓</td><td>✗</td><td>✓</td><td><span class="pf fail">FAIL</span> Q3: 9 rows mein se "Colours &amp; type" ✓ lekin subtitle "Colours, type, spacing · 4" — token manager lagta hai, colour picker nahi</td></tr>
+<tr><td>3 "color · 18" kind</td><td>✗</td><td>✓</td><td>✗</td><td>✓</td><td><span class="pf fail">FAIL</span> Q1/Q3: user "colour badalna" chahta tha, ab "18 tokens · used 5×" — engine ki zabaan (H2)</td></tr>
+<tr><td>4 "primary" row</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><span class="pf pass">PASS</span> naam + hex + "used 34×" — clear</td></tr>
+<tr><td>5 Edit → value</td><td>✓</td><td>✓</td><td>✓</td><td>✗</td><td><span class="pf fail">FAIL</span> Q4: "Primary colour staged" — canvas nahi badla, "staged" ka matlab user ko nahi pata (H1)</td></tr>
+<tr><td>6 Save to draft</td><td>✗</td><td>✓</td><td>✓</td><td>✓</td><td><span class="pf fail">FAIL</span> Q1: "draft"? Maine to colour badla tha — ab publish bhi karna hai? (H1, H2)</td></tr>
+</tbody></table></div>
+<p><strong>2 / 6 pass.</strong> Char issue rows. Yehi wo "6 steps" wali finding hai jo plan §0 mein thi — lekin ab har step ka <em>kyun</em> saath hai.</p>
+
+<h3>v3 (Editor v3 · IA) — 4 steps</h3>
+<p>Kholein: <a href="https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick?page-id=4418%3A45431&node-id=4418-81300&scaling=min-zoom&content-scaling=fixed">v3 · Home</a> → rail Brand.</p>
+<div class="tbl-scroll"><table class="steps-table">
+<thead><tr><th>Step</th><th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th><th>Verdict · evidence</th></tr></thead>
+<tbody>
+<tr><td>1 Rail › Brand</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><span class="pf pass">PASS</span> Brand · Simple khulta hai: 6 swatches saamne</td></tr>
+<tr><td>2 "Primary" row</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><span class="pf pass">PASS</span> swatch + naam + hex; picker overlay</td></tr>
+<tr><td>3 Colour → Apply</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><span class="pf pass">PASS</span> Q4: Draft chip + canvas ka button recolour</td></tr>
+<tr><td>4 Save</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><span class="pf pass">PASS</span> toast "Brand saved · applied to 34 elements"</td></tr>
+</tbody></table></div>
+<p><strong>4 / 4 pass.</strong> Farq method ne dikhaya, feeling ne nahi: Q3 aur Q1 ke fails khatam hue kyunki labels user ki zabaan mein aaye (H2), aur Q4 ke fails khatam hue kyunki canvas turant badalta hai (H1).</p>
+
+<div class="warn">
+  <span class="note-label">Trap</span>
+  Score karte waqt <em>persona</em> ban kar socho, designer ban kar nahi. Aap ko pata hai "staged" ka matlab kya hai — pehli baar wale user ko nahi. Jab shak ho, Nahi likho.
+</div>
+
+<h2>Practice — ab aap: "Menu page ka layout template se badlo"</h2>
+<p>Kholein: <a href="https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick?page-id=4418%3A45431&node-id=4418-90494&scaling=min-zoom&content-scaling=fixed">v3 · Pages panel</a>. Options mein <strong>Show hints on click</strong> ON karo. Har step khud click karo, phir yahan score karo — teacher ka verdict charon jawab ke baad khulta hai.</p>
+
+<div class="walk" data-key="v3-replace-menu">
+  <div class="step" data-verdict="pass" data-note="Label visible, panel page list ke saath khulta hai. Rail ab 6 items, koi ⋯ nahi.">
+    <h4>Step 1 · Rail › Pages</h4>
+    <p class="do">Left rail mein "Pages" click.</p>
+  </div>
+  <div class="step" data-verdict="pass" data-note="Pass, lekin Q2 kamzor: ⋯ ek chhota glyph hai. Webflow bhi yehi karta hai (H4), isliye pass. P2 note: row hover par ⋯ ko highlight karo.">
+    <h4>Step 2 · Menu row ka ⋯</h4>
+    <p class="do">Menu row ke right side ⋯ click.</p>
+  </div>
+  <div class="step" data-verdict="pass" data-note="Q3 strong: verb + object + ellipsis (…) = user jaanta hai dialog aayega, kuch turant nahi hoga (H4).">
+    <h4>Step 3 · "Replace layout with template…"</h4>
+    <p class="do">Menu mein wo row click.</p>
+  </div>
+  <div class="step" data-verdict="pass" data-note="Q1 banner se pass: 'Replacing: Menu · your current layout is backed up first' — user ko pata hai wo yahan kyun hai aur kya hoga. Buttons 'Use for Menu' — Q3 pass.">
+    <h4>Step 4 · Catalogue (replace mode) › "Use for Menu"</h4>
+    <p class="do">Bistro Menu card ka "Use for Menu".</p>
+  </div>
+  <div class="step" data-verdict="pass" data-note="Dialog copy sab bata deti hai (6 sections replaced, backup first, restore from History) — H5 error prevention. Q4: aage badha.">
+    <h4>Step 5 · Confirm "Replace Menu with Bistro Menu?"</h4>
+    <p class="do">"Replace Menu" button.</p>
+  </div>
+  <div class="step" data-verdict="fail" data-q="1" data-note="Observed problem, P1: user ne abhi 'Replace Menu' dabaya, ab phir ek 'Replace'? Do confirmations ek ke baad ek = 'kya pichla kaam nahi hua?' (H1 + H5 ka overdose). Fix: backup line already confirm mein hai — backup-ready dialog hatao, seedha applied; backup FAIL wala dialog sirf failure par. Wajah file mein: Figma API 2 se zyada conditional blocks nahi leta, isliye 2-step bana (plan §6).">
+    <h4>Step 6 · "Backup ready" › Replace</h4>
+    <p class="do">Doosra dialog: "Replace".</p>
+  </div>
+  <div class="step" data-verdict="pass" data-note="Q4 strong: breadcrumb Menu, naya canvas, toast 'Menu replaced · Undo · View backup' — H1 + H3 dono.">
+    <h4>Step 7 · Applied</h4>
+    <p class="do">Menu · Bistro Menu template applied.</p>
+  </div>
+</div>
+
+<div class="win">
+  <span class="note-label">Aap ne kya banaya</span>
+  Ek flow, 7 steps, 1 P1 finding evidence ke saath — <em>"Templates · replace | Replace Menu ke baad | applied | doosra Replace dialog | backup step confirm mein merge | P1"</em>. Ye row sidha issue table mein jaati hai. Feeling se finding tak: 15 minute.
+</div>
+
+<h2>Retrieval</h2>
+
+<div class="quiz" data-answer="0">
+  <p class="q">Ek step FAIL kab hota hai?</p>
+  <button>Ek sawal Nahi</button>
+  <button>Do sawal Nahi</button>
+  <button>Chaar sawal Nahi</button>
+  <p class="why">NN/g ka rule: Pass sirf jab charon Haan. Ek Nahi kaafi hai — wo ek issue row hai.</p>
+</div>
+
+<div class="quiz" data-answer="0">
+  <p class="q">Button click kiya, URL ka node-id same raha. Is file mein pehla shak?</p>
+  <button>Close-first action list</button>
+  <button>Overlay position galat</button>
+  <button>Flow start missing</button>
+  <p class="why">Verified 2026-09-13: action list jo Close se shuru ho, overlay na khula ho to poori list abort. Purane Clone page par 65 aise the.</p>
+</div>
+
+<div class="quiz" data-answer="0">
+  <p class="q">Do confirmations ek ke baad ek — kaunsa sawal fail hota hai?</p>
+  <button>Q1 right result</button>
+  <button>Q2 notice control</button>
+  <button>Q4 see progress</button>
+  <p class="why">Control dikh raha hai (Q2 ✓), click ke baad kuch hota hai (Q4 ✓) — lekin user ko nahi pata ye step kyun zaroori hai. Q1.</p>
+</div>
+
+<h2>Aage</h2>
+<ul>
+  <li>Lesson 02 — Lens 1: presentation mode mein 5 minute ka dead-click hunt (Show hints, R, node-id).</li>
+  <li>Lesson 03 — Fix column: 10 heuristics se "kyun" likhna.</li>
+</ul>
+
+<div class="foot">
+  <p><strong>Primary source:</strong> <a href="https://www.nngroup.com/articles/cognitive-walkthroughs/">NN/g — Evaluate Interface Learnability with Cognitive Walkthroughs</a> (10 min). Method wahi hai jo yahan hai; wahan team version bhi hai.</p>
+  <ul>
+    <li>Reference: <a href="../reference/audit-lenses.html">Teen lens, char sawal, ek table</a></li>
+    <li>Figma: <a href="https://help.figma.com/hc/en-us/articles/360040318013-Play-your-prototypes">Play your prototypes</a> — Show hints on click, R, Hide UI</li>
+  </ul>
+  <p>Kuch samajh na aaye, ya kisi step ka verdict aap ko galat lage — mujhse poochho. Aap ka verdict teacher se alag ho sakta hai; alag hona galat nahi, bina evidence ke hona galat hai.</p>
+</div>
+
+</div>
+
+<script src="../assets/walkthrough.js"></script>
+<script src="../assets/quiz.js"></script>

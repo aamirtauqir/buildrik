@@ -1,0 +1,124 @@
+[
+  {
+    "label": "Template recovery",
+    "goto": "8690:13237"
+  },
+  {
+    "label": "Backup failure scenario",
+    "x": 720,
+    "y": 378
+  },
+  {
+    "label": "Attempt replace",
+    "x": 720,
+    "y": 592,
+    "shot": "r31-backup-failed.png"
+  },
+  {
+    "label": "Retry backup",
+    "x": 720,
+    "y": 493
+  },
+  {
+    "label": "Confirm replacement",
+    "x": 720,
+    "y": 592,
+    "wait": 1800,
+    "shot": "r31-template-applied.png"
+  },
+  {
+    "label": "Undo replacement",
+    "x": 720,
+    "y": 541,
+    "shot": "r31-template-undone.png"
+  },
+  {
+    "label": "Open original page",
+    "x": 720,
+    "y": 541,
+    "shot": "r31-about-after-template-undo.png",
+    "expected": "8663:13368"
+  },
+  {
+    "label": "Template catalogue",
+    "goto": "8690:13237"
+  },
+  {
+    "label": "Open catalogue",
+    "x": 720,
+    "y": 330
+  },
+  {
+    "label": "SaaS Landing",
+    "x": 538,
+    "y": 224,
+    "shot": "r31-saas-preview.png"
+  },
+  {
+    "label": "Create page",
+    "x": 720,
+    "y": 584
+  },
+  {
+    "label": "Confirm new page",
+    "x": 720,
+    "y": 535,
+    "shot": "r31-saas-created.png",
+    "expected": "8663:13173"
+  },
+  {
+    "label": "Preview page",
+    "x": 805,
+    "y": 28,
+    "shot": "r31-saas-preview-result.png"
+  },
+  {
+    "label": "Back preview",
+    "x": 104,
+    "y": 28
+  },
+  {
+    "label": "Mobile",
+    "x": 476,
+    "y": 96,
+    "expected": "8676:13182"
+  },
+  {
+    "label": "Build from Mobile",
+    "x": 411,
+    "y": 28,
+    "expected": "8628:12592"
+  },
+  {
+    "label": "Return Editor",
+    "x": 319,
+    "y": 28,
+    "expected": "8676:13182",
+    "shot": "r31-build-return-mobile.png"
+  },
+  {
+    "label": "Premium catalogue",
+    "goto": "8690:13237"
+  },
+  {
+    "label": "Catalogue",
+    "x": 720,
+    "y": 330
+  },
+  {
+    "label": "Ecommerce preview",
+    "x": 538,
+    "y": 338
+  },
+  {
+    "label": "Create premium",
+    "x": 720,
+    "y": 584,
+    "shot": "r31-premium-gate.png"
+  },
+  {
+    "label": "Back catalogue",
+    "x": 720,
+    "y": 583
+  }
+]

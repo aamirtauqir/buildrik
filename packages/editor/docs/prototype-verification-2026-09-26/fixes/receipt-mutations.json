@@ -1,0 +1,20 @@
+{
+  "receipt": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"mutatedNodeIds\":[\"4418:130983\",\"4418:130988\",\"4418:130989\",\"I7417:116903;7197:79541\",\"7889:196332\",\"7889:196340\",\"7889:196348\",\"I7417:116903;7399:86257;7396:85942\",\"I7417:116903;7399:86257\",\"4418:130986\",\"4418:146546\"],\"variableIds\":[\"VariableID:7961:197163\",\"VariableID:7961:197164\",\"VariableID:7961:197165\"],\"recovery\":{\"width\":1440,\"height\":900,\"overflow\":\"VERTICAL\"},\"failureEntry\":[{\"id\":\"4418:146671\",\"reactions\":[{\"trigger\":{\"type\":\"ON_CLICK\"},\"actions\":[{\"type\":\"NODE\",\"destinationId\":\"4418:81300\",\"navigation\":\"NAVIGATE\",\"transition\":null,\"resetVideoPosition\":false},{\"type\":\"NODE\",\"destinationId\":\"4418:130886\",\"navigation\":\"OVERLAY\",\"transition\":null,\"resetVideoPosition\":false}]}]}]}"
+      }
+    ],
+    "isError": false
+  },
+  "failure": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"mutatedNodeIds\":[\"4418:146671\",\"4418:146670\",\"4418:146661\",\"4418:146546\"],\"failureButton\":{\"x\":582.5,\"y\":813},\"viewport\":{\"w\":1440,\"h\":900}}"
+      }
+    ],
+    "isError": false
+  }
+}

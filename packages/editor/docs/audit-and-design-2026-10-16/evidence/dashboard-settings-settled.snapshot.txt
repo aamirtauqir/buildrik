@@ -1,0 +1,190 @@
+--- BEGIN UNTRUSTED EXTERNAL CONTENT (source: http://localhost:3000/dashboard/settings) ---
+--- BEGIN UNTRUSTED EXTERNAL C​ONTENT (source: http://localhost:3000/dashboard/settings) ---
+@e1 [link] "Skip to content"
+  @e2 [link] "B Buildrick"
+    @e3 [link] "Dashboard"
+    @e4 [link] "Marketplace"
+    @e5 [link] "Learn"
+    @e6 [link] "Resources"
+    @e7 [link] "Templates"
+  @e8 [button] "Search"
+  @e9 [button] "Notifications (4 unread)"
+  @e10 [button] "Account menu"
+  @e11 [button] "Switch workspace"
+        @e12 [link] "Home"
+        @e13 [link] "Getting started"
+        @e14 [link] "Sites 1"
+        @e15 [link] "Agency"
+        @e16 [link] "Media"
+        @e17 [link] "Settings"
+  @e18 [link] "Upgrade plan"
+  @e19 [link] "General & branding Name, URL, logo & accent color"
+  @e20 [link] "Team Members, roles & seats"
+  @e21 [link] "Apps & integrations Vercel, webhooks & external tools"
+  @e22 [link] "Domains Every site's connected domains & DNS"
+  @e23 [link] "Workspace API tokens Tokens for scripts & integrations"
+  @e24 [link] "Plan & billing Your plan, invoices & payment method"
+  @e25 [link] "Usage & credits Bandwidth, storage & AI credits"
+  @e26 [link] "Profile Your name and avatar"
+  @e27 [link] "Account & sign-in Email, password & connected logins"
+  @e28 [link] "Security 2FA & active sessions"
+  @e29 [link] "Notifications Emails, digests & alerts"
+  @e30 [link] "Transfer or delete Transfer ownership; deletion happens 30 days later, cancel any time before"
+@e31 [button] "Accept All"
+@e32 [button] "Essential Only"
+@e33 [button] "Manage Preferences"
+@e34 [button] "v3.0.2 Output Detail Standard React Components Hide Until Restart Marker Color Clear on copy/send Block page interactions Manage MCP & Webhooks Manage MCP & Webhooks MCP Connection MCP connection allows agents to receive and act on annotations. Learn more Webhooks Auto-Send The webhook URL will receive live annotation changes and annotation data."
+  @e35 [button]
+  @e36 [button]
+  @e37 [button] [disabled]
+  @e38 [button] [disabled]
+  @e39 [button] [disabled]
+  @e40 [button] [disabled]
+  @e41 [button]
+  @e42 [button]
+  @e43 [link]
+  @e44 [button] "Switch to light mode"
+  @e45 [button] "Standard"
+  @e46 [checkbox] [checked]
+  @e47 [checkbox]
+  @e48 [button] "Indigo"
+  @e49 [button] "Blue"
+  @e50 [button] "Cyan"
+  @e51 [button] "Green"
+  @e52 [button] "Yellow"
+  @e53 [button] "Orange"
+  @e54 [button] "Red"
+  @e55 [checkbox] "Clear on copy/send"
+  @e56 [checkbox] "Block page interactions" [checked]
+  @e57 [button] "Manage MCP & Webhooks"
+  @e58 [button] "Manage MCP & Webhooks"
+    @e59 [link] "Learn more"
+  @e60 [checkbox] "Auto-Send" [checked] [disabled]
+  @e61 [textbox] "Webhook URL"
+
+── cursor-interactive (not in ARIA tree) ──
+@c1 [popover-child, cursor:pointer] "B"
+@c2 [popover-child, cursor:pointer] "Buildrick"
+@c3 [popover-child, cursor:pointer] "span"
+@c4 [popover-child, cursor:pointer] "1"
+@c5 [cursor:pointer] "span"
+@c6 [cursor:pointer] "General & branding
+
+Name, URL, logo & accent color"
+@c7 [cursor:pointer] "General & branding"
+@c8 [cursor:pointer] "Name, URL, logo & accent color"
+@c9 [cursor:pointer] "span"
+@c10 [cursor:pointer] "Team
+
+Members, roles & seats"
+@c11 [cursor:pointer] "Team"
+@c12 [cursor:pointer] "Members, roles & seats"
+@c13 [cursor:pointer] "span"
+@c14 [cursor:pointer] "Apps & integrations
+
+Vercel, webhooks & external tools"
+@c15 [cursor:pointer] "Apps & integrations"
+@c16 [cursor:pointer] "Vercel, webhooks & external tools"
+@c17 [cursor:pointer] "span"
+@c18 [cursor:pointer] "Domains
+
+Every site's connected domains & DNS"
+@c19 [cursor:pointer] "Domains"
+@c20 [cursor:pointer] "Every site's connected domains & DNS"
+@c21 [cursor:pointer] "span"
+@c22 [cursor:pointer] "Workspace API tokens
+
+Tokens for scripts & integrations"
+@c23 [cursor:pointer] "Workspace API tokens"
+@c24 [cursor:pointer] "Tokens for scripts & integrations"
+@c25 [cursor:pointer] "span"
+@c26 [cursor:pointer] "Plan & billing
+
+Your plan, invoices & payment method"
+@c27 [cursor:pointer] "Plan & billing"
+@c28 [cursor:pointer] "Your plan, invoices & payment method"
+@c29 [cursor:pointer] "span"
+@c30 [cursor:pointer] "Usage & credits
+
+Bandwidth, storage & AI credits"
+@c31 [cursor:pointer] "Usage & credits"
+@c32 [cursor:pointer] "Bandwidth, storage & AI credits"
+@c33 [cursor:pointer] "span"
+@c34 [cursor:pointer] "Profile
+
+Your name and avatar"
+@c35 [cursor:pointer] "Profile"
+@c36 [cursor:pointer] "Your name and avatar"
+@c37 [cursor:pointer] "span"
+@c38 [cursor:pointer] "Account & sign-in
+
+Email, password & connected logins"
+@c39 [cursor:pointer] "Account & sign-in"
+@c40 [cursor:pointer] "Email, password & connected logins"
+@c41 [cursor:pointer] "span"
+@c42 [cursor:pointer] "Security
+
+2FA & active sessions"
+@c43 [cursor:pointer] "Security"
+@c44 [cursor:pointer] "2FA & active sessions"
+@c45 [cursor:pointer] "span"
+@c46 [cursor:pointer] "Notifications
+
+Emails, digests & alerts"
+@c47 [cursor:pointer] "Notifications"
+@c48 [cursor:pointer] "Emails, digests & alerts"
+@c49 [cursor:pointer] "span"
+@c50 [cursor:pointer] "Transfer or delete
+
+Transfer ownership; deletion happens 30 days later, cancel a"
+@c51 [cursor:pointer] "Transfer or delete"
+@c52 [cursor:pointer] "Transfer ownership; deletion happens 30 days later, cancel any time before"
+@c53 [popover-child, cursor:pointer, tabindex=0, role=button] "v3.0.2
+
+Output Detail
+Standard
+React Components
+Hide Until Restart
+Marker Color
+"
+@c54 [popover-child, cursor:pointer] "div"
+@c55 [popover-child, cursor:pointer] "div"
+@c56 [popover-child, cursor:pointer] "div"
+@c57 [popover-child, cursor:pointer] "span"
+@c58 [popover-child, cursor:pointer] "span"
+@c59 [popover-child, cursor:pointer] "div"
+@c60 [popover-child, cursor:pointer] "span"
+@c61 [popover-child, cursor:pointer] "span"
+@c62 [popover-child, cursor:pointer] "div"
+@c63 [popover-child, cursor:pointer] "span"
+@c64 [popover-child, cursor:pointer] "span"
+@c65 [popover-child, cursor:pointer] "div"
+@c66 [popover-child, cursor:pointer] "span"
+@c67 [popover-child, cursor:pointer] "span"
+@c68 [popover-child, cursor:pointer] "div"
+@c69 [popover-child, cursor:pointer] "span"
+@c70 [popover-child, cursor:pointer] "span"
+@c71 [popover-child, cursor:pointer] "div"
+@c72 [popover-child, cursor:pointer] "span"
+@c73 [popover-child, cursor:pointer] "span"
+@c74 [popover-child, cursor:pointer] "div"
+@c75 [popover-child, cursor:pointer] "span"
+@c76 [popover-child, cursor:pointer] "div"
+@c77 [popover-child, cursor:pointer] "div"
+@c78 [popover-child, cursor:pointer] "span"
+@c79 [popover-child, cursor:pointer] "span"
+@c80 [popover-child, cursor:pointer] "span"
+@c81 [popover-child, cursor:pointer] "span"
+@c82 [popover-child, cursor:pointer] "Standard"
+@c83 [popover-child, cursor:pointer] "span"
+@c84 [popover-child, cursor:pointer] "span"
+@c85 [popover-child, cursor:pointer] "span"
+@c86 [popover-child, cursor:pointer] "span"
+@c87 [popover-child, cursor:pointer] "span"
+@c88 [popover-child, cursor:pointer] "Clear on copy/send"
+@c89 [popover-child, cursor:pointer] "Block page interactions"
+@c90 [popover-child, cursor:pointer] "Manage MCP & Webhooks"
+@c91 [popover-child, cursor:pointer] "span"
+@c92 [popover-child, cursor:pointer] "Manage MCP & Webhooks"
+--- END UNTRUSTED EXTERNAL C​ONTENT ---
+--- END UNTRUSTED EXTERNAL CONTENT ---

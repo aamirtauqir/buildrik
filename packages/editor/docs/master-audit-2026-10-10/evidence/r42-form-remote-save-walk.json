@@ -1,0 +1,7 @@
+[
+ {"x":720,"y":493,"shot":"r42-form-url-invalid.png"},
+ {"x":720,"y":645,"wait":0,"shot":"r42-form-spam-saving.png"},
+ {"wait":2600,"shot":"r42-form-spam-saved-with-url-draft.png"},
+ {"x":720,"y":513,"shot":"r42-form-url-reopen.png"},
+ {"x":720,"y":541,"wait":2600,"shot":"r42-form-redirect-save-failed.png"}
+]

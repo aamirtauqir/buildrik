@@ -1,0 +1,9 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"panels\":[{\"id\":\"8539:9304\",\"layout\":\"VERTICAL\",\"bounds\":[1088,56,352,920],\"visibleChildren\":[{\"id\":\"8655:12878\",\"name\":\"Panel header / History\",\"bounds\":[17,17,318,30]},{\"id\":\"8539:9309\",\"name\":\"Document history · Home\",\"bounds\":[17,63,318,16]},{\"id\":\"8539:9311\",\"name\":\"History content\",\"bounds\":[17,95,318,415]}]},{\"id\":\"8539:9547\",\"layout\":\"VERTICAL\",\"bounds\":[1088,56,352,920],\"visibleChildren\":[{\"id\":\"8655:12891\",\"name\":\"Panel header / Publish\",\"bounds\":[17,17,318,30]},{\"id\":\"8539:9552\",\"name\":\"Buildrick demo · current document\",\"bounds\":[17,63,318,16]},{\"id\":\"8539:9554\",\"name\":\"Publish content\",\"bounds\":[17,95,318,389]}]},{\"id\":\"8539:9624\",\"layout\":\"VERTICAL\",\"bounds\":[0,56,352,920],\"visibleChildren\":[{\"id\":\"8655:12895\",\"name\":\"Panel header / Pages\",\"bounds\":[17,17,318,30]},{\"id\":\"8655:12899\",\"name\":\"Pages / navigation and settings\",\"bounds\":[17,63,318,794]},{\"id\":\"8539:9657\",\"name\":\"+ New page\",\"bounds\":[17,873,318,30]}]}],\"fields\":[{\"id\":\"8657:12816\",\"main\":\"8531:330\",\"width\":320},{\"id\":\"8657:12821\",\"main\":\"8531:318\",\"width\":320},{\"id\":\"8657:12823\",\"main\":\"8531:318\",\"width\":320}],\"padding\":[{\"id\":\"I8468:633;8314:4\",\"text\":\"Set all sides to 32px\"},{\"id\":\"I8584:12322;8314:4\",\"text\":\"Set all sides to 32px\"}],\"previewHeadingBound\":{\"characters\":{\"type\":\"VARIABLE_ALIAS\",\"id\":\"VariableID:8627:649\"}}}"
+    }
+  ],
+  "isError": false
+}

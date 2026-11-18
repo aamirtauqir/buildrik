@@ -1,0 +1,9 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"createdNodeIds\":[],\"mutatedNodeIds\":[\"8843:16833\",\"I8843:16833;8314:8\",\"8843:20492\",\"I8843:20492;8314:8\",\"8912:17353\",\"8843:16845\",\"8843:17103\",\"8843:20504\",\"8843:20774\",\"9064:17596\",\"9064:17597\",\"8841:15284\",\"8841:14865\"],\"reactionsPreserved\":true,\"widthBindingsPreserved\":true,\"undoParent\":\"9064:17596\",\"resultParent\":\"8841:14865\",\"resultVisibility\":{\"type\":\"VARIABLE_ALIAS\",\"id\":\"VariableID:9064:17499\"},\"duplicateHidden\":true,\"viewportFills\":[{\"id\":\"8843:16845\",\"fills\":[{\"type\":\"SOLID\",\"visible\":true,\"opacity\":1,\"blendMode\":\"NORMAL\",\"color\":{\"r\":0.95686274766922,\"g\":0.9647058844566345,\"b\":0.9764705896377563},\"boundVariables\":{\"color\":{\"type\":\"VARIABLE_ALIAS\",\"id\":\"VariableID:8322:788\"}}}]},{\"id\":\"8843:20504\",\"fills\":[{\"type\":\"SOLID\",\"visible\":true,\"opacity\":1,\"blendMode\":\"NORMAL\",\"color\":{\"r\":0.95686274766922,\"g\":0.9647058844566345,\"b\":0.9764705896377563},\"boundVariables\":{\"color\":{\"type\":\"VARIABLE_ALIAS\",\"id\":\"VariableID:8322:788\"}}}]}]}"
+    }
+  ],
+  "isError": false
+}

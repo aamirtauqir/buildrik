@@ -1,0 +1,858 @@
+--- BEGIN UNTRUSTED EXTERNAL CONTENT (source: http://localhost:3000/edit/cmv8uviql000bucorbmjjol97) ---
+--- BEGIN UNTRUSTED EXTERNAL C​ONTENT (source: http://localhost:3000/edit/cmv8uviql000bucorbmjjol97) ---
+    @e1 [button] "‹ Exit"
+    @e2 [button] "s0-qa site"
+    @e3 [button] "Home"
+    @e4 [button] "History ›"
+    @e5 [button] "Review"
+    @e6 [button] "Comments"
+    @e7 [button] "Notifications, 2 unread"
+    @e8 [button] "Preview"
+    @e9 [button] "Site menu"
+@e10 [link] "Skip to Canvas"
+    @e11 [tab] "Add elements, blocks and components to your page": Add
+    @e12 [tab] "View and reorder page structure": Layers
+    @e13 [tab] "Manage all pages in your site": Pages
+    @e14 [tab] "Upload and manage images, videos, and fonts": Assets
+    @e15 [tab] "Collections, records and data sources for dynamic content": CMS
+    @e16 [tab] "Brand — global colors, fonts, spacing tokens": Brand
+    @e17 [button] "Help — keyboard shortcuts": Help
+@e18 [button] "Get started — 3 of 7 complete. Click to expand.": 3/7
+@e19 [button] "v3.0.2 Output Detail Standard React Components Hide Until Restart Marker Color Clear on copy/send Block page interactions Manage MCP & Webhooks Manage MCP & Webhooks MCP Connection MCP connection allows agents to receive and act on annotations. Learn more Webhooks Auto-Send The webhook URL will receive live annotation changes and annotation data."
+  @e20 [button]
+  @e21 [button]
+  @e22 [button] [disabled]
+  @e23 [button] [disabled]
+  @e24 [button] [disabled]
+  @e25 [button] [disabled]
+  @e26 [button]
+  @e27 [button]
+  @e28 [link]
+  @e29 [button] "Switch to light mode"
+  @e30 [button] "Standard"
+  @e31 [checkbox] [checked]
+  @e32 [checkbox]
+  @e33 [button] "Indigo"
+  @e34 [button] "Blue"
+  @e35 [button] "Cyan"
+  @e36 [button] "Green"
+  @e37 [button] "Yellow"
+  @e38 [button] "Orange"
+  @e39 [button] "Red"
+  @e40 [checkbox] "Clear on copy/send"
+  @e41 [checkbox] "Block page interactions" [checked]
+  @e42 [button] "Manage MCP & Webhooks"
+  @e43 [button] "Manage MCP & Webhooks"
+    @e44 [link] "Learn more"
+  @e45 [checkbox] "Auto-Send" [checked] [disabled]
+  @e46 [textbox] "Webhook URL"
+  @e47 [button] "Back to canvas"
+    @e48 [button] "Colours 58"
+    @e49 [button] "Colour mode"
+    @e50 [button] "Fonts & type styles"
+    @e51 [button] "Styles"
+    @e52 [button] "Component styles"
+    @e53 [button] "Classes"
+    @e54 [button] "Presets"
+    @e55 [button] "Brand checks"
+    @e56 [button] "Starters"
+    @e57 [button] "Spacing"
+    @e58 [button] "Import / export"
+  @e59 [button] "Review changes · 0"
+  @e60 [button] "Restore points"
+    @e61 [button] "+ Add token"
+@e62 [button] "Browse starters"
+@e63 [button] "Import"
+        @e64 [button] "Used by 4 — highlight on the canvas": Used by 4
+        @e65 [button] "Used by 2 — highlight on the canvas": Used by 2
+        @e66 [button] "Used by 2 — highlight on the canvas": Used by 2
+        @e67 [button] "Used by 4 — highlight on the canvas": Used by 4
+        @e68 [button] "Used by 4 — highlight on the canvas": Used by 4
+        @e69 [button] "Used by 2 — highlight on the canvas": Used by 2
+        @e70 [button] "Used by 2 — highlight on the canvas": Used by 2
+        @e71 [button] "Used by 2 — highlight on the canvas": Used by 2
+  @e72 [button] "Generate colour scale"
+  @e73 [button] "Connect to tokens"
+      @e74 [tab] "Light" [selected]
+      @e75 [tab] "Dark" [disabled]
+    @e76 [combobox] "Preview zoom"
+      @e77 [option] "25%"
+      @e78 [option] "50%" [selected]
+      @e79 [option] "100%"
+      @e80 [button] "Token actions": ⋯
+      @e81 [button] "Change"
+      @e82 [button] "Set"
+      @e83 [button] "View ›" [disabled]
+      @e84 [button] "About drafts"
+
+── cursor-interactive (not in ARIA tree) ──
+@c1 [cursor:pointer] "Review"
+@c2 [cursor:pointer] "›"
+@c3 [cursor:pointer] "Add"
+@c4 [cursor:pointer] "Layers"
+@c5 [cursor:pointer] "Pages"
+@c6 [cursor:pointer] "Assets"
+@c7 [cursor:pointer] "CMS"
+@c8 [cursor:pointer] "Brand"
+@c9 [cursor:pointer] "Help"
+@c10 [cursor:pointer] "span"
+@c11 [cursor:pointer] "span"
+@c12 [tabindex=0] "div"
+@c13 [popover-child, cursor:pointer] "div"
+@c14 [popover-child, cursor:pointer, tabindex=0, role=button] "span"
+@c15 [popover-child, cursor:pointer] "span"
+@c16 [popover-child, cursor:pointer] "span"
+@c17 [popover-child, cursor:pointer] "span"
+@c18 [popover-child, cursor:pointer] "div"
+@c19 [popover-child, cursor:pointer, tabindex=0, role=button] "span"
+@c20 [popover-child, cursor:pointer] "span"
+@c21 [popover-child, cursor:pointer] "span"
+@c22 [popover-child, cursor:pointer] "span"
+@c23 [popover-child, cursor:pointer] "div"
+@c24 [popover-child, cursor:pointer, tabindex=0, role=button] "span"
+@c25 [popover-child, cursor:pointer] "span"
+@c26 [popover-child, cursor:pointer] "span"
+@c27 [popover-child, cursor:pointer] "span"
+@c28 [popover-child, cursor:pointer] "span"
+@c29 [popover-child, cursor:pointer] "div"
+@c30 [popover-child, cursor:pointer, tabindex=0, role=button] "span"
+@c31 [popover-child, cursor:pointer] "span"
+@c32 [popover-child, cursor:pointer] "span"
+@c33 [popover-child, cursor:pointer] "3/7"
+@c34 [popover-child, cursor:pointer, tabindex=0, role=button] "v3.0.2
+
+Output Detail
+Standard
+React Components
+Hide Until Restart
+Marker Color
+"
+@c35 [popover-child, cursor:pointer] "div"
+@c36 [popover-child, cursor:pointer] "div"
+@c37 [popover-child, cursor:pointer] "div"
+@c38 [popover-child, cursor:pointer] "span"
+@c39 [popover-child, cursor:pointer] "span"
+@c40 [popover-child, cursor:pointer] "div"
+@c41 [popover-child, cursor:pointer] "span"
+@c42 [popover-child, cursor:pointer] "span"
+@c43 [popover-child, cursor:pointer] "div"
+@c44 [popover-child, cursor:pointer] "span"
+@c45 [popover-child, cursor:pointer] "span"
+@c46 [popover-child, cursor:pointer] "div"
+@c47 [popover-child, cursor:pointer] "span"
+@c48 [popover-child, cursor:pointer] "span"
+@c49 [popover-child, cursor:pointer] "div"
+@c50 [popover-child, cursor:pointer] "span"
+@c51 [popover-child, cursor:pointer] "span"
+@c52 [popover-child, cursor:pointer] "div"
+@c53 [popover-child, cursor:pointer] "span"
+@c54 [popover-child, cursor:pointer] "span"
+@c55 [popover-child, cursor:pointer] "div"
+@c56 [popover-child, cursor:pointer] "span"
+@c57 [popover-child, cursor:pointer] "div"
+@c58 [popover-child, cursor:pointer] "div"
+@c59 [popover-child, cursor:pointer] "span"
+@c60 [popover-child, cursor:pointer] "span"
+@c61 [popover-child, cursor:pointer] "span"
+@c62 [popover-child, cursor:pointer] "span"
+@c63 [popover-child, cursor:pointer] "Standard"
+@c64 [popover-child, cursor:pointer] "span"
+@c65 [popover-child, cursor:pointer] "span"
+@c66 [popover-child, cursor:pointer] "span"
+@c67 [popover-child, cursor:pointer] "span"
+@c68 [popover-child, cursor:pointer] "span"
+@c69 [popover-child, cursor:pointer] "Clear on copy/send"
+@c70 [popover-child, cursor:pointer] "Block page interactions"
+@c71 [popover-child, cursor:pointer] "Manage MCP & Webhooks"
+@c72 [popover-child, cursor:pointer] "span"
+@c73 [popover-child, cursor:pointer] "Manage MCP & Webhooks"
+@c74 [popover-child, cursor:pointer, tabindex=0, role=row] "color-action
+#1A56DB
+—
+Used by 0"
+@c75 [popover-child, cursor:pointer] "span"
+@c76 [popover-child, cursor:pointer] "span"
+@c77 [popover-child, cursor:pointer] "color-action"
+@c78 [popover-child, cursor:pointer] "color-action"
+@c79 [popover-child, cursor:pointer] "#1A56DB"
+@c80 [popover-child, cursor:pointer] "—"
+@c81 [popover-child, cursor:pointer] "Used by 0"
+@c82 [popover-child, cursor:pointer] "Used by 0"
+@c83 [popover-child, cursor:pointer, role=row] "color-surface
+#F8FAFC
+—
+Used by 0"
+@c84 [popover-child, cursor:pointer] "span"
+@c85 [popover-child, cursor:pointer] "span"
+@c86 [popover-child, cursor:pointer] "color-surface"
+@c87 [popover-child, cursor:pointer] "color-surface"
+@c88 [popover-child, cursor:pointer] "#F8FAFC"
+@c89 [popover-child, cursor:pointer] "—"
+@c90 [popover-child, cursor:pointer] "Used by 0"
+@c91 [popover-child, cursor:pointer] "Used by 0"
+@c92 [popover-child, cursor:pointer, role=row] "color-text-primary
+#334155
+—
+Used by 0"
+@c93 [popover-child, cursor:pointer] "span"
+@c94 [popover-child, cursor:pointer] "span"
+@c95 [popover-child, cursor:pointer] "color-text-primary"
+@c96 [popover-child, cursor:pointer] "color-text-primary"
+@c97 [popover-child, cursor:pointer] "#334155"
+@c98 [popover-child, cursor:pointer] "—"
+@c99 [popover-child, cursor:pointer] "Used by 0"
+@c100 [popover-child, cursor:pointer] "Used by 0"
+@c101 [popover-child, cursor:pointer, role=row] "color-feedback-error
+#EF4444
+—
+Used by 0"
+@c102 [popover-child, cursor:pointer] "span"
+@c103 [popover-child, cursor:pointer] "span"
+@c104 [popover-child, cursor:pointer] "color-feedback-error"
+@c105 [popover-child, cursor:pointer] "color-feedback-error"
+@c106 [popover-child, cursor:pointer] "#EF4444"
+@c107 [popover-child, cursor:pointer] "—"
+@c108 [popover-child, cursor:pointer] "Used by 0"
+@c109 [popover-child, cursor:pointer] "Used by 0"
+@c110 [popover-child, cursor:pointer, role=row] "color-primary
+#1A56DB
+#60A5FA
+Used by 4"
+@c111 [popover-child, cursor:pointer] "span"
+@c112 [popover-child, cursor:pointer] "span"
+@c113 [popover-child, cursor:pointer] "color-primary"
+@c114 [popover-child, cursor:pointer] "color-primary"
+@c115 [popover-child, cursor:pointer] "#1A56DB"
+@c116 [popover-child, cursor:pointer] "#60A5FA"
+@c117 [popover-child, cursor:pointer] "Used by 4"
+@c118 [popover-child, cursor:pointer, role=row] "color-secondary
+#64748B
+#94A3B8
+Used by 0"
+@c119 [popover-child, cursor:pointer] "span"
+@c120 [popover-child, cursor:pointer] "span"
+@c121 [popover-child, cursor:pointer] "color-secondary"
+@c122 [popover-child, cursor:pointer] "color-secondary"
+@c123 [popover-child, cursor:pointer] "#64748B"
+@c124 [popover-child, cursor:pointer] "#94A3B8"
+@c125 [popover-child, cursor:pointer] "Used by 0"
+@c126 [popover-child, cursor:pointer] "Used by 0"
+@c127 [popover-child, cursor:pointer, role=row] "color-accent
+#15803D
+#4ADE80
+Used by 0"
+@c128 [popover-child, cursor:pointer] "span"
+@c129 [popover-child, cursor:pointer] "span"
+@c130 [popover-child, cursor:pointer] "color-accent"
+@c131 [popover-child, cursor:pointer] "color-accent"
+@c132 [popover-child, cursor:pointer] "#15803D"
+@c133 [popover-child, cursor:pointer] "#4ADE80"
+@c134 [popover-child, cursor:pointer] "Used by 0"
+@c135 [popover-child, cursor:pointer] "Used by 0"
+@c136 [popover-child, cursor:pointer, role=row] "color-background
+#F8FAFC
+#0F172A
+Used by 0"
+@c137 [popover-child, cursor:pointer] "span"
+@c138 [popover-child, cursor:pointer] "span"
+@c139 [popover-child, cursor:pointer] "color-background"
+@c140 [popover-child, cursor:pointer] "color-background"
+@c141 [popover-child, cursor:pointer] "#F8FAFC"
+@c142 [popover-child, cursor:pointer] "#0F172A"
+@c143 [popover-child, cursor:pointer] "Used by 0"
+@c144 [popover-child, cursor:pointer] "Used by 0"
+@c145 [popover-child, cursor:pointer, role=row] "color-page-background
+transparent
+—
+Used by 2"
+@c146 [popover-child, cursor:pointer] "span"
+@c147 [popover-child, cursor:pointer] "span"
+@c148 [popover-child, cursor:pointer] "color-page-background"
+@c149 [popover-child, cursor:pointer] "color-page-background"
+@c150 [popover-child, cursor:pointer] "transparent"
+@c151 [popover-child, cursor:pointer] "—"
+@c152 [popover-child, cursor:pointer] "Used by 2"
+@c153 [popover-child, cursor:pointer, role=row] "color-text
+#334155
+#E2E8F0
+Used by 0"
+@c154 [popover-child, cursor:pointer] "span"
+@c155 [popover-child, cursor:pointer] "span"
+@c156 [popover-child, cursor:pointer] "color-text"
+@c157 [popover-child, cursor:pointer] "color-text"
+@c158 [popover-child, cursor:pointer] "#334155"
+@c159 [popover-child, cursor:pointer] "#E2E8F0"
+@c160 [popover-child, cursor:pointer] "Used by 0"
+@c161 [popover-child, cursor:pointer] "Used by 0"
+@c162 [popover-child, cursor:pointer, role=row] "color-muted
+#71717A
+#A1A1AA
+Used by 0"
+@c163 [popover-child, cursor:pointer] "span"
+@c164 [popover-child, cursor:pointer] "span"
+@c165 [popover-child, cursor:pointer] "color-muted"
+@c166 [popover-child, cursor:pointer] "color-muted"
+@c167 [popover-child, cursor:pointer] "#71717A"
+@c168 [popover-child, cursor:pointer] "#A1A1AA"
+@c169 [popover-child, cursor:pointer] "Used by 0"
+@c170 [popover-child, cursor:pointer] "Used by 0"
+@c171 [popover-child, cursor:pointer, role=row] "color-border
+#27272A
+#3F3F46
+Used by 0"
+@c172 [popover-child, cursor:pointer] "span"
+@c173 [popover-child, cursor:pointer] "span"
+@c174 [popover-child, cursor:pointer] "color-border"
+@c175 [popover-child, cursor:pointer] "color-border"
+@c176 [popover-child, cursor:pointer] "#27272A"
+@c177 [popover-child, cursor:pointer] "#3F3F46"
+@c178 [popover-child, cursor:pointer] "Used by 0"
+@c179 [popover-child, cursor:pointer] "Used by 0"
+@c180 [popover-child, cursor:pointer, role=row] "color-on-primary
+#FFFFFF
+#FFFFFF
+Used by 2"
+@c181 [popover-child, cursor:pointer] "span"
+@c182 [popover-child, cursor:pointer] "span"
+@c183 [popover-child, cursor:pointer] "color-on-primary"
+@c184 [popover-child, cursor:pointer] "color-on-primary"
+@c185 [popover-child, cursor:pointer] "#FFFFFF"
+@c186 [popover-child, cursor:pointer] "#FFFFFF"
+@c187 [popover-child, cursor:pointer] "Used by 2"
+@c188 [popover-child, cursor:pointer, role=row] "color-surface-raised
+#FFFFFF
+#1E293B
+Used by 0"
+@c189 [popover-child, cursor:pointer] "span"
+@c190 [popover-child, cursor:pointer] "span"
+@c191 [popover-child, cursor:pointer] "color-surface-raised"
+@c192 [popover-child, cursor:pointer] "color-surface-raised"
+@c193 [popover-child, cursor:pointer] "#FFFFFF"
+@c194 [popover-child, cursor:pointer] "#1E293B"
+@c195 [popover-child, cursor:pointer] "Used by 0"
+@c196 [popover-child, cursor:pointer] "Used by 0"
+@c197 [popover-child, cursor:pointer, role=row] "color-surface-muted
+#F3F4F6
+#1E293B
+Used by 0"
+@c198 [popover-child, cursor:pointer] "span"
+@c199 [popover-child, cursor:pointer] "span"
+@c200 [popover-child, cursor:pointer] "color-surface-muted"
+@c201 [popover-child, cursor:pointer] "color-surface-muted"
+@c202 [popover-child, cursor:pointer] "#F3F4F6"
+@c203 [popover-child, cursor:pointer] "#1E293B"
+@c204 [popover-child, cursor:pointer] "Used by 0"
+@c205 [popover-child, cursor:pointer] "Used by 0"
+@c206 [popover-child, cursor:pointer, role=row] "color-border-subtle
+#E5E7EB
+#334155
+Used by 0"
+@c207 [popover-child, cursor:pointer] "span"
+@c208 [popover-child, cursor:pointer] "span"
+@c209 [popover-child, cursor:pointer] "color-border-subtle"
+@c210 [popover-child, cursor:pointer] "color-border-subtle"
+@c211 [popover-child, cursor:pointer] "#E5E7EB"
+@c212 [popover-child, cursor:pointer] "#334155"
+@c213 [popover-child, cursor:pointer] "Used by 0"
+@c214 [popover-child, cursor:pointer] "Used by 0"
+@c215 [popover-child, cursor:pointer, role=row] "color-text-strong
+#111827
+#F8FAFC
+Used by 0"
+@c216 [popover-child, cursor:pointer] "span"
+@c217 [popover-child, cursor:pointer] "span"
+@c218 [popover-child, cursor:pointer] "color-text-strong"
+@c219 [popover-child, cursor:pointer] "color-text-strong"
+@c220 [popover-child, cursor:pointer] "#111827"
+@c221 [popover-child, cursor:pointer] "#F8FAFC"
+@c222 [popover-child, cursor:pointer] "Used by 0"
+@c223 [popover-child, cursor:pointer] "Used by 0"
+@c224 [popover-child, cursor:pointer, role=row] "color-text-subtle
+#6B7280
+#94A3B8
+Used by 0"
+@c225 [popover-child, cursor:pointer] "span"
+@c226 [popover-child, cursor:pointer] "span"
+@c227 [popover-child, cursor:pointer] "color-text-subtle"
+@c228 [popover-child, cursor:pointer] "color-text-subtle"
+@c229 [popover-child, cursor:pointer] "#6B7280"
+@c230 [popover-child, cursor:pointer] "#94A3B8"
+@c231 [popover-child, cursor:pointer] "Used by 0"
+@c232 [popover-child, cursor:pointer] "Used by 0"
+@c233 [popover-child, cursor:pointer, role=row] "color-success
+#15803D
+#4ADE80
+Used by 0"
+@c234 [popover-child, cursor:pointer] "span"
+@c235 [popover-child, cursor:pointer] "span"
+@c236 [popover-child, cursor:pointer] "color-success"
+@c237 [popover-child, cursor:pointer] "color-success"
+@c238 [popover-child, cursor:pointer] "#15803D"
+@c239 [popover-child, cursor:pointer] "#4ADE80"
+@c240 [popover-child, cursor:pointer] "Used by 0"
+@c241 [popover-child, cursor:pointer] "Used by 0"
+@c242 [popover-child, cursor:pointer, role=row] "color-warning
+#8E4B10
+#FACA15
+Used by 0"
+@c243 [popover-child, cursor:pointer] "span"
+@c244 [popover-child, cursor:pointer] "span"
+@c245 [popover-child, cursor:pointer] "color-warning"
+@c246 [popover-child, cursor:pointer] "color-warning"
+@c247 [popover-child, cursor:pointer] "#8E4B10"
+@c248 [popover-child, cursor:pointer] "#FACA15"
+@c249 [popover-child, cursor:pointer] "Used by 0"
+@c250 [popover-child, cursor:pointer] "Used by 0"
+@c251 [popover-child, cursor:pointer, role=row] "color-error
+#EF4444
+#F87171
+Used by 0"
+@c252 [popover-child, cursor:pointer] "span"
+@c253 [popover-child, cursor:pointer] "span"
+@c254 [popover-child, cursor:pointer] "color-error"
+@c255 [popover-child, cursor:pointer] "color-error"
+@c256 [popover-child, cursor:pointer] "#EF4444"
+@c257 [popover-child, cursor:pointer] "#F87171"
+@c258 [popover-child, cursor:pointer] "Used by 0"
+@c259 [popover-child, cursor:pointer] "Used by 0"
+@c260 [popover-child, cursor:pointer, role=row] "color-brand-500
+#1A56DB
+—
+Used by 4"
+@c261 [popover-child, cursor:pointer] "span"
+@c262 [popover-child, cursor:pointer] "span"
+@c263 [popover-child, cursor:pointer] "color-brand-500"
+@c264 [popover-child, cursor:pointer] "color-brand-500"
+@c265 [popover-child, cursor:pointer] "#1A56DB"
+@c266 [popover-child, cursor:pointer] "—"
+@c267 [popover-child, cursor:pointer] "Used by 4"
+@c268 [popover-child, cursor:pointer, role=row] "color-slate-50
+#F8FAFC
+—
+Used by 0"
+@c269 [popover-child, cursor:pointer] "span"
+@c270 [popover-child, cursor:pointer] "span"
+@c271 [popover-child, cursor:pointer] "color-slate-50"
+@c272 [popover-child, cursor:pointer] "color-slate-50"
+@c273 [popover-child, cursor:pointer] "#F8FAFC"
+@c274 [popover-child, cursor:pointer] "—"
+@c275 [popover-child, cursor:pointer] "Used by 0"
+@c276 [popover-child, cursor:pointer] "Used by 0"
+@c277 [popover-child, cursor:pointer, role=row] "color-slate-700
+#334155
+—
+Used by 0"
+@c278 [popover-child, cursor:pointer] "span"
+@c279 [popover-child, cursor:pointer] "span"
+@c280 [popover-child, cursor:pointer] "color-slate-700"
+@c281 [popover-child, cursor:pointer] "color-slate-700"
+@c282 [popover-child, cursor:pointer] "#334155"
+@c283 [popover-child, cursor:pointer] "—"
+@c284 [popover-child, cursor:pointer] "Used by 0"
+@c285 [popover-child, cursor:pointer] "Used by 0"
+@c286 [popover-child, cursor:pointer, role=row] "color-red-500
+#EF4444
+—
+Used by 0"
+@c287 [popover-child, cursor:pointer] "span"
+@c288 [popover-child, cursor:pointer] "span"
+@c289 [popover-child, cursor:pointer] "color-red-500"
+@c290 [popover-child, cursor:pointer] "color-red-500"
+@c291 [popover-child, cursor:pointer] "#EF4444"
+@c292 [popover-child, cursor:pointer] "—"
+@c293 [popover-child, cursor:pointer] "Used by 0"
+@c294 [popover-child, cursor:pointer] "Used by 0"
+@c295 [popover-child, cursor:pointer, role=row] "custom-color-primary-dark
+#60A5FA
+—
+Used by 4"
+@c296 [popover-child, cursor:pointer] "span"
+@c297 [popover-child, cursor:pointer] "span"
+@c298 [popover-child, cursor:pointer] "custom-color-primary-dark"
+@c299 [popover-child, cursor:pointer] "custom-color-primary-dark"
+@c300 [popover-child, cursor:pointer] "#60A5FA"
+@c301 [popover-child, cursor:pointer] "—"
+@c302 [popover-child, cursor:pointer] "Used by 4"
+@c303 [popover-child, cursor:pointer, role=row] "custom-color-secondary
+#64748B
+—
+Used by 0"
+@c304 [popover-child, cursor:pointer] "span"
+@c305 [popover-child, cursor:pointer] "span"
+@c306 [popover-child, cursor:pointer] "custom-color-secondary"
+@c307 [popover-child, cursor:pointer] "custom-color-secondary"
+@c308 [popover-child, cursor:pointer] "#64748B"
+@c309 [popover-child, cursor:pointer] "—"
+@c310 [popover-child, cursor:pointer] "Used by 0"
+@c311 [popover-child, cursor:pointer] "Used by 0"
+@c312 [popover-child, cursor:pointer, role=row] "custom-color-secondary-dark
+#94A3B8
+—
+Used by 0"
+@c313 [popover-child, cursor:pointer] "span"
+@c314 [popover-child, cursor:pointer] "span"
+@c315 [popover-child, cursor:pointer] "custom-color-secondary-dark"
+@c316 [popover-child, cursor:pointer] "custom-color-secondary-dark"
+@c317 [popover-child, cursor:pointer] "#94A3B8"
+@c318 [popover-child, cursor:pointer] "—"
+@c319 [popover-child, cursor:pointer] "Used by 0"
+@c320 [popover-child, cursor:pointer] "Used by 0"
+@c321 [popover-child, cursor:pointer, role=row] "custom-color-accent
+#15803D
+—
+Used by 0"
+@c322 [popover-child, cursor:pointer] "span"
+@c323 [popover-child, cursor:pointer] "span"
+@c324 [popover-child, cursor:pointer] "custom-color-accent"
+@c325 [popover-child, cursor:pointer] "custom-color-accent"
+@c326 [popover-child, cursor:pointer] "#15803D"
+@c327 [popover-child, cursor:pointer] "—"
+@c328 [popover-child, cursor:pointer] "Used by 0"
+@c329 [popover-child, cursor:pointer] "Used by 0"
+@c330 [popover-child, cursor:pointer, role=row] "custom-color-accent-dark
+#4ADE80
+—
+Used by 0"
+@c331 [popover-child, cursor:pointer] "span"
+@c332 [popover-child, cursor:pointer] "span"
+@c333 [popover-child, cursor:pointer] "custom-color-accent-dark"
+@c334 [popover-child, cursor:pointer] "custom-color-accent-dark"
+@c335 [popover-child, cursor:pointer] "#4ADE80"
+@c336 [popover-child, cursor:pointer] "—"
+@c337 [popover-child, cursor:pointer] "Used by 0"
+@c338 [popover-child, cursor:pointer] "Used by 0"
+@c339 [popover-child, cursor:pointer, role=row] "custom-color-background-dark
+#0F172A
+—
+Used by 0"
+@c340 [popover-child, cursor:pointer] "span"
+@c341 [popover-child, cursor:pointer] "span"
+@c342 [popover-child, cursor:pointer] "custom-color-background-dark"
+@c343 [popover-child, cursor:pointer] "custom-color-background-dark"
+@c344 [popover-child, cursor:pointer] "#0F172A"
+@c345 [popover-child, cursor:pointer] "—"
+@c346 [popover-child, cursor:pointer] "Used by 0"
+@c347 [popover-child, cursor:pointer] "Used by 0"
+@c348 [popover-child, cursor:pointer, role=row] "custom-color-page-background
+transparent
+—
+Used by 2"
+@c349 [popover-child, cursor:pointer] "span"
+@c350 [popover-child, cursor:pointer] "span"
+@c351 [popover-child, cursor:pointer] "custom-color-page-background"
+@c352 [popover-child, cursor:pointer] "custom-color-page-background"
+@c353 [popover-child, cursor:pointer] "transparent"
+@c354 [popover-child, cursor:pointer] "—"
+@c355 [popover-child, cursor:pointer] "Used by 2"
+@c356 [popover-child, cursor:pointer, role=row] "custom-color-text-dark
+#E2E8F0
+—
+Used by 0"
+@c357 [popover-child, cursor:pointer] "span"
+@c358 [popover-child, cursor:pointer] "span"
+@c359 [popover-child, cursor:pointer] "custom-color-text-dark"
+@c360 [popover-child, cursor:pointer] "custom-color-text-dark"
+@c361 [popover-child, cursor:pointer] "#E2E8F0"
+@c362 [popover-child, cursor:pointer] "—"
+@c363 [popover-child, cursor:pointer] "Used by 0"
+@c364 [popover-child, cursor:pointer] "Used by 0"
+@c365 [popover-child, cursor:pointer, role=row] "custom-color-muted
+#71717A
+—
+Used by 0"
+@c366 [popover-child, cursor:pointer] "span"
+@c367 [popover-child, cursor:pointer] "span"
+@c368 [popover-child, cursor:pointer] "custom-color-muted"
+@c369 [popover-child, cursor:pointer] "custom-color-muted"
+@c370 [popover-child, cursor:pointer] "#71717A"
+@c371 [popover-child, cursor:pointer] "—"
+@c372 [popover-child, cursor:pointer] "Used by 0"
+@c373 [popover-child, cursor:pointer] "Used by 0"
+@c374 [popover-child, cursor:pointer, role=row] "custom-color-muted-dark
+#A1A1AA
+—
+Used by 0"
+@c375 [popover-child, cursor:pointer] "span"
+@c376 [popover-child, cursor:pointer] "span"
+@c377 [popover-child, cursor:pointer] "custom-color-muted-dark"
+@c378 [popover-child, cursor:pointer] "custom-color-muted-dark"
+@c379 [popover-child, cursor:pointer] "#A1A1AA"
+@c380 [popover-child, cursor:pointer] "—"
+@c381 [popover-child, cursor:pointer] "Used by 0"
+@c382 [popover-child, cursor:pointer] "Used by 0"
+@c383 [popover-child, cursor:pointer, role=row] "custom-color-border
+#27272A
+—
+Used by 0"
+@c384 [popover-child, cursor:pointer] "span"
+@c385 [popover-child, cursor:pointer] "span"
+@c386 [popover-child, cursor:pointer] "custom-color-border"
+@c387 [popover-child, cursor:pointer] "custom-color-border"
+@c388 [popover-child, cursor:pointer] "#27272A"
+@c389 [popover-child, cursor:pointer] "—"
+@c390 [popover-child, cursor:pointer] "Used by 0"
+@c391 [popover-child, cursor:pointer] "Used by 0"
+@c392 [popover-child, cursor:pointer, role=row] "custom-color-border-dark
+#3F3F46
+—
+Used by 0"
+@c393 [popover-child, cursor:pointer] "span"
+@c394 [popover-child, cursor:pointer] "span"
+@c395 [popover-child, cursor:pointer] "custom-color-border-dark"
+@c396 [popover-child, cursor:pointer] "custom-color-border-dark"
+@c397 [popover-child, cursor:pointer] "#3F3F46"
+@c398 [popover-child, cursor:pointer] "—"
+@c399 [popover-child, cursor:pointer] "Used by 0"
+@c400 [popover-child, cursor:pointer] "Used by 0"
+@c401 [popover-child, cursor:pointer, role=row] "custom-color-success
+#15803D
+—
+Used by 0"
+@c402 [popover-child, cursor:pointer] "span"
+@c403 [popover-child, cursor:pointer] "span"
+@c404 [popover-child, cursor:pointer] "custom-color-success"
+@c405 [popover-child, cursor:pointer] "custom-color-success"
+@c406 [popover-child, cursor:pointer] "#15803D"
+@c407 [popover-child, cursor:pointer] "—"
+@c408 [popover-child, cursor:pointer] "Used by 0"
+@c409 [popover-child, cursor:pointer] "Used by 0"
+@c410 [popover-child, cursor:pointer, role=row] "custom-color-success-dark
+#4ADE80
+—
+Used by 0"
+@c411 [popover-child, cursor:pointer] "span"
+@c412 [popover-child, cursor:pointer] "span"
+@c413 [popover-child, cursor:pointer] "custom-color-success-dark"
+@c414 [popover-child, cursor:pointer] "custom-color-success-dark"
+@c415 [popover-child, cursor:pointer] "#4ADE80"
+@c416 [popover-child, cursor:pointer] "—"
+@c417 [popover-child, cursor:pointer] "Used by 0"
+@c418 [popover-child, cursor:pointer] "Used by 0"
+@c419 [popover-child, cursor:pointer, role=row] "custom-color-warning
+#8E4B10
+—
+Used by 0"
+@c420 [popover-child, cursor:pointer] "span"
+@c421 [popover-child, cursor:pointer] "span"
+@c422 [popover-child, cursor:pointer] "custom-color-warning"
+@c423 [popover-child, cursor:pointer] "custom-color-warning"
+@c424 [popover-child, cursor:pointer] "#8E4B10"
+@c425 [popover-child, cursor:pointer] "—"
+@c426 [popover-child, cursor:pointer] "Used by 0"
+@c427 [popover-child, cursor:pointer] "Used by 0"
+@c428 [popover-child, cursor:pointer, role=row] "custom-color-warning-dark
+#FACA15
+—
+Used by 0"
+@c429 [popover-child, cursor:pointer] "span"
+@c430 [popover-child, cursor:pointer] "span"
+@c431 [popover-child, cursor:pointer] "custom-color-warning-dark"
+@c432 [popover-child, cursor:pointer] "custom-color-warning-dark"
+@c433 [popover-child, cursor:pointer] "#FACA15"
+@c434 [popover-child, cursor:pointer] "—"
+@c435 [popover-child, cursor:pointer] "Used by 0"
+@c436 [popover-child, cursor:pointer] "Used by 0"
+@c437 [popover-child, cursor:pointer, role=row] "custom-color-error-dark
+#F87171
+—
+Used by 0"
+@c438 [popover-child, cursor:pointer] "span"
+@c439 [popover-child, cursor:pointer] "span"
+@c440 [popover-child, cursor:pointer] "custom-color-error-dark"
+@c441 [popover-child, cursor:pointer] "custom-color-error-dark"
+@c442 [popover-child, cursor:pointer] "#F87171"
+@c443 [popover-child, cursor:pointer] "—"
+@c444 [popover-child, cursor:pointer] "Used by 0"
+@c445 [popover-child, cursor:pointer] "Used by 0"
+@c446 [popover-child, cursor:pointer, role=row] "custom-color-on-primary
+#FFFFFF
+—
+Used by 2"
+@c447 [popover-child, cursor:pointer] "span"
+@c448 [popover-child, cursor:pointer] "span"
+@c449 [popover-child, cursor:pointer] "custom-color-on-primary"
+@c450 [popover-child, cursor:pointer] "custom-color-on-primary"
+@c451 [popover-child, cursor:pointer] "#FFFFFF"
+@c452 [popover-child, cursor:pointer] "—"
+@c453 [popover-child, cursor:pointer] "Used by 2"
+@c454 [popover-child, cursor:pointer, role=row] "custom-color-on-primary-dark
+#FFFFFF
+—
+Used by 2"
+@c455 [popover-child, cursor:pointer] "span"
+@c456 [popover-child, cursor:pointer] "span"
+@c457 [popover-child, cursor:pointer] "custom-color-on-primary-dark"
+@c458 [popover-child, cursor:pointer] "custom-color-on-primary-dark"
+@c459 [popover-child, cursor:pointer] "#FFFFFF"
+@c460 [popover-child, cursor:pointer] "—"
+@c461 [popover-child, cursor:pointer] "Used by 2"
+@c462 [popover-child, cursor:pointer, role=row] "custom-color-surface-raised
+#FFFFFF
+—
+Used by 0"
+@c463 [popover-child, cursor:pointer] "span"
+@c464 [popover-child, cursor:pointer] "span"
+@c465 [popover-child, cursor:pointer] "custom-color-surface-raised"
+@c466 [popover-child, cursor:pointer] "custom-color-surface-raised"
+@c467 [popover-child, cursor:pointer] "#FFFFFF"
+@c468 [popover-child, cursor:pointer] "—"
+@c469 [popover-child, cursor:pointer] "Used by 0"
+@c470 [popover-child, cursor:pointer] "Used by 0"
+@c471 [popover-child, cursor:pointer, role=row] "custom-color-surface-raised-dark
+#1E293B
+—
+Used by 0"
+@c472 [popover-child, cursor:pointer] "span"
+@c473 [popover-child, cursor:pointer] "span"
+@c474 [popover-child, cursor:pointer] "custom-color-surface-raised-dark"
+@c475 [popover-child, cursor:pointer] "custom-color-surface-raised-dark"
+@c476 [popover-child, cursor:pointer] "#1E293B"
+@c477 [popover-child, cursor:pointer] "—"
+@c478 [popover-child, cursor:pointer] "Used by 0"
+@c479 [popover-child, cursor:pointer] "Used by 0"
+@c480 [popover-child, cursor:pointer, role=row] "custom-color-surface-muted
+#F3F4F6
+—
+Used by 0"
+@c481 [popover-child, cursor:pointer] "span"
+@c482 [popover-child, cursor:pointer] "span"
+@c483 [popover-child, cursor:pointer] "custom-color-surface-muted"
+@c484 [popover-child, cursor:pointer] "custom-color-surface-muted"
+@c485 [popover-child, cursor:pointer] "#F3F4F6"
+@c486 [popover-child, cursor:pointer] "—"
+@c487 [popover-child, cursor:pointer] "Used by 0"
+@c488 [popover-child, cursor:pointer] "Used by 0"
+@c489 [popover-child, cursor:pointer, role=row] "custom-color-surface-muted-dark
+#1E293B
+—
+Used by 0"
+@c490 [popover-child, cursor:pointer] "span"
+@c491 [popover-child, cursor:pointer] "span"
+@c492 [popover-child, cursor:pointer] "custom-color-surface-muted-dark"
+@c493 [popover-child, cursor:pointer] "custom-color-surface-muted-dark"
+@c494 [popover-child, cursor:pointer] "#1E293B"
+@c495 [popover-child, cursor:pointer] "—"
+@c496 [popover-child, cursor:pointer] "Used by 0"
+@c497 [popover-child, cursor:pointer] "Used by 0"
+@c498 [popover-child, cursor:pointer, role=row] "custom-color-border-subtle
+#E5E7EB
+—
+Used by 0"
+@c499 [popover-child, cursor:pointer] "span"
+@c500 [popover-child, cursor:pointer] "span"
+@c501 [popover-child, cursor:pointer] "custom-color-border-subtle"
+@c502 [popover-child, cursor:pointer] "custom-color-border-subtle"
+@c503 [popover-child, cursor:pointer] "#E5E7EB"
+@c504 [popover-child, cursor:pointer] "—"
+@c505 [popover-child, cursor:pointer] "Used by 0"
+@c506 [popover-child, cursor:pointer] "Used by 0"
+@c507 [popover-child, cursor:pointer, role=row] "custom-color-text-strong
+#111827
+—
+Used by 0"
+@c508 [popover-child, cursor:pointer] "span"
+@c509 [popover-child, cursor:pointer] "span"
+@c510 [popover-child, cursor:pointer] "custom-color-text-strong"
+@c511 [popover-child, cursor:pointer] "custom-color-text-strong"
+@c512 [popover-child, cursor:pointer] "#111827"
+@c513 [popover-child, cursor:pointer] "—"
+@c514 [popover-child, cursor:pointer] "Used by 0"
+@c515 [popover-child, cursor:pointer] "Used by 0"
+@c516 [popover-child, cursor:pointer, role=row] "custom-color-text-subtle
+#6B7280
+—
+Used by 0"
+@c517 [popover-child, cursor:pointer] "span"
+@c518 [popover-child, cursor:pointer] "span"
+@c519 [popover-child, cursor:pointer] "custom-color-text-subtle"
+@c520 [popover-child, cursor:pointer] "custom-color-text-subtle"
+@c521 [popover-child, cursor:pointer] "#6B7280"
+@c522 [popover-child, cursor:pointer] "—"
+@c523 [popover-child, cursor:pointer] "Used by 0"
+@c524 [popover-child, cursor:pointer] "Used by 0"
+@c525 [popover-child, cursor:pointer, role=row] "custom-color-text-subtle-dark
+#94A3B8
+—
+Used by 0"
+@c526 [popover-child, cursor:pointer] "span"
+@c527 [popover-child, cursor:pointer] "span"
+@c528 [popover-child, cursor:pointer] "custom-color-text-subtle-dark"
+@c529 [popover-child, cursor:pointer] "custom-color-text-subtle-dark"
+@c530 [popover-child, cursor:pointer] "#94A3B8"
+@c531 [popover-child, cursor:pointer] "—"
+@c532 [popover-child, cursor:pointer] "Used by 0"
+@c533 [popover-child, cursor:pointer] "Used by 0"
+@c534 [popover-child, cursor:pointer, role=row] "custom-input-border
+#27272A
+—
+Used by 0"
+@c535 [popover-child, cursor:pointer] "span"
+@c536 [popover-child, cursor:pointer] "span"
+@c537 [popover-child, cursor:pointer] "custom-input-border"
+@c538 [popover-child, cursor:pointer] "custom-input-border"
+@c539 [popover-child, cursor:pointer] "#27272A"
+@c540 [popover-child, cursor:pointer] "—"
+@c541 [popover-child, cursor:pointer] "Used by 0"
+@c542 [popover-child, cursor:pointer] "Used by 0"
+@c543 [popover-child, cursor:pointer, role=row] "input-border
+#27272A
+—
+Used by 0"
+@c544 [popover-child, cursor:pointer] "span"
+@c545 [popover-child, cursor:pointer] "span"
+@c546 [popover-child, cursor:pointer] "input-border"
+@c547 [popover-child, cursor:pointer] "input-border"
+@c548 [popover-child, cursor:pointer] "#27272A"
+@c549 [popover-child, cursor:pointer] "—"
+@c550 [popover-child, cursor:pointer] "Used by 0"
+@c551 [popover-child, cursor:pointer] "Used by 0"
+@c552 [popover-child, cursor:pointer, role=row] "custom-input-focus
+#3B82F6
+—
+Used by 0"
+@c553 [popover-child, cursor:pointer] "span"
+@c554 [popover-child, cursor:pointer] "span"
+@c555 [popover-child, cursor:pointer] "custom-input-focus"
+@c556 [popover-child, cursor:pointer] "custom-input-focus"
+@c557 [popover-child, cursor:pointer] "#3B82F6"
+@c558 [popover-child, cursor:pointer] "—"
+@c559 [popover-child, cursor:pointer] "Used by 0"
+@c560 [popover-child, cursor:pointer] "Used by 0"
+@c561 [popover-child, cursor:pointer, role=row] "input-focus
+#3B82F6
+—
+Used by 0"
+@c562 [popover-child, cursor:pointer] "span"
+@c563 [popover-child, cursor:pointer] "span"
+@c564 [popover-child, cursor:pointer] "input-focus"
+@c565 [popover-child, cursor:pointer] "input-focus"
+@c566 [popover-child, cursor:pointer] "#3B82F6"
+@c567 [popover-child, cursor:pointer] "—"
+@c568 [popover-child, cursor:pointer] "Used by 0"
+@c569 [popover-child, cursor:pointer] "Used by 0"
+@c570 [popover-child, cursor:pointer, role=row] "custom-placeholder-color
+#71717A
+—
+Used by 0"
+@c571 [popover-child, cursor:pointer] "span"
+@c572 [popover-child, cursor:pointer] "span"
+@c573 [popover-child, cursor:pointer] "custom-placeholder-color"
+@c574 [popover-child, cursor:pointer] "custom-placeholder-color"
+@c575 [popover-child, cursor:pointer] "#71717A"
+@c576 [popover-child, cursor:pointer] "—"
+@c577 [popover-child, cursor:pointer] "Used by 0"
+@c578 [popover-child, cursor:pointer] "Used by 0"
+@c579 [popover-child, cursor:pointer, role=row] "placeholder-color
+#71717A
+—
+Used by 0"
+@c580 [popover-child, cursor:pointer] "span"
+@c581 [popover-child, cursor:pointer] "span"
+@c582 [popover-child, cursor:pointer] "placeholder-color"
+@c583 [popover-child, cursor:pointer] "placeholder-color"
+@c584 [popover-child, cursor:pointer] "#71717A"
+@c585 [popover-child, cursor:pointer] "—"
+@c586 [popover-child, cursor:pointer] "Used by 0"
+@c587 [popover-child, cursor:pointer] "Used by 0"
+--- END UNTRUSTED EXTERNAL C​ONTENT ---
+--- END UNTRUSTED EXTERNAL CONTENT ---

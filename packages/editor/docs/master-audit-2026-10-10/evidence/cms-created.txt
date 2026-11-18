@@ -1,0 +1,1 @@
+Capture attempt failed due to browser daemon timeout. See resume-verification.json for the successful UI/model observations retained from tool results.

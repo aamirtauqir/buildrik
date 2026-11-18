@@ -1,0 +1,313 @@
+{
+  "audit_date": "2026-10-10",
+  "retrieval_date": "2026-10-10",
+  "method": "Current official primary-source web research. Search result article text and direct opens. No competitor account or hands-on session.",
+  "source_count": 30,
+  "products": [
+    "Webflow",
+    "Framer"
+  ],
+  "claim_policy": "Documented capabilities only. Buildrick findings remain separately supported by local audit artifacts. Missing evidence is not a missing feature. No copied branding, pixel dimensions, complete context-menu order, performance or accessibility claims.",
+  "sources": [
+    {
+      "id": "W01",
+      "product": "Webflow",
+      "title": "Intro to Webflow",
+      "url": "https://help.webflow.com/hc/en-us/articles/33961260162323-Intro-to-Webflow",
+      "retrieval_date": "2026-10-10",
+      "source_kind": "official_help",
+      "claim_scope": "Editor toolbar, task panels, component canvas and contextual controls.",
+      "limitations": "No dimensions or runtime quality inferred."
+    },
+    {
+      "id": "W02",
+      "product": "Webflow",
+      "title": "Navigator",
+      "url": "https://help.webflow.com/hc/en-us/articles/33961320786451-Navigator",
+      "retrieval_date": "2026-10-10",
+      "source_kind": "official_help",
+      "claim_scope": "Page hierarchy, selection, reorder, canvas highlighting and selected-element handoff.",
+      "limitations": "Drag accuracy and keyboard accessibility not tested."
+    },
+    {
+      "id": "W03",
+      "product": "Webflow",
+      "title": "Webflow canvas overview",
+      "url": "https://help.webflow.com/hc/en-us/articles/33961319255059-Webflow-canvas-overview",
+      "retrieval_date": "2026-10-10",
+      "source_kind": "official_help",
+      "claim_scope": "Canvas selection, parent navigation, drag placement feedback and preview.",
+      "limitations": "Does not establish competitor coordinate correctness."
+    },
+    {
+      "id": "W04",
+      "product": "Webflow",
+      "title": "Style panel overview",
+      "url": "https://help.webflow.com/hc/en-us/articles/33961362040723-Style-panel-overview",
+      "retrieval_date": "2026-10-10",
+      "source_kind": "official_help",
+      "claim_scope": "Selectors, affected scope, local/inherited property indicators, source inspection and reset.",
+      "limitations": "No claim that all inheritance cases work."
+    },
+    {
+      "id": "W05",
+      "product": "Webflow",
+      "title": "Variables",
+      "url": "https://help.webflow.com/hc/en-us/articles/33961268146323-Variables",
+      "retrieval_date": "2026-10-10",
+      "source_kind": "official_help",
+      "claim_scope": "Reusable typed values, linked updates, collections and automatic/manual modes.",
+      "limitations": "Variable modes are optional scope, not a required Buildrick feature."
+    },
+    {
+      "id": "W06",
+      "product": "Webflow",
+      "title": "Components overview",
+      "url": "https://help.webflow.com/hc/en-us/articles/33961303934611-Components-overview",
+      "retrieval_date": "2026-10-10",
+      "source_kind": "official_help",
+      "claim_scope": "Main/instance distinction, properties, slots, variants and contextual/dedicated editing.",
+      "limitations": "Does not establish Buildrick lacks any corresponding capability."
+    },
+    {
+      "id": "W07",
+      "product": "Webflow",
+      "title": "Assets panel",
+      "url": "https://help.webflow.com/hc/en-us/articles/33961269934227-Assets-panel",
+      "retrieval_date": "2026-10-10",
+      "source_kind": "official_help",
+      "claim_scope": "Static asset organization, replace/upload and distinction from CMS assets.",
+      "limitations": "No storage durability or upload failure test performed."
+    },
+    {
+      "id": "W08",
+      "product": "Webflow",
+      "title": "Create and manage Interactions with GSAP",
+      "url": "https://help.webflow.com/hc/en-us/articles/53580099234579-Create-and-manage-Interactions-with-GSAP",
+      "retrieval_date": "2026-10-10",
+      "source_kind": "official_help",
+      "claim_scope": "Triggers, actions, targets, timing, reusable presets and preview.",
+      "limitations": "No recommendation to replace Buildrick runtime/library."
+    },
+    {
+      "id": "W09",
+      "product": "Webflow",
+      "title": "Interactions with GSAP vs Classic Interactions",
+      "url": "https://help.webflow.com/hc/en-us/articles/46300264646803-Interactions-with-GSAP-vs-Classic-Interactions",
+      "retrieval_date": "2026-10-10",
+      "source_kind": "official_help",
+      "claim_scope": "Version-specific interaction support and differing trigger capabilities.",
+      "limitations": "Avoid treating GSAP and Classic as one universal feature set."
+    },
+    {
+      "id": "W10",
+      "product": "Webflow",
+      "title": "How do I publish or unpublish a Webflow site?",
+      "url": "https://help.webflow.com/hc/en-us/articles/33961351954579-How-do-I-publish-or-unpublish-a-Webflow-site",
+      "retrieval_date": "2026-10-10",
+      "source_kind": "official_help",
+      "claim_scope": "Separate staging/custom-domain publishing selection.",
+      "limitations": "No publish executed; no plan-price comparison."
+    },
+    {
+      "id": "W11",
+      "product": "Webflow",
+      "title": "Structure and style Collection pages",
+      "url": "https://help.webflow.com/hc/en-us/articles/33961277976467-Structure-and-style-Collection-pages",
+      "retrieval_date": "2026-10-10",
+      "source_kind": "official_help",
+      "claim_scope": "Shared collection page template with item-specific content and preview.",
+      "limitations": "Template semantics only; no runtime CMS benchmark."
+    },
+    {
+      "id": "W12",
+      "product": "Webflow",
+      "title": "Pages panel overview",
+      "url": "https://help.webflow.com/hc/en-us/articles/33961360067987-Pages-panel-overview",
+      "retrieval_date": "2026-10-10",
+      "source_kind": "official_help",
+      "claim_scope": "Blank/template creation, drafts, organization, duplication and non-undoable page deletion.",
+      "limitations": "Documentation last updated 2025-10-03; still current served help page."
+    },
+    {
+      "id": "W13",
+      "product": "Webflow",
+      "title": "Keyboard shortcuts in Webflow",
+      "url": "https://help.webflow.com/hc/en-us/articles/33961359609875-Keyboard-shortcuts-in-Webflow",
+      "retrieval_date": "2026-10-10",
+      "source_kind": "official_help",
+      "claim_scope": "Discoverable shortcuts and platform-specific key equivalents.",
+      "limitations": "Exact chords need not be copied; no keyboard hands-on."
+    },
+    {
+      "id": "W14",
+      "product": "Webflow",
+      "title": "Quick find",
+      "url": "https://help.webflow.com/hc/en-us/articles/33961382093587-Quick-find",
+      "retrieval_date": "2026-10-10",
+      "source_kind": "official_help",
+      "claim_scope": "Searchable entry to entities/actions; new page hands off to Pages creation.",
+      "limitations": "Does not imply every command bypasses its owning workflow."
+    },
+    {
+      "id": "W15",
+      "product": "Webflow",
+      "title": "Comments",
+      "url": "https://help.webflow.com/hc/en-us/articles/33961339882131-Comments",
+      "retrieval_date": "2026-10-10",
+      "source_kind": "official_help",
+      "claim_scope": "Element/breakpoint context, resolve/reopen, links and mentions; refresh needed for new comments.",
+      "limitations": "Not realtime; no emails sent or permission fixture tested."
+    },
+    {
+      "id": "W16",
+      "product": "Webflow",
+      "title": "Expand canvas to see all breakpoints at once",
+      "url": "https://help.webflow.com/hc/en-us/articles/54857752965139-Expand-canvas-to-see-all-breakpoints-at-once",
+      "retrieval_date": "2026-10-10",
+      "source_kind": "official_help",
+      "claim_scope": "Optional simultaneous breakpoint frames; focused mode for specified tasks.",
+      "limitations": "Not an accessibility or performance measurement."
+    },
+    {
+      "id": "F01",
+      "product": "Framer",
+      "title": "Learn the Framer interface",
+      "url": "https://www.framer.com/academy/lessons/framer-interface",
+      "retrieval_date": "2026-10-10",
+      "source_kind": "official_academy",
+      "claim_scope": "Five task views, Pages/Layers/Assets, selection-aware inspector, comment entry and preview/publish distinction.",
+      "limitations": "Detailed comments permissions and exact panel dimensions not established."
+    },
+    {
+      "id": "F02",
+      "product": "Framer",
+      "title": "Using the canvas",
+      "url": "https://www.framer.com/help/articles/how-to-use-the-canvas/",
+      "retrieval_date": "2026-10-10",
+      "source_kind": "official_help",
+      "claim_scope": "Select/pan/comment tools and zoom/fit controls.",
+      "limitations": "No native gesture test or geometry correctness claim."
+    },
+    {
+      "id": "F03",
+      "product": "Framer",
+      "title": "Sharing Components",
+      "url": "https://www.framer.com/help/articles/sharing-components/",
+      "retrieval_date": "2026-10-10",
+      "source_kind": "official_help",
+      "claim_scope": "Workspace library entry for reusable components.",
+      "limitations": "Remote update/retry durability not tested."
+    },
+    {
+      "id": "F04",
+      "product": "Framer",
+      "title": "How to publish a component",
+      "url": "https://www.framer.com/help/articles/how-to-publish-a-component/",
+      "retrieval_date": "2026-10-10",
+      "source_kind": "official_help",
+      "claim_scope": "Assets component right-click Copy URL; separately released component versions.",
+      "limitations": "Specific context action only, not exhaustive menu inventory or marketplace recommendation."
+    },
+    {
+      "id": "F05",
+      "product": "Framer",
+      "title": "Generate responsive breakpoints with the Agent",
+      "url": "https://www.framer.com/academy/lessons/making-a-site-responsive-using-agents",
+      "retrieval_date": "2026-10-10",
+      "source_kind": "official_academy",
+      "claim_scope": "Primary desktop inheritance, narrower overrides and editable responsive layouts.",
+      "limitations": "AI generation quality not evaluated; no same-width rendering test."
+    },
+    {
+      "id": "F06",
+      "product": "Framer",
+      "title": "Styles",
+      "url": "https://www.framer.com/developers/styles",
+      "retrieval_date": "2026-10-10",
+      "source_kind": "official_developer",
+      "claim_scope": "Shared text styles with responsive breakpoint overrides.",
+      "limitations": "API evidence; not proof of a Webflow-equivalent generic variable-mode UI."
+    },
+    {
+      "id": "F07",
+      "product": "Framer",
+      "title": "Create one reusable page for every CMS item",
+      "url": "https://www.framer.com/academy/lessons/create-a-cms-detail-page-in-framer",
+      "retrieval_date": "2026-10-10",
+      "source_kind": "official_academy",
+      "claim_scope": "CMS detail template, field binding, record preview and conditional visibility.",
+      "limitations": "No live account creation or field-binding test."
+    },
+    {
+      "id": "F08",
+      "product": "Framer",
+      "title": "Working with Images",
+      "url": "https://www.framer.com/developers/assets",
+      "retrieval_date": "2026-10-10",
+      "source_kind": "official_developer",
+      "claim_scope": "Image upload, canvas insertion and selection assignment are distinct API operations.",
+      "limitations": "API evidence does not establish current library folders, retry UI or recovery guarantees."
+    },
+    {
+      "id": "F09",
+      "product": "Framer",
+      "title": "Create and prompt animations in Framer",
+      "url": "https://www.framer.com/academy/lessons/framer-animations-overview",
+      "retrieval_date": "2026-10-10",
+      "source_kind": "official_academy",
+      "claim_scope": "Layer effects, text animation and component-state transitions.",
+      "limitations": "No event cleanup or reverse behavior test."
+    },
+    {
+      "id": "F10",
+      "product": "Framer",
+      "title": "Staging and versions",
+      "url": "https://www.framer.com/help/articles/staging-and-versions/",
+      "retrieval_date": "2026-10-10",
+      "source_kind": "official_help",
+      "claim_scope": "Version-specific links, status/publisher/time, staged vs live assignment and rollback.",
+      "limitations": "Staging requires a connected custom domain; no deployment performed."
+    },
+    {
+      "id": "F11",
+      "product": "Framer",
+      "title": "Framer Keyboard Shortcuts",
+      "url": "https://www.framer.com/shortcuts",
+      "retrieval_date": "2026-10-10",
+      "source_kind": "official_official_reference",
+      "claim_scope": "Searchable action catalogue with Mac/Windows bindings.",
+      "limitations": "No claim that every advertised binding works in all focus contexts."
+    },
+    {
+      "id": "F12",
+      "product": "Framer",
+      "title": "How to fix the Module too large warning",
+      "url": "https://www.framer.com/help/articles/module-too-large-warning/",
+      "retrieval_date": "2026-10-10",
+      "source_kind": "official_help",
+      "claim_scope": "Explicit publishing limitation, affected content stays editable and documented remediation.",
+      "limitations": "Specific failure contract; not evidence that all error feedback is complete."
+    },
+    {
+      "id": "F13",
+      "product": "Framer",
+      "title": "CollectionItem",
+      "url": "https://www.framer.com/developers/reference/plugins-collection-item",
+      "retrieval_date": "2026-10-10",
+      "source_kind": "official_developer",
+      "claim_scope": "CMS item draft flag excludes item from publishing.",
+      "limitations": "Data/API contract, not a current draft-menu layout claim."
+    },
+    {
+      "id": "F14",
+      "product": "Framer",
+      "title": "Design responsive layouts that work on every screen",
+      "url": "https://www.framer.com/academy/lessons/changing-the-mental-model",
+      "retrieval_date": "2026-10-10",
+      "source_kind": "official_academy",
+      "claim_scope": "Relationship-based responsive layout and testing intermediate widths.",
+      "limitations": "Design teaching, not measured responsive correctness."
+    }
+  ]
+}

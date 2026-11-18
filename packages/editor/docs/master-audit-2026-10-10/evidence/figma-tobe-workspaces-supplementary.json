@@ -1,0 +1,1978 @@
+{
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "pageId": "8312:2",
+  "status": "Proposed native design; no service operations or prototype reactions",
+  "frames": [
+    {
+      "designId": "TB-G01",
+      "id": "8318:751",
+      "name": "TO-BE TB-G01 / Media quick chooser",
+      "x": 6000,
+      "y": 4500,
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 155,
+      "textNodes": 53,
+      "autoLayout": 5,
+      "instances": 12,
+      "actions": [
+        {
+          "id": "8318:762",
+          "name": "Action / ⌘ K",
+          "disabled": false
+        },
+        {
+          "id": "8318:764",
+          "name": "Action / History",
+          "disabled": false
+        },
+        {
+          "id": "8318:766",
+          "name": "Action / Review",
+          "disabled": false
+        },
+        {
+          "id": "8318:768",
+          "name": "Action / Preview",
+          "disabled": false
+        },
+        {
+          "id": "8318:770",
+          "name": "Action / Publish",
+          "disabled": false
+        },
+        {
+          "id": "8318:773",
+          "name": "Action / Open Add",
+          "disabled": false
+        },
+        {
+          "id": "8318:777",
+          "name": "Action / Open Layers",
+          "disabled": false
+        },
+        {
+          "id": "8318:781",
+          "name": "Action / Open Pages",
+          "disabled": false
+        },
+        {
+          "id": "8318:785",
+          "name": "Action / Open Media",
+          "disabled": false
+        },
+        {
+          "id": "8318:789",
+          "name": "Action / Open CMS",
+          "disabled": false
+        },
+        {
+          "id": "8318:793",
+          "name": "Action / Open Brand",
+          "disabled": false
+        },
+        {
+          "id": "8318:797",
+          "name": "Action / help",
+          "disabled": false
+        },
+        {
+          "id": "8318:803",
+          "name": "Action / close",
+          "disabled": false
+        },
+        {
+          "id": "8318:877",
+          "name": "Action / Open upload queue",
+          "disabled": false
+        },
+        {
+          "id": "8318:879",
+          "name": "Action / Filter quick media",
+          "disabled": false
+        },
+        {
+          "id": "8318:894",
+          "name": "Action / Use image / return to Home image property",
+          "disabled": false
+        },
+        {
+          "id": "8318:896",
+          "name": "Action / Open full Media library / preserve target",
+          "disabled": false
+        },
+        {
+          "id": "8318:881",
+          "name": "Action / Select studio-gradient1.webp",
+          "disabled": false
+        },
+        {
+          "id": "8318:885",
+          "name": "Action / Select studio-gradient2.webp",
+          "disabled": false
+        },
+        {
+          "id": "8318:889",
+          "name": "Action / Select studio-gradient3.webp",
+          "disabled": false
+        },
+        {
+          "id": "8318:842",
+          "name": "Action / undo",
+          "disabled": false
+        },
+        {
+          "id": "8318:845",
+          "name": "Action / redo",
+          "disabled": false
+        },
+        {
+          "id": "8318:855",
+          "name": "Action / more",
+          "disabled": false
+        },
+        {
+          "id": "8318:858",
+          "name": "Action / close",
+          "disabled": false
+        }
+      ],
+      "forms": [
+        {
+          "id": "8318:872",
+          "name": "Search / Search images"
+        },
+        {
+          "id": "8318:899",
+          "name": "Property / Source"
+        },
+        {
+          "id": "8318:903",
+          "name": "Property / Alt text"
+        }
+      ],
+      "imageFills": [
+        "8318:882",
+        "8318:886",
+        "8318:890",
+        "8318:829"
+      ],
+      "textOutsideFrame": [],
+      "fontFamilies": [
+        "Inter"
+      ]
+    },
+    {
+      "designId": "TB-G02",
+      "id": "8318:911",
+      "name": "TO-BE TB-G02 / Site menu",
+      "x": 8000,
+      "y": 4500,
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 226,
+      "textNodes": 81,
+      "autoLayout": 11,
+      "instances": 18,
+      "actions": [
+        {
+          "id": "8318:922",
+          "name": "Action / ⌘ K",
+          "disabled": false
+        },
+        {
+          "id": "8318:924",
+          "name": "Action / History",
+          "disabled": false
+        },
+        {
+          "id": "8318:926",
+          "name": "Action / Review",
+          "disabled": false
+        },
+        {
+          "id": "8318:928",
+          "name": "Action / Preview",
+          "disabled": false
+        },
+        {
+          "id": "8318:930",
+          "name": "Action / Publish",
+          "disabled": false
+        },
+        {
+          "id": "8318:933",
+          "name": "Action / Open Add",
+          "disabled": false
+        },
+        {
+          "id": "8318:937",
+          "name": "Action / Open Layers",
+          "disabled": false
+        },
+        {
+          "id": "8318:941",
+          "name": "Action / Open Pages",
+          "disabled": false
+        },
+        {
+          "id": "8318:945",
+          "name": "Action / Open Media",
+          "disabled": false
+        },
+        {
+          "id": "8318:949",
+          "name": "Action / Open CMS",
+          "disabled": false
+        },
+        {
+          "id": "8318:953",
+          "name": "Action / Open Brand",
+          "disabled": false
+        },
+        {
+          "id": "8318:957",
+          "name": "Action / help",
+          "disabled": false
+        },
+        {
+          "id": "8318:963",
+          "name": "Action / close",
+          "disabled": false
+        },
+        {
+          "id": "8318:1023",
+          "name": "Action / undo",
+          "disabled": false
+        },
+        {
+          "id": "8318:1026",
+          "name": "Action / redo",
+          "disabled": false
+        },
+        {
+          "id": "8318:1036",
+          "name": "Action / more",
+          "disabled": false
+        },
+        {
+          "id": "8318:1039",
+          "name": "Action / close",
+          "disabled": false
+        },
+        {
+          "id": "8318:1114",
+          "name": "Action / Open Site settings",
+          "disabled": false
+        },
+        {
+          "id": "8318:1116",
+          "name": "Action / Open Templates",
+          "disabled": false
+        },
+        {
+          "id": "8318:1118",
+          "name": "Action / Open CMS records",
+          "disabled": false
+        },
+        {
+          "id": "8318:1120",
+          "name": "Action / Open Export dialog",
+          "disabled": false
+        },
+        {
+          "id": "8318:1124",
+          "name": "Action / Back to projects ↗",
+          "disabled": false
+        },
+        {
+          "id": "8318:1126",
+          "name": "Action / Duplicate site",
+          "disabled": false
+        },
+        {
+          "id": "8318:1128",
+          "name": "Action / Share preview link…",
+          "disabled": false
+        },
+        {
+          "id": "8318:1130",
+          "name": "Action / Site health ↗",
+          "disabled": false
+        },
+        {
+          "id": "8318:1133",
+          "name": "Action / Invite teammates ↗",
+          "disabled": false
+        },
+        {
+          "id": "8318:1135",
+          "name": "Action / Account settings ↗",
+          "disabled": false
+        }
+      ],
+      "forms": [
+        {
+          "id": "8318:966",
+          "name": "Search / Search layers"
+        },
+        {
+          "id": "8318:1057",
+          "name": "Property / Font"
+        },
+        {
+          "id": "8318:1061",
+          "name": "Property / Size"
+        },
+        {
+          "id": "8318:1065",
+          "name": "Property / Weight"
+        },
+        {
+          "id": "8318:1069",
+          "name": "Property / Line height"
+        },
+        {
+          "id": "8318:1073",
+          "name": "Property / Letter spacing"
+        },
+        {
+          "id": "8318:1081",
+          "name": "Property / Width"
+        },
+        {
+          "id": "8318:1085",
+          "name": "Property / Height"
+        },
+        {
+          "id": "8318:1093",
+          "name": "Property / Margin"
+        },
+        {
+          "id": "8318:1097",
+          "name": "Property / Padding"
+        },
+        {
+          "id": "8318:1105",
+          "name": "Property / Brand token"
+        }
+      ],
+      "imageFills": [],
+      "textOutsideFrame": [],
+      "fontFamilies": [
+        "Inter"
+      ]
+    },
+    {
+      "designId": "TB-G03",
+      "id": "8318:1141",
+      "name": "TO-BE TB-G03 / History restore safety-copy guard",
+      "x": 10000,
+      "y": 4500,
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 145,
+      "textNodes": 49,
+      "autoLayout": 1,
+      "instances": 12,
+      "actions": [
+        {
+          "id": "8318:1152",
+          "name": "Action / ⌘ K",
+          "disabled": false
+        },
+        {
+          "id": "8318:1154",
+          "name": "Action / History",
+          "disabled": false
+        },
+        {
+          "id": "8318:1156",
+          "name": "Action / Review",
+          "disabled": false
+        },
+        {
+          "id": "8318:1158",
+          "name": "Action / Preview",
+          "disabled": false
+        },
+        {
+          "id": "8318:1160",
+          "name": "Action / Publish",
+          "disabled": false
+        },
+        {
+          "id": "8318:1163",
+          "name": "Action / Open Add",
+          "disabled": false
+        },
+        {
+          "id": "8318:1167",
+          "name": "Action / Open Layers",
+          "disabled": false
+        },
+        {
+          "id": "8318:1171",
+          "name": "Action / Open Pages",
+          "disabled": false
+        },
+        {
+          "id": "8318:1175",
+          "name": "Action / Open Media",
+          "disabled": false
+        },
+        {
+          "id": "8318:1179",
+          "name": "Action / Open CMS",
+          "disabled": false
+        },
+        {
+          "id": "8318:1183",
+          "name": "Action / Open Brand",
+          "disabled": false
+        },
+        {
+          "id": "8318:1187",
+          "name": "Action / help",
+          "disabled": false
+        },
+        {
+          "id": "8318:1193",
+          "name": "Action / close",
+          "disabled": false
+        },
+        {
+          "id": "8318:1246",
+          "name": "Action / undo",
+          "disabled": false
+        },
+        {
+          "id": "8318:1249",
+          "name": "Action / redo",
+          "disabled": false
+        },
+        {
+          "id": "8318:1277",
+          "name": "Action / Save named version",
+          "disabled": false
+        },
+        {
+          "id": "8318:1285",
+          "name": "Action / Open History restore confirmation",
+          "disabled": false
+        },
+        {
+          "id": "8318:1291",
+          "name": "Action / Close dialog / return focus",
+          "disabled": false
+        },
+        {
+          "id": "8318:1303",
+          "name": "Action / Cancel restore / keep current draft",
+          "disabled": false
+        },
+        {
+          "id": "8318:1305",
+          "name": "Action / Retry safety version then restore",
+          "disabled": false
+        }
+      ],
+      "forms": [
+        {
+          "id": "8318:1196",
+          "name": "Search / Search layers"
+        }
+      ],
+      "imageFills": [],
+      "textOutsideFrame": [],
+      "fontFamilies": [
+        "Inter"
+      ]
+    },
+    {
+      "designId": "TB-G04",
+      "id": "8318:1310",
+      "name": "TO-BE TB-G04 / Export format and options",
+      "x": 6000,
+      "y": 5600,
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 259,
+      "textNodes": 91,
+      "autoLayout": 17,
+      "instances": 22,
+      "actions": [
+        {
+          "id": "8318:1321",
+          "name": "Action / ⌘ K",
+          "disabled": false
+        },
+        {
+          "id": "8318:1323",
+          "name": "Action / History",
+          "disabled": false
+        },
+        {
+          "id": "8318:1325",
+          "name": "Action / Review",
+          "disabled": false
+        },
+        {
+          "id": "8318:1327",
+          "name": "Action / Preview",
+          "disabled": false
+        },
+        {
+          "id": "8318:1329",
+          "name": "Action / Publish",
+          "disabled": false
+        },
+        {
+          "id": "8318:1332",
+          "name": "Action / Open Add",
+          "disabled": false
+        },
+        {
+          "id": "8318:1336",
+          "name": "Action / Open Layers",
+          "disabled": false
+        },
+        {
+          "id": "8318:1340",
+          "name": "Action / Open Pages",
+          "disabled": false
+        },
+        {
+          "id": "8318:1344",
+          "name": "Action / Open Media",
+          "disabled": false
+        },
+        {
+          "id": "8318:1348",
+          "name": "Action / Open CMS",
+          "disabled": false
+        },
+        {
+          "id": "8318:1352",
+          "name": "Action / Open Brand",
+          "disabled": false
+        },
+        {
+          "id": "8318:1356",
+          "name": "Action / help",
+          "disabled": false
+        },
+        {
+          "id": "8318:1362",
+          "name": "Action / close",
+          "disabled": false
+        },
+        {
+          "id": "8318:1422",
+          "name": "Action / undo",
+          "disabled": false
+        },
+        {
+          "id": "8318:1425",
+          "name": "Action / redo",
+          "disabled": false
+        },
+        {
+          "id": "8318:1435",
+          "name": "Action / more",
+          "disabled": false
+        },
+        {
+          "id": "8318:1438",
+          "name": "Action / close",
+          "disabled": false
+        },
+        {
+          "id": "8318:1512",
+          "name": "Action / Close dialog / return focus",
+          "disabled": false
+        },
+        {
+          "id": "8318:1516",
+          "name": "Action / Select export format / HTML",
+          "disabled": false
+        },
+        {
+          "id": "8318:1518",
+          "name": "Action / Select export format / ZIP",
+          "disabled": false
+        },
+        {
+          "id": "8318:1520",
+          "name": "Action / Select export format / React",
+          "disabled": false
+        },
+        {
+          "id": "8318:1522",
+          "name": "Action / Select export format / Vue · Soon",
+          "disabled": true
+        },
+        {
+          "id": "8318:1524",
+          "name": "Action / Select export format / Next.js · Soon",
+          "disabled": true
+        },
+        {
+          "id": "8318:1526",
+          "name": "Action / Open export tab / Preview",
+          "disabled": false
+        },
+        {
+          "id": "8318:1528",
+          "name": "Action / Open export tab / Code",
+          "disabled": false
+        },
+        {
+          "id": "8318:1530",
+          "name": "Action / Open export tab / Options",
+          "disabled": false
+        },
+        {
+          "id": "8318:1538",
+          "name": "Action / Set CSS style / Embedded",
+          "disabled": false
+        },
+        {
+          "id": "8318:1540",
+          "name": "Action / Set CSS style / External",
+          "disabled": false
+        },
+        {
+          "id": "8318:1542",
+          "name": "Action / Set CSS style / Inline",
+          "disabled": false
+        },
+        {
+          "id": "8318:1545",
+          "name": "Action / Toggle Minify output",
+          "disabled": false
+        },
+        {
+          "id": "8318:1548",
+          "name": "Action / Toggle Include reset CSS",
+          "disabled": false
+        },
+        {
+          "id": "8318:1553",
+          "name": "Action / Toggle Include meta tags",
+          "disabled": false
+        },
+        {
+          "id": "8318:1558",
+          "name": "Action / Toggle Include viewport meta",
+          "disabled": false
+        },
+        {
+          "id": "8318:1566",
+          "name": "Action / Cancel export",
+          "disabled": false
+        },
+        {
+          "id": "8318:1568",
+          "name": "Action / Start HTML download",
+          "disabled": false
+        }
+      ],
+      "forms": [
+        {
+          "id": "8318:1365",
+          "name": "Search / Search layers"
+        },
+        {
+          "id": "8318:1456",
+          "name": "Property / Font"
+        },
+        {
+          "id": "8318:1460",
+          "name": "Property / Size"
+        },
+        {
+          "id": "8318:1464",
+          "name": "Property / Weight"
+        },
+        {
+          "id": "8318:1468",
+          "name": "Property / Line height"
+        },
+        {
+          "id": "8318:1472",
+          "name": "Property / Letter spacing"
+        },
+        {
+          "id": "8318:1480",
+          "name": "Property / Width"
+        },
+        {
+          "id": "8318:1484",
+          "name": "Property / Height"
+        },
+        {
+          "id": "8318:1492",
+          "name": "Property / Margin"
+        },
+        {
+          "id": "8318:1496",
+          "name": "Property / Padding"
+        },
+        {
+          "id": "8318:1504",
+          "name": "Property / Brand token"
+        },
+        {
+          "id": "8318:1533",
+          "name": "Property / Page title"
+        }
+      ],
+      "imageFills": [],
+      "textOutsideFrame": [],
+      "fontFamilies": [
+        "Inter"
+      ]
+    },
+    {
+      "designId": "TB-G05",
+      "id": "8318:243842",
+      "name": "TO-BE TB-G05 / CMS first collection draft validation",
+      "x": 8000,
+      "y": 5600,
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 55,
+      "textNodes": 29,
+      "autoLayout": 4,
+      "instances": 10,
+      "actions": [
+        {
+          "id": "8318:243845",
+          "name": "Action / Return / Home",
+          "disabled": false
+        },
+        {
+          "id": "8318:243848",
+          "name": "Action / Open command palette",
+          "disabled": false
+        },
+        {
+          "id": "8318:243931",
+          "name": "Action / Open first collection setup",
+          "disabled": false
+        },
+        {
+          "id": "8318:243951",
+          "name": "Action / Choose draft field 1 type",
+          "disabled": false
+        },
+        {
+          "id": "8318:243953",
+          "name": "Action / Remove draft field 1",
+          "disabled": false
+        },
+        {
+          "id": "8318:243958",
+          "name": "Action / Choose draft field 2 type",
+          "disabled": false
+        },
+        {
+          "id": "8318:243960",
+          "name": "Action / Remove draft field 2",
+          "disabled": false
+        },
+        {
+          "id": "8318:243963",
+          "name": "Action / Add collection field",
+          "disabled": false
+        },
+        {
+          "id": "8318:243965",
+          "name": "Action / Toggle generate page per entry",
+          "disabled": false
+        },
+        {
+          "id": "8318:243970",
+          "name": "Action / Cancel collection draft / preserve return context",
+          "disabled": false
+        },
+        {
+          "id": "8318:243972",
+          "name": "Action / Validate and create first collection",
+          "disabled": false
+        }
+      ],
+      "forms": [
+        {
+          "id": "8318:243942",
+          "name": "Property / Collection name"
+        },
+        {
+          "id": "8318:243949",
+          "name": "Property / Field 1 name"
+        },
+        {
+          "id": "8318:243956",
+          "name": "Property / Field 2 name"
+        }
+      ],
+      "imageFills": [],
+      "textOutsideFrame": [],
+      "fontFamilies": [
+        "Inter"
+      ]
+    },
+    {
+      "designId": "TB-G06",
+      "id": "8318:244095",
+      "name": "TO-BE TB-G06 / General settings validation timing",
+      "x": 10000,
+      "y": 5600,
+      "width": 1440,
+      "height": 650,
+      "nativeNodes": 46,
+      "textNodes": 27,
+      "autoLayout": 6,
+      "instances": 3,
+      "actions": [
+        {
+          "id": "8318:244117",
+          "name": "Action / Save General settings / clean",
+          "disabled": true
+        },
+        {
+          "id": "8318:244138",
+          "name": "Action / Save General settings / invalid",
+          "disabled": true
+        },
+        {
+          "id": "8318:244140",
+          "name": "Action / Discard invalid General draft",
+          "disabled": false
+        }
+      ],
+      "forms": [
+        {
+          "id": "8318:244101",
+          "name": "Property / Site name"
+        },
+        {
+          "id": "8318:244106",
+          "name": "Property / Author (optional)"
+        },
+        {
+          "id": "8318:244110",
+          "name": "Property / Site URL slug"
+        },
+        {
+          "id": "8318:244122",
+          "name": "Property / Site name"
+        },
+        {
+          "id": "8318:244127",
+          "name": "Property / Author (optional)"
+        },
+        {
+          "id": "8318:244131",
+          "name": "Property / Site URL slug"
+        }
+      ],
+      "imageFills": [],
+      "textOutsideFrame": [],
+      "fontFamilies": [
+        "Inter"
+      ]
+    }
+  ],
+  "mutationEvidence": [
+    {
+      "key": "suppBuild",
+      "result": [
+        {
+          "frames": [
+            {
+              "designId": "TB-G01",
+              "frameId": "8318:751",
+              "noteId": "8318:908"
+            },
+            {
+              "designId": "TB-G02",
+              "frameId": "8318:911",
+              "noteId": "8318:1138"
+            },
+            {
+              "designId": "TB-G03",
+              "frameId": "8318:1141",
+              "noteId": "8318:1307"
+            },
+            {
+              "designId": "TB-G04",
+              "frameId": "8318:1310",
+              "noteId": "8318:1570"
+            }
+          ],
+          "createdNodeIds": [
+            "8318:751",
+            "8318:752",
+            "8318:753",
+            "8318:754",
+            "8318:755",
+            "8318:756",
+            "8318:757",
+            "8318:758",
+            "8318:759",
+            "8318:760",
+            "8318:761",
+            "8318:762",
+            "I8318:762;8314:6",
+            "8318:764",
+            "I8318:764;8314:8",
+            "8318:766",
+            "I8318:766;8314:8",
+            "8318:768",
+            "I8318:768;8314:6",
+            "8318:770",
+            "I8318:770;8314:4",
+            "8318:772",
+            "8318:773",
+            "8318:774",
+            "8318:775",
+            "8318:776",
+            "8318:777",
+            "8318:778",
+            "8318:779",
+            "8318:780",
+            "8318:781",
+            "8318:782",
+            "8318:783",
+            "8318:784",
+            "8318:785",
+            "8318:786",
+            "8318:787",
+            "8318:788",
+            "8318:789",
+            "8318:790",
+            "8318:791",
+            "8318:792",
+            "8318:793",
+            "8318:794",
+            "8318:795",
+            "8318:796",
+            "8318:797",
+            "8318:798",
+            "8318:799",
+            "8318:800",
+            "8318:801",
+            "8318:802",
+            "8318:803",
+            "8318:804",
+            "8318:805",
+            "8318:872",
+            "8318:873",
+            "8318:874",
+            "8318:875",
+            "8318:876",
+            "8318:877",
+            "I8318:877;8314:6",
+            "8318:879",
+            "I8318:879;8314:8",
+            "8318:881",
+            "8318:882",
+            "8318:883",
+            "8318:884",
+            "8318:885",
+            "8318:886",
+            "8318:887",
+            "8318:888",
+            "8318:889",
+            "8318:890",
+            "8318:891",
+            "8318:892",
+            "8318:893",
+            "8318:894",
+            "I8318:894;8314:4",
+            "8318:896",
+            "I8318:896;8314:6",
+            "8318:810",
+            "8318:811",
+            "8318:812",
+            "8318:813",
+            "8318:814",
+            "8318:815",
+            "8318:816",
+            "8318:817",
+            "8318:818",
+            "8318:819",
+            "8318:820",
+            "8318:821",
+            "8318:822",
+            "8318:823",
+            "8318:824",
+            "8318:825",
+            "8318:826",
+            "8318:827",
+            "I8318:827;8314:4",
+            "8318:829",
+            "8318:830",
+            "8318:831",
+            "8318:832",
+            "8318:833",
+            "8318:834",
+            "8318:835",
+            "8318:836",
+            "8318:837",
+            "8318:838",
+            "8318:839",
+            "8318:840",
+            "8318:841",
+            "8318:842",
+            "8318:843",
+            "8318:844",
+            "8318:845",
+            "8318:846",
+            "8318:847",
+            "8318:848",
+            "I8318:848;8314:8",
+            "8318:850",
+            "8318:851",
+            "8318:852",
+            "8318:853",
+            "I8318:853;8314:8",
+            "8318:855",
+            "8318:856",
+            "8318:857",
+            "8318:858",
+            "8318:859",
+            "8318:860",
+            "8318:861",
+            "8318:862",
+            "8318:863",
+            "8318:864",
+            "8318:865",
+            "8318:866",
+            "8318:867",
+            "8318:868",
+            "8318:869",
+            "8318:870",
+            "8318:871",
+            "8318:898",
+            "8318:899",
+            "8318:900",
+            "8318:901",
+            "8318:902",
+            "8318:903",
+            "8318:904",
+            "8318:905",
+            "8318:906",
+            "8318:907",
+            "8318:908",
+            "8318:909",
+            "8318:910",
+            "8318:911",
+            "8318:912",
+            "8318:913",
+            "8318:914",
+            "8318:915",
+            "8318:916",
+            "8318:917",
+            "8318:918",
+            "8318:919",
+            "8318:920",
+            "8318:921",
+            "8318:922",
+            "I8318:922;8314:6",
+            "8318:924",
+            "I8318:924;8314:8",
+            "8318:926",
+            "I8318:926;8314:8",
+            "8318:928",
+            "I8318:928;8314:6",
+            "8318:930",
+            "I8318:930;8314:4",
+            "8318:932",
+            "8318:933",
+            "8318:934",
+            "8318:935",
+            "8318:936",
+            "8318:937",
+            "8318:938",
+            "8318:939",
+            "8318:940",
+            "8318:941",
+            "8318:942",
+            "8318:943",
+            "8318:944",
+            "8318:945",
+            "8318:946",
+            "8318:947",
+            "8318:948",
+            "8318:949",
+            "8318:950",
+            "8318:951",
+            "8318:952",
+            "8318:953",
+            "8318:954",
+            "8318:955",
+            "8318:956",
+            "8318:957",
+            "8318:958",
+            "8318:959",
+            "8318:960",
+            "8318:961",
+            "8318:962",
+            "8318:963",
+            "8318:964",
+            "8318:965",
+            "8318:966",
+            "8318:967",
+            "8318:968",
+            "8318:969",
+            "8318:970",
+            "8318:971",
+            "8318:972",
+            "8318:973",
+            "8318:974",
+            "8318:975",
+            "8318:976",
+            "8318:977",
+            "8318:978",
+            "8318:979",
+            "8318:980",
+            "8318:981",
+            "8318:982",
+            "8318:983",
+            "8318:984",
+            "8318:985",
+            "8318:986",
+            "8318:987",
+            "8318:988",
+            "8318:989",
+            "8318:990",
+            "8318:991",
+            "8318:992",
+            "8318:993",
+            "8318:994",
+            "8318:995",
+            "8318:996",
+            "8318:997",
+            "8318:998",
+            "8318:999",
+            "8318:1000",
+            "8318:1001",
+            "8318:1002",
+            "8318:1003",
+            "8318:1004",
+            "8318:1005",
+            "8318:1006",
+            "8318:1007",
+            "8318:1008",
+            "I8318:1008;8314:4",
+            "8318:1010",
+            "8318:1011",
+            "8318:1012",
+            "8318:1013",
+            "8318:1014",
+            "8318:1015",
+            "8318:1016",
+            "8318:1017",
+            "8318:1018",
+            "8318:1019",
+            "8318:1020",
+            "8318:1021",
+            "8318:1022",
+            "8318:1023",
+            "8318:1024",
+            "8318:1025",
+            "8318:1026",
+            "8318:1027",
+            "8318:1028",
+            "8318:1029",
+            "I8318:1029;8314:8",
+            "8318:1031",
+            "8318:1032",
+            "8318:1033",
+            "8318:1034",
+            "I8318:1034;8314:8",
+            "8318:1036",
+            "8318:1037",
+            "8318:1038",
+            "8318:1039",
+            "8318:1040",
+            "8318:1041",
+            "8318:1042",
+            "8318:1043",
+            "8318:1044",
+            "8318:1045",
+            "8318:1046",
+            "8318:1047",
+            "8318:1048",
+            "8318:1049",
+            "8318:1050",
+            "8318:1051",
+            "8318:1052",
+            "8318:1053",
+            "8318:1054",
+            "8318:1055",
+            "8318:1056",
+            "8318:1057",
+            "8318:1058",
+            "8318:1059",
+            "8318:1060",
+            "8318:1061",
+            "8318:1062",
+            "8318:1063",
+            "8318:1064",
+            "8318:1065",
+            "8318:1066",
+            "8318:1067",
+            "8318:1068",
+            "8318:1069",
+            "8318:1070",
+            "8318:1071",
+            "8318:1072",
+            "8318:1073",
+            "8318:1074",
+            "8318:1075",
+            "8318:1076",
+            "8318:1077",
+            "8318:1078",
+            "8318:1079",
+            "8318:1080",
+            "8318:1081",
+            "8318:1082",
+            "8318:1083",
+            "8318:1084",
+            "8318:1085",
+            "8318:1086",
+            "8318:1087",
+            "8318:1088",
+            "8318:1089",
+            "8318:1090",
+            "8318:1091",
+            "8318:1092",
+            "8318:1093",
+            "8318:1094",
+            "8318:1095",
+            "8318:1096",
+            "8318:1097",
+            "8318:1098",
+            "8318:1099",
+            "8318:1100",
+            "8318:1101",
+            "8318:1102",
+            "8318:1103",
+            "8318:1104",
+            "8318:1105",
+            "8318:1106",
+            "8318:1107",
+            "8318:1108",
+            "8318:1109",
+            "8318:1110",
+            "8318:1111",
+            "8318:1112",
+            "8318:1113",
+            "8318:1114",
+            "I8318:1114;8314:8",
+            "8318:1116",
+            "I8318:1116;8314:8",
+            "8318:1118",
+            "I8318:1118;8314:8",
+            "8318:1120",
+            "I8318:1120;8314:8",
+            "8318:1122",
+            "8318:1123",
+            "8318:1124",
+            "I8318:1124;8314:8",
+            "8318:1126",
+            "I8318:1126;8314:8",
+            "8318:1128",
+            "I8318:1128;8314:8",
+            "8318:1130",
+            "I8318:1130;8314:8",
+            "8318:1132",
+            "8318:1133",
+            "I8318:1133;8314:8",
+            "8318:1135",
+            "I8318:1135;8314:8",
+            "8318:1137",
+            "8318:1138",
+            "8318:1139",
+            "8318:1140",
+            "8318:1141",
+            "8318:1142",
+            "8318:1143",
+            "8318:1144",
+            "8318:1145",
+            "8318:1146",
+            "8318:1147",
+            "8318:1148",
+            "8318:1149",
+            "8318:1150",
+            "8318:1151",
+            "8318:1152",
+            "I8318:1152;8314:6",
+            "8318:1154",
+            "I8318:1154;8314:8",
+            "8318:1156",
+            "I8318:1156;8314:8",
+            "8318:1158",
+            "I8318:1158;8314:6",
+            "8318:1160",
+            "I8318:1160;8314:4",
+            "8318:1162",
+            "8318:1163",
+            "8318:1164",
+            "8318:1165",
+            "8318:1166",
+            "8318:1167",
+            "8318:1168",
+            "8318:1169",
+            "8318:1170",
+            "8318:1171",
+            "8318:1172",
+            "8318:1173",
+            "8318:1174",
+            "8318:1175",
+            "8318:1176",
+            "8318:1177",
+            "8318:1178",
+            "8318:1179",
+            "8318:1180",
+            "8318:1181",
+            "8318:1182",
+            "8318:1183",
+            "8318:1184",
+            "8318:1185",
+            "8318:1186",
+            "8318:1187",
+            "8318:1188",
+            "8318:1189",
+            "8318:1190",
+            "8318:1191",
+            "8318:1192",
+            "8318:1193",
+            "8318:1194",
+            "8318:1195",
+            "8318:1196",
+            "8318:1197",
+            "8318:1198",
+            "8318:1199",
+            "8318:1200",
+            "8318:1201",
+            "8318:1202",
+            "8318:1203",
+            "8318:1204",
+            "8318:1205",
+            "8318:1206",
+            "8318:1207",
+            "8318:1208",
+            "8318:1209",
+            "8318:1210",
+            "8318:1211",
+            "8318:1212",
+            "8318:1213",
+            "8318:1214",
+            "8318:1215",
+            "8318:1216",
+            "8318:1217",
+            "8318:1218",
+            "8318:1219",
+            "8318:1220",
+            "8318:1221",
+            "8318:1222",
+            "8318:1223",
+            "8318:1224",
+            "8318:1225",
+            "8318:1226",
+            "8318:1227",
+            "8318:1228",
+            "8318:1229",
+            "8318:1230",
+            "8318:1231",
+            "8318:1232",
+            "8318:1233",
+            "8318:1234",
+            "8318:1235",
+            "8318:1236",
+            "8318:1237",
+            "8318:1238",
+            "I8318:1238;8314:4",
+            "8318:1240",
+            "8318:1241",
+            "8318:1242",
+            "8318:1243",
+            "8318:1244",
+            "8318:1245",
+            "8318:1246",
+            "8318:1247",
+            "8318:1248",
+            "8318:1249",
+            "8318:1250",
+            "8318:1251",
+            "8318:1252",
+            "I8318:1252;8314:8",
+            "8318:1254",
+            "8318:1255",
+            "8318:1276",
+            "8318:1277",
+            "I8318:1277;8314:6",
+            "8318:1279",
+            "8318:1280",
+            "8318:1281",
+            "8318:1282",
+            "8318:1283",
+            "8318:1284",
+            "8318:1285",
+            "I8318:1285;8314:6",
+            "8318:1287",
+            "8318:1288",
+            "8318:1289",
+            "8318:1290",
+            "8318:1291",
+            "I8318:1291;8314:8",
+            "8318:1293",
+            "8318:1294",
+            "8318:1295",
+            "8318:1296",
+            "8318:1297",
+            "8318:1298",
+            "8318:1299",
+            "8318:1300",
+            "8318:1301",
+            "8318:1302",
+            "8318:1303",
+            "I8318:1303;8314:6",
+            "8318:1305",
+            "I8318:1305;8314:4",
+            "8318:1307",
+            "8318:1308",
+            "8318:1309",
+            "8318:1310",
+            "8318:1311",
+            "8318:1312",
+            "8318:1313",
+            "8318:1314",
+            "8318:1315",
+            "8318:1316",
+            "8318:1317",
+            "8318:1318",
+            "8318:1319",
+            "8318:1320",
+            "8318:1321",
+            "I8318:1321;8314:6",
+            "8318:1323",
+            "I8318:1323;8314:8",
+            "8318:1325",
+            "I8318:1325;8314:8",
+            "8318:1327",
+            "I8318:1327;8314:6",
+            "8318:1329",
+            "I8318:1329;8314:4",
+            "8318:1331",
+            "8318:1332",
+            "8318:1333",
+            "8318:1334",
+            "8318:1335",
+            "8318:1336",
+            "8318:1337",
+            "8318:1338",
+            "8318:1339",
+            "8318:1340",
+            "8318:1341",
+            "8318:1342",
+            "8318:1343",
+            "8318:1344",
+            "8318:1345",
+            "8318:1346",
+            "8318:1347",
+            "8318:1348",
+            "8318:1349",
+            "8318:1350",
+            "8318:1351",
+            "8318:1352",
+            "8318:1353",
+            "8318:1354",
+            "8318:1355",
+            "8318:1356",
+            "8318:1357",
+            "8318:1358",
+            "8318:1359",
+            "8318:1360",
+            "8318:1361",
+            "8318:1362",
+            "8318:1363",
+            "8318:1364",
+            "8318:1365",
+            "8318:1366",
+            "8318:1367",
+            "8318:1368",
+            "8318:1369",
+            "8318:1370",
+            "8318:1371",
+            "8318:1372",
+            "8318:1373",
+            "8318:1374",
+            "8318:1375",
+            "8318:1376",
+            "8318:1377",
+            "8318:1378",
+            "8318:1379",
+            "8318:1380",
+            "8318:1381",
+            "8318:1382",
+            "8318:1383",
+            "8318:1384",
+            "8318:1385",
+            "8318:1386",
+            "8318:1387",
+            "8318:1388",
+            "8318:1389",
+            "8318:1390",
+            "8318:1391",
+            "8318:1392",
+            "8318:1393",
+            "8318:1394",
+            "8318:1395",
+            "8318:1396",
+            "8318:1397",
+            "8318:1398",
+            "8318:1399",
+            "8318:1400",
+            "8318:1401",
+            "8318:1402",
+            "8318:1403",
+            "8318:1404",
+            "8318:1405",
+            "8318:1406",
+            "8318:1407",
+            "I8318:1407;8314:4",
+            "8318:1409",
+            "8318:1410",
+            "8318:1411",
+            "8318:1412",
+            "8318:1413",
+            "8318:1414",
+            "8318:1415",
+            "8318:1416",
+            "8318:1417",
+            "8318:1418",
+            "8318:1419",
+            "8318:1420",
+            "8318:1421",
+            "8318:1422",
+            "8318:1423",
+            "8318:1424",
+            "8318:1425",
+            "8318:1426",
+            "8318:1427",
+            "8318:1428",
+            "I8318:1428;8314:8",
+            "8318:1430",
+            "8318:1431",
+            "8318:1432",
+            "8318:1433",
+            "I8318:1433;8314:8",
+            "8318:1435",
+            "8318:1436",
+            "8318:1437",
+            "8318:1438",
+            "8318:1439",
+            "8318:1440",
+            "8318:1441",
+            "8318:1442",
+            "8318:1443",
+            "8318:1444",
+            "8318:1445",
+            "8318:1446",
+            "8318:1447",
+            "8318:1448",
+            "8318:1449",
+            "8318:1450",
+            "8318:1451",
+            "8318:1452",
+            "8318:1453",
+            "8318:1454",
+            "8318:1455",
+            "8318:1456",
+            "8318:1457",
+            "8318:1458",
+            "8318:1459",
+            "8318:1460",
+            "8318:1461",
+            "8318:1462",
+            "8318:1463",
+            "8318:1464",
+            "8318:1465",
+            "8318:1466",
+            "8318:1467",
+            "8318:1468",
+            "8318:1469",
+            "8318:1470",
+            "8318:1471",
+            "8318:1472",
+            "8318:1473",
+            "8318:1474",
+            "8318:1475",
+            "8318:1476",
+            "8318:1477",
+            "8318:1478",
+            "8318:1479",
+            "8318:1480",
+            "8318:1481",
+            "8318:1482",
+            "8318:1483",
+            "8318:1484",
+            "8318:1485",
+            "8318:1486",
+            "8318:1487",
+            "8318:1488",
+            "8318:1489",
+            "8318:1490",
+            "8318:1491",
+            "8318:1492",
+            "8318:1493",
+            "8318:1494",
+            "8318:1495",
+            "8318:1496",
+            "8318:1497",
+            "8318:1498",
+            "8318:1499",
+            "8318:1500",
+            "8318:1501",
+            "8318:1502",
+            "8318:1503",
+            "8318:1504",
+            "8318:1505",
+            "8318:1506",
+            "8318:1507",
+            "8318:1508",
+            "8318:1509",
+            "8318:1510",
+            "8318:1511",
+            "8318:1512",
+            "I8318:1512;8314:8",
+            "8318:1514",
+            "8318:1515",
+            "8318:1516",
+            "I8318:1516;8314:4",
+            "8318:1518",
+            "I8318:1518;8314:6",
+            "8318:1520",
+            "I8318:1520;8314:6",
+            "8318:1522",
+            "I8318:1522;8314:12",
+            "8318:1524",
+            "I8318:1524;8314:12",
+            "8318:1526",
+            "I8318:1526;8314:8",
+            "8318:1528",
+            "I8318:1528;8314:8",
+            "8318:1530",
+            "I8318:1530;8314:4",
+            "8318:1532",
+            "8318:1533",
+            "8318:1534",
+            "8318:1535",
+            "8318:1536",
+            "8318:1537",
+            "8318:1538",
+            "I8318:1538;8314:4",
+            "8318:1540",
+            "I8318:1540;8314:6",
+            "8318:1542",
+            "I8318:1542;8314:6",
+            "8318:1544",
+            "8318:1545",
+            "8318:1546",
+            "8318:1547",
+            "8318:1548",
+            "8318:1549",
+            "8318:1550",
+            "8318:1551",
+            "8318:1552",
+            "8318:1553",
+            "8318:1554",
+            "8318:1555",
+            "8318:1556",
+            "8318:1557",
+            "8318:1558",
+            "8318:1559",
+            "8318:1560",
+            "8318:1561",
+            "8318:1562",
+            "8318:1563",
+            "8318:1564",
+            "8318:1565",
+            "8318:1566",
+            "I8318:1566;8314:6",
+            "8318:1568",
+            "I8318:1568;8314:4",
+            "8318:1570",
+            "8318:1571",
+            "8318:1572"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "suppFix",
+      "result": [
+        {
+          "createdNodeIds": [
+            "8318:2313",
+            "8318:2314",
+            "8318:2315"
+          ],
+          "mutatedNodeIds": [
+            "8318:830",
+            "8318:832",
+            "8318:836",
+            "8318:837",
+            "8318:838",
+            "8318:839",
+            "8318:829",
+            "8318:833",
+            "8318:834",
+            "8318:881",
+            "8318:885",
+            "8318:889",
+            "8318:1114",
+            "I8318:1114;8314:8",
+            "8318:1116",
+            "I8318:1116;8314:8",
+            "8318:1118",
+            "I8318:1118;8314:8",
+            "8318:1120",
+            "I8318:1120;8314:8",
+            "8318:1124",
+            "I8318:1124;8314:8",
+            "8318:1126",
+            "I8318:1126;8314:8",
+            "8318:1128",
+            "I8318:1128;8314:8",
+            "8318:1130",
+            "I8318:1130;8314:8",
+            "8318:1133",
+            "I8318:1133;8314:8",
+            "8318:1135",
+            "I8318:1135;8314:8",
+            "8318:1288",
+            "8318:1509",
+            "8318:1564",
+            "8318:899",
+            "8318:900",
+            "8318:901",
+            "8318:903",
+            "8318:904",
+            "8318:905",
+            "8318:1057",
+            "8318:1058",
+            "8318:1059",
+            "8318:1061",
+            "8318:1062",
+            "8318:1063",
+            "8318:1065",
+            "8318:1066",
+            "8318:1067",
+            "8318:1069",
+            "8318:1070",
+            "8318:1071",
+            "8318:1073",
+            "8318:1074",
+            "8318:1075",
+            "8318:1081",
+            "8318:1082",
+            "8318:1083",
+            "8318:1085",
+            "8318:1086",
+            "8318:1087",
+            "8318:1093",
+            "8318:1094",
+            "8318:1095",
+            "8318:1097",
+            "8318:1098",
+            "8318:1099",
+            "8318:1105",
+            "8318:1106",
+            "8318:1107",
+            "8318:1456",
+            "8318:1457",
+            "8318:1458",
+            "8318:1460",
+            "8318:1461",
+            "8318:1462",
+            "8318:1464",
+            "8318:1465",
+            "8318:1466",
+            "8318:1468",
+            "8318:1469",
+            "8318:1470",
+            "8318:1472",
+            "8318:1473",
+            "8318:1474",
+            "8318:1480",
+            "8318:1481",
+            "8318:1482",
+            "8318:1484",
+            "8318:1485",
+            "8318:1486",
+            "8318:1492",
+            "8318:1493",
+            "8318:1494",
+            "8318:1496",
+            "8318:1497",
+            "8318:1498",
+            "8318:1504",
+            "8318:1505",
+            "8318:1506",
+            "8318:1533",
+            "8318:1534",
+            "8318:1535"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "suppCMSBuild",
+      "result": [
+        {
+          "frames": [
+            {
+              "designId": "TB-G05",
+              "frameId": "8318:243842",
+              "noteId": "8318:243974"
+            }
+          ],
+          "createdNodeIds": [
+            "8318:243842",
+            "8318:243843",
+            "8318:243844",
+            "8318:243845",
+            "I8318:243845;8314:8",
+            "8318:243846",
+            "8318:243847",
+            "8318:243848",
+            "I8318:243848;8314:6",
+            "8318:243849",
+            "8318:243929",
+            "8318:243930",
+            "8318:243931",
+            "I8318:243931;8314:4",
+            "8318:243882",
+            "8318:243933",
+            "8318:243934",
+            "8318:243935",
+            "8318:243936",
+            "8318:243937",
+            "8318:243938",
+            "8318:243939",
+            "8318:243940",
+            "8318:243941",
+            "8318:243942",
+            "8318:243943",
+            "8318:243944",
+            "8318:243945",
+            "8318:243946",
+            "8318:243947",
+            "8318:243948",
+            "8318:243949",
+            "8318:243950",
+            "8318:243951",
+            "I8318:243951;8314:6",
+            "8318:243953",
+            "I8318:243953;8314:8",
+            "8318:243955",
+            "8318:243956",
+            "8318:243957",
+            "8318:243958",
+            "I8318:243958;8314:6",
+            "8318:243960",
+            "I8318:243960;8314:8",
+            "8318:243962",
+            "8318:243963",
+            "I8318:243963;8314:8",
+            "8318:243965",
+            "8318:243966",
+            "8318:243967",
+            "8318:243968",
+            "8318:243969",
+            "8318:243970",
+            "I8318:243970;8314:6",
+            "8318:243972",
+            "I8318:243972;8314:4",
+            "8318:243974",
+            "8318:243975",
+            "8318:243976"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "suppGeneralBuild",
+      "result": [
+        {
+          "frames": [
+            {
+              "designId": "TB-G06",
+              "frameId": "8318:244095",
+              "noteId": "8318:244142"
+            }
+          ],
+          "createdNodeIds": [
+            "8318:244095",
+            "8318:244096",
+            "8318:244097",
+            "8318:244098",
+            "8318:244099",
+            "8318:244100",
+            "8318:244101",
+            "8318:244102",
+            "8318:244103",
+            "8318:244104",
+            "8318:244105",
+            "8318:244106",
+            "8318:244107",
+            "8318:244108",
+            "8318:244109",
+            "8318:244110",
+            "8318:244111",
+            "8318:244112",
+            "8318:244113",
+            "8318:244114",
+            "8318:244115",
+            "8318:244116",
+            "8318:244117",
+            "I8318:244117;8314:12",
+            "8318:244119",
+            "8318:244120",
+            "8318:244121",
+            "8318:244122",
+            "8318:244123",
+            "8318:244124",
+            "8318:244125",
+            "8318:244126",
+            "8318:244127",
+            "8318:244128",
+            "8318:244129",
+            "8318:244130",
+            "8318:244131",
+            "8318:244132",
+            "8318:244133",
+            "8318:244134",
+            "8318:244135",
+            "8318:244136",
+            "8318:244137",
+            "8318:244138",
+            "I8318:244138;8314:12",
+            "8318:244140",
+            "I8318:244140;8314:6",
+            "8318:244142",
+            "8318:244143",
+            "8318:244144"
+          ]
+        }
+      ]
+    }
+  ]
+}

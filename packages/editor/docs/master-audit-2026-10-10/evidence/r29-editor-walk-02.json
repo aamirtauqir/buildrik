@@ -1,0 +1,43 @@
+[
+  {
+    "label": "Mobile Main section baseline",
+    "goto": "8584:12241",
+    "shot": "r29-mobile-before.png"
+  },
+  {
+    "label": "Mobile History preserves canvas",
+    "x": 600,
+    "y": 28,
+    "shot": "r29-mobile-history.png"
+  },
+  {
+    "label": "Close returns Mobile Main section",
+    "x": 1391,
+    "y": 87,
+    "shot": "r29-mobile-return.png"
+  },
+  {
+    "label": "Publish normalized field",
+    "x": 897,
+    "y": 28,
+    "shot": "r29-publish-final.png"
+  },
+  {
+    "label": "Destination opens specific targets",
+    "x": 1230,
+    "y": 266,
+    "shot": "r29-publish-targets.png"
+  },
+  {
+    "label": "Return from targets",
+    "x": 88,
+    "y": 28,
+    "shot": "r29-targets-return.png"
+  },
+  {
+    "label": "Pages normalized fields",
+    "x": 109,
+    "y": 157,
+    "shot": "r29-pages-final.png"
+  }
+]

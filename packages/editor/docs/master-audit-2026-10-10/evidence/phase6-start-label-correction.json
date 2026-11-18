@@ -1,0 +1,282 @@
+{
+  "date": "2026-10-11",
+  "mutatedNodeIds": [
+    "8312:2"
+  ],
+  "before": [
+    {
+      "nodeId": "8318:244368",
+      "name": "Pages · create blank page"
+    },
+    {
+      "nodeId": "8317:297",
+      "name": "Editor · Home Desktop"
+    },
+    {
+      "nodeId": "8373:1245",
+      "name": "Editor · Home Desktop"
+    },
+    {
+      "nodeId": "8391:1815",
+      "name": "Editor · Home Desktop"
+    },
+    {
+      "nodeId": "8387:1810",
+      "name": "Editor · Home Desktop"
+    },
+    {
+      "nodeId": "8381:1659",
+      "name": "Editor · Home Desktop"
+    },
+    {
+      "nodeId": "8381:1508",
+      "name": "Editor · Home Desktop"
+    },
+    {
+      "nodeId": "8381:1357",
+      "name": "Editor · Home Desktop"
+    },
+    {
+      "nodeId": "8380:1339",
+      "name": "Editor · Home Desktop"
+    },
+    {
+      "nodeId": "8377:1874",
+      "name": "Editor · Home Desktop"
+    },
+    {
+      "nodeId": "8377:1674",
+      "name": "Editor · Home Desktop"
+    },
+    {
+      "nodeId": "8377:1474",
+      "name": "Editor · Home Desktop"
+    },
+    {
+      "nodeId": "8377:1288",
+      "name": "Editor · Home Desktop"
+    },
+    {
+      "nodeId": "8375:1280",
+      "name": "Editor · Home Desktop"
+    },
+    {
+      "nodeId": "8373:1436",
+      "name": "Editor · Home Desktop"
+    },
+    {
+      "nodeId": "8391:2071",
+      "name": "Editor · Home Desktop"
+    },
+    {
+      "nodeId": "8351:1402",
+      "name": "Editor · Home Desktop"
+    },
+    {
+      "nodeId": "8334:243783",
+      "name": "Templates · Studio page result"
+    },
+    {
+      "nodeId": "8317:243948",
+      "name": "Pages · switch page"
+    },
+    {
+      "nodeId": "8317:245051",
+      "name": "Publish · simulated checks"
+    },
+    {
+      "nodeId": "8317:245216",
+      "name": "Preview · Home Mobile"
+    },
+    {
+      "nodeId": "8317:246897",
+      "name": "Components · reset, detach and master"
+    },
+    {
+      "nodeId": "8317:247144",
+      "name": "Inspector · unlock selection"
+    },
+    {
+      "nodeId": "8334:1250",
+      "name": "CMS · first collection"
+    },
+    {
+      "nodeId": "8317:246658",
+      "name": "CMS · bound record"
+    },
+    {
+      "nodeId": "8317:242436",
+      "name": "Settings · SEO and image choice"
+    },
+    {
+      "nodeId": "8317:242017",
+      "name": "Media · unsaved metadata"
+    },
+    {
+      "nodeId": "8334:243338",
+      "name": "Brand · foundations"
+    },
+    {
+      "nodeId": "8387:1440",
+      "name": "Brand · foundations"
+    },
+    {
+      "nodeId": "8387:1574",
+      "name": "Brand · foundations"
+    },
+    {
+      "nodeId": "8387:1701",
+      "name": "Brand · foundations"
+    },
+    {
+      "nodeId": "8389:1500",
+      "name": "Brand · foundations"
+    },
+    {
+      "nodeId": "8317:242809",
+      "name": "Templates · create page"
+    },
+    {
+      "nodeId": "8317:243462",
+      "name": "Flow 1"
+    }
+  ],
+  "after": [
+    {
+      "nodeId": "8318:244368",
+      "name": "E19 · New page / blank"
+    },
+    {
+      "nodeId": "8317:297",
+      "name": "E01 · Editor / Heading Style"
+    },
+    {
+      "nodeId": "8373:1245",
+      "name": "Heading · Effects / E01 canvas"
+    },
+    {
+      "nodeId": "8391:1815",
+      "name": "Issues · Image selected · missing alt context"
+    },
+    {
+      "nodeId": "8387:1810",
+      "name": "Brand · Return to canvas · token applied"
+    },
+    {
+      "nodeId": "8381:1659",
+      "name": "Heading · C00 · Content panel state"
+    },
+    {
+      "nodeId": "8381:1508",
+      "name": "Heading · C10 · Content panel state"
+    },
+    {
+      "nodeId": "8381:1357",
+      "name": "Heading · C01 · Content panel state"
+    },
+    {
+      "nodeId": "8380:1339",
+      "name": "Heading · Content / static text"
+    },
+    {
+      "nodeId": "8377:1874",
+      "name": "Heading · E00 · Effects panel state"
+    },
+    {
+      "nodeId": "8377:1674",
+      "name": "Heading · S00 · Style panel state"
+    },
+    {
+      "nodeId": "8377:1474",
+      "name": "Heading · E10 · Effects panel state"
+    },
+    {
+      "nodeId": "8377:1288",
+      "name": "Heading · E01 · Effects panel state"
+    },
+    {
+      "nodeId": "8375:1280",
+      "name": "Heading · Layers collapsed / Style preserved"
+    },
+    {
+      "nodeId": "8373:1436",
+      "name": "Heading · Inspector collapsed / Style caller"
+    },
+    {
+      "nodeId": "8391:2071",
+      "name": "Issues · Image context retained"
+    },
+    {
+      "nodeId": "8351:1402",
+      "name": "P6-NAV01 · Desktop breakpoint chooser"
+    },
+    {
+      "nodeId": "8334:243783",
+      "name": "WS · Studio created page (simulated)"
+    },
+    {
+      "nodeId": "8317:243948",
+      "name": "E03 · Pages / structure and page settings"
+    },
+    {
+      "nodeId": "8317:245051",
+      "name": "E09 · Publish / blocked release checks"
+    },
+    {
+      "nodeId": "8317:245216",
+      "name": "E10 · Preview / Mobile visual checks"
+    },
+    {
+      "nodeId": "8317:246897",
+      "name": "IN-06 · Component instance"
+    },
+    {
+      "nodeId": "8317:247144",
+      "name": "IN-07 · Locked heading"
+    },
+    {
+      "nodeId": "8334:1250",
+      "name": "WS · CMS zero collections"
+    },
+    {
+      "nodeId": "8317:246658",
+      "name": "IN-05 · CMS-bound heading"
+    },
+    {
+      "nodeId": "8317:242436",
+      "name": "TB-W08 / Settings / SEO draft"
+    },
+    {
+      "nodeId": "8317:242017",
+      "name": "TB-W04 / Media / Metadata not saved"
+    },
+    {
+      "nodeId": "8334:243338",
+      "name": "WS · Brand palette management"
+    },
+    {
+      "nodeId": "8387:1440",
+      "name": "Brand · Page background picker · original"
+    },
+    {
+      "nodeId": "8387:1574",
+      "name": "Brand · Page background picker · sampled"
+    },
+    {
+      "nodeId": "8387:1701",
+      "name": "Brand · Page background applied · simulated"
+    },
+    {
+      "nodeId": "8389:1500",
+      "name": "Brand · Reopen applied token colour"
+    },
+    {
+      "nodeId": "8317:242809",
+      "name": "TB-W11 / Template preview"
+    },
+    {
+      "nodeId": "8317:243462",
+      "name": "IN-03 · Container · Grid"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+[
+  {
+    "wait": 10000,
+    "shot": "r35-font-roles-start.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8814-15869&starting-point-node-id=8814%3A15869&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 610,
+    "y": 450,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8814-15869&starting-point-node-id=8814%3A15869&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 900,
+    "y": 667,
+    "shot": "r35-font-rendered-change.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8814-15869&starting-point-node-id=8814%3A15869&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 910,
+    "y": 788,
+    "shot": "r35-font-applied.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8814-15869&starting-point-node-id=8814%3A15869&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

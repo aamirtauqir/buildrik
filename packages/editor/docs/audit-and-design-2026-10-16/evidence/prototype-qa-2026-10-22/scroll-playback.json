@@ -1,0 +1,56 @@
+[
+  {
+    "fixtureLoad": "422:50915",
+    "actual": "422:50915"
+  },
+  {
+    "frame": "422:50915",
+    "wheel": {
+      "x": 1371,
+      "y": 650,
+      "target": "CANVAS"
+    },
+    "actual": "422:50915",
+    "screenshots": [
+      "scroll-422-50915-before.png",
+      "scroll-422-50915-after.png"
+    ],
+    "visualAssessment": "PASS: work area scrolled; lower controls visible; selected object/class and scope retained; global header and save/page footer stationary. Wheel movement verified by before/after screenshots; no app persistence claim."
+  },
+  {
+    "fixtureLoad": "439:51387",
+    "actual": "439:51387"
+  },
+  {
+    "frame": "439:51387",
+    "wheel": {
+      "x": 1060,
+      "y": 590,
+      "target": "CANVAS"
+    },
+    "actual": "439:51387",
+    "screenshots": [
+      "scroll-439-51387-before.png",
+      "scroll-439-51387-after.png"
+    ],
+    "visualAssessment": "PASS: work area scrolled; lower controls visible; selected object/class and scope retained; global header and save/page footer stationary. Wheel movement verified by before/after screenshots; no app persistence claim."
+  },
+  {
+    "fixtureLoad": "439:51578",
+    "actual": "439:51578"
+  },
+  {
+    "frame": "439:51578",
+    "wheel": {
+      "x": 980,
+      "y": 650,
+      "target": "CANVAS"
+    },
+    "actual": "439:51578",
+    "screenshots": [
+      "scroll-439-51578-before.png",
+      "scroll-439-51578-after.png"
+    ],
+    "visualAssessment": "PASS: work area scrolled; lower controls visible; selected object/class and scope retained; global header and save/page footer stationary. Wheel movement verified by before/after screenshots; no app persistence claim."
+  }
+]

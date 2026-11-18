@@ -1,0 +1,271 @@
+[
+  {
+    "fixtureLoad": "423:96903",
+    "actual": "423:96903"
+  },
+  {
+    "origin": "423:96903",
+    "to": "423:97218",
+    "key": "Enter",
+    "pointer": null,
+    "actual": "423:97218",
+    "pass": true
+  },
+  {
+    "origin": "423:97218",
+    "to": "423:97552",
+    "key": "Escape",
+    "pointer": null,
+    "actual": "423:97552",
+    "pass": true
+  },
+  {
+    "origin": "423:97552",
+    "to": "423:97866",
+    "key": "Control+z",
+    "pointer": null,
+    "actual": "423:97866",
+    "pass": true
+  },
+  {
+    "origin": "423:97866",
+    "to": "423:97218",
+    "key": "Enter",
+    "pointer": null,
+    "actual": "423:97218",
+    "pass": true
+  },
+  {
+    "origin": "423:97218",
+    "to": "423:98532",
+    "key": null,
+    "pointer": [
+      824,
+      170
+    ],
+    "actual": "423:98532",
+    "pass": true
+  },
+  {
+    "origin": "423:98532",
+    "to": "423:97218",
+    "key": "Escape",
+    "pointer": null,
+    "actual": "423:97218",
+    "pass": true
+  },
+  {
+    "origin": "423:97218",
+    "to": "423:98182",
+    "key": null,
+    "pointer": [
+      876,
+      170
+    ],
+    "actual": "423:98182",
+    "pass": true
+  },
+  {
+    "origin": "423:98182",
+    "to": "423:97218",
+    "key": "Escape",
+    "pointer": null,
+    "actual": "423:97218",
+    "pass": true
+  },
+  {
+    "origin": "423:97218",
+    "to": "423:97552",
+    "key": "Escape",
+    "pointer": null,
+    "actual": "423:97552",
+    "pass": true
+  },
+  {
+    "origin": "423:97552",
+    "to": "423:97218",
+    "key": "Enter",
+    "pointer": null,
+    "actual": "423:97218",
+    "pass": true
+  },
+  {
+    "origin": "423:97218",
+    "to": "423:97552",
+    "key": "Escape",
+    "pointer": null,
+    "actual": "423:97552",
+    "pass": true
+  },
+  {
+    "origin": "423:97552",
+    "to": "423:97866",
+    "key": "Meta+z",
+    "pointer": null,
+    "actual": "423:97866",
+    "pass": true
+  },
+  {
+    "origin": "423:97866",
+    "to": "423:97218",
+    "key": "Enter",
+    "pointer": null,
+    "actual": "423:97218",
+    "pass": true
+  },
+  {
+    "origin": "423:97218",
+    "to": "423:98532",
+    "key": null,
+    "pointer": [
+      824,
+      170
+    ],
+    "actual": "423:98532",
+    "pass": true
+  },
+  {
+    "origin": "423:98532",
+    "to": "423:98884",
+    "key": null,
+    "pointer": [
+      889,
+      460
+    ],
+    "actual": "423:98884",
+    "pass": true
+  },
+  {
+    "origin": "423:98884",
+    "to": "423:99224",
+    "key": "Escape",
+    "pointer": null,
+    "actual": "423:99224",
+    "pass": true
+  },
+  {
+    "origin": "423:99224",
+    "to": "423:98884",
+    "key": "Enter",
+    "pointer": null,
+    "actual": "423:98884",
+    "pass": true
+  },
+  {
+    "origin": "423:98884",
+    "to": "423:99224",
+    "key": "Escape",
+    "pointer": null,
+    "actual": "423:99224",
+    "pass": true
+  },
+  {
+    "origin": "423:99224",
+    "to": "423:97866",
+    "key": "Meta+z",
+    "pointer": null,
+    "actual": "423:97866",
+    "pass": true
+  },
+  {
+    "origin": "423:97866",
+    "to": "423:97218",
+    "key": "Enter",
+    "pointer": null,
+    "actual": "423:97218",
+    "pass": true
+  },
+  {
+    "origin": "423:97218",
+    "to": "423:98532",
+    "key": null,
+    "pointer": [
+      824,
+      170
+    ],
+    "actual": "423:98532",
+    "pass": true
+  },
+  {
+    "origin": "423:98532",
+    "to": "423:98884",
+    "key": null,
+    "pointer": [
+      889,
+      460
+    ],
+    "actual": "423:98884",
+    "pass": true
+  },
+  {
+    "origin": "423:98884",
+    "to": "423:99224",
+    "key": "Escape",
+    "pointer": null,
+    "actual": "423:99224",
+    "pass": true
+  },
+  {
+    "origin": "423:99224",
+    "to": "423:97866",
+    "key": "Control+z",
+    "pointer": null,
+    "actual": "423:97866",
+    "pass": true
+  },
+  {
+    "nativeFocusProbe": [
+      {
+        "tag": "BUTTON",
+        "role": null,
+        "label": "Previous frame",
+        "text": ""
+      },
+      {
+        "tag": "BUTTON",
+        "role": null,
+        "label": "Restart",
+        "text": "RestartR"
+      },
+      {
+        "tag": "BODY",
+        "role": null,
+        "label": null,
+        "text": "\n\n    Skip to contentBuildrick \u00b7 Editor design \u00b7 2026-10-18\n  @layer css-modules {\n    .multiplayer-"
+      },
+      {
+        "tag": "BUTTON",
+        "role": null,
+        "label": null,
+        "text": "Skip to content"
+      },
+      {
+        "tag": "A",
+        "role": null,
+        "label": "File browser",
+        "text": ""
+      },
+      {
+        "tag": "BUTTON",
+        "role": null,
+        "label": "Open flows list",
+        "text": ""
+      },
+      {
+        "tag": "BUTTON",
+        "role": null,
+        "label": "Comment",
+        "text": ""
+      },
+      {
+        "tag": "BUTTON",
+        "role": null,
+        "label": "Multiplayer tools",
+        "text": ""
+      }
+    ],
+    "snapshotBefore": "--- BEGIN UNTRUSTED EXTERNAL CONTENT (source: https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=423-97866&starting-point-node-id=423%3A96903&scaling=scale-down) ---\n--- BEGIN UNTRUSTED EXTERNAL C\u200bONTENT (source: https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=423-97866&starting-point-node-id=423%3A96903&scaling=scale-down) ---\n    @e1 [button] \"Previous frame\"\n    @e2 [button] \"Next frame\"\n  @e3 [button] \"Restart\"\n\n\u2500\u2500 cursor-interactive (not in ARIA tree) \u2500\u2500\n@c1 [popover-child, cursor:pointer] \"span\"\n--- END UNTRUSTED EXTERNAL C\u200bONTENT ---\n--- END UNTRUSTED EXTERNAL CONTENT ---",
+    "snapshotAfter": "--- BEGIN UNTRUSTED EXTERNAL CONTENT (source: https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=423-97866&starting-point-node-id=423%3A96903&scaling=scale-down) ---\n--- BEGIN UNTRUSTED EXTERNAL C\u200bONTENT (source: https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=423-97866&starting-point-node-id=423%3A96903&scaling=scale-down) ---\n  @e1 [button] \"Skip to content\"\n  @e2 [link] \"File browser\"\n  @e3 [button] \"Open flows list\"\n  @e4 [button] \"Comment\"\n  @e5 [button] \"Multiplayer tools\"\n  @e6 [button] \"Log in or create account\"\n  @e7 [button] \"Continue with Google\"\n  @e8 [button] \"Options\"\n  @e9 [button] \"Enter full screen (F)\"\n    @e10 [button] \"Previous frame\"\n    @e11 [button] \"Next frame\"\n  @e12 [button] \"Restart\"\n\n\u2500\u2500 cursor-interactive (not in ARIA tree) \u2500\u2500\n@c1 [popover-child, cursor:pointer] \"span\"\n--- END UNTRUSTED EXTERNAL C\u200bONTENT ---\n--- END UNTRUSTED EXTERNAL CONTENT ---",
+    "limitation": "Player accessibility is separate from application accessibility."
+  }
+]

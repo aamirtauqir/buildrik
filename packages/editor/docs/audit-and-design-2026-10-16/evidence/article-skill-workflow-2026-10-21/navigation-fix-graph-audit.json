@@ -1,0 +1,22 @@
+{
+  "mutatedNodeIds": [
+    "353:25048",
+    "353:25334"
+  ],
+  "page": "3:10",
+  "roots": 185,
+  "edges": 602,
+  "invalidDestinations": [],
+  "selfLinks": [],
+  "urlLinks": [],
+  "unreachable": [],
+  "rootsWithoutHubReturn": [],
+  "changedRoots": [
+    "350:25304",
+    "350:25767",
+    "350:26230",
+    "353:24569",
+    "353:24957",
+    "353:25243"
+  ]
+}

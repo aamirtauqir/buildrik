@@ -1,0 +1,23 @@
+[
+  {
+    "goto": "8843:30589",
+    "wait": 6500,
+    "shot": "r43-form-service-field.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-30589&starting-point-node-id=8843%3A30589&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 1320,
+    "y": 212,
+    "shot": "r43-form-four-field-selector.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-30589&starting-point-node-id=8843%3A30589&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 915,
+    "y": 319,
+    "shot": "r43-form-service-detail.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-30589&starting-point-node-id=8843%3A30589&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

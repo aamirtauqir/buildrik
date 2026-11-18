@@ -1,0 +1,145 @@
+[
+  {
+    "id": "8507:2799",
+    "name": "T01 / Integrated inspector / Image settings",
+    "nodes": 144,
+    "instances": 38,
+    "fonts": [
+      "Inter"
+    ],
+    "overflow": [],
+    "edgeCount": 11,
+    "missingDestinations": [],
+    "imageLayers": 0
+  },
+  {
+    "id": "8507:3011",
+    "name": "T02 / Integrated inspector / Image alt text updated",
+    "nodes": 144,
+    "instances": 38,
+    "fonts": [
+      "Inter"
+    ],
+    "overflow": [],
+    "edgeCount": 12,
+    "missingDestinations": [],
+    "imageLayers": 0
+  },
+  {
+    "id": "8507:246872",
+    "name": "T03 / Integrated inspector / Email field settings",
+    "nodes": 144,
+    "instances": 38,
+    "fonts": [
+      "Inter"
+    ],
+    "overflow": [],
+    "edgeCount": 11,
+    "missingDestinations": [],
+    "imageLayers": 0
+  },
+  {
+    "id": "8507:247087",
+    "name": "T04 / Integrated inspector / Required email field",
+    "nodes": 144,
+    "instances": 38,
+    "fonts": [
+      "Inter"
+    ],
+    "overflow": [],
+    "edgeCount": 12,
+    "missingDestinations": [],
+    "imageLayers": 0
+  },
+  {
+    "id": "8507:247302",
+    "name": "T05 / Integrated inspector / Form submission settings",
+    "nodes": 134,
+    "instances": 36,
+    "fonts": [
+      "Inter"
+    ],
+    "overflow": [],
+    "edgeCount": 11,
+    "missingDestinations": [],
+    "imageLayers": 0
+  },
+  {
+    "id": "8507:247507",
+    "name": "T06 / Integrated inspector / Form redirect needs URL",
+    "nodes": 134,
+    "instances": 36,
+    "fonts": [
+      "Inter"
+    ],
+    "overflow": [],
+    "edgeCount": 12,
+    "missingDestinations": [],
+    "imageLayers": 0
+  },
+  {
+    "id": "8507:247712",
+    "name": "T07 / Integrated inspector / Collection list settings",
+    "nodes": 132,
+    "instances": 36,
+    "fonts": [
+      "Inter"
+    ],
+    "overflow": [],
+    "edgeCount": 11,
+    "missingDestinations": [],
+    "imageLayers": 0
+  },
+  {
+    "id": "8507:247900",
+    "name": "T08 / Integrated inspector / Collection limit updated",
+    "nodes": 131,
+    "instances": 36,
+    "fonts": [
+      "Inter"
+    ],
+    "overflow": [],
+    "edgeCount": 12,
+    "missingDestinations": [],
+    "imageLayers": 0
+  },
+  {
+    "id": "8507:248087",
+    "name": "T09 / Integrated inspector / Component instance settings",
+    "nodes": 139,
+    "instances": 37,
+    "fonts": [
+      "Inter"
+    ],
+    "overflow": [],
+    "edgeCount": 11,
+    "missingDestinations": [],
+    "imageLayers": 0
+  },
+  {
+    "id": "8507:248294",
+    "name": "T10 / Integrated inspector / Reset instance review",
+    "nodes": 122,
+    "instances": 34,
+    "fonts": [
+      "Inter"
+    ],
+    "overflow": [],
+    "edgeCount": 12,
+    "missingDestinations": [],
+    "imageLayers": 0
+  },
+  {
+    "id": "8507:248469",
+    "name": "T11 / Integrated inspector / Instance reset result",
+    "nodes": 139,
+    "instances": 37,
+    "fonts": [
+      "Inter"
+    ],
+    "overflow": [],
+    "edgeCount": 12,
+    "missingDestinations": [],
+    "imageLayers": 0
+  }
+]

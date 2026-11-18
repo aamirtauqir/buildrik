@@ -1,0 +1,18 @@
+{
+  "mutatedNodeIds": [
+    "9051:17534"
+  ],
+  "ratioOnlyRestore": [
+    "VariableID:9051:17485",
+    "VariableID:9051:17486"
+  ],
+  "migrationOnlyRestore": [
+    "VariableID:9051:17487",
+    "VariableID:9051:17488",
+    "VariableID:9051:17489",
+    "VariableID:9051:17490",
+    "VariableID:9051:17491"
+  ],
+  "guard": "Owned migrated pair must still be absent; non-migration Undo preserves current unrelated sizing.",
+  "actions": 21
+}

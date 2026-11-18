@@ -1,0 +1,404 @@
+{
+  "mutatedNodeIds": [
+    "8317:319",
+    "8317:327",
+    "8317:243743",
+    "8317:243747",
+    "8317:243970",
+    "8317:243974",
+    "8317:310",
+    "8317:312",
+    "8317:316",
+    "8317:308",
+    "8317:244175",
+    "8317:244177",
+    "8317:244181",
+    "8317:244179",
+    "8317:244173",
+    "8317:244303",
+    "8317:244399",
+    "8317:244405",
+    "8317:244403",
+    "8317:244397",
+    "8317:244527",
+    "8317:244569",
+    "8317:244573",
+    "8317:244571",
+    "8317:244565",
+    "8317:244695",
+    "8317:244735",
+    "8317:244737",
+    "8317:244741",
+    "8317:244739",
+    "8317:244733",
+    "8317:244863",
+    "8317:244900",
+    "8317:244902",
+    "8317:244906",
+    "8317:244904",
+    "8317:244898",
+    "8317:245028",
+    "8317:245064",
+    "8317:245066",
+    "8317:245068",
+    "8317:245062",
+    "8317:245192",
+    "8317:339",
+    "8317:246883",
+    "8317:245046",
+    "8317:302",
+    "8318:1114",
+    "8318:1116",
+    "8318:1120"
+  ],
+  "connections": [
+    {
+      "sourceId": "8317:319",
+      "sourceName": "Open Add",
+      "destinationId": "8317:243717",
+      "readback": "8317:243717"
+    },
+    {
+      "sourceId": "8317:327",
+      "sourceName": "Open Pages",
+      "destinationId": "8317:243948",
+      "readback": "8317:243948"
+    },
+    {
+      "sourceId": "8317:243743",
+      "sourceName": "Open Layers",
+      "destinationId": "8317:297",
+      "readback": "8317:297"
+    },
+    {
+      "sourceId": "8317:243747",
+      "sourceName": "Open Pages",
+      "destinationId": "8317:243948",
+      "readback": "8317:243948"
+    },
+    {
+      "sourceId": "8317:243970",
+      "sourceName": "Open Add",
+      "destinationId": "8317:243717",
+      "readback": "8317:243717"
+    },
+    {
+      "sourceId": "8317:243974",
+      "sourceName": "Open Layers",
+      "destinationId": "8317:297",
+      "readback": "8317:297"
+    },
+    {
+      "sourceId": "8317:310",
+      "sourceName": "History",
+      "destinationId": "8317:244554",
+      "readback": "8317:244554"
+    },
+    {
+      "sourceId": "8317:312",
+      "sourceName": "Review",
+      "destinationId": "8317:244386",
+      "readback": "8317:244386"
+    },
+    {
+      "sourceId": "8317:316",
+      "sourceName": "Publish",
+      "destinationId": "8317:245051",
+      "readback": "8317:245051"
+    },
+    {
+      "sourceId": "8317:308",
+      "sourceName": "⌘ K",
+      "destinationId": "8317:245583",
+      "readback": "8317:245583"
+    },
+    {
+      "sourceId": "8317:244175",
+      "sourceName": "History",
+      "destinationId": "8317:244554",
+      "readback": "8317:244554"
+    },
+    {
+      "sourceId": "8317:244177",
+      "sourceName": "Review",
+      "destinationId": "8317:244386",
+      "readback": "8317:244386"
+    },
+    {
+      "sourceId": "8317:244181",
+      "sourceName": "Publish",
+      "destinationId": "8317:245051",
+      "readback": "8317:245051"
+    },
+    {
+      "sourceId": "8317:244179",
+      "sourceName": "Preview",
+      "destinationId": "8329:1629",
+      "readback": "8329:1629"
+    },
+    {
+      "sourceId": "8317:244173",
+      "sourceName": "⌘ K",
+      "destinationId": "8317:245583",
+      "readback": "8317:245583"
+    },
+    {
+      "sourceId": "8317:244303",
+      "sourceName": "Action / close",
+      "destinationId": "8317:297",
+      "readback": "8317:297"
+    },
+    {
+      "sourceId": "8317:244399",
+      "sourceName": "History",
+      "destinationId": "8317:244554",
+      "readback": "8317:244554"
+    },
+    {
+      "sourceId": "8317:244405",
+      "sourceName": "Publish",
+      "destinationId": "8317:245051",
+      "readback": "8317:245051"
+    },
+    {
+      "sourceId": "8317:244403",
+      "sourceName": "Preview",
+      "destinationId": "8329:1629",
+      "readback": "8329:1629"
+    },
+    {
+      "sourceId": "8317:244397",
+      "sourceName": "⌘ K",
+      "destinationId": "8317:245583",
+      "readback": "8317:245583"
+    },
+    {
+      "sourceId": "8317:244527",
+      "sourceName": "Action / close",
+      "destinationId": "8317:297",
+      "readback": "8317:297"
+    },
+    {
+      "sourceId": "8317:244569",
+      "sourceName": "Review",
+      "destinationId": "8317:244386",
+      "readback": "8317:244386"
+    },
+    {
+      "sourceId": "8317:244573",
+      "sourceName": "Publish",
+      "destinationId": "8317:245051",
+      "readback": "8317:245051"
+    },
+    {
+      "sourceId": "8317:244571",
+      "sourceName": "Preview",
+      "destinationId": "8329:1629",
+      "readback": "8329:1629"
+    },
+    {
+      "sourceId": "8317:244565",
+      "sourceName": "⌘ K",
+      "destinationId": "8317:245583",
+      "readback": "8317:245583"
+    },
+    {
+      "sourceId": "8317:244695",
+      "sourceName": "Action / close",
+      "destinationId": "8317:297",
+      "readback": "8317:297"
+    },
+    {
+      "sourceId": "8317:244735",
+      "sourceName": "History",
+      "destinationId": "8317:244554",
+      "readback": "8317:244554"
+    },
+    {
+      "sourceId": "8317:244737",
+      "sourceName": "Review",
+      "destinationId": "8317:244386",
+      "readback": "8317:244386"
+    },
+    {
+      "sourceId": "8317:244741",
+      "sourceName": "Publish",
+      "destinationId": "8317:245051",
+      "readback": "8317:245051"
+    },
+    {
+      "sourceId": "8317:244739",
+      "sourceName": "Preview",
+      "destinationId": "8329:1629",
+      "readback": "8329:1629"
+    },
+    {
+      "sourceId": "8317:244733",
+      "sourceName": "⌘ K",
+      "destinationId": "8317:245583",
+      "readback": "8317:245583"
+    },
+    {
+      "sourceId": "8317:244863",
+      "sourceName": "Action / close",
+      "destinationId": "8317:297",
+      "readback": "8317:297"
+    },
+    {
+      "sourceId": "8317:244900",
+      "sourceName": "History",
+      "destinationId": "8317:244554",
+      "readback": "8317:244554"
+    },
+    {
+      "sourceId": "8317:244902",
+      "sourceName": "Review",
+      "destinationId": "8317:244386",
+      "readback": "8317:244386"
+    },
+    {
+      "sourceId": "8317:244906",
+      "sourceName": "Publish",
+      "destinationId": "8317:245051",
+      "readback": "8317:245051"
+    },
+    {
+      "sourceId": "8317:244904",
+      "sourceName": "Preview",
+      "destinationId": "8329:1629",
+      "readback": "8329:1629"
+    },
+    {
+      "sourceId": "8317:244898",
+      "sourceName": "⌘ K",
+      "destinationId": "8317:245583",
+      "readback": "8317:245583"
+    },
+    {
+      "sourceId": "8317:245028",
+      "sourceName": "Action / close",
+      "destinationId": "8317:297",
+      "readback": "8317:297"
+    },
+    {
+      "sourceId": "8317:245064",
+      "sourceName": "History",
+      "destinationId": "8317:244554",
+      "readback": "8317:244554"
+    },
+    {
+      "sourceId": "8317:245066",
+      "sourceName": "Review",
+      "destinationId": "8317:244386",
+      "readback": "8317:244386"
+    },
+    {
+      "sourceId": "8317:245068",
+      "sourceName": "Preview",
+      "destinationId": "8329:1629",
+      "readback": "8329:1629"
+    },
+    {
+      "sourceId": "8317:245062",
+      "sourceName": "⌘ K",
+      "destinationId": "8317:245583",
+      "readback": "8317:245583"
+    },
+    {
+      "sourceId": "8317:245192",
+      "sourceName": "Action / close",
+      "destinationId": "8317:297",
+      "readback": "8317:297"
+    },
+    {
+      "sourceId": "8317:339",
+      "sourceName": "Open Brand",
+      "destinationId": "8334:243338",
+      "readback": "8334:243338"
+    },
+    {
+      "sourceId": "8317:246883",
+      "sourceName": "Open selected-element AI",
+      "destinationId": "8317:244162",
+      "readback": "8317:244162"
+    },
+    {
+      "sourceId": "8317:245046",
+      "sourceName": "Open History",
+      "destinationId": "8317:244554",
+      "readback": "8317:244554"
+    },
+    {
+      "sourceId": "8317:302",
+      "sourceName": "Buildrick demo",
+      "destinationId": "8318:911",
+      "readback": "8318:911"
+    },
+    {
+      "sourceId": "8318:1114",
+      "sourceName": "Action / Open Site settings",
+      "destinationId": "8317:242436",
+      "readback": "8317:242436"
+    },
+    {
+      "sourceId": "8318:1116",
+      "sourceName": "Action / Open Templates",
+      "destinationId": "8317:242809",
+      "readback": "8317:242809"
+    },
+    {
+      "sourceId": "8318:1120",
+      "sourceName": "Action / Open Export dialog",
+      "destinationId": "8318:1310",
+      "readback": "8318:1310"
+    }
+  ],
+  "paletteChildren": [
+    {
+      "id": "8317:245782",
+      "name": "Search / Search pages, elements and actions",
+      "type": "FRAME"
+    },
+    {
+      "id": "8317:245786",
+      "name": "DESTINATIONS",
+      "type": "TEXT"
+    },
+    {
+      "id": "8317:245787",
+      "name": "Row / Open Pages",
+      "type": "FRAME"
+    },
+    {
+      "id": "8317:245791",
+      "name": "Row / Manage media",
+      "type": "FRAME"
+    },
+    {
+      "id": "8317:245795",
+      "name": "Row / Open CMS",
+      "type": "FRAME"
+    },
+    {
+      "id": "8317:245799",
+      "name": "Row / Site settings",
+      "type": "FRAME"
+    },
+    {
+      "id": "8317:245803",
+      "name": "Row / Open Activity",
+      "type": "FRAME"
+    },
+    {
+      "id": "8317:245807",
+      "name": "Row / Keyboard shortcuts",
+      "type": "FRAME"
+    },
+    {
+      "id": "8317:245811",
+      "name": "↑ ↓ Navigate    Enter Open    Esc Close",
+      "type": "TEXT"
+    }
+  ],
+  "limitation": "Native wiring only; caller-specific cancellation for command palette and site menu remains pending."
+}

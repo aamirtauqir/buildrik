@@ -1,0 +1,159 @@
+[
+  {
+    "outer": {
+      "x": 280,
+      "y": 136.5,
+      "w": 976,
+      "h": 531
+    },
+    "viewport": {
+      "w": 976,
+      "h": 531
+    },
+    "nodes": [
+      {
+        "tag": "BODY",
+        "x": 0,
+        "y": 0,
+        "w": 976,
+        "h": 922.78125,
+        "background": "rgba(0, 0, 0, 0)",
+        "image": "none",
+        "color": "rgb(0, 0, 0)",
+        "font": "Times"
+      },
+      {
+        "tag": "DIV",
+        "x": 40,
+        "y": 24,
+        "w": 96.109375,
+        "h": 23,
+        "background": "rgba(0, 0, 0, 0)",
+        "image": "none",
+        "color": "rgb(165, 180, 252)",
+        "font": "Times"
+      },
+      {
+        "tag": "DIV",
+        "x": 394.625,
+        "y": 27,
+        "w": 168.796875,
+        "h": 17,
+        "background": "rgba(0, 0, 0, 0)",
+        "image": "none",
+        "color": "rgb(0, 0, 0)",
+        "font": "Times"
+      },
+      {
+        "tag": "SECTION",
+        "x": 0,
+        "y": 72,
+        "w": 976,
+        "h": 488.1875,
+        "background": "rgba(0, 0, 0, 0)",
+        "image": "linear-gradient(135deg, rgb(10, 8, 30) 0%, rgb(24, 15, 58) 100%)",
+        "color": "rgb(0, 0, 0)",
+        "font": "Times"
+      },
+      {
+        "tag": "DIV",
+        "x": 40,
+        "y": 413.1875,
+        "w": 896,
+        "h": 47,
+        "background": "rgba(0, 0, 0, 0)",
+        "image": "none",
+        "color": "rgb(0, 0, 0)",
+        "font": "Times"
+      },
+      {
+        "tag": "SECTION",
+        "x": 0,
+        "y": 560.1875,
+        "w": 976,
+        "h": 362.59375,
+        "background": "rgb(13, 11, 31)",
+        "image": "none",
+        "color": "rgb(0, 0, 0)",
+        "font": "Times"
+      },
+      {
+        "tag": "DIV",
+        "x": 40,
+        "y": 640.1875,
+        "w": 896,
+        "h": 202.59375,
+        "background": "rgba(0, 0, 0, 0)",
+        "image": "none",
+        "color": "rgb(0, 0, 0)",
+        "font": "Times"
+      },
+      {
+        "tag": "DIV",
+        "x": 40,
+        "y": 640.1875,
+        "w": 282.65625,
+        "h": 202.59375,
+        "background": "rgba(255, 255, 255, 0.03)",
+        "image": "none",
+        "color": "rgb(0, 0, 0)",
+        "font": "Times"
+      },
+      {
+        "tag": "DIV",
+        "x": 73,
+        "y": 673.1875,
+        "w": 216.65625,
+        "h": 37,
+        "background": "rgba(0, 0, 0, 0)",
+        "image": "none",
+        "color": "rgb(0, 0, 0)",
+        "font": "Times"
+      },
+      {
+        "tag": "DIV",
+        "x": 346.65625,
+        "y": 640.1875,
+        "w": 282.671875,
+        "h": 202.59375,
+        "background": "rgba(255, 255, 255, 0.03)",
+        "image": "none",
+        "color": "rgb(0, 0, 0)",
+        "font": "Times"
+      },
+      {
+        "tag": "DIV",
+        "x": 379.65625,
+        "y": 673.1875,
+        "w": 216.671875,
+        "h": 37,
+        "background": "rgba(0, 0, 0, 0)",
+        "image": "none",
+        "color": "rgb(0, 0, 0)",
+        "font": "Times"
+      },
+      {
+        "tag": "DIV",
+        "x": 653.328125,
+        "y": 640.1875,
+        "w": 282.65625,
+        "h": 202.59375,
+        "background": "rgba(255, 255, 255, 0.03)",
+        "image": "none",
+        "color": "rgb(0, 0, 0)",
+        "font": "Times"
+      },
+      {
+        "tag": "DIV",
+        "x": 686.328125,
+        "y": 673.1875,
+        "w": 216.65625,
+        "h": 37,
+        "background": "rgba(0, 0, 0, 0)",
+        "image": "none",
+        "color": "rgb(0, 0, 0)",
+        "font": "Times"
+      }
+    ]
+  }
+]

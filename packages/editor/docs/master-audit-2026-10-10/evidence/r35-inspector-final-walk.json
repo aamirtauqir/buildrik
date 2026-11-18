@@ -1,0 +1,12 @@
+[
+  {
+    "goto": "8843:18380",
+    "wait": 5000,
+    "shot": "r35-input-final.png"
+  },
+  {
+    "x": 1330,
+    "y": 212,
+    "shot": "r35-input-type-options.png"
+  }
+]

@@ -1,0 +1,131 @@
+{
+  "date": "2026-10-11",
+  "initialLocate": {
+    "source": "8317:244538",
+    "destination": "8395:1562",
+    "pass": true
+  },
+  "steps": [
+    {
+      "action": "pin to comments",
+      "expected": "8317-244386",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8317-244386&starting-point-node-id=8317%3A244386&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "comment card locate",
+      "expected": "8395-1562",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8395-1562&starting-point-node-id=8317%3A244386&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "located Escape",
+      "expected": "8317-244386",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8317-244386&starting-point-node-id=8317%3A244386&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "Review compare",
+      "expected": "8317-244554",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8317-244554&starting-point-node-id=8317%3A244386&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "Back to saves",
+      "expected": "8395-1711",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8395-1711&starting-point-node-id=8317%3A244386&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "Compare saved version",
+      "expected": "8317-244554",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8317-244554&starting-point-node-id=8317%3A244386&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "Back to saves",
+      "expected": "8395-1711",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8395-1711&starting-point-node-id=8317%3A244386&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "Back to Review",
+      "expected": "8317-244386",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8317-244386&starting-point-node-id=8317%3A244386&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "Locate Heading",
+      "expected": "8395-1562",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8395-1562&starting-point-node-id=8317%3A244386&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "Edit heading",
+      "expected": "8317-297",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8317-297&starting-point-node-id=8317%3A244386&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "open Review",
+      "expected": "8317-244386",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8317-244386&starting-point-node-id=8317%3A244386&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "Locate Heading",
+      "expected": "8395-1562",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8395-1562&starting-point-node-id=8317%3A244386&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "located compare",
+      "expected": "8317-244554",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8317-244554&starting-point-node-id=8317%3A244386&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "Back to saves",
+      "expected": "8395-1711",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8395-1711&starting-point-node-id=8317%3A244386&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "list Escape",
+      "expected": "8317-244554",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8317-244554&starting-point-node-id=8317%3A244386&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "Back to saves",
+      "expected": "8395-1711",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8395-1711&starting-point-node-id=8317%3A244386&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "close list",
+      "expected": "8317-297",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8317-297&starting-point-node-id=8317%3A244386&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "open Review",
+      "expected": "8317-244386",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8317-244386&starting-point-node-id=8317%3A244386&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "Locate Heading",
+      "expected": "8395-1562",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8395-1562&starting-point-node-id=8317%3A244386&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "close located Review",
+      "expected": "8317-297",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8317-297&starting-point-node-id=8317%3A244386&hide-ui=1",
+      "pass": true
+    }
+  ],
+  "method": "Figma presentation synthetic pointer events and Escape with per-step URL verification; not comment/server/version operations."
+}

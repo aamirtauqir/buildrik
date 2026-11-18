@@ -1,0 +1,94 @@
+[
+  {
+    "label": "Open explicit QA fixture console",
+    "goto": "8633:12844",
+    "shot": "r28-review-console.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8633-12844&starting-point-node-id=8633%3A12844&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Reset heading fixture",
+    "x": 208,
+    "y": 492,
+    "expected": "8465:3",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8633-12844&starting-point-node-id=8633%3A12844&hide-ui=1",
+    "verification": "URL_MISMATCH"
+  },
+  {
+    "label": "Open Build for undo check",
+    "x": 411,
+    "y": 28,
+    "expected": "8628:12592",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8633-12844&starting-point-node-id=8633%3A12844&hide-ui=1",
+    "verification": "URL_MISMATCH"
+  },
+  {
+    "label": "Generate undo-check draft",
+    "x": 201,
+    "y": 574,
+    "wait": 2200,
+    "expected": "8628:12749",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8633-12844&starting-point-node-id=8633%3A12844&hide-ui=1",
+    "verification": "URL_MISMATCH"
+  },
+  {
+    "label": "Review undo-check draft",
+    "x": 201,
+    "y": 674,
+    "expected": "8628:12826",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-3&starting-point-node-id=8633%3A12844&hide-ui=1",
+    "verification": "URL_MISMATCH"
+  },
+  {
+    "label": "Apply before undo",
+    "x": 1241,
+    "y": 528,
+    "expected": "8628:12915",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-3&starting-point-node-id=8633%3A12844&hide-ui=1",
+    "verification": "URL_MISMATCH"
+  },
+  {
+    "label": "Undo restores pre-run heading",
+    "x": 201,
+    "y": 684,
+    "shot": "r28-editor-undo.png",
+    "expected": "8465:3",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-3&starting-point-node-id=8633%3A12844&hide-ui=1",
+    "verification": "URL_MATCH"
+  },
+  {
+    "label": "Open Build for discard check",
+    "x": 411,
+    "y": 28,
+    "expected": "8628:12592",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8628-12592&starting-point-node-id=8633%3A12844&hide-ui=1",
+    "verification": "URL_MATCH"
+  },
+  {
+    "label": "Generate discard-check draft",
+    "x": 201,
+    "y": 574,
+    "wait": 2200,
+    "expected": "8628:12749",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8628-12749&starting-point-node-id=8633%3A12844&hide-ui=1",
+    "verification": "URL_MATCH"
+  },
+  {
+    "label": "Discard draft",
+    "x": 201,
+    "y": 724,
+    "shot": "r28-build-discarded.png",
+    "expected": "8628:12592",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8628-12592&starting-point-node-id=8633%3A12844&hide-ui=1",
+    "verification": "URL_MATCH"
+  },
+  {
+    "label": "Return after discard",
+    "x": 319,
+    "y": 28,
+    "shot": "r28-editor-after-discard.png",
+    "expected": "8465:3",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-3&starting-point-node-id=8633%3A12844&hide-ui=1",
+    "verification": "URL_MATCH"
+  }
+]

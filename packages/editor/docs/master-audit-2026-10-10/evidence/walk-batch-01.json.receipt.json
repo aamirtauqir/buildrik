@@ -1,0 +1,26 @@
+[
+  {
+    "label": "Choose Heading On click trigger",
+    "x": 530,
+    "y": 262,
+    "shot": "walk-01-trigger-selected.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-3&starting-point-node-id=8465%3A3&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Return to Heading",
+    "x": 1260,
+    "y": 430,
+    "shot": "walk-02-heading-return.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-3&starting-point-node-id=8465%3A3&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Open text style picker",
+    "x": 1240,
+    "y": 315,
+    "shot": "walk-03-text-styles.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-3&starting-point-node-id=8465%3A3&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

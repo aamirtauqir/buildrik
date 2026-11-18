@@ -1,0 +1,1869 @@
+{
+  "date": "2026-10-12",
+  "page": "8463:2",
+  "screens": [
+    {
+      "key": "T01",
+      "id": "8507:2799",
+      "name": "T01 / Integrated inspector / Image settings",
+      "inspector": "8507:2855",
+      "actions": [
+        {
+          "id": "8507:3004",
+          "label": "Use descriptive alt"
+        },
+        {
+          "id": "8507:3006",
+          "label": "View email field"
+        }
+      ],
+      "bounds": {
+        "w": 1440,
+        "h": 1000
+      },
+      "instanceCount": 38
+    },
+    {
+      "key": "T02",
+      "id": "8507:3011",
+      "name": "T02 / Integrated inspector / Image alt text updated",
+      "inspector": "8507:3067",
+      "actions": [
+        {
+          "id": "8507:3216",
+          "label": "Undo alt text"
+        },
+        {
+          "id": "8507:3218",
+          "label": "View email field"
+        }
+      ],
+      "bounds": {
+        "w": 1440,
+        "h": 1000
+      },
+      "instanceCount": 38
+    },
+    {
+      "key": "T03",
+      "id": "8507:246872",
+      "name": "T03 / Integrated inspector / Email field settings",
+      "inspector": "8507:246928",
+      "actions": [
+        {
+          "id": "8507:247077",
+          "label": "Make field required"
+        },
+        {
+          "id": "8507:247079",
+          "label": "Form submission settings"
+        }
+      ],
+      "bounds": {
+        "w": 1440,
+        "h": 1000
+      },
+      "instanceCount": 38
+    },
+    {
+      "key": "T04",
+      "id": "8507:247087",
+      "name": "T04 / Integrated inspector / Required email field",
+      "inspector": "8507:247143",
+      "actions": [
+        {
+          "id": "8507:247292",
+          "label": "Undo required"
+        },
+        {
+          "id": "8507:247294",
+          "label": "Form submission settings"
+        }
+      ],
+      "bounds": {
+        "w": 1440,
+        "h": 1000
+      },
+      "instanceCount": 38
+    },
+    {
+      "key": "T05",
+      "id": "8507:247302",
+      "name": "T05 / Integrated inspector / Form submission settings",
+      "inspector": "8507:247358",
+      "actions": [
+        {
+          "id": "8507:247497",
+          "label": "Review redirect"
+        },
+        {
+          "id": "8507:247499",
+          "label": "Select email field"
+        }
+      ],
+      "bounds": {
+        "w": 1440,
+        "h": 1000
+      },
+      "instanceCount": 36
+    },
+    {
+      "key": "T06",
+      "id": "8507:247507",
+      "name": "T06 / Integrated inspector / Form redirect needs URL",
+      "inspector": "8507:247563",
+      "actions": [
+        {
+          "id": "8507:247702",
+          "label": "Cancel redirect"
+        },
+        {
+          "id": "8507:247704",
+          "label": "Select email field"
+        }
+      ],
+      "bounds": {
+        "w": 1440,
+        "h": 1000
+      },
+      "instanceCount": 36
+    },
+    {
+      "key": "T07",
+      "id": "8507:247712",
+      "name": "T07 / Integrated inspector / Collection list settings",
+      "inspector": "8507:247768",
+      "actions": [
+        {
+          "id": "8507:247890",
+          "label": "Show 2 items"
+        },
+        {
+          "id": "8507:247892",
+          "label": "View component instance"
+        }
+      ],
+      "bounds": {
+        "w": 1440,
+        "h": 1000
+      },
+      "instanceCount": 36
+    },
+    {
+      "key": "T08",
+      "id": "8507:247900",
+      "name": "T08 / Integrated inspector / Collection limit updated",
+      "inspector": "8507:247956",
+      "actions": [
+        {
+          "id": "8507:248078",
+          "label": "Undo limit"
+        },
+        {
+          "id": "8507:248080",
+          "label": "View component instance"
+        }
+      ],
+      "bounds": {
+        "w": 1440,
+        "h": 1000
+      },
+      "instanceCount": 36
+    },
+    {
+      "key": "T09",
+      "id": "8507:248087",
+      "name": "T09 / Integrated inspector / Component instance settings",
+      "inspector": "8507:248143",
+      "actions": [
+        {
+          "id": "8507:248287",
+          "label": "Review reset"
+        },
+        {
+          "id": "8507:248289",
+          "label": "View project image"
+        }
+      ],
+      "bounds": {
+        "w": 1440,
+        "h": 1000
+      },
+      "instanceCount": 37
+    },
+    {
+      "key": "T10",
+      "id": "8507:248294",
+      "name": "T10 / Integrated inspector / Reset instance review",
+      "inspector": "8507:248350",
+      "actions": [
+        {
+          "id": "8507:248462",
+          "label": "Reset this instance"
+        },
+        {
+          "id": "8507:248464",
+          "label": "Cancel reset"
+        }
+      ],
+      "bounds": {
+        "w": 1440,
+        "h": 1000
+      },
+      "instanceCount": 34
+    },
+    {
+      "key": "T11",
+      "id": "8507:248469",
+      "name": "T11 / Integrated inspector / Instance reset result",
+      "inspector": "8507:248525",
+      "actions": [
+        {
+          "id": "8507:248669",
+          "label": "Undo reset"
+        },
+        {
+          "id": "8507:248671",
+          "label": "View project image"
+        }
+      ],
+      "bounds": {
+        "w": 1440,
+        "h": 1000
+      },
+      "instanceCount": 37
+    }
+  ],
+  "specs": [
+    {
+      "key": "T01",
+      "title": "Image settings",
+      "selected": "Project image",
+      "kind": "image",
+      "note": "Image content is local. Fit follows the active breakpoint.",
+      "groups": [
+        [
+          "Source & accessibility",
+          [
+            "Source",
+            "project-cover.jpg"
+          ],
+          [
+            "Alt text",
+            "Studio interior"
+          ],
+          [
+            "Loading",
+            "Lazy"
+          ]
+        ],
+        [
+          "Image layout",
+          [
+            "Fit",
+            "Cover"
+          ],
+          [
+            "Width",
+            "100 %"
+          ],
+          [
+            "Height",
+            "240 px"
+          ]
+        ],
+        [
+          "CMS binding",
+          [
+            "Source field",
+            "Not bound"
+          ],
+          [
+            "Fallback",
+            "project-cover.jpg"
+          ]
+        ]
+      ],
+      "actions": [
+        [
+          "Use descriptive alt",
+          "T02"
+        ],
+        [
+          "View email field",
+          "T03"
+        ]
+      ]
+    },
+    {
+      "key": "T02",
+      "title": "Image alt text updated",
+      "selected": "Project image",
+      "kind": "image",
+      "note": "Alt text updated for this image. Its source and layout are unchanged.",
+      "groups": [
+        [
+          "Source & accessibility",
+          [
+            "Source",
+            "project-cover.jpg"
+          ],
+          [
+            "Alt text",
+            "Sunlit studio interior"
+          ],
+          [
+            "Loading",
+            "Lazy"
+          ]
+        ],
+        [
+          "Image layout",
+          [
+            "Fit",
+            "Cover"
+          ],
+          [
+            "Width",
+            "100 %"
+          ],
+          [
+            "Height",
+            "240 px"
+          ]
+        ],
+        [
+          "CMS binding",
+          [
+            "Source field",
+            "Not bound"
+          ],
+          [
+            "Fallback",
+            "project-cover.jpg"
+          ]
+        ]
+      ],
+      "actions": [
+        [
+          "Undo alt text",
+          "T01"
+        ],
+        [
+          "View email field",
+          "T03"
+        ]
+      ]
+    },
+    {
+      "key": "T03",
+      "title": "Email field settings",
+      "selected": "Email input",
+      "kind": "form",
+      "note": "Settings target the selected field. Submission settings belong to its form.",
+      "groups": [
+        [
+          "Field",
+          [
+            "Input type",
+            "Email"
+          ],
+          [
+            "Name",
+            "email"
+          ],
+          [
+            "Placeholder",
+            "you@example.com"
+          ],
+          [
+            "Default",
+            "Empty"
+          ]
+        ],
+        [
+          "Validation",
+          [
+            "Required",
+            "Off"
+          ],
+          [
+            "Disabled",
+            "Off"
+          ]
+        ],
+        [
+          "Accessibility",
+          [
+            "Label",
+            "Email address"
+          ],
+          [
+            "Autocomplete",
+            "email"
+          ]
+        ]
+      ],
+      "actions": [
+        [
+          "Make field required",
+          "T04"
+        ],
+        [
+          "Form submission settings",
+          "T05"
+        ]
+      ]
+    },
+    {
+      "key": "T04",
+      "title": "Required email field",
+      "selected": "Email input",
+      "kind": "form",
+      "note": "Required applies to this email field. Disabled remains off.",
+      "groups": [
+        [
+          "Field",
+          [
+            "Input type",
+            "Email"
+          ],
+          [
+            "Name",
+            "email"
+          ],
+          [
+            "Placeholder",
+            "you@example.com"
+          ],
+          [
+            "Default",
+            "Empty"
+          ]
+        ],
+        [
+          "Validation",
+          [
+            "Required",
+            "On"
+          ],
+          [
+            "Disabled",
+            "Off"
+          ]
+        ],
+        [
+          "Accessibility",
+          [
+            "Label",
+            "Email address"
+          ],
+          [
+            "Autocomplete",
+            "email"
+          ]
+        ]
+      ],
+      "actions": [
+        [
+          "Undo required",
+          "T03"
+        ],
+        [
+          "Form submission settings",
+          "T05"
+        ]
+      ]
+    },
+    {
+      "key": "T05",
+      "title": "Form submission settings",
+      "selected": "Contact form",
+      "kind": "form",
+      "note": "Submission settings save to the site outside canvas Undo. Send to requires Admin.",
+      "groups": [
+        [
+          "After submit",
+          [
+            "Then",
+            "Show message"
+          ],
+          [
+            "Message",
+            "Thanks for reaching out"
+          ]
+        ],
+        [
+          "Delivery",
+          [
+            "Send to",
+            "hello@studio.test",
+            "Admin"
+          ],
+          [
+            "Spam guard",
+            "On"
+          ]
+        ],
+        [
+          "Current scope",
+          [
+            "Form",
+            "contact-form"
+          ],
+          [
+            "Site role",
+            "Designer"
+          ]
+        ]
+      ],
+      "actions": [
+        [
+          "Review redirect",
+          "T06"
+        ],
+        [
+          "Select email field",
+          "T03"
+        ]
+      ]
+    },
+    {
+      "key": "T06",
+      "title": "Form redirect needs URL",
+      "selected": "Contact form",
+      "kind": "form",
+      "note": "Enter a redirect destination before saving. No incomplete redirect is sent.",
+      "groups": [
+        [
+          "After submit",
+          [
+            "Then",
+            "Redirect"
+          ],
+          [
+            "Redirect to",
+            "Missing URL",
+            "Invalid"
+          ]
+        ],
+        [
+          "Delivery",
+          [
+            "Send to",
+            "hello@studio.test",
+            "Admin"
+          ],
+          [
+            "Spam guard",
+            "On"
+          ]
+        ],
+        [
+          "Validation",
+          [
+            "Save status",
+            "Not saved"
+          ],
+          [
+            "Recovery",
+            "Keep show message"
+          ]
+        ]
+      ],
+      "actions": [
+        [
+          "Cancel redirect",
+          "T05"
+        ],
+        [
+          "Select email field",
+          "T03"
+        ]
+      ]
+    },
+    {
+      "key": "T07",
+      "title": "Collection list settings",
+      "selected": "Project collection",
+      "kind": "cms",
+      "note": "This list repeats its template for Projects. Changing its limit is one Undo step.",
+      "groups": [
+        [
+          "Collection",
+          [
+            "Collection",
+            "Projects"
+          ],
+          [
+            "Show items",
+            "3"
+          ],
+          [
+            "Records",
+            "3 available",
+            "Read only"
+          ]
+        ],
+        [
+          "Template binding",
+          [
+            "Title",
+            "Projects.Title"
+          ],
+          [
+            "Image",
+            "Projects.Cover"
+          ],
+          [
+            "Fallback",
+            "Untitled project"
+          ]
+        ]
+      ],
+      "actions": [
+        [
+          "Show 2 items",
+          "T08"
+        ],
+        [
+          "View component instance",
+          "T09"
+        ]
+      ]
+    },
+    {
+      "key": "T08",
+      "title": "Collection limit updated",
+      "selected": "Project collection",
+      "kind": "cms",
+      "note": "Two project items shown. Collection records and template are unchanged.",
+      "groups": [
+        [
+          "Collection",
+          [
+            "Collection",
+            "Projects"
+          ],
+          [
+            "Show items",
+            "2"
+          ],
+          [
+            "Records",
+            "3 available",
+            "Read only"
+          ]
+        ],
+        [
+          "Template binding",
+          [
+            "Title",
+            "Projects.Title"
+          ],
+          [
+            "Image",
+            "Projects.Cover"
+          ],
+          [
+            "Fallback",
+            "Untitled project"
+          ]
+        ]
+      ],
+      "actions": [
+        [
+          "Undo limit",
+          "T07"
+        ],
+        [
+          "View component instance",
+          "T09"
+        ]
+      ]
+    },
+    {
+      "key": "T09",
+      "title": "Component instance settings",
+      "selected": "Primary button instance",
+      "kind": "component",
+      "note": "Instance overrides affect this button. Master edits affect every linked instance.",
+      "groups": [
+        [
+          "Component",
+          [
+            "Master",
+            "Primary button"
+          ],
+          [
+            "Variant",
+            "Default"
+          ],
+          [
+            "Instance",
+            "Home / Hero"
+          ]
+        ],
+        [
+          "Overrides",
+          [
+            "Text",
+            "Explore our work",
+            "Override"
+          ],
+          [
+            "Radius",
+            "8 px",
+            "Override"
+          ]
+        ],
+        [
+          "Link",
+          [
+            "Destination",
+            "/work"
+          ],
+          [
+            "New tab",
+            "Off"
+          ]
+        ]
+      ],
+      "actions": [
+        [
+          "Review reset",
+          "T10"
+        ],
+        [
+          "View project image",
+          "T01"
+        ]
+      ]
+    },
+    {
+      "key": "T10",
+      "title": "Reset instance review",
+      "selected": "Primary button instance",
+      "kind": "component",
+      "note": "Reset removes this instance’s text and radius overrides. Other instances stay unchanged.",
+      "groups": [
+        [
+          "Reset preview",
+          [
+            "Text",
+            "Explore → View work"
+          ],
+          [
+            "Radius",
+            "8 px → 4 px"
+          ]
+        ],
+        [
+          "Retained",
+          [
+            "Master link",
+            "Primary button"
+          ],
+          [
+            "Destination",
+            "/work"
+          ]
+        ]
+      ],
+      "actions": [
+        [
+          "Reset this instance",
+          "T11"
+        ],
+        [
+          "Cancel reset",
+          "T09"
+        ]
+      ]
+    },
+    {
+      "key": "T11",
+      "title": "Instance reset result",
+      "selected": "Primary button instance",
+      "kind": "component",
+      "note": "This instance follows its master again. Undo restores its two overrides.",
+      "groups": [
+        [
+          "Component",
+          [
+            "Master",
+            "Primary button"
+          ],
+          [
+            "Variant",
+            "Default"
+          ],
+          [
+            "Instance",
+            "Home / Hero"
+          ]
+        ],
+        [
+          "Values",
+          [
+            "Text",
+            "View work",
+            "Master"
+          ],
+          [
+            "Radius",
+            "4 px",
+            "Master"
+          ]
+        ],
+        [
+          "Link",
+          [
+            "Destination",
+            "/work"
+          ],
+          [
+            "New tab",
+            "Off"
+          ]
+        ]
+      ],
+      "actions": [
+        [
+          "Undo reset",
+          "T09"
+        ],
+        [
+          "View project image",
+          "T01"
+        ]
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "8507:3004",
+      "label": "Use descriptive alt",
+      "to": "8507:3011",
+      "from": "8507:2799",
+      "x": 1265,
+      "y": 759
+    },
+    {
+      "id": "8507:3006",
+      "label": "View email field",
+      "to": "8507:246872",
+      "from": "8507:2799",
+      "x": 1265,
+      "y": 799
+    },
+    {
+      "id": "8507:2823",
+      "label": "Email input",
+      "to": "8507:246872",
+      "from": "8507:2799",
+      "x": 109,
+      "y": 461
+    },
+    {
+      "id": "8507:2824",
+      "label": "Contact form",
+      "to": "8507:247302",
+      "from": "8507:2799",
+      "x": 109,
+      "y": 501
+    },
+    {
+      "id": "8507:2825",
+      "label": "Project collection",
+      "to": "8507:247712",
+      "from": "8507:2799",
+      "x": 109,
+      "y": 541
+    },
+    {
+      "id": "8507:2826",
+      "label": "Button instance",
+      "to": "8507:248087",
+      "from": "8507:2799",
+      "x": 109,
+      "y": 581
+    },
+    {
+      "id": "8507:2802",
+      "label": "Design",
+      "to": "8465:2",
+      "from": "8507:2799",
+      "x": 319,
+      "y": 28
+    },
+    {
+      "id": "8507:2803",
+      "label": "AI",
+      "to": "8465:19",
+      "from": "8507:2799",
+      "x": 415,
+      "y": 28
+    },
+    {
+      "id": "8507:2804",
+      "label": "Agents",
+      "to": "8465:31",
+      "from": "8507:2799",
+      "x": 511,
+      "y": 28
+    },
+    {
+      "id": "8507:2805",
+      "label": "Team",
+      "to": "8465:46",
+      "from": "8507:2799",
+      "x": 607,
+      "y": 28
+    },
+    {
+      "id": "8507:2808",
+      "label": "Share",
+      "to": "8465:47",
+      "from": "8507:2799",
+      "x": 1005,
+      "y": 28
+    },
+    {
+      "id": "8507:3216",
+      "label": "Undo alt text",
+      "to": "8507:2799",
+      "from": "8507:3011",
+      "x": 1265,
+      "y": 759
+    },
+    {
+      "id": "8507:3218",
+      "label": "View email field",
+      "to": "8507:246872",
+      "from": "8507:3011",
+      "x": 1265,
+      "y": 799
+    },
+    {
+      "id": "8507:3034",
+      "label": "Project image",
+      "to": "8507:2799",
+      "from": "8507:3011",
+      "x": 109,
+      "y": 421
+    },
+    {
+      "id": "8507:3035",
+      "label": "Email input",
+      "to": "8507:246872",
+      "from": "8507:3011",
+      "x": 109,
+      "y": 461
+    },
+    {
+      "id": "8507:3036",
+      "label": "Contact form",
+      "to": "8507:247302",
+      "from": "8507:3011",
+      "x": 109,
+      "y": 501
+    },
+    {
+      "id": "8507:3037",
+      "label": "Project collection",
+      "to": "8507:247712",
+      "from": "8507:3011",
+      "x": 109,
+      "y": 541
+    },
+    {
+      "id": "8507:3038",
+      "label": "Button instance",
+      "to": "8507:248087",
+      "from": "8507:3011",
+      "x": 109,
+      "y": 581
+    },
+    {
+      "id": "8507:3014",
+      "label": "Design",
+      "to": "8465:2",
+      "from": "8507:3011",
+      "x": 319,
+      "y": 28
+    },
+    {
+      "id": "8507:3015",
+      "label": "AI",
+      "to": "8465:19",
+      "from": "8507:3011",
+      "x": 415,
+      "y": 28
+    },
+    {
+      "id": "8507:3016",
+      "label": "Agents",
+      "to": "8465:31",
+      "from": "8507:3011",
+      "x": 511,
+      "y": 28
+    },
+    {
+      "id": "8507:3017",
+      "label": "Team",
+      "to": "8465:46",
+      "from": "8507:3011",
+      "x": 607,
+      "y": 28
+    },
+    {
+      "id": "8507:3020",
+      "label": "Share",
+      "to": "8465:47",
+      "from": "8507:3011",
+      "x": 1005,
+      "y": 28
+    },
+    {
+      "id": "8507:247077",
+      "label": "Make field required",
+      "to": "8507:247087",
+      "from": "8507:246872",
+      "x": 1265,
+      "y": 759
+    },
+    {
+      "id": "8507:247079",
+      "label": "Form submission settings",
+      "to": "8507:247302",
+      "from": "8507:246872",
+      "x": 1265,
+      "y": 799
+    },
+    {
+      "id": "8507:246895",
+      "label": "Project image",
+      "to": "8507:2799",
+      "from": "8507:246872",
+      "x": 109,
+      "y": 421
+    },
+    {
+      "id": "8507:246897",
+      "label": "Contact form",
+      "to": "8507:247302",
+      "from": "8507:246872",
+      "x": 109,
+      "y": 501
+    },
+    {
+      "id": "8507:246898",
+      "label": "Project collection",
+      "to": "8507:247712",
+      "from": "8507:246872",
+      "x": 109,
+      "y": 541
+    },
+    {
+      "id": "8507:246899",
+      "label": "Button instance",
+      "to": "8507:248087",
+      "from": "8507:246872",
+      "x": 109,
+      "y": 581
+    },
+    {
+      "id": "8507:246875",
+      "label": "Design",
+      "to": "8465:2",
+      "from": "8507:246872",
+      "x": 319,
+      "y": 28
+    },
+    {
+      "id": "8507:246876",
+      "label": "AI",
+      "to": "8465:19",
+      "from": "8507:246872",
+      "x": 415,
+      "y": 28
+    },
+    {
+      "id": "8507:246877",
+      "label": "Agents",
+      "to": "8465:31",
+      "from": "8507:246872",
+      "x": 511,
+      "y": 28
+    },
+    {
+      "id": "8507:246878",
+      "label": "Team",
+      "to": "8465:46",
+      "from": "8507:246872",
+      "x": 607,
+      "y": 28
+    },
+    {
+      "id": "8507:246881",
+      "label": "Share",
+      "to": "8465:47",
+      "from": "8507:246872",
+      "x": 1005,
+      "y": 28
+    },
+    {
+      "id": "8507:247292",
+      "label": "Undo required",
+      "to": "8507:246872",
+      "from": "8507:247087",
+      "x": 1265,
+      "y": 759
+    },
+    {
+      "id": "8507:247294",
+      "label": "Form submission settings",
+      "to": "8507:247302",
+      "from": "8507:247087",
+      "x": 1265,
+      "y": 799
+    },
+    {
+      "id": "8507:247110",
+      "label": "Project image",
+      "to": "8507:2799",
+      "from": "8507:247087",
+      "x": 109,
+      "y": 421
+    },
+    {
+      "id": "8507:247111",
+      "label": "Email input",
+      "to": "8507:246872",
+      "from": "8507:247087",
+      "x": 109,
+      "y": 461
+    },
+    {
+      "id": "8507:247112",
+      "label": "Contact form",
+      "to": "8507:247302",
+      "from": "8507:247087",
+      "x": 109,
+      "y": 501
+    },
+    {
+      "id": "8507:247113",
+      "label": "Project collection",
+      "to": "8507:247712",
+      "from": "8507:247087",
+      "x": 109,
+      "y": 541
+    },
+    {
+      "id": "8507:247114",
+      "label": "Button instance",
+      "to": "8507:248087",
+      "from": "8507:247087",
+      "x": 109,
+      "y": 581
+    },
+    {
+      "id": "8507:247090",
+      "label": "Design",
+      "to": "8465:2",
+      "from": "8507:247087",
+      "x": 319,
+      "y": 28
+    },
+    {
+      "id": "8507:247091",
+      "label": "AI",
+      "to": "8465:19",
+      "from": "8507:247087",
+      "x": 415,
+      "y": 28
+    },
+    {
+      "id": "8507:247092",
+      "label": "Agents",
+      "to": "8465:31",
+      "from": "8507:247087",
+      "x": 511,
+      "y": 28
+    },
+    {
+      "id": "8507:247093",
+      "label": "Team",
+      "to": "8465:46",
+      "from": "8507:247087",
+      "x": 607,
+      "y": 28
+    },
+    {
+      "id": "8507:247096",
+      "label": "Share",
+      "to": "8465:47",
+      "from": "8507:247087",
+      "x": 1005,
+      "y": 28
+    },
+    {
+      "id": "8507:247497",
+      "label": "Review redirect",
+      "to": "8507:247507",
+      "from": "8507:247302",
+      "x": 1265,
+      "y": 759
+    },
+    {
+      "id": "8507:247499",
+      "label": "Select email field",
+      "to": "8507:246872",
+      "from": "8507:247302",
+      "x": 1265,
+      "y": 799
+    },
+    {
+      "id": "8507:247325",
+      "label": "Project image",
+      "to": "8507:2799",
+      "from": "8507:247302",
+      "x": 109,
+      "y": 421
+    },
+    {
+      "id": "8507:247326",
+      "label": "Email input",
+      "to": "8507:246872",
+      "from": "8507:247302",
+      "x": 109,
+      "y": 461
+    },
+    {
+      "id": "8507:247328",
+      "label": "Project collection",
+      "to": "8507:247712",
+      "from": "8507:247302",
+      "x": 109,
+      "y": 541
+    },
+    {
+      "id": "8507:247329",
+      "label": "Button instance",
+      "to": "8507:248087",
+      "from": "8507:247302",
+      "x": 109,
+      "y": 581
+    },
+    {
+      "id": "8507:247305",
+      "label": "Design",
+      "to": "8465:2",
+      "from": "8507:247302",
+      "x": 319,
+      "y": 28
+    },
+    {
+      "id": "8507:247306",
+      "label": "AI",
+      "to": "8465:19",
+      "from": "8507:247302",
+      "x": 415,
+      "y": 28
+    },
+    {
+      "id": "8507:247307",
+      "label": "Agents",
+      "to": "8465:31",
+      "from": "8507:247302",
+      "x": 511,
+      "y": 28
+    },
+    {
+      "id": "8507:247308",
+      "label": "Team",
+      "to": "8465:46",
+      "from": "8507:247302",
+      "x": 607,
+      "y": 28
+    },
+    {
+      "id": "8507:247311",
+      "label": "Share",
+      "to": "8465:47",
+      "from": "8507:247302",
+      "x": 1005,
+      "y": 28
+    },
+    {
+      "id": "8507:247702",
+      "label": "Cancel redirect",
+      "to": "8507:247302",
+      "from": "8507:247507",
+      "x": 1265,
+      "y": 759
+    },
+    {
+      "id": "8507:247704",
+      "label": "Select email field",
+      "to": "8507:246872",
+      "from": "8507:247507",
+      "x": 1265,
+      "y": 799
+    },
+    {
+      "id": "8507:247530",
+      "label": "Project image",
+      "to": "8507:2799",
+      "from": "8507:247507",
+      "x": 109,
+      "y": 421
+    },
+    {
+      "id": "8507:247531",
+      "label": "Email input",
+      "to": "8507:246872",
+      "from": "8507:247507",
+      "x": 109,
+      "y": 461
+    },
+    {
+      "id": "8507:247532",
+      "label": "Contact form",
+      "to": "8507:247302",
+      "from": "8507:247507",
+      "x": 109,
+      "y": 501
+    },
+    {
+      "id": "8507:247533",
+      "label": "Project collection",
+      "to": "8507:247712",
+      "from": "8507:247507",
+      "x": 109,
+      "y": 541
+    },
+    {
+      "id": "8507:247534",
+      "label": "Button instance",
+      "to": "8507:248087",
+      "from": "8507:247507",
+      "x": 109,
+      "y": 581
+    },
+    {
+      "id": "8507:247510",
+      "label": "Design",
+      "to": "8465:2",
+      "from": "8507:247507",
+      "x": 319,
+      "y": 28
+    },
+    {
+      "id": "8507:247511",
+      "label": "AI",
+      "to": "8465:19",
+      "from": "8507:247507",
+      "x": 415,
+      "y": 28
+    },
+    {
+      "id": "8507:247512",
+      "label": "Agents",
+      "to": "8465:31",
+      "from": "8507:247507",
+      "x": 511,
+      "y": 28
+    },
+    {
+      "id": "8507:247513",
+      "label": "Team",
+      "to": "8465:46",
+      "from": "8507:247507",
+      "x": 607,
+      "y": 28
+    },
+    {
+      "id": "8507:247516",
+      "label": "Share",
+      "to": "8465:47",
+      "from": "8507:247507",
+      "x": 1005,
+      "y": 28
+    },
+    {
+      "id": "8507:247890",
+      "label": "Show 2 items",
+      "to": "8507:247900",
+      "from": "8507:247712",
+      "x": 1265,
+      "y": 585
+    },
+    {
+      "id": "8507:247892",
+      "label": "View component instance",
+      "to": "8507:248087",
+      "from": "8507:247712",
+      "x": 1265,
+      "y": 625
+    },
+    {
+      "id": "8507:247735",
+      "label": "Project image",
+      "to": "8507:2799",
+      "from": "8507:247712",
+      "x": 109,
+      "y": 421
+    },
+    {
+      "id": "8507:247736",
+      "label": "Email input",
+      "to": "8507:246872",
+      "from": "8507:247712",
+      "x": 109,
+      "y": 461
+    },
+    {
+      "id": "8507:247737",
+      "label": "Contact form",
+      "to": "8507:247302",
+      "from": "8507:247712",
+      "x": 109,
+      "y": 501
+    },
+    {
+      "id": "8507:247739",
+      "label": "Button instance",
+      "to": "8507:248087",
+      "from": "8507:247712",
+      "x": 109,
+      "y": 581
+    },
+    {
+      "id": "8507:247715",
+      "label": "Design",
+      "to": "8465:2",
+      "from": "8507:247712",
+      "x": 319,
+      "y": 28
+    },
+    {
+      "id": "8507:247716",
+      "label": "AI",
+      "to": "8465:19",
+      "from": "8507:247712",
+      "x": 415,
+      "y": 28
+    },
+    {
+      "id": "8507:247717",
+      "label": "Agents",
+      "to": "8465:31",
+      "from": "8507:247712",
+      "x": 511,
+      "y": 28
+    },
+    {
+      "id": "8507:247718",
+      "label": "Team",
+      "to": "8465:46",
+      "from": "8507:247712",
+      "x": 607,
+      "y": 28
+    },
+    {
+      "id": "8507:247721",
+      "label": "Share",
+      "to": "8465:47",
+      "from": "8507:247712",
+      "x": 1005,
+      "y": 28
+    },
+    {
+      "id": "8507:248078",
+      "label": "Undo limit",
+      "to": "8507:247712",
+      "from": "8507:247900",
+      "x": 1265,
+      "y": 585
+    },
+    {
+      "id": "8507:248080",
+      "label": "View component instance",
+      "to": "8507:248087",
+      "from": "8507:247900",
+      "x": 1265,
+      "y": 625
+    },
+    {
+      "id": "8507:247923",
+      "label": "Project image",
+      "to": "8507:2799",
+      "from": "8507:247900",
+      "x": 109,
+      "y": 421
+    },
+    {
+      "id": "8507:247924",
+      "label": "Email input",
+      "to": "8507:246872",
+      "from": "8507:247900",
+      "x": 109,
+      "y": 461
+    },
+    {
+      "id": "8507:247925",
+      "label": "Contact form",
+      "to": "8507:247302",
+      "from": "8507:247900",
+      "x": 109,
+      "y": 501
+    },
+    {
+      "id": "8507:247926",
+      "label": "Project collection",
+      "to": "8507:247712",
+      "from": "8507:247900",
+      "x": 109,
+      "y": 541
+    },
+    {
+      "id": "8507:247927",
+      "label": "Button instance",
+      "to": "8507:248087",
+      "from": "8507:247900",
+      "x": 109,
+      "y": 581
+    },
+    {
+      "id": "8507:247903",
+      "label": "Design",
+      "to": "8465:2",
+      "from": "8507:247900",
+      "x": 319,
+      "y": 28
+    },
+    {
+      "id": "8507:247904",
+      "label": "AI",
+      "to": "8465:19",
+      "from": "8507:247900",
+      "x": 415,
+      "y": 28
+    },
+    {
+      "id": "8507:247905",
+      "label": "Agents",
+      "to": "8465:31",
+      "from": "8507:247900",
+      "x": 511,
+      "y": 28
+    },
+    {
+      "id": "8507:247906",
+      "label": "Team",
+      "to": "8465:46",
+      "from": "8507:247900",
+      "x": 607,
+      "y": 28
+    },
+    {
+      "id": "8507:247909",
+      "label": "Share",
+      "to": "8465:47",
+      "from": "8507:247900",
+      "x": 1005,
+      "y": 28
+    },
+    {
+      "id": "8507:248287",
+      "label": "Review reset",
+      "to": "8507:248294",
+      "from": "8507:248087",
+      "x": 1265,
+      "y": 759
+    },
+    {
+      "id": "8507:248289",
+      "label": "View project image",
+      "to": "8507:2799",
+      "from": "8507:248087",
+      "x": 1265,
+      "y": 799
+    },
+    {
+      "id": "8507:248110",
+      "label": "Project image",
+      "to": "8507:2799",
+      "from": "8507:248087",
+      "x": 109,
+      "y": 421
+    },
+    {
+      "id": "8507:248111",
+      "label": "Email input",
+      "to": "8507:246872",
+      "from": "8507:248087",
+      "x": 109,
+      "y": 461
+    },
+    {
+      "id": "8507:248112",
+      "label": "Contact form",
+      "to": "8507:247302",
+      "from": "8507:248087",
+      "x": 109,
+      "y": 501
+    },
+    {
+      "id": "8507:248113",
+      "label": "Project collection",
+      "to": "8507:247712",
+      "from": "8507:248087",
+      "x": 109,
+      "y": 541
+    },
+    {
+      "id": "8507:248090",
+      "label": "Design",
+      "to": "8465:2",
+      "from": "8507:248087",
+      "x": 319,
+      "y": 28
+    },
+    {
+      "id": "8507:248091",
+      "label": "AI",
+      "to": "8465:19",
+      "from": "8507:248087",
+      "x": 415,
+      "y": 28
+    },
+    {
+      "id": "8507:248092",
+      "label": "Agents",
+      "to": "8465:31",
+      "from": "8507:248087",
+      "x": 511,
+      "y": 28
+    },
+    {
+      "id": "8507:248093",
+      "label": "Team",
+      "to": "8465:46",
+      "from": "8507:248087",
+      "x": 607,
+      "y": 28
+    },
+    {
+      "id": "8507:248096",
+      "label": "Share",
+      "to": "8465:47",
+      "from": "8507:248087",
+      "x": 1005,
+      "y": 28
+    },
+    {
+      "id": "8507:248462",
+      "label": "Reset this instance",
+      "to": "8507:248469",
+      "from": "8507:248294",
+      "x": 1265,
+      "y": 585
+    },
+    {
+      "id": "8507:248464",
+      "label": "Cancel reset",
+      "to": "8507:248087",
+      "from": "8507:248294",
+      "x": 1265,
+      "y": 625
+    },
+    {
+      "id": "8507:248317",
+      "label": "Project image",
+      "to": "8507:2799",
+      "from": "8507:248294",
+      "x": 109,
+      "y": 421
+    },
+    {
+      "id": "8507:248318",
+      "label": "Email input",
+      "to": "8507:246872",
+      "from": "8507:248294",
+      "x": 109,
+      "y": 461
+    },
+    {
+      "id": "8507:248319",
+      "label": "Contact form",
+      "to": "8507:247302",
+      "from": "8507:248294",
+      "x": 109,
+      "y": 501
+    },
+    {
+      "id": "8507:248320",
+      "label": "Project collection",
+      "to": "8507:247712",
+      "from": "8507:248294",
+      "x": 109,
+      "y": 541
+    },
+    {
+      "id": "8507:248321",
+      "label": "Button instance",
+      "to": "8507:248087",
+      "from": "8507:248294",
+      "x": 109,
+      "y": 581
+    },
+    {
+      "id": "8507:248297",
+      "label": "Design",
+      "to": "8465:2",
+      "from": "8507:248294",
+      "x": 319,
+      "y": 28
+    },
+    {
+      "id": "8507:248298",
+      "label": "AI",
+      "to": "8465:19",
+      "from": "8507:248294",
+      "x": 415,
+      "y": 28
+    },
+    {
+      "id": "8507:248299",
+      "label": "Agents",
+      "to": "8465:31",
+      "from": "8507:248294",
+      "x": 511,
+      "y": 28
+    },
+    {
+      "id": "8507:248300",
+      "label": "Team",
+      "to": "8465:46",
+      "from": "8507:248294",
+      "x": 607,
+      "y": 28
+    },
+    {
+      "id": "8507:248303",
+      "label": "Share",
+      "to": "8465:47",
+      "from": "8507:248294",
+      "x": 1005,
+      "y": 28
+    },
+    {
+      "id": "8507:248669",
+      "label": "Undo reset",
+      "to": "8507:248087",
+      "from": "8507:248469",
+      "x": 1265,
+      "y": 759
+    },
+    {
+      "id": "8507:248671",
+      "label": "View project image",
+      "to": "8507:2799",
+      "from": "8507:248469",
+      "x": 1265,
+      "y": 799
+    },
+    {
+      "id": "8507:248492",
+      "label": "Project image",
+      "to": "8507:2799",
+      "from": "8507:248469",
+      "x": 109,
+      "y": 421
+    },
+    {
+      "id": "8507:248493",
+      "label": "Email input",
+      "to": "8507:246872",
+      "from": "8507:248469",
+      "x": 109,
+      "y": 461
+    },
+    {
+      "id": "8507:248494",
+      "label": "Contact form",
+      "to": "8507:247302",
+      "from": "8507:248469",
+      "x": 109,
+      "y": 501
+    },
+    {
+      "id": "8507:248495",
+      "label": "Project collection",
+      "to": "8507:247712",
+      "from": "8507:248469",
+      "x": 109,
+      "y": 541
+    },
+    {
+      "id": "8507:248496",
+      "label": "Button instance",
+      "to": "8507:248087",
+      "from": "8507:248469",
+      "x": 109,
+      "y": 581
+    },
+    {
+      "id": "8507:248472",
+      "label": "Design",
+      "to": "8465:2",
+      "from": "8507:248469",
+      "x": 319,
+      "y": 28
+    },
+    {
+      "id": "8507:248473",
+      "label": "AI",
+      "to": "8465:19",
+      "from": "8507:248469",
+      "x": 415,
+      "y": 28
+    },
+    {
+      "id": "8507:248474",
+      "label": "Agents",
+      "to": "8465:31",
+      "from": "8507:248469",
+      "x": 511,
+      "y": 28
+    },
+    {
+      "id": "8507:248475",
+      "label": "Team",
+      "to": "8465:46",
+      "from": "8507:248469",
+      "x": 607,
+      "y": 28
+    },
+    {
+      "id": "8507:248478",
+      "label": "Share",
+      "to": "8465:47",
+      "from": "8507:248469",
+      "x": 1005,
+      "y": 28
+    },
+    {
+      "id": "8509:3552",
+      "label": "Integrated type settings",
+      "to": "8507:2799",
+      "from": "8465:10",
+      "x": 1265,
+      "y": 889
+    }
+  ]
+}

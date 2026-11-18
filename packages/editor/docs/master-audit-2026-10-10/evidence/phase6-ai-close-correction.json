@@ -1,0 +1,9 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"mutatedNodeIds\":[\"8391:1711\",\"8391:1780\",\"8391:1796\",\"8391:1797\",\"8391:2039\"],\"removedRouteSource\":\"8391:1711\",\"close\":{\"source\":\"8391:1780\",\"destination\":\"8317:297\"}}"
+    }
+  ],
+  "isError": false
+}

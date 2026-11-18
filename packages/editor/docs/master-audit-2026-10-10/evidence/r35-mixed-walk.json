@@ -1,0 +1,6 @@
+[
+  {"goto":"8465:12","wait":5000,"shot":"r35-mixed-start.png"},
+  {"x":1264,"y":787,"shot":"r35-mixed-applied.png"},
+  {"x":1264,"y":787,"shot":"r35-mixed-repeat.png"},
+  {"x":1264,"y":827,"shot":"r35-mixed-undone.png"}
+]

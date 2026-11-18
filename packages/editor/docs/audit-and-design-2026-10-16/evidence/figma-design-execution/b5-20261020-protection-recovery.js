@@ -1,0 +1,85 @@
+// Prepend continuation-helpers.js page3:6, then b5-cms-helpers.js.
+// P07 §§6–8; target endpoint states are separate from honest interim states.
+const items={};
+async function task(code,title,{tab='Fields',data=null}={}){
+ const c=await cms(code,title,{tab,data});items[code]=c;
+ c.body=frame(c.work,'Task body / scroll',1144,data?756:708);pad(c.body,24);c.body.itemSpacing=16;c.body.clipsContent=true;c.body.overflowDirection='VERTICAL';return c;
+}
+async function dlg(code,title,origin,body,buttons,{width=720}={}){
+ const r=await clone(origin.r.id,'B5-'+code+' · '+title);const m=modal(r,title,body,{width,actions:buttons.map(([label,kind='secondary'])=>({label,kind,width:Math.max(96,label.length*7+24)}))});m.d.y=128;
+ const b=frame(null,'Task details',width-48,null);m.d.insertChild(2,b);b.itemSpacing=12;const c={r,m,body:b};items[code]=c;return c;
+}
+const fields=await task('F21','Fields / stored values and usage');
+text(fields.body,'Fields',1096,'Panel');
+for(const v of [['Title','Text','Required','Used by 4'],['Reading time','Number','Optional','Used by 0 · 20 values'],['Summary','Text','Optional','Used by 0 · 8 values']]){
+ const row=frame(fields.body,'Field / '+v[0],1096,40,'HORIZONTAL');row.itemSpacing=16;row.counterAxisAlignItems='CENTER';text(row,v[0],300,'Label');text(row,v[1],160);text(row,v[2],160);text(row,v[3],320,'Meta','ink-soft');
+}
+const fa=actions(fields.body,['Change Reading time type','Delete Summary','Add required field']);
+const convert=await dlg('F22','Change Reading time type',fields,'20 records have a value. Preview the first five before changing Number to Text.',[['Cancel'],['Clear values…'],['Convert 20 values','primary']]);
+for(const v of ['Intro to grids       5  →  "5"','Design systems       8  →  "8"','Client handoff       4  →  "4"','Accessible forms    10  →  "10"','Responsive layouts   6  →  "6"'])text(convert.body,v,672,'Value');
+text(convert.body,'Lossless conversion · Used by 0 · Values remain intact.',672,'Meta','ink-soft');
+const clear=await dlg('F23','Clear Reading time values?',fields,'20 records will lose their Reading time value. This cannot be reversed by document Undo.',[['Cancel'],['Clear 20 values','disabled']]);
+const confirm=labeled(clear.body,'Type 20 to confirm','',672);
+const entered=await dlg('F24','Clear Reading time values?',fields,'20 records will lose their Reading time value. This cannot be reversed by document Undo.',[['Cancel'],['Clear 20 values','primary']]);labeled(entered.body,'Type 20 to confirm','20',672);
+const cp=await dlg('F25','Converting Reading time…',fields,'Waiting for the server to confirm all 20 values. Fields and saved values remain unchanged until acknowledgment.',[]);
+const clearPending=await dlg('F37','Clearing Reading time values…',fields,'Waiting for acknowledgment. The 20 stored values remain unchanged until the server confirms the operation.',[]);
+const converted=await task('F26','Reading time / conversion acknowledged');text(converted.body,'Reading time',1096,'Panel');labeled(converted.body,'Type','Text',720,{kind:'select'});text(converted.body,'20 values converted and saved. Used by 0.',1096,'Body','success-text');const done=button(converted.body,'Back to Fields','link',144);
+const refused=await dlg('F27','Couldn’t change Reading time',fields,'The conversion was refused. Number and all 20 stored values are unchanged.',[['Back to Fields'],['Retry','primary']]);
+const interim=await dlg('F28','Type change unavailable',fields,'20 records have a value in Reading time. Safe conversion is not available yet. The field and stored values will be kept.',[['Back to Fields','primary']]);
+const deletion=await dlg('F29','Delete Summary?',fields,'8 records have a value in Summary. The field and values will stay in Recently deleted for 30 days; its key remains reserved.',[['Cancel'],['Delete field','disabled']]);const typed=labeled(deletion.body,'Type 8 to confirm','',672);
+const deleteEntered=await dlg('F30','Delete Summary?',fields,'8 records have a value in Summary. The field and values will stay in Recently deleted for 30 days; its key remains reserved.',[['Cancel'],['Delete field','primary']]);labeled(deleteEntered.body,'Type 8 to confirm','8',672);
+const deletePending=await dlg('F31','Deleting Summary…',fields,'Waiting for acknowledgment. The field remains available until the server confirms deletion.',[]);
+const interimDelete=await dlg('F32','Summary can’t be deleted yet',fields,'8 records contain values. Recoverable field deletion is not available yet. Values and field are kept.',[['Back to Fields','primary']]);
+const required=await dlg('F33','Make Subtitle required?',fields,'18 published records have no Subtitle value. They will be skipped on the next publish unless a value is provided.',[['Cancel'],['Required for new only'],['Set a default value','primary']]);
+const defaults=await dlg('F34','Default Subtitle value',fields,'Apply a default to the 18 published records that have no value. Existing values will be kept.',[['Cancel'],['Save default','primary']]);labeled(defaults.body,'Default value','Latest from the studio',672);
+const newOnly=await task('F35','Subtitle / required for new records');text(newOnly.body,'Subtitle',1096,'Panel');check(newOnly.body,'Required for new records only',true,720);text(newOnly.body,'Existing published records keep their current publishing eligibility. New records must provide Subtitle.',720);const requiredSave=button(newOnly.body,'Save field','primary',120);
+const requiredPending=await dlg('F36','Saving Subtitle…',fields,'Waiting for the server. No existing record values or publishing rules change before acknowledgment.',[]);
+link(fa['Change Reading time type'],convert.r.id);link(fa['Delete Summary'],deletion.r.id);link(fa['Add required field'],required.r.id);link(convert.m.refs['Clear values…'],clear.r.id);link(convert.m.refs['Convert 20 values'],cp.r.id);link(confirm,entered.r.id);link(entered.m.refs['Clear 20 values'],clearPending.r.id);link(typed,deleteEntered.r.id);link(deleteEntered.m.refs['Delete field'],deletePending.r.id);link(done,fields.r.id);link(refused.m.refs.Retry,convert.r.id);
+link(required.m.refs['Set a default value'],defaults.r.id);link(required.m.refs['Required for new only'],newOnly.r.id);link(defaults.m.refs['Save default'],requiredPending.r.id);link(requiredSave,requiredPending.r.id);
+for(const x of [convert,clear,entered,deletion,deleteEntered,required,defaults,refused,interim,interimDelete])for(const key of ['Cancel','Back to Fields'])if(x.m.refs[key])link(x.m.refs[key],fields.r.id);
+const rd=await task('R21','Recently deleted / all object types',{data:'Recently deleted'});
+const filter=select(rd.body,'All types',240);text(rd.body,'Deleted items are kept for 30 days. Restore preserves IDs when supported.',1096,'Body','ink-soft');
+const rowButtons={};
+for(const [name,type,collection,days]of [['Spring launch','Record','Blog','27'],['Summary','Field','Blog','29'],['Archive','Collection','—','24'],['Availability','Source','—','28']]){
+ const r=frame(rd.body,'Deleted '+type+' / '+name,1096,32,'HORIZONTAL');r.itemSpacing=12;r.counterAxisAlignItems='CENTER';text(r,name,240,'Label');text(r,type,100);text(r,collection,180,'Body','ink-soft');text(r,'Deletes in '+days+' days',200,'Meta','ink-soft');rowButtons[type]=button(r,'Restore','secondary',100);
+}const bulk=button(rd.body,'Restore selected','disabled',160);
+const collision=await dlg('R22','Choose a new slug',rd,'Spring launch can be restored with its original ID, but spring-launch is now used by another Blog record.',[['Cancel'],['Restore record','primary']]);labeled(collision.body,'Slug','spring-launch-restored',672);text(collision.body,'Incoming references keep working because the record ID is unchanged.',672,'Meta','ink-soft');
+const rp=await dlg('R23','Restoring Spring launch…',rd,'Waiting for acknowledgment. The record stays in Recently deleted until the server confirms restoration.',[]);
+const rs=await task('R24','Spring launch / exact ID restored',{tab:'Records'});text(rs.body,'Spring launch',1096,'Panel');labeled(rs.body,'Slug','spring-launch-restored',720);text(rs.body,'Restored with its original record ID. Incoming references resolve again.',720,'Body','success-text');const rsback=button(rs.body,'Back to Recently deleted','link',232);
+const rf=await dlg('R25','Couldn’t restore Spring launch',rd,'The item remains in Recently deleted. Its retention period has not changed.',[['Cancel'],['Retry','primary']]);
+const fallback=await task('R26','Recently deleted / interim record recovery',{data:'Recently deleted'});
+text(fallback.body,'Spring launch',1096,'Panel');text(fallback.body,'Record · Blog · Deletes in 27 days',1096,'Meta','ink-soft');text(fallback.body,'Exact restoration is not available yet. Fields and collections cannot be restored from this editor yet.',1096);const fallbackButton=button(fallback.body,'Restore as new record…','secondary',232);
+const newWarn=await dlg('R27','Restore as a new record?',fallback,'This creates a new record ID. Existing incoming references will not be repaired. Review references and publishing before using the copy.',[['Cancel'],['Create new record','primary']]);labeled(newWarn.body,'Slug','spring-launch-copy',672);
+const newPending=await dlg('R28','Creating recovered copy…',fallback,'The original deleted item is kept. A new record is available only after the server confirms creation.',[]);
+const fieldRestore=await dlg('R29','Restoring Summary…',rd,'Restoring the same field ID, reserved key and saved record values. Waiting for acknowledgment.',[]);
+const collectionRestore=await dlg('R30','Restoring Archive…',rd,'Restoring the collection, fields and records with their original IDs. Waiting for acknowledgment.',[]);
+const restoredField=await task('R31','Summary / field restored');text(restoredField.body,'Summary',1096,'Panel');text(restoredField.body,'Text · key summary · 8 saved values restored · Original field ID',1096,'Body','success-text');
+const restoredCollection=await task('R32','Archive / collection restored',{tab:'Records'});const hh=restoredCollection.work.findOne(n=>n.name==='Work-area header').children.find(n=>n.type==='TEXT');hh.characters='Archive · 12 records';text(restoredCollection.body,'Archive restored',1096,'Panel');text(restoredCollection.body,'12 records and all fields are back with the same IDs. Existing bindings resolve again.',1096,'Body','success-text');const ar=button(restoredCollection.nav,'Archive   12','ghost',216);restoredCollection.nav.insertChild(5,ar);
+const empty=await task('R33','Recently deleted / empty',{data:'Recently deleted'});text(empty.body,'No recently deleted items',1096,'Panel');text(empty.body,'Deleted records, fields, collections and sources appear here for 30 days.',1096,'Body','ink-soft');
+const loading=await task('R34','Recently deleted / loading',{data:'Recently deleted'});text(loading.body,'Loading deleted items…',1096,'Panel');
+const loadfail=await task('R35','Recently deleted / load failure',{data:'Recently deleted'});notice(loadfail.body,'Couldn’t load deleted items','Your items have not been changed.');link(button(loadfail.body,'Retry','primary',96),loading.r.id);
+link(rowButtons.Record,collision.r.id);link(rowButtons.Field,fieldRestore.r.id);link(rowButtons.Collection,collectionRestore.r.id);link(collision.m.refs.Cancel,rd.r.id);link(collision.m.refs['Restore record'],rp.r.id);link(rsback,rd.r.id);link(rf.m.refs.Cancel,rd.r.id);link(rf.m.refs.Retry,rp.r.id);link(fallbackButton,newWarn.r.id);link(newWarn.m.refs.Cancel,fallback.r.id);link(newWarn.m.refs['Create new record'],newPending.r.id);
+const settings=await task('K21','Collection settings / URL impact',{tab:'Collection settings'});
+labeled(settings.body,'Collection name','Blog',720);labeled(settings.body,'Collection slug','journal',720);text(settings.body,'Buildrick CMS · Records are edited here',720,'Meta','ink-soft');notice(settings.body,'20 live URLs will change on next publish','Old /blog/ URLs will show 404 unless redirects are added.',720);const redirects=button(settings.body,'Add redirects from old URLs','link',264);const sa=actions(settings.body,['Save collection','Delete collection…'],720);
+const usage=await dlg('K22','Blog is still in use',settings,'Remove usages before deleting this collection. No bindings or records have been changed.',[['Cancel'],['Show usages','primary']]);
+for(const v of ['1,000 records · 20 generated live pages','4 bindings · 2 lists · 1 condition','1 incoming collection reference · Team.featured_post'])text(usage.body,v,672);
+const usages=await task('K23','Blog / usages before deletion',{tab:'Collection settings'});for(const v of ['Home / Latest posts / Collection list','Blog detail / Title / Text binding','Home / Featured / Visibility condition','Team / Featured post / Reference field'])text(usages.body,v,1096,'Body');text(usages.body,'Open each owning area and remove or replace the usage. Collection deletion stays blocked while any usage remains.',1096,'Meta','ink-soft');link(button(usages.body,'Back to Collection settings','link',264),settings.r.id);
+const safe=await dlg('K24','Delete Blog?',settings,'1,000 records will move with Blog to Recently deleted for 30 days. Preflight: 0 bindings, lists, conditions, dynamic pages and incoming references.',[['Cancel'],['Delete collection','disabled']]);const delkey=labeled(safe.body,'Type DELETE to confirm','',672);
+const safeTyped=await dlg('K25','Delete Blog?',settings,'1,000 records will move with Blog to Recently deleted for 30 days. Preflight: 0 bindings, lists, conditions, dynamic pages and incoming references.',[['Cancel'],['Delete collection','primary']]);labeled(safeTyped.body,'Type DELETE to confirm','DELETE',672);
+const kp=await dlg('K26','Deleting Blog…',settings,'Waiting for the server. The collection and document bindings are unchanged until acknowledgment.',[]);
+const kfail=await dlg('K27','Couldn’t delete Blog',settings,'Blog, its records and document bindings are unchanged.',[['Cancel'],['Retry','primary']]);
+const interimCollection=await dlg('K28','Delete Blog? · recovery unavailable',settings,'1,000 records will be deleted with Blog. Deleted collections can’t be restored from the editor yet; data is retained on the server. Preflight: no remaining usages.',[['Cancel'],['Delete collection','disabled']]);labeled(interimCollection.body,'Type DELETE to confirm','',672);
+const redirectsRoot=await clone('238:12721','B5-K29 · CMS Blog slug / Site settings Redirects exact handoff');
+const backRedirect=redirectsRoot.findOne(n=>n.type==='INSTANCE'&&n.name.includes('Back to Editor'));if(backRedirect){backRedirect.setProperties({'Label#4:18':'‹ Back to CMS · Blog'});backRedirect.name='‹ Back to CMS · Blog';link(backRedirect,settings.r.id);}
+link(redirects,redirectsRoot.id);link(sa['Delete collection…'],usage.r.id);link(usage.m.refs.Cancel,settings.r.id);link(usage.m.refs['Show usages'],usages.r.id);link(delkey,safeTyped.r.id);link(safeTyped.m.refs['Delete collection'],kp.r.id);link(kfail.m.refs.Retry,kp.r.id);
+for(const x of [safe,safeTyped,kfail,interimCollection])link(x.m.refs.Cancel,settings.r.id);
+for(const c of Object.values(items).filter(c=>c.navActions)){if(c!==rd)link(c.navActions.Deleted,rd.r.id);link(c.back,'165:2');if(c.tabs.Fields&&c!==fields)link(c.tabs.Fields,fields.r.id);if(c.tabs['Collection settings']&&c!==settings)link(c.tabs['Collection settings'],settings.r.id);}
+// Restore source retains the existing separately authored source recovery contract.
+const sourceRoot=page.children.find(n=>/source.*restor/i.test(n.name)&&!n.name.startsWith('B5-R'));if(sourceRoot)link(rowButtons.Source,sourceRoot.id);
+const original=await figma.getNodeByIdAsync('165:2');const door=original.findOne(n=>n.type==='INSTANCE'&&n.name==='Recently deleted');if(door)link(door,rd.r.id);
+const board=frame(null,'B5 · Stored-data protection and recovery review · 2026-10-20',1440,null);page.appendChild(board);board.x=80;board.y=batchY+Math.ceil(roots.length/4)*1060;roots.push(board);pad(board,24);board.itemSpacing=12;
+text(board,'CMS protection and recovery · outcome specimens',1392,'Area');
+text(board,'Target endpoints and interim fallbacks are separate review starting points. Pending operations never auto-navigate to success. Conversion/tombstone/undelete are engineering dependencies, not verified runtime capability.',1392,'Body','ink-soft');
+for(const codes of [['F21','F26','F27','F28','F32'],['R21','R24','R26','R31','R32'],['R33','R34','R35','K24','K28']]){const row=frame(board,'Review scenarios',1392,32,'HORIZONTAL');row.itemSpacing=12;for(const code of codes)link(button(row,code+' '+items[code].r.name.split(' · ').slice(1).join(' · ').slice(0,25),'secondary',264),items[code].r.id);}
+text(board,'Keyboard contract: initial focus on Cancel for destructive dialogs; typed confirmation is exact; Escape returns without mutation; pending mutations do not dismiss. Dialog focus remains contained and returns to its initiating control. Keyboard and server playback NOT RUN.',1392,'Meta','ink-soft');
+return await finish();

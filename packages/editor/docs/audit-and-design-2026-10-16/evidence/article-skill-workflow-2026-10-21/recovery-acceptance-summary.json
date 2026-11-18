@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-21",
+  "attempts": 91,
+  "successes": 89,
+  "misses": 2,
+  "acceptance_steps": 49,
+  "acceptance": [
+    {
+      "plan": "recovery-accept-assets.json",
+      "steps": 23,
+      "successful_run_start_indexes": [
+        41
+      ]
+    },
+    {
+      "plan": "recovery-accept-publish.json",
+      "steps": 4,
+      "successful_run_start_indexes": [
+        87
+      ]
+    },
+    {
+      "plan": "recovery-accept-open.json",
+      "steps": 11,
+      "successful_run_start_indexes": [
+        64
+      ]
+    },
+    {
+      "plan": "recovery-accept-resolved.json",
+      "steps": 11,
+      "successful_run_start_indexes": [
+        76
+      ]
+    }
+  ],
+  "scope": "Prototype pointer playback only; direct loads excluded; original two misses retained."
+}

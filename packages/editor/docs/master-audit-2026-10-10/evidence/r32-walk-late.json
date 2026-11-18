@@ -1,0 +1,105 @@
+[
+  {
+    "label": "Reset at review",
+    "goto": "8690:13237",
+    "wait": 2000
+  },
+  {
+    "label": "Remaining flows review → CMS / records, schema and dynamic pages",
+    "x": 720,
+    "y": 558,
+    "wait": 2000
+  },
+  {
+    "label": "8539:9881 → Add record",
+    "x": 1348,
+    "y": 329,
+    "wait": 2000
+  },
+  {
+    "label": "Edit new article title",
+    "x": 720,
+    "y": 227,
+    "wait": 1500,
+    "shot": "r32-cms-title-binding-fix.png"
+  },
+  {
+    "label": "CMS / record → Save draft",
+    "x": 720,
+    "y": 480,
+    "shot": "r32-cms-saved-binding-fix.png",
+    "wait": 2000
+  },
+  {
+    "label": "CMS / record saved → Back to records",
+    "x": 720,
+    "y": 569,
+    "shot": "r32-cms-new-record-binding-fix.png",
+    "wait": 2000
+  },
+  {
+    "label": "Reopen saved new record",
+    "x": 610,
+    "y": 726,
+    "wait": 1500,
+    "shot": "r32-cms-reopened-binding-fix.png"
+  },
+  {
+    "label": "Reset review",
+    "goto": "8690:13237"
+  },
+  {
+    "label": "Open CMS",
+    "x": 720,
+    "y": 558
+  },
+  {
+    "label": "Open Sources",
+    "x": 72,
+    "y": 288
+  },
+  {
+    "label": "Connect sample JSON",
+    "x": 720,
+    "y": 473,
+    "shot": "r32-source-connected.png"
+  },
+  {
+    "label": "Rename source",
+    "x": 720,
+    "y": 521,
+    "shot": "r32-source-renamed.png"
+  },
+  {
+    "label": "Return to CMS",
+    "x": 720,
+    "y": 665
+  },
+  {
+    "label": "Open Variables",
+    "x": 72,
+    "y": 324
+  },
+  {
+    "label": "Add company",
+    "x": 720,
+    "y": 473
+  },
+  {
+    "label": "Edit company value",
+    "x": 720,
+    "y": 521,
+    "shot": "r32-variable-edited.png"
+  },
+  {
+    "label": "Back to CMS",
+    "x": 720,
+    "y": 665
+  },
+  {
+    "label": "Open Team",
+    "x": 72,
+    "y": 216,
+    "shot": "r32-team.png"
+  }
+]

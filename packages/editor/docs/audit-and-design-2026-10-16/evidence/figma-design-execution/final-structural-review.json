@@ -1,0 +1,636 @@
+[
+  {
+    "id": "7:18654",
+    "name": "J-F1.01 · Open existing Home",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 94,
+      "INSTANCE": 93,
+      "TEXT": 61,
+      "VECTOR": 81,
+      "RECTANGLE": 4,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 59,
+      "Geist Mono": 2
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "7:18981",
+    "name": "J-F1.02 · Add / target Hero",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 88,
+      "INSTANCE": 92,
+      "TEXT": 69,
+      "VECTOR": 83,
+      "RECTANGLE": 4,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 67,
+      "Geist Mono": 2
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "7:19448",
+    "name": "J-F1.03 · Text inserted / receipt",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 103,
+      "INSTANCE": 98,
+      "TEXT": 73,
+      "VECTOR": 95,
+      "RECTANGLE": 12,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 71,
+      "Geist Mono": 2
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "7:19791",
+    "name": "J-F1.04 · Select Text in Layers",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 110,
+      "INSTANCE": 102,
+      "TEXT": 64,
+      "VECTOR": 97,
+      "RECTANGLE": 12,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 62,
+      "Geist Mono": 2
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "7:20283",
+    "name": "J-F1.05 · Edit content",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 110,
+      "INSTANCE": 102,
+      "TEXT": 64,
+      "VECTOR": 97,
+      "RECTANGLE": 12,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 62,
+      "Geist Mono": 2
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "7:20634",
+    "name": "J-F1.06 · Style / Desktop 24px",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 138,
+      "INSTANCE": 115,
+      "TEXT": 84,
+      "VECTOR": 103,
+      "RECTANGLE": 17,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 76,
+      "Geist Mono": 8
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "8:1282",
+    "name": "J-F1.07 · Tablet / inherited 24px",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 138,
+      "INSTANCE": 115,
+      "TEXT": 84,
+      "VECTOR": 103,
+      "RECTANGLE": 17,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 76,
+      "Geist Mono": 8
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "8:1705",
+    "name": "J-F1.08 · Tablet / override 20px",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 139,
+      "INSTANCE": 116,
+      "TEXT": 86,
+      "VECTOR": 103,
+      "RECTANGLE": 17,
+      "ELLIPSE": 2
+    },
+    "fonts": {
+      "Inter": 78,
+      "Geist Mono": 8
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "8:2272",
+    "name": "J-F1.09 · Remove override / fallback 24px",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 138,
+      "INSTANCE": 115,
+      "TEXT": 84,
+      "VECTOR": 103,
+      "RECTANGLE": 17,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 76,
+      "Geist Mono": 8
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "8:2695",
+    "name": "J-F1.10 · Undo removal / restored 20px",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 139,
+      "INSTANCE": 116,
+      "TEXT": 86,
+      "VECTOR": 103,
+      "RECTANGLE": 17,
+      "ELLIPSE": 2
+    },
+    "fonts": {
+      "Inter": 78,
+      "Geist Mono": 8
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "8:3262",
+    "name": "J-F1.11 · Preview / current Tablet",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 13,
+      "INSTANCE": 4,
+      "TEXT": 14,
+      "VECTOR": 3,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 13,
+      "Geist Mono": 1
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "8:3298",
+    "name": "J-F1.12 · Return / same context",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 138,
+      "INSTANCE": 115,
+      "TEXT": 84,
+      "VECTOR": 103,
+      "RECTANGLE": 17,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 76,
+      "Geist Mono": 8
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "10:2",
+    "name": "C01 · Locked insertion",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 88,
+      "INSTANCE": 93,
+      "TEXT": 70,
+      "VECTOR": 83,
+      "RECTANGLE": 4,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 68,
+      "Geist Mono": 2
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "10:370",
+    "name": "C02 · Stale insertion target",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 88,
+      "INSTANCE": 93,
+      "TEXT": 70,
+      "VECTOR": 83,
+      "RECTANGLE": 4,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 68,
+      "Geist Mono": 2
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "10:1190",
+    "name": "C03 · Mixed multi-selection",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 129,
+      "INSTANCE": 113,
+      "TEXT": 89,
+      "VECTOR": 95,
+      "RECTANGLE": 9,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 83,
+      "Geist Mono": 6
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "10:1626",
+    "name": "C04 · Save pending",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 138,
+      "INSTANCE": 115,
+      "TEXT": 84,
+      "VECTOR": 103,
+      "RECTANGLE": 17,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 76,
+      "Geist Mono": 8
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "10:2199",
+    "name": "C05 · Save failed / edits retained",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 140,
+      "INSTANCE": 117,
+      "TEXT": 86,
+      "VECTOR": 108,
+      "RECTANGLE": 17,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 78,
+      "Geist Mono": 8
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "10:2647",
+    "name": "C06 · Focus mode / panels hidden",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 36,
+      "INSTANCE": 21,
+      "VECTOR": 18,
+      "TEXT": 19,
+      "RECTANGLE": 8,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 17,
+      "Geist Mono": 2
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "10:2795",
+    "name": "C07 · Restored panel arrangement",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 138,
+      "INSTANCE": 115,
+      "TEXT": 84,
+      "VECTOR": 103,
+      "RECTANGLE": 17,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 76,
+      "Geist Mono": 8
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "10:3228",
+    "name": "C08 · Narrow target / overlay",
+    "width": 1366,
+    "height": 768,
+    "counts": {
+      "FRAME": 139,
+      "INSTANCE": 115,
+      "TEXT": 84,
+      "VECTOR": 102,
+      "RECTANGLE": 17,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 76,
+      "Geist Mono": 8
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "10:3787",
+    "name": "C09 · Narrow insertion / Inspector stays closed",
+    "width": 1280,
+    "height": 720,
+    "counts": {
+      "FRAME": 76,
+      "INSTANCE": 76,
+      "TEXT": 55,
+      "VECTOR": 77,
+      "RECTANGLE": 10,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 53,
+      "Geist Mono": 2
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "11:2",
+    "name": "R01 · 1024 × 768 / two-row toolbar",
+    "width": 1024,
+    "height": 768,
+    "counts": {
+      "FRAME": 84,
+      "INSTANCE": 80,
+      "TEXT": 46,
+      "VECTOR": 79,
+      "RECTANGLE": 10,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 44,
+      "Geist Mono": 2
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "11:311",
+    "name": "R02 · 1440 × 600 / short viewport",
+    "width": 1440,
+    "height": 600,
+    "counts": {
+      "FRAME": 138,
+      "INSTANCE": 115,
+      "TEXT": 84,
+      "VECTOR": 103,
+      "RECTANGLE": 17,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 76,
+      "Geist Mono": 8
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "11:870",
+    "name": "R03 · 1920 × 1080 / wide workspace",
+    "width": 1920,
+    "height": 1080,
+    "counts": {
+      "FRAME": 136,
+      "INSTANCE": 113,
+      "TEXT": 86,
+      "VECTOR": 99,
+      "RECTANGLE": 17,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 78,
+      "Geist Mono": 8
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "11:1297",
+    "name": "R04 · 1365 / overlay threshold below",
+    "width": 1365,
+    "height": 768,
+    "counts": {
+      "FRAME": 139,
+      "INSTANCE": 115,
+      "TEXT": 84,
+      "VECTOR": 102,
+      "RECTANGLE": 17,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 76,
+      "Geist Mono": 8
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "11:1866",
+    "name": "R05 · 1367 / docked threshold above",
+    "width": 1367,
+    "height": 768,
+    "counts": {
+      "FRAME": 138,
+      "INSTANCE": 115,
+      "TEXT": 84,
+      "VECTOR": 103,
+      "RECTANGLE": 17,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 76,
+      "Geist Mono": 8
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "11:2299",
+    "name": "R06 · 1280 / People and notifications",
+    "width": 1280,
+    "height": 720,
+    "counts": {
+      "FRAME": 87,
+      "INSTANCE": 89,
+      "TEXT": 50,
+      "VECTOR": 96,
+      "RECTANGLE": 10,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 48,
+      "Geist Mono": 2
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "15:2450",
+    "name": "T01 · 1440 / docked Review replaces Inspector",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 97,
+      "INSTANCE": 92,
+      "TEXT": 58,
+      "VECTOR": 88,
+      "RECTANGLE": 10,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 56,
+      "Geist Mono": 2
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "15:3054",
+    "name": "T02 · 1281 / Review overlay",
+    "width": 1281,
+    "height": 768,
+    "counts": {
+      "FRAME": 98,
+      "INSTANCE": 92,
+      "TEXT": 58,
+      "VECTOR": 88,
+      "RECTANGLE": 10,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 56,
+      "Geist Mono": 2
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "15:8208",
+    "name": "T03 · 1279 / Review sheet",
+    "width": 1279,
+    "height": 768,
+    "counts": {
+      "FRAME": 94,
+      "INSTANCE": 86,
+      "TEXT": 58,
+      "VECTOR": 81,
+      "RECTANGLE": 10,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 56,
+      "Geist Mono": 2
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "15:8645",
+    "name": "T04 · 1279 / Locate collapses to 48px peek",
+    "width": 1279,
+    "height": 768,
+    "counts": {
+      "FRAME": 85,
+      "INSTANCE": 80,
+      "TEXT": 47,
+      "VECTOR": 79,
+      "RECTANGLE": 10,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 45,
+      "Geist Mono": 2
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "17:2170",
+    "name": "B2 / geometry and keyboard handoff",
+    "width": 1120,
+    "height": 746,
+    "counts": {
+      "TEXT": 21,
+      "FRAME": 3
+    },
+    "fonts": {
+      "Inter": 21
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  }
+]

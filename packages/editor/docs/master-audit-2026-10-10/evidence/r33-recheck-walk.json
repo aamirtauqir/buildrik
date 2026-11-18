@@ -1,0 +1,62 @@
+[
+  {
+    "label": "Media direct list",
+    "goto": "8773:13794"
+  },
+  {
+    "label": "Select asset 2",
+    "x": 633,
+    "y": 419
+  },
+  {
+    "label": "Delete asset 2",
+    "x": 1225,
+    "y": 655
+  },
+  {
+    "label": "Confirm",
+    "x": 720,
+    "y": 535
+  },
+  {
+    "label": "Undo preserves list",
+    "x": 720,
+    "y": 517,
+    "shot": "r33-media-list-return-verified.png"
+  },
+  {
+    "label": "CMS schema",
+    "goto": "8771:13537"
+  },
+  {
+    "label": "Add field",
+    "x": 342,
+    "y": 186
+  },
+  {
+    "label": "Number",
+    "x": 538,
+    "y": 451
+  },
+  {
+    "label": "Minimum two",
+    "x": 538,
+    "y": 633
+  },
+  {
+    "label": "Save",
+    "x": 902,
+    "y": 736
+  },
+  {
+    "label": "Reopen number",
+    "x": 841,
+    "y": 439,
+    "shot": "r33-cms-number-reopened.png"
+  },
+  {
+    "label": "Brand section handoff",
+    "goto": "8539:11118",
+    "shot": "r33-brand-sections-entry.png"
+  }
+]

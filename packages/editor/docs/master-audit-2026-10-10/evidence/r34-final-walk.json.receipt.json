@@ -1,0 +1,63 @@
+[
+  {
+    "label": "Fresh MCP entry",
+    "goto": "8816:14125",
+    "wait": 12000,
+    "shot": "r34-mcp-disconnect-hidden.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8816-14125&starting-point-node-id=8816%3A14125&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Set server URL",
+    "x": 720,
+    "y": 558,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8816-14125&starting-point-node-id=8816%3A14125&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Review connection",
+    "x": 902,
+    "y": 643,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8816-14125&starting-point-node-id=8816%3A14125&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Authorize",
+    "x": 902,
+    "y": 637,
+    "shot": "r34-mcp-connected-final.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8816-14125&starting-point-node-id=8816%3A14125&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Disconnect",
+    "x": 720,
+    "y": 691,
+    "shot": "r34-mcp-disconnected-final.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8816-14125&starting-point-node-id=8816%3A14125&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Matching media search",
+    "goto": "8819:14287",
+    "wait": 10000,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8819-14287&starting-point-node-id=8819%3A14287&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Search gradient2",
+    "x": 902,
+    "y": 583,
+    "shot": "r34-media-matching-list.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8819-14287&starting-point-node-id=8819%3A14287&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Keep search in grid",
+    "x": 313,
+    "y": 229,
+    "shot": "r34-media-matching-grid.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8819-14287&starting-point-node-id=8819%3A14287&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

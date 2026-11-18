@@ -1,0 +1,12 @@
+[
+ {"x":720,"y":575,"shot":"r42-form-discard-retains-saved.png"},
+ {"x":1320,"y":212},
+ {"x":720,"y":403},
+ {"x":720,"y":379},
+ {"x":720,"y":609},
+ {"x":850,"y":631,"shot":"r42-form-before-remote-save-with-undo.png"},
+ {"x":1320,"y":321},
+ {"x":720,"y":669,"wait":2600,"shot":"r42-form-remote-saved-with-field-undo.png"},
+ {"x":720,"y":717},
+ {"x":1240,"y":281,"shot":"r42-form-undo-retains-remote-save.png"}
+]

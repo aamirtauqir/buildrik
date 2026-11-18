@@ -1,0 +1,305 @@
+[
+  {
+    "n": 1,
+    "name": "Heading \u00b7 S",
+    "type": "Heading",
+    "tab": "Style",
+    "acceptance": "Type block \"Heading\": Level H1\u2013H6 segmented, Text style select, \"Edit text on canvas\" button; Typography (font, size + line pair, weight, colour with token chip, align); Size (Width/Height Fixed\u00b7Fill\u00b7Hug); Spacing box diagram (margin outside, padding inside, \ud83d\udd17 link); Fill \"+\" row; Border \"+\" row",
+    "decisions": "DD-3, DD-15, R-DD-9, DD-9b, DD-11"
+  },
+  {
+    "n": 2,
+    "name": "Heading \u00b7 B",
+    "type": "Heading",
+    "tab": "Behaviour",
+    "acceptance": "CMS binding (Static / From CMS, bindable); Visibility (Desktop \u00b7 Tablet \u00b7 Mobile); Interactions (list + \"+ Add interaction\"); CSS classes (chips + add input); Attributes closed with summary",
+    "decisions": "Q1, DD-10, DD-9"
+  },
+  {
+    "n": 3,
+    "name": "Heading \u00b7 E",
+    "type": "Heading",
+    "tab": "Effects",
+    "acceptance": "Opacity \"+\"; Shadow \"+\"; Filters \"+\"; Transform & motion \"+\"; Advanced closed (cursor, blend) \u2014 no Interactions",
+    "decisions": "Q1, DD-9"
+  },
+  {
+    "n": 4,
+    "name": "Text \u00b7 S",
+    "type": "Text",
+    "tab": "Style",
+    "acceptance": "Type block \"Text\": Text style + Edit text on canvas; then as #1",
+    "decisions": "DD-3, R-DD-9"
+  },
+  {
+    "n": 5,
+    "name": "Button \u00b7 S",
+    "type": "Button",
+    "tab": "Style",
+    "acceptance": "Type block \"Button\": Edit text on canvas, Type (Button/Submit/Reset), Disabled checkbox (label beside box)",
+    "decisions": "DD-3, X-8"
+  },
+  {
+    "n": 6,
+    "name": "Button \u00b7 B",
+    "type": "Button",
+    "tab": "Behaviour",
+    "acceptance": "Link section: Link to (None/Page/URL/Email/Phone/Anchor), Page select, Open in new tab, Rel field, hint \"Changing Link to clears the old destination\"; CMS binding; Visibility; Interactions; classes; attributes",
+    "decisions": "R-DD-9, X-3"
+  },
+  {
+    "n": 7,
+    "name": "Link \u00b7 B",
+    "type": "Link",
+    "tab": "Behaviour",
+    "acceptance": "Link section with URL type selected (URL field, new tab, rel)",
+    "decisions": "R-DD-9"
+  },
+  {
+    "n": 8,
+    "name": "Image \u00b7 S",
+    "type": "Image",
+    "tab": "Style",
+    "acceptance": "Type block \"Image\": source row (thumb, file name, size, Replace), Alt text + missing-alt hint, Fit (Cover/Contain/Fill), Loading; Size; Spacing; Border; Fill",
+    "decisions": "DD-3"
+  },
+  {
+    "n": 9,
+    "name": "Video embed \u00b7 S",
+    "type": "Video embed",
+    "tab": "Style",
+    "acceptance": "Type block \"Video embed\": Video URL, \"Detected: YouTube\", Ratio 16:9/4:3/1:1, Autoplay / Muted / Show controls, warning \"Browsers block autoplay with sound\u2026 Turn on Muted\"",
+    "decisions": "Q5, X-9"
+  },
+  {
+    "n": 10,
+    "name": "Audio \u00b7 S",
+    "type": "Audio",
+    "tab": "Style",
+    "acceptance": "Type block \"Audio\": source row + \"Choose audio\", Show controls, Loop, Autoplay",
+    "decisions": "Q5"
+  },
+  {
+    "n": 11,
+    "name": "Countdown \u00b7 S",
+    "type": "Countdown",
+    "tab": "Style",
+    "acceptance": "Type block: Ends at (date-time), \"visitor's time zone\" hint, When done (Show message / Hide), Message",
+    "decisions": "Q5"
+  },
+  {
+    "n": 12,
+    "name": "Progress \u00b7 S",
+    "type": "Progress",
+    "tab": "Style",
+    "acceptance": "Type block: Value / Max pair, Show label",
+    "decisions": "Q5"
+  },
+  {
+    "n": 13,
+    "name": "Accordion \u00b7 S",
+    "type": "Accordion",
+    "tab": "Style",
+    "acceptance": "Type block: items list with \"Open\" per item, \"Allow several open at once\"",
+    "decisions": "Q5"
+  },
+  {
+    "n": 14,
+    "name": "Input \u00b7 S",
+    "type": "Input",
+    "tab": "Style",
+    "acceptance": "Type block \"Input\": Input type, Name, Placeholder, Default, Required, Disabled",
+    "decisions": "DD-3, X-8"
+  },
+  {
+    "n": 15,
+    "name": "Checkbox \u00b7 S",
+    "type": "Checkbox",
+    "tab": "Style",
+    "acceptance": "Type block \"Checkbox\" (not \"Container\"): Edit text on canvas, Name, Checked by default, Required",
+    "decisions": "Q2, P-13"
+  },
+  {
+    "n": 16,
+    "name": "Flex \u00b7 S",
+    "type": "Flex",
+    "tab": "Style",
+    "acceptance": "Type block \"Flex\": Direction (Row/Column), 3\u00d73 Align grid + label, Wrap, Gap \u2014 always visible",
+    "decisions": "DD-5, DD-9"
+  },
+  {
+    "n": 17,
+    "name": "Container (grid) \u00b7 S",
+    "type": "Container",
+    "tab": "Style",
+    "acceptance": "Layout: Display Block/Flex/Grid/None, Columns + Gap when grid, Position; Size; Spacing; Fill; Border; \"Text inside\" closed with summary",
+    "decisions": "R-DD-9, DD-10"
+  },
+  {
+    "n": 18,
+    "name": "Section \u00b7 B",
+    "type": "Section",
+    "tab": "Behaviour",
+    "acceptance": "Link section present (linkable); no CMS binding",
+    "decisions": "DD-10"
+  },
+  {
+    "n": 19,
+    "name": "Form \u00b7 B",
+    "type": "Form",
+    "tab": "Behaviour",
+    "acceptance": "Fields list (drag handle, label, type, required) + \"+ Add field\"; After submit (Then, Message/Redirect, Send to) + note \"Saved to your site straight away \u2014 not part of Undo. Changing Send to needs an admin.\"",
+    "decisions": "DD-15, C-5"
+  },
+  {
+    "n": 20,
+    "name": "Collection list \u00b7 B",
+    "type": "Collection list",
+    "tab": "Behaviour",
+    "acceptance": "Collection select incl. \"+ New collection\u2026\", Show N items, \"Open collection \u203a\"",
+    "decisions": "\u00a717.D"
+  },
+  {
+    "n": 21,
+    "name": "Nothing selected \u2014 Page panel",
+    "type": "Page",
+    "tab": "Style",
+    "acceptance": "Header \"Home \u00b7 Page\"; Fill (background), Size (max width), Typography (font, text colour), Spacing; link \"SEO & social\u2026\" + \"Your place here is kept\"; no tabs",
+    "decisions": "DD-13, P-5",
+    "page": true
+  },
+  {
+    "n": 22,
+    "name": "Multi-select (3 headings)",
+    "type": "Heading",
+    "tab": "Style",
+    "acceptance": "Bar: \"3 selected \u00b7 Headings\", \u2726 AI, \u22ef, \u2715; Align \u00d76, Distribute \u00d72 (disabled under 3), Group; same tabs; \"Mixed\" in fields that differ; note \"Edits apply to all 3. One Undo\u2026\"",
+    "decisions": "DD-12",
+    "multi": true
+  },
+  {
+    "n": 23,
+    "name": "Locked element",
+    "type": "Heading",
+    "tab": "Style",
+    "acceptance": "\ud83d\udd12 mark; line \"Locked \u2014 unlock to edit \u00b7 Unlock\"; controls shown read-only (values legible, not dimmed)",
+    "decisions": "DD-18, P-1",
+    "locked": true
+  },
+  {
+    "n": 24,
+    "name": "CMS-bound heading \u00b7 B",
+    "type": "Heading",
+    "tab": "Behaviour",
+    "acceptance": "Header chip \"\u2301 Menu.name\" (clickable); CMS binding: From CMS, Collection (+ New collection\u2026), Field (filtered by type), Preview \"Cacio e pepe (record 1 of 3)\", Open record \u203a, Unbind, hint \"Unbind keeps the text you see now\"",
+    "decisions": "R-DD-17, P-2",
+    "bound": true
+  },
+  {
+    "n": 25,
+    "name": "CMS source missing \u00b7 B",
+    "type": "Heading",
+    "tab": "Behaviour",
+    "acceptance": "Red header chip \"\u2301 Specials.title \u00b7 missing\"; error box \"Source missing \u2014 Collection \u201cSpecials\u201d was deleted\u2026\" with Reconnect\u2026 / Unbind",
+    "decisions": "R-DD-17",
+    "missing": true
+  },
+  {
+    "n": 26,
+    "name": "Component instance \u00b7 S",
+    "type": "Component",
+    "tab": "Style",
+    "acceptance": "Header \"\u25c6 Component: Reservation banner\"; component row: Variant select, \"Edit master \u203a\", \u22ef (Reset to master, Detach instance\u2026); override dot on the changed field (padding) with \"overrides master\" text",
+    "decisions": "DD-16, R-DD-14"
+  },
+  {
+    "n": 27,
+    "name": "Button :hover \u00b7 S",
+    "type": "Button",
+    "tab": "Style",
+    "acceptance": "Context row chip \"State: :hover \u25be\" (accent), \"N :hover overrides \u00b7 Reset\"; override dots on changed fields",
+    "decisions": "R-DD-14",
+    "hover": true
+  },
+  {
+    "n": 28,
+    "name": "Heading on Tablet \u00b7 S",
+    "type": "Heading",
+    "tab": "Style",
+    "acceptance": "Breakpoint chip \"Tablet \u00b7 1 override\" + Revert; dot on Size with \"Overridden on Tablet\"",
+    "decisions": "R-DD-14",
+    "tablet": true
+  },
+  {
+    "n": 29,
+    "name": "Save conflict",
+    "type": "Heading",
+    "tab": "Style",
+    "acceptance": "Line \"This site changed elsewhere \u2014 resolve to keep editing \u00b7 Resolve\"; controls read-only",
+    "decisions": "Q4",
+    "conflict": true
+  },
+  {
+    "n": 30,
+    "name": "\u22ef menu",
+    "type": "Heading",
+    "tab": "Style",
+    "acceptance": "Duplicate \u2318D \u00b7 Copy style \u2325\u2318C \u00b7 Paste style \u2325\u2318V \u00b7 Apply style to all {H3 headings} on this page (N) \u00b7 Reset style \u00b7 \u2014 \u00b7 Save as component\u2026 \u00b7 Lock \u00b7 \u2014 \u00b7 Delete \u232b (danger). Nothing else.",
+    "decisions": "R-DD-8, DD-6b",
+    "overlay": "menu"
+  },
+  {
+    "n": 31,
+    "name": "Apply-to-all dialog",
+    "type": "Heading",
+    "tab": "Style",
+    "acceptance": "Title \"Apply this style to N H3 headings on Home?\"; Copies / Keeps / Skipped rows; hint \"save this as a text style in Brand\"; Cancel / Apply to N; + toast \"Applied to N H3 headings \u00b7 Undo\"",
+    "decisions": "DD-6b",
+    "overlay": "dialog"
+  },
+  {
+    "n": 32,
+    "name": "State menu",
+    "type": "Heading",
+    "tab": "Style",
+    "acceptance": "\"Edit styles for\": Base, :hover, :focus, :active, :disabled",
+    "decisions": "R-DD-14",
+    "overlay": "state"
+  },
+  {
+    "n": 33,
+    "name": "Colour / token popover",
+    "type": "Heading",
+    "tab": "Style",
+    "acceptance": "Opens beside the panel, over the canvas (never clipped); brand colour list with token names + hex; \"Add colours in Brand \u203a\" link",
+    "decisions": "P-4",
+    "overlay": "colour"
+  },
+  {
+    "n": 34,
+    "name": "Field error",
+    "type": "Heading",
+    "tab": "Style",
+    "acceptance": "Size field with red border + line \"Use a number or a unit like 24px, 2rem, auto.\"",
+    "decisions": "DD-19",
+    "error": true
+  },
+  {
+    "n": 35,
+    "name": "AI column",
+    "type": "Heading",
+    "tab": "Style",
+    "acceptance": "Right column replaced by AI: \"\u2039 Inspector\" back, scope \"Scope: Heading\", prompt box, suggestions; note returning keeps tab/scroll/state",
+    "decisions": "DD-7, P-6, P-7",
+    "ai": true
+  },
+  {
+    "n": 36,
+    "name": "Inspector hidden",
+    "type": "Heading",
+    "tab": "Style",
+    "acceptance": "Canvas full width, \"Show inspector\" button, \u2318\\ hint",
+    "decisions": "R-DD-8",
+    "hidden": true
+  }
+]

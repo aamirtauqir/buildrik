@@ -1,0 +1,191 @@
+{
+  "createdNodeIds": [
+    "8353:312",
+    "8353:313",
+    "8353:314",
+    "8353:315",
+    "8353:316",
+    "8353:317",
+    "8353:318",
+    "8353:319",
+    "8353:320",
+    "8353:321",
+    "8353:322",
+    "8353:323",
+    "8353:324",
+    "8353:325",
+    "8353:327",
+    "8353:328",
+    "8353:329",
+    "8353:330",
+    "8353:331",
+    "8353:332",
+    "8353:333",
+    "8353:334",
+    "8353:335",
+    "8353:336"
+  ],
+  "boardId": "8353:312",
+  "width": 1200,
+  "height": 772,
+  "grid": {
+    "id": "S:f87ef6c35e92f62e4f6e4e78f29414d0d3953bb9,",
+    "name": "TO-BE / 4 px alignment",
+    "layoutGrids": [
+      {
+        "pattern": "GRID",
+        "visible": true,
+        "color": {
+          "r": 0.10199999809265137,
+          "g": 0.3370000123977661,
+          "b": 0.859000027179718,
+          "a": 0.07999999821186066
+        },
+        "sectionSize": 4,
+        "boundVariables": {}
+      }
+    ],
+    "sample": "8353:327"
+  },
+  "appliedEffects": [
+    {
+      "node": "8353:316",
+      "style": "S:e82334e58c3bcbd487ac1c04e3a84e39aa48d129,",
+      "name": "elevation/raised",
+      "effects": [
+        {
+          "type": "DROP_SHADOW",
+          "visible": true,
+          "radius": 2,
+          "boundVariables": {},
+          "color": {
+            "r": 0,
+            "g": 0,
+            "b": 0,
+            "a": 0.05000000074505806
+          },
+          "offset": {
+            "x": 0,
+            "y": 1
+          },
+          "spread": 0,
+          "blendMode": "NORMAL",
+          "showShadowBehindNode": true
+        },
+        {
+          "type": "DROP_SHADOW",
+          "visible": true,
+          "radius": 3,
+          "boundVariables": {},
+          "color": {
+            "r": 0,
+            "g": 0,
+            "b": 0,
+            "a": 0.05000000074505806
+          },
+          "offset": {
+            "x": 0,
+            "y": 1
+          },
+          "spread": -1,
+          "blendMode": "NORMAL",
+          "showShadowBehindNode": true
+        }
+      ]
+    },
+    {
+      "node": "8353:319",
+      "style": "S:423f2470cad96a3a20316900246b14505bb11a74,",
+      "name": "elevation/drag",
+      "effects": [
+        {
+          "type": "DROP_SHADOW",
+          "visible": true,
+          "radius": 6,
+          "boundVariables": {},
+          "color": {
+            "r": 0,
+            "g": 0,
+            "b": 0,
+            "a": 0.10000000149011612
+          },
+          "offset": {
+            "x": 0,
+            "y": 4
+          },
+          "spread": -1,
+          "blendMode": "NORMAL",
+          "showShadowBehindNode": true
+        },
+        {
+          "type": "DROP_SHADOW",
+          "visible": true,
+          "radius": 4,
+          "boundVariables": {},
+          "color": {
+            "r": 0,
+            "g": 0,
+            "b": 0,
+            "a": 0.05999999865889549
+          },
+          "offset": {
+            "x": 0,
+            "y": 2
+          },
+          "spread": -2,
+          "blendMode": "NORMAL",
+          "showShadowBehindNode": true
+        }
+      ]
+    },
+    {
+      "node": "8353:322",
+      "style": "S:ced2a9789b82f579fa0757ca3b7195db5b7d9929,",
+      "name": "elevation/overlay",
+      "effects": [
+        {
+          "type": "DROP_SHADOW",
+          "visible": true,
+          "radius": 15,
+          "boundVariables": {},
+          "color": {
+            "r": 0,
+            "g": 0,
+            "b": 0,
+            "a": 0.10000000149011612
+          },
+          "offset": {
+            "x": 0,
+            "y": 10
+          },
+          "spread": -3,
+          "blendMode": "NORMAL",
+          "showShadowBehindNode": true
+        },
+        {
+          "type": "DROP_SHADOW",
+          "visible": true,
+          "radius": 6,
+          "boundVariables": {},
+          "color": {
+            "r": 0,
+            "g": 0,
+            "b": 0,
+            "a": 0.05000000074505806
+          },
+          "offset": {
+            "x": 0,
+            "y": 4
+          },
+          "spread": -4,
+          "blendMode": "NORMAL",
+          "showShadowBehindNode": true
+        }
+      ]
+    }
+  ],
+  "textStyles": [
+    "S:a6e9e8d014e9ec33d8adf054294441c6bc10fa75,",
+    "S:472b6f0b5f23f000c1bc7b6bb9b3b89092b95b6d,"
+  ]
+}

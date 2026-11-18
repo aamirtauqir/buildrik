@@ -1,0 +1,17 @@
+{
+  "caller": "8317:243462",
+  "main": "8384:1597",
+  "submenu": "8317:247616",
+  "routes": [
+    {"source":"8317:243585","action":"Caller Inspector more","destination":"8384:1597","verification":"presentation"},
+    {"source":"8384:1778","action":"Main Arrange","destination":"8317:247616","verification":"presentation"},
+    {"source":"8317:247851","action":"Submenu Arrange toggle","destination":"8384:1597","verification":"presentation"},
+    {"source":"8384:1597","action":"Main Escape","destination":"8317:243462","verification":"presentation"},
+    {"source":"8317:247616","action":"Submenu Escape","destination":"8317:243462","verification":"presentation"},
+    {"source":"8384:1694","action":"Main outside canvas","destination":"8317:243462","verification":"presentation"},
+    {"source":"8384:1730","action":"Main Inspector more","destination":"8317:243462","verification":"mutation receipt only"},
+    {"source":"8384:1492","action":"Submenu outside canvas","destination":"8317:243462","verification":"mutation receipt only"},
+    {"source":"8384:1529","action":"Submenu Inspector more","destination":"8317:243462","verification":"mutation receipt only"}
+  ],
+  "attribution":"Exact mutation order from executed Figma script; no new native graph scan."
+}

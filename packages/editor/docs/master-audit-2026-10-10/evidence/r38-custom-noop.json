@@ -1,0 +1,9 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"mutatedNodeIds\":[\"8844:264736\"],\"mutatedVariableIds\":[\"VariableID:8946:17359\"],\"behavior\":\"Choosing Custom on an already Custom size preserves document-size and Undo snapshots.\"}"
+    }
+  ],
+  "isError": false
+}

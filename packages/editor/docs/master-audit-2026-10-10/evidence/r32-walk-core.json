@@ -1,0 +1,239 @@
+[
+  {
+    "label": "Reset at review",
+    "goto": "8690:13237"
+  },
+  {
+    "label": "Remaining flows review \u2192 Pages / folders, selection and order",
+    "x": 720,
+    "y": 510
+  },
+  {
+    "label": "Pages / organize \u2192 New folder\u2026",
+    "x": 720,
+    "y": 504
+  },
+  {
+    "label": "Pages / create folder \u2192 Create folder",
+    "x": 720,
+    "y": 559
+  },
+  {
+    "label": "Pages / organize \u2192 Select pages\u2026",
+    "x": 720,
+    "y": 600
+  },
+  {
+    "label": "Pages / bulk \u2192 Move to folder\u2026",
+    "x": 720,
+    "y": 463
+  },
+  {
+    "label": "Pages / move \u2192 Move to Company",
+    "x": 720,
+    "y": 517,
+    "shot": "r32-folder-moved.png"
+  },
+  {
+    "label": "Pages / organize \u2192 Reorder pages\u2026",
+    "x": 720,
+    "y": 648
+  },
+  {
+    "label": "Pages / order \u2192 Move Journal before About",
+    "x": 720,
+    "y": 503,
+    "shot": "r32-reordered.png"
+  },
+  {
+    "label": "Pages / organize \u2192 Back to pages",
+    "x": 720,
+    "y": 696,
+    "shot": "r32-manager-reordered.png"
+  },
+  {
+    "label": "Reset at review",
+    "goto": "8690:13237"
+  },
+  {
+    "label": "Remaining flows review \u2192 Pages / folders, selection and order",
+    "x": 720,
+    "y": 510
+  },
+  {
+    "label": "Pages / organize \u2192 Select pages\u2026",
+    "x": 720,
+    "y": 600
+  },
+  {
+    "label": "Pages / bulk \u2192 Duplicate selected",
+    "x": 720,
+    "y": 559,
+    "shot": "r32-bulk-copies.png"
+  },
+  {
+    "label": "Pages / bulk copies \u2192 Review copied Journal content",
+    "x": 720,
+    "y": 551,
+    "shot": "r32-journal-copy.png"
+  },
+  {
+    "label": "Journal copy to Build",
+    "x": 411,
+    "y": 28
+  },
+  {
+    "label": "Return to copied Journal",
+    "x": 320,
+    "y": 28,
+    "expected": "8730:13385",
+    "shot": "r32-copy-build-return.png"
+  },
+  {
+    "label": "Reset at review",
+    "goto": "8690:13237"
+  },
+  {
+    "label": "Remaining flows review \u2192 CMS / records, schema and dynamic pages",
+    "x": 720,
+    "y": 558
+  },
+  {
+    "label": "8539:9881 \u2192 Add record",
+    "x": 1348,
+    "y": 329
+  },
+  {
+    "label": "Edit new article title",
+    "x": 720,
+    "y": 227
+  },
+  {
+    "label": "CMS / record \u2192 Save draft",
+    "x": 720,
+    "y": 480,
+    "shot": "r32-cms-saved.png"
+  },
+  {
+    "label": "CMS / record saved \u2192 Back to records",
+    "x": 720,
+    "y": 569,
+    "shot": "r32-cms-new-record.png"
+  },
+  {
+    "label": "8539:9881 \u2192 Import\u2026",
+    "x": 1229,
+    "y": 329
+  },
+  {
+    "label": "CMS / import \u2192 Choose sample CSV",
+    "x": 720,
+    "y": 493
+  },
+  {
+    "label": "CMS / import mapping \u2192 Import 2 valid rows",
+    "x": 720,
+    "y": 527,
+    "shot": "r32-cms-imported.png"
+  },
+  {
+    "label": "CMS / import result \u2192 Back to records",
+    "x": 720,
+    "y": 517
+  },
+  {
+    "label": "8539:9881 \u2192 Open tab / Dynamic pages",
+    "x": 504,
+    "y": 179
+  },
+  {
+    "label": "8539:11574 \u2192 Select a page",
+    "x": 538,
+    "y": 384
+  },
+  {
+    "label": "CMS / template picker \u2192 Use Journal page",
+    "x": 720,
+    "y": 527,
+    "shot": "r32-cms-template-selected.png"
+  },
+  {
+    "label": "8539:11574 \u2192 Save",
+    "x": 546,
+    "y": 480,
+    "shot": "r32-cms-dynamic-saved.png"
+  },
+  {
+    "label": "Reset at review",
+    "goto": "8690:13237"
+  },
+  {
+    "label": "Remaining flows review \u2192 Assets / edits and versions",
+    "x": 720,
+    "y": 606
+  },
+  {
+    "label": "8539:9786 \u2192 Open image editor",
+    "x": 1226,
+    "y": 566
+  },
+  {
+    "label": "8539:11678 \u2192 1:1",
+    "x": 538,
+    "y": 514
+  },
+  {
+    "label": "8539:11678 \u2192 Save version",
+    "x": 738,
+    "y": 856,
+    "shot": "r32-media-version-saved.png"
+  },
+  {
+    "label": "Media / version saved \u2192 Review versions",
+    "x": 720,
+    "y": 527,
+    "shot": "r32-media-versions-unapplied.png"
+  },
+  {
+    "label": "Media / versions \u2192 Apply latest version to selected image",
+    "x": 720,
+    "y": 568,
+    "shot": "r32-media-applied.png"
+  },
+  {
+    "label": "Reset at review",
+    "goto": "8690:13237"
+  },
+  {
+    "label": "Remaining flows review \u2192 Brand / shared definitions",
+    "x": 720,
+    "y": 654
+  },
+  {
+    "label": "8539:9974 \u2192 Open token colour picker",
+    "x": 1220,
+    "y": 412
+  },
+  {
+    "label": "Brand / colour \u2192 Choose subtle background",
+    "x": 720,
+    "y": 511
+  },
+  {
+    "label": "Brand / colour \u2192 Review changes",
+    "x": 720,
+    "y": 607
+  },
+  {
+    "label": "Brand / review \u2192 Apply changes",
+    "x": 720,
+    "y": 553,
+    "shot": "r32-brand-applied.png"
+  },
+  {
+    "label": "Brand / applied \u2192 Undo changes",
+    "x": 720,
+    "y": 535,
+    "shot": "r32-brand-undone.png"
+  }
+]

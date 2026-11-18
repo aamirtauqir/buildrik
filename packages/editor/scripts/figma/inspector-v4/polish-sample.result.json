@@ -1,0 +1,1 @@
+{"content":[{"type":"text","text":"TypeError: cannot read property 'children' of null\n    at <anonymous> (PLUGIN_1_SOURCE:63:25)\n"},{"type":"text","text":"Figma Debug UUID: d0c32a21-2f07-43e7-b21c-a47444a3453d"}],"structuredContent":{"safeToRetryWithoutCanvasRead":true,"error_code":"INVALID_ARGUMENT"},"isError":true}

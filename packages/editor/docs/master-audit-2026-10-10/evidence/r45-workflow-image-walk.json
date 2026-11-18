@@ -1,0 +1,26 @@
+[
+  {
+    "x": 573,
+    "y": 96,
+    "shot": "r45-workflow-image-mobile.png"
+  },
+  {
+    "x": 118,
+    "y": 984
+  },
+  {
+    "x": 720,
+    "y": 474,
+    "shot": "r45-workflow-image-hidden.png"
+  },
+  {
+    "x": 108,
+    "y": 459,
+    "shot": "r45-workflow-hidden-layer-style.png"
+  },
+  {
+    "x": 1260,
+    "y": 369,
+    "shot": "r45-workflow-display-reset-undo-access.png"
+  }
+]

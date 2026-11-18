@@ -1,0 +1,64 @@
+[
+  {
+    "label": "Authored-alt image entry",
+    "goto": "8507:3011",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8507%3A3011&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Open source chooser",
+    "x": 1241,
+    "y": 261,
+    "shot": "r28-image-chooser.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8507%3A3011&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Select upper gradient row",
+    "x": 530,
+    "y": 422,
+    "shot": "r28-image-selected.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8507%3A3011&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Commit selected asset",
+    "x": 545,
+    "y": 596,
+    "shot": "r28-image-committed.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8507%3A3011&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Reopen source for upload",
+    "x": 1241,
+    "y": 261,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8507%3A3011&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Upload method",
+    "x": 1100,
+    "y": 315,
+    "shot": "r28-upload-form.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8507%3A3011&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Choose sample file",
+    "x": 720,
+    "y": 485,
+    "shot": "r28-upload-file.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8507%3A3011&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Upload sample file",
+    "x": 720,
+    "y": 535,
+    "wait": 2200,
+    "shot": "r28-upload-ready.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8507%3A3011&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

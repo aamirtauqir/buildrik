@@ -1,0 +1,10 @@
+{
+  "before": {
+    "focus": "Cut · Heading",
+    "role": "menuitem"
+  },
+  "afterArrowDown": {
+    "focus": "Cut · Heading",
+    "role": "menuitem"
+  }
+}

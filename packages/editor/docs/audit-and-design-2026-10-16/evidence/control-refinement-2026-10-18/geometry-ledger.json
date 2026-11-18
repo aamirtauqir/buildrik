@@ -1,0 +1,38 @@
+{
+  "createdNodeIds": [
+    "38:1090",
+    "38:1100",
+    "38:1091",
+    "38:1092",
+    "38:1093",
+    "38:1094",
+    "38:1095",
+    "I38:1095;4:394",
+    "I38:1095;4:395",
+    "I38:1095;32:641",
+    "I38:1095;32:641;33:1090"
+  ],
+  "mutatedNodeIds": [
+    "4:596",
+    "4:597",
+    "32:636",
+    "32:1282"
+  ],
+  "variables": [
+    {
+      "id": "VariableID:38:1088",
+      "name": "size/property-label",
+      "value": 88,
+      "css": "--bk-size-property-label",
+      "status": "Figma-only proposed token"
+    },
+    {
+      "id": "VariableID:38:1089",
+      "name": "size/unit-control",
+      "value": 48,
+      "css": "--bk-size-unit-control",
+      "status": "Figma-only proposed token"
+    }
+  ],
+  "sliderMinimum": "38:1090"
+}

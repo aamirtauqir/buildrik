@@ -1,0 +1,149 @@
+{
+  "createdNodeIds": [
+    "137:52464",
+    "137:53190",
+    "137:53911",
+    "137:54622",
+    "137:55343",
+    "137:56060",
+    "137:56781",
+    "137:57493",
+    "137:58206",
+    "137:58919",
+    "137:59625"
+  ],
+  "mutatedNodeIds": [
+    "137:53172",
+    "134:45058",
+    "134:45060",
+    "137:53210",
+    "137:52675",
+    "134:41466",
+    "134:42185",
+    "134:42905",
+    "134:43625",
+    "137:54619",
+    "137:54642",
+    "137:54122",
+    "137:56052",
+    "137:56056",
+    "137:56770",
+    "137:56774",
+    "137:56054",
+    "137:57490",
+    "137:58914",
+    "137:58202",
+    "137:58204",
+    "137:58939",
+    "137:58417",
+    "137:60333",
+    "137:60336",
+    "131:42512",
+    "I137:54133;62:1585",
+    "I127:37614;62:1585",
+    "I127:39050;62:1585",
+    "127:38094",
+    "127:38342",
+    "127:39524",
+    "127:39772",
+    "127:40949",
+    "131:39842",
+    "131:40585",
+    "131:41330",
+    "131:42035",
+    "134:44589"
+  ],
+  "frames": [
+    {
+      "id": "137:52464",
+      "name": "B3-P126 · Pages / About removed from Studio",
+      "w": 1440,
+      "h": 900,
+      "nodes": 696,
+      "images": []
+    },
+    {
+      "id": "137:53190",
+      "name": "B3-P127 · Home / Studio removal retained",
+      "w": 1440,
+      "h": 900,
+      "nodes": 521,
+      "images": []
+    },
+    {
+      "id": "137:53911",
+      "name": "B3-P128 · Pages / About moved down one position",
+      "w": 1440,
+      "h": 900,
+      "nodes": 696,
+      "images": []
+    },
+    {
+      "id": "137:54622",
+      "name": "B3-P129 · Home / page order retained",
+      "w": 1440,
+      "h": 900,
+      "nodes": 521,
+      "images": []
+    },
+    {
+      "id": "137:55343",
+      "name": "B3-P130 · Pages / reorder About with menu",
+      "w": 1440,
+      "h": 900,
+      "nodes": 699,
+      "images": []
+    },
+    {
+      "id": "137:56060",
+      "name": "B3-P131 · Pages / About last root page",
+      "w": 1440,
+      "h": 900,
+      "nodes": 702,
+      "images": []
+    },
+    {
+      "id": "137:56781",
+      "name": "B3-P132 · Pages / first root page order boundary",
+      "w": 1440,
+      "h": 900,
+      "nodes": 699,
+      "images": []
+    },
+    {
+      "id": "137:57493",
+      "name": "B3-P133 · Pages / Client projects folder actions",
+      "w": 1440,
+      "h": 900,
+      "nodes": 698,
+      "images": []
+    },
+    {
+      "id": "137:58206",
+      "name": "B3-P134 · Pages / private folder deleted, About kept",
+      "w": 1440,
+      "h": 900,
+      "nodes": 682,
+      "images": []
+    },
+    {
+      "id": "137:58919",
+      "name": "B3-P135 · Home / deleted folder stays removed",
+      "w": 1440,
+      "h": 900,
+      "nodes": 521,
+      "images": []
+    },
+    {
+      "id": "137:59625",
+      "name": "B3-P136 · Pages / Home reordered without changing homepage",
+      "w": 1440,
+      "h": 900,
+      "nodes": 696,
+      "images": []
+    }
+  ],
+  "allAffectedNodeIds": "affected-nodes.json (includes inherited instance descendants)",
+  "createdNodeCount": 7142,
+  "createdNodeIdsScope": "Root IDs only; full descendant IDs in artifact"
+}

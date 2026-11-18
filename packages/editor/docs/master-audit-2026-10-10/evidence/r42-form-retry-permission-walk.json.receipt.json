@@ -1,0 +1,57 @@
+[
+  {
+    "x": 720,
+    "y": 693,
+    "wait": 0,
+    "shot": "r42-form-retry-saving.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-30589&starting-point-node-id=8843%3A30589&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 1100,
+    "y": 800,
+    "wait": 0,
+    "shot": "r42-form-saving-outside-click.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-30589&starting-point-node-id=8843%3A30589&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "wait": 2600,
+    "shot": "r42-form-retry-saved.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-30589&starting-point-node-id=8843%3A30589&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 720,
+    "y": 621,
+    "shot": "r42-form-editor-recipient-denied.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-30589&starting-point-node-id=8843%3A30589&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "press": "Escape",
+    "shot": "r42-form-permission-escape.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-30589&starting-point-node-id=8843%3A30589&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 720,
+    "y": 537,
+    "shot": "r42-form-url-before-dirty-exit.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-30589&starting-point-node-id=8843%3A30589&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 720,
+    "y": 493,
+    "shot": "r42-form-invalid-before-dirty-exit.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-30589&starting-point-node-id=8843%3A30589&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "press": "Escape",
+    "shot": "r42-form-dirty-exit-guard.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-30589&starting-point-node-id=8843%3A30589&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

@@ -1,0 +1,17 @@
+{
+  "correction": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"mutatedNodeIds\":[\"8283:2091\",\"8283:2093\",\"8283:2096\",\"8283:2483\",\"8283:2492\",\"8283:2501\",\"8283:2092\",\"8283:2094\",\"8283:2097\"],\"createdNodeIds\":[],\"imageHash\":\"58e87f6cea35d65bb15476374286da14020b7f79\",\"contentOnlyImageFills\":6,\"filenameWidth\":114.5,\"evidence\":\"AssetCell.tsx object-cover/truncate, SlimLauncher two-column grid and measured114.5px cards\"}"
+      }
+    ],
+    "isError": false
+  },
+  "validation": [
+    {
+      "type": "text",
+      "text": "[{\"id\":\"8283:1998\",\"width\":1280,\"height\":720,\"imageFillNodes\":[\"8283:2091\",\"8283:2093\",\"8283:2096\"],\"filenameNodes\":[{\"id\":\"8283:2092\",\"width\":114.5,\"height\":18,\"textAutoResize\":\"TRUNCATE\"},{\"id\":\"8283:2094\",\"width\":114.5,\"height\":18,\"textAutoResize\":\"TRUNCATE\"},{\"id\":\"8283:2097\",\"width\":114.5,\"height\":18,\"textAutoResize\":\"TRUNCATE\"}]},{\"id\":\"8283:2325\",\"width\":1280,\"height\":720,\"imageFillNodes\":[\"8283:2483\",\"8283:2492\",\"8283:2501\"],\"filenameNodes\":[{\"id\":\"8283:2489\",\"width\":202.5500030517578,\"height\":18,\"textAutoResize\":\"TRUNCATE\"},{\"id\":\"8283:2498\",\"width\":202.5500030517578,\"height\":18,\"textAutoResize\":\"TRUNCATE\"},{\"id\":\"8283:2507\",\"width\":202.5500030517578,\"height\":18,\"textAutoResize\":\"TRUNCATE\"}]}]"
+    }
+  ]
+}

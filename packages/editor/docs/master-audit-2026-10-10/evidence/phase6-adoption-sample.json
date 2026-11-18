@@ -1,0 +1,107 @@
+[
+  {
+    "id": "8317:297",
+    "name": "TO-BE E01 · Editor / Heading Style",
+    "nodeCount": 198,
+    "instanceCount": 8,
+    "families": [
+      {
+        "id": "8326:260",
+        "name": "Button / TO-BE",
+        "count": 8
+      }
+    ],
+    "textCount": 66,
+    "styledTextCount": 7,
+    "boundNodeCount": 16,
+    "effectStyleCount": 0
+  },
+  {
+    "id": "8317:246897",
+    "name": "TO-BE IN-06 · Component instance",
+    "nodeCount": 198,
+    "instanceCount": 16,
+    "families": [
+      {
+        "id": "8326:260",
+        "name": "Button / TO-BE",
+        "count": 10
+      },
+      {
+        "id": "8339:154",
+        "name": "Inspector property / TO-BE",
+        "count": 6
+      }
+    ],
+    "textCount": 69,
+    "styledTextCount": 10,
+    "boundNodeCount": 85,
+    "effectStyleCount": 0
+  },
+  {
+    "id": "8334:1058",
+    "name": "P6 WS · CMS Projects records",
+    "nodeCount": 80,
+    "instanceCount": 9,
+    "families": [
+      {
+        "id": "8326:260",
+        "name": "Button / TO-BE",
+        "count": 9
+      }
+    ],
+    "textCount": 34,
+    "styledTextCount": 9,
+    "boundNodeCount": 18,
+    "effectStyleCount": 0
+  },
+  {
+    "id": "8332:1244",
+    "name": "P6 IN-16 · Reset instance confirmation",
+    "nodeCount": 208,
+    "instanceCount": 19,
+    "families": [
+      {
+        "id": "8326:260",
+        "name": "Button / TO-BE",
+        "count": 13
+      },
+      {
+        "id": "8339:154",
+        "name": "Inspector property / TO-BE",
+        "count": 6
+      }
+    ],
+    "textCount": 74,
+    "styledTextCount": 13,
+    "boundNodeCount": 91,
+    "effectStyleCount": 0
+  },
+  {
+    "id": "8351:1402",
+    "name": "TO-BE P6-NAV01 · Desktop breakpoint chooser",
+    "nodeCount": 206,
+    "instanceCount": 11,
+    "families": [
+      {
+        "id": "8326:260",
+        "name": "Button / TO-BE",
+        "count": 8
+      },
+      {
+        "id": "8347:206",
+        "name": "Dropdown / TO-BE",
+        "count": 1
+      },
+      {
+        "id": "8328:176",
+        "name": "Menu item / TO-BE",
+        "count": 2
+      }
+    ],
+    "textCount": 70,
+    "styledTextCount": 10,
+    "boundNodeCount": 22,
+    "effectStyleCount": 0
+  }
+]

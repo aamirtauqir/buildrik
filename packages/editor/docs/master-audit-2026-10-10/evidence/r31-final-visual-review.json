@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-13",
+  "scope": "R31 authored Editor prototype scenarios",
+  "reviewed_visual_pass": [
+    "r31-final-title-draft.png",
+    "r31-final-title-saved.png",
+    "r31-final-home-isolation.png",
+    "r31-final-about-retained.png",
+    "r31-final-inherited-title.png",
+    "r31-history-saved.png",
+    "r31-history-renamed.png",
+    "r31-history-empty.png",
+    "r31-journal-build-return.png",
+    "r31-journal-mobile-preview.png",
+    "r31-copy-build-return.png",
+    "r31-final-template-description.png",
+    "r31-direct-options.png",
+    "r31-direct-settings.png",
+    "r31-drawer-copy-row-verified.png",
+    "r31-drawer-copy-options-verified.png",
+    "r31-escape-copy-options.png"
+  ],
+  "inconclusive": [
+    "r31-walk-copy-shortcut.json.receipt.json",
+    "r31-escape-options.png"
+  ],
+  "keyboard_scope": "Real Escape keypress from copied-page Options returned to Manage pages. Other routes native connected only.",
+  "product_complete": false
+}

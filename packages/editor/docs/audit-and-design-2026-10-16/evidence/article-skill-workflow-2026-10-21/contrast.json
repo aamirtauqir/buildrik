@@ -1,0 +1,97 @@
+[
+  {
+    "node": "303:32419",
+    "text": "\u2715 Collection list \u201cLatest posts\u201d has no source",
+    "fontSize": 13,
+    "foreground": {
+      "r": 0.7843137383460999,
+      "g": 0.11764705926179886,
+      "b": 0.11764705926179886
+    },
+    "backgroundNode": "303:32418",
+    "background": {
+      "r": 0.9921568632125854,
+      "g": 0.9098039269447327,
+      "b": 0.9098039269447327
+    },
+    "ratio": 4.886012724819832,
+    "passes_4_5": true,
+    "scope": "Opaque solid-fill design values only; not a rendered-app audit."
+  },
+  {
+    "node": "307:23965",
+    "text": "Resolved \u00b7 Navigation spacing updated.",
+    "fontSize": 12,
+    "foreground": {
+      "r": 0.019607843831181526,
+      "g": 0.47843137383461,
+      "b": 0.3333333432674408
+    },
+    "backgroundNode": "307:23961",
+    "background": {
+      "r": 1,
+      "g": 1,
+      "b": 1
+    },
+    "ratio": 5.355173074706218,
+    "passes_4_5": true,
+    "scope": "Opaque solid-fill design values only; not a rendered-app audit."
+  },
+  {
+    "node": "310:20927",
+    "text": "Selected: Home / Navigation / Logo",
+    "fontSize": 12,
+    "foreground": {
+      "r": 0.10196078568696976,
+      "g": 0.33725491166114807,
+      "b": 0.8588235378265381
+    },
+    "backgroundNode": "310:20918",
+    "background": {
+      "r": 1,
+      "g": 1,
+      "b": 1
+    },
+    "ratio": 6.18022863844206,
+    "passes_4_5": true,
+    "scope": "Opaque solid-fill design values only; not a rendered-app audit."
+  },
+  {
+    "node": "302:3508",
+    "text": "Container content",
+    "fontSize": 12,
+    "foreground": {
+      "r": 0.06666667014360428,
+      "g": 0.0941176488995552,
+      "b": 0.15294118225574493
+    },
+    "backgroundNode": "302:3505",
+    "background": {
+      "r": 1,
+      "g": 1,
+      "b": 1
+    },
+    "ratio": 17.739716892257665,
+    "passes_4_5": true,
+    "scope": "Opaque solid-fill design values only; not a rendered-app audit."
+  },
+  {
+    "node": "302:3510",
+    "text": "Content is inside this container\u2019s children. Select a child on the canvas or in Layers to edit it.",
+    "fontSize": 13,
+    "foreground": {
+      "r": 0.29411765933036804,
+      "g": 0.3333333432674408,
+      "b": 0.38823530077934265
+    },
+    "backgroundNode": "302:3505",
+    "background": {
+      "r": 1,
+      "g": 1,
+      "b": 1
+    },
+    "ratio": 7.557377826387225,
+    "passes_4_5": true,
+    "scope": "Opaque solid-fill design values only; not a rendered-app audit."
+  }
+]

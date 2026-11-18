@@ -1,0 +1,26 @@
+Feature ID,Original source,Expected behavior,Improved destination,Shared pattern,Design status,Prototype status,Validation status,Limitations
+R30-P01,NewPageModal.tsx,Blank page creates and selects page,8663:12911 → 8663:12975,Shared dialog/buttons,IMPLEMENTED,FINITE_CONNECTED,BROWSER_VISUAL_PASS,Sample Contact only
+R30-P02,NewPageModal.tsx,Template choice defers creation until selection,8663:12890 → 8539:12186 → 8663:12963 → 8663:13173,Template catalogue/dialog,PARTIAL,FINITE_CONNECTED,BROWSER_VISUAL_PASS,Portfolio only
+R30-P03,NewPageModal.tsx,Cancel creates nothing,8663:12890 → 8539:9579,Shared buttons,IMPLEMENTED,FINITE_CONNECTED,BROWSER_VISUAL_PASS,Finite fixture
+R30-P04,NewPageModal.tsx,Name required and failure allows retry,8663:12935 / 8663:12954,Disabled/primary buttons,IMPLEMENTED,FINITE_CONNECTED,PARTIAL_PLAYBACK,Failure retry played; required name only native inspected
+R30-P05,NewPageModal.tsx,Optional add to navigation,8663:12911,Shared secondary button,PARTIAL,STATE_CONNECTED,BROWSER_VISUAL_PASS,No complete navigation insertion
+R30-P06,PageManager and prior audit,Page-specific selection and preview,8663:12975 / 8663:13173 / 8663:13368,Existing Editor shell,PARTIAL,FINITE_CONNECTED,PARTIAL_PLAYBACK,About and all Mobile previews not exhaustively played
+R30-P07,Prior PAGES-HISTORY-AUDIT,Search rename duplicate delete pages,8539:9579,Pages drawer,OPEN,INCOMPLETE,UNVERIFIED,Next pass
+R30-S01,usePageSettings.ts,Shared draft across tabs,8539:10798 / 8539:10865 / 8539:10914,Shared fields,PARTIAL,STATE_CONNECTED,BROWSER_VISUAL_PASS,Home title description slug and Advanced flags
+R30-S02,usePageSettings.ts and slug.ts,Duplicate slug blocks save,8665:12961,Validation dialog,IMPLEMENTED,FINITE_CONNECTED,BROWSER_VISUAL_PASS,Journal conflict fixture
+R30-S03,usePageSettings.ts,Save or discard draft,8665:12943 / 8665:12978,Shared confirmation,IMPLEMENTED,STATE_CONNECTED,BROWSER_VISUAL_PASS,Prototype variables only
+R30-S04,usePageSettings.ts,Request failure retains edits and retries,8665:12953,Recovery dialog,IMPLEMENTED,STATE_CONNECTED,BROWSER_VISUAL_PASS,No server write
+R30-S05,usePageSettings.ts,Consistent indexing state,8539:10822 / 8539:10914,Shared select/value variable,IMPLEMENTED,STATE_CONNECTED,BROWSER_VISUAL_PASS,On/Off display
+R30-S06,usePageSettings.ts,OG/custom head/site defaults,8539:10865 / 8539:10914,Existing settings,PARTIAL,INCOMPLETE,UNVERIFIED,Advanced capabilities remain
+R30-R01,publish.service.ts,Readiness loading error blockers ready,8662:12993 / 13005 / 13019 / 13041,Right task panel,IMPLEMENTED,FINITE_CONNECTED,BROWSER_VISUAL_PASS,Finite results not live checks
+R30-R02,PublishConfirmModal.tsx,Explicit production confirmation and cancel,8662:13058,Shared confirmation,IMPLEMENTED,FINITE_CONNECTED,BROWSER_VISUAL_PASS,No target chooser or scheduling
+R30-R03,publish.service.ts,Deployment progress failure retry success,8662:13069 / 13097 / 13082,Right task panel,IMPLEMENTED,FINITE_CONNECTED,BROWSER_VISUAL_PASS,No deployment triggered
+R30-R04,Existing published-history design,Published release appears in history,8539:11837,Conditional release card,IMPLEMENTED,STATE_CONNECTED,NATIVE_INSPECTED,Published history branch not played
+R30-H01,CompareView.tsx and prior audit,Compare selected version against current,8666:12945 / 8666:12963,Two-column comparison,PARTIAL,STATE_CONNECTED,BROWSER_VISUAL_PASS,Heading only; HIST-01 remains
+R30-H02,Prior PAGES-HISTORY-AUDIT,Restore with safety copy and Undo,8666:12984 / 13000 / 13009,Confirmation/recovery,PARTIAL,STATE_CONNECTED,BROWSER_VISUAL_PASS,Home heading only
+R30-H03,Prior PAGES-HISTORY-AUDIT,Failure retains current draft and retries,8666:13016,Recovery dialog,IMPLEMENTED,FINITE_CONNECTED,BROWSER_VISUAL_PASS,Finite error fixture
+R30-H04,Prior PAGES-HISTORY-AUDIT,Save rename delete version,8666:13028 / 13048 / 13063,Shared fields/buttons,PARTIAL,STATE_CONNECTED,NATIVE_INSPECTED,Browser playback pending
+R30-M01,Existing responsive ownership contract,Reset reads current Desktop value,8465:7 → 8465:15,Shared Inspector controls,PARTIAL,STATE_CONNECTED,BROWSER_VISUAL_PASS,Display96 verified; arbitrary canvas cascade not certified
+R30-M02,Existing page-switch ownership contract,Mobile preserves selected Contact page,8663:12975 ↔ 8676:12958,Existing shell,IMPLEMENTED,FINITE_CONNECTED,BROWSER_VISUAL_PASS,Other two pairs native inspected
+R30-B01,R28 Editor/Build return contract,Build returns to original new page and breakpoint,Existing six Build return controls,Existing shell and return variable,IMPLEMENTED,STATE_CONNECTED,NATIVE_INSPECTED,Playback pending
+

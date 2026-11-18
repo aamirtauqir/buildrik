@@ -1,0 +1,1488 @@
+[
+  {
+    "designId": "TB-W01",
+    "id": "8317:9",
+    "name": "TO-BE TB-W01 / CMS records",
+    "x": 6000,
+    "y": 0,
+    "width": 1440,
+    "height": 900,
+    "nativeNodes": 90,
+    "textNodes": 42,
+    "autoLayout": 7,
+    "instances": 9,
+    "imageFills": [],
+    "actions": [
+      {
+        "id": "8317:12",
+        "name": "Action / Return / Home",
+        "disabled": false
+      },
+      {
+        "id": "8317:16",
+        "name": "Action / Open command palette",
+        "disabled": false
+      },
+      {
+        "id": "8317:27",
+        "name": "Action / Open Articles",
+        "disabled": false
+      },
+      {
+        "id": "8317:31",
+        "name": "Action / Open Team",
+        "disabled": false
+      },
+      {
+        "id": "8317:35",
+        "name": "Action / Open New collection",
+        "disabled": false
+      },
+      {
+        "id": "8317:39",
+        "name": "Action / Open Sources",
+        "disabled": false
+      },
+      {
+        "id": "8317:43",
+        "name": "Action / Open Variables",
+        "disabled": false
+      },
+      {
+        "id": "8317:47",
+        "name": "Action / Open Conditions",
+        "disabled": false
+      },
+      {
+        "id": "8317:55",
+        "name": "Action / Open tab / Records",
+        "disabled": false
+      },
+      {
+        "id": "8317:57",
+        "name": "Action / Open tab / Fields",
+        "disabled": false
+      },
+      {
+        "id": "8317:59",
+        "name": "Action / Open tab / Dynamic pages",
+        "disabled": false
+      },
+      {
+        "id": "8317:61",
+        "name": "Action / Open tab / Settings",
+        "disabled": false
+      },
+      {
+        "id": "8317:72",
+        "name": "Action / Import…",
+        "disabled": false
+      },
+      {
+        "id": "8317:74",
+        "name": "Action / Add record",
+        "disabled": false
+      },
+      {
+        "id": "8317:82",
+        "name": "Action / Open row / Designing with purpose",
+        "disabled": false
+      },
+      {
+        "id": "8317:87",
+        "name": "Action / Open row / A quieter workspace",
+        "disabled": false
+      },
+      {
+        "id": "8317:92",
+        "name": "Action / Open row / Materials that last",
+        "disabled": false
+      },
+      {
+        "id": "8317:98",
+        "name": "Action / Open CMS record conflict example",
+        "disabled": false
+      }
+    ],
+    "formControls": [
+      {
+        "id": "8317:21",
+        "name": "Search / Find in cms"
+      },
+      {
+        "id": "8317:68",
+        "name": "Search / Search articles"
+      }
+    ],
+    "textOutsideFrame": []
+  },
+  {
+    "designId": "TB-W02",
+    "id": "8317:103",
+    "name": "TO-BE TB-W02 / CMS record conflict",
+    "x": 8000,
+    "y": 0,
+    "width": 1440,
+    "height": 900,
+    "nativeNodes": 94,
+    "textNodes": 39,
+    "autoLayout": 5,
+    "instances": 10,
+    "imageFills": [],
+    "actions": [
+      {
+        "id": "8317:106",
+        "name": "Action / Return / Home",
+        "disabled": false
+      },
+      {
+        "id": "8317:110",
+        "name": "Action / Open command palette",
+        "disabled": false
+      },
+      {
+        "id": "8317:121",
+        "name": "Action / Open Articles",
+        "disabled": false
+      },
+      {
+        "id": "8317:125",
+        "name": "Action / Open Team",
+        "disabled": false
+      },
+      {
+        "id": "8317:129",
+        "name": "Action / Open New collection",
+        "disabled": false
+      },
+      {
+        "id": "8317:133",
+        "name": "Action / Open Sources",
+        "disabled": false
+      },
+      {
+        "id": "8317:137",
+        "name": "Action / Open Variables",
+        "disabled": false
+      },
+      {
+        "id": "8317:141",
+        "name": "Action / Open Conditions",
+        "disabled": false
+      },
+      {
+        "id": "8317:149",
+        "name": "Action / Open tab / Records",
+        "disabled": false
+      },
+      {
+        "id": "8317:151",
+        "name": "Action / Open tab / Fields",
+        "disabled": false
+      },
+      {
+        "id": "8317:153",
+        "name": "Action / Open tab / Dynamic pages",
+        "disabled": false
+      },
+      {
+        "id": "8317:155",
+        "name": "Action / Open tab / Settings",
+        "disabled": false
+      },
+      {
+        "id": "8317:186",
+        "name": "Action / Use server version",
+        "disabled": false
+      },
+      {
+        "id": "8317:188",
+        "name": "Action / Keep my changes",
+        "disabled": false
+      },
+      {
+        "id": "8317:194",
+        "name": "Action / Discard",
+        "disabled": false
+      },
+      {
+        "id": "8317:196",
+        "name": "Action / Save record",
+        "disabled": true
+      }
+    ],
+    "formControls": [
+      {
+        "id": "8317:115",
+        "name": "Search / Find in cms"
+      },
+      {
+        "id": "8317:171",
+        "name": "Property / Your title"
+      },
+      {
+        "id": "8317:175",
+        "name": "Property / Server title"
+      },
+      {
+        "id": "8317:179",
+        "name": "Property / Slug"
+      }
+    ],
+    "textOutsideFrame": []
+  },
+  {
+    "designId": "TB-W03",
+    "id": "8317:201",
+    "name": "TO-BE TB-W03 / Media / Library",
+    "x": 10000,
+    "y": 0,
+    "width": 1440,
+    "height": 900,
+    "nativeNodes": 92,
+    "textNodes": 37,
+    "autoLayout": 4,
+    "instances": 8,
+    "imageFills": [
+      "8317:258",
+      "8317:262",
+      "8317:266"
+    ],
+    "actions": [
+      {
+        "id": "8317:204",
+        "name": "Action / Return / Home",
+        "disabled": false
+      },
+      {
+        "id": "8317:208",
+        "name": "Action / Open command palette",
+        "disabled": false
+      },
+      {
+        "id": "8317:219",
+        "name": "Action / Open All media",
+        "disabled": false
+      },
+      {
+        "id": "8317:223",
+        "name": "Action / Open Recent",
+        "disabled": false
+      },
+      {
+        "id": "8317:227",
+        "name": "Action / Open In use",
+        "disabled": false
+      },
+      {
+        "id": "8317:231",
+        "name": "Action / Open Unused",
+        "disabled": false
+      },
+      {
+        "id": "8317:235",
+        "name": "Action / Open Folders",
+        "disabled": false
+      },
+      {
+        "id": "8317:239",
+        "name": "Action / Open Brand fonts",
+        "disabled": false
+      },
+      {
+        "id": "8317:249",
+        "name": "Action / Open upload queue",
+        "disabled": false
+      },
+      {
+        "id": "8317:252",
+        "name": "Action / Open tab / Grid",
+        "disabled": false
+      },
+      {
+        "id": "8317:254",
+        "name": "Action / Open tab / List",
+        "disabled": false
+      },
+      {
+        "id": "8317:257",
+        "name": "Action / Select media / 0",
+        "disabled": false
+      },
+      {
+        "id": "8317:261",
+        "name": "Action / Select media / 1",
+        "disabled": false
+      },
+      {
+        "id": "8317:265",
+        "name": "Action / Select media / 2",
+        "disabled": false
+      },
+      {
+        "id": "8317:283",
+        "name": "Action / Open image editor",
+        "disabled": false
+      },
+      {
+        "id": "8317:285",
+        "name": "Action / View versions",
+        "disabled": false
+      },
+      {
+        "id": "8317:287",
+        "name": "Action / Use image / return to Home image property",
+        "disabled": false
+      }
+    ],
+    "formControls": [
+      {
+        "id": "8317:245",
+        "name": "Search / Search all media"
+      },
+      {
+        "id": "8317:273",
+        "name": "Property / Alt text"
+      },
+      {
+        "id": "8317:277",
+        "name": "Property / Tags"
+      }
+    ],
+    "textOutsideFrame": []
+  },
+  {
+    "designId": "TB-W04",
+    "id": "8317:242017",
+    "name": "TO-BE TB-W04 / Media / Metadata not saved",
+    "x": 6000,
+    "y": 1100,
+    "width": 1440,
+    "height": 900,
+    "nativeNodes": 94,
+    "textNodes": 38,
+    "autoLayout": 4,
+    "instances": 9,
+    "imageFills": [
+      "8317:242074",
+      "8317:242078",
+      "8317:242082"
+    ],
+    "actions": [
+      {
+        "id": "8317:242020",
+        "name": "Action / Return / Home",
+        "disabled": false
+      },
+      {
+        "id": "8317:242024",
+        "name": "Action / Open command palette",
+        "disabled": false
+      },
+      {
+        "id": "8317:242035",
+        "name": "Action / Open All media",
+        "disabled": false
+      },
+      {
+        "id": "8317:242039",
+        "name": "Action / Open Recent",
+        "disabled": false
+      },
+      {
+        "id": "8317:242043",
+        "name": "Action / Open In use",
+        "disabled": false
+      },
+      {
+        "id": "8317:242047",
+        "name": "Action / Open Unused",
+        "disabled": false
+      },
+      {
+        "id": "8317:242051",
+        "name": "Action / Open Folders",
+        "disabled": false
+      },
+      {
+        "id": "8317:242055",
+        "name": "Action / Open Brand fonts",
+        "disabled": false
+      },
+      {
+        "id": "8317:242065",
+        "name": "Action / Open upload queue",
+        "disabled": false
+      },
+      {
+        "id": "8317:242068",
+        "name": "Action / Open tab / Grid",
+        "disabled": false
+      },
+      {
+        "id": "8317:242070",
+        "name": "Action / Open tab / List",
+        "disabled": false
+      },
+      {
+        "id": "8317:242073",
+        "name": "Action / Select media / 0",
+        "disabled": false
+      },
+      {
+        "id": "8317:242077",
+        "name": "Action / Select media / 1",
+        "disabled": false
+      },
+      {
+        "id": "8317:242081",
+        "name": "Action / Select media / 2",
+        "disabled": false
+      },
+      {
+        "id": "8317:242099",
+        "name": "Action / Open image editor",
+        "disabled": false
+      },
+      {
+        "id": "8317:242101",
+        "name": "Action / View versions",
+        "disabled": false
+      },
+      {
+        "id": "8317:242108",
+        "name": "Action / Retry media metadata save",
+        "disabled": false
+      },
+      {
+        "id": "8317:242110",
+        "name": "Action / Discard edits",
+        "disabled": false
+      }
+    ],
+    "formControls": [
+      {
+        "id": "8317:242061",
+        "name": "Search / Search all media"
+      },
+      {
+        "id": "8317:242089",
+        "name": "Property / Alt text"
+      },
+      {
+        "id": "8317:242093",
+        "name": "Property / Tags"
+      }
+    ],
+    "textOutsideFrame": []
+  },
+  {
+    "designId": "TB-W05",
+    "id": "8317:242115",
+    "name": "TO-BE TB-W05 / Media / Upload incomplete",
+    "x": 8000,
+    "y": 1100,
+    "width": 1440,
+    "height": 900,
+    "nativeNodes": 96,
+    "textNodes": 40,
+    "autoLayout": 5,
+    "instances": 9,
+    "imageFills": [
+      "8317:242172",
+      "8317:242176",
+      "8317:242180"
+    ],
+    "actions": [
+      {
+        "id": "8317:242118",
+        "name": "Action / Return / Home",
+        "disabled": false
+      },
+      {
+        "id": "8317:242122",
+        "name": "Action / Open command palette",
+        "disabled": false
+      },
+      {
+        "id": "8317:242133",
+        "name": "Action / Open All media",
+        "disabled": false
+      },
+      {
+        "id": "8317:242137",
+        "name": "Action / Open Recent",
+        "disabled": false
+      },
+      {
+        "id": "8317:242141",
+        "name": "Action / Open In use",
+        "disabled": false
+      },
+      {
+        "id": "8317:242145",
+        "name": "Action / Open Unused",
+        "disabled": false
+      },
+      {
+        "id": "8317:242149",
+        "name": "Action / Open Folders",
+        "disabled": false
+      },
+      {
+        "id": "8317:242153",
+        "name": "Action / Open Brand fonts",
+        "disabled": false
+      },
+      {
+        "id": "8317:242163",
+        "name": "Action / Open upload queue",
+        "disabled": false
+      },
+      {
+        "id": "8317:242166",
+        "name": "Action / Open tab / Grid",
+        "disabled": false
+      },
+      {
+        "id": "8317:242168",
+        "name": "Action / Open tab / List",
+        "disabled": false
+      },
+      {
+        "id": "8317:242171",
+        "name": "Action / Select media / 0",
+        "disabled": false
+      },
+      {
+        "id": "8317:242175",
+        "name": "Action / Select media / 1",
+        "disabled": false
+      },
+      {
+        "id": "8317:242179",
+        "name": "Action / Select media / 2",
+        "disabled": false
+      },
+      {
+        "id": "8317:242197",
+        "name": "Action / Open image editor",
+        "disabled": false
+      },
+      {
+        "id": "8317:242199",
+        "name": "Action / View versions",
+        "disabled": false
+      },
+      {
+        "id": "8317:242206",
+        "name": "Action / Retry adding to library",
+        "disabled": false
+      },
+      {
+        "id": "8317:242208",
+        "name": "Action / Close upload status",
+        "disabled": false
+      }
+    ],
+    "formControls": [
+      {
+        "id": "8317:242159",
+        "name": "Search / Search all media"
+      },
+      {
+        "id": "8317:242187",
+        "name": "Property / Alt text"
+      },
+      {
+        "id": "8317:242191",
+        "name": "Property / Tags"
+      }
+    ],
+    "textOutsideFrame": []
+  },
+  {
+    "designId": "TB-W06",
+    "id": "8317:242215",
+    "name": "TO-BE TB-W06 / Brand palette and token",
+    "x": 10000,
+    "y": 1100,
+    "width": 1440,
+    "height": 900,
+    "nativeNodes": 108,
+    "textNodes": 46,
+    "autoLayout": 2,
+    "instances": 5,
+    "imageFills": [],
+    "actions": [
+      {
+        "id": "8317:242218",
+        "name": "Action / Return / Home",
+        "disabled": false
+      },
+      {
+        "id": "8317:242222",
+        "name": "Action / Open command palette",
+        "disabled": false
+      },
+      {
+        "id": "8317:242233",
+        "name": "Action / Open Colours",
+        "disabled": false
+      },
+      {
+        "id": "8317:242237",
+        "name": "Action / Open Fonts & type styles",
+        "disabled": false
+      },
+      {
+        "id": "8317:242241",
+        "name": "Action / Open Spacing",
+        "disabled": false
+      },
+      {
+        "id": "8317:242245",
+        "name": "Action / Open Advanced tokens",
+        "disabled": false
+      },
+      {
+        "id": "8317:242249",
+        "name": "Action / Open Classes",
+        "disabled": false
+      },
+      {
+        "id": "8317:242253",
+        "name": "Action / Open Component styles",
+        "disabled": false
+      },
+      {
+        "id": "8317:242257",
+        "name": "Action / Open Restore points",
+        "disabled": false
+      },
+      {
+        "id": "8317:242261",
+        "name": "Action / Open Import / Export",
+        "disabled": false
+      },
+      {
+        "id": "8317:242267",
+        "name": "Action / Select Light token mode",
+        "disabled": false
+      },
+      {
+        "id": "8317:242269",
+        "name": "Action / Select Dark token mode",
+        "disabled": false
+      },
+      {
+        "id": "8317:242273",
+        "name": "Action / Inspect token / Page / background",
+        "disabled": false
+      },
+      {
+        "id": "8317:242277",
+        "name": "Action / Inspect token / Text / primary",
+        "disabled": false
+      },
+      {
+        "id": "8317:242281",
+        "name": "Action / Inspect token / Brand / primary",
+        "disabled": false
+      },
+      {
+        "id": "8317:242285",
+        "name": "Action / Inspect token / Surface / subtle",
+        "disabled": false
+      },
+      {
+        "id": "8317:242289",
+        "name": "Action / Inspect token / Success",
+        "disabled": false
+      },
+      {
+        "id": "8317:242293",
+        "name": "Action / Inspect token / Warning",
+        "disabled": false
+      },
+      {
+        "id": "8317:242305",
+        "name": "Action / Open token colour picker",
+        "disabled": false
+      },
+      {
+        "id": "8317:242309",
+        "name": "Action / View known bindings",
+        "disabled": false
+      },
+      {
+        "id": "8317:242312",
+        "name": "Action / Return / Home colour property",
+        "disabled": false
+      }
+    ],
+    "formControls": [
+      {
+        "id": "8317:242227",
+        "name": "Search / Find in brand"
+      },
+      {
+        "id": "8317:242301",
+        "name": "Property / Light value"
+      }
+    ],
+    "textOutsideFrame": []
+  },
+  {
+    "designId": "TB-W07",
+    "id": "8317:242322",
+    "name": "TO-BE TB-W07 / Brand typography and spacing",
+    "x": 6000,
+    "y": 2200,
+    "width": 1440,
+    "height": 900,
+    "nativeNodes": 110,
+    "textNodes": 60,
+    "autoLayout": 12,
+    "instances": 4,
+    "imageFills": [],
+    "actions": [
+      {
+        "id": "8317:242325",
+        "name": "Action / Return / Home",
+        "disabled": false
+      },
+      {
+        "id": "8317:242329",
+        "name": "Action / Open command palette",
+        "disabled": false
+      },
+      {
+        "id": "8317:242340",
+        "name": "Action / Open Colours",
+        "disabled": false
+      },
+      {
+        "id": "8317:242344",
+        "name": "Action / Open Fonts & type styles",
+        "disabled": false
+      },
+      {
+        "id": "8317:242348",
+        "name": "Action / Open Spacing",
+        "disabled": false
+      },
+      {
+        "id": "8317:242352",
+        "name": "Action / Open Advanced tokens",
+        "disabled": false
+      },
+      {
+        "id": "8317:242356",
+        "name": "Action / Open Classes",
+        "disabled": false
+      },
+      {
+        "id": "8317:242360",
+        "name": "Action / Open Component styles",
+        "disabled": false
+      },
+      {
+        "id": "8317:242364",
+        "name": "Action / Open Restore points",
+        "disabled": false
+      },
+      {
+        "id": "8317:242368",
+        "name": "Action / Open Import / Export",
+        "disabled": false
+      },
+      {
+        "id": "8317:242374",
+        "name": "Action / Select Light token mode",
+        "disabled": false
+      },
+      {
+        "id": "8317:242376",
+        "name": "Action / Select Dark token mode",
+        "disabled": false
+      },
+      {
+        "id": "8317:242385",
+        "name": "Action / Open row / Display",
+        "disabled": false
+      },
+      {
+        "id": "8317:242390",
+        "name": "Action / Open row / Heading",
+        "disabled": false
+      },
+      {
+        "id": "8317:242395",
+        "name": "Action / Open row / Body",
+        "disabled": false
+      },
+      {
+        "id": "8317:242400",
+        "name": "Action / Open row / Caption",
+        "disabled": false
+      },
+      {
+        "id": "8317:242413",
+        "name": "Action / Open row / Space / small",
+        "disabled": false
+      },
+      {
+        "id": "8317:242418",
+        "name": "Action / Open row / Space / medium",
+        "disabled": false
+      },
+      {
+        "id": "8317:242423",
+        "name": "Action / Open row / Space / large",
+        "disabled": false
+      },
+      {
+        "id": "8317:242428",
+        "name": "Action / Open spacing preset scope confirmation",
+        "disabled": false
+      },
+      {
+        "id": "8317:242430",
+        "name": "Action / Manage fonts",
+        "disabled": false
+      }
+    ],
+    "formControls": [
+      {
+        "id": "8317:242334",
+        "name": "Search / Find in brand"
+      }
+    ],
+    "textOutsideFrame": []
+  },
+  {
+    "designId": "TB-W08",
+    "id": "8317:242436",
+    "name": "TO-BE TB-W08 / Settings / SEO draft",
+    "x": 8000,
+    "y": 2200,
+    "width": 1440,
+    "height": 900,
+    "nativeNodes": 118,
+    "textNodes": 45,
+    "autoLayout": 5,
+    "instances": 5,
+    "imageFills": [],
+    "actions": [
+      {
+        "id": "8317:242439",
+        "name": "Action / Return / Home",
+        "disabled": false
+      },
+      {
+        "id": "8317:242443",
+        "name": "Action / Open command palette",
+        "disabled": false
+      },
+      {
+        "id": "8317:242454",
+        "name": "Action / Open General",
+        "disabled": false
+      },
+      {
+        "id": "8317:242458",
+        "name": "Action / Open Languages",
+        "disabled": false
+      },
+      {
+        "id": "8317:242462",
+        "name": "Action / Open Brand ↗",
+        "disabled": false
+      },
+      {
+        "id": "8317:242466",
+        "name": "Action / Open SEO",
+        "disabled": false
+      },
+      {
+        "id": "8317:242470",
+        "name": "Action / Open Domains",
+        "disabled": false
+      },
+      {
+        "id": "8317:242474",
+        "name": "Action / Open Redirects",
+        "disabled": false
+      },
+      {
+        "id": "8317:242478",
+        "name": "Action / Open Access",
+        "disabled": false
+      },
+      {
+        "id": "8317:242482",
+        "name": "Action / Open Analytics",
+        "disabled": false
+      },
+      {
+        "id": "8317:242486",
+        "name": "Action / Open Form submissions",
+        "disabled": false
+      },
+      {
+        "id": "8317:242490",
+        "name": "Action / Open Custom code",
+        "disabled": false
+      },
+      {
+        "id": "8317:242494",
+        "name": "Action / Open Security headers",
+        "disabled": false
+      },
+      {
+        "id": "8317:242498",
+        "name": "Action / Open Danger zone",
+        "disabled": false
+      },
+      {
+        "id": "8317:242504",
+        "name": "Action / Open dashboard / Members ↗",
+        "disabled": false
+      },
+      {
+        "id": "8317:242508",
+        "name": "Action / Open dashboard / Billing ↗",
+        "disabled": false
+      },
+      {
+        "id": "8317:242512",
+        "name": "Action / Open dashboard / Integrations ↗",
+        "disabled": false
+      },
+      {
+        "id": "8317:242539",
+        "name": "Action / Open Media / social image chooser",
+        "disabled": false
+      },
+      {
+        "id": "8317:242551",
+        "name": "Action / Discard",
+        "disabled": false
+      },
+      {
+        "id": "8317:242553",
+        "name": "Action / Save",
+        "disabled": false
+      }
+    ],
+    "formControls": [
+      {
+        "id": "8317:242448",
+        "name": "Search / Find in site settings"
+      },
+      {
+        "id": "8317:242522",
+        "name": "Property / Site title"
+      },
+      {
+        "id": "8317:242526",
+        "name": "Property / Description"
+      },
+      {
+        "id": "8317:242531",
+        "name": "Property / Social title"
+      },
+      {
+        "id": "8317:242535",
+        "name": "Property / Social description"
+      }
+    ],
+    "textOutsideFrame": []
+  },
+  {
+    "designId": "TB-W09",
+    "id": "8317:242558",
+    "name": "TO-BE TB-W09 / Settings / Unsaved exit",
+    "x": 10000,
+    "y": 2200,
+    "width": 1440,
+    "height": 900,
+    "nativeNodes": 129,
+    "textNodes": 50,
+    "autoLayout": 6,
+    "instances": 8,
+    "imageFills": [],
+    "actions": [
+      {
+        "id": "8317:242561",
+        "name": "Action / Return / Home",
+        "disabled": false
+      },
+      {
+        "id": "8317:242565",
+        "name": "Action / Open command palette",
+        "disabled": false
+      },
+      {
+        "id": "8317:242576",
+        "name": "Action / Open General",
+        "disabled": false
+      },
+      {
+        "id": "8317:242580",
+        "name": "Action / Open Languages",
+        "disabled": false
+      },
+      {
+        "id": "8317:242584",
+        "name": "Action / Open Brand ↗",
+        "disabled": false
+      },
+      {
+        "id": "8317:242588",
+        "name": "Action / Open SEO",
+        "disabled": false
+      },
+      {
+        "id": "8317:242592",
+        "name": "Action / Open Domains",
+        "disabled": false
+      },
+      {
+        "id": "8317:242596",
+        "name": "Action / Open Redirects",
+        "disabled": false
+      },
+      {
+        "id": "8317:242600",
+        "name": "Action / Open Access",
+        "disabled": false
+      },
+      {
+        "id": "8317:242604",
+        "name": "Action / Open Analytics",
+        "disabled": false
+      },
+      {
+        "id": "8317:242608",
+        "name": "Action / Open Form submissions",
+        "disabled": false
+      },
+      {
+        "id": "8317:242612",
+        "name": "Action / Open Custom code",
+        "disabled": false
+      },
+      {
+        "id": "8317:242616",
+        "name": "Action / Open Security headers",
+        "disabled": false
+      },
+      {
+        "id": "8317:242620",
+        "name": "Action / Open Danger zone",
+        "disabled": false
+      },
+      {
+        "id": "8317:242626",
+        "name": "Action / Open dashboard / Members ↗",
+        "disabled": false
+      },
+      {
+        "id": "8317:242630",
+        "name": "Action / Open dashboard / Billing ↗",
+        "disabled": false
+      },
+      {
+        "id": "8317:242634",
+        "name": "Action / Open dashboard / Integrations ↗",
+        "disabled": false
+      },
+      {
+        "id": "8317:242661",
+        "name": "Action / Open Media / social image chooser",
+        "disabled": false
+      },
+      {
+        "id": "8317:242673",
+        "name": "Action / Discard",
+        "disabled": false
+      },
+      {
+        "id": "8317:242675",
+        "name": "Action / Save",
+        "disabled": false
+      },
+      {
+        "id": "8317:242682",
+        "name": "Action / Keep editing",
+        "disabled": false
+      },
+      {
+        "id": "8317:242684",
+        "name": "Action / Save and continue",
+        "disabled": false
+      },
+      {
+        "id": "8317:242686",
+        "name": "Action / Discard changes",
+        "disabled": false
+      }
+    ],
+    "formControls": [
+      {
+        "id": "8317:242570",
+        "name": "Search / Find in site settings"
+      },
+      {
+        "id": "8317:242644",
+        "name": "Property / Site title"
+      },
+      {
+        "id": "8317:242648",
+        "name": "Property / Description"
+      },
+      {
+        "id": "8317:242653",
+        "name": "Property / Social title"
+      },
+      {
+        "id": "8317:242657",
+        "name": "Property / Social description"
+      }
+    ],
+    "textOutsideFrame": []
+  },
+  {
+    "designId": "TB-W10",
+    "id": "8317:242691",
+    "name": "TO-BE TB-W10 / Settings / Analytics",
+    "x": 6000,
+    "y": 3300,
+    "width": 1440,
+    "height": 900,
+    "nativeNodes": 114,
+    "textNodes": 42,
+    "autoLayout": 2,
+    "instances": 6,
+    "imageFills": [],
+    "actions": [
+      {
+        "id": "8317:242694",
+        "name": "Action / Return / Home",
+        "disabled": false
+      },
+      {
+        "id": "8317:242698",
+        "name": "Action / Open command palette",
+        "disabled": false
+      },
+      {
+        "id": "8317:242709",
+        "name": "Action / Open General",
+        "disabled": false
+      },
+      {
+        "id": "8317:242713",
+        "name": "Action / Open Languages",
+        "disabled": false
+      },
+      {
+        "id": "8317:242717",
+        "name": "Action / Open Brand ↗",
+        "disabled": false
+      },
+      {
+        "id": "8317:242721",
+        "name": "Action / Open SEO",
+        "disabled": false
+      },
+      {
+        "id": "8317:242725",
+        "name": "Action / Open Domains",
+        "disabled": false
+      },
+      {
+        "id": "8317:242729",
+        "name": "Action / Open Redirects",
+        "disabled": false
+      },
+      {
+        "id": "8317:242733",
+        "name": "Action / Open Access",
+        "disabled": false
+      },
+      {
+        "id": "8317:242737",
+        "name": "Action / Open Analytics",
+        "disabled": false
+      },
+      {
+        "id": "8317:242741",
+        "name": "Action / Open Form submissions",
+        "disabled": false
+      },
+      {
+        "id": "8317:242745",
+        "name": "Action / Open Custom code",
+        "disabled": false
+      },
+      {
+        "id": "8317:242749",
+        "name": "Action / Open Security headers",
+        "disabled": false
+      },
+      {
+        "id": "8317:242753",
+        "name": "Action / Open Danger zone",
+        "disabled": false
+      },
+      {
+        "id": "8317:242759",
+        "name": "Action / Open dashboard / Members ↗",
+        "disabled": false
+      },
+      {
+        "id": "8317:242763",
+        "name": "Action / Open dashboard / Billing ↗",
+        "disabled": false
+      },
+      {
+        "id": "8317:242767",
+        "name": "Action / Open dashboard / Integrations ↗",
+        "disabled": false
+      },
+      {
+        "id": "8317:242789",
+        "name": "Action / Refresh Buildrick status",
+        "disabled": false
+      },
+      {
+        "id": "8317:242796",
+        "name": "Action / Open dashboard integrations",
+        "disabled": false
+      },
+      {
+        "id": "8317:242802",
+        "name": "Action / Discard",
+        "disabled": true
+      },
+      {
+        "id": "8317:242804",
+        "name": "Action / Save",
+        "disabled": true
+      }
+    ],
+    "formControls": [
+      {
+        "id": "8317:242703",
+        "name": "Search / Find in site settings"
+      },
+      {
+        "id": "8317:242777",
+        "name": "Property / Measurement ID"
+      }
+    ],
+    "textOutsideFrame": []
+  },
+  {
+    "designId": "TB-W11",
+    "id": "8317:242809",
+    "name": "TO-BE TB-W11 / Template preview",
+    "x": 8000,
+    "y": 3300,
+    "width": 1440,
+    "height": 900,
+    "nativeNodes": 74,
+    "textNodes": 32,
+    "autoLayout": 3,
+    "instances": 8,
+    "imageFills": [],
+    "actions": [
+      {
+        "id": "8317:242812",
+        "name": "Action / Return / Home",
+        "disabled": false
+      },
+      {
+        "id": "8317:242816",
+        "name": "Action / Open command palette",
+        "disabled": false
+      },
+      {
+        "id": "8317:242827",
+        "name": "Action / Open All templates",
+        "disabled": false
+      },
+      {
+        "id": "8317:242831",
+        "name": "Action / Open Landing pages",
+        "disabled": false
+      },
+      {
+        "id": "8317:242835",
+        "name": "Action / Open Portfolio",
+        "disabled": false
+      },
+      {
+        "id": "8317:242839",
+        "name": "Action / Open Business",
+        "disabled": false
+      },
+      {
+        "id": "8317:242843",
+        "name": "Action / Open Saved templates",
+        "disabled": false
+      },
+      {
+        "id": "8317:242856",
+        "name": "Action / Template preview control / visual only",
+        "disabled": false
+      },
+      {
+        "id": "8317:242865",
+        "name": "Action / Create page confirmation",
+        "disabled": false
+      },
+      {
+        "id": "8317:242871",
+        "name": "Action / Template replacement confirmation",
+        "disabled": false
+      },
+      {
+        "id": "8317:242877",
+        "name": "Action / Open tab / Desktop",
+        "disabled": false
+      },
+      {
+        "id": "8317:242879",
+        "name": "Action / Open tab / Tablet",
+        "disabled": false
+      },
+      {
+        "id": "8317:242881",
+        "name": "Action / Open tab / Mobile",
+        "disabled": false
+      }
+    ],
+    "formControls": [
+      {
+        "id": "8317:242821",
+        "name": "Search / Find in templates"
+      },
+      {
+        "id": "8317:242861",
+        "name": "Property / New page name"
+      }
+    ],
+    "textOutsideFrame": []
+  },
+  {
+    "designId": "TB-W12",
+    "id": "8317:242887",
+    "name": "TO-BE TB-W12 / Templates backup failure",
+    "x": 10000,
+    "y": 3300,
+    "width": 1440,
+    "height": 900,
+    "nativeNodes": 85,
+    "textNodes": 37,
+    "autoLayout": 4,
+    "instances": 11,
+    "imageFills": [],
+    "actions": [
+      {
+        "id": "8317:242890",
+        "name": "Action / Return / Home",
+        "disabled": false
+      },
+      {
+        "id": "8317:242894",
+        "name": "Action / Open command palette",
+        "disabled": false
+      },
+      {
+        "id": "8317:242905",
+        "name": "Action / Open All templates",
+        "disabled": false
+      },
+      {
+        "id": "8317:242909",
+        "name": "Action / Open Landing pages",
+        "disabled": false
+      },
+      {
+        "id": "8317:242913",
+        "name": "Action / Open Portfolio",
+        "disabled": false
+      },
+      {
+        "id": "8317:242917",
+        "name": "Action / Open Business",
+        "disabled": false
+      },
+      {
+        "id": "8317:242921",
+        "name": "Action / Open Saved templates",
+        "disabled": false
+      },
+      {
+        "id": "8317:242934",
+        "name": "Action / Template preview control / visual only",
+        "disabled": false
+      },
+      {
+        "id": "8317:242943",
+        "name": "Action / Create page confirmation",
+        "disabled": false
+      },
+      {
+        "id": "8317:242949",
+        "name": "Action / Template replacement confirmation",
+        "disabled": false
+      },
+      {
+        "id": "8317:242955",
+        "name": "Action / Open tab / Desktop",
+        "disabled": false
+      },
+      {
+        "id": "8317:242957",
+        "name": "Action / Open tab / Tablet",
+        "disabled": false
+      },
+      {
+        "id": "8317:242959",
+        "name": "Action / Open tab / Mobile",
+        "disabled": false
+      },
+      {
+        "id": "8317:242967",
+        "name": "Action / Try backup again",
+        "disabled": false
+      },
+      {
+        "id": "8317:242969",
+        "name": "Action / Keep current page",
+        "disabled": false
+      },
+      {
+        "id": "8317:242971",
+        "name": "Action / Replace without backup",
+        "disabled": false
+      }
+    ],
+    "formControls": [
+      {
+        "id": "8317:242899",
+        "name": "Search / Find in templates"
+      },
+      {
+        "id": "8317:242939",
+        "name": "Property / New page name"
+      }
+    ],
+    "textOutsideFrame": []
+  }
+]

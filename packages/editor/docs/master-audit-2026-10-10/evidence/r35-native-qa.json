@@ -1,0 +1,888 @@
+{
+  "roots": [
+    {
+      "id": "8690:13237",
+      "name": "R35 / Product design review"
+    },
+    {
+      "id": "8841:14864",
+      "name": "R35 / Inspector / Shared Style"
+    },
+    {
+      "id": "8841:14872",
+      "name": "R35 / Inspector / Shared Interactions"
+    },
+    {
+      "id": "8842:14345",
+      "name": "R35 / Inspector / Text"
+    },
+    {
+      "id": "8843:16808",
+      "name": "R35 / Inspector / Heading"
+    },
+    {
+      "id": "8843:17112",
+      "name": "R35 / Inspector / Paragraph"
+    },
+    {
+      "id": "8843:17410",
+      "name": "R35 / Inspector / Label"
+    },
+    {
+      "id": "8843:17685",
+      "name": "R35 / Inspector / Link"
+    },
+    {
+      "id": "8843:18023",
+      "name": "R35 / Inspector / Button"
+    },
+    {
+      "id": "8843:18380",
+      "name": "R35 / Inspector / Input"
+    },
+    {
+      "id": "8843:18697",
+      "name": "R35 / Inspector / Textarea"
+    },
+    {
+      "id": "8843:19020",
+      "name": "R35 / Inspector / Select"
+    },
+    {
+      "id": "8843:19319",
+      "name": "R35 / Inspector / Checkbox"
+    },
+    {
+      "id": "8843:19606",
+      "name": "R35 / Inspector / Radio"
+    },
+    {
+      "id": "8843:19893",
+      "name": "R35 / Inspector / Switch"
+    },
+    {
+      "id": "8843:20180",
+      "name": "R35 / Inspector / Upload"
+    },
+    {
+      "id": "8843:20467",
+      "name": "R35 / Inspector / Image"
+    },
+    {
+      "id": "8843:20783",
+      "name": "R35 / Inspector / Video"
+    },
+    {
+      "id": "8843:21101",
+      "name": "R35 / Inspector / Audio"
+    },
+    {
+      "id": "8843:21394",
+      "name": "R35 / Inspector / Svg"
+    },
+    {
+      "id": "8843:21669",
+      "name": "R35 / Inspector / Icon"
+    },
+    {
+      "id": "8843:21956",
+      "name": "R35 / Inspector / Lottie"
+    },
+    {
+      "id": "8843:22237",
+      "name": "R35 / Inspector / Video Embed"
+    },
+    {
+      "id": "8843:22537",
+      "name": "R35 / Inspector / Map Embed"
+    },
+    {
+      "id": "8843:22812",
+      "name": "R35 / Inspector / Spacer"
+    },
+    {
+      "id": "8843:23080",
+      "name": "R35 / Inspector / Divider"
+    },
+    {
+      "id": "8843:23348",
+      "name": "R35 / Inspector / Countdown"
+    },
+    {
+      "id": "8843:23636",
+      "name": "R35 / Inspector / Progress"
+    },
+    {
+      "id": "8843:23923",
+      "name": "R35 / Inspector / Accordion"
+    },
+    {
+      "id": "8843:24210",
+      "name": "R35 / Inspector / Flex"
+    },
+    {
+      "id": "8843:24478",
+      "name": "R35 / Inspector / Stack"
+    },
+    {
+      "id": "8843:24746",
+      "name": "R35 / Inspector / Grid"
+    },
+    {
+      "id": "8843:25014",
+      "name": "R35 / Inspector / Columns"
+    },
+    {
+      "id": "8843:25282",
+      "name": "R35 / Inspector / Container"
+    },
+    {
+      "id": "8843:25603",
+      "name": "R35 / Inspector / Section"
+    },
+    {
+      "id": "8843:25924",
+      "name": "R35 / Inspector / Card"
+    },
+    {
+      "id": "8843:26245",
+      "name": "R35 / Inspector / Cta"
+    },
+    {
+      "id": "8843:26566",
+      "name": "R35 / Inspector / Hero"
+    },
+    {
+      "id": "8843:26834",
+      "name": "R35 / Inspector / Features"
+    },
+    {
+      "id": "8843:27102",
+      "name": "R35 / Inspector / Header"
+    },
+    {
+      "id": "8843:27370",
+      "name": "R35 / Inspector / Footer"
+    },
+    {
+      "id": "8843:27638",
+      "name": "R35 / Inspector / Nav"
+    },
+    {
+      "id": "8843:27906",
+      "name": "R35 / Inspector / Navbar"
+    },
+    {
+      "id": "8843:28174",
+      "name": "R35 / Inspector / Pricing"
+    },
+    {
+      "id": "8843:28442",
+      "name": "R35 / Inspector / Social"
+    },
+    {
+      "id": "8843:28710",
+      "name": "R35 / Inspector / Testimonials"
+    },
+    {
+      "id": "8843:28978",
+      "name": "R35 / Inspector / Tabs"
+    },
+    {
+      "id": "8843:29246",
+      "name": "R35 / Inspector / List"
+    },
+    {
+      "id": "8843:29514",
+      "name": "R35 / Inspector / Table"
+    },
+    {
+      "id": "8843:29782",
+      "name": "R35 / Inspector / Gallery"
+    },
+    {
+      "id": "8843:30050",
+      "name": "R35 / Inspector / Custom"
+    },
+    {
+      "id": "8843:30318",
+      "name": "R35 / Inspector / List Item"
+    },
+    {
+      "id": "8843:30589",
+      "name": "R35 / Inspector / Form"
+    },
+    {
+      "id": "8843:30923",
+      "name": "R35 / Inspector / Slider"
+    },
+    {
+      "id": "8843:31228",
+      "name": "R35 / Inspector / Collection List"
+    },
+    {
+      "id": "8843:31521",
+      "name": "R35 / Inspector / Product Card"
+    },
+    {
+      "id": "8843:31792",
+      "name": "R35 / Inspector / Product Grid"
+    },
+    {
+      "id": "8843:32063",
+      "name": "R35 / Inspector / Product Detail"
+    },
+    {
+      "id": "8844:16149",
+      "name": "R35 / Inspector / Element library"
+    },
+    {
+      "id": "8844:264650",
+      "name": "R35 / Choice / Display"
+    },
+    {
+      "id": "8844:264670",
+      "name": "R35 / Choice / Align"
+    },
+    {
+      "id": "8844:264690",
+      "name": "R35 / Choice / Position"
+    },
+    {
+      "id": "8844:264710",
+      "name": "R35 / Choice / Overflow"
+    },
+    {
+      "id": "8844:264727",
+      "name": "R35 / Choice / Text style"
+    },
+    {
+      "id": "8844:264744",
+      "name": "R35 / Choice / Weight"
+    },
+    {
+      "id": "8844:264764",
+      "name": "R35 / Choice / Align"
+    },
+    {
+      "id": "8844:264784",
+      "name": "R35 / Choice / Width"
+    },
+    {
+      "id": "8844:264801",
+      "name": "R35 / Choice / Height"
+    },
+    {
+      "id": "8844:264818",
+      "name": "R35 / Choice / Fill type"
+    },
+    {
+      "id": "8844:264838",
+      "name": "R35 / Choice / Fit"
+    },
+    {
+      "id": "8844:264855",
+      "name": "R35 / Choice / Blend mode"
+    },
+    {
+      "id": "8844:264872",
+      "name": "R35 / Choice / Style"
+    },
+    {
+      "id": "8844:264895",
+      "name": "R35 / Choice / Trigger"
+    },
+    {
+      "id": "8844:264945",
+      "name": "R35 / Choice / Animation"
+    },
+    {
+      "id": "8844:264971",
+      "name": "R35 / Choice / Text style"
+    },
+    {
+      "id": "8844:264993",
+      "name": "R35 / Choice / Level"
+    },
+    {
+      "id": "8844:265018",
+      "name": "R35 / Choice / Text style"
+    },
+    {
+      "id": "8844:265040",
+      "name": "R35 / Choice / Text style"
+    },
+    {
+      "id": "8844:265059",
+      "name": "R35 / Choice / Text style"
+    },
+    {
+      "id": "8844:265075",
+      "name": "R35 / Choice / Link to"
+    },
+    {
+      "id": "8844:265098",
+      "name": "R35 / Choice / Type"
+    },
+    {
+      "id": "8844:265114",
+      "name": "R35 / Choice / Link to"
+    },
+    {
+      "id": "8844:265137",
+      "name": "R35 / Choice / Input type"
+    },
+    {
+      "id": "8844:265186",
+      "name": "R35 / Choice / Autocomplete"
+    },
+    {
+      "id": "8844:265209",
+      "name": "R35 / Choice / Decoding"
+    },
+    {
+      "id": "8844:265226",
+      "name": "R35 / Choice / Preload"
+    },
+    {
+      "id": "8844:265243",
+      "name": "R35 / Choice / Icon size"
+    },
+    {
+      "id": "8844:265268",
+      "name": "R35 / Choice / Stroke width"
+    },
+    {
+      "id": "8844:265290",
+      "name": "R35 / Choice / Ratio"
+    },
+    {
+      "id": "8844:265306",
+      "name": "R35 / Choice / Link to"
+    },
+    {
+      "id": "8844:265329",
+      "name": "R35 / Choice / Link to"
+    },
+    {
+      "id": "8844:265352",
+      "name": "R35 / Choice / Link to"
+    },
+    {
+      "id": "8844:265375",
+      "name": "R35 / Choice / Link to"
+    },
+    {
+      "id": "8844:265398",
+      "name": "R35 / Choice / Encoding"
+    },
+    {
+      "id": "8849:16865",
+      "name": "R35 / Responsive / Editor / 1280"
+    },
+    {
+      "id": "8849:17071",
+      "name": "R35 / Responsive / Editor / 1024"
+    },
+    {
+      "id": "8849:17307",
+      "name": "R35 / Responsive / Navigator drawer / 1024"
+    },
+    {
+      "id": "8850:16637",
+      "name": "R35 / Responsive / Build / 1280"
+    },
+    {
+      "id": "8850:16724",
+      "name": "R35 / Responsive / Build / 1024"
+    },
+    {
+      "id": "8850:16811",
+      "name": "R35 / Responsive / CMS / 1280"
+    },
+    {
+      "id": "8850:16960",
+      "name": "R35 / Responsive / CMS / 1024"
+    },
+    {
+      "id": "8850:17109",
+      "name": "R35 / Responsive / Brand / 1280"
+    },
+    {
+      "id": "8850:17187",
+      "name": "R35 / Responsive / Brand / 1024"
+    },
+    {
+      "id": "8850:17265",
+      "name": "R35 / Responsive / Media / 1280"
+    },
+    {
+      "id": "8850:17366",
+      "name": "R35 / Responsive / Media / 1024"
+    },
+    {
+      "id": "8850:17467",
+      "name": "R35 / Responsive / Media details drawer / 1024"
+    },
+    {
+      "id": "8855:16760",
+      "name": "R35 / Brand / Rendered font impact"
+    },
+    {
+      "id": "8856:16807",
+      "name": "R35 / Brand / Rendered Primary button"
+    },
+    {
+      "id": "8856:16933",
+      "name": "R35 / Brand / Rendered Secondary button"
+    },
+    {
+      "id": "8856:17055",
+      "name": "R35 / Brand / Rendered Ghost button"
+    },
+    {
+      "id": "8857:16854",
+      "name": "R35 / Brand / Rendered Elevated card"
+    },
+    {
+      "id": "8857:16977",
+      "name": "R35 / Brand / Rendered Flat card"
+    },
+    {
+      "id": "8857:17108",
+      "name": "R35 / Brand / Rendered Text input"
+    },
+    {
+      "id": "8857:17218",
+      "name": "R35 / Brand / Rendered Default link"
+    },
+    {
+      "id": "8857:17326",
+      "name": "R35 / Brand / Rendered Muted link"
+    },
+    {
+      "id": "8857:17442",
+      "name": "R35 / Brand / Rendered Success badge"
+    },
+    {
+      "id": "8857:17560",
+      "name": "R35 / Brand / Rendered Error badge"
+    },
+    {
+      "id": "8857:265939",
+      "name": "R35 / Brand / Rendered Info alert"
+    },
+    {
+      "id": "8857:266059",
+      "name": "R35 / Brand / Rendered Error alert"
+    },
+    {
+      "id": "8857:266183",
+      "name": "R35 / Brand / Rendered Tooltip"
+    },
+    {
+      "id": "8857:266314",
+      "name": "R35 / Brand / Rendered Modal panel"
+    },
+    {
+      "id": "8857:266443",
+      "name": "R35 / Brand / Rendered Top bar"
+    },
+    {
+      "id": "8857:266564",
+      "name": "R35 / Brand / Rendered Default table"
+    },
+    {
+      "id": "8857:266682",
+      "name": "R35 / Brand / Rendered Page section"
+    },
+    {
+      "id": "8857:266798",
+      "name": "R35 / Brand / Rendered Container"
+    },
+    {
+      "id": "8861:17071",
+      "name": "R35 / Responsive / Media List / 1280"
+    },
+    {
+      "id": "8861:17175",
+      "name": "R35 / Responsive / Media List / 1024"
+    },
+    {
+      "id": "8861:17320",
+      "name": "R35 / Responsive / Review"
+    },
+    {
+      "id": "8863:17115",
+      "name": "R35 / Inspector / columns Columns"
+    },
+    {
+      "id": "8863:17140",
+      "name": "R35 / Inspector / columns Gap"
+    },
+    {
+      "id": "8863:17177",
+      "name": "R35 / Inspector / image Object fit"
+    },
+    {
+      "id": "8864:17119",
+      "name": "R35 / CMS / Reference chooser"
+    },
+    {
+      "id": "8867:17134",
+      "name": "R35 / Team / Retained discussion"
+    },
+    {
+      "id": "8884:17236",
+      "name": "R35 / Layers / Original order"
+    },
+    {
+      "id": "8884:17470",
+      "name": "R35 / Layers / Reordered"
+    },
+    {
+      "id": "8884:17704",
+      "name": "R35 / Layers / Nested"
+    },
+    {
+      "id": "8885:17348",
+      "name": "R35 / Content / Long asset names / 1024"
+    },
+    {
+      "id": "8465:3",
+      "name": "I02 / Design / Typography"
+    },
+    {
+      "id": "8465:12",
+      "name": "I11 / Design / Mixed selection"
+    },
+    {
+      "id": "8465:48",
+      "name": "PROPOSED / scope unverified / C03 / Team / Comments"
+    },
+    {
+      "id": "8465:49",
+      "name": "PROPOSED / scope unverified / C04 / Team / Heading discussion"
+    },
+    {
+      "id": "8818:14463",
+      "name": "R34 / Team / Missing anchor"
+    },
+    {
+      "id": "8818:14476",
+      "name": "R34 / Team / Expired invitation"
+    },
+    {
+      "id": "8818:14502",
+      "name": "R34 / CMS / Missing reference"
+    },
+    {
+      "id": "8818:14528",
+      "name": "R34 / Media / Upload rejected"
+    },
+    {
+      "id": "8818:14541",
+      "name": "R34 / History / Restore scope"
+    },
+    {
+      "id": "8771:13888",
+      "name": "R33 / CMS / Reference field"
+    },
+    {
+      "id": "8539:10714",
+      "name": "R33 / Workspace / Members"
+    },
+    {
+      "id": "8465:10",
+      "name": "I09 / Design / Element settings"
+    },
+    {
+      "id": "8507:2799",
+      "name": "T01 / Integrated inspector / Image settings"
+    },
+    {
+      "id": "8507:246872",
+      "name": "T03 / Integrated inspector / Email field settings"
+    },
+    {
+      "id": "8507:247302",
+      "name": "T05 / Integrated inspector / Form submission settings"
+    },
+    {
+      "id": "8507:247712",
+      "name": "T07 / Integrated inspector / Collection list settings"
+    },
+    {
+      "id": "8465:2",
+      "name": "I01 / Design / Layout & spacing"
+    },
+    {
+      "id": "8465:5",
+      "name": "I04 / Design / Grid editor"
+    },
+    {
+      "id": "8628:12592",
+      "name": "B01 / Build / Start a scoped task"
+    },
+    {
+      "id": "8814:15869",
+      "name": "R34 / Brand / Font roles"
+    },
+    {
+      "id": "8814:15890",
+      "name": "R34 / Brand / Font impact"
+    },
+    {
+      "id": "8666:12945",
+      "name": "R30 / History \u00b7 Semantic comparison"
+    },
+    {
+      "id": "8727:13378",
+      "name": "R32 / Media / upload"
+    },
+    {
+      "id": "8772:16083",
+      "name": "R33 / Brand / button-primary"
+    },
+    {
+      "id": "8772:16092",
+      "name": "R33 / Brand / Review button-primary"
+    },
+    {
+      "id": "8772:16190",
+      "name": "R33 / Brand / button-secondary"
+    },
+    {
+      "id": "8772:16199",
+      "name": "R33 / Brand / Review button-secondary"
+    },
+    {
+      "id": "8772:16275",
+      "name": "R33 / Brand / button-ghost"
+    },
+    {
+      "id": "8772:16284",
+      "name": "R33 / Brand / Review button-ghost"
+    },
+    {
+      "id": "8772:16349",
+      "name": "R33 / Brand / card-elevated"
+    },
+    {
+      "id": "8772:16358",
+      "name": "R33 / Brand / Review card-elevated"
+    },
+    {
+      "id": "8772:16412",
+      "name": "R33 / Brand / card-flat"
+    },
+    {
+      "id": "8772:16421",
+      "name": "R33 / Brand / Review card-flat"
+    },
+    {
+      "id": "8772:16475",
+      "name": "R33 / Brand / form-input-default"
+    },
+    {
+      "id": "8772:16484",
+      "name": "R33 / Brand / Review form-input-default"
+    },
+    {
+      "id": "8772:16560",
+      "name": "R33 / Brand / link-default"
+    },
+    {
+      "id": "8772:16569",
+      "name": "R33 / Brand / Review link-default"
+    },
+    {
+      "id": "8772:16601",
+      "name": "R33 / Brand / link-muted"
+    },
+    {
+      "id": "8772:16610",
+      "name": "R33 / Brand / Review link-muted"
+    },
+    {
+      "id": "8772:16642",
+      "name": "R33 / Brand / badge-success"
+    },
+    {
+      "id": "8772:16651",
+      "name": "R33 / Brand / Review badge-success"
+    },
+    {
+      "id": "8772:16705",
+      "name": "R33 / Brand / badge-error"
+    },
+    {
+      "id": "8772:16714",
+      "name": "R33 / Brand / Review badge-error"
+    },
+    {
+      "id": "8772:16768",
+      "name": "R33 / Brand / alert-info"
+    },
+    {
+      "id": "8772:16777",
+      "name": "R33 / Brand / Review alert-info"
+    },
+    {
+      "id": "8772:16842",
+      "name": "R33 / Brand / alert-error"
+    },
+    {
+      "id": "8772:16851",
+      "name": "R33 / Brand / Review alert-error"
+    },
+    {
+      "id": "8772:16905",
+      "name": "R33 / Brand / tooltip-default"
+    },
+    {
+      "id": "8772:16914",
+      "name": "R33 / Brand / Review tooltip-default"
+    },
+    {
+      "id": "8772:16979",
+      "name": "R33 / Brand / modal-default"
+    },
+    {
+      "id": "8772:16988",
+      "name": "R33 / Brand / Review modal-default"
+    },
+    {
+      "id": "8772:17053",
+      "name": "R33 / Brand / nav-topbar"
+    },
+    {
+      "id": "8772:17062",
+      "name": "R33 / Brand / Review nav-topbar"
+    },
+    {
+      "id": "8772:17116",
+      "name": "R33 / Brand / table-default"
+    },
+    {
+      "id": "8772:17125",
+      "name": "R33 / Brand / Review table-default"
+    },
+    {
+      "id": "8772:17179",
+      "name": "R33 / Brand / layout-section"
+    },
+    {
+      "id": "8772:17188",
+      "name": "R33 / Brand / Review layout-section"
+    },
+    {
+      "id": "8772:17231",
+      "name": "R33 / Brand / layout-container"
+    },
+    {
+      "id": "8772:17240",
+      "name": "R33 / Brand / Review layout-container"
+    }
+  ],
+  "instances": 4356,
+  "masters": [
+    "8314:5",
+    "8314:7",
+    "8531:318",
+    "8314:9",
+    "8627:621",
+    "8314:3",
+    "8316:11",
+    "8531:330",
+    "8531:312",
+    "8531:320",
+    "8531:314",
+    "8531:316",
+    "8316:16",
+    "8627:626",
+    "8627:632",
+    "8328:217",
+    "8328:219",
+    "8464:28",
+    "8314:11",
+    "8531:352",
+    "8531:342",
+    "8316:21",
+    "8328:194",
+    "8328:143",
+    "8328:145",
+    "8316:26"
+  ],
+  "destinations": 371,
+  "checks": 6783,
+  "missing": [],
+  "overflowCount": 0,
+  "overflow": [],
+  "related": [
+    {
+      "id": "8465:15",
+      "name": "I14 / Design / Mobile \u00b7 override removed"
+    },
+    {
+      "id": "8539:11467",
+      "name": "R26 overlay / cms-empty"
+    },
+    {
+      "id": "8539:12158",
+      "name": "R26 overlay / component-empty"
+    },
+    {
+      "id": "8688:13161",
+      "name": "R31 / Pages \u00b7 search"
+    },
+    {
+      "id": "8688:13170",
+      "name": "R31 / Pages \u00b7 search results"
+    },
+    {
+      "id": "8724:13244",
+      "name": "R32 / Pages / move"
+    },
+    {
+      "id": "8748:13627",
+      "name": "R32 / Media / filtered results"
+    },
+    {
+      "id": "8771:14003",
+      "name": "R33 / CMS / Long text field"
+    },
+    {
+      "id": "8771:14006",
+      "name": "R33 / CMS / Long text key conflict"
+    },
+    {
+      "id": "8776:13885",
+      "name": "R33 / Workspace / Remove member"
+    },
+    {
+      "id": "8819:14287",
+      "name": "R34 / Media / Search"
+    },
+    {
+      "id": "8819:14511",
+      "name": "R34 / Media / Empty library"
+    },
+    {
+      "id": "8820:14330",
+      "name": "R34 / Media / Grid search results"
+    },
+    {
+      "id": "8884:17470",
+      "name": "R35 / Layers / Reordered"
+    },
+    {
+      "id": "8884:17704",
+      "name": "R35 / Layers / Nested"
+    },
+    {
+      "id": "8885:17348",
+      "name": "R35 / Content / Long asset names / 1024"
+    }
+  ]
+}

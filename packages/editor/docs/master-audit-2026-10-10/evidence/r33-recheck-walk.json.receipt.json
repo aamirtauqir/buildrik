@@ -1,0 +1,86 @@
+[
+  {
+    "label": "Media direct list",
+    "goto": "8773:13794",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8773-13794&starting-point-node-id=8773%3A13794&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Select asset 2",
+    "x": 633,
+    "y": 419,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8773-13794&starting-point-node-id=8773%3A13794&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Delete asset 2",
+    "x": 1225,
+    "y": 655,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8773-13794&starting-point-node-id=8773%3A13794&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Confirm",
+    "x": 720,
+    "y": 535,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8773-13794&starting-point-node-id=8773%3A13794&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Undo preserves list",
+    "x": 720,
+    "y": 517,
+    "shot": "r33-media-list-return-verified.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8773-13794&starting-point-node-id=8773%3A13794&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "CMS schema",
+    "goto": "8771:13537",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8771-13537&starting-point-node-id=8771%3A13537&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Add field",
+    "x": 342,
+    "y": 186,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8771-13537&starting-point-node-id=8771%3A13537&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Number",
+    "x": 538,
+    "y": 451,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8771-13537&starting-point-node-id=8771%3A13537&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Minimum two",
+    "x": 538,
+    "y": 633,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8771-13537&starting-point-node-id=8771%3A13537&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Save",
+    "x": 902,
+    "y": 736,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8771-13537&starting-point-node-id=8771%3A13537&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Reopen number",
+    "x": 841,
+    "y": 439,
+    "shot": "r33-cms-number-reopened.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8771-13537&starting-point-node-id=8771%3A13537&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Brand section handoff",
+    "goto": "8539:11118",
+    "shot": "r33-brand-sections-entry.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8539-11118&starting-point-node-id=8539%3A11118&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

@@ -1,0 +1,3637 @@
+{
+  "page": "8463:2",
+  "roots": {
+    "I01": "8465:2",
+    "I02": "8465:3",
+    "I03": "8465:4",
+    "I04": "8465:5",
+    "I05": "8465:6",
+    "I06": "8465:7",
+    "I07": "8465:8",
+    "I08": "8465:9",
+    "I09": "8465:10",
+    "I10": "8465:11",
+    "I11": "8465:12",
+    "I12": "8465:13",
+    "I13": "8465:14",
+    "I14": "8465:15",
+    "I15": "8465:16",
+    "I16": "8465:17",
+    "I17": "8465:18",
+    "A01": "8465:19",
+    "A02": "8465:20",
+    "A03": "8465:21",
+    "A04": "8465:22",
+    "A05": "8465:23",
+    "A06": "8465:24",
+    "A07": "8465:25",
+    "A08": "8465:26",
+    "A09": "8465:27",
+    "A10": "8465:28",
+    "A11": "8465:29",
+    "A12": "8465:30",
+    "G01": "8465:31",
+    "G02": "8465:32",
+    "G03": "8465:33",
+    "G04": "8465:34",
+    "G05": "8465:35",
+    "G06": "8465:36",
+    "G07": "8465:37",
+    "G08": "8465:38",
+    "G09": "8465:39",
+    "G10": "8465:40",
+    "G11": "8465:41",
+    "G12": "8465:42",
+    "G13": "8465:43",
+    "G14": "8465:44",
+    "G15": "8465:45",
+    "C01": "8465:46",
+    "C02": "8465:47",
+    "C03": "8465:48",
+    "C04": "8465:49",
+    "C05": "8465:50",
+    "C06": "8465:51",
+    "C07": "8465:52",
+    "C08": "8465:53",
+    "C09": "8465:54",
+    "C10": "8465:55",
+    "C11": "8465:56",
+    "C12": "8465:57",
+    "C13": "8465:58",
+    "C14": "8465:59",
+    "C15": "8465:60",
+    "C16": "8465:61",
+    "I18": "8472:2670",
+    "I19": "8480:2729"
+  },
+  "screens": [
+    {
+      "key": "I01",
+      "group": "Design",
+      "title": "Layout & spacing",
+      "selection": "Main section",
+      "sub": "Style",
+      "scope": "Desktop \u00b7 Base",
+      "description": "Edit the hero-section class. Changes affect 3 matching sections.",
+      "sections": [
+        [
+          "Selector",
+          [
+            [
+              "Class",
+              "hero-section",
+              "3 uses"
+            ]
+          ]
+        ],
+        [
+          "Layout",
+          [
+            [
+              "Display",
+              "Flex",
+              "Local"
+            ],
+            [
+              "Direction",
+              "Column",
+              "Local"
+            ],
+            [
+              "Align / justify",
+              "Start / Center",
+              "Local"
+            ],
+            [
+              "Gap",
+              "24 px",
+              "Token"
+            ]
+          ]
+        ],
+        [
+          "Size",
+          [
+            [
+              "Width / max",
+              "100% / 1200px",
+              "Local"
+            ],
+            [
+              "Height / min",
+              "Auto / 640px",
+              "Local"
+            ],
+            [
+              "Overflow",
+              "Visible",
+              "Local"
+            ]
+          ]
+        ],
+        [
+          "Position",
+          [
+            [
+              "Position",
+              "Relative",
+              "Local"
+            ],
+            [
+              "Z-index",
+              "Auto",
+              "Inherited"
+            ]
+          ]
+        ]
+      ],
+      "actions": [
+        [
+          "Typography",
+          "I02"
+        ],
+        [
+          "Appearance",
+          "I03"
+        ],
+        [
+          "Edit grid",
+          "I04"
+        ],
+        [
+          "Box spacing",
+          "I05"
+        ]
+      ]
+    },
+    {
+      "key": "I02",
+      "group": "Design",
+      "title": "Typography",
+      "selection": "Heading",
+      "sub": "Style",
+      "scope": "Desktop \u00b7 Base",
+      "description": "hero-title class \u00b7 2 elements across Home and About.",
+      "sections": [
+        [
+          "Selector",
+          [
+            [
+              "Class",
+              "hero-title",
+              "2 uses"
+            ]
+          ]
+        ],
+        [
+          "Typography",
+          [
+            [
+              "Font family",
+              "Inter",
+              "Token"
+            ],
+            [
+              "Weight",
+              "600",
+              "Local"
+            ],
+            [
+              "Font size",
+              "72 px",
+              "Local"
+            ],
+            [
+              "Line height",
+              "1.15",
+              "Local"
+            ],
+            [
+              "Letter spacing",
+              "\u22120.5 px",
+              "Local"
+            ],
+            [
+              "Text color",
+              "Text / primary",
+              "Token"
+            ],
+            [
+              "Align",
+              "Left",
+              "Inherited"
+            ],
+            [
+              "Max width",
+              "18 ch",
+              "Local"
+            ]
+          ]
+        ]
+      ],
+      "actions": [
+        [
+          "Mobile override",
+          "I06"
+        ],
+        [
+          "Class manager",
+          "I07"
+        ],
+        [
+          "Layout",
+          "I01"
+        ],
+        [
+          "Ask AI",
+          "A01"
+        ]
+      ]
+    },
+    {
+      "key": "I03",
+      "group": "Design",
+      "title": "Appearance & effects",
+      "selection": "Main section",
+      "sub": "Style",
+      "scope": "Desktop \u00b7 Base",
+      "description": "Layer backgrounds and reuse Brand variables.",
+      "sections": [
+        [
+          "Backgrounds",
+          [
+            [
+              "Layer 1",
+              "Surface / white",
+              "Token"
+            ],
+            [
+              "Layer 2",
+              "No image",
+              "Local"
+            ]
+          ]
+        ],
+        [
+          "Borders",
+          [
+            [
+              "Width / style",
+              "1 px / Solid",
+              "Local"
+            ],
+            [
+              "Color",
+              "Border / subtle",
+              "Token"
+            ],
+            [
+              "Radius",
+              "12 px",
+              "Token"
+            ]
+          ]
+        ],
+        [
+          "Effects",
+          [
+            [
+              "Shadow",
+              "Soft / medium",
+              "Token"
+            ],
+            [
+              "Opacity",
+              "100%",
+              "Local"
+            ],
+            [
+              "Transform",
+              "None",
+              "Local"
+            ],
+            [
+              "Filter",
+              "None",
+              "Local"
+            ],
+            [
+              "Transition",
+              "180ms / ease",
+              "Local"
+            ]
+          ]
+        ]
+      ],
+      "actions": [
+        [
+          "Hover state",
+          "I08"
+        ],
+        [
+          "Layout",
+          "I01"
+        ],
+        [
+          "Interactions",
+          "I10"
+        ]
+      ]
+    },
+    {
+      "key": "I04",
+      "group": "Design",
+      "title": "Grid editor",
+      "selection": "Project grid",
+      "sub": "Style",
+      "scope": "Desktop \u00b7 Base",
+      "description": "Edit tracks visually or use exact CSS units.",
+      "sections": [
+        [
+          "Selector",
+          [
+            [
+              "Class",
+              "project-grid",
+              "1 use"
+            ]
+          ]
+        ],
+        [
+          "Grid tracks",
+          [
+            [
+              "Columns",
+              "1fr 1fr 1fr",
+              "Local"
+            ],
+            [
+              "Rows",
+              "Auto",
+              "Local"
+            ],
+            [
+              "Column gap",
+              "24 px",
+              "Token"
+            ],
+            [
+              "Row gap",
+              "32 px",
+              "Token"
+            ],
+            [
+              "Auto flow",
+              "Row",
+              "Local"
+            ]
+          ]
+        ],
+        [
+          "Selected child",
+          [
+            [
+              "Column",
+              "1 / span 2",
+              "Local"
+            ],
+            [
+              "Row",
+              "Auto",
+              "Local"
+            ],
+            [
+              "Align self",
+              "Stretch",
+              "Inherited"
+            ]
+          ]
+        ]
+      ],
+      "actions": [
+        [
+          "Two columns",
+          "I12"
+        ],
+        [
+          "Layout",
+          "I01"
+        ],
+        [
+          "Ask AI",
+          "A02"
+        ]
+      ]
+    },
+    {
+      "key": "I05",
+      "group": "Design",
+      "title": "Box model & units",
+      "selection": "Main section",
+      "sub": "Style",
+      "scope": "Desktop \u00b7 Base",
+      "description": "Linked padding changes all sides. Alt-edit changes one side.",
+      "box": true,
+      "sections": [
+        [
+          "Spacing controls",
+          [
+            [
+              "Padding mode",
+              "Linked",
+              "Local"
+            ],
+            [
+              "Margin X",
+              "Auto",
+              "Local"
+            ],
+            [
+              "Unit",
+              "px",
+              "Local"
+            ]
+          ]
+        ],
+        [
+          "Responsive sizing",
+          [
+            [
+              "Width",
+              "100 %",
+              "Local"
+            ],
+            [
+              "Min / max width",
+              "0 / 1200 px",
+              "Local"
+            ],
+            [
+              "Height",
+              "Auto",
+              "Local"
+            ],
+            [
+              "Aspect ratio",
+              "Auto",
+              "Local"
+            ]
+          ]
+        ]
+      ],
+      "actions": [
+        [
+          "Apply 32px padding",
+          "I13"
+        ],
+        [
+          "Layout",
+          "I01"
+        ]
+      ]
+    },
+    {
+      "key": "I06",
+      "group": "Design",
+      "title": "Mobile override",
+      "selection": "Heading",
+      "sub": "Style",
+      "scope": "Mobile \u00b7 Base",
+      "description": "Mobile \u2264 479px. Class inheritance remains visible.",
+      "mobile": true,
+      "sections": [
+        [
+          "Selector",
+          [
+            [
+              "Class",
+              "hero-title",
+              "2 uses"
+            ]
+          ]
+        ],
+        [
+          "Typography",
+          [
+            [
+              "Font size",
+              "40 px",
+              "Override"
+            ],
+            [
+              "Desktop value",
+              "72 px",
+              "Inherited"
+            ],
+            [
+              "Line height",
+              "1.15",
+              "Inherited"
+            ],
+            [
+              "Letter spacing",
+              "\u22120.5 px",
+              "Inherited"
+            ],
+            [
+              "Text color",
+              "Text / primary",
+              "Token"
+            ]
+          ]
+        ],
+        [
+          "Reset scope",
+          [
+            [
+              "Target",
+              "Mobile / Base",
+              "Local"
+            ],
+            [
+              "Declaration",
+              "font-size only",
+              "Local"
+            ]
+          ]
+        ]
+      ],
+      "actions": [
+        [
+          "Reset font size",
+          "I14"
+        ],
+        [
+          "Desktop",
+          "I02"
+        ],
+        [
+          "Ask AI",
+          "A01"
+        ]
+      ]
+    },
+    {
+      "key": "I07",
+      "group": "Design",
+      "title": "Class & cascade manager",
+      "selection": "Heading",
+      "sub": "Style",
+      "scope": "Desktop \u00b7 Base",
+      "description": "Inspect class usage before changing a shared rule.",
+      "sections": [
+        [
+          "Active selector",
+          [
+            [
+              "Base class",
+              "hero-title",
+              "2 uses"
+            ],
+            [
+              "Combo class",
+              "is-featured",
+              "1 use"
+            ]
+          ]
+        ],
+        [
+          "Cascade \u00b7 strongest first",
+          [
+            [
+              "Element override",
+              "None",
+              "Local"
+            ],
+            [
+              "Combo class",
+              "Color: accent",
+              "Local"
+            ],
+            [
+              "Base class",
+              "Size: 72px",
+              "Inherited"
+            ],
+            [
+              "HTML H1",
+              "Weight: 600",
+              "Inherited"
+            ]
+          ]
+        ],
+        [
+          "Usage",
+          [
+            [
+              "Home",
+              "Hero / Heading",
+              "Local"
+            ],
+            [
+              "About",
+              "Intro / Heading",
+              "Local"
+            ]
+          ]
+        ]
+      ],
+      "actions": [
+        [
+          "Preview shared change",
+          "I15"
+        ],
+        [
+          "Back to typography",
+          "I02"
+        ]
+      ]
+    },
+    {
+      "key": "I08",
+      "group": "Design",
+      "title": "Hover state",
+      "selection": "Primary button",
+      "sub": "Style",
+      "scope": "Desktop \u00b7 Hover",
+      "description": "State changes affect hover only. Keyboard focus has its own style.",
+      "sections": [
+        [
+          "Selector",
+          [
+            [
+              "Class",
+              "button-primary",
+              "4 uses"
+            ],
+            [
+              "Pseudo-state",
+              "Hover",
+              "Local"
+            ]
+          ]
+        ],
+        [
+          "Appearance",
+          [
+            [
+              "Background",
+              "Accent / dark",
+              "Override"
+            ],
+            [
+              "Text color",
+              "White",
+              "Inherited"
+            ],
+            [
+              "Translate Y",
+              "\u22122 px",
+              "Override"
+            ],
+            [
+              "Transition",
+              "180ms / ease",
+              "Inherited"
+            ]
+          ]
+        ],
+        [
+          "Accessibility",
+          [
+            [
+              "Focus ring",
+              "2px / accent",
+              "Inherited"
+            ],
+            [
+              "Reduced motion",
+              "No transform",
+              "Local"
+            ]
+          ]
+        ]
+      ],
+      "actions": [
+        [
+          "Base appearance",
+          "I03"
+        ],
+        [
+          "Interactions",
+          "I10"
+        ]
+      ]
+    },
+    {
+      "key": "I09",
+      "group": "Design",
+      "title": "Element settings",
+      "selection": "Heading",
+      "sub": "Settings",
+      "scope": "Desktop \u00b7 Base",
+      "description": "Content and semantic attributes stay separate from styles.",
+      "sections": [
+        [
+          "Content",
+          [
+            [
+              "Text",
+              "Spaces for living",
+              "Local"
+            ],
+            [
+              "CMS source",
+              "Projects.Title",
+              "Local"
+            ],
+            [
+              "Fallback",
+              "Untitled project",
+              "Local"
+            ]
+          ]
+        ],
+        [
+          "Semantics",
+          [
+            [
+              "HTML tag",
+              "H1",
+              "Local"
+            ],
+            [
+              "Element ID",
+              "hero-heading",
+              "Local"
+            ],
+            [
+              "Language",
+              "Inherit page",
+              "Inherited"
+            ]
+          ]
+        ],
+        [
+          "Accessibility",
+          [
+            [
+              "Tab index",
+              "Default",
+              "Inherited"
+            ],
+            [
+              "Accessible name",
+              "From content",
+              "Inherited"
+            ]
+          ]
+        ],
+        [
+          "Custom attributes",
+          [
+            [
+              "data-section",
+              "hero",
+              "Local"
+            ]
+          ]
+        ]
+      ],
+      "actions": [
+        [
+          "Style",
+          "I02"
+        ],
+        [
+          "AI copy edit",
+          "A01"
+        ],
+        [
+          "Interaction settings",
+          "I10"
+        ]
+      ]
+    },
+    {
+      "key": "I10",
+      "group": "Design",
+      "title": "Interactions",
+      "selection": "Main section",
+      "sub": "Interactions",
+      "scope": "Desktop \u00b7 Base",
+      "description": "Trigger, target and action are explicit; preview before applying.",
+      "sections": [
+        [
+          "Trigger",
+          [
+            [
+              "Event",
+              "Scroll into view",
+              "Local"
+            ],
+            [
+              "Threshold",
+              "20%",
+              "Local"
+            ],
+            [
+              "Repeat",
+              "Once",
+              "Local"
+            ]
+          ]
+        ],
+        [
+          "Action",
+          [
+            [
+              "Target",
+              "This section",
+              "Local"
+            ],
+            [
+              "Animation",
+              "Fade + move Y",
+              "Local"
+            ],
+            [
+              "Duration",
+              "400 ms",
+              "Local"
+            ],
+            [
+              "Easing",
+              "Ease out",
+              "Local"
+            ]
+          ]
+        ],
+        [
+          "Accessibility",
+          [
+            [
+              "Reduced motion",
+              "Opacity only",
+              "Local"
+            ],
+            [
+              "Initial visibility",
+              "Visible fallback",
+              "Local"
+            ]
+          ]
+        ]
+      ],
+      "actions": [
+        [
+          "Preview animation",
+          "I16"
+        ],
+        [
+          "Style",
+          "I01"
+        ]
+      ]
+    },
+    {
+      "key": "I11",
+      "group": "Design",
+      "title": "Mixed selection",
+      "selection": "3 elements",
+      "sub": "Style",
+      "scope": "Desktop \u00b7 Base",
+      "description": "Only shared properties are editable. One locked element is excluded.",
+      "sections": [
+        [
+          "Selection",
+          [
+            [
+              "Eligible",
+              "2 of 3 elements",
+              "Local"
+            ],
+            [
+              "Locked element",
+              "Project image",
+              "Locked"
+            ]
+          ]
+        ],
+        [
+          "Shared properties",
+          [
+            [
+              "Font size",
+              "Mixed",
+              "Mixed"
+            ],
+            [
+              "Color",
+              "Text / primary",
+              "Token"
+            ],
+            [
+              "Margin top",
+              "Mixed",
+              "Mixed"
+            ],
+            [
+              "Opacity",
+              "100%",
+              "Local"
+            ]
+          ]
+        ],
+        [
+          "Edit rule",
+          [
+            [
+              "Apply to",
+              "2 unlocked nodes",
+              "Local"
+            ],
+            [
+              "Undo",
+              "One transaction",
+              "Local"
+            ]
+          ]
+        ]
+      ],
+      "actions": [
+        [
+          "Inspect Heading",
+          "I02"
+        ],
+        [
+          "Team presence",
+          "C01"
+        ]
+      ]
+    },
+    {
+      "key": "I12",
+      "group": "Design",
+      "title": "Grid \u00b7 two-column result",
+      "selection": "Project grid",
+      "sub": "Style",
+      "scope": "Desktop \u00b7 Base",
+      "description": "Columns changed to 2; each auto-placed card reflows.",
+      "grid": true,
+      "sections": [
+        [
+          "Grid result",
+          [
+            [
+              "Columns",
+              "1fr 1fr",
+              "Override"
+            ],
+            [
+              "Rows",
+              "Auto",
+              "Local"
+            ],
+            [
+              "Gap",
+              "24 px",
+              "Token"
+            ],
+            [
+              "Children",
+              "Auto placed",
+              "Local"
+            ]
+          ]
+        ]
+      ],
+      "actions": [
+        [
+          "Undo columns",
+          "I04"
+        ],
+        [
+          "Mobile",
+          "I06"
+        ]
+      ]
+    },
+    {
+      "key": "I13",
+      "group": "Design",
+      "title": "Spacing \u00b7 applied",
+      "selection": "Main section",
+      "sub": "Style",
+      "scope": "Desktop \u00b7 Base",
+      "description": "All four padding sides now use 32px.",
+      "box": true,
+      "paddingValue": "32",
+      "sections": [
+        [
+          "Applied spacing",
+          [
+            [
+              "Padding",
+              "32 px \u00d7 4",
+              "Override"
+            ],
+            [
+              "Margin X",
+              "Auto",
+              "Local"
+            ]
+          ]
+        ]
+      ],
+      "actions": [
+        [
+          "Undo spacing",
+          "I05"
+        ],
+        [
+          "Layout",
+          "I01"
+        ]
+      ]
+    },
+    {
+      "key": "I14",
+      "group": "Design",
+      "title": "Mobile \u00b7 override removed",
+      "selection": "Heading",
+      "sub": "Style",
+      "scope": "Mobile \u00b7 Base",
+      "description": "Only Mobile/Base font-size was removed. Desktop rule now supplies 72px.",
+      "mobile": true,
+      "sections": [
+        [
+          "Typography",
+          [
+            [
+              "Font size",
+              "72 px",
+              "Inherited"
+            ],
+            [
+              "Source",
+              "Desktop / Base",
+              "Inherited"
+            ],
+            [
+              "Local overrides",
+              "0",
+              "Local"
+            ]
+          ]
+        ]
+      ],
+      "actions": [
+        [
+          "Undo reset",
+          "I06"
+        ],
+        [
+          "Desktop typography",
+          "I02"
+        ]
+      ]
+    },
+    {
+      "key": "I15",
+      "group": "Design",
+      "title": "Shared class impact",
+      "selection": "Heading",
+      "sub": "Style",
+      "scope": "Desktop \u00b7 Base",
+      "description": "Review both uses before changing the shared hero-title class.",
+      "sections": [
+        [
+          "Proposed class change",
+          [
+            [
+              "Font size",
+              "72 \u2192 64 px",
+              "Override"
+            ],
+            [
+              "Affected",
+              "2 headings",
+              "Local"
+            ]
+          ]
+        ],
+        [
+          "Affected pages",
+          [
+            [
+              "Home / Hero",
+              "Heading",
+              "Local"
+            ],
+            [
+              "About / Intro",
+              "Heading",
+              "Local"
+            ]
+          ]
+        ],
+        [
+          "Decision",
+          [
+            [
+              "Alternative",
+              "Element override",
+              "Local"
+            ]
+          ]
+        ]
+      ],
+      "actions": [
+        [
+          "Apply class change",
+          "I17"
+        ],
+        [
+          "Cancel",
+          "I07"
+        ]
+      ]
+    },
+    {
+      "key": "I16",
+      "group": "Design",
+      "title": "Animation preview",
+      "selection": "Main section",
+      "sub": "Interactions",
+      "scope": "Desktop \u00b7 Preview",
+      "description": "End state: opacity 100%, translateY 0. Reduced-motion alternative is opacity only.",
+      "sections": [
+        [
+          "Preview result",
+          [
+            [
+              "Trigger",
+              "Entered viewport",
+              "Local"
+            ],
+            [
+              "Progress",
+              "400 / 400ms",
+              "Local"
+            ],
+            [
+              "Opacity",
+              "100%",
+              "Local"
+            ],
+            [
+              "Translate Y",
+              "0 px",
+              "Local"
+            ]
+          ]
+        ]
+      ],
+      "actions": [
+        [
+          "Replay setup",
+          "I10"
+        ],
+        [
+          "Back to Style",
+          "I01"
+        ]
+      ]
+    },
+    {
+      "key": "I17",
+      "group": "Design",
+      "title": "Shared class \u00b7 applied",
+      "selection": "Heading",
+      "sub": "Style",
+      "scope": "Desktop \u00b7 Base",
+      "description": "hero-title now uses 64px on both Home and About.",
+      "sections": [
+        [
+          "Typography",
+          [
+            [
+              "Font size",
+              "64 px",
+              "Override"
+            ],
+            [
+              "Scope",
+              "hero-title class",
+              "Local"
+            ],
+            [
+              "Affected",
+              "2 elements",
+              "Local"
+            ]
+          ]
+        ]
+      ],
+      "actions": [
+        [
+          "Undo shared change",
+          "I07"
+        ],
+        [
+          "Back to Style",
+          "I02"
+        ]
+      ]
+    },
+    {
+      "key": "A01",
+      "group": "AI",
+      "title": "AI assistant",
+      "subtitle": "A precise edit, in the right context.",
+      "status": "Ready",
+      "scope": "Selected element",
+      "context": "Home / Hero / Heading",
+      "prompt": "Rewrite this heading in a confident, warm tone. Keep it under 8 words.",
+      "cards": [
+        [
+          "Context attached",
+          "Heading text, hero-title styles, Brand voice",
+          "Selected element \u00b7 1 target"
+        ],
+        [
+          "Suggested prompts",
+          "Shorten copy \u00b7 Improve accessibility \u00b7 Explain styles",
+          "No changes until you review"
+        ]
+      ],
+      "fields": [
+        [
+          "Mode",
+          "Edit content"
+        ],
+        [
+          "Scope",
+          "Selected element"
+        ],
+        [
+          "Brand context",
+          "Studio North"
+        ],
+        [
+          "Model",
+          "Workspace default"
+        ]
+      ],
+      "actions": [
+        [
+          "Generate proposal",
+          "A03"
+        ],
+        [
+          "Change scope",
+          "A02"
+        ],
+        [
+          "History",
+          "A08"
+        ]
+      ]
+    },
+    {
+      "key": "A02",
+      "group": "AI",
+      "title": "Choose AI scope",
+      "subtitle": "Control exactly what the assistant can read and change.",
+      "status": "Scope selection",
+      "scope": "Page",
+      "context": "Home \u00b7 5 sections",
+      "cards": [
+        [
+          "Selected element",
+          "Only the current Heading and its editable properties",
+          "1 element"
+        ],
+        [
+          "Page",
+          "Home structure, styles and content",
+          "5 sections \u00b7 excludes other pages"
+        ],
+        [
+          "Site",
+          "Pages, navigation and approved Brand context",
+          "3 pages \u00b7 broader review required"
+        ]
+      ],
+      "fields": [
+        [
+          "Selected scope",
+          "Page"
+        ],
+        [
+          "Include",
+          "Layout + content"
+        ],
+        [
+          "Exclude",
+          "Publish / members"
+        ],
+        [
+          "Context limit",
+          "Selected page only"
+        ]
+      ],
+      "actions": [
+        [
+          "Use page scope",
+          "A09"
+        ],
+        [
+          "Use element scope",
+          "A01"
+        ],
+        [
+          "Use site scope",
+          "A10"
+        ]
+      ]
+    },
+    {
+      "key": "A03",
+      "group": "AI",
+      "title": "Generating a proposal",
+      "subtitle": "Reading the selected heading and Brand voice.",
+      "status": "Generating",
+      "scope": "Selected element",
+      "context": "Home / Hero / Heading",
+      "cards": [
+        [
+          "1. Read context",
+          "Heading, current revision and Brand voice attached",
+          "Complete"
+        ],
+        [
+          "2. Draft alternatives",
+          "Creating concise heading options",
+          "In progress"
+        ],
+        [
+          "3. Validate scope",
+          "Check target identity and proposed changes",
+          "Queued"
+        ]
+      ],
+      "fields": [
+        [
+          "Mutation",
+          "None yet"
+        ],
+        [
+          "Usage",
+          "Reservation pending"
+        ],
+        [
+          "Target revision",
+          "r42"
+        ],
+        [
+          "Scope",
+          "1 heading"
+        ]
+      ],
+      "actions": [
+        [
+          "View proposal",
+          "A04"
+        ],
+        [
+          "Cancel generation",
+          "A01"
+        ],
+        [
+          "Error scenario",
+          "A07"
+        ]
+      ]
+    },
+    {
+      "key": "A04",
+      "group": "AI",
+      "title": "Review AI changes",
+      "subtitle": "One content edit. Layout and styles stay the same.",
+      "status": "Ready for review",
+      "scope": "Selected element",
+      "context": "Home / Hero / Heading",
+      "cards": [
+        [
+          "Before",
+          "Make space for what matters.",
+          "Current revision r42"
+        ],
+        [
+          "After",
+          "Spaces for better living.",
+          "Proposed heading"
+        ],
+        [
+          "Change summary",
+          "1 text value \u00b7 0 style changes \u00b7 0 deletions",
+          "Scope verified against r42"
+        ]
+      ],
+      "fields": [
+        [
+          "Target",
+          "Hero / Heading"
+        ],
+        [
+          "Affected",
+          "1 element"
+        ],
+        [
+          "Revision",
+          "r42 \u00b7 current"
+        ],
+        [
+          "Apply mode",
+          "One undo step"
+        ]
+      ],
+      "actions": [
+        [
+          "Apply change",
+          "A05"
+        ],
+        [
+          "Discard",
+          "A01"
+        ],
+        [
+          "Stale scenario",
+          "A06"
+        ]
+      ]
+    },
+    {
+      "key": "A05",
+      "group": "AI",
+      "title": "AI change applied",
+      "subtitle": "The heading now reads \u201cSpaces for better living.\u201d",
+      "status": "Applied",
+      "scope": "Selected element",
+      "context": "Home / Hero / Heading",
+      "cards": [
+        [
+          "Applied change",
+          "Spaces for better living.",
+          "Revision r43 \u00b7 1 content edit"
+        ],
+        [
+          "History entry",
+          "AI: rewrite hero heading",
+          "Undo restores the previous text"
+        ]
+      ],
+      "fields": [
+        [
+          "Status",
+          "Applied to draft"
+        ],
+        [
+          "Publish",
+          "Not published"
+        ],
+        [
+          "Revision",
+          "r43"
+        ],
+        [
+          "History",
+          "1 transaction"
+        ]
+      ],
+      "actions": [
+        [
+          "Undo AI change",
+          "A04"
+        ],
+        [
+          "Continue editing",
+          "I02"
+        ],
+        [
+          "New request",
+          "A01"
+        ]
+      ]
+    },
+    {
+      "key": "A06",
+      "group": "AI",
+      "title": "Proposal needs refresh",
+      "subtitle": "The target changed after this proposal was generated.",
+      "status": "Stale",
+      "scope": "Selected element",
+      "context": "Home / Hero / Heading",
+      "cards": [
+        [
+          "Proposal baseline",
+          "r42 \u00b7 Make space for what matters.",
+          "Generated earlier"
+        ],
+        [
+          "Current document",
+          "r44 \u00b7 Thoughtful spaces, designed for you.",
+          "Updated by a teammate"
+        ],
+        [
+          "Apply paused",
+          "Regenerate against the current document or discard.",
+          "Do not overwrite newer content"
+        ]
+      ],
+      "fields": [
+        [
+          "Baseline",
+          "r42"
+        ],
+        [
+          "Current",
+          "r44"
+        ],
+        [
+          "Apply",
+          "Blocked"
+        ],
+        [
+          "Recovery",
+          "Regenerate"
+        ]
+      ],
+      "actions": [
+        [
+          "Regenerate",
+          "A03"
+        ],
+        [
+          "Discard proposal",
+          "A01"
+        ]
+      ]
+    },
+    {
+      "key": "A07",
+      "group": "AI",
+      "title": "AI is unavailable",
+      "subtitle": "Your prompt and context have been kept.",
+      "status": "Provider error",
+      "scope": "Selected element",
+      "context": "Home / Hero / Heading",
+      "cards": [
+        [
+          "Request failed",
+          "The provider did not return a usable response.",
+          "No changes applied"
+        ],
+        [
+          "Usage",
+          "Reservation will be reconciled by the service.",
+          "Do not assume a successful charge"
+        ],
+        [
+          "Recovery",
+          "Retry this prompt or review workspace AI settings.",
+          "Configuration is admin-managed"
+        ]
+      ],
+      "fields": [
+        [
+          "Prompt",
+          "Retained"
+        ],
+        [
+          "Document",
+          "Unchanged"
+        ],
+        [
+          "Retry",
+          "Manual"
+        ],
+        [
+          "Provider",
+          "Unavailable"
+        ]
+      ],
+      "actions": [
+        [
+          "Retry request",
+          "A03"
+        ],
+        [
+          "AI settings",
+          "A11"
+        ],
+        [
+          "Back",
+          "A01"
+        ]
+      ]
+    },
+    {
+      "key": "A08",
+      "group": "AI",
+      "title": "AI conversation history",
+      "subtitle": "Find prompts, proposals and their document impact.",
+      "status": "History",
+      "scope": "Selected element",
+      "context": "Studio North",
+      "cards": [
+        [
+          "Rewrite hero heading",
+          "Selected element \u00b7 Home / Hero / Heading",
+          "Applied \u00b7 r43"
+        ],
+        [
+          "Improve mobile layout",
+          "Page \u00b7 Home",
+          "Discarded \u00b7 no changes"
+        ],
+        [
+          "Accessibility suggestions",
+          "Site \u00b7 3 pages",
+          "Review pending"
+        ]
+      ],
+      "fields": [
+        [
+          "Filter",
+          "This site"
+        ],
+        [
+          "Retention",
+          "Workspace policy"
+        ],
+        [
+          "Visible to",
+          "Authorized members"
+        ],
+        [
+          "Export",
+          "Admin policy"
+        ]
+      ],
+      "actions": [
+        [
+          "Open heading result",
+          "A05"
+        ],
+        [
+          "New conversation",
+          "A01"
+        ],
+        [
+          "Open site review",
+          "A10"
+        ]
+      ]
+    },
+    {
+      "key": "A09",
+      "group": "AI",
+      "title": "Page assistant",
+      "subtitle": "Improve this page while preserving its content structure.",
+      "status": "Ready",
+      "scope": "Page",
+      "context": "Home \u00b7 5 sections",
+      "prompt": "Improve the Home page hierarchy and mobile spacing without deleting content.",
+      "cards": [
+        [
+          "Page context",
+          "Hero, projects, services, testimonials, footer",
+          "5 sections \u00b7 Home only"
+        ],
+        [
+          "Review approach",
+          "Compare every layout change before applying.",
+          "Page changes can become an agent task"
+        ]
+      ],
+      "fields": [
+        [
+          "Scope",
+          "Home page"
+        ],
+        [
+          "Allowed",
+          "Layout + styles"
+        ],
+        [
+          "Protected",
+          "Content + links"
+        ],
+        [
+          "Other pages",
+          "Excluded"
+        ]
+      ],
+      "actions": [
+        [
+          "Plan as agent task",
+          "G02"
+        ],
+        [
+          "Change scope",
+          "A02"
+        ]
+      ]
+    },
+    {
+      "key": "A10",
+      "group": "AI",
+      "title": "Site assistant",
+      "subtitle": "Work across pages with an explicit impact review.",
+      "status": "Ready",
+      "scope": "Site",
+      "context": "Studio North \u00b7 3 pages",
+      "prompt": "Audit typography and accessibility across the site. Propose fixes first.",
+      "cards": [
+        [
+          "Site context",
+          "Home, About and Contact + Brand variables",
+          "3 pages"
+        ],
+        [
+          "Protected actions",
+          "Publishing, member access and credentials require separate permission.",
+          "No automatic production changes"
+        ]
+      ],
+      "fields": [
+        [
+          "Scope",
+          "3 site pages"
+        ],
+        [
+          "Mode",
+          "Audit + propose"
+        ],
+        [
+          "Publish",
+          "Not allowed"
+        ],
+        [
+          "Budget",
+          "Review before run"
+        ]
+      ],
+      "actions": [
+        [
+          "Create site audit task",
+          "G02"
+        ],
+        [
+          "Change scope",
+          "A02"
+        ],
+        [
+          "Usage & limits",
+          "A11"
+        ]
+      ]
+    },
+    {
+      "key": "A11",
+      "group": "AI",
+      "title": "AI settings & usage",
+      "subtitle": "Workspace-level controls with clear ownership.",
+      "status": "Admin settings",
+      "scope": "Workspace",
+      "context": "Studio North workspace",
+      "cards": [
+        [
+          "Provider configuration",
+          "Workspace default model \u00b7 key stored by the service",
+          "Credentials are never displayed"
+        ],
+        [
+          "Usage allowance",
+          "120 / 500 units used \u00b7 example data",
+          "Limits and reservation policy"
+        ],
+        [
+          "Access",
+          "Editors may request draft changes; publishing remains separate.",
+          "Workspace admin manages configuration"
+        ]
+      ],
+      "fields": [
+        [
+          "AI access",
+          "Enabled"
+        ],
+        [
+          "Provider status",
+          "Connected \u00b7 sample"
+        ],
+        [
+          "Limit",
+          "500 units / month"
+        ],
+        [
+          "Role",
+          "Admin required"
+        ]
+      ],
+      "actions": [
+        [
+          "Back to assistant",
+          "A01"
+        ],
+        [
+          "Quota exhausted",
+          "A12"
+        ]
+      ]
+    },
+    {
+      "key": "A12",
+      "group": "AI",
+      "title": "AI limit reached",
+      "subtitle": "You can continue editing manually.",
+      "status": "Quota exhausted",
+      "scope": "Workspace",
+      "context": "Studio North workspace",
+      "cards": [
+        [
+          "Allowance exhausted",
+          "500 / 500 units used \u00b7 example scenario",
+          "New generation unavailable"
+        ],
+        [
+          "Existing proposals",
+          "Reviewing already-generated changes remains available.",
+          "No new generation needed"
+        ]
+      ],
+      "fields": [
+        [
+          "Reset",
+          "Next billing cycle"
+        ],
+        [
+          "Admin action",
+          "Review allowance"
+        ],
+        [
+          "Prompt",
+          "Retained"
+        ],
+        [
+          "Manual editing",
+          "Available"
+        ]
+      ],
+      "actions": [
+        [
+          "Review existing proposal",
+          "A04"
+        ],
+        [
+          "Usage settings",
+          "A11"
+        ],
+        [
+          "Return to editor",
+          "I02"
+        ]
+      ]
+    },
+    {
+      "key": "G01",
+      "group": "Agents",
+      "title": "Agents",
+      "subtitle": "Give a task, review the plan, approve the result.",
+      "status": "Task workspace",
+      "scope": "Site",
+      "context": "Studio North",
+      "cards": [
+        [
+          "Responsive layout",
+          "Fix spacing and layout across breakpoints",
+          "Draft-only permissions"
+        ],
+        [
+          "Content & SEO",
+          "Suggest metadata, headings and accessible copy",
+          "Review before changes"
+        ],
+        [
+          "Accessibility audit",
+          "Find missing labels, contrast and structure issues",
+          "Read + propose"
+        ]
+      ],
+      "fields": [
+        [
+          "Active runs",
+          "1"
+        ],
+        [
+          "Awaiting review",
+          "1"
+        ],
+        [
+          "Autopublish",
+          "Never"
+        ],
+        [
+          "Default scope",
+          "Selected page"
+        ]
+      ],
+      "actions": [
+        [
+          "New task",
+          "G02"
+        ],
+        [
+          "View active run",
+          "G04"
+        ],
+        [
+          "Review ready result",
+          "G05"
+        ]
+      ]
+    },
+    {
+      "key": "G02",
+      "group": "Agents",
+      "title": "New agent task",
+      "subtitle": "Define the outcome and the boundaries before running.",
+      "status": "Draft task",
+      "scope": "Page",
+      "context": "Home \u00b7 Desktop, Tablet, Mobile",
+      "prompt": "Fix the Home page mobile layout. Preserve text, images and links.",
+      "cards": [
+        [
+          "Goal",
+          "Improve mobile hierarchy and spacing on Home.",
+          "Responsive layout agent"
+        ],
+        [
+          "Boundaries",
+          "Only Home. No deletion, publishing or shared Brand token changes.",
+          "Protected by task permissions"
+        ]
+      ],
+      "fields": [
+        [
+          "Allowed pages",
+          "Home"
+        ],
+        [
+          "Breakpoints",
+          "Tablet + Mobile"
+        ],
+        [
+          "Max actions",
+          "20"
+        ],
+        [
+          "Budget cap",
+          "10 units"
+        ]
+      ],
+      "actions": [
+        [
+          "Generate plan",
+          "G03"
+        ],
+        [
+          "Cancel task",
+          "G01"
+        ],
+        [
+          "Site audit preset",
+          "G11"
+        ]
+      ]
+    },
+    {
+      "key": "G03",
+      "group": "Agents",
+      "title": "Approve the plan",
+      "subtitle": "Review the proposed steps before the agent starts.",
+      "status": "Awaiting approval",
+      "scope": "Page",
+      "context": "Home \u00b7 baseline r42",
+      "cards": [
+        [
+          "1. Inspect",
+          "Read layout and breakpoint overrides.",
+          "Read only"
+        ],
+        [
+          "2. Propose",
+          "Adjust hero spacing and project grid columns.",
+          "Up to 4 style changes"
+        ],
+        [
+          "3. Validate",
+          "Check overflow, touch targets and heading order.",
+          "Report findings; no publishing"
+        ]
+      ],
+      "fields": [
+        [
+          "Allowed writes",
+          "Home styles"
+        ],
+        [
+          "Protected",
+          "Content + Brand"
+        ],
+        [
+          "Maximum usage",
+          "10 units"
+        ],
+        [
+          "Approval",
+          "This plan only"
+        ]
+      ],
+      "actions": [
+        [
+          "Approve & run",
+          "G04"
+        ],
+        [
+          "Edit task",
+          "G02"
+        ],
+        [
+          "Cancel",
+          "G01"
+        ]
+      ]
+    },
+    {
+      "key": "G04",
+      "group": "Agents",
+      "title": "Responsive layout \u00b7 running",
+      "subtitle": "Preparing a draft change set for your review.",
+      "status": "Running \u00b7 2 / 3",
+      "scope": "Page",
+      "context": "Home \u00b7 baseline r42",
+      "cards": [
+        [
+          "Inspect layout",
+          "5 sections and 3 breakpoints inspected.",
+          "Complete"
+        ],
+        [
+          "Prepare changes",
+          "Hero padding and grid layout proposals.",
+          "Running"
+        ],
+        [
+          "Validate output",
+          "Check affected elements after proposed changes.",
+          "Queued"
+        ]
+      ],
+      "fields": [
+        [
+          "Elapsed",
+          "00:24 \u00b7 example"
+        ],
+        [
+          "Usage",
+          "3 / 10 units"
+        ],
+        [
+          "Applied to site",
+          "0 changes"
+        ],
+        [
+          "Cancellation",
+          "Keeps run log"
+        ]
+      ],
+      "actions": [
+        [
+          "Review result",
+          "G05"
+        ],
+        [
+          "Cancel run",
+          "G08"
+        ],
+        [
+          "Failure scenario",
+          "G09"
+        ]
+      ]
+    },
+    {
+      "key": "G05",
+      "group": "Agents",
+      "title": "Review agent changes",
+      "subtitle": "Four proposed style edits across two elements.",
+      "status": "Ready for review",
+      "scope": "Page",
+      "context": "Home \u00b7 r42 current",
+      "cards": [
+        [
+          "Hero \u00b7 Mobile",
+          "Padding: 64px \u2192 24px; heading: 72px \u2192 40px",
+          "2 changes \u00b7 selected"
+        ],
+        [
+          "Project grid \u00b7 Tablet",
+          "Columns: 3 \u2192 2; gap: 32px \u2192 24px",
+          "2 changes \u00b7 selected"
+        ],
+        [
+          "Validation report",
+          "No horizontal overflow in proposed views. Content preserved.",
+          "Design example \u00b7 engineering checks required"
+        ]
+      ],
+      "fields": [
+        [
+          "Selected changes",
+          "4 of 4"
+        ],
+        [
+          "Deletes",
+          "0"
+        ],
+        [
+          "Current baseline",
+          "r42"
+        ],
+        [
+          "Apply",
+          "One transaction"
+        ]
+      ],
+      "actions": [
+        [
+          "Apply 4 changes",
+          "G06"
+        ],
+        [
+          "Review 2 changes",
+          "G10"
+        ],
+        [
+          "Reject all",
+          "G01"
+        ],
+        [
+          "Stale baseline",
+          "G12"
+        ]
+      ]
+    },
+    {
+      "key": "G06",
+      "group": "Agents",
+      "title": "Agent changes applied",
+      "subtitle": "Four approved edits were added to the draft.",
+      "status": "Applied",
+      "scope": "Page",
+      "context": "Home \u00b7 r43",
+      "cards": [
+        [
+          "Change set",
+          "Hero mobile spacing and tablet project grid.",
+          "4 style edits \u00b7 2 elements"
+        ],
+        [
+          "Audit trail",
+          "Requested by You \u00b7 executed by Responsive layout agent",
+          "Plan approved \u00b7 result approved"
+        ],
+        [
+          "Next step",
+          "Preview responsive views before requesting publication.",
+          "No automatic publish"
+        ]
+      ],
+      "fields": [
+        [
+          "Revision",
+          "r43"
+        ],
+        [
+          "Undo scope",
+          "Entire change set"
+        ],
+        [
+          "Publish",
+          "Not published"
+        ],
+        [
+          "Usage",
+          "6 units \u00b7 sample"
+        ]
+      ],
+      "actions": [
+        [
+          "Undo change set",
+          "G05"
+        ],
+        [
+          "Open editor",
+          "I06"
+        ],
+        [
+          "All agent runs",
+          "G07"
+        ]
+      ]
+    },
+    {
+      "key": "G07",
+      "group": "Agents",
+      "title": "Agent runs & audit log",
+      "subtitle": "Every plan, approval and result stays traceable.",
+      "status": "History",
+      "scope": "Site",
+      "context": "Studio North",
+      "cards": [
+        [
+          "Responsive layout \u00b7 run 014",
+          "Requested by You \u00b7 Home \u00b7 4 changes",
+          "Applied \u00b7 6 units"
+        ],
+        [
+          "SEO audit \u00b7 run 013",
+          "Requested by Sara \u00b7 3 pages",
+          "Rejected \u00b7 no changes"
+        ],
+        [
+          "Accessibility \u00b7 run 012",
+          "Requested by You \u00b7 Home",
+          "Cancelled \u00b7 partial report retained"
+        ]
+      ],
+      "fields": [
+        [
+          "Filter",
+          "All runs"
+        ],
+        [
+          "Identity",
+          "Human + agent"
+        ],
+        [
+          "Approval log",
+          "Retained"
+        ],
+        [
+          "Credentials",
+          "Redacted"
+        ]
+      ],
+      "actions": [
+        [
+          "Open run 014",
+          "G06"
+        ],
+        [
+          "Start new task",
+          "G02"
+        ]
+      ]
+    },
+    {
+      "key": "G08",
+      "group": "Agents",
+      "title": "Run cancelled",
+      "subtitle": "The agent stopped before applying any changes.",
+      "status": "Cancelled",
+      "scope": "Page",
+      "context": "Home \u00b7 baseline r42",
+      "cards": [
+        [
+          "Completed work",
+          "Layout inspection is available in the run log.",
+          "Read-only output retained"
+        ],
+        [
+          "Unfinished work",
+          "Proposed changes were not applied.",
+          "Document unchanged"
+        ]
+      ],
+      "fields": [
+        [
+          "Applied",
+          "0 changes"
+        ],
+        [
+          "Usage",
+          "Reconcile actual use"
+        ],
+        [
+          "Draft task",
+          "Retained"
+        ],
+        [
+          "Restart",
+          "Requires new run"
+        ]
+      ],
+      "actions": [
+        [
+          "Edit & restart",
+          "G02"
+        ],
+        [
+          "View runs",
+          "G07"
+        ]
+      ]
+    },
+    {
+      "key": "G09",
+      "group": "Agents",
+      "title": "Run needs attention",
+      "subtitle": "The validation step failed; no changes were applied.",
+      "status": "Failed \u00b7 step 3",
+      "scope": "Page",
+      "context": "Home \u00b7 baseline r42",
+      "cards": [
+        [
+          "Failure",
+          "Validation service did not return a result.",
+          "Unknown is not a pass"
+        ],
+        [
+          "Partial output",
+          "4 draft changes are retained for inspection.",
+          "Apply is blocked until validation"
+        ],
+        [
+          "Recovery",
+          "Retry validation against the same current revision.",
+          "If stale, regenerate first"
+        ]
+      ],
+      "fields": [
+        [
+          "Document",
+          "Unchanged"
+        ],
+        [
+          "Failure step",
+          "Validate"
+        ],
+        [
+          "Retry scope",
+          "Failed step"
+        ],
+        [
+          "Usage",
+          "Actual use only"
+        ]
+      ],
+      "actions": [
+        [
+          "Retry validation",
+          "G04"
+        ],
+        [
+          "Edit task",
+          "G02"
+        ],
+        [
+          "Cancel",
+          "G08"
+        ]
+      ]
+    },
+    {
+      "key": "G10",
+      "group": "Agents",
+      "title": "Review selected changes",
+      "subtitle": "Apply only the two mobile hero changes.",
+      "status": "Partial selection",
+      "scope": "Page",
+      "context": "Home \u00b7 r42 current",
+      "cards": [
+        [
+          "Selected \u00b7 Hero",
+          "Padding 64px \u2192 24px; heading 72px \u2192 40px",
+          "2 selected changes"
+        ],
+        [
+          "Excluded \u00b7 Project grid",
+          "Columns and gap stay unchanged.",
+          "2 excluded changes"
+        ],
+        [
+          "Dependencies",
+          "Selected edits do not depend on grid changes.",
+          "Safe to review independently"
+        ]
+      ],
+      "fields": [
+        [
+          "Selected",
+          "2 of 4"
+        ],
+        [
+          "Unselected",
+          "Grid edits"
+        ],
+        [
+          "Apply",
+          "One transaction"
+        ],
+        [
+          "Publish",
+          "Not included"
+        ]
+      ],
+      "actions": [
+        [
+          "Apply selected 2",
+          "G13"
+        ],
+        [
+          "Select all",
+          "G05"
+        ],
+        [
+          "Discard",
+          "G01"
+        ]
+      ]
+    },
+    {
+      "key": "G11",
+      "group": "Agents",
+      "title": "Site audit task",
+      "subtitle": "A read-only audit across the whole site.",
+      "status": "Draft task",
+      "scope": "Site",
+      "context": "Home, About, Contact",
+      "cards": [
+        [
+          "Audit coverage",
+          "Typography, heading structure, labels and metadata.",
+          "3 pages"
+        ],
+        [
+          "Agent permissions",
+          "Read site + propose findings. No document writes.",
+          "Read-only preset"
+        ]
+      ],
+      "fields": [
+        [
+          "Agent",
+          "Accessibility audit"
+        ],
+        [
+          "Pages",
+          "All 3"
+        ],
+        [
+          "Writes",
+          "Not allowed"
+        ],
+        [
+          "Budget cap",
+          "10 units"
+        ]
+      ],
+      "actions": [
+        [
+          "Review audit plan",
+          "G14"
+        ],
+        [
+          "Back",
+          "G01"
+        ]
+      ]
+    },
+    {
+      "key": "G12",
+      "group": "Agents",
+      "title": "Agent result is stale",
+      "subtitle": "Home changed while this agent was working.",
+      "status": "Conflict",
+      "scope": "Page",
+      "context": "Baseline r42 \u2192 current r44",
+      "cards": [
+        [
+          "Conflicting target",
+          "Hero padding was edited by Sara.",
+          "64px \u2192 32px since baseline"
+        ],
+        [
+          "Apply paused",
+          "Regenerate the change set using the latest revision.",
+          "No silent overwrite"
+        ]
+      ],
+      "fields": [
+        [
+          "Baseline",
+          "r42"
+        ],
+        [
+          "Current",
+          "r44"
+        ],
+        [
+          "Approval",
+          "Invalidated"
+        ],
+        [
+          "Apply",
+          "Blocked"
+        ]
+      ],
+      "actions": [
+        [
+          "Refresh task",
+          "G02"
+        ],
+        [
+          "Discard result",
+          "G01"
+        ],
+        [
+          "View team changes",
+          "C05"
+        ]
+      ]
+    },
+    {
+      "key": "G13",
+      "group": "Agents",
+      "title": "Selected changes applied",
+      "subtitle": "Only the two approved hero edits were applied.",
+      "status": "Applied \u00b7 2 changes",
+      "scope": "Page",
+      "context": "Home \u00b7 r43",
+      "cards": [
+        [
+          "Hero updated",
+          "Mobile padding 24px and heading 40px.",
+          "2 style edits"
+        ],
+        [
+          "Grid preserved",
+          "Columns and gap remain unchanged.",
+          "Excluded changes were not applied"
+        ]
+      ],
+      "fields": [
+        [
+          "Applied",
+          "2 of 4"
+        ],
+        [
+          "Revision",
+          "r43"
+        ],
+        [
+          "Undo",
+          "This change set"
+        ],
+        [
+          "Publish",
+          "Not published"
+        ]
+      ],
+      "actions": [
+        [
+          "Undo selected edits",
+          "G10"
+        ],
+        [
+          "Open Mobile editor",
+          "I06"
+        ],
+        [
+          "Run history",
+          "G07"
+        ]
+      ]
+    },
+    {
+      "key": "G14",
+      "group": "Agents",
+      "title": "Approve site audit",
+      "subtitle": "Authorize a read-only inspection of three pages.",
+      "status": "Awaiting approval",
+      "scope": "Site",
+      "context": "Studio North \u00b7 r42",
+      "cards": [
+        [
+          "1. Read",
+          "Home, About and Contact document snapshots.",
+          "3 pages"
+        ],
+        [
+          "2. Check",
+          "Heading hierarchy, link names and image descriptions.",
+          "No edits"
+        ],
+        [
+          "3. Report",
+          "Create prioritized findings with element locations.",
+          "No apply or publish permission"
+        ]
+      ],
+      "fields": [
+        [
+          "Scope",
+          "3 named pages"
+        ],
+        [
+          "Write permission",
+          "None"
+        ],
+        [
+          "Maximum usage",
+          "10 units"
+        ],
+        [
+          "Approval",
+          "One audit run"
+        ]
+      ],
+      "actions": [
+        [
+          "Run audit",
+          "G15"
+        ],
+        [
+          "Edit scope",
+          "G11"
+        ],
+        [
+          "Cancel",
+          "G01"
+        ]
+      ]
+    },
+    {
+      "key": "G15",
+      "group": "Agents",
+      "title": "Site audit report",
+      "subtitle": "Three findings ready for human review.",
+      "status": "Report ready",
+      "scope": "Site",
+      "context": "Home, About, Contact",
+      "cards": [
+        [
+          "Home \u00b7 Image",
+          "Missing meaningful alternative text.",
+          "High \u00b7 locate element"
+        ],
+        [
+          "About \u00b7 Headings",
+          "Heading level jumps from H1 to H3.",
+          "Medium \u00b7 structural review"
+        ],
+        [
+          "Contact \u00b7 Submit",
+          "Accessible button name needs verification.",
+          "Needs check \u00b7 not a confirmed pass"
+        ]
+      ],
+      "fields": [
+        [
+          "Pages inspected",
+          "3"
+        ],
+        [
+          "Findings",
+          "3"
+        ],
+        [
+          "Applied changes",
+          "0"
+        ],
+        [
+          "Publish",
+          "Not allowed"
+        ]
+      ],
+      "actions": [
+        [
+          "Inspect element settings",
+          "I09"
+        ],
+        [
+          "View agent runs",
+          "G07"
+        ]
+      ]
+    },
+    {
+      "key": "C01",
+      "group": "Team",
+      "title": "Team collaboration",
+      "subtitle": "See who is here and what they are editing.",
+      "status": "Connected \u00b7 example",
+      "scope": "Site",
+      "context": "Studio North",
+      "cards": [
+        [
+          "You \u00b7 Designer",
+          "Home / Hero heading",
+          "Editing"
+        ],
+        [
+          "Sara \u00b7 Designer",
+          "Home / Project grid",
+          "Editing \u00b7 presence indicator"
+        ],
+        [
+          "Alex \u00b7 Reviewer",
+          "About / Introduction",
+          "Viewing \u00b7 comments only"
+        ]
+      ],
+      "fields": [
+        [
+          "Connection",
+          "Connected"
+        ],
+        [
+          "Editing scope",
+          "This site"
+        ],
+        [
+          "Your role",
+          "Designer"
+        ],
+        [
+          "Publishing",
+          "Requires permission"
+        ]
+      ],
+      "actions": [
+        [
+          "Share & permissions",
+          "C02"
+        ],
+        [
+          "Open comments",
+          "C03"
+        ],
+        [
+          "Activity",
+          "C05"
+        ],
+        [
+          "Connection lost",
+          "C07"
+        ]
+      ]
+    },
+    {
+      "key": "C02",
+      "group": "Team",
+      "title": "Share & permissions",
+      "subtitle": "Grant the minimum access needed for this site.",
+      "status": "Site access",
+      "scope": "Site",
+      "context": "Studio North",
+      "cards": [
+        [
+          "Sara",
+          "Designer \u00b7 can edit site drafts",
+          "Existing member"
+        ],
+        [
+          "Alex",
+          "Reviewer \u00b7 can comment, cannot edit or publish",
+          "Existing member"
+        ],
+        [
+          "Client review link",
+          "Review a pinned version without editor access.",
+          "Link lifecycle managed separately"
+        ]
+      ],
+      "fields": [
+        [
+          "Invite email",
+          "teammate@example.com"
+        ],
+        [
+          "Role",
+          "Reviewer"
+        ],
+        [
+          "Site access",
+          "Studio North only"
+        ],
+        [
+          "Publish permission",
+          "Not granted"
+        ]
+      ],
+      "actions": [
+        [
+          "Review invitation",
+          "C09"
+        ],
+        [
+          "Client review",
+          "C06"
+        ],
+        [
+          "Back to team",
+          "C01"
+        ]
+      ]
+    },
+    {
+      "key": "C03",
+      "group": "Team",
+      "title": "Comments",
+      "subtitle": "Discuss a specific element and keep the context.",
+      "status": "2 open threads",
+      "scope": "Page",
+      "context": "Home / Hero / Heading",
+      "cards": [
+        [
+          "Alex \u00b7 Hero heading",
+          "Could we make the promise more specific?",
+          "Pinned to Heading \u00b7 r42"
+        ],
+        [
+          "Sara \u00b7 Reply",
+          "I\u2019ll ask the assistant for a shorter alternative.",
+          "2 replies \u00b7 assigned to You"
+        ],
+        [
+          "Project image",
+          "Please confirm the final image crop.",
+          "Open \u00b7 Home / Projects"
+        ]
+      ],
+      "fields": [
+        [
+          "Filter",
+          "Open"
+        ],
+        [
+          "Assigned to",
+          "You"
+        ],
+        [
+          "Mention",
+          "@Sara"
+        ],
+        [
+          "Anchor",
+          "Heading / r42"
+        ]
+      ],
+      "actions": [
+        [
+          "Open thread",
+          "C04"
+        ],
+        [
+          "Ask AI about heading",
+          "A01"
+        ],
+        [
+          "Team",
+          "C01"
+        ]
+      ]
+    },
+    {
+      "key": "C04",
+      "group": "Team",
+      "title": "Heading discussion",
+      "subtitle": "Home / Hero / Heading \u00b7 thread 014",
+      "status": "Open thread",
+      "scope": "Element",
+      "context": "Heading \u00b7 r42",
+      "cards": [
+        [
+          "Alex \u00b7 10:42",
+          "Could we make the promise more specific?",
+          "Reviewer"
+        ],
+        [
+          "You \u00b7 10:45",
+          "Proposed copy: \u201cSpaces for better living.\u201d",
+          "Designer"
+        ],
+        [
+          "Sara \u00b7 10:47",
+          "This is clearer. Please keep the heading level.",
+          "Mentioned \u00b7 @You"
+        ]
+      ],
+      "fields": [
+        [
+          "Assigned to",
+          "You"
+        ],
+        [
+          "Replies",
+          "3"
+        ],
+        [
+          "Anchor status",
+          "Located"
+        ],
+        [
+          "Resolve permission",
+          "Designer"
+        ]
+      ],
+      "actions": [
+        [
+          "Resolve thread",
+          "C10"
+        ],
+        [
+          "Back to comments",
+          "C03"
+        ],
+        [
+          "Inspect heading",
+          "I09"
+        ]
+      ]
+    },
+    {
+      "key": "C05",
+      "group": "Team",
+      "title": "Site activity",
+      "subtitle": "Human edits, agent runs and approvals in one timeline.",
+      "status": "Activity",
+      "scope": "Site",
+      "context": "Studio North",
+      "cards": [
+        [
+          "Sara \u00b7 changed spacing",
+          "Home / Hero \u00b7 padding 64px \u2192 32px",
+          "Revision r44 \u00b7 2 minutes ago"
+        ],
+        [
+          "You \u00b7 applied AI copy",
+          "Home / Heading \u00b7 1 content change",
+          "Revision r43 \u00b7 5 minutes ago"
+        ],
+        [
+          "Responsive layout agent",
+          "Plan approved by You; result awaits review.",
+          "Run 014 \u00b7 draft only"
+        ]
+      ],
+      "fields": [
+        [
+          "Filter",
+          "All actors"
+        ],
+        [
+          "Human changes",
+          "Visible"
+        ],
+        [
+          "Agent changes",
+          "Attributed"
+        ],
+        [
+          "Restore",
+          "Permission required"
+        ]
+      ],
+      "actions": [
+        [
+          "Review conflicting edit",
+          "C08"
+        ],
+        [
+          "Agent run",
+          "G05"
+        ],
+        [
+          "Team",
+          "C01"
+        ]
+      ]
+    },
+    {
+      "key": "C06",
+      "group": "Team",
+      "title": "Client review",
+      "subtitle": "Request feedback on a named, immutable review version.",
+      "status": "Review draft",
+      "scope": "Snapshot",
+      "context": "Studio North \u00b7 version r43",
+      "cards": [
+        [
+          "Review target",
+          "Home, About and Contact at revision r43.",
+          "Pinned snapshot"
+        ],
+        [
+          "Client permissions",
+          "View, comment and approve this review only.",
+          "No design or publish access"
+        ],
+        [
+          "Freshness",
+          "New editor changes require a new review request.",
+          "Approval stays attached to r43"
+        ]
+      ],
+      "fields": [
+        [
+          "Recipient",
+          "client@example.com"
+        ],
+        [
+          "Version",
+          "r43"
+        ],
+        [
+          "Link expiry",
+          "7 days"
+        ],
+        [
+          "Status",
+          "Not sent"
+        ]
+      ],
+      "actions": [
+        [
+          "Preview reviewer view",
+          "C11"
+        ],
+        [
+          "Back to permissions",
+          "C02"
+        ]
+      ]
+    },
+    {
+      "key": "C07",
+      "group": "Team",
+      "title": "Connection interrupted",
+      "subtitle": "Your local changes are retained while reconnecting.",
+      "status": "Offline",
+      "scope": "Site",
+      "context": "Studio North \u00b7 last synced r43",
+      "cards": [
+        [
+          "Local changes",
+          "2 pending edits kept in this browser.",
+          "Not synced"
+        ],
+        [
+          "Team presence",
+          "Last known status may be out of date.",
+          "Presence paused"
+        ],
+        [
+          "Reconnect",
+          "Compare server revision before sending queued changes.",
+          "Do not claim saved until acknowledged"
+        ]
+      ],
+      "fields": [
+        [
+          "Last sync",
+          "r43"
+        ],
+        [
+          "Pending edits",
+          "2"
+        ],
+        [
+          "Server revision",
+          "Unknown"
+        ],
+        [
+          "Publish",
+          "Unavailable offline"
+        ]
+      ],
+      "actions": [
+        [
+          "Reconnect \u00b7 conflict",
+          "C08"
+        ],
+        [
+          "Return to team",
+          "C01"
+        ]
+      ]
+    },
+    {
+      "key": "C08",
+      "group": "Team",
+      "title": "Resolve a conflicting change",
+      "subtitle": "Both you and Sara edited the same property.",
+      "status": "Conflict needs review",
+      "scope": "Property",
+      "context": "Home / Hero / padding",
+      "cards": [
+        [
+          "Your local value",
+          "24px \u00b7 based on r43",
+          "Pending edit"
+        ],
+        [
+          "Server value",
+          "32px \u00b7 changed by Sara in r44",
+          "Current saved value"
+        ],
+        [
+          "Choose explicitly",
+          "Keep server or reapply your value against the latest revision.",
+          "Never overwrite unrelated edits"
+        ]
+      ],
+      "fields": [
+        [
+          "Property",
+          "padding"
+        ],
+        [
+          "Baseline",
+          "r43"
+        ],
+        [
+          "Server",
+          "r44"
+        ],
+        [
+          "Other edits",
+          "Retained"
+        ]
+      ],
+      "actions": [
+        [
+          "Use server 32px",
+          "C12"
+        ],
+        [
+          "Reapply my 24px",
+          "C13"
+        ],
+        [
+          "Decide later",
+          "C07"
+        ]
+      ]
+    },
+    {
+      "key": "C09",
+      "group": "Team",
+      "title": "Review invitation",
+      "subtitle": "Confirm site and role before sending an invitation.",
+      "status": "Ready to invite",
+      "scope": "Site",
+      "context": "Studio North",
+      "cards": [
+        [
+          "Recipient",
+          "teammate@example.com",
+          "New invitation"
+        ],
+        [
+          "Access grant",
+          "Reviewer on Studio North only.",
+          "View + comment"
+        ],
+        [
+          "Not included",
+          "Editing, publishing, billing and workspace administration.",
+          "No elevated permissions"
+        ]
+      ],
+      "fields": [
+        [
+          "Inviter",
+          "Workspace admin"
+        ],
+        [
+          "Delivery",
+          "Email invitation"
+        ],
+        [
+          "Expiry",
+          "7 days"
+        ],
+        [
+          "Access begins",
+          "On acceptance"
+        ]
+      ],
+      "actions": [
+        [
+          "Send invitation",
+          "C14"
+        ],
+        [
+          "Edit invitation",
+          "C02"
+        ]
+      ]
+    },
+    {
+      "key": "C10",
+      "group": "Team",
+      "title": "Thread resolved",
+      "subtitle": "The discussion is retained in resolved comments.",
+      "status": "Resolved",
+      "scope": "Element",
+      "context": "Home / Hero / Heading",
+      "cards": [
+        [
+          "Resolution",
+          "Resolved by You \u00b7 wording agreed.",
+          "Thread 014"
+        ],
+        [
+          "History retained",
+          "3 replies and the element anchor remain available.",
+          "Resolved does not change page content"
+        ]
+      ],
+      "fields": [
+        [
+          "Status",
+          "Resolved"
+        ],
+        [
+          "Resolved by",
+          "You"
+        ],
+        [
+          "Anchor",
+          "Heading"
+        ],
+        [
+          "Visibility",
+          "Resolved filter"
+        ]
+      ],
+      "actions": [
+        [
+          "Reopen thread",
+          "C04"
+        ],
+        [
+          "Back to comments",
+          "C03"
+        ]
+      ]
+    },
+    {
+      "key": "C11",
+      "group": "Team",
+      "title": "Reviewer view",
+      "subtitle": "Studio North \u00b7 review version r43",
+      "status": "Reviewer",
+      "scope": "Snapshot",
+      "context": "Home \u00b7 r43",
+      "cards": [
+        [
+          "Review the draft",
+          "Inspect the pinned page preview and leave feedback.",
+          "Version r43"
+        ],
+        [
+          "Feedback",
+          "1 open comment on the Home heading.",
+          "Comment-only access"
+        ],
+        [
+          "Approval",
+          "Approve this version or request changes.",
+          "Does not publish the site"
+        ]
+      ],
+      "fields": [
+        [
+          "Role",
+          "External reviewer"
+        ],
+        [
+          "Version",
+          "r43"
+        ],
+        [
+          "Editing",
+          "Not permitted"
+        ],
+        [
+          "Publish",
+          "Not permitted"
+        ]
+      ],
+      "actions": [
+        [
+          "Approve version",
+          "C15"
+        ],
+        [
+          "Request changes",
+          "C16"
+        ],
+        [
+          "Back to setup",
+          "C06"
+        ]
+      ]
+    },
+    {
+      "key": "C12",
+      "group": "Team",
+      "title": "Server value kept",
+      "subtitle": "Hero padding now matches the saved server value.",
+      "status": "Conflict resolved",
+      "scope": "Property",
+      "context": "Home / Hero / padding",
+      "cards": [
+        [
+          "Resolution",
+          "Kept Sara\u2019s 32px value from r44.",
+          "No overwrite"
+        ],
+        [
+          "Other local edits",
+          "Unrelated changes remain queued for sync.",
+          "1 pending edit"
+        ]
+      ],
+      "fields": [
+        [
+          "Padding",
+          "32 px"
+        ],
+        [
+          "Baseline",
+          "r44"
+        ],
+        [
+          "Discarded",
+          "Only local padding"
+        ],
+        [
+          "Other edits",
+          "Retained"
+        ]
+      ],
+      "actions": [
+        [
+          "Return to team",
+          "C01"
+        ],
+        [
+          "Activity",
+          "C05"
+        ]
+      ]
+    },
+    {
+      "key": "C13",
+      "group": "Team",
+      "title": "Your value reapplied",
+      "subtitle": "A new change sets Hero padding to 24px.",
+      "status": "Conflict resolved",
+      "scope": "Property",
+      "context": "Home / Hero / padding",
+      "cards": [
+        [
+          "Resolution",
+          "Applied 24px against revision r44.",
+          "New revision r45"
+        ],
+        [
+          "Undo behavior",
+          "Undo restores the prior server value: 32px.",
+          "Does not undo Sara\u2019s other edits"
+        ]
+      ],
+      "fields": [
+        [
+          "Padding",
+          "24 px"
+        ],
+        [
+          "Revision",
+          "r45"
+        ],
+        [
+          "Actor",
+          "You"
+        ],
+        [
+          "Other edits",
+          "Retained"
+        ]
+      ],
+      "actions": [
+        [
+          "Return to team",
+          "C01"
+        ],
+        [
+          "Activity",
+          "C05"
+        ]
+      ]
+    },
+    {
+      "key": "C14",
+      "group": "Team",
+      "title": "Invitation pending",
+      "subtitle": "The recipient must accept before access begins.",
+      "status": "Pending invitation",
+      "scope": "Site",
+      "context": "Studio North",
+      "cards": [
+        [
+          "teammate@example.com",
+          "Reviewer \u00b7 Studio North only",
+          "Pending acceptance"
+        ],
+        [
+          "Delivery state",
+          "Invitation created \u00b7 example state",
+          "Delivery confirmation comes from the service"
+        ]
+      ],
+      "fields": [
+        [
+          "Role",
+          "Reviewer"
+        ],
+        [
+          "Expires",
+          "In 7 days"
+        ],
+        [
+          "Access",
+          "Not active yet"
+        ],
+        [
+          "Manage",
+          "Admin only"
+        ]
+      ],
+      "actions": [
+        [
+          "Back to permissions",
+          "C02"
+        ],
+        [
+          "Team",
+          "C01"
+        ]
+      ]
+    },
+    {
+      "key": "C15",
+      "group": "Team",
+      "title": "Version approved",
+      "subtitle": "Approval belongs to review version r43.",
+      "status": "Approved",
+      "scope": "Snapshot",
+      "context": "Studio North \u00b7 r43",
+      "cards": [
+        [
+          "Client approval",
+          "Approved by Alex for revision r43.",
+          "Review sign-off"
+        ],
+        [
+          "Publish remains separate",
+          "A publisher must validate the current draft and deployment target.",
+          "Approval is not deployment"
+        ]
+      ],
+      "fields": [
+        [
+          "Approved revision",
+          "r43"
+        ],
+        [
+          "Current draft",
+          "Check freshness"
+        ],
+        [
+          "Publisher",
+          "Separate permission"
+        ],
+        [
+          "Review",
+          "Complete"
+        ]
+      ],
+      "actions": [
+        [
+          "Back to review setup",
+          "C06"
+        ],
+        [
+          "Team activity",
+          "C05"
+        ]
+      ]
+    },
+    {
+      "key": "C16",
+      "group": "Team",
+      "title": "Changes requested",
+      "subtitle": "Feedback stays attached to review version r43.",
+      "status": "Changes requested",
+      "scope": "Snapshot",
+      "context": "Studio North \u00b7 r43",
+      "cards": [
+        [
+          "Client feedback",
+          "Please refine the hero copy before approval.",
+          "Alex \u00b7 r43"
+        ],
+        [
+          "Next step",
+          "Update the draft, create a new snapshot, and request review again.",
+          "Previous feedback retained"
+        ]
+      ],
+      "fields": [
+        [
+          "Status",
+          "Changes requested"
+        ],
+        [
+          "Approval",
+          "Not granted"
+        ],
+        [
+          "Target",
+          "r43"
+        ],
+        [
+          "Next review",
+          "New version"
+        ]
+      ],
+      "actions": [
+        [
+          "Open heading thread",
+          "C04"
+        ],
+        [
+          "Back to review",
+          "C06"
+        ]
+      ]
+    },
+    {
+      "key": "I18",
+      "group": "Design",
+      "title": "AI heading applied",
+      "actions": [
+        [
+          "Undo AI text change",
+          "I02"
+        ]
+      ]
+    },
+    {
+      "key": "I19",
+      "group": "Design",
+      "title": "Font size input popover",
+      "actions": [
+        [
+          "Review change",
+          "I15"
+        ],
+        [
+          "Cancel",
+          "I02"
+        ]
+      ]
+    }
+  ]
+}

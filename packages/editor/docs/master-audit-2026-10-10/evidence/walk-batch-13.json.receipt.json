@@ -1,0 +1,78 @@
+[
+  {
+    "label": "Site settings",
+    "x": 720,
+    "y": 224,
+    "shot": "walk-site-general.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8543-9508&starting-point-node-id=8507%3A247507&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "General advanced",
+    "x": 1110,
+    "y": 338,
+    "shot": "walk-generic-options.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8543-9508&starting-point-node-id=8507%3A247507&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Grid start",
+    "goto": "8465:5",
+    "shot": "walk-grid-start.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-5&starting-point-node-id=8465%3A5&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Grid two columns",
+    "x": 1265,
+    "y": 727,
+    "expected": "8465:13",
+    "shot": "walk-grid-two.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-13&starting-point-node-id=8465%3A5&hide-ui=1",
+    "verification": "URL_MATCH"
+  },
+  {
+    "label": "Grid undo",
+    "x": 1265,
+    "y": 423,
+    "expected": "8465:5",
+    "shot": "walk-grid-undo.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-5&starting-point-node-id=8465%3A5&hide-ui=1",
+    "verification": "URL_MATCH"
+  },
+  {
+    "label": "Classes",
+    "x": 109,
+    "y": 317,
+    "expected": "8465:8",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-8&starting-point-node-id=8465%3A5&hide-ui=1",
+    "verification": "URL_MATCH"
+  },
+  {
+    "label": "Class impact",
+    "x": 1265,
+    "y": 683,
+    "expected": "8465:16",
+    "shot": "walk-class-impact.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-16&starting-point-node-id=8465%3A5&hide-ui=1",
+    "verification": "URL_MATCH"
+  },
+  {
+    "label": "Apply class",
+    "x": 1265,
+    "y": 567,
+    "expected": "8465:18",
+    "shot": "walk-class-applied.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-18&starting-point-node-id=8465%3A5&hide-ui=1",
+    "verification": "URL_MATCH"
+  },
+  {
+    "label": "Undo class",
+    "x": 1265,
+    "y": 379,
+    "expected": "8465:8",
+    "shot": "walk-class-undo.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-8&starting-point-node-id=8465%3A5&hide-ui=1",
+    "verification": "URL_MATCH"
+  }
+]

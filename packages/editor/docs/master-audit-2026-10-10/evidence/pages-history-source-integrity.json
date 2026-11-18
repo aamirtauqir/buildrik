@@ -1,0 +1,10 @@
+{
+  "allPreexistingHashesMatch": true,
+  "files": {
+    "packages/editor/src/editor/canvas/menus/ElementContextMenu.tsx": true,
+    "packages/editor/src/editor/canvas/menus/MenuItem.tsx": true,
+    "packages/editor/src/editor/canvas/menus/SubmenuItem.tsx": true,
+    "packages/editor/src/editor/canvas/menus/SubmenuPanel.tsx": true,
+    "packages/editor/src/editor/canvas/menus/__tests__/ElementContextMenu.overlay.test.tsx": true
+  }
+}

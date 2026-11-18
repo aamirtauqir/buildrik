@@ -1,0 +1,3 @@
+--- BEGIN UNTRUSTED EXTERNAL CONTENT (source: https://www.figma.com/proto/6yvgev9dRXrSLPluWkjDoz/Buildrick-%E2%80%94-Editor-Improvements-%C2%B7-Existing-Features?node-id=6-8134&starting-point-node-id=6%3A8134&scaling=scale-down-width&hide-ui=1) ---
+Skip to contentBuildrick — Editor Improvements · Existing FeaturesLog in or create accountContinue with GoogleScreenreader support is currently disabled. To enable it, use the Accessibility settings from the Options menu.
+--- END UNTRUSTED EXTERNAL CONTENT ---

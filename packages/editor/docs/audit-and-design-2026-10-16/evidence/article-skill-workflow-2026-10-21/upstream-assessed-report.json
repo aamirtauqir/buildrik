@@ -1,0 +1,82 @@
+{
+  "summary": {
+    "total_checks": 17,
+    "passed": 15,
+    "failed": 2,
+    "compliance_score": 88.2,
+    "grade": "B",
+    "severity_distribution": {
+      "Cosmetic": 0,
+      "Minor": 0,
+      "Major": 2,
+      "Critical": 0
+    }
+  },
+  "issues": [
+    {
+      "heuristic_id": "N4",
+      "heuristic_name": "Consistency and standards",
+      "checkpoint": "UI elements behave the same way throughout",
+      "severity": 2,
+      "severity_label": "Major",
+      "action": "Fix before next release",
+      "notes": "Prototype-only issue C02: in F4.01, identical Fix links differ in operability: 303:32421 has a route, 303:32429 has none. Scope is limited to the tested prototype, not application behavior."
+    },
+    {
+      "heuristic_id": "N10",
+      "heuristic_name": "Help and documentation",
+      "checkpoint": "Contextual help is provided where needed",
+      "severity": 2,
+      "severity_label": "Major",
+      "action": "Fix before next release",
+      "notes": "Prototype-only issue C01: F1.01 guidance 302:3510 says select a child, but the only product reaction is Add (302:3422). No child-selection route is present in this specimen. Generic controller guidance does not explain the constrained task."
+    }
+  ],
+  "strengths": [
+    {
+      "heuristic_id": "N1",
+      "heuristic_name": "Visibility of system status",
+      "checkpoint": "Current location is clear in navigation"
+    },
+    {
+      "heuristic_id": "N2",
+      "heuristic_name": "Match between system and real world",
+      "checkpoint": "Labels use user language, not internal jargon"
+    },
+    {
+      "heuristic_id": "N2",
+      "heuristic_name": "Match between system and real world",
+      "checkpoint": "Information appears in natural and logical order"
+    },
+    {
+      "heuristic_id": "N3",
+      "heuristic_name": "User control and freedom",
+      "checkpoint": "Cancel/back options are clearly visible"
+    },
+    {
+      "heuristic_id": "N4",
+      "heuristic_name": "Consistency and standards",
+      "checkpoint": "Terminology is consistent across all pages"
+    }
+  ],
+  "top_priorities": [
+    {
+      "heuristic_id": "N4",
+      "heuristic_name": "Consistency and standards",
+      "checkpoint": "UI elements behave the same way throughout",
+      "severity": 2,
+      "severity_label": "Major",
+      "action": "Fix before next release",
+      "notes": "Prototype-only issue C02: in F4.01, identical Fix links differ in operability: 303:32421 has a route, 303:32429 has none. Scope is limited to the tested prototype, not application behavior."
+    },
+    {
+      "heuristic_id": "N10",
+      "heuristic_name": "Help and documentation",
+      "checkpoint": "Contextual help is provided where needed",
+      "severity": 2,
+      "severity_label": "Major",
+      "action": "Fix before next release",
+      "notes": "Prototype-only issue C01: F1.01 guidance 302:3510 says select a child, but the only product reaction is Add (302:3422). No child-selection route is present in this specimen. Generic controller guidance does not explain the constrained task."
+    }
+  ]
+}

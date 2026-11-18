@@ -1,0 +1,4503 @@
+{
+  "date": "2026-10-16T16:18:43.721Z",
+  "scope": "Registry insertion and default selected-root Inspector in empty standalone demo; not Add discoverability, per-control edits, save/reopen, preview or published behavior.",
+  "records": [
+    {
+      "block_id": "container",
+      "label": "Container",
+      "declared_type": "container",
+      "returned_id": "el-mvb69kfg-16afqd71h3n",
+      "roots": [
+        {
+          "id": "el-mvb69kfg-16afqd71h3n",
+          "type": "container",
+          "tag": "div",
+          "attributes": {},
+          "children": []
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Container",
+      "inspector_sections": [
+        "Layout",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Container selected\nHome\n\u203a\nContainer\nContainer\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nLayout\nDisplay\nBlock\nFlex\nGrid\nNone\nPosition\nDefault\nStatic\nRelative\nAbsolute\nFixed\nSticky\nMore settings\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder\nText inside",
+      "selected_type": "container",
+      "selected_tag": "div"
+    },
+    {
+      "block_id": "text",
+      "label": "Text",
+      "declared_type": "text",
+      "returned_id": "el-mvb69kmh-1f238y31iaa",
+      "roots": [
+        {
+          "id": "el-mvb69kmh-1f238y31iaa",
+          "type": "text",
+          "tag": "span",
+          "attributes": {},
+          "children": []
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Text",
+      "inspector_sections": [
+        "Text",
+        "Typography",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border"
+      ],
+      "inspector_text": "Text selected\nHome\n\u203a\nText\nText\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nText\nText style\nCustom\nHeading 1\nHeading 2\nHeading 3\nSub-heading\nBody large\nBody text\nCaption\nCaption XS\nEdit text on canvas\nTypography\nFont\nInherit\nFont size\nLine height\npx\n\u00d7\nem\n%\nnormal\nWeight\nDefault\n100\n200\n300\n400\n500\n600\n700\n800\n900\nColour\nAlign\nLeft\nCenter\nRight\nMore settings\n9\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder",
+      "selected_type": "text",
+      "selected_tag": "span"
+    },
+    {
+      "block_id": "heading",
+      "label": "Heading",
+      "declared_type": "heading",
+      "returned_id": "el-mvb69kri-17y2ba212td",
+      "roots": [
+        {
+          "id": "el-mvb69kri-17y2ba212td",
+          "type": "heading",
+          "tag": "h2",
+          "attributes": {},
+          "children": []
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Heading",
+      "inspector_sections": [
+        "Heading",
+        "Typography",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border"
+      ],
+      "inspector_text": "Heading selected\nHome\n\u203a\nHeading\nHeading\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nHeading\nLevel\nH1\nH2\nH3\nH4\nH5\nH6\nText style\nCustom\nHeading 1\nHeading 2\nHeading 3\nSub-heading\nBody large\nBody text\nCaption\nCaption XS\nEdit text on canvas\nTypography\nFont\nInter\nFont size\npx\nem\nrem\n%\nvw\nLine height\npx\n\u00d7\nem\n%\nnormal\nWeight\nDefault\n100\n200\n300\n400\n500\n600\n700\n800\n900\nColour\nAlign\nLeft\nCenter\nRight\nMore settings\n9\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder",
+      "selected_type": "heading",
+      "selected_tag": "h2"
+    },
+    {
+      "block_id": "paragraph",
+      "label": "Paragraph",
+      "declared_type": "paragraph",
+      "returned_id": "el-mvb69kuv-4jlwo917g0",
+      "roots": [
+        {
+          "id": "el-mvb69kuv-4jlwo917g0",
+          "type": "paragraph",
+          "tag": "p",
+          "attributes": {},
+          "children": []
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Text",
+      "inspector_sections": [
+        "Text",
+        "Typography",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border"
+      ],
+      "inspector_text": "Text selected\nHome\n\u203a\nText\nText\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nText\nText style\nCustom\nHeading 1\nHeading 2\nHeading 3\nSub-heading\nBody large\nBody text\nCaption\nCaption XS\nEdit text on canvas\nTypography\nFont\nInter\nFont size\npx\nem\nrem\n%\nvw\nLine height\npx\n\u00d7\nem\n%\nnormal\nWeight\nDefault\n100\n200\n300\n400\n500\n600\n700\n800\n900\nColour\nAlign\nLeft\nCenter\nRight\nMore settings\n9\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder",
+      "selected_type": "paragraph",
+      "selected_tag": "p"
+    },
+    {
+      "block_id": "button",
+      "label": "Button",
+      "declared_type": "button",
+      "returned_id": "el-mvb69kxr-1qip1n1sqfj",
+      "roots": [
+        {
+          "id": "el-mvb69kxr-1qip1n1sqfj",
+          "type": "button",
+          "tag": "button",
+          "attributes": {},
+          "children": []
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Button",
+      "inspector_sections": [
+        "Button",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Button selected\nHome\n\u203a\nButton\nButton\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nButton\nEdit text on canvas\nType\nButton\nSubmit\nReset\nDisabled\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight \u00b7 Fixed\npx\n%\nrem\nvw\nvh\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nColour\nPrimary\nMore settings\n2\nBorder\nRadius\npx\n%\nem\nrem\nWidth\npx\nem\nrem\nStyle\nDefault\nNone\nSolid\nDashed\nDotted\nDouble\nGroove\nRidge\nInset\nOutset\nColor\nMore settings\n8\nText inside\n\nInter \u00b7 14px \u00b7 On / primary",
+      "selected_type": "button",
+      "selected_tag": "button"
+    },
+    {
+      "block_id": "link",
+      "label": "Link",
+      "declared_type": "link",
+      "returned_id": "el-mvb69l0m-ug0xvi1jdm",
+      "roots": [
+        {
+          "id": "el-mvb69l0m-ug0xvi1jdm",
+          "type": "link",
+          "tag": "a",
+          "attributes": {
+            "href": "#"
+          },
+          "children": []
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Link",
+      "inspector_sections": [
+        "Link",
+        "Typography",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border"
+      ],
+      "inspector_text": "Link selected\nHome\n\u203a\nLink\nLink\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nLink\nText style\nCustom\nHeading 1\nHeading 2\nHeading 3\nSub-heading\nBody large\nBody text\nCaption\nCaption XS\nEdit text on canvas\nTypography\nFont\nInherit\nFont size\nLine height\npx\n\u00d7\nem\n%\nnormal\nWeight\nDefault\n100\n200\n300\n400\n500\n600\n700\n800\n900\nColour\nPrimary\nAlign\nLeft\nCenter\nRight\nTransform\nAa\nAA\naa\nAa\nDecoration\n\u2014\nU\u0332\nS\u0336\nO\u0305\nLetter\npx\nem\nnormal\nWord\npx\nem\nnormal\nStyle\nN\nI\nWhite Space\nDefault\nNormal\nNo Wrap\nPre\nPre Wrap\nPre Line\nWord Break\nDefault\nNormal\nBreak All\nKeep All\nBreak Word\nText Indent\npx\n%\nem\nrem\nvw\nvh\nauto\nVertical Align\nDefault\nBaseline\nTop\nMiddle\nBottom\nSub\nSuper\nLess\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder",
+      "selected_type": "link",
+      "selected_tag": "a"
+    },
+    {
+      "block_id": "list",
+      "label": "List",
+      "declared_type": "list",
+      "returned_id": "el-mvb69l42-19hlxw8jt5x",
+      "roots": [
+        {
+          "id": "el-mvb69l42-19hlxw8jt5x",
+          "type": "list",
+          "tag": "ul",
+          "attributes": {},
+          "children": [
+            {
+              "id": "el-mvb69l42-18o6nv3mo31",
+              "type": "list-item",
+              "tag": "li",
+              "attributes": {},
+              "children": []
+            },
+            {
+              "id": "el-mvb69l42-sc5a271e7e",
+              "type": "list-item",
+              "tag": "li",
+              "attributes": {},
+              "children": []
+            },
+            {
+              "id": "el-mvb69l42-1j53esh1gal",
+              "type": "list-item",
+              "tag": "li",
+              "attributes": {},
+              "children": []
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "List",
+      "inspector_sections": [
+        "Layout",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "List selected\nHome\n\u203a\nList\nList\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nLayout\nDisplay\nBlock\nFlex\nGrid\nNone\nPosition\nDefault\nStatic\nRelative\nAbsolute\nFixed\nSticky\nMore settings\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder\nText inside\n\nInter \u00b7 16px \u00b7 #333333",
+      "selected_type": "list",
+      "selected_tag": "ul"
+    },
+    {
+      "block_id": "divider",
+      "label": "Divider",
+      "declared_type": "divider",
+      "returned_id": "el-mvb69l6x-1xb1xt51mdz",
+      "roots": [
+        {
+          "id": "el-mvb69l6x-1xb1xt51mdz",
+          "type": "divider",
+          "tag": "hr",
+          "attributes": {},
+          "children": []
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Divider",
+      "inspector_sections": [
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border"
+      ],
+      "inspector_text": "Divider selected\nHome\n\u203a\nDivider\nDivider\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight \u00b7 Fixed\npx\n%\nrem\nvw\nvh\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nColour\nBorder / subtle\nMore settings\n2\nBorder",
+      "selected_type": "divider",
+      "selected_tag": "hr"
+    },
+    {
+      "block_id": "row",
+      "label": "Row",
+      "declared_type": "columns",
+      "returned_id": "el-mvb69l9u-18r2iqclpw9",
+      "roots": [
+        {
+          "id": "el-mvb69l9u-18r2iqclpw9",
+          "type": "columns",
+          "tag": "div",
+          "attributes": {},
+          "children": []
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Columns",
+      "inspector_sections": [
+        "Columns",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Columns selected\nHome\n\u203a\nColumns\nColumns\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nColumns\nColumns\nDefault\n2\n3\n4\n5\n6\nGap\nDefault\nNone\n8px\n16px\n24px\n32px\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder\nText inside",
+      "selected_type": "columns",
+      "selected_tag": "div"
+    },
+    {
+      "block_id": "column",
+      "label": "Column",
+      "declared_type": "container",
+      "returned_id": "el-mvb69ldr-8l1t431uc0",
+      "roots": [
+        {
+          "id": "el-mvb69ldr-8l1t431uc0",
+          "type": "container",
+          "tag": "div",
+          "attributes": {},
+          "children": []
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Container",
+      "inspector_sections": [
+        "Layout",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Container selected\nHome\n\u203a\nContainer\nContainer\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nLayout\nDisplay\nBlock\nFlex\nGrid\nNone\nPosition\nDefault\nStatic\nRelative\nAbsolute\nFixed\nSticky\nMore settings\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder\nText inside\n\nInter \u00b7 16px \u00b7 Text",
+      "selected_type": "container",
+      "selected_tag": "div"
+    },
+    {
+      "block_id": "spacer",
+      "label": "Spacer",
+      "declared_type": "spacer",
+      "returned_id": "el-mvb69li2-1ak1d3zmdg1",
+      "roots": [
+        {
+          "id": "el-mvb69li2-1ak1d3zmdg1",
+          "type": "spacer",
+          "tag": "div",
+          "attributes": {},
+          "children": []
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Spacer",
+      "inspector_sections": [
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border"
+      ],
+      "inspector_text": "Spacer selected\nHome\n\u203a\nSpacer\nSpacer\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight \u00b7 Fixed\npx\n%\nrem\nvw\nvh\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder",
+      "selected_type": "spacer",
+      "selected_tag": "div"
+    },
+    {
+      "block_id": "theme-toggle",
+      "label": "Theme toggle",
+      "declared_type": "container",
+      "returned_id": "el-mvb69ll2-pjdxagttso",
+      "roots": [
+        {
+          "id": "el-mvb69ll2-pjdxagttso",
+          "type": "container",
+          "tag": "div",
+          "attributes": {
+            "data-bk-theme-toggle": "true",
+            "role": "group",
+            "aria-label": "Theme"
+          },
+          "children": [
+            {
+              "id": "el-mvb69ll2-1h18316uoiu",
+              "type": "button",
+              "tag": "button",
+              "attributes": {
+                "data-bk-tt": "light",
+                "type": "button"
+              },
+              "children": []
+            },
+            {
+              "id": "el-mvb69ll2-15szjrx1h8s",
+              "type": "button",
+              "tag": "button",
+              "attributes": {
+                "data-bk-tt": "dark",
+                "type": "button"
+              },
+              "children": []
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": null,
+      "inspector_sections": [],
+      "inspector_text": "Theme toggle\n\nSite preference\n\nDark mode \u00b7 Off\n\nLight and dark values come from Brand. The toggle changes the visitor\u2019s theme.\n\nOpen Brand \u2192 Colour mode\nDark mode is Off \u00b7 Theme toggle is hidden on publish.",
+      "selected_type": "container",
+      "selected_tag": "div"
+    },
+    {
+      "block_id": "image",
+      "label": "Image",
+      "declared_type": "image",
+      "returned_id": "el-mvb69lnx-1cagm89piu5",
+      "roots": [
+        {
+          "id": "el-mvb69lnx-1cagm89piu5",
+          "type": "image",
+          "tag": "img",
+          "attributes": {
+            "alt": "Image"
+          },
+          "children": []
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Image",
+      "inspector_sections": [
+        "Image",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border"
+      ],
+      "inspector_text": "Image selected\nHome\n\u203a\nImage\nImage\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nImage\nNo file yet\nChoose image\nAlt text\nFit\nCover\nContain\nFill\nLoading\nDefault\nLazy\nEager\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMin width\npx\n%\nem\nrem\nvw\nvh\nauto\nMax width\npx\n%\nem\nrem\nvw\nvh\nauto\nMin height\npx\n%\nem\nrem\nvw\nvh\nauto\nMax height\npx\n%\nem\nrem\nvw\nvh\nauto\nLess\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder",
+      "selected_type": "image",
+      "selected_tag": "img"
+    },
+    {
+      "block_id": "video",
+      "label": "Video",
+      "declared_type": "video",
+      "returned_id": "el-mvb69lqv-dogbsfjth4",
+      "roots": [
+        {
+          "id": "el-mvb69lqv-dogbsfjth4",
+          "type": "video",
+          "tag": "video",
+          "attributes": {
+            "controls": ""
+          },
+          "children": [
+            {
+              "id": "el-mvb69lqv-1gp64gl16ip",
+              "type": "container",
+              "tag": "source",
+              "attributes": {
+                "src": "",
+                "type": "video/mp4"
+              },
+              "children": []
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Video",
+      "inspector_sections": [
+        "Video",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border"
+      ],
+      "inspector_text": "Video selected\nHome\n\u203a\nVideo\nVideo\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nVideo\nNo file yet\nChoose video\nPoster image\nAutoplay\nMuted\nLoop\nShow controls\nPlays inline\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMin width\npx\n%\nem\nrem\nvw\nvh\nauto\nMax width\npx\n%\nem\nrem\nvw\nvh\nauto\nMin height\npx\n%\nem\nrem\nvw\nvh\nauto\nMax height\npx\n%\nem\nrem\nvw\nvh\nauto\nLess\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder",
+      "selected_type": "video",
+      "selected_tag": "video"
+    },
+    {
+      "block_id": "audio",
+      "label": "Audio",
+      "declared_type": "audio",
+      "returned_id": "el-mvb69lts-191g9g85o13",
+      "roots": [
+        {
+          "id": "el-mvb69lts-191g9g85o13",
+          "type": "audio",
+          "tag": "audio",
+          "attributes": {
+            "controls": ""
+          },
+          "children": [
+            {
+              "id": "el-mvb69lts-1c41qo91ljc",
+              "type": "container",
+              "tag": "source",
+              "attributes": {
+                "src": "",
+                "type": "audio/mpeg"
+              },
+              "children": []
+            },
+            {
+              "id": "el-mvb69lts-15wub50z2dz",
+              "type": "text",
+              "tag": "span",
+              "attributes": {},
+              "children": []
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Audio",
+      "inspector_sections": [
+        "Audio",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border"
+      ],
+      "inspector_text": "Audio selected\nHome\n\u203a\nAudio\nAudio\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nAudio\nNo file yet\nChoose audio\nShow controls\nLoop\nAutoplay\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder",
+      "selected_type": "audio",
+      "selected_tag": "audio"
+    },
+    {
+      "block_id": "svg",
+      "label": "SVG",
+      "declared_type": "svg",
+      "returned_id": "el-mvb69lwn-1f5beg0wfjl",
+      "roots": [
+        {
+          "id": "el-mvb69lwn-1f5beg0wfjl",
+          "type": "svg",
+          "tag": "svg",
+          "attributes": {
+            "width": "100",
+            "height": "100",
+            "viewBox": "0 0 100 100",
+            "xmlns": "http://www.w3.org/2000/svg"
+          },
+          "children": [
+            {
+              "id": "el-mvb69lwn-16mkn7c1tf1",
+              "type": "container",
+              "tag": "circle",
+              "attributes": {
+                "cx": "50",
+                "cy": "50",
+                "r": "40",
+                "stroke": "#1A56DB",
+                "stroke-width": "4",
+                "fill": "none"
+              },
+              "children": []
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Svg",
+      "inspector_sections": [
+        "Svg",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border"
+      ],
+      "inspector_text": "Svg selected\nHome\n\u203a\nSvg\nSvg\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nSvg\nNo file yet\nChoose SVG\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder",
+      "selected_type": "svg",
+      "selected_tag": "svg"
+    },
+    {
+      "block_id": "lottie",
+      "label": "Lottie Animation",
+      "declared_type": "lottie",
+      "returned_id": "el-mvb69lzi-1pxvcxl23l",
+      "roots": [
+        {
+          "id": "el-mvb69lzi-1pxvcxl23l",
+          "type": "lottie",
+          "tag": "div",
+          "attributes": {
+            "data-lottie-src": ""
+          },
+          "children": [
+            {
+              "id": "el-mvb69lzi-u6m038airp",
+              "type": "text",
+              "tag": "span",
+              "attributes": {},
+              "children": []
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Lottie",
+      "inspector_sections": [
+        "Lottie",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border"
+      ],
+      "inspector_text": "Lottie selected\nHome\n\u203a\nLottie\nLottie\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nLottie\nAnimation URL\nSize\nWidth \u00b7 Fixed\npx\n%\nrem\nvw\nvh\nHeight \u00b7 Fixed\npx\n%\nrem\nvw\nvh\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nColour\nMore settings\n2\nBorder\nRadius\npx\n%\nem\nrem\nMore settings\n11",
+      "selected_type": "lottie",
+      "selected_tag": "div"
+    },
+    {
+      "block_id": "icon",
+      "label": "Icon",
+      "declared_type": "icon",
+      "returned_id": "el-mvb69m2t-luk1git5qa",
+      "roots": [
+        {
+          "id": "el-mvb69m2t-luk1git5qa",
+          "type": "icon",
+          "tag": "span",
+          "attributes": {
+            "data-icon-name": "star",
+            "data-icon-library": "lucide",
+            "data-icon-size": "32",
+            "data-icon-color": "#FFFFFF",
+            "data-icon-stroke": "2"
+          },
+          "children": []
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Icon",
+      "inspector_sections": [
+        "Icon",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border"
+      ],
+      "inspector_text": "Icon selected\nHome\n\u203a\nIcon\nIcon\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nIcon\nChange icon\nIcon size\nDefault\n16px\n20px\n24px\n32px\n48px\n64px\nStroke width\nDefault\n1\n1.5\n2\n2.5\n3\nSize\nWidth \u00b7 Fixed\npx\n%\nrem\nvw\nvh\nHeight \u00b7 Fixed\npx\n%\nrem\nvw\nvh\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder",
+      "selected_type": "icon",
+      "selected_tag": "span"
+    },
+    {
+      "block_id": "gallery",
+      "label": "Image Gallery",
+      "declared_type": "gallery",
+      "returned_id": "el-mvb69m75-1l0oeut1jgm",
+      "roots": [
+        {
+          "id": "el-mvb69m75-1l0oeut1jgm",
+          "type": "gallery",
+          "tag": "div",
+          "attributes": {},
+          "children": [
+            {
+              "id": "el-mvb69m75-1hlo48j192r",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": [
+                {
+                  "id": "el-mvb69m75-5p5pzc1dua",
+                  "type": "image",
+                  "tag": "img",
+                  "attributes": {
+                    "src": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'400'%20height%3D'260'%20viewBox%3D'0%200%20400%20260'%3E%3Crect%20width%3D'400'%20height%3D'260'%20fill%3D'%23E2E8F0'%2F%3E%3Ccircle%20cx%3D'152'%20cy%3D'91'%20r%3D'18'%20fill%3D'%2394A3B8'%2F%3E%3Cpath%20d%3D'M72%20202.8%20L152%20130%20L208%20171.6%20L256%20140.4%20L328%20202.8%20Z'%20fill%3D'%2394A3B8'%2F%3E%3C%2Fsvg%3E",
+                    "alt": "Gallery item 1"
+                  },
+                  "children": []
+                },
+                {
+                  "id": "el-mvb69m75-j4c4nx1mro",
+                  "type": "image",
+                  "tag": "img",
+                  "attributes": {
+                    "src": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'400'%20height%3D'260'%20viewBox%3D'0%200%20400%20260'%3E%3Crect%20width%3D'400'%20height%3D'260'%20fill%3D'%23E2E8F0'%2F%3E%3Ccircle%20cx%3D'152'%20cy%3D'91'%20r%3D'18'%20fill%3D'%2394A3B8'%2F%3E%3Cpath%20d%3D'M72%20202.8%20L152%20130%20L208%20171.6%20L256%20140.4%20L328%20202.8%20Z'%20fill%3D'%2394A3B8'%2F%3E%3C%2Fsvg%3E",
+                    "alt": "Gallery item 2"
+                  },
+                  "children": []
+                },
+                {
+                  "id": "el-mvb69m75-3098qm1dz1",
+                  "type": "image",
+                  "tag": "img",
+                  "attributes": {
+                    "src": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'400'%20height%3D'260'%20viewBox%3D'0%200%20400%20260'%3E%3Crect%20width%3D'400'%20height%3D'260'%20fill%3D'%23E2E8F0'%2F%3E%3Ccircle%20cx%3D'152'%20cy%3D'91'%20r%3D'18'%20fill%3D'%2394A3B8'%2F%3E%3Cpath%20d%3D'M72%20202.8%20L152%20130%20L208%20171.6%20L256%20140.4%20L328%20202.8%20Z'%20fill%3D'%2394A3B8'%2F%3E%3C%2Fsvg%3E",
+                    "alt": "Gallery item 3"
+                  },
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Gallery",
+      "inspector_sections": [
+        "Layout",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Gallery selected\nHome\n\u203a\nGallery\nGallery\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nLayout\nDisplay\nBlock\nFlex\nGrid\nNone\nPosition\nDefault\nStatic\nRelative\nAbsolute\nFixed\nSticky\nMore settings\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder\nText inside\n\nInter \u00b7 16px \u00b7 Text",
+      "selected_type": "gallery",
+      "selected_tag": "div"
+    },
+    {
+      "block_id": "video-embed",
+      "label": "Video Embed",
+      "declared_type": "video-embed",
+      "returned_id": "el-mvb69mck-1ucmsv0116i",
+      "roots": [
+        {
+          "id": "el-mvb69mck-1ucmsv0116i",
+          "type": "video-embed",
+          "tag": "div",
+          "attributes": {},
+          "children": [
+            {
+              "id": "el-mvb69mck-10u2hog1kqd",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": [
+                {
+                  "id": "el-mvb69mck-1edkc5e13gi",
+                  "type": "container",
+                  "tag": "div",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "id": "el-mvb69mck-apykl6hzx0",
+                      "type": "text",
+                      "tag": "span",
+                      "attributes": {},
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "el-mvb69mck-1odb7mm28ku",
+                  "type": "container",
+                  "tag": "div",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "id": "el-mvb69mck-1hra4v814j7",
+                      "type": "text",
+                      "tag": "span",
+                      "attributes": {},
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Video embed",
+      "inspector_sections": [
+        "Video embed",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border"
+      ],
+      "inspector_text": "Video embed selected\nHome\n\u203a\nVideo embed\nVideo embed\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nVideo embed\nVideo URL\nRatio\n16:9\n4:3\n1:1\nAutoplay\nMuted\nShow controls\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight \u00b7 Fixed\npx\n%\nrem\nvw\nvh\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nColour\nMore settings\n2\nBorder\nRadius\npx\n%\nem\nrem\nMore settings\n11",
+      "selected_type": "video-embed",
+      "selected_tag": "div"
+    },
+    {
+      "block_id": "map-embed",
+      "label": "Map Embed",
+      "declared_type": "map-embed",
+      "returned_id": "el-mvb69mg5-bmk96w1a5s",
+      "roots": [
+        {
+          "id": "el-mvb69mg5-bmk96w1a5s",
+          "type": "map-embed",
+          "tag": "div",
+          "attributes": {},
+          "children": [
+            {
+              "id": "el-mvb69mg5-1uvngskvedt",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": [
+                {
+                  "id": "el-mvb69mg5-w3j3d61g5x",
+                  "type": "container",
+                  "tag": "div",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "id": "el-mvb69mg5-6ybpdg4y33",
+                      "type": "container",
+                      "tag": "div",
+                      "attributes": {},
+                      "children": [
+                        {
+                          "id": "el-mvb69mg5-1m49h7j1gjf",
+                          "type": "text",
+                          "tag": "span",
+                          "attributes": {},
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "id": "el-mvb69mg5-qx1wbt1bic",
+                      "type": "container",
+                      "tag": "div",
+                      "attributes": {},
+                      "children": [
+                        {
+                          "id": "el-mvb69mg5-ett4311nnn",
+                          "type": "text",
+                          "tag": "span",
+                          "attributes": {},
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Map embed",
+      "inspector_sections": [
+        "Map embed",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border"
+      ],
+      "inspector_text": "Map embed selected\nHome\n\u203a\nMap embed\nMap embed\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nMap embed\nLocation\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight \u00b7 Fixed\npx\n%\nrem\nvw\nvh\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nColour\nMore settings\n2\nBorder\nRadius\npx\n%\nem\nrem\nMore settings\n11",
+      "selected_type": "map-embed",
+      "selected_tag": "div"
+    },
+    {
+      "block_id": "section",
+      "label": "Section",
+      "declared_type": "section",
+      "returned_id": "el-mvb69mj0-1o524xjjot0",
+      "roots": [
+        {
+          "id": "el-mvb69mj0-1o524xjjot0",
+          "type": "section",
+          "tag": "section",
+          "attributes": {},
+          "children": [
+            {
+              "id": "el-mvb69mj0-9zrdkm1t6t",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": []
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Section",
+      "inspector_sections": [
+        "Layout",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Section selected\nHome\n\u203a\nSection\nSection\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nLayout\nDisplay\nBlock\nFlex\nGrid\nNone\nPosition\nDefault\nStatic\nRelative\nAbsolute\nFixed\nSticky\nMore settings\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder\nText inside\n\nInter \u00b7 16px \u00b7 Text",
+      "selected_type": "section",
+      "selected_tag": "section"
+    },
+    {
+      "block_id": "columns",
+      "label": "2 Columns",
+      "declared_type": "columns",
+      "returned_id": "el-mvb69mlt-v6j0lg1axl",
+      "roots": [
+        {
+          "id": "el-mvb69mlt-v6j0lg1axl",
+          "type": "columns",
+          "tag": "div",
+          "attributes": {},
+          "children": [
+            {
+              "id": "el-mvb69mlu-1txmoeeoaqt",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": []
+            },
+            {
+              "id": "el-mvb69mlu-53llql1l8b",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": []
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Columns",
+      "inspector_sections": [
+        "Columns",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Columns selected\nHome\n\u203a\nColumns\nColumns\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nColumns\nColumns\nDefault\n2\n3\n4\n5\n6\nGap\nDefault\nNone\n8px\n16px\n24px\n32px\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder\nText inside",
+      "selected_type": "columns",
+      "selected_tag": "div"
+    },
+    {
+      "block_id": "columns3",
+      "label": "3 Columns",
+      "declared_type": "columns",
+      "returned_id": "el-mvb69mon-19sras8czjt",
+      "roots": [
+        {
+          "id": "el-mvb69mon-19sras8czjt",
+          "type": "columns",
+          "tag": "div",
+          "attributes": {},
+          "children": [
+            {
+              "id": "el-mvb69mon-1tr835ahf64",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": []
+            },
+            {
+              "id": "el-mvb69mon-tcix65142u",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": []
+            },
+            {
+              "id": "el-mvb69mon-hopik5b22x",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": []
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Columns",
+      "inspector_sections": [
+        "Columns",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Columns selected\nHome\n\u203a\nColumns\nColumns\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nColumns\nColumns\nDefault\n2\n3\n4\n5\n6\nGap\nDefault\nNone\n8px\n16px\n24px\n32px\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder\nText inside",
+      "selected_type": "columns",
+      "selected_tag": "div"
+    },
+    {
+      "block_id": "grid",
+      "label": "Grid",
+      "declared_type": "grid",
+      "returned_id": "el-mvb69mrh-1rxkcou11wq",
+      "roots": [
+        {
+          "id": "el-mvb69mrh-1rxkcou11wq",
+          "type": "grid",
+          "tag": "div",
+          "attributes": {},
+          "children": [
+            {
+              "id": "el-mvb69mrh-14o4raliqpu",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": []
+            },
+            {
+              "id": "el-mvb69mri-iwgo6jx8ee",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": []
+            },
+            {
+              "id": "el-mvb69mri-1u003wf1txa",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": []
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Grid",
+      "inspector_sections": [
+        "Grid",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Grid selected\nHome\n\u203a\nGrid\nGrid\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nGrid\nColumns\nGap\npx\nrem\nem\n%\nMore settings\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder\nText inside",
+      "selected_type": "grid",
+      "selected_tag": "div"
+    },
+    {
+      "block_id": "flex",
+      "label": "Flex Container",
+      "declared_type": "flex",
+      "returned_id": "el-mvb69muu-1hvjgghfcuu",
+      "roots": [
+        {
+          "id": "el-mvb69muu-1hvjgghfcuu",
+          "type": "flex",
+          "tag": "div",
+          "attributes": {},
+          "children": [
+            {
+              "id": "el-mvb69muu-os9r0y1ogu",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": []
+            },
+            {
+              "id": "el-mvb69muu-1wni9wh11ot",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": []
+            },
+            {
+              "id": "el-mvb69muu-fpwlos19me",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": []
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Flex",
+      "inspector_sections": [
+        "Flex",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Flex selected\nHome\n\u203a\nFlex\nFlex\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nFlex\nDirection\nRow\nColumn\n\nAlign\nCenter / Left\n\nWrap\nGap\npx\nrem\nem\n%\nMore settings\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder\nText inside\n\nInter \u00b7 16px \u00b7 Text",
+      "selected_type": "flex",
+      "selected_tag": "div"
+    },
+    {
+      "block_id": "collection-list",
+      "label": "Collection list",
+      "declared_type": "collection-list",
+      "returned_id": "el-mvb69mzv-8xg0qbv7vx",
+      "roots": [
+        {
+          "id": "el-mvb69mzv-8xg0qbv7vx",
+          "type": "collection-list",
+          "tag": "div",
+          "attributes": {},
+          "children": [
+            {
+              "id": "el-mvb69mzv-1vpmwiq17e7",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": [
+                {
+                  "id": "el-mvb69mzv-1mgxj2fgjbe",
+                  "type": "container",
+                  "tag": "div",
+                  "attributes": {},
+                  "children": []
+                },
+                {
+                  "id": "el-mvb69mzv-hq1nmd1ehz",
+                  "type": "heading",
+                  "tag": "h3",
+                  "attributes": {},
+                  "children": []
+                },
+                {
+                  "id": "el-mvb69mzv-mxnwoylswr",
+                  "type": "paragraph",
+                  "tag": "p",
+                  "attributes": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Collection list",
+      "inspector_sections": [
+        "Layout",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Collection list selected\nHome\n\u203a\nCollection list\nCollection list\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nLayout\nDisplay\nBlock\nFlex\nGrid\nNone\nColumns\nGap\npx\nrem\nem\n%\nPosition\nDefault\nStatic\nRelative\nAbsolute\nFixed\nSticky\nMore settings\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder\nText inside\n\nInter \u00b7 16px \u00b7 Text",
+      "selected_type": "collection-list",
+      "selected_tag": "div"
+    },
+    {
+      "block_id": "form",
+      "label": "Form",
+      "declared_type": "form",
+      "returned_id": "el-mvb69n5x-we2owt1hdm",
+      "roots": [
+        {
+          "id": "el-mvb69n5x-we2owt1hdm",
+          "type": "form",
+          "tag": "form",
+          "attributes": {},
+          "children": [
+            {
+              "id": "el-mvb69n5x-mby3motpik",
+              "type": "input",
+              "tag": "input",
+              "attributes": {
+                "type": "text",
+                "name": "fullname",
+                "placeholder": "Name"
+              },
+              "children": []
+            },
+            {
+              "id": "el-mvb69n5x-1e8fysjwr7i",
+              "type": "input",
+              "tag": "input",
+              "attributes": {
+                "type": "email",
+                "name": "email",
+                "placeholder": "Email"
+              },
+              "children": []
+            },
+            {
+              "id": "el-mvb69n5x-1p0onoe3akq",
+              "type": "button",
+              "tag": "button",
+              "attributes": {
+                "type": "submit"
+              },
+              "children": []
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Form",
+      "inspector_sections": [
+        "Layout",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Form selected\nHome\n\u203a\nForm\nForm\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nLayout\nDisplay\nBlock\nFlex\nGrid\nNone\nDirection\nRow\nColumn\n\nAlign\nTop / Stretch\n\nWrap\nGap\npx\nrem\nem\n%\nPosition\nDefault\nStatic\nRelative\nAbsolute\nFixed\nSticky\nMore settings\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder\nText inside\n\nInter \u00b7 16px \u00b7 Text",
+      "selected_type": "form",
+      "selected_tag": "form"
+    },
+    {
+      "block_id": "input",
+      "label": "Input",
+      "declared_type": "input",
+      "returned_id": "el-mvb69n93-67h7xcp6lm",
+      "roots": [
+        {
+          "id": "el-mvb69n93-67h7xcp6lm",
+          "type": "input",
+          "tag": "input",
+          "attributes": {
+            "type": "text",
+            "name": "text",
+            "placeholder": "Enter text..."
+          },
+          "children": []
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Input",
+      "inspector_sections": [
+        "Input",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Input selected\nHome\n\u203a\nInput\nInput\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nInput\nInput type\nDefault\nText\nEmail\nPassword\nNumber\nPhone\nURL\nDate\nTime\nDate & Time\nSearch\nFile\nHidden\nRange\nColor\nName\nPlaceholder\nDefault\nRequired\nDisabled\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight \u00b7 Fixed\npx\n%\nrem\nvw\nvh\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nColour\nSurface / raised\nMore settings\n2\nBorder\nRadius\npx\n%\nem\nrem\nWidth\npx\nem\nrem\nStyle\nDefault\nNone\nSolid\nDashed\nDotted\nDouble\nGroove\nRidge\nInset\nOutset\nColor\nMore settings\n8\nText inside\n\nInter \u00b7 13px \u00b7 #1a1a1a",
+      "selected_type": "input",
+      "selected_tag": "input"
+    },
+    {
+      "block_id": "textarea",
+      "label": "Textarea",
+      "declared_type": "textarea",
+      "returned_id": "el-mvb69nbz-1i98du8l03i",
+      "roots": [
+        {
+          "id": "el-mvb69nbz-1i98du8l03i",
+          "type": "textarea",
+          "tag": "textarea",
+          "attributes": {
+            "name": "message",
+            "placeholder": "Enter message..."
+          },
+          "children": []
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Textarea",
+      "inspector_sections": [
+        "Textarea",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Textarea selected\nHome\n\u203a\nTextarea\nTextarea\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nTextarea\nName\nPlaceholder\nDefault\nRows\nRequired\nDisabled\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMin width\npx\n%\nem\nrem\nvw\nvh\nauto\nMax width\npx\n%\nem\nrem\nvw\nvh\nauto\nMin height\npx\n%\nem\nrem\nvw\nvh\nauto\nMax height\npx\n%\nem\nrem\nvw\nvh\nauto\nLess\nSpacing\nMargin\nPadding\nLink sides\nFill\nColour\nSurface / raised\nMore settings\n2\nBorder\nRadius\npx\n%\nem\nrem\nWidth\npx\nem\nrem\nStyle\nDefault\nNone\nSolid\nDashed\nDotted\nDouble\nGroove\nRidge\nInset\nOutset\nColor\nMore settings\n8\nText inside\n\nInter \u00b7 13px \u00b7 #1a1a1a",
+      "selected_type": "textarea",
+      "selected_tag": "textarea"
+    },
+    {
+      "block_id": "select",
+      "label": "Select",
+      "declared_type": "select",
+      "returned_id": "el-mvb69neu-1mhr091rsl",
+      "roots": [
+        {
+          "id": "el-mvb69neu-1mhr091rsl",
+          "type": "select",
+          "tag": "select",
+          "attributes": {
+            "name": "choice"
+          },
+          "children": [
+            {
+              "id": "el-mvb69neu-k5zfmjbyul",
+              "type": "container",
+              "tag": "option",
+              "attributes": {},
+              "children": []
+            },
+            {
+              "id": "el-mvb69neu-6lcwk11sea",
+              "type": "container",
+              "tag": "option",
+              "attributes": {},
+              "children": []
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Select",
+      "inspector_sections": [
+        "Select",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Select selected\nHome\n\u203a\nSelect\nSelect\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nSelect\nName\nOptions (one per line)\nRequired\nDisabled\nMultiple\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight \u00b7 Fixed\npx\n%\nrem\nvw\nvh\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nColour\nSurface / raised\nMore settings\n2\nBorder\nRadius\npx\n%\nem\nrem\nWidth\npx\nem\nrem\nStyle\nDefault\nNone\nSolid\nDashed\nDotted\nDouble\nGroove\nRidge\nInset\nOutset\nColor\nMore settings\n8\nText inside\n\nInter \u00b7 13px \u00b7 #1a1a1a",
+      "selected_type": "select",
+      "selected_tag": "select"
+    },
+    {
+      "block_id": "checkbox",
+      "label": "Checkbox",
+      "declared_type": "checkbox",
+      "returned_id": "el-mvb69nhq-16w8zp05jvp",
+      "roots": [
+        {
+          "id": "el-mvb69nhq-16w8zp05jvp",
+          "type": "checkbox",
+          "tag": "label",
+          "attributes": {},
+          "children": [
+            {
+              "id": "el-mvb69nhp-qo8lae1r6v",
+              "type": "input",
+              "tag": "input",
+              "attributes": {
+                "type": "checkbox",
+                "name": "checkbox"
+              },
+              "children": []
+            },
+            {
+              "id": "el-mvb69nhq-d7prxja7xq",
+              "type": "text",
+              "tag": "span",
+              "attributes": {},
+              "children": []
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Checkbox",
+      "inspector_sections": [
+        "Checkbox",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Checkbox selected\nHome\n\u203a\nCheckbox\nCheckbox\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nCheckbox\nEdit text on canvas\nName\nChecked by default\nRequired\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder\nText inside\n\nInter \u00b7 14px \u00b7 #333333",
+      "selected_type": "checkbox",
+      "selected_tag": "label"
+    },
+    {
+      "block_id": "radio",
+      "label": "Radio",
+      "declared_type": "radio",
+      "returned_id": "el-mvb69nkl-zt85j3al0x",
+      "roots": [
+        {
+          "id": "el-mvb69nkl-zt85j3al0x",
+          "type": "radio",
+          "tag": "label",
+          "attributes": {},
+          "children": [
+            {
+              "id": "el-mvb69nkl-qjwnnd1iwn",
+              "type": "input",
+              "tag": "input",
+              "attributes": {
+                "type": "radio",
+                "name": "radio-group"
+              },
+              "children": []
+            },
+            {
+              "id": "el-mvb69nkl-1kt7y3h1a1f",
+              "type": "text",
+              "tag": "span",
+              "attributes": {},
+              "children": []
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Radio",
+      "inspector_sections": [
+        "Radio",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Radio selected\nHome\n\u203a\nRadio\nRadio\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nRadio\nEdit text on canvas\nName\nChecked by default\nRequired\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder\nText inside\n\nInter \u00b7 14px \u00b7 #333333",
+      "selected_type": "radio",
+      "selected_tag": "label"
+    },
+    {
+      "block_id": "file",
+      "label": "File Upload",
+      "declared_type": "input",
+      "returned_id": "el-mvb69np3-1f3jsc1vrh",
+      "roots": [
+        {
+          "id": "el-mvb69np3-1f3jsc1vrh",
+          "type": "input",
+          "tag": "input",
+          "attributes": {
+            "type": "file",
+            "name": "file"
+          },
+          "children": []
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Input",
+      "inspector_sections": [
+        "Input",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Input selected\nHome\n\u203a\nInput\nInput\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nInput\nInput type\nDefault\nText\nEmail\nPassword\nNumber\nPhone\nURL\nDate\nTime\nDate & Time\nSearch\nFile\nHidden\nRange\nColor\nName\nPlaceholder\nDefault\nRequired\nDisabled\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight \u00b7 Fixed\npx\n%\nrem\nvw\nvh\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nColour\nSurface / raised\nMore settings\n2\nBorder\nRadius\npx\n%\nem\nrem\nWidth\npx\nem\nrem\nStyle\nDefault\nNone\nSolid\nDashed\nDotted\nDouble\nGroove\nRidge\nInset\nOutset\nColor\nMore settings\n8\nText inside\n\nInter \u00b7 13px \u00b7 #1a1a1a",
+      "selected_type": "input",
+      "selected_tag": "input"
+    },
+    {
+      "block_id": "date",
+      "label": "Date",
+      "declared_type": "input",
+      "returned_id": "el-mvb69nuu-lx03u016gs",
+      "roots": [
+        {
+          "id": "el-mvb69nuu-lx03u016gs",
+          "type": "input",
+          "tag": "input",
+          "attributes": {
+            "type": "date",
+            "name": "date"
+          },
+          "children": []
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Input",
+      "inspector_sections": [
+        "Input",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Input selected\nHome\n\u203a\nInput\nInput\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nInput\nInput type\nDefault\nText\nEmail\nPassword\nNumber\nPhone\nURL\nDate\nTime\nDate & Time\nSearch\nFile\nHidden\nRange\nColor\nName\nPlaceholder\nDefault\nRequired\nDisabled\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight \u00b7 Fixed\npx\n%\nrem\nvw\nvh\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nColour\nSurface / raised\nMore settings\n2\nBorder\nRadius\npx\n%\nem\nrem\nWidth\npx\nem\nrem\nStyle\nDefault\nNone\nSolid\nDashed\nDotted\nDouble\nGroove\nRidge\nInset\nOutset\nColor\nMore settings\n8\nText inside\n\nInter \u00b7 13px \u00b7 #1a1a1a",
+      "selected_type": "input",
+      "selected_tag": "input"
+    },
+    {
+      "block_id": "time",
+      "label": "Time",
+      "declared_type": "input",
+      "returned_id": "el-mvb69o0k-1ewg0hkm7dd",
+      "roots": [
+        {
+          "id": "el-mvb69o0k-1ewg0hkm7dd",
+          "type": "input",
+          "tag": "input",
+          "attributes": {
+            "type": "time",
+            "name": "time"
+          },
+          "children": []
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Input",
+      "inspector_sections": [
+        "Input",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Input selected\nHome\n\u203a\nInput\nInput\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nInput\nInput type\nDefault\nText\nEmail\nPassword\nNumber\nPhone\nURL\nDate\nTime\nDate & Time\nSearch\nFile\nHidden\nRange\nColor\nName\nPlaceholder\nDefault\nRequired\nDisabled\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight \u00b7 Fixed\npx\n%\nrem\nvw\nvh\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nColour\nSurface / raised\nMore settings\n2\nBorder\nRadius\npx\n%\nem\nrem\nWidth\npx\nem\nrem\nStyle\nDefault\nNone\nSolid\nDashed\nDotted\nDouble\nGroove\nRidge\nInset\nOutset\nColor\nMore settings\n8\nText inside\n\nInter \u00b7 13px \u00b7 #1a1a1a",
+      "selected_type": "input",
+      "selected_tag": "input"
+    },
+    {
+      "block_id": "email",
+      "label": "Email",
+      "declared_type": "input",
+      "returned_id": "el-mvb69o3g-k67kp51wd7",
+      "roots": [
+        {
+          "id": "el-mvb69o3g-k67kp51wd7",
+          "type": "input",
+          "tag": "input",
+          "attributes": {
+            "type": "email",
+            "name": "email",
+            "placeholder": "email@example.com"
+          },
+          "children": []
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Input",
+      "inspector_sections": [
+        "Input",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Input selected\nHome\n\u203a\nInput\nInput\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nInput\nInput type\nDefault\nText\nEmail\nPassword\nNumber\nPhone\nURL\nDate\nTime\nDate & Time\nSearch\nFile\nHidden\nRange\nColor\nName\nPlaceholder\nDefault\nRequired\nDisabled\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight \u00b7 Fixed\npx\n%\nrem\nvw\nvh\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nColour\nSurface / raised\nMore settings\n2\nBorder\nRadius\npx\n%\nem\nrem\nWidth\npx\nem\nrem\nStyle\nDefault\nNone\nSolid\nDashed\nDotted\nDouble\nGroove\nRidge\nInset\nOutset\nColor\nMore settings\n8\nText inside\n\nInter \u00b7 13px \u00b7 #1a1a1a",
+      "selected_type": "input",
+      "selected_tag": "input"
+    },
+    {
+      "block_id": "password",
+      "label": "Password",
+      "declared_type": "input",
+      "returned_id": "el-mvb69o6c-1qks0erovzg",
+      "roots": [
+        {
+          "id": "el-mvb69o6c-1qks0erovzg",
+          "type": "input",
+          "tag": "input",
+          "attributes": {
+            "type": "password",
+            "name": "password",
+            "placeholder": "Password"
+          },
+          "children": []
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Input",
+      "inspector_sections": [
+        "Input",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Input selected\nHome\n\u203a\nInput\nInput\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nInput\nInput type\nDefault\nText\nEmail\nPassword\nNumber\nPhone\nURL\nDate\nTime\nDate & Time\nSearch\nFile\nHidden\nRange\nColor\nName\nPlaceholder\nDefault\nRequired\nDisabled\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight \u00b7 Fixed\npx\n%\nrem\nvw\nvh\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nColour\nSurface / raised\nMore settings\n2\nBorder\nRadius\npx\n%\nem\nrem\nWidth\npx\nem\nrem\nStyle\nDefault\nNone\nSolid\nDashed\nDotted\nDouble\nGroove\nRidge\nInset\nOutset\nColor\nMore settings\n8\nText inside\n\nInter \u00b7 13px \u00b7 #1a1a1a",
+      "selected_type": "input",
+      "selected_tag": "input"
+    },
+    {
+      "block_id": "number",
+      "label": "Number",
+      "declared_type": "input",
+      "returned_id": "el-mvb69o97-150mhe11sjm",
+      "roots": [
+        {
+          "id": "el-mvb69o97-150mhe11sjm",
+          "type": "input",
+          "tag": "input",
+          "attributes": {
+            "type": "number",
+            "name": "number",
+            "placeholder": "0"
+          },
+          "children": []
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Input",
+      "inspector_sections": [
+        "Input",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Input selected\nHome\n\u203a\nInput\nInput\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nInput\nInput type\nDefault\nText\nEmail\nPassword\nNumber\nPhone\nURL\nDate\nTime\nDate & Time\nSearch\nFile\nHidden\nRange\nColor\nName\nPlaceholder\nDefault\nRequired\nDisabled\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight \u00b7 Fixed\npx\n%\nrem\nvw\nvh\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nColour\nSurface / raised\nMore settings\n2\nBorder\nRadius\npx\n%\nem\nrem\nWidth\npx\nem\nrem\nStyle\nDefault\nNone\nSolid\nDashed\nDotted\nDouble\nGroove\nRidge\nInset\nOutset\nColor\nMore settings\n8\nText inside\n\nInter \u00b7 13px \u00b7 #1a1a1a",
+      "selected_type": "input",
+      "selected_tag": "input"
+    },
+    {
+      "block_id": "range",
+      "label": "Range Slider",
+      "declared_type": "input",
+      "returned_id": "el-mvb69oc4-1vgejdk1i8l",
+      "roots": [
+        {
+          "id": "el-mvb69oc4-1vgejdk1i8l",
+          "type": "input",
+          "tag": "input",
+          "attributes": {
+            "type": "range",
+            "name": "range",
+            "min": "0",
+            "max": "100",
+            "value": "50"
+          },
+          "children": []
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Input",
+      "inspector_sections": [
+        "Input",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Input selected\nHome\n\u203a\nInput\nInput\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nInput\nInput type\nDefault\nText\nEmail\nPassword\nNumber\nPhone\nURL\nDate\nTime\nDate & Time\nSearch\nFile\nHidden\nRange\nColor\nName\nPlaceholder\nDefault\nRequired\nDisabled\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight \u00b7 Fixed\npx\n%\nrem\nvw\nvh\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nColour\nSurface / raised\nMore settings\n2\nBorder\nRadius\npx\n%\nem\nrem\nWidth\npx\nem\nrem\nStyle\nDefault\nNone\nSolid\nDashed\nDotted\nDouble\nGroove\nRidge\nInset\nOutset\nColor\nMore settings\n8\nText inside\n\nInter \u00b7 13px \u00b7 #1a1a1a",
+      "selected_type": "input",
+      "selected_tag": "input"
+    },
+    {
+      "block_id": "color",
+      "label": "Color Picker",
+      "declared_type": "input",
+      "returned_id": "el-mvb69ogh-sr2efs16bz",
+      "roots": [
+        {
+          "id": "el-mvb69ogh-sr2efs16bz",
+          "type": "input",
+          "tag": "input",
+          "attributes": {
+            "type": "color",
+            "name": "color",
+            "value": "#1A56DB"
+          },
+          "children": []
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Input",
+      "inspector_sections": [
+        "Input",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Input selected\nHome\n\u203a\nInput\nInput\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nInput\nInput type\nDefault\nText\nEmail\nPassword\nNumber\nPhone\nURL\nDate\nTime\nDate & Time\nSearch\nFile\nHidden\nRange\nColor\nName\nPlaceholder\nDefault\nRequired\nDisabled\nSize\nWidth \u00b7 Fixed\npx\n%\nrem\nvw\nvh\nHeight \u00b7 Fixed\npx\n%\nrem\nvw\nvh\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nColour\nSurface / raised\nMore settings\n2\nBorder\nRadius\npx\n%\nem\nrem\nWidth\npx\nem\nrem\nStyle\nDefault\nNone\nSolid\nDashed\nDotted\nDouble\nGroove\nRidge\nInset\nOutset\nColor\nMore settings\n8\nText inside\n\nInter \u00b7 13px \u00b7 #1a1a1a",
+      "selected_type": "input",
+      "selected_tag": "input"
+    },
+    {
+      "block_id": "label",
+      "label": "Label",
+      "declared_type": "label",
+      "returned_id": "el-mvb69om9-10f6w2e7zfh",
+      "roots": [
+        {
+          "id": "el-mvb69om9-10f6w2e7zfh",
+          "type": "label",
+          "tag": "label",
+          "attributes": {},
+          "children": []
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Label",
+      "inspector_sections": [
+        "Label",
+        "Typography",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border"
+      ],
+      "inspector_text": "Label selected\nHome\n\u203a\nLabel\nLabel\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nLabel\nText style\nCustom\nHeading 1\nHeading 2\nHeading 3\nSub-heading\nBody large\nBody text\nCaption\nCaption XS\nEdit text on canvas\nTypography\nFont\nInter\nFont size\npx\nem\nrem\n%\nvw\nLine height\npx\n\u00d7\nem\n%\nnormal\nWeight\nDefault\n100\n200\n300\n400\n500\n600\n700\n800\n900\nColour\nAlign\nLeft\nCenter\nRight\nMore settings\n9\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder",
+      "selected_type": "label",
+      "selected_tag": "label"
+    },
+    {
+      "block_id": "submit",
+      "label": "Submit Button",
+      "declared_type": "button",
+      "returned_id": "el-mvb69ort-h5ht9nkor7",
+      "roots": [
+        {
+          "id": "el-mvb69ort-h5ht9nkor7",
+          "type": "button",
+          "tag": "button",
+          "attributes": {
+            "type": "submit"
+          },
+          "children": []
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Button",
+      "inspector_sections": [
+        "Button",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Button selected\nHome\n\u203a\nButton\nButton\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nButton\nEdit text on canvas\nType\nButton\nSubmit\nReset\nDisabled\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight \u00b7 Fixed\npx\n%\nrem\nvw\nvh\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nColour\nPrimary\nMore settings\n2\nBorder\nRadius\npx\n%\nem\nrem\nWidth\npx\nem\nrem\nStyle\nDefault\nNone\nSolid\nDashed\nDotted\nDouble\nGroove\nRidge\nInset\nOutset\nColor\nMore settings\n8\nText inside\n\nInter \u00b7 14px \u00b7 On / primary",
+      "selected_type": "button",
+      "selected_tag": "button"
+    },
+    {
+      "block_id": "hero",
+      "label": "Hero",
+      "declared_type": "hero",
+      "returned_id": "el-mvb69ouu-14bhjju1eef",
+      "roots": [
+        {
+          "id": "el-mvb69ouu-14bhjju1eef",
+          "type": "hero",
+          "tag": "section",
+          "attributes": {},
+          "children": [
+            {
+              "id": "el-mvb69ouu-1ia24zrf4fd",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": [
+                {
+                  "id": "el-mvb69out-121y23nawyn",
+                  "type": "heading",
+                  "tag": "h1",
+                  "attributes": {},
+                  "children": []
+                },
+                {
+                  "id": "el-mvb69out-1p2ls7o1ine",
+                  "type": "paragraph",
+                  "tag": "p",
+                  "attributes": {},
+                  "children": []
+                },
+                {
+                  "id": "el-mvb69out-4n6gs1h0k3",
+                  "type": "link",
+                  "tag": "a",
+                  "attributes": {
+                    "href": "#"
+                  },
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Hero",
+      "inspector_sections": [
+        "Layout",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Hero selected\nHome\n\u203a\nHero\nHero\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nLayout\nDisplay\nBlock\nFlex\nGrid\nNone\nPosition\nDefault\nStatic\nRelative\nAbsolute\nFixed\nSticky\nMore settings\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder\nText inside",
+      "selected_type": "hero",
+      "selected_tag": "section"
+    },
+    {
+      "block_id": "features",
+      "label": "Features",
+      "declared_type": "features",
+      "returned_id": "el-mvb69oyc-1gzml7vwqd7",
+      "roots": [
+        {
+          "id": "el-mvb69oyc-1gzml7vwqd7",
+          "type": "features",
+          "tag": "section",
+          "attributes": {},
+          "children": [
+            {
+              "id": "el-mvb69oyc-14r1inaoubz",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": [
+                {
+                  "id": "el-mvb69oyc-1wkn7zq1uq0",
+                  "type": "heading",
+                  "tag": "h3",
+                  "attributes": {},
+                  "children": []
+                },
+                {
+                  "id": "el-mvb69oyc-y5z0zm190t",
+                  "type": "paragraph",
+                  "tag": "p",
+                  "attributes": {},
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "el-mvb69oyc-1b2oygk1clq",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": [
+                {
+                  "id": "el-mvb69oyc-1ifvqy71rhk",
+                  "type": "heading",
+                  "tag": "h3",
+                  "attributes": {},
+                  "children": []
+                },
+                {
+                  "id": "el-mvb69oyc-r2ekhr1bi8",
+                  "type": "paragraph",
+                  "tag": "p",
+                  "attributes": {},
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "el-mvb69oyc-w7tai213os",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": [
+                {
+                  "id": "el-mvb69oyc-1rorj0p14av",
+                  "type": "heading",
+                  "tag": "h3",
+                  "attributes": {},
+                  "children": []
+                },
+                {
+                  "id": "el-mvb69oyc-1n3f2w36uun",
+                  "type": "paragraph",
+                  "tag": "p",
+                  "attributes": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Features",
+      "inspector_sections": [
+        "Layout",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Features selected\nHome\n\u203a\nFeatures\nFeatures\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nLayout\nDisplay\nBlock\nFlex\nGrid\nNone\nPosition\nDefault\nStatic\nRelative\nAbsolute\nFixed\nSticky\nMore settings\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder\nText inside",
+      "selected_type": "features",
+      "selected_tag": "section"
+    },
+    {
+      "block_id": "menu-grid",
+      "label": "Menu grid",
+      "declared_type": "section",
+      "returned_id": "el-mvb69p19-2zg7tvjxxf",
+      "roots": [
+        {
+          "id": "el-mvb69p19-2zg7tvjxxf",
+          "type": "section",
+          "tag": "section",
+          "attributes": {},
+          "children": [
+            {
+              "id": "el-mvb69p19-fja9tb1wi3",
+              "type": "heading",
+              "tag": "h2",
+              "attributes": {},
+              "children": []
+            },
+            {
+              "id": "el-mvb69p19-qp9sn11vym",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": [
+                {
+                  "id": "el-mvb69p19-86jxi91z22",
+                  "type": "container",
+                  "tag": "div",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "id": "el-mvb69p19-196ebkc1526",
+                      "type": "heading",
+                      "tag": "h3",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "id": "el-mvb69p19-8uxqu61h67",
+                      "type": "paragraph",
+                      "tag": "p",
+                      "attributes": {},
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "el-mvb69p19-1jbw6051kj3",
+                  "type": "container",
+                  "tag": "div",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "id": "el-mvb69p19-hqkt6v1jae",
+                      "type": "heading",
+                      "tag": "h3",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "id": "el-mvb69p19-wo0xad17fw",
+                      "type": "paragraph",
+                      "tag": "p",
+                      "attributes": {},
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "el-mvb69p19-1j5trah1jmg",
+                  "type": "container",
+                  "tag": "div",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "id": "el-mvb69p19-1e2ut8n1x63",
+                      "type": "heading",
+                      "tag": "h3",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "id": "el-mvb69p19-rmpzwwz8ae",
+                      "type": "paragraph",
+                      "tag": "p",
+                      "attributes": {},
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Section",
+      "inspector_sections": [
+        "Layout",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Section selected\nHome\n\u203a\nSection\nSection\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nLayout\nDisplay\nBlock\nFlex\nGrid\nNone\nPosition\nDefault\nStatic\nRelative\nAbsolute\nFixed\nSticky\nMore settings\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder\nText inside",
+      "selected_type": "section",
+      "selected_tag": "section"
+    },
+    {
+      "block_id": "testimonials-section",
+      "label": "Testimonials",
+      "declared_type": "section",
+      "returned_id": "el-mvb69p46-i7cb18x3ue",
+      "roots": [
+        {
+          "id": "el-mvb69p46-i7cb18x3ue",
+          "type": "section",
+          "tag": "section",
+          "attributes": {},
+          "children": [
+            {
+              "id": "el-mvb69p45-9da1x51ou0",
+              "type": "heading",
+              "tag": "h2",
+              "attributes": {},
+              "children": []
+            },
+            {
+              "id": "el-mvb69p46-1cv5hldq9of",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": [
+                {
+                  "id": "el-mvb69p45-1fknmps1xwd",
+                  "type": "container",
+                  "tag": "blockquote",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "id": "el-mvb69p45-1f3yu8v1env",
+                      "type": "paragraph",
+                      "tag": "p",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "id": "el-mvb69p45-11wclhap4og",
+                      "type": "container",
+                      "tag": "cite",
+                      "attributes": {},
+                      "children": [
+                        {
+                          "id": "el-mvb69p45-wjhsvky6zx",
+                          "type": "text",
+                          "tag": "span",
+                          "attributes": {},
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "el-mvb69p46-o76d9i1nn9",
+                  "type": "container",
+                  "tag": "blockquote",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "id": "el-mvb69p45-qe8mdc15bg",
+                      "type": "paragraph",
+                      "tag": "p",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "id": "el-mvb69p46-pjmus712lj",
+                      "type": "container",
+                      "tag": "cite",
+                      "attributes": {},
+                      "children": [
+                        {
+                          "id": "el-mvb69p46-1uhnsbe3xwb",
+                          "type": "text",
+                          "tag": "span",
+                          "attributes": {},
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Section",
+      "inspector_sections": [
+        "Layout",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Section selected\nHome\n\u203a\nSection\nSection\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nLayout\nDisplay\nBlock\nFlex\nGrid\nNone\nPosition\nDefault\nStatic\nRelative\nAbsolute\nFixed\nSticky\nMore settings\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder\nText inside",
+      "selected_type": "section",
+      "selected_tag": "section"
+    },
+    {
+      "block_id": "cta",
+      "label": "CTA",
+      "declared_type": "cta",
+      "returned_id": "el-mvb69p7y-ndtil1ycd",
+      "roots": [
+        {
+          "id": "el-mvb69p7y-ndtil1ycd",
+          "type": "cta",
+          "tag": "section",
+          "attributes": {},
+          "children": [
+            {
+              "id": "el-mvb69p7y-1edipkt1oz4",
+              "type": "heading",
+              "tag": "h2",
+              "attributes": {},
+              "children": []
+            },
+            {
+              "id": "el-mvb69p7y-ynxnsz8dh5",
+              "type": "paragraph",
+              "tag": "p",
+              "attributes": {},
+              "children": []
+            },
+            {
+              "id": "el-mvb69p7y-a9c0kkeq5m",
+              "type": "button",
+              "tag": "button",
+              "attributes": {},
+              "children": []
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "CTA",
+      "inspector_sections": [
+        "Layout",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "CTA selected\nHome\n\u203a\nCTA\nCTA\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nLayout\nDisplay\nBlock\nFlex\nGrid\nNone\nPosition\nDefault\nStatic\nRelative\nAbsolute\nFixed\nSticky\nMore settings\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nColour\nPrimary\nMore settings\n2\nBorder\nText inside\n\nInter \u00b7 16px \u00b7 On / primary",
+      "selected_type": "cta",
+      "selected_tag": "section"
+    },
+    {
+      "block_id": "contact",
+      "label": "Contact",
+      "declared_type": "section",
+      "returned_id": "el-mvb69pdg-u6h3wi1n8i",
+      "roots": [
+        {
+          "id": "el-mvb69pdg-u6h3wi1n8i",
+          "type": "section",
+          "tag": "section",
+          "attributes": {},
+          "children": [
+            {
+              "id": "el-mvb69pdg-yl2dj4jywh",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": [
+                {
+                  "id": "el-mvb69pdg-1w5ituj1alv",
+                  "type": "container",
+                  "tag": "div",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "id": "el-mvb69pdg-1xyyt6v10e9",
+                      "type": "heading",
+                      "tag": "h2",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "id": "el-mvb69pdg-1qckadpr7ox",
+                      "type": "paragraph",
+                      "tag": "p",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "id": "el-mvb69pdg-6oeqxmjtlo",
+                      "type": "paragraph",
+                      "tag": "p",
+                      "attributes": {},
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "el-mvb69pdg-1uai1dcrljf",
+                  "type": "container",
+                  "tag": "div",
+                  "attributes": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Section",
+      "inspector_sections": [
+        "Layout",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Section selected\nHome\n\u203a\nSection\nSection\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nLayout\nDisplay\nBlock\nFlex\nGrid\nNone\nPosition\nDefault\nStatic\nRelative\nAbsolute\nFixed\nSticky\nMore settings\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder\nText inside\n\nInter \u00b7 16px \u00b7 Text",
+      "selected_type": "section",
+      "selected_tag": "section"
+    },
+    {
+      "block_id": "footer",
+      "label": "Footer",
+      "declared_type": "footer",
+      "returned_id": "el-mvb69pi5-jrs5s8l7cu",
+      "roots": [
+        {
+          "id": "el-mvb69pi5-jrs5s8l7cu",
+          "type": "footer",
+          "tag": "footer",
+          "attributes": {},
+          "children": [
+            {
+              "id": "el-mvb69pi5-1ss2c8o26zs",
+              "type": "paragraph",
+              "tag": "p",
+              "attributes": {},
+              "children": []
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Footer",
+      "inspector_sections": [
+        "Layout",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Footer selected\nHome\n\u203a\nFooter\nFooter\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nLayout\nDisplay\nBlock\nFlex\nGrid\nNone\nPosition\nDefault\nStatic\nRelative\nAbsolute\nFixed\nSticky\nMore settings\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nColour\nMore settings\n2\nBorder\nText inside\n\nInter \u00b7 16px \u00b7 #fff",
+      "selected_type": "footer",
+      "selected_tag": "footer"
+    },
+    {
+      "block_id": "navbar",
+      "label": "Navbar",
+      "declared_type": "navbar",
+      "returned_id": "el-mvb69pma-1idabu4ty3j",
+      "roots": [
+        {
+          "id": "el-mvb69pma-1idabu4ty3j",
+          "type": "navbar",
+          "tag": "nav",
+          "attributes": {},
+          "children": [
+            {
+              "id": "el-mvb69pma-12fr9ezoxos",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": [
+                {
+                  "id": "el-mvb69pma-14jbdugvoq1",
+                  "type": "text",
+                  "tag": "span",
+                  "attributes": {},
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "el-mvb69pma-12k7gm916jd",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": [
+                {
+                  "id": "el-mvb69pma-2yzktu1pwd",
+                  "type": "link",
+                  "tag": "a",
+                  "attributes": {
+                    "href": "#"
+                  },
+                  "children": []
+                },
+                {
+                  "id": "el-mvb69pma-u04id41irt",
+                  "type": "link",
+                  "tag": "a",
+                  "attributes": {
+                    "href": "#"
+                  },
+                  "children": []
+                },
+                {
+                  "id": "el-mvb69pma-943xcy1qmd",
+                  "type": "link",
+                  "tag": "a",
+                  "attributes": {
+                    "href": "#"
+                  },
+                  "children": []
+                },
+                {
+                  "id": "el-mvb69pma-10lnv9gel4g",
+                  "type": "link",
+                  "tag": "a",
+                  "attributes": {
+                    "href": "#"
+                  },
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Navbar",
+      "inspector_sections": [
+        "Layout",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Navbar selected\nHome\n\u203a\nNavbar\nNavbar\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nLayout\nDisplay\nBlock\nFlex\nGrid\nNone\nDirection\nRow\nColumn\n\nAlign\nCenter / Space between\n\nWrap\nGap\npx\nrem\nem\n%\nPosition\nDefault\nStatic\nRelative\nAbsolute\nFixed\nSticky\nMore settings\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nColour\nSurface / raised\nMore settings\n2\nBorder\nText inside",
+      "selected_type": "navbar",
+      "selected_tag": "nav"
+    },
+    {
+      "block_id": "card",
+      "label": "Card",
+      "declared_type": "card",
+      "returned_id": "el-mvb69pp5-1vjs3j21jqp",
+      "roots": [
+        {
+          "id": "el-mvb69pp5-1vjs3j21jqp",
+          "type": "card",
+          "tag": "div",
+          "attributes": {},
+          "children": [
+            {
+              "id": "el-mvb69pp5-10kjeeq1yb2",
+              "type": "image",
+              "tag": "img",
+              "attributes": {
+                "src": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'320'%20height%3D'180'%20viewBox%3D'0%200%20320%20180'%3E%3Crect%20width%3D'320'%20height%3D'180'%20fill%3D'%23E2E8F0'%2F%3E%3Ccircle%20cx%3D'122'%20cy%3D'63'%20r%3D'13'%20fill%3D'%2394A3B8'%2F%3E%3Cpath%20d%3D'M57.599999999999994%20140.4%20L121.6%2090%20L166.4%20118.80000000000001%20L204.8%2097.2%20L262.4%20140.4%20Z'%20fill%3D'%2394A3B8'%2F%3E%3C%2Fsvg%3E",
+                "alt": "Card image"
+              },
+              "children": []
+            },
+            {
+              "id": "el-mvb69pp5-ndqfks13tn",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": [
+                {
+                  "id": "el-mvb69pp5-vpulb453uj",
+                  "type": "heading",
+                  "tag": "h3",
+                  "attributes": {},
+                  "children": []
+                },
+                {
+                  "id": "el-mvb69pp5-t7bzlk1ynb",
+                  "type": "paragraph",
+                  "tag": "p",
+                  "attributes": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Card",
+      "inspector_sections": [
+        "Layout",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Card selected\nHome\n\u203a\nCard\nCard\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nLayout\nDisplay\nBlock\nFlex\nGrid\nNone\nInline\nOff\nInline block\nInline\nInline flex\nInline grid\nPosition\nDefault\nStatic\nRelative\nAbsolute\nFixed\nSticky\nOVERFLOW\nvis\nhid\nscr\naut\nX\nDefault\nvisible\nhidden\nscroll\nauto\nY\nDefault\nvisible\nhidden\nscroll\nauto\ncontent\nborder\nVISIBILITY & FLOAT\nVisible\nvis\nhid\ncol\nFloat\nnone\nleft\nright\nClear\nnone\nleft\nright\nboth\nLess\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMin width\npx\n%\nem\nrem\nvw\nvh\nauto\nMax width\npx\n%\nem\nrem\nvw\nvh\nauto\nMin height\npx\n%\nem\nrem\nvw\nvh\nauto\nMax height\npx\n%\nem\nrem\nvw\nvh\nauto\nLess\nSpacing\nMargin\nPadding\nLink sides\nFill\nColour\nSurface / raised\nMore settings\n2\nBorder\nRadius\npx\n%\nem\nrem\nMore settings\n11\nText inside\n\nInter \u00b7 16px \u00b7 Text",
+      "selected_type": "card",
+      "selected_tag": "div"
+    },
+    {
+      "block_id": "slider",
+      "label": "Slider/Carousel",
+      "declared_type": "slider",
+      "returned_id": "el-mvb69ps5-1dy9vdp1365",
+      "roots": [
+        {
+          "id": "el-mvb69ps5-1dy9vdp1365",
+          "type": "slider",
+          "tag": "div",
+          "attributes": {},
+          "children": [
+            {
+              "id": "el-mvb69ps5-zgmx8e6gn2",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": [
+                {
+                  "id": "el-mvb69ps5-ajw89ptlj",
+                  "type": "heading",
+                  "tag": "h3",
+                  "attributes": {},
+                  "children": []
+                },
+                {
+                  "id": "el-mvb69ps5-bbcq8915w8",
+                  "type": "paragraph",
+                  "tag": "p",
+                  "attributes": {},
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "el-mvb69ps5-uee6e71yol",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": [
+                {
+                  "id": "el-mvb69ps5-17vt4v75670",
+                  "type": "heading",
+                  "tag": "h3",
+                  "attributes": {},
+                  "children": []
+                },
+                {
+                  "id": "el-mvb69ps5-1gi62bh118i",
+                  "type": "paragraph",
+                  "tag": "p",
+                  "attributes": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Slider",
+      "inspector_sections": [
+        "Layout",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Slider selected\nHome\n\u203a\nSlider\nSlider\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nLayout\nDisplay\nBlock\nFlex\nGrid\nNone\nPosition\nDefault\nStatic\nRelative\nAbsolute\nFixed\nSticky\nMore settings\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder\nText inside\n\nInter \u00b7 16px \u00b7 Text",
+      "selected_type": "slider",
+      "selected_tag": "div"
+    },
+    {
+      "block_id": "testimonials",
+      "label": "Testimonials",
+      "declared_type": "testimonials",
+      "returned_id": "el-mvb69pv1-1u7aqi8ht3w",
+      "roots": [
+        {
+          "id": "el-mvb69pv1-1u7aqi8ht3w",
+          "type": "testimonials",
+          "tag": "div",
+          "attributes": {},
+          "children": [
+            {
+              "id": "el-mvb69pv1-93iig31tt2",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": [
+                {
+                  "id": "el-mvb69pv1-1d6kna01ecs",
+                  "type": "paragraph",
+                  "tag": "p",
+                  "attributes": {},
+                  "children": []
+                },
+                {
+                  "id": "el-mvb69pv1-sdkc901q9t",
+                  "type": "container",
+                  "tag": "div",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "id": "el-mvb69pv1-vyldpj1lx3",
+                      "type": "container",
+                      "tag": "strong",
+                      "attributes": {},
+                      "children": [
+                        {
+                          "id": "el-mvb69pv1-1k9w8nw118y",
+                          "type": "text",
+                          "tag": "span",
+                          "attributes": {},
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "id": "el-mvb69pv1-1xuyufi1lxm",
+                      "type": "text",
+                      "tag": "span",
+                      "attributes": {},
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "el-mvb69pv1-xhezzsp8jp",
+                  "type": "container",
+                  "tag": "div",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "id": "el-mvb69pv1-8xi76t1mc6",
+                      "type": "text",
+                      "tag": "span",
+                      "attributes": {},
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Testimonials",
+      "inspector_sections": [
+        "Layout",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Testimonials selected\nHome\n\u203a\nTestimonials\nTestimonials\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nLayout\nDisplay\nBlock\nFlex\nGrid\nNone\nPosition\nDefault\nStatic\nRelative\nAbsolute\nFixed\nSticky\nMore settings\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder\nText inside\n\nInter \u00b7 16px \u00b7 Text",
+      "selected_type": "testimonials",
+      "selected_tag": "div"
+    },
+    {
+      "block_id": "pricing",
+      "label": "Pricing Table",
+      "declared_type": "pricing",
+      "returned_id": "el-mvb69pyq-1gkdcps16au",
+      "roots": [
+        {
+          "id": "el-mvb69pyq-1gkdcps16au",
+          "type": "pricing",
+          "tag": "div",
+          "attributes": {},
+          "children": [
+            {
+              "id": "el-mvb69pyq-1ay4yamk46p",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": [
+                {
+                  "id": "el-mvb69pyq-khqahq1o2h",
+                  "type": "heading",
+                  "tag": "h3",
+                  "attributes": {},
+                  "children": []
+                },
+                {
+                  "id": "el-mvb69pyq-m2d6npee7y",
+                  "type": "paragraph",
+                  "tag": "p",
+                  "attributes": {},
+                  "children": []
+                },
+                {
+                  "id": "el-mvb69pyq-1ggyhzhwo4p",
+                  "type": "list",
+                  "tag": "ul",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "id": "el-mvb69pyq-1f7koz3m7f7",
+                      "type": "list-item",
+                      "tag": "li",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "id": "el-mvb69pyq-1efna2p1mw3",
+                      "type": "list-item",
+                      "tag": "li",
+                      "attributes": {},
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "el-mvb69pyq-1x0n61cfiol",
+                  "type": "link",
+                  "tag": "a",
+                  "attributes": {
+                    "href": "#"
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "el-mvb69pyq-edgueggq8",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": [
+                {
+                  "id": "el-mvb69pyq-qn9t421su3",
+                  "type": "heading",
+                  "tag": "h3",
+                  "attributes": {},
+                  "children": []
+                },
+                {
+                  "id": "el-mvb69pyq-yf0tbjix3o",
+                  "type": "paragraph",
+                  "tag": "p",
+                  "attributes": {},
+                  "children": []
+                },
+                {
+                  "id": "el-mvb69pyq-pm9xhbdj0y",
+                  "type": "list",
+                  "tag": "ul",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "id": "el-mvb69pyq-hkmhb91811",
+                      "type": "list-item",
+                      "tag": "li",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "id": "el-mvb69pyq-1dwkvkh1pid",
+                      "type": "list-item",
+                      "tag": "li",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "id": "el-mvb69pyq-if89p2m1ql",
+                      "type": "list-item",
+                      "tag": "li",
+                      "attributes": {},
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "el-mvb69pyq-qfa11hoc0g",
+                  "type": "link",
+                  "tag": "a",
+                  "attributes": {
+                    "href": "#"
+                  },
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Pricing",
+      "inspector_sections": [
+        "Layout",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Pricing selected\nHome\n\u203a\nPricing\nPricing\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nLayout\nDisplay\nBlock\nFlex\nGrid\nNone\nPosition\nDefault\nStatic\nRelative\nAbsolute\nFixed\nSticky\nMore settings\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder\nText inside",
+      "selected_type": "pricing",
+      "selected_tag": "div"
+    },
+    {
+      "block_id": "progress",
+      "label": "Progress Bar",
+      "declared_type": "progress",
+      "returned_id": "el-mvb69q3d-1jqzekcyjr9",
+      "roots": [
+        {
+          "id": "el-mvb69q3d-1jqzekcyjr9",
+          "type": "progress",
+          "tag": "div",
+          "attributes": {},
+          "children": [
+            {
+              "id": "el-mvb69q3d-ekcmlf1yel",
+              "type": "heading",
+              "tag": "h1",
+              "attributes": {},
+              "children": []
+            },
+            {
+              "id": "el-mvb69q3d-1xw2rmm1go6",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": [
+                {
+                  "id": "el-mvb69q3d-pgs3rrzraj",
+                  "type": "container",
+                  "tag": "progress",
+                  "attributes": {
+                    "value": "93",
+                    "max": "100"
+                  },
+                  "children": []
+                },
+                {
+                  "id": "el-mvb69q3d-b5xe231bku",
+                  "type": "container",
+                  "tag": "div",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "id": "el-mvb69q3d-1130u1252bs",
+                      "type": "text",
+                      "tag": "span",
+                      "attributes": {},
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "el-mvb69q3d-1x3rh6q1xjj",
+                  "type": "container",
+                  "tag": "div",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "id": "el-mvb69q3d-cb9elo1ehj",
+                      "type": "heading",
+                      "tag": "h2",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "id": "el-mvb69q3d-giyvyhbmtd",
+                      "type": "paragraph",
+                      "tag": "p",
+                      "attributes": {},
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Progress",
+      "inspector_sections": [
+        "Progress",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Progress selected\nHome\n\u203a\nProgress\nProgress\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nProgress\nValue\nMaximum\nShow label\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder\nText inside\n\nInter \u00b7 16px \u00b7 Text",
+      "selected_type": "progress",
+      "selected_tag": "div"
+    },
+    {
+      "block_id": "countdown",
+      "label": "Countdown Timer",
+      "declared_type": "countdown",
+      "returned_id": "el-mvb69q7w-1atq61y7fn0",
+      "roots": [
+        {
+          "id": "el-mvb69q7w-1atq61y7fn0",
+          "type": "countdown",
+          "tag": "div",
+          "attributes": {},
+          "children": [
+            {
+              "id": "el-mvb69q7v-10qdhedlc94",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": [
+                {
+                  "id": "el-mvb69q7v-qpvmzz1k9c",
+                  "type": "heading",
+                  "tag": "h3",
+                  "attributes": {},
+                  "children": []
+                },
+                {
+                  "id": "el-mvb69q7v-14n5tiuhdzi",
+                  "type": "paragraph",
+                  "tag": "p",
+                  "attributes": {},
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "el-mvb69q7w-1g4lo7x1v7v",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": [
+                {
+                  "id": "el-mvb69q7v-16xb3s2176d",
+                  "type": "container",
+                  "tag": "div",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "id": "el-mvb69q7v-1ha5rivf4p5",
+                      "type": "text",
+                      "tag": "span",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "id": "el-mvb69q7v-1ku8akr1i53",
+                      "type": "text",
+                      "tag": "span",
+                      "attributes": {},
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "el-mvb69q7w-12uoif41173",
+                  "type": "container",
+                  "tag": "div",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "id": "el-mvb69q7v-sstjyp952q",
+                      "type": "text",
+                      "tag": "span",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "id": "el-mvb69q7v-3z6kajfj67",
+                      "type": "text",
+                      "tag": "span",
+                      "attributes": {},
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "el-mvb69q7w-12z4zyr11kc",
+                  "type": "container",
+                  "tag": "div",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "id": "el-mvb69q7w-19fnrqw1rkf",
+                      "type": "text",
+                      "tag": "span",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "id": "el-mvb69q7w-187lyc31aao",
+                      "type": "text",
+                      "tag": "span",
+                      "attributes": {},
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "el-mvb69q7w-vg0fiv1ipe",
+                  "type": "container",
+                  "tag": "div",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "id": "el-mvb69q7w-1rpjsiq2mxc",
+                      "type": "text",
+                      "tag": "span",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "id": "el-mvb69q7w-1mwx36e2uyn",
+                      "type": "text",
+                      "tag": "span",
+                      "attributes": {},
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Countdown",
+      "inspector_sections": [
+        "Countdown",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Countdown selected\nHome\n\u203a\nCountdown\nCountdown\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nCountdown\nEnds at\n\nUses the visitor\u2019s time zone.\n\nWhen done\nShow message\nHide\nMessage\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder\nText inside",
+      "selected_type": "countdown",
+      "selected_tag": "div"
+    },
+    {
+      "block_id": "accordion",
+      "label": "Accordion / FAQ",
+      "declared_type": "accordion",
+      "returned_id": "el-mvb69qcm-1u1nkyf11z5",
+      "roots": [
+        {
+          "id": "el-mvb69qcm-1u1nkyf11z5",
+          "type": "accordion",
+          "tag": "div",
+          "attributes": {
+            "class": "accordion",
+            "data-allow-multiple": "false"
+          },
+          "children": [
+            {
+              "id": "el-mvb69qcm-70jdvp11i4",
+              "type": "container",
+              "tag": "div",
+              "attributes": {
+                "class": "accordion-item open",
+                "data-accordion-state": "open"
+              },
+              "children": [
+                {
+                  "id": "el-mvb69qcm-1500jmfzwoa",
+                  "type": "button",
+                  "tag": "button",
+                  "attributes": {
+                    "class": "accordion-header"
+                  },
+                  "children": [
+                    {
+                      "id": "el-mvb69qcn-lpjxotvcer",
+                      "type": "text",
+                      "tag": "span",
+                      "attributes": {},
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "el-mvb69qcn-1ok7qza1w6j",
+                  "type": "container",
+                  "tag": "div",
+                  "attributes": {
+                    "class": "accordion-content"
+                  },
+                  "children": [
+                    {
+                      "id": "el-mvb69qcn-knzl8j19vj",
+                      "type": "container",
+                      "tag": "div",
+                      "attributes": {},
+                      "children": [
+                        {
+                          "id": "el-mvb69qcn-7e9wgdiczm",
+                          "type": "paragraph",
+                          "tag": "p",
+                          "attributes": {},
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "el-mvb69qcn-d6eeiqqo0n",
+              "type": "container",
+              "tag": "div",
+              "attributes": {
+                "class": "accordion-item",
+                "data-accordion-state": "closed"
+              },
+              "children": [
+                {
+                  "id": "el-mvb69qcn-s3vdedvwb0",
+                  "type": "button",
+                  "tag": "button",
+                  "attributes": {
+                    "class": "accordion-header"
+                  },
+                  "children": [
+                    {
+                      "id": "el-mvb69qcn-zzwobe1wy5",
+                      "type": "text",
+                      "tag": "span",
+                      "attributes": {},
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "el-mvb69qco-9ae466j9gd",
+                  "type": "container",
+                  "tag": "div",
+                  "attributes": {
+                    "class": "accordion-content"
+                  },
+                  "children": [
+                    {
+                      "id": "el-mvb69qco-cptd2yai7r",
+                      "type": "container",
+                      "tag": "div",
+                      "attributes": {},
+                      "children": [
+                        {
+                          "id": "el-mvb69qco-3aoy6m86e5",
+                          "type": "paragraph",
+                          "tag": "p",
+                          "attributes": {},
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "el-mvb69qco-1v5mq3javzq",
+              "type": "container",
+              "tag": "div",
+              "attributes": {
+                "class": "accordion-item",
+                "data-accordion-state": "closed"
+              },
+              "children": [
+                {
+                  "id": "el-mvb69qco-1rbwegp12ef",
+                  "type": "button",
+                  "tag": "button",
+                  "attributes": {
+                    "class": "accordion-header"
+                  },
+                  "children": [
+                    {
+                      "id": "el-mvb69qco-1kq7dcf3nhr",
+                      "type": "text",
+                      "tag": "span",
+                      "attributes": {},
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "el-mvb69qco-1499d7c18jt",
+                  "type": "container",
+                  "tag": "div",
+                  "attributes": {
+                    "class": "accordion-content"
+                  },
+                  "children": [
+                    {
+                      "id": "el-mvb69qcp-1qiwacp1jcf",
+                      "type": "container",
+                      "tag": "div",
+                      "attributes": {},
+                      "children": [
+                        {
+                          "id": "el-mvb69qcp-8x3szp8xf9",
+                          "type": "paragraph",
+                          "tag": "p",
+                          "attributes": {},
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Accordion",
+      "inspector_sections": [
+        "Accordion",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Accordion selected\nHome\n\u203a\nAccordion\nAccordion\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nAccordion\n1 \u00b7 What is Aquibra?\nOpen\nClosed\n2 \u00b7 Is it free to use?\nOpen\nClosed\n3 \u00b7 Can I export my designs?\nOpen\nClosed\nAllow several open at once\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder\nText inside\n\nInter \u00b7 16px \u00b7 Text",
+      "selected_type": "accordion",
+      "selected_tag": "div"
+    },
+    {
+      "block_id": "social-icons",
+      "label": "Social Icons",
+      "declared_type": "social",
+      "returned_id": "el-mvb69qfl-1b8xjf01vwh",
+      "roots": [
+        {
+          "id": "el-mvb69qfl-1b8xjf01vwh",
+          "type": "social",
+          "tag": "div",
+          "attributes": {},
+          "children": [
+            {
+              "id": "el-mvb69qfl-usynex1kal",
+              "type": "link",
+              "tag": "a",
+              "attributes": {
+                "href": "#"
+              },
+              "children": []
+            },
+            {
+              "id": "el-mvb69qfl-1nqw3nnp9",
+              "type": "link",
+              "tag": "a",
+              "attributes": {
+                "href": "#"
+              },
+              "children": []
+            },
+            {
+              "id": "el-mvb69qfl-1v9j2cq14lj",
+              "type": "link",
+              "tag": "a",
+              "attributes": {
+                "href": "#"
+              },
+              "children": []
+            },
+            {
+              "id": "el-mvb69qfl-1yn2e9c1fqk",
+              "type": "link",
+              "tag": "a",
+              "attributes": {
+                "href": "#"
+              },
+              "children": []
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Social icons",
+      "inspector_sections": [
+        "Layout",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Social icons selected\nHome\n\u203a\nSocial icons\nSocial icons\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nLayout\nDisplay\nBlock\nFlex\nGrid\nNone\nDirection\nRow\nColumn\n\nAlign\nStretch / Left\n\nWrap\nGap\npx\nrem\nem\n%\nPosition\nDefault\nStatic\nRelative\nAbsolute\nFixed\nSticky\nMore settings\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder\nText inside",
+      "selected_type": "social",
+      "selected_tag": "div"
+    },
+    {
+      "block_id": "contact-form",
+      "label": "Contact Form",
+      "declared_type": "form",
+      "returned_id": "el-mvb69qih-10656bjoi6a",
+      "roots": [
+        {
+          "id": "el-mvb69qih-10656bjoi6a",
+          "type": "form",
+          "tag": "form",
+          "attributes": {},
+          "children": [
+            {
+              "id": "el-mvb69qih-52qg8arszw",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": [
+                {
+                  "id": "el-mvb69qih-kweuucijwf",
+                  "type": "label",
+                  "tag": "label",
+                  "attributes": {},
+                  "children": []
+                },
+                {
+                  "id": "el-mvb69qih-5rr3yiss2i",
+                  "type": "input",
+                  "tag": "input",
+                  "attributes": {
+                    "type": "text",
+                    "name": "fullname",
+                    "placeholder": "Your name"
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "el-mvb69qih-ourgnophzu",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": [
+                {
+                  "id": "el-mvb69qih-i38dy1if92",
+                  "type": "label",
+                  "tag": "label",
+                  "attributes": {},
+                  "children": []
+                },
+                {
+                  "id": "el-mvb69qih-9xa7h6egvk",
+                  "type": "input",
+                  "tag": "input",
+                  "attributes": {
+                    "type": "email",
+                    "name": "email",
+                    "placeholder": "you@example.com"
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "el-mvb69qih-x7j6qv13aj",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": [
+                {
+                  "id": "el-mvb69qih-clerqm11hs",
+                  "type": "label",
+                  "tag": "label",
+                  "attributes": {},
+                  "children": []
+                },
+                {
+                  "id": "el-mvb69qih-r9znku124",
+                  "type": "textarea",
+                  "tag": "textarea",
+                  "attributes": {
+                    "name": "message",
+                    "placeholder": "How can we help?"
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "el-mvb69qih-1rrjifo4ppb",
+              "type": "button",
+              "tag": "button",
+              "attributes": {
+                "type": "submit"
+              },
+              "children": []
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Form",
+      "inspector_sections": [
+        "Layout",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Form selected\nHome\n\u203a\nForm\nForm\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nLayout\nDisplay\nBlock\nFlex\nGrid\nNone\nDirection\nRow\nColumn\n\nAlign\nTop / Stretch\n\nWrap\nGap\npx\nrem\nem\n%\nPosition\nDefault\nStatic\nRelative\nAbsolute\nFixed\nSticky\nMore settings\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder\nText inside",
+      "selected_type": "form",
+      "selected_tag": "form"
+    },
+    {
+      "block_id": "stack",
+      "label": "Stack (Vertical)",
+      "declared_type": "stack",
+      "returned_id": "el-mvb69qlc-1laijhq1ah4",
+      "roots": [
+        {
+          "id": "el-mvb69qlc-1laijhq1ah4",
+          "type": "stack",
+          "tag": "div",
+          "attributes": {
+            "class": "stack"
+          },
+          "children": [
+            {
+              "id": "el-mvb69qlc-of0bfd1ony",
+              "type": "container",
+              "tag": "div",
+              "attributes": {
+                "class": "stack-item"
+              },
+              "children": [
+                {
+                  "id": "el-mvb69qlc-18nnz6t1jtt",
+                  "type": "paragraph",
+                  "tag": "p",
+                  "attributes": {},
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "el-mvb69qld-1q2p91yt9cd",
+              "type": "container",
+              "tag": "div",
+              "attributes": {
+                "class": "stack-item"
+              },
+              "children": [
+                {
+                  "id": "el-mvb69qld-u5n1jjzyfx",
+                  "type": "paragraph",
+                  "tag": "p",
+                  "attributes": {},
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "el-mvb69qld-188sm0g15v0",
+              "type": "container",
+              "tag": "div",
+              "attributes": {
+                "class": "stack-item"
+              },
+              "children": [
+                {
+                  "id": "el-mvb69qld-1d1lcw41seg",
+                  "type": "paragraph",
+                  "tag": "p",
+                  "attributes": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Stack",
+      "inspector_sections": [
+        "Stack",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Stack selected\nHome\n\u203a\nStack\nStack\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nStack\nDirection\nRow\nColumn\n\nAlign\nStretch / Left\n\nWrap\nGap\npx\nrem\nem\n%\nMore settings\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder\nText inside",
+      "selected_type": "stack",
+      "selected_tag": "div"
+    },
+    {
+      "block_id": "switch",
+      "label": "Switch / Toggle",
+      "declared_type": "switch",
+      "returned_id": "el-mvb69qo7-1jj5gkl1kdn",
+      "roots": [
+        {
+          "id": "el-mvb69qo7-1jj5gkl1kdn",
+          "type": "switch",
+          "tag": "label",
+          "attributes": {
+            "class": "switch-wrapper"
+          },
+          "children": [
+            {
+              "id": "el-mvb69qo7-3wpc5e1bbz",
+              "type": "input",
+              "tag": "input",
+              "attributes": {
+                "type": "checkbox",
+                "class": "switch-input"
+              },
+              "children": []
+            },
+            {
+              "id": "el-mvb69qo7-y2jpt31i4w",
+              "type": "container",
+              "tag": "span",
+              "attributes": {
+                "class": "switch-track"
+              },
+              "children": [
+                {
+                  "id": "el-mvb69qo7-1i3uk2ayiql",
+                  "type": "container",
+                  "tag": "span",
+                  "attributes": {
+                    "class": "switch-thumb"
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "el-mvb69qo8-1upw93s622t",
+              "type": "text",
+              "tag": "span",
+              "attributes": {},
+              "children": []
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Switch",
+      "inspector_sections": [
+        "Switch",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Switch selected\nHome\n\u203a\nSwitch\nSwitch\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nSwitch\nEdit text on canvas\nName\nChecked by default\nRequired\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder\nText inside\n\nInter \u00b7 14px \u00b7 #333333",
+      "selected_type": "switch",
+      "selected_tag": "label"
+    },
+    {
+      "block_id": "tabs",
+      "label": "Tabs",
+      "declared_type": "tabs",
+      "returned_id": "el-mvb69qr1-9znd0l88nf",
+      "roots": [
+        {
+          "id": "el-mvb69qr1-9znd0l88nf",
+          "type": "tabs",
+          "tag": "div",
+          "attributes": {
+            "class": "tabs"
+          },
+          "children": [
+            {
+              "id": "el-mvb69qr2-1y53wo91q1y",
+              "type": "container",
+              "tag": "div",
+              "attributes": {
+                "class": "tabs-nav",
+                "role": "tablist"
+              },
+              "children": [
+                {
+                  "id": "el-mvb69qr2-a737ir13gm",
+                  "type": "button",
+                  "tag": "button",
+                  "attributes": {
+                    "class": "tab-button active",
+                    "role": "tab",
+                    "aria-selected": "true"
+                  },
+                  "children": [
+                    {
+                      "id": "el-mvb69qr2-11dcai7pj2v",
+                      "type": "text",
+                      "tag": "span",
+                      "attributes": {},
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "el-mvb69qr2-13i5gqe11nq",
+                  "type": "button",
+                  "tag": "button",
+                  "attributes": {
+                    "class": "tab-button",
+                    "role": "tab",
+                    "aria-selected": "false"
+                  },
+                  "children": [
+                    {
+                      "id": "el-mvb69qr3-1bq8b5671ox",
+                      "type": "text",
+                      "tag": "span",
+                      "attributes": {},
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "el-mvb69qr3-18c1mg51rgc",
+                  "type": "button",
+                  "tag": "button",
+                  "attributes": {
+                    "class": "tab-button",
+                    "role": "tab",
+                    "aria-selected": "false"
+                  },
+                  "children": [
+                    {
+                      "id": "el-mvb69qr3-1cnni7b1jo4",
+                      "type": "text",
+                      "tag": "span",
+                      "attributes": {},
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "el-mvb69qr3-10vcxk1tl7c",
+              "type": "container",
+              "tag": "div",
+              "attributes": {
+                "class": "tab-panel active",
+                "role": "tabpanel"
+              },
+              "children": [
+                {
+                  "id": "el-mvb69qr3-1xwdl911z0h",
+                  "type": "paragraph",
+                  "tag": "p",
+                  "attributes": {},
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "el-mvb69qr4-1rxydd419yf",
+              "type": "container",
+              "tag": "div",
+              "attributes": {
+                "class": "tab-panel",
+                "role": "tabpanel"
+              },
+              "children": [
+                {
+                  "id": "el-mvb69qr4-8sdwfl1wj9",
+                  "type": "paragraph",
+                  "tag": "p",
+                  "attributes": {},
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "el-mvb69qr4-33wrs7wp44",
+              "type": "container",
+              "tag": "div",
+              "attributes": {
+                "class": "tab-panel",
+                "role": "tabpanel"
+              },
+              "children": [
+                {
+                  "id": "el-mvb69qr4-gmrx3dm0ka",
+                  "type": "paragraph",
+                  "tag": "p",
+                  "attributes": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Tabs",
+      "inspector_sections": [
+        "Layout",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Tabs selected\nHome\n\u203a\nTabs\nTabs\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nLayout\nDisplay\nBlock\nFlex\nGrid\nNone\nPosition\nDefault\nStatic\nRelative\nAbsolute\nFixed\nSticky\nMore settings\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder\nText inside\n\nInter \u00b7 16px \u00b7 Text",
+      "selected_type": "tabs",
+      "selected_tag": "div"
+    },
+    {
+      "block_id": "modal",
+      "label": "Modal / Dialog",
+      "declared_type": "button",
+      "returned_id": "el-mvb69qw9-ibrr76lq4r",
+      "roots": [
+        {
+          "id": "el-mvb69qw9-ibrr76lq4r",
+          "type": "button",
+          "tag": "button",
+          "attributes": {
+            "class": "modal-trigger"
+          },
+          "children": [
+            {
+              "id": "el-mvb69qw9-1goiazwtydx",
+              "type": "text",
+              "tag": "span",
+              "attributes": {},
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "el-mvb69qwa-14lz99u16i0",
+          "type": "container",
+          "tag": "div",
+          "attributes": {
+            "class": "modal-overlay",
+            "role": "dialog",
+            "aria-modal": "true"
+          },
+          "children": [
+            {
+              "id": "el-mvb69qwa-1bekccr6of0",
+              "type": "container",
+              "tag": "div",
+              "attributes": {
+                "class": "modal-content"
+              },
+              "children": [
+                {
+                  "id": "el-mvb69qwa-gym4nf32b1",
+                  "type": "container",
+                  "tag": "div",
+                  "attributes": {
+                    "class": "modal-header"
+                  },
+                  "children": [
+                    {
+                      "id": "el-mvb69qwa-1akvx4z1y5i",
+                      "type": "heading",
+                      "tag": "h3",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "id": "el-mvb69qwa-gjxl2x1sey",
+                      "type": "button",
+                      "tag": "button",
+                      "attributes": {
+                        "class": "modal-close"
+                      },
+                      "children": [
+                        {
+                          "id": "el-mvb69qwa-82xeu319f6",
+                          "type": "text",
+                          "tag": "span",
+                          "attributes": {},
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "el-mvb69qwb-vz9tgj1fng",
+                  "type": "container",
+                  "tag": "div",
+                  "attributes": {
+                    "class": "modal-body"
+                  },
+                  "children": [
+                    {
+                      "id": "el-mvb69qwb-uzbg7c1vwd",
+                      "type": "paragraph",
+                      "tag": "p",
+                      "attributes": {},
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Button",
+      "inspector_sections": [
+        "Button",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Button selected\nHome\n\u203a\nButton\nButton\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nButton\nEdit text on canvas\nType\nButton\nSubmit\nReset\nDisabled\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight \u00b7 Fixed\npx\n%\nrem\nvw\nvh\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nColour\nPrimary\nMore settings\n2\nBorder\nText inside\n\nInter \u00b7 14px \u00b7 On / primary",
+      "selected_type": "button",
+      "selected_tag": "button"
+    },
+    {
+      "block_id": "table",
+      "label": "Table",
+      "declared_type": "table",
+      "returned_id": "el-mvb69r16-1p7fkrp33m4",
+      "roots": [
+        {
+          "id": "el-mvb69r16-16cgw0t1mzt",
+          "type": "container",
+          "tag": "div",
+          "attributes": {
+            "class": "table-wrapper"
+          },
+          "children": [
+            {
+              "id": "el-mvb69r16-1p7fkrp33m4",
+              "type": "table",
+              "tag": "table",
+              "attributes": {
+                "class": "data-table"
+              },
+              "children": [
+                {
+                  "id": "el-mvb69r16-169okeg1r2k",
+                  "type": "container",
+                  "tag": "thead",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "id": "el-mvb69r16-8e7sh81xja",
+                      "type": "container",
+                      "tag": "tr",
+                      "attributes": {},
+                      "children": [
+                        {
+                          "id": "el-mvb69r16-her5o18ae",
+                          "type": "container",
+                          "tag": "th",
+                          "attributes": {},
+                          "children": [
+                            {
+                              "id": "el-mvb69r17-1j1o7ug95dj",
+                              "type": "text",
+                              "tag": "span",
+                              "attributes": {},
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "id": "el-mvb69r17-8f1w1d1voc",
+                          "type": "container",
+                          "tag": "th",
+                          "attributes": {},
+                          "children": [
+                            {
+                              "id": "el-mvb69r17-om5p47108i",
+                              "type": "text",
+                              "tag": "span",
+                              "attributes": {},
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "id": "el-mvb69r17-1q3w95e160x",
+                          "type": "container",
+                          "tag": "th",
+                          "attributes": {},
+                          "children": [
+                            {
+                              "id": "el-mvb69r17-1ed6veyvohw",
+                              "type": "text",
+                              "tag": "span",
+                              "attributes": {},
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "id": "el-mvb69r17-1y0azpeghwi",
+                          "type": "container",
+                          "tag": "th",
+                          "attributes": {},
+                          "children": [
+                            {
+                              "id": "el-mvb69r17-vi0oaxu3h6",
+                              "type": "text",
+                              "tag": "span",
+                              "attributes": {},
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "el-mvb69r18-1se2etkq6hz",
+                  "type": "container",
+                  "tag": "tbody",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "id": "el-mvb69r18-1qf8yqcijrp",
+                      "type": "container",
+                      "tag": "tr",
+                      "attributes": {},
+                      "children": [
+                        {
+                          "id": "el-mvb69r18-ka58rsjgjn",
+                          "type": "container",
+                          "tag": "td",
+                          "attributes": {},
+                          "children": [
+                            {
+                              "id": "el-mvb69r18-drd6c217gi",
+                              "type": "text",
+                              "tag": "span",
+                              "attributes": {},
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "id": "el-mvb69r19-qsez1o1b1z",
+                          "type": "container",
+                          "tag": "td",
+                          "attributes": {},
+                          "children": [
+                            {
+                              "id": "el-mvb69r19-ve00eq76ev",
+                              "type": "text",
+                              "tag": "span",
+                              "attributes": {},
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "id": "el-mvb69r19-13wkkvdfe8u",
+                          "type": "container",
+                          "tag": "td",
+                          "attributes": {},
+                          "children": [
+                            {
+                              "id": "el-mvb69r19-1uzk7qi15fu",
+                              "type": "container",
+                              "tag": "span",
+                              "attributes": {
+                                "class": "status-badge status-active"
+                              },
+                              "children": [
+                                {
+                                  "id": "el-mvb69r19-atyhjxz56z",
+                                  "type": "text",
+                                  "tag": "span",
+                                  "attributes": {},
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "id": "el-mvb69r19-1ykw1x119q2",
+                          "type": "container",
+                          "tag": "td",
+                          "attributes": {},
+                          "children": [
+                            {
+                              "id": "el-mvb69r19-n5hkvv68wd",
+                              "type": "button",
+                              "tag": "button",
+                              "attributes": {
+                                "class": "table-action-btn"
+                              },
+                              "children": [
+                                {
+                                  "id": "el-mvb69r19-1xd26m1kiz",
+                                  "type": "text",
+                                  "tag": "span",
+                                  "attributes": {},
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "el-mvb69r1a-1q29qikfsn5",
+                      "type": "container",
+                      "tag": "tr",
+                      "attributes": {},
+                      "children": [
+                        {
+                          "id": "el-mvb69r1a-1l7ubh8m06k",
+                          "type": "container",
+                          "tag": "td",
+                          "attributes": {},
+                          "children": [
+                            {
+                              "id": "el-mvb69r1a-1caif4tidys",
+                              "type": "text",
+                              "tag": "span",
+                              "attributes": {},
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "id": "el-mvb69r1a-c8p5iugri6",
+                          "type": "container",
+                          "tag": "td",
+                          "attributes": {},
+                          "children": [
+                            {
+                              "id": "el-mvb69r1a-1skcuerbhdf",
+                              "type": "text",
+                              "tag": "span",
+                              "attributes": {},
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "id": "el-mvb69r1a-1rilg125ksv",
+                          "type": "container",
+                          "tag": "td",
+                          "attributes": {},
+                          "children": [
+                            {
+                              "id": "el-mvb69r1a-ffrede1gay",
+                              "type": "container",
+                              "tag": "span",
+                              "attributes": {
+                                "class": "status-badge status-pending"
+                              },
+                              "children": [
+                                {
+                                  "id": "el-mvb69r1a-98soz7949w",
+                                  "type": "text",
+                                  "tag": "span",
+                                  "attributes": {},
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "id": "el-mvb69r1b-1ixxzwl1vks",
+                          "type": "container",
+                          "tag": "td",
+                          "attributes": {},
+                          "children": [
+                            {
+                              "id": "el-mvb69r1b-142y4aacwfq",
+                              "type": "button",
+                              "tag": "button",
+                              "attributes": {
+                                "class": "table-action-btn"
+                              },
+                              "children": [
+                                {
+                                  "id": "el-mvb69r1b-1jyxiat1hto",
+                                  "type": "text",
+                                  "tag": "span",
+                                  "attributes": {},
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "el-mvb69r1b-3lx98mo0y9",
+                      "type": "container",
+                      "tag": "tr",
+                      "attributes": {},
+                      "children": [
+                        {
+                          "id": "el-mvb69r1b-gqya4tettr",
+                          "type": "container",
+                          "tag": "td",
+                          "attributes": {},
+                          "children": [
+                            {
+                              "id": "el-mvb69r1b-1gp41xz1kvb",
+                              "type": "text",
+                              "tag": "span",
+                              "attributes": {},
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "id": "el-mvb69r1b-1wrq8da25hb",
+                          "type": "container",
+                          "tag": "td",
+                          "attributes": {},
+                          "children": [
+                            {
+                              "id": "el-mvb69r1b-7zlp3o1l2p",
+                              "type": "text",
+                              "tag": "span",
+                              "attributes": {},
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "id": "el-mvb69r1c-1u60w3v18o4",
+                          "type": "container",
+                          "tag": "td",
+                          "attributes": {},
+                          "children": [
+                            {
+                              "id": "el-mvb69r1c-scy6518a3",
+                              "type": "container",
+                              "tag": "span",
+                              "attributes": {
+                                "class": "status-badge status-inactive"
+                              },
+                              "children": [
+                                {
+                                  "id": "el-mvb69r1c-1j5prpv1cfw",
+                                  "type": "text",
+                                  "tag": "span",
+                                  "attributes": {},
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "id": "el-mvb69r1c-7awgm71rfg",
+                          "type": "container",
+                          "tag": "td",
+                          "attributes": {},
+                          "children": [
+                            {
+                              "id": "el-mvb69r1c-1yzk7392hvc",
+                              "type": "button",
+                              "tag": "button",
+                              "attributes": {
+                                "class": "table-action-btn"
+                              },
+                              "children": [
+                                {
+                                  "id": "el-mvb69r1c-1pzdsyu1qv7",
+                                  "type": "text",
+                                  "tag": "span",
+                                  "attributes": {},
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Table",
+      "inspector_sections": [
+        "Layout",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Table selected\nHome\n\u203a\nContainer\n\u203a\nTable\nTable\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nLayout\nDisplay\nBlock\nFlex\nGrid\nNone\nInline\nOff\nInline block\nInline\nInline flex\nInline grid\nPosition\nDefault\nStatic\nRelative\nAbsolute\nFixed\nSticky\nOVERFLOW\nvis\nhid\nscr\naut\nX\nDefault\nvisible\nhidden\nscroll\nauto\nY\nDefault\nvisible\nhidden\nscroll\nauto\ncontent\nborder\nVISIBILITY & FLOAT\nVisible\nvis\nhid\ncol\nFloat\nnone\nleft\nright\nClear\nnone\nleft\nright\nboth\nLess\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nColour\nSurface / raised\nMore settings\n2\nBorder\nText inside\n\nInter \u00b7 16px \u00b7 Text",
+      "selected_type": "table",
+      "selected_tag": "table"
+    },
+    {
+      "block_id": "product-card",
+      "label": "Product Card",
+      "declared_type": "product-card",
+      "returned_id": "el-mvb69r6i-tugl6m1ldo",
+      "roots": [
+        {
+          "id": "el-mvb69r6i-tugl6m1ldo",
+          "type": "product-card",
+          "tag": "div",
+          "attributes": {
+            "data-product-card": ""
+          },
+          "children": [
+            {
+              "id": "el-mvb69r6i-ag36eictuu",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": [
+                {
+                  "id": "el-mvb69r6i-1gyf5l013cy",
+                  "type": "image",
+                  "tag": "img",
+                  "attributes": {
+                    "data-bind": "image",
+                    "src": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400",
+                    "alt": "Product"
+                  },
+                  "children": []
+                },
+                {
+                  "id": "el-mvb69r6i-habld77vt6",
+                  "type": "text",
+                  "tag": "span",
+                  "attributes": {},
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "el-mvb69r6i-fytdj51inl",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": [
+                {
+                  "id": "el-mvb69r6i-eppn2x1sia",
+                  "type": "paragraph",
+                  "tag": "p",
+                  "attributes": {
+                    "data-bind": "category"
+                  },
+                  "children": []
+                },
+                {
+                  "id": "el-mvb69r6i-wfmnre3zv3",
+                  "type": "heading",
+                  "tag": "h3",
+                  "attributes": {
+                    "data-bind": "name"
+                  },
+                  "children": []
+                },
+                {
+                  "id": "el-mvb69r6i-1r5nvlj1wys",
+                  "type": "paragraph",
+                  "tag": "p",
+                  "attributes": {
+                    "data-bind": "description"
+                  },
+                  "children": []
+                },
+                {
+                  "id": "el-mvb69r6i-1lvqcxz6ncx",
+                  "type": "container",
+                  "tag": "div",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "id": "el-mvb69r6i-v9fyux4hnx",
+                      "type": "text",
+                      "tag": "span",
+                      "attributes": {
+                        "data-bind": "price"
+                      },
+                      "children": []
+                    },
+                    {
+                      "id": "el-mvb69r6i-tdpuf91ezh",
+                      "type": "button",
+                      "tag": "button",
+                      "attributes": {
+                        "data-add-to-cart": ""
+                      },
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Product-card",
+      "inspector_sections": [
+        "Layout",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Product-card selected\nHome\n\u203a\nProduct-card\nProduct-card\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nLayout\nDisplay\nBlock\nFlex\nGrid\nNone\nInline\nOff\nInline block\nInline\nInline flex\nInline grid\nPosition\nDefault\nStatic\nRelative\nAbsolute\nFixed\nSticky\nOVERFLOW\nvis\nhid\nscr\naut\nX\nDefault\nvisible\nhidden\nscroll\nauto\nY\nDefault\nvisible\nhidden\nscroll\nauto\ncontent\nborder\nVISIBILITY & FLOAT\nVisible\nvis\nhid\ncol\nFloat\nnone\nleft\nright\nClear\nnone\nleft\nright\nboth\nLess\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMin width\npx\n%\nem\nrem\nvw\nvh\nauto\nMax width\npx\n%\nem\nrem\nvw\nvh\nauto\nMin height\npx\n%\nem\nrem\nvw\nvh\nauto\nMax height\npx\n%\nem\nrem\nvw\nvh\nauto\nLess\nSpacing\nMargin\nPadding\nLink sides\nFill\nColour\nSurface / raised\nMore settings\n2\nBorder\nRadius\npx\n%\nem\nrem\nMore settings\n11\nText inside\n\nInter \u00b7 16px \u00b7 Text",
+      "selected_type": "product-card",
+      "selected_tag": "div"
+    },
+    {
+      "block_id": "product-grid",
+      "label": "Product Grid",
+      "declared_type": "product-grid",
+      "returned_id": "el-mvb69r9u-bs3e5s103q",
+      "roots": [
+        {
+          "id": "el-mvb69r9u-bs3e5s103q",
+          "type": "product-grid",
+          "tag": "div",
+          "attributes": {
+            "class": "product-grid",
+            "data-cms-collection": "products",
+            "data-cms-template": "true"
+          },
+          "children": []
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Product-grid",
+      "inspector_sections": [
+        "Layout",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Product-grid selected\nHome\n\u203a\nProduct-grid\nProduct-grid\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nLayout\nDisplay\nBlock\nFlex\nGrid\nNone\nColumns\nGap\npx\nrem\nem\n%\nPosition\nDefault\nStatic\nRelative\nAbsolute\nFixed\nSticky\nMore settings\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder\nText inside\n\nInter \u00b7 16px \u00b7 Text",
+      "selected_type": "product-grid",
+      "selected_tag": "div"
+    },
+    {
+      "block_id": "product-detail",
+      "label": "Product Detail",
+      "declared_type": "product-detail",
+      "returned_id": "el-mvb69rcq-fsisz91fvt",
+      "roots": [
+        {
+          "id": "el-mvb69rcq-fsisz91fvt",
+          "type": "product-detail",
+          "tag": "article",
+          "attributes": {
+            "data-product-detail": ""
+          },
+          "children": [
+            {
+              "id": "el-mvb69rcp-45ildw10ry",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": [
+                {
+                  "id": "el-mvb69rcp-gqastw59sn",
+                  "type": "image",
+                  "tag": "img",
+                  "attributes": {
+                    "data-bind": "image",
+                    "src": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600",
+                    "alt": "Product"
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "el-mvb69rcq-2xwu641xc7",
+              "type": "container",
+              "tag": "div",
+              "attributes": {},
+              "children": [
+                {
+                  "id": "el-mvb69rcq-674zdr1po8",
+                  "type": "text",
+                  "tag": "span",
+                  "attributes": {
+                    "data-bind": "category"
+                  },
+                  "children": []
+                },
+                {
+                  "id": "el-mvb69rcq-f7zsyr1fvr",
+                  "type": "heading",
+                  "tag": "h1",
+                  "attributes": {
+                    "data-bind": "name"
+                  },
+                  "children": []
+                },
+                {
+                  "id": "el-mvb69rcq-1uy3h4q1y69",
+                  "type": "paragraph",
+                  "tag": "p",
+                  "attributes": {
+                    "data-bind": "description"
+                  },
+                  "children": []
+                },
+                {
+                  "id": "el-mvb69rcq-1ybs32j1y8s",
+                  "type": "container",
+                  "tag": "div",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "id": "el-mvb69rcq-12q157g19un",
+                      "type": "text",
+                      "tag": "span",
+                      "attributes": {
+                        "data-bind": "price"
+                      },
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "el-mvb69rcq-zvy4ur128i",
+                  "type": "container",
+                  "tag": "div",
+                  "attributes": {},
+                  "children": [
+                    {
+                      "id": "el-mvb69rcq-1b9mcq1y4h",
+                      "type": "text",
+                      "tag": "span",
+                      "attributes": {},
+                      "children": []
+                    },
+                    {
+                      "id": "el-mvb69rcq-1i9ln03yivo",
+                      "type": "text",
+                      "tag": "span",
+                      "attributes": {},
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "el-mvb69rcq-1wokxd1420o",
+                  "type": "button",
+                  "tag": "button",
+                  "attributes": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Product-detail",
+      "inspector_sections": [
+        "Layout",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Product-detail selected\nHome\n\u203a\nProduct-detail\nProduct-detail\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nLayout\nDisplay\nBlock\nFlex\nGrid\nNone\nColumns\nGap\npx\nrem\nem\n%\nPosition\nDefault\nStatic\nRelative\nAbsolute\nFixed\nSticky\nMore settings\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight\nHug \u00b7 Auto\nFill\nFixed\nMin width\npx\n%\nem\nrem\nvw\nvh\nauto\nMax width\npx\n%\nem\nrem\nvw\nvh\nauto\nMin height\npx\n%\nem\nrem\nvw\nvh\nauto\nMax height\npx\n%\nem\nrem\nvw\nvh\nauto\nLess\nSpacing\nMargin\nPadding\nLink sides\nFill\nBorder\nText inside\n\nInter \u00b7 16px \u00b7 Text",
+      "selected_type": "product-detail",
+      "selected_tag": "article"
+    },
+    {
+      "block_id": "cart-button",
+      "label": "Cart Button",
+      "declared_type": "button",
+      "returned_id": "el-mvb69rfm-4hxa6w1lt3",
+      "roots": [
+        {
+          "id": "el-mvb69rfm-4hxa6w1lt3",
+          "type": "button",
+          "tag": "button",
+          "attributes": {
+            "data-checkout": ""
+          },
+          "children": [
+            {
+              "id": "el-mvb69rfm-1o7krvswqsq",
+              "type": "svg",
+              "tag": "svg",
+              "attributes": {
+                "width": "20",
+                "height": "20",
+                "viewBox": "0 0 24 24",
+                "fill": "none",
+                "stroke": "currentColor",
+                "stroke-width": "2",
+                "stroke-linecap": "round",
+                "stroke-linejoin": "round"
+              },
+              "children": [
+                {
+                  "id": "el-mvb69rfm-vikb5j1d3f",
+                  "type": "container",
+                  "tag": "circle",
+                  "attributes": {
+                    "cx": "9",
+                    "cy": "21",
+                    "r": "1"
+                  },
+                  "children": []
+                },
+                {
+                  "id": "el-mvb69rfm-1ybtqmrh1i4",
+                  "type": "container",
+                  "tag": "circle",
+                  "attributes": {
+                    "cx": "20",
+                    "cy": "21",
+                    "r": "1"
+                  },
+                  "children": []
+                },
+                {
+                  "id": "el-mvb69rfm-1amd9fe15wc",
+                  "type": "container",
+                  "tag": "path",
+                  "attributes": {
+                    "d": "M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "el-mvb69rfm-tfvd221ued",
+              "type": "text",
+              "tag": "span",
+              "attributes": {},
+              "children": []
+            },
+            {
+              "id": "el-mvb69rfm-13u5jftdiaz",
+              "type": "text",
+              "tag": "span",
+              "attributes": {
+                "data-cart-count": ""
+              },
+              "children": []
+            },
+            {
+              "id": "el-mvb69rfm-kc6i8b1ba6",
+              "type": "text",
+              "tag": "span",
+              "attributes": {},
+              "children": []
+            }
+          ]
+        }
+      ],
+      "inspector_visible": true,
+      "inspector_identity": "Button",
+      "inspector_sections": [
+        "Button",
+        "Size",
+        "Spacing",
+        "Fill",
+        "Border",
+        "Text inside"
+      ],
+      "inspector_text": "Button selected\nHome\n\u203a\nButton\nButton\n\u2726 AI\nStyle\nBehaviour\nEffects\nState: Base\nButton\nEdit text on canvas\nType\nButton\nSubmit\nReset\nDisabled\nSize\nWidth \u00b7 Fill\npx\n%\nrem\nvw\nvh\nHeight \u00b7 Fixed\npx\n%\nrem\nvw\nvh\nMore settings\nSpacing\nMargin\nPadding\nLink sides\nFill\nColour\nMore settings\n2\nBorder\nRadius\npx\n%\nem\nrem\nWidth\npx\nem\nrem\nStyle\nDefault\nNone\nSolid\nDashed\nDotted\nDouble\nGroove\nRidge\nInset\nOutset\nColor\nMore settings\n8\nText inside\n\nInter \u00b7 14px \u00b7 white",
+      "selected_type": "button",
+      "selected_tag": "button"
+    }
+  ],
+  "summary": {
+    "registered": 69,
+    "inserted": 69,
+    "default_inspector_mounted": 69,
+    "actual_selected_type_mismatch": [],
+    "distinct_native_tags_in_model": 38,
+    "native_tags_in_model": [
+      "a",
+      "article",
+      "audio",
+      "blockquote",
+      "button",
+      "circle",
+      "cite",
+      "div",
+      "footer",
+      "form",
+      "h1",
+      "h2",
+      "h3",
+      "hr",
+      "img",
+      "input",
+      "label",
+      "li",
+      "nav",
+      "option",
+      "p",
+      "path",
+      "progress",
+      "section",
+      "select",
+      "source",
+      "span",
+      "strong",
+      "svg",
+      "table",
+      "tbody",
+      "td",
+      "textarea",
+      "th",
+      "thead",
+      "tr",
+      "ul",
+      "video"
+    ],
+    "note": "Includes descendants and multiple sibling roots; Icon SVG markup remains in content and is not counted as additional tree nodes. Table returns nested table, Modal returns trigger."
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "exportedRoots": 4,
+  "reachableRoots": [
+    "424:337006",
+    "424:337452",
+    "424:337627",
+    "424:337803"
+  ],
+  "reachableControls": 9,
+  "invalidReachable": [],
+  "outsideHubRoots": []
+}

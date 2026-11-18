@@ -1,0 +1,30 @@
+{
+  "recorded": "2026-10-10",
+  "fixture": "cmv1z8k860002yulrh29dr5fw",
+  "requests": [
+    "GET http://localhost:3000/api/trpc/media.uploadPrefix?[query omitted] → 200 (834ms, 83B)",
+    "POST http://localhost:3000/api/asset-upload → 200 (20172ms, 1390B)",
+    "PUT https://vercel.com/api/blob/?[query omitted] → 200 (965ms, 800B)",
+    "POST http://localhost:3000/api/trpc/media.createAsset?[query omitted] → 500 (27766ms, 7458B)"
+  ],
+  "reload": {
+    "time": "2026-10-10T13:49:20.933Z",
+    "images": [
+      {
+        "id": "el-mv2g8ftn-zfjetw1e8v",
+        "src": null,
+        "asset": null,
+        "w": 0,
+        "h": 0
+      }
+    ],
+    "assets": [
+      "buildrick-audit-media-1010 asset",
+      "buildrick-audit-media-1010 asset"
+    ],
+    "save": [
+      "save-status-saved"
+    ]
+  },
+  "evidenceKind": "CLI network log and DOM reads; sanitized, no authentication material"
+}

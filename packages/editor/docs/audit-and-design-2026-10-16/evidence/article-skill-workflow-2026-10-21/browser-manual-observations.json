@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-21 Asia/Karachi",
+  "method": "Canvas pointer/mouse events; observed destination URL and screenshots before structured transition logging began.",
+  "transitions": [
+    {
+      "from": "329:1218",
+      "to": "330:321239",
+      "control": "Source details",
+      "x": 1282,
+      "y": 664,
+      "result": "PASS",
+      "screenshot": "browser-source-open.png"
+    },
+    {
+      "from": "330:321239",
+      "to": "329:1218",
+      "control": "Back to font size",
+      "x": 667,
+      "y": 651,
+      "result": "PASS",
+      "screenshot": "browser-source-return.png"
+    },
+    {
+      "from": "302:3370",
+      "to": "302:3396",
+      "control": "F1 · Edit a page",
+      "x": 264,
+      "y": 298,
+      "result": "PASS",
+      "screenshot": "browser-f1-entry.png"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+[
+  {
+    "label": "Input settings",
+    "wait": 10000,
+    "shot": "r35-input-settings.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-18380&starting-point-node-id=8843%3A18380&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Style tab",
+    "x": 1155,
+    "y": 117,
+    "shot": "r35-style-open.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-18380&starting-point-node-id=8843%3A18380&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Close style",
+    "x": 1390,
+    "y": 90,
+    "shot": "r35-style-return.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-18380&starting-point-node-id=8843%3A18380&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

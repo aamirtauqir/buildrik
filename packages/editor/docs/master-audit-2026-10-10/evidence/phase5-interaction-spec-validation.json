@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-10",
+  "scope": "Documentation consistency only; no browser, app, runtime or Figma verification",
+  "findingRows": 60,
+  "exactFindingIdsAndPriorities": true,
+  "canonicalMenuTypes": 55,
+  "cmsBindableTypes": 6,
+  "replaceBlockTypes": 14,
+  "inventedNativeNodes": 0,
+  "knownToBePage": "8312:2",
+  "dualDockCanvasWidths": {
+    "1440": 800,
+    "1280": 640,
+    "1024": 384
+  },
+  "provisionalCanvasFloor": 423,
+  "status": "Initial specification consistency passed; current native mapping and gate status are in phase5-acceptance-mapping-validation.json and PHASE5-INDEPENDENT-GATE-REVIEW.md."
+}

@@ -1,0 +1,41 @@
+[
+  {
+    "label": "Select alternate library image without committing",
+    "x": 530,
+    "y": 422,
+    "shot": "walk-image-draft.png"
+  },
+  {
+    "label": "Cancel library selection",
+    "x": 350,
+    "y": 596,
+    "shot": "walk-image-cancel.png"
+  },
+  {
+    "label": "Reopen source chooser",
+    "x": 1241,
+    "y": 261
+  },
+  {
+    "label": "Select alternate library image",
+    "x": 530,
+    "y": 422
+  },
+  {
+    "label": "Commit selected image",
+    "x": 545,
+    "y": 596,
+    "shot": "walk-image-applied.png"
+  },
+  {
+    "label": "Reopen changed image source",
+    "x": 1241,
+    "y": 261
+  },
+  {
+    "label": "Open Upload method",
+    "x": 1100,
+    "y": 315,
+    "shot": "walk-upload-open.png"
+  }
+]

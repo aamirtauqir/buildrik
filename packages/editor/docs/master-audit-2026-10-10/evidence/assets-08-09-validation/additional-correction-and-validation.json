@@ -1,0 +1,26 @@
+{
+  "initial": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"mutatedNodeIds\":[\"8283:2091\",\"8283:2093\",\"8283:2096\",\"8283:2483\",\"8283:2492\",\"8283:2501\",\"8283:2092\",\"8283:2094\",\"8283:2097\"],\"createdNodeIds\":[],\"imageHash\":\"58e87f6cea35d65bb15476374286da14020b7f79\",\"contentOnlyImageFills\":6,\"filenameWidth\":114.5,\"evidence\":\"AssetCell.tsx object-cover/truncate, SlimLauncher two-column grid and measured114.5px cards\"}"
+      }
+    ],
+    "isError": false
+  },
+  "second": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"mutatedNodeIds\":[\"8283:2484\",\"8283:2493\",\"8283:2502\",\"8283:2431\",\"8283:2447\",\"8283:2511\"],\"createdNodeIds\":[]}"
+      }
+    ],
+    "isError": false
+  },
+  "final": [
+    {
+      "type": "text",
+      "text": "{\"mutatedNodeIds\":[\"8283:2511\"],\"createdNodeIds\":[],\"text\":\"Select an asset to see\\ndetails.\",\"width\":155,\"height\":40}"
+    }
+  ]
+}

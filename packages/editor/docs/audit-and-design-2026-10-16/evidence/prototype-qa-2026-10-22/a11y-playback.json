@@ -1,0 +1,73 @@
+[
+  {
+    "fixtureLoad": "423:97218",
+    "actual": "423:97218"
+  },
+  {
+    "target": "Link",
+    "focusSequence": [
+      {
+        "tag": "ARTICLE",
+        "role": null,
+        "text": "ExitFieldwork StudioSite settingsIn review \u00b7 2PreviewPublishAddLayersPagesAssetsCMSBrandHelpLayersSe"
+      },
+      {
+        "tag": "BUTTON",
+        "role": "link",
+        "text": "Review"
+      },
+      {
+        "tag": "BUTTON",
+        "role": "link",
+        "text": "Link"
+      }
+    ],
+    "found": true
+  },
+  {
+    "origin": "423:97218",
+    "to": "423:98532",
+    "key": "Enter",
+    "pointer": null,
+    "actual": "423:98532",
+    "pass": true
+  },
+  {
+    "focusAfterActivation": {
+      "tag": "ARTICLE",
+      "role": null,
+      "text": "ExitFieldwork StudioSite settingsIn review \u00b7 2PreviewPublishAddLayersPagesAssetsCMSBrandHelpLayersSe"
+    }
+  },
+  {
+    "target": "Cancel",
+    "focusSequence": [
+      {
+        "tag": "BUTTON",
+        "role": "link",
+        "text": "Review"
+      },
+      {
+        "tag": "BUTTON",
+        "role": "link",
+        "text": "Cancel"
+      }
+    ],
+    "found": true
+  },
+  {
+    "origin": "423:98532",
+    "to": "423:97218",
+    "key": "Enter",
+    "pointer": null,
+    "actual": "423:97218",
+    "pass": true
+  },
+  {
+    "focusAfterActivation": {
+      "tag": "ARTICLE",
+      "role": null,
+      "text": "ExitFieldwork StudioSite settingsIn review \u00b7 2PreviewPublishAddLayersPagesAssetsCMSBrandHelpLayersSe"
+    }
+  }
+]

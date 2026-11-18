@@ -1,0 +1,49 @@
+[
+  {
+    "label": "Select ready upload into source draft",
+    "x": 720,
+    "y": 535,
+    "shot": "r28-upload-selected.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8507%3A3011&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Commit uploaded fixture",
+    "x": 545,
+    "y": 556,
+    "shot": "r28-upload-committed.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8507%3A3011&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Open source for URL",
+    "x": 1241,
+    "y": 261,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8507%3A3011&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Open URL method",
+    "x": 1100,
+    "y": 353,
+    "shot": "r28-url-form.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8507%3A3011&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Fill sample URL",
+    "x": 730,
+    "y": 488,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8507%3A3011&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Check sample URL",
+    "x": 720,
+    "y": 535,
+    "wait": 2200,
+    "shot": "r28-url-ready.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8507%3A3011&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

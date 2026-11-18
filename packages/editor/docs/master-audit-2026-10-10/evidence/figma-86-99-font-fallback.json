@@ -1,0 +1,34 @@
+{
+  "mutatedNodeIds": [
+    "8309:247561",
+    "8309:247564"
+  ],
+  "readback": [
+    {
+      "id": "8309:247561",
+      "text": "🔒",
+      "font": {
+        "family": "Noto Emoji",
+        "style": "Regular",
+        "variationSettings": {
+          "wght": 400
+        }
+      },
+      "w": 36,
+      "h": 34
+    },
+    {
+      "id": "8309:247564",
+      "text": "📊",
+      "font": {
+        "family": "Noto Emoji",
+        "style": "Regular",
+        "variationSettings": {
+          "wght": 400
+        }
+      },
+      "w": 36,
+      "h": 34
+    }
+  ]
+}

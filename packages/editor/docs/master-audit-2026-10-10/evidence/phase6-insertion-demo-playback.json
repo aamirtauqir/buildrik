@@ -1,0 +1,136 @@
+{
+  "date": "2026-10-11T18:54:20.201Z",
+  "scope": "Finite Figma prototype only; no production or backend effects.",
+  "steps": [
+    {
+      "label": "blank page Add",
+      "xy": [
+        638,
+        427
+      ],
+      "expected": "8415-1581",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8415-1581&starting-point-node-id=8329%3A1288&hide-ui=1",
+      "pass": true
+    },
+    {
+      "label": "cancel Add using close",
+      "xy": [
+        318,
+        80
+      ],
+      "expected": "8329-1288",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8329-1288&starting-point-node-id=8329%3A1288&hide-ui=1",
+      "pass": true
+    },
+    {
+      "label": "reopen Add",
+      "xy": [
+        638,
+        427
+      ],
+      "expected": "8415-1581",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8415-1581&starting-point-node-id=8329%3A1288&hide-ui=1",
+      "pass": true
+    },
+    {
+      "label": "insert Heading",
+      "xy": [
+        200,
+        243
+      ],
+      "expected": "8415-1691",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8415-1691&starting-point-node-id=8329%3A1288&hide-ui=1",
+      "pass": true
+    },
+    {
+      "label": "apply 48 px sample",
+      "xy": [
+        1290,
+        829
+      ],
+      "expected": "8415-1801",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8415-1801&starting-point-node-id=8329%3A1288&hide-ui=1",
+      "pass": true
+    },
+    {
+      "label": "Undo size change",
+      "xy": [
+        1290,
+        829
+      ],
+      "expected": "8415-1691",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8415-1691&starting-point-node-id=8329%3A1288&hide-ui=1",
+      "pass": true
+    },
+    {
+      "label": "Undo insertion",
+      "xy": [
+        950,
+        76
+      ],
+      "expected": "8329-1288",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8329-1288&starting-point-node-id=8329%3A1288&hide-ui=1",
+      "pass": true
+    },
+    {
+      "label": "reopen Add alternate",
+      "xy": [
+        638,
+        427
+      ],
+      "expected": "8415-1581",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8415-1581&starting-point-node-id=8329%3A1288&hide-ui=1",
+      "pass": true
+    },
+    {
+      "label": "insert from guidance",
+      "xy": [
+        638,
+        427
+      ],
+      "expected": "8415-1691",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8415-1691&starting-point-node-id=8329%3A1288&hide-ui=1",
+      "pass": true
+    },
+    {
+      "label": "reapply style sample",
+      "xy": [
+        1290,
+        829
+      ],
+      "expected": "8415-1801",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8415-1801&starting-point-node-id=8329%3A1288&hide-ui=1",
+      "pass": true
+    },
+    {
+      "label": "Undo insertion from styled",
+      "xy": [
+        950,
+        76
+      ],
+      "expected": "8329-1288",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8329-1288&starting-point-node-id=8329%3A1288&hide-ui=1",
+      "pass": true
+    },
+    {
+      "label": "reopen Add for cancel",
+      "xy": [
+        638,
+        427
+      ],
+      "expected": "8415-1581",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8415-1581&starting-point-node-id=8329%3A1288&hide-ui=1",
+      "pass": true
+    },
+    {
+      "label": "Back to blank page",
+      "xy": [
+        950,
+        76
+      ],
+      "expected": "8329-1288",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8329-1288&starting-point-node-id=8329%3A1288&hide-ui=1",
+      "pass": true
+    }
+  ]
+}

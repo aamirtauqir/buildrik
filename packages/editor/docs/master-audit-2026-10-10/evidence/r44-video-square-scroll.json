@@ -1,0 +1,10 @@
+{
+  "precedingWalk": "r44-video-stale-square-walk.json",
+  "urlNode": "8843:22237",
+  "event": "WheelEvent",
+  "target": "CANVAS at (650,650)",
+  "deltaY": 480,
+  "waitMs": 900,
+  "screenshot": "r44-video-square-scrolled.png",
+  "review": "Root visually verified the full square preview, title strip, preview caption and website footer are reachable inside the scrolling canvas. Header, device and inspector remain fixed."
+}

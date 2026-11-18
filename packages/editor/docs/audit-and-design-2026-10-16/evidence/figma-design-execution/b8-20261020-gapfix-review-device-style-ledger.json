@@ -1,0 +1,2247 @@
+{
+  "master": "4:253",
+  "panelVariable": "VariableID:3:17",
+  "changed": [
+    {
+      "root": "276:29206",
+      "id": "276:29213",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29206",
+      "id": "276:29214",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29254",
+      "id": "276:29261",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29254",
+      "id": "276:29262",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29300",
+      "id": "276:29307",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29300",
+      "id": "276:29308",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29338",
+      "id": "276:29345",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29338",
+      "id": "276:29346",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29371",
+      "id": "276:29378",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29371",
+      "id": "276:29379",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29404",
+      "id": "276:29411",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29404",
+      "id": "276:29412",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29453",
+      "id": "276:29460",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29453",
+      "id": "276:29461",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29496",
+      "id": "276:29503",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29496",
+      "id": "276:29504",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29533",
+      "id": "276:29540",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29533",
+      "id": "276:29541",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29573",
+      "id": "276:29580",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29573",
+      "id": "276:29581",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29616",
+      "id": "276:29623",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29616",
+      "id": "276:29624",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29658",
+      "id": "276:29665",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29658",
+      "id": "276:29666",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29698",
+      "id": "276:29705",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29698",
+      "id": "276:29706",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29742",
+      "id": "276:29749",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29742",
+      "id": "276:29750",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29801",
+      "id": "276:29808",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29801",
+      "id": "276:29809",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29852",
+      "id": "276:29860",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29852",
+      "id": "276:29861",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29893",
+      "id": "276:29901",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29893",
+      "id": "276:29902",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29945",
+      "id": "276:29953",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29945",
+      "id": "276:29954",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29997",
+      "id": "276:30005",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:29997",
+      "id": "276:30006",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:30041",
+      "id": "276:30049",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:30041",
+      "id": "276:30050",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:30092",
+      "id": "276:30100",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:30092",
+      "id": "276:30101",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:30128",
+      "id": "276:30135",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:30128",
+      "id": "276:30136",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:30572",
+      "id": "276:30579",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:30572",
+      "id": "276:30580",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:30625",
+      "id": "276:30632",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:30625",
+      "id": "276:30633",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:30670",
+      "id": "276:30677",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:30670",
+      "id": "276:30678",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:30715",
+      "id": "276:30722",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:30715",
+      "id": "276:30723",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:30766",
+      "id": "276:30773",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:30766",
+      "id": "276:30774",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:30803",
+      "id": "276:30810",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "276:30803",
+      "id": "276:30811",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "278:79269",
+      "id": "278:79276",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "278:79269",
+      "id": "278:79277",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "278:79319",
+      "id": "278:79326",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "278:79319",
+      "id": "278:79327",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "278:79355",
+      "id": "278:79362",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "278:79355",
+      "id": "278:79363",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "278:79409",
+      "id": "278:79416",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "278:79409",
+      "id": "278:79418",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "278:79447",
+      "id": "278:79454",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "278:79447",
+      "id": "278:79456",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "278:79482",
+      "id": "280:76064",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "278:79482",
+      "id": "280:76066",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "278:79538",
+      "id": "278:79545",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "278:79538",
+      "id": "278:79546",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "278:79588",
+      "id": "280:76104",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "278:79588",
+      "id": "280:76106",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "278:79632",
+      "id": "278:79639",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "278:79632",
+      "id": "278:79641",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "278:79671",
+      "id": "278:79678",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "278:79671",
+      "id": "278:79679",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "278:79787",
+      "id": "278:79794",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "278:79787",
+      "id": "278:79795",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "278:79826",
+      "id": "278:79833",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "278:79826",
+      "id": "278:79834",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "278:79879",
+      "id": "280:75990",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "278:79879",
+      "id": "280:75991",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "278:79931",
+      "id": "280:76027",
+      "name": "Desktop",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "278:79931",
+      "id": "280:76028",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "selected": [
+    {
+      "root": "276:29206",
+      "id": "276:29215",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:29254",
+      "id": "276:29263",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:29300",
+      "id": "276:29309",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:29338",
+      "id": "276:29347",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:29371",
+      "id": "276:29380",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:29404",
+      "id": "276:29413",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:29453",
+      "id": "276:29462",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:29496",
+      "id": "276:29505",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:29533",
+      "id": "276:29542",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:29573",
+      "id": "276:29582",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:29616",
+      "id": "276:29625",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:29658",
+      "id": "276:29667",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:29698",
+      "id": "276:29707",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:29742",
+      "id": "276:29751",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:29801",
+      "id": "276:29810",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:29852",
+      "id": "276:29859",
+      "name": "Desktop"
+    },
+    {
+      "root": "276:29893",
+      "id": "276:29900",
+      "name": "Desktop"
+    },
+    {
+      "root": "276:29945",
+      "id": "276:29952",
+      "name": "Desktop"
+    },
+    {
+      "root": "276:29997",
+      "id": "276:30004",
+      "name": "Desktop"
+    },
+    {
+      "root": "276:30041",
+      "id": "276:30048",
+      "name": "Desktop"
+    },
+    {
+      "root": "276:30092",
+      "id": "276:30099",
+      "name": "Desktop"
+    },
+    {
+      "root": "276:30128",
+      "id": "276:30137",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:30572",
+      "id": "276:30581",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:30625",
+      "id": "276:30634",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:30670",
+      "id": "276:30679",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:30715",
+      "id": "276:30724",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:30766",
+      "id": "276:30775",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:30803",
+      "id": "276:30812",
+      "name": "Mobile"
+    },
+    {
+      "root": "278:79269",
+      "id": "278:79278",
+      "name": "Mobile"
+    },
+    {
+      "root": "278:79319",
+      "id": "278:79328",
+      "name": "Mobile"
+    },
+    {
+      "root": "278:79355",
+      "id": "278:79364",
+      "name": "Mobile"
+    },
+    {
+      "root": "278:79409",
+      "id": "278:79417",
+      "name": "Tablet"
+    },
+    {
+      "root": "278:79447",
+      "id": "278:79455",
+      "name": "Tablet"
+    },
+    {
+      "root": "278:79482",
+      "id": "280:76065",
+      "name": "Tablet"
+    },
+    {
+      "root": "278:79538",
+      "id": "278:79547",
+      "name": "Mobile"
+    },
+    {
+      "root": "278:79588",
+      "id": "280:76105",
+      "name": "Tablet"
+    },
+    {
+      "root": "278:79632",
+      "id": "278:79640",
+      "name": "Tablet"
+    },
+    {
+      "root": "278:79671",
+      "id": "278:79680",
+      "name": "Mobile"
+    },
+    {
+      "root": "278:79787",
+      "id": "278:79796",
+      "name": "Mobile"
+    },
+    {
+      "root": "278:79826",
+      "id": "278:79835",
+      "name": "Mobile"
+    },
+    {
+      "root": "278:79879",
+      "id": "280:75992",
+      "name": "Mobile"
+    },
+    {
+      "root": "278:79931",
+      "id": "280:76029",
+      "name": "Mobile"
+    }
+  ],
+  "originalBlack": [
+    "276:29860",
+    "276:29901",
+    "276:29953",
+    "276:30005",
+    "276:30049",
+    "276:30100",
+    "278:79418",
+    "278:79456",
+    "280:76066",
+    "280:76106",
+    "278:79641"
+  ]
+}

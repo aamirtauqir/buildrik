@@ -1,0 +1,145 @@
+[
+  {
+    "label": "Editor entry",
+    "goto": "8465:3",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-3&starting-point-node-id=8465%3A3&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "I02 / Design / Typography → Pages",
+    "x": 109,
+    "y": 157,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-3&starting-point-node-id=8465%3A3&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "R29 / Editor overlay / Pages → + New page",
+    "x": 176,
+    "y": 944,
+    "shot": "r30-new-template.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-3&starting-point-node-id=8465%3A3&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "R30 / Pages · new-template → Cancel",
+    "x": 720,
+    "y": 656,
+    "shot": "r30-cancel-no-new-page.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-3&starting-point-node-id=8465%3A3&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "R29 / Editor overlay / Pages → + New page",
+    "x": 176,
+    "y": 944,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-3&starting-point-node-id=8465%3A3&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "R30 / Pages · new-template → Blank · Empty canvas",
+    "x": 568,
+    "y": 478,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-3&starting-point-node-id=8465%3A3&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "R30 / Pages · new-blank → Add to site navigation · On",
+    "x": 720,
+    "y": 526,
+    "shot": "r30-navigation-off.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-3&starting-point-node-id=8465%3A3&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "R30 / Pages · new-blank → Create page",
+    "x": 720,
+    "y": 608,
+    "shot": "r30-created-blank.png",
+    "expected": "8663:12975",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8663-12975&starting-point-node-id=8465%3A3&hide-ui=1",
+    "verification": "URL_MATCH"
+  },
+  {
+    "label": "R30 / Editor / Contact blank → Preview",
+    "x": 805,
+    "y": 28,
+    "shot": "r30-blank-preview.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8663-12975&starting-point-node-id=8465%3A3&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "R30 / Preview / blank → Button / TO-BE",
+    "x": 82,
+    "y": 28,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8663-12975&starting-point-node-id=8465%3A3&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "R30 / Editor / Contact blank → Manage pages",
+    "x": 1264,
+    "y": 189,
+    "shot": "r30-contact-in-pages.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8663-12975&starting-point-node-id=8465%3A3&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Select Home page",
+    "x": 176,
+    "y": 183,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-3&starting-point-node-id=8465%3A3&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "I02 / Design / Typography → Pages",
+    "x": 109,
+    "y": 157,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-3&starting-point-node-id=8465%3A3&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "R29 / Editor overlay / Pages → + New page",
+    "x": 176,
+    "y": 944,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-3&starting-point-node-id=8465%3A3&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "R30 / Pages · new-template → Choose template",
+    "x": 720,
+    "y": 608,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-3&starting-point-node-id=8465%3A3&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "R26 overlay / templates → Portfolio",
+    "x": 538,
+    "y": 262,
+    "shot": "r30-template-preview.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-3&starting-point-node-id=8465%3A3&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "R30 / Pages · Template preview → Use template · Create Contact",
+    "x": 720,
+    "y": 553,
+    "shot": "r30-created-template.png",
+    "expected": "8663:13173",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8663-13173&starting-point-node-id=8465%3A3&hide-ui=1",
+    "verification": "URL_MATCH"
+  },
+  {
+    "label": "R30 / Editor / Contact from template → Preview",
+    "x": 805,
+    "y": 28,
+    "shot": "r30-contact-preview.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8663-13173&starting-point-node-id=8465%3A3&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "R30 / Preview / template → Button / TO-BE",
+    "x": 82,
+    "y": 28,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8663-13173&starting-point-node-id=8465%3A3&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

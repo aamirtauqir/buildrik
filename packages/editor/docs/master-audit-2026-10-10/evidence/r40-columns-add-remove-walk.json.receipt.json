@@ -1,0 +1,31 @@
+[
+  {
+    "x": 718,
+    "y": 517,
+    "shot": "r40-added4.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-25014&starting-point-node-id=8843%3A25014&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 1260,
+    "y": 301,
+    "shot": "r40-undo-add3.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-25014&starting-point-node-id=8843%3A25014&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 1330,
+    "y": 184,
+    "wait": 1200,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-25014&starting-point-node-id=8843%3A25014&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 719,
+    "y": 421,
+    "wait": 1200,
+    "shot": "r40-removal-preview.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-25014&starting-point-node-id=8843%3A25014&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

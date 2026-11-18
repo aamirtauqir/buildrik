@@ -1,0 +1,101 @@
+{
+  "changes": [
+    {
+      "frame": "8281:2",
+      "index": 51,
+      "action": "placeholderGlyph",
+      "node": "8294:2"
+    },
+    {
+      "frame": "8283:2",
+      "index": 51,
+      "action": "placeholderGlyph",
+      "node": "8294:6"
+    },
+    {
+      "frame": "8283:299",
+      "index": 51,
+      "action": "placeholderGlyph",
+      "node": "8294:10"
+    },
+    {
+      "frame": "8283:610",
+      "index": 46,
+      "action": "searchStacking",
+      "afterIndex": 47,
+      "node": "8283:691"
+    },
+    {
+      "frame": "8283:610",
+      "index": 75,
+      "action": "placeholderGlyph",
+      "node": "8294:14"
+    },
+    {
+      "frame": "8283:935",
+      "index": 46,
+      "action": "searchStacking",
+      "afterIndex": 47,
+      "node": "8283:1015"
+    },
+    {
+      "frame": "8283:935",
+      "index": 73,
+      "action": "placeholderGlyph",
+      "node": "8294:18"
+    },
+    {
+      "frame": "8283:1249",
+      "index": 46,
+      "action": "searchStacking",
+      "afterIndex": 47,
+      "node": "8283:1329"
+    },
+    {
+      "frame": "8283:1249",
+      "index": 108,
+      "action": "placeholderGlyph",
+      "node": "8294:22"
+    },
+    {
+      "frame": "8283:1654",
+      "index": 46,
+      "action": "searchStacking",
+      "afterIndex": 47,
+      "node": "8283:1734"
+    },
+    {
+      "frame": "8283:1654",
+      "index": 108,
+      "action": "placeholderGlyph",
+      "node": "8294:26"
+    },
+    {
+      "frame": "8283:1998",
+      "index": 46,
+      "action": "searchStacking",
+      "afterIndex": 47,
+      "node": "8283:2078"
+    },
+    {
+      "frame": "8283:1998",
+      "index": 82,
+      "action": "placeholderGlyph",
+      "node": "8294:30"
+    },
+    {
+      "frame": "8283:2523",
+      "index": 82,
+      "action": "placeholderGlyph",
+      "node": "8294:34"
+    },
+    {
+      "frame": "8283:2523",
+      "index": 125,
+      "action": "searchStacking",
+      "afterIndex": 126,
+      "node": "8283:2725"
+    }
+  ],
+  "errors": []
+}

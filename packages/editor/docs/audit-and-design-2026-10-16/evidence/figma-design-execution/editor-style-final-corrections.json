@@ -1,0 +1,35 @@
+{
+  "customDisclosureFix": [
+    {
+      "type": "text",
+      "text": "{\"createdNodeIds\":[],\"mutatedNodeIds\":[\"39:9162\",\"I39:9162;4:269\"],\"reason\":\"Custom color expands inline within the picker; retain Ghost disclosure semantics\"}"
+    }
+  ],
+  "inspectorAudit": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"page\":\"3:5\",\"counts\":{\"IconButton\":8,\"Button\":23,\"Select\":14,\"Input\":4,\"NumericUnit\":13,\"UnitSelector\":7,\"ColorControl\":3,\"Search\":1},\"linkCount\":4,\"bad\":[]}"
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "primaryFocus": {
+    "node": "4:244",
+    "stroke": "color/bg-panel",
+    "weight": 2
+  },
+  "buttonSet": {
+    "node": "4:283",
+    "x": 4472,
+    "y": 420,
+    "width": 1050,
+    "height": 302
+  },
+  "linkRows": {
+    "y": 248,
+    "xStart": 24,
+    "xStep": 170
+  }
+}

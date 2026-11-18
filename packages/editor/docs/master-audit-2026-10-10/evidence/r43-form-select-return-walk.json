@@ -1,0 +1,10 @@
+[
+  {"x":720,"y":551,"shot":"r43-form-select-conversion-return.png"},
+  {"x":720,"y":551,"shot":"r43-form-select-options-reopened.png"},
+  {"x":575,"y":475,"shot":"r43-form-select-renamed-shared.png"},
+  {"x":865,"y":675,"shot":"r43-form-select-done-returns-detail.png"},
+  {"x":720,"y":599,"shot":"r43-form-select-back-fields.png"},
+  {"press":"Escape","shot":"r43-form-select-back-canvas.png"},
+  {"x":475,"y":96,"shot":"r43-form-select-mobile-output.png"},
+  {"x":110,"y":581,"shot":"r43-form-select-layer-reopens-detail.png"}
+]

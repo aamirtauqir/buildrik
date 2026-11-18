@@ -1,0 +1,124 @@
+[
+  {
+    "label": "Apply Heading 1",
+    "x": 720,
+    "y": 352,
+    "shot": "walk-style-0.png"
+  },
+  {
+    "label": "Reopen text styles",
+    "x": 1240,
+    "y": 315
+  },
+  {
+    "label": "Apply Heading 2",
+    "x": 720,
+    "y": 394,
+    "shot": "walk-style-1.png"
+  },
+  {
+    "label": "Reopen text styles",
+    "x": 1240,
+    "y": 315
+  },
+  {
+    "label": "Apply Heading 3",
+    "x": 720,
+    "y": 436,
+    "shot": "walk-style-2.png"
+  },
+  {
+    "label": "Reopen text styles",
+    "x": 1240,
+    "y": 315
+  },
+  {
+    "label": "Apply Sub-heading",
+    "x": 720,
+    "y": 478,
+    "shot": "walk-style-3.png"
+  },
+  {
+    "label": "Reopen text styles",
+    "x": 1240,
+    "y": 315
+  },
+  {
+    "label": "Apply Body large",
+    "x": 720,
+    "y": 520,
+    "shot": "walk-style-4.png"
+  },
+  {
+    "label": "Reopen text styles",
+    "x": 1240,
+    "y": 315
+  },
+  {
+    "label": "Apply Body text",
+    "x": 720,
+    "y": 562,
+    "shot": "walk-style-5.png"
+  },
+  {
+    "label": "Reopen text styles",
+    "x": 1240,
+    "y": 315
+  },
+  {
+    "label": "Apply Caption",
+    "x": 720,
+    "y": 604,
+    "shot": "walk-style-6.png"
+  },
+  {
+    "label": "Reopen text styles",
+    "x": 1240,
+    "y": 315
+  },
+  {
+    "label": "Apply Caption XS",
+    "x": 720,
+    "y": 646,
+    "shot": "walk-style-7.png"
+  },
+  {
+    "label": "Open text styles for cancel",
+    "x": 1240,
+    "y": 315
+  },
+  {
+    "label": "Cancel retains Caption XS",
+    "x": 610,
+    "y": 718,
+    "shot": "walk-style-cancel.png"
+  },
+  {
+    "label": "Enter Mobile override",
+    "x": 476,
+    "y": 96,
+    "expected": "8465:7",
+    "shot": "walk-mobile-before.png"
+  },
+  {
+    "label": "Reset Mobile font size",
+    "x": 1265,
+    "y": 683,
+    "expected": "8465:15",
+    "shot": "walk-mobile-reset.png"
+  },
+  {
+    "label": "Return Desktop after reset",
+    "x": 380,
+    "y": 96,
+    "expected": "8590:12700",
+    "shot": "walk-desktop-reset-retained.png"
+  },
+  {
+    "label": "Return Mobile after reset",
+    "x": 476,
+    "y": 96,
+    "expected": "8465:15",
+    "shot": "walk-mobile-roundtrip.png"
+  }
+]

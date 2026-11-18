@@ -1,0 +1,298 @@
+[
+  {
+    "label": "Clean metadata readback",
+    "goto": "8690:13237"
+  },
+  {
+    "label": "Manage pages",
+    "x": 720,
+    "y": 282
+  },
+  {
+    "label": "About options",
+    "x": 970,
+    "y": 420
+  },
+  {
+    "label": "About settings",
+    "x": 720,
+    "y": 413
+  },
+  {
+    "label": "Title picker",
+    "x": 538,
+    "y": 343
+  },
+  {
+    "label": "Select title",
+    "x": 720,
+    "y": 421,
+    "shot": "r31-final-title-draft.png"
+  },
+  {
+    "label": "Save About",
+    "x": 546,
+    "y": 596,
+    "wait": 2300,
+    "shot": "r31-final-title-saved.png"
+  },
+  {
+    "label": "Manage",
+    "x": 720,
+    "y": 501
+  },
+  {
+    "label": "Home options",
+    "x": 970,
+    "y": 372
+  },
+  {
+    "label": "Home isolation",
+    "x": 720,
+    "y": 413,
+    "shot": "r31-final-home-isolation.png"
+  },
+  {
+    "label": "Leave Home",
+    "x": 354,
+    "y": 596
+  },
+  {
+    "label": "Discard untouched Home",
+    "x": 720,
+    "y": 527
+  },
+  {
+    "label": "About options",
+    "x": 970,
+    "y": 420
+  },
+  {
+    "label": "About retained title",
+    "x": 720,
+    "y": 413,
+    "shot": "r31-final-about-retained.png"
+  },
+  {
+    "label": "Site defaults",
+    "x": 1110,
+    "y": 475
+  },
+  {
+    "label": "Sample site title",
+    "x": 720,
+    "y": 577
+  },
+  {
+    "label": "Save site defaults",
+    "x": 720,
+    "y": 625
+  },
+  {
+    "label": "Title picker",
+    "x": 538,
+    "y": 343
+  },
+  {
+    "label": "Clear page override",
+    "x": 720,
+    "y": 613,
+    "shot": "r31-final-inherited-title.png"
+  },
+  {
+    "label": "History operations",
+    "goto": "8690:13237"
+  },
+  {
+    "label": "History",
+    "x": 720,
+    "y": 426
+  },
+  {
+    "label": "Session",
+    "x": 1153,
+    "y": 166
+  },
+  {
+    "label": "Save version",
+    "x": 1110,
+    "y": 224
+  },
+  {
+    "label": "Set checkpoint name",
+    "x": 720,
+    "y": 494
+  },
+  {
+    "label": "Save",
+    "x": 720,
+    "y": 543
+  },
+  {
+    "label": "Open saves",
+    "x": 720,
+    "y": 525,
+    "shot": "r31-history-saved.png"
+  },
+  {
+    "label": "Session",
+    "x": 1153,
+    "y": 166
+  },
+  {
+    "label": "Version actions",
+    "x": 116,
+    "y": 273
+  },
+  {
+    "label": "Rename version",
+    "x": 538,
+    "y": 262
+  },
+  {
+    "label": "Choose new name",
+    "x": 720,
+    "y": 494
+  },
+  {
+    "label": "Save name",
+    "x": 720,
+    "y": 543,
+    "shot": "r31-history-renamed.png"
+  },
+  {
+    "label": "Back to saves",
+    "x": 720,
+    "y": 645
+  },
+  {
+    "label": "Session",
+    "x": 1153,
+    "y": 166
+  },
+  {
+    "label": "Version actions",
+    "x": 116,
+    "y": 273
+  },
+  {
+    "label": "Delete version",
+    "x": 1110,
+    "y": 338
+  },
+  {
+    "label": "Cancel delete",
+    "x": 720,
+    "y": 559,
+    "shot": "r31-history-delete-cancel.png"
+  },
+  {
+    "label": "Back to saves",
+    "x": 720,
+    "y": 645
+  },
+  {
+    "label": "Session",
+    "x": 1153,
+    "y": 166
+  },
+  {
+    "label": "Version actions",
+    "x": 116,
+    "y": 273
+  },
+  {
+    "label": "Delete version",
+    "x": 1110,
+    "y": 338
+  },
+  {
+    "label": "Confirm delete",
+    "x": 720,
+    "y": 511,
+    "shot": "r31-history-empty.png"
+  },
+  {
+    "label": "Journal context",
+    "goto": "8688:13188"
+  },
+  {
+    "label": "Journal Mobile",
+    "x": 476,
+    "y": 96,
+    "expected": "8697:13137"
+  },
+  {
+    "label": "Build",
+    "x": 411,
+    "y": 28,
+    "expected": "8628:12592"
+  },
+  {
+    "label": "Return Journal Mobile",
+    "x": 319,
+    "y": 28,
+    "expected": "8697:13137",
+    "shot": "r31-journal-build-return.png"
+  },
+  {
+    "label": "Journal preview",
+    "x": 805,
+    "y": 28,
+    "shot": "r31-journal-mobile-preview.png"
+  },
+  {
+    "label": "Back preview",
+    "x": 104,
+    "y": 28
+  },
+  {
+    "label": "Journal Desktop",
+    "x": 380,
+    "y": 96,
+    "expected": "8688:13188"
+  },
+  {
+    "label": "Copy context",
+    "goto": "8688:13308"
+  },
+  {
+    "label": "Build",
+    "x": 411,
+    "y": 28,
+    "expected": "8628:12592"
+  },
+  {
+    "label": "Return Copy",
+    "x": 319,
+    "y": 28,
+    "expected": "8688:13308",
+    "shot": "r31-copy-build-return.png"
+  },
+  {
+    "label": "Final template description",
+    "goto": "8690:13237"
+  },
+  {
+    "label": "Catalogue",
+    "x": 720,
+    "y": 330
+  },
+  {
+    "label": "SaaS",
+    "x": 538,
+    "y": 224
+  },
+  {
+    "label": "Create",
+    "x": 720,
+    "y": 584
+  },
+  {
+    "label": "Confirm",
+    "x": 720,
+    "y": 535,
+    "expected": "8663:13173",
+    "shot": "r31-final-template-description.png"
+  }
+]

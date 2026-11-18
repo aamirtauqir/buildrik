@@ -1,0 +1,120 @@
+{
+  "visual": {
+    "mutatedNodeIds": [
+      "419:55265",
+      "421:50014",
+      "419:57033",
+      "I419:57033;88:20493"
+    ],
+    "hidden": [
+      "419:55265",
+      "421:50014"
+    ],
+    "label": "‹ Hero instance · Style / Tablet",
+    "reactions": [
+      {
+        "action": {
+          "type": "NODE",
+          "destinationId": "415:50289",
+          "navigation": "NAVIGATE",
+          "transition": null,
+          "resetVideoPosition": false,
+          "resetScrollPosition": false
+        },
+        "actions": [
+          {
+            "type": "NODE",
+            "destinationId": "415:50289",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": false
+          }
+        ],
+        "trigger": {
+          "type": "ON_CLICK"
+        }
+      }
+    ]
+  },
+  "componentReturn": {
+    "mutatedNodeIds": [
+      "419:57033"
+    ],
+    "before": [
+      {
+        "action": {
+          "type": "NODE",
+          "destinationId": "415:50289",
+          "navigation": "NAVIGATE",
+          "transition": null,
+          "resetVideoPosition": false,
+          "resetScrollPosition": false
+        },
+        "actions": [
+          {
+            "type": "NODE",
+            "destinationId": "415:50289",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": false
+          }
+        ],
+        "trigger": {
+          "type": "ON_CLICK"
+        }
+      }
+    ],
+    "after": [
+      {
+        "action": {
+          "type": "NODE",
+          "destinationId": "415:55220",
+          "navigation": "NAVIGATE",
+          "transition": null,
+          "resetVideoPosition": false,
+          "resetScrollPosition": false
+        },
+        "actions": [
+          {
+            "type": "NODE",
+            "destinationId": "415:55220",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": false
+          }
+        ],
+        "trigger": {
+          "type": "ON_CLICK"
+        }
+      }
+    ],
+    "primary": [
+      {
+        "action": {
+          "type": "NODE",
+          "destinationId": "415:55220",
+          "navigation": "NAVIGATE",
+          "transition": null,
+          "resetVideoPosition": false,
+          "resetScrollPosition": false
+        },
+        "actions": [
+          {
+            "type": "NODE",
+            "destinationId": "415:55220",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": false
+          }
+        ],
+        "trigger": {
+          "type": "ON_CLICK"
+        }
+      }
+    ]
+  }
+}

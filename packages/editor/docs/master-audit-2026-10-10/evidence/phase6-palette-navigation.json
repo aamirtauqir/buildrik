@@ -1,0 +1,159 @@
+{
+  "mutatedNodeIds": [
+    "8317:245787",
+    "8317:245799",
+    "8317:245803",
+    "8317:245583",
+    "8318:911",
+    "8317:245780"
+  ],
+  "records": [
+    {
+      "id": "8317:245787",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8317:243948",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8317:243948",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ]
+    },
+    {
+      "id": "8317:245799",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8317:242436",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8317:242436",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ]
+    },
+    {
+      "id": "8317:245803",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8317:244887",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8317:244887",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ]
+    },
+    {
+      "id": "8317:245583",
+      "reactions": [
+        {
+          "action": {
+            "type": "BACK"
+          },
+          "actions": [
+            {
+              "type": "BACK"
+            }
+          ],
+          "trigger": {
+            "type": "ON_KEY_DOWN",
+            "device": "KEYBOARD",
+            "keyCodes": [
+              27
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "8318:911",
+      "reactions": [
+        {
+          "action": {
+            "type": "BACK"
+          },
+          "actions": [
+            {
+              "type": "BACK"
+            }
+          ],
+          "trigger": {
+            "type": "ON_KEY_DOWN",
+            "device": "KEYBOARD",
+            "keyCodes": [
+              27
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "8317:245780",
+      "reactions": [
+        {
+          "action": {
+            "type": "BACK"
+          },
+          "actions": [
+            {
+              "type": "BACK"
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ]
+    }
+  ],
+  "limitation": "BACK uses presentation navigation history; verify entered and direct-start behavior during traversal. Arrow-key navigation is not simulated yet."
+}

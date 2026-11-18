@@ -1,0 +1,112 @@
+--- BEGIN UNTRUSTED EXTERNAL CONTENT (source: http://localhost:3000/dashboard/templates) ---
+--- BEGIN UNTRUSTED EXTERNAL C​ONTENT (source: http://localhost:3000/dashboard/templates) ---
+@e1 [link] "Skip to content"
+  @e2 [link] "B Buildrick"
+    @e3 [link] "Dashboard"
+    @e4 [link] "Marketplace"
+    @e5 [link] "Learn"
+    @e6 [link] "Resources"
+    @e7 [link] "Templates"
+  @e8 [button] "Search"
+  @e9 [button] "Notifications"
+  @e10 [button] "Account menu"
+  @e11 [textbox] "Search templates"
+    @e12 [button] "All"
+    @e13 [button] "Portfolio"
+    @e14 [button] "Business"
+    @e15 [button] "Blog"
+    @e16 [button] "Agency"
+    @e17 [button] "E-commerce"
+    @e18 [button] "Restaurant"
+    @e19 [button] "All levels"
+    @e20 [button] "Beginner"
+    @e21 [button] "Intermediate"
+    @e22 [button] "Advanced"
+    @e23 [button] "Popular"
+    @e24 [button] "Newest"
+    @e25 [button] "A–Z"
+@e26 [button] "Accept All"
+@e27 [button] "Essential Only"
+@e28 [button] "Manage Preferences"
+@e29 [button] "v3.0.2 Output Detail Standard React Components Hide Until Restart Marker Color Clear on copy/send Block page interactions Manage MCP & Webhooks Manage MCP & Webhooks MCP Connection MCP connection allows agents to receive and act on annotations. Learn more Webhooks Auto-Send The webhook URL will receive live annotation changes and annotation data."
+  @e30 [button]
+  @e31 [button]
+  @e32 [button] [disabled]
+  @e33 [button] [disabled]
+  @e34 [button] [disabled]
+  @e35 [button] [disabled]
+  @e36 [button]
+  @e37 [button]
+  @e38 [link]
+  @e39 [button] "Switch to light mode"
+  @e40 [button] "Standard"
+  @e41 [checkbox] [checked]
+  @e42 [checkbox]
+  @e43 [button] "Indigo"
+  @e44 [button] "Blue"
+  @e45 [button] "Cyan"
+  @e46 [button] "Green"
+  @e47 [button] "Yellow"
+  @e48 [button] "Orange"
+  @e49 [button] "Red"
+  @e50 [checkbox] "Clear on copy/send"
+  @e51 [checkbox] "Block page interactions" [checked]
+  @e52 [button] "Manage MCP & Webhooks"
+  @e53 [button] "Manage MCP & Webhooks"
+    @e54 [link] "Learn more"
+  @e55 [checkbox] "Auto-Send" [checked] [disabled]
+  @e56 [textbox] "Webhook URL"
+
+── cursor-interactive (not in ARIA tree) ──
+@c1 [popover-child, cursor:pointer] "B"
+@c2 [popover-child, cursor:pointer] "Buildrick"
+@c3 [popover-child, cursor:pointer] "span"
+@c4 [popover-child, cursor:pointer, tabindex=0, role=button] "v3.0.2
+
+Output Detail
+Standard
+React Components
+Hide Until Restart
+Marker Color
+"
+@c5 [popover-child, cursor:pointer] "div"
+@c6 [popover-child, cursor:pointer] "div"
+@c7 [popover-child, cursor:pointer] "div"
+@c8 [popover-child, cursor:pointer] "span"
+@c9 [popover-child, cursor:pointer] "span"
+@c10 [popover-child, cursor:pointer] "div"
+@c11 [popover-child, cursor:pointer] "span"
+@c12 [popover-child, cursor:pointer] "span"
+@c13 [popover-child, cursor:pointer] "div"
+@c14 [popover-child, cursor:pointer] "span"
+@c15 [popover-child, cursor:pointer] "span"
+@c16 [popover-child, cursor:pointer] "div"
+@c17 [popover-child, cursor:pointer] "span"
+@c18 [popover-child, cursor:pointer] "span"
+@c19 [popover-child, cursor:pointer] "div"
+@c20 [popover-child, cursor:pointer] "span"
+@c21 [popover-child, cursor:pointer] "span"
+@c22 [popover-child, cursor:pointer] "div"
+@c23 [popover-child, cursor:pointer] "span"
+@c24 [popover-child, cursor:pointer] "span"
+@c25 [popover-child, cursor:pointer] "div"
+@c26 [popover-child, cursor:pointer] "span"
+@c27 [popover-child, cursor:pointer] "div"
+@c28 [popover-child, cursor:pointer] "div"
+@c29 [popover-child, cursor:pointer] "span"
+@c30 [popover-child, cursor:pointer] "span"
+@c31 [popover-child, cursor:pointer] "span"
+@c32 [popover-child, cursor:pointer] "span"
+@c33 [popover-child, cursor:pointer] "Standard"
+@c34 [popover-child, cursor:pointer] "span"
+@c35 [popover-child, cursor:pointer] "span"
+@c36 [popover-child, cursor:pointer] "span"
+@c37 [popover-child, cursor:pointer] "span"
+@c38 [popover-child, cursor:pointer] "span"
+@c39 [popover-child, cursor:pointer] "Clear on copy/send"
+@c40 [popover-child, cursor:pointer] "Block page interactions"
+@c41 [popover-child, cursor:pointer] "Manage MCP & Webhooks"
+@c42 [popover-child, cursor:pointer] "span"
+@c43 [popover-child, cursor:pointer] "Manage MCP & Webhooks"
+--- END UNTRUSTED EXTERNAL C​ONTENT ---
+--- END UNTRUSTED EXTERNAL CONTENT ---

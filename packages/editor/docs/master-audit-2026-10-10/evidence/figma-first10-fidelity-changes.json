@@ -1,0 +1,1203 @@
+{
+  "scope": [
+    "8281:2",
+    "8283:2",
+    "8283:299",
+    "8283:610",
+    "8283:935",
+    "8283:1249",
+    "8283:1654",
+    "8283:1998",
+    "8283:2325",
+    "8283:2523"
+  ],
+  "changes": [
+    {
+      "frame": "8281:2",
+      "node": "8281:15",
+      "action": "shadow",
+      "index": 11
+    },
+    {
+      "frame": "8281:2",
+      "node": "8281:75",
+      "action": "ellipsis",
+      "index": 41,
+      "before": "Audit persisted page",
+      "after": "Audit persisted p…"
+    },
+    {
+      "frame": "8281:2",
+      "node": "8281:76",
+      "action": "ellipsis",
+      "index": 42,
+      "before": "Audit after checkpoint",
+      "after": "Audit after check…"
+    },
+    {
+      "frame": "8281:2",
+      "node": "8281:82",
+      "action": "shadow",
+      "index": 45
+    },
+    {
+      "frame": "8281:2",
+      "node": "8281:111",
+      "action": "shadow",
+      "index": 66
+    },
+    {
+      "frame": "8281:2",
+      "node": "8281:126",
+      "action": "shadow",
+      "index": 78
+    },
+    {
+      "frame": "8283:2",
+      "node": "8283:15",
+      "action": "shadow",
+      "index": 11
+    },
+    {
+      "frame": "8283:2",
+      "node": "8283:75",
+      "action": "ellipsis",
+      "index": 41,
+      "before": "Audit persisted page",
+      "after": "Audit persisted p…"
+    },
+    {
+      "frame": "8283:2",
+      "node": "8283:76",
+      "action": "ellipsis",
+      "index": 42,
+      "before": "Audit after checkpoint",
+      "after": "Audit after check…"
+    },
+    {
+      "frame": "8283:2",
+      "node": "8283:82",
+      "action": "shadow",
+      "index": 45
+    },
+    {
+      "frame": "8283:2",
+      "node": "8283:96",
+      "action": "shadow",
+      "index": 55
+    },
+    {
+      "frame": "8283:2",
+      "node": "8283:98",
+      "action": "shadow",
+      "index": 56
+    },
+    {
+      "frame": "8283:2",
+      "node": "8283:100",
+      "action": "shadow",
+      "index": 57
+    },
+    {
+      "frame": "8283:2",
+      "node": "8283:102",
+      "action": "shadow",
+      "index": 58
+    },
+    {
+      "frame": "8283:2",
+      "node": "8283:103",
+      "action": "shadow",
+      "index": 59
+    },
+    {
+      "frame": "8283:2",
+      "node": "8283:104",
+      "action": "shadow",
+      "index": 60
+    },
+    {
+      "frame": "8283:2",
+      "node": "8283:146",
+      "action": "shadow",
+      "index": 83
+    },
+    {
+      "frame": "8283:2",
+      "node": "8283:149",
+      "action": "hideSrOnly",
+      "index": 85
+    },
+    {
+      "frame": "8283:2",
+      "node": "8283:150",
+      "action": "hideSrOnly",
+      "index": 86
+    },
+    {
+      "frame": "8283:2",
+      "node": "8283:190",
+      "action": "shadow",
+      "index": 112
+    },
+    {
+      "frame": "8283:2",
+      "node": "8283:218",
+      "action": "mono",
+      "index": 136
+    },
+    {
+      "frame": "8283:2",
+      "node": "8283:229",
+      "action": "mono",
+      "index": 144
+    },
+    {
+      "frame": "8283:2",
+      "node": "8283:245",
+      "action": "shadow",
+      "index": 156
+    },
+    {
+      "frame": "8283:2",
+      "node": "8283:246",
+      "action": "mono",
+      "index": 157
+    },
+    {
+      "frame": "8283:2",
+      "node": "8283:261",
+      "action": "mono",
+      "index": 170
+    },
+    {
+      "frame": "8283:2",
+      "node": "8283:270",
+      "action": "mono",
+      "index": 176
+    },
+    {
+      "frame": "8283:2",
+      "node": "8283:287",
+      "action": "shadow",
+      "index": 189
+    },
+    {
+      "frame": "8283:299",
+      "node": "8283:312",
+      "action": "shadow",
+      "index": 11
+    },
+    {
+      "frame": "8283:299",
+      "node": "8283:372",
+      "action": "ellipsis",
+      "index": 41,
+      "before": "Audit persisted page",
+      "after": "Audit persisted p…"
+    },
+    {
+      "frame": "8283:299",
+      "node": "8283:373",
+      "action": "ellipsis",
+      "index": 42,
+      "before": "Audit after checkpoint",
+      "after": "Audit after check…"
+    },
+    {
+      "frame": "8283:299",
+      "node": "8283:379",
+      "action": "shadow",
+      "index": 45
+    },
+    {
+      "frame": "8283:299",
+      "node": "8283:389",
+      "action": "shadow",
+      "index": 52
+    },
+    {
+      "frame": "8283:299",
+      "node": "8283:391",
+      "action": "shadow",
+      "index": 53
+    },
+    {
+      "frame": "8283:299",
+      "node": "8283:393",
+      "action": "shadow",
+      "index": 54
+    },
+    {
+      "frame": "8283:299",
+      "node": "8283:395",
+      "action": "shadow",
+      "index": 55
+    },
+    {
+      "frame": "8283:299",
+      "node": "8283:396",
+      "action": "shadow",
+      "index": 56
+    },
+    {
+      "frame": "8283:299",
+      "node": "8283:397",
+      "action": "shadow",
+      "index": 57
+    },
+    {
+      "frame": "8283:299",
+      "node": "8283:439",
+      "action": "shadow",
+      "index": 80
+    },
+    {
+      "frame": "8283:299",
+      "node": "8283:442",
+      "action": "hideSrOnly",
+      "index": 82
+    },
+    {
+      "frame": "8283:299",
+      "node": "8283:443",
+      "action": "hideSrOnly",
+      "index": 83
+    },
+    {
+      "frame": "8283:299",
+      "node": "8283:484",
+      "action": "shadow",
+      "index": 110
+    },
+    {
+      "frame": "8283:299",
+      "node": "8283:512",
+      "action": "mono",
+      "index": 134
+    },
+    {
+      "frame": "8283:299",
+      "node": "8283:523",
+      "action": "mono",
+      "index": 142
+    },
+    {
+      "frame": "8283:299",
+      "node": "8283:539",
+      "action": "shadow",
+      "index": 154
+    },
+    {
+      "frame": "8283:299",
+      "node": "8283:540",
+      "action": "mono",
+      "index": 155
+    },
+    {
+      "frame": "8283:299",
+      "node": "8283:555",
+      "action": "mono",
+      "index": 168
+    },
+    {
+      "frame": "8283:299",
+      "node": "8283:564",
+      "action": "mono",
+      "index": 174
+    },
+    {
+      "frame": "8283:299",
+      "node": "8283:581",
+      "action": "shadow",
+      "index": 187
+    },
+    {
+      "frame": "8283:299",
+      "node": "8283:591",
+      "action": "shadow",
+      "index": 189
+    },
+    {
+      "frame": "8283:610",
+      "node": "8283:623",
+      "action": "shadow",
+      "index": 11
+    },
+    {
+      "frame": "8283:610",
+      "node": "8283:646",
+      "action": "shadow",
+      "index": 25
+    },
+    {
+      "frame": "8283:610",
+      "node": "8283:727",
+      "action": "ellipsis",
+      "index": 65,
+      "before": "Audit persisted page",
+      "after": "Audit persisted p…"
+    },
+    {
+      "frame": "8283:610",
+      "node": "8283:728",
+      "action": "ellipsis",
+      "index": 66,
+      "before": "Audit after checkpoint",
+      "after": "Audit after check…"
+    },
+    {
+      "frame": "8283:610",
+      "node": "8283:734",
+      "action": "shadow",
+      "index": 69
+    },
+    {
+      "frame": "8283:610",
+      "node": "8283:744",
+      "action": "shadow",
+      "index": 76
+    },
+    {
+      "frame": "8283:610",
+      "node": "8283:746",
+      "action": "shadow",
+      "index": 77
+    },
+    {
+      "frame": "8283:610",
+      "node": "8283:748",
+      "action": "shadow",
+      "index": 78
+    },
+    {
+      "frame": "8283:610",
+      "node": "8283:750",
+      "action": "shadow",
+      "index": 79
+    },
+    {
+      "frame": "8283:610",
+      "node": "8283:751",
+      "action": "shadow",
+      "index": 80
+    },
+    {
+      "frame": "8283:610",
+      "node": "8283:752",
+      "action": "shadow",
+      "index": 81
+    },
+    {
+      "frame": "8283:610",
+      "node": "8283:779",
+      "action": "shadow",
+      "index": 99
+    },
+    {
+      "frame": "8283:610",
+      "node": "8283:782",
+      "action": "hideSrOnly",
+      "index": 101
+    },
+    {
+      "frame": "8283:610",
+      "node": "8283:783",
+      "action": "hideSrOnly",
+      "index": 102
+    },
+    {
+      "frame": "8283:610",
+      "node": "8283:823",
+      "action": "shadow",
+      "index": 128
+    },
+    {
+      "frame": "8283:610",
+      "node": "8283:851",
+      "action": "mono",
+      "index": 152
+    },
+    {
+      "frame": "8283:610",
+      "node": "8283:862",
+      "action": "mono",
+      "index": 160
+    },
+    {
+      "frame": "8283:610",
+      "node": "8283:878",
+      "action": "shadow",
+      "index": 172
+    },
+    {
+      "frame": "8283:610",
+      "node": "8283:879",
+      "action": "mono",
+      "index": 173
+    },
+    {
+      "frame": "8283:610",
+      "node": "8283:894",
+      "action": "mono",
+      "index": 186
+    },
+    {
+      "frame": "8283:610",
+      "node": "8283:903",
+      "action": "mono",
+      "index": 192
+    },
+    {
+      "frame": "8283:610",
+      "node": "8283:920",
+      "action": "shadow",
+      "index": 205
+    },
+    {
+      "frame": "8283:935",
+      "node": "8283:948",
+      "action": "shadow",
+      "index": 11
+    },
+    {
+      "frame": "8283:935",
+      "node": "8283:976",
+      "action": "shadow",
+      "index": 27
+    },
+    {
+      "frame": "8283:935",
+      "node": "8283:1041",
+      "action": "ellipsis",
+      "index": 63,
+      "before": "Audit persisted page",
+      "after": "Audit persisted p…"
+    },
+    {
+      "frame": "8283:935",
+      "node": "8283:1042",
+      "action": "ellipsis",
+      "index": 64,
+      "before": "Audit after checkpoint",
+      "after": "Audit after check…"
+    },
+    {
+      "frame": "8283:935",
+      "node": "8283:1048",
+      "action": "shadow",
+      "index": 67
+    },
+    {
+      "frame": "8283:935",
+      "node": "8283:1058",
+      "action": "shadow",
+      "index": 74
+    },
+    {
+      "frame": "8283:935",
+      "node": "8283:1060",
+      "action": "shadow",
+      "index": 75
+    },
+    {
+      "frame": "8283:935",
+      "node": "8283:1062",
+      "action": "shadow",
+      "index": 76
+    },
+    {
+      "frame": "8283:935",
+      "node": "8283:1064",
+      "action": "shadow",
+      "index": 77
+    },
+    {
+      "frame": "8283:935",
+      "node": "8283:1065",
+      "action": "shadow",
+      "index": 78
+    },
+    {
+      "frame": "8283:935",
+      "node": "8283:1066",
+      "action": "shadow",
+      "index": 79
+    },
+    {
+      "frame": "8283:935",
+      "node": "8283:1093",
+      "action": "shadow",
+      "index": 97
+    },
+    {
+      "frame": "8283:935",
+      "node": "8283:1096",
+      "action": "hideSrOnly",
+      "index": 99
+    },
+    {
+      "frame": "8283:935",
+      "node": "8283:1097",
+      "action": "hideSrOnly",
+      "index": 100
+    },
+    {
+      "frame": "8283:935",
+      "node": "8283:1137",
+      "action": "shadow",
+      "index": 126
+    },
+    {
+      "frame": "8283:935",
+      "node": "8283:1165",
+      "action": "mono",
+      "index": 150
+    },
+    {
+      "frame": "8283:935",
+      "node": "8283:1176",
+      "action": "mono",
+      "index": 158
+    },
+    {
+      "frame": "8283:935",
+      "node": "8283:1192",
+      "action": "shadow",
+      "index": 170
+    },
+    {
+      "frame": "8283:935",
+      "node": "8283:1193",
+      "action": "mono",
+      "index": 171
+    },
+    {
+      "frame": "8283:935",
+      "node": "8283:1208",
+      "action": "mono",
+      "index": 184
+    },
+    {
+      "frame": "8283:935",
+      "node": "8283:1217",
+      "action": "mono",
+      "index": 190
+    },
+    {
+      "frame": "8283:935",
+      "node": "8283:1234",
+      "action": "shadow",
+      "index": 203
+    },
+    {
+      "frame": "8283:1249",
+      "node": "8283:1262",
+      "action": "shadow",
+      "index": 11
+    },
+    {
+      "frame": "8283:1249",
+      "node": "8283:1281",
+      "action": "shadow",
+      "index": 23
+    },
+    {
+      "frame": "8283:1249",
+      "node": "8283:1339",
+      "action": "mono",
+      "index": 50
+    },
+    {
+      "frame": "8283:1249",
+      "node": "8283:1342",
+      "action": "mono",
+      "index": 53
+    },
+    {
+      "frame": "8283:1249",
+      "node": "8283:1440",
+      "action": "ellipsis",
+      "index": 98,
+      "before": "Audit persisted page",
+      "after": "Audit persisted p…"
+    },
+    {
+      "frame": "8283:1249",
+      "node": "8283:1441",
+      "action": "ellipsis",
+      "index": 99,
+      "before": "Audit after checkpoint",
+      "after": "Audit after check…"
+    },
+    {
+      "frame": "8283:1249",
+      "node": "8283:1447",
+      "action": "shadow",
+      "index": 102
+    },
+    {
+      "frame": "8283:1249",
+      "node": "8283:1457",
+      "action": "shadow",
+      "index": 109
+    },
+    {
+      "frame": "8283:1249",
+      "node": "8283:1459",
+      "action": "shadow",
+      "index": 110
+    },
+    {
+      "frame": "8283:1249",
+      "node": "8283:1461",
+      "action": "shadow",
+      "index": 111
+    },
+    {
+      "frame": "8283:1249",
+      "node": "8283:1463",
+      "action": "shadow",
+      "index": 112
+    },
+    {
+      "frame": "8283:1249",
+      "node": "8283:1464",
+      "action": "shadow",
+      "index": 113
+    },
+    {
+      "frame": "8283:1249",
+      "node": "8283:1465",
+      "action": "shadow",
+      "index": 114
+    },
+    {
+      "frame": "8283:1249",
+      "node": "8283:1492",
+      "action": "shadow",
+      "index": 132
+    },
+    {
+      "frame": "8283:1249",
+      "node": "8283:1495",
+      "action": "hideSrOnly",
+      "index": 134
+    },
+    {
+      "frame": "8283:1249",
+      "node": "8283:1496",
+      "action": "hideSrOnly",
+      "index": 135
+    },
+    {
+      "frame": "8283:1249",
+      "node": "8283:1536",
+      "action": "shadow",
+      "index": 161
+    },
+    {
+      "frame": "8283:1249",
+      "node": "8283:1564",
+      "action": "mono",
+      "index": 185
+    },
+    {
+      "frame": "8283:1249",
+      "node": "8283:1575",
+      "action": "mono",
+      "index": 193
+    },
+    {
+      "frame": "8283:1249",
+      "node": "8283:1591",
+      "action": "shadow",
+      "index": 205
+    },
+    {
+      "frame": "8283:1249",
+      "node": "8283:1592",
+      "action": "mono",
+      "index": 206
+    },
+    {
+      "frame": "8283:1249",
+      "node": "8283:1607",
+      "action": "mono",
+      "index": 219
+    },
+    {
+      "frame": "8283:1249",
+      "node": "8283:1616",
+      "action": "mono",
+      "index": 225
+    },
+    {
+      "frame": "8283:1249",
+      "node": "8283:1633",
+      "action": "shadow",
+      "index": 238
+    },
+    {
+      "frame": "8283:1249",
+      "node": "8283:1646",
+      "action": "shadow",
+      "index": 243
+    },
+    {
+      "frame": "8283:1654",
+      "node": "8283:1667",
+      "action": "shadow",
+      "index": 11
+    },
+    {
+      "frame": "8283:1654",
+      "node": "8283:1744",
+      "action": "mono",
+      "index": 50
+    },
+    {
+      "frame": "8283:1654",
+      "node": "8283:1747",
+      "action": "mono",
+      "index": 53
+    },
+    {
+      "frame": "8283:1654",
+      "node": "8283:1750",
+      "action": "mono",
+      "index": 56
+    },
+    {
+      "frame": "8283:1654",
+      "node": "8283:1753",
+      "action": "mono",
+      "index": 59
+    },
+    {
+      "frame": "8283:1654",
+      "node": "8283:1756",
+      "action": "mono",
+      "index": 62
+    },
+    {
+      "frame": "8283:1654",
+      "node": "8283:1793",
+      "action": "ellipsis",
+      "index": 98,
+      "before": "Audit persisted page",
+      "after": "Audit persisted p…"
+    },
+    {
+      "frame": "8283:1654",
+      "node": "8283:1794",
+      "action": "ellipsis",
+      "index": 99,
+      "before": "Audit after checkpoint",
+      "after": "Audit after check…"
+    },
+    {
+      "frame": "8283:1654",
+      "node": "8283:1800",
+      "action": "shadow",
+      "index": 102
+    },
+    {
+      "frame": "8283:1654",
+      "node": "8283:1810",
+      "action": "shadow",
+      "index": 109
+    },
+    {
+      "frame": "8283:1654",
+      "node": "8283:1812",
+      "action": "shadow",
+      "index": 110
+    },
+    {
+      "frame": "8283:1654",
+      "node": "8283:1814",
+      "action": "shadow",
+      "index": 111
+    },
+    {
+      "frame": "8283:1654",
+      "node": "8283:1816",
+      "action": "shadow",
+      "index": 112
+    },
+    {
+      "frame": "8283:1654",
+      "node": "8283:1817",
+      "action": "shadow",
+      "index": 113
+    },
+    {
+      "frame": "8283:1654",
+      "node": "8283:1818",
+      "action": "shadow",
+      "index": 114
+    },
+    {
+      "frame": "8283:1654",
+      "node": "8283:1845",
+      "action": "shadow",
+      "index": 132
+    },
+    {
+      "frame": "8283:1654",
+      "node": "8283:1848",
+      "action": "hideSrOnly",
+      "index": 134
+    },
+    {
+      "frame": "8283:1654",
+      "node": "8283:1849",
+      "action": "hideSrOnly",
+      "index": 135
+    },
+    {
+      "frame": "8283:1654",
+      "node": "8283:1889",
+      "action": "shadow",
+      "index": 161
+    },
+    {
+      "frame": "8283:1654",
+      "node": "8283:1917",
+      "action": "mono",
+      "index": 185
+    },
+    {
+      "frame": "8283:1654",
+      "node": "8283:1928",
+      "action": "mono",
+      "index": 193
+    },
+    {
+      "frame": "8283:1654",
+      "node": "8283:1944",
+      "action": "shadow",
+      "index": 205
+    },
+    {
+      "frame": "8283:1654",
+      "node": "8283:1945",
+      "action": "mono",
+      "index": 206
+    },
+    {
+      "frame": "8283:1654",
+      "node": "8283:1960",
+      "action": "mono",
+      "index": 219
+    },
+    {
+      "frame": "8283:1654",
+      "node": "8283:1969",
+      "action": "mono",
+      "index": 225
+    },
+    {
+      "frame": "8283:1654",
+      "node": "8283:1986",
+      "action": "shadow",
+      "index": 238
+    },
+    {
+      "frame": "8283:1998",
+      "node": "8283:2011",
+      "action": "shadow",
+      "index": 11
+    },
+    {
+      "frame": "8283:1998",
+      "node": "8283:2043",
+      "action": "shadow",
+      "index": 29
+    },
+    {
+      "frame": "8283:1998",
+      "node": "8283:2117",
+      "action": "ellipsis",
+      "index": 72,
+      "before": "Audit persisted page",
+      "after": "Audit persisted p…"
+    },
+    {
+      "frame": "8283:1998",
+      "node": "8283:2118",
+      "action": "ellipsis",
+      "index": 73,
+      "before": "Audit after checkpoint",
+      "after": "Audit after check…"
+    },
+    {
+      "frame": "8283:1998",
+      "node": "8283:2124",
+      "action": "shadow",
+      "index": 76
+    },
+    {
+      "frame": "8283:1998",
+      "node": "8283:2134",
+      "action": "shadow",
+      "index": 83
+    },
+    {
+      "frame": "8283:1998",
+      "node": "8283:2136",
+      "action": "shadow",
+      "index": 84
+    },
+    {
+      "frame": "8283:1998",
+      "node": "8283:2138",
+      "action": "shadow",
+      "index": 85
+    },
+    {
+      "frame": "8283:1998",
+      "node": "8283:2140",
+      "action": "shadow",
+      "index": 86
+    },
+    {
+      "frame": "8283:1998",
+      "node": "8283:2141",
+      "action": "shadow",
+      "index": 87
+    },
+    {
+      "frame": "8283:1998",
+      "node": "8283:2142",
+      "action": "shadow",
+      "index": 88
+    },
+    {
+      "frame": "8283:1998",
+      "node": "8283:2169",
+      "action": "shadow",
+      "index": 106
+    },
+    {
+      "frame": "8283:1998",
+      "node": "8283:2172",
+      "action": "hideSrOnly",
+      "index": 108
+    },
+    {
+      "frame": "8283:1998",
+      "node": "8283:2173",
+      "action": "hideSrOnly",
+      "index": 109
+    },
+    {
+      "frame": "8283:1998",
+      "node": "8283:2213",
+      "action": "shadow",
+      "index": 135
+    },
+    {
+      "frame": "8283:1998",
+      "node": "8283:2241",
+      "action": "mono",
+      "index": 159
+    },
+    {
+      "frame": "8283:1998",
+      "node": "8283:2252",
+      "action": "mono",
+      "index": 167
+    },
+    {
+      "frame": "8283:1998",
+      "node": "8283:2268",
+      "action": "shadow",
+      "index": 179
+    },
+    {
+      "frame": "8283:1998",
+      "node": "8283:2269",
+      "action": "mono",
+      "index": 180
+    },
+    {
+      "frame": "8283:1998",
+      "node": "8283:2284",
+      "action": "mono",
+      "index": 193
+    },
+    {
+      "frame": "8283:1998",
+      "node": "8283:2293",
+      "action": "mono",
+      "index": 199
+    },
+    {
+      "frame": "8283:1998",
+      "node": "8283:2310",
+      "action": "shadow",
+      "index": 212
+    },
+    {
+      "frame": "8283:2325",
+      "node": "8283:2338",
+      "action": "shadow",
+      "index": 11
+    },
+    {
+      "frame": "8283:2325",
+      "node": "8283:2398",
+      "action": "shadow",
+      "index": 42
+    },
+    {
+      "frame": "8283:2325",
+      "node": "8283:2418",
+      "action": "shadow",
+      "index": 51
+    },
+    {
+      "frame": "8283:2523",
+      "node": "8283:2536",
+      "action": "shadow",
+      "index": 11
+    },
+    {
+      "frame": "8283:2523",
+      "node": "8283:2602",
+      "action": "uppercase",
+      "index": 45,
+      "before": "Collections",
+      "after": "COLLECTIONS"
+    },
+    {
+      "frame": "8283:2523",
+      "node": "8283:2603",
+      "action": "mono",
+      "index": 46
+    },
+    {
+      "frame": "8283:2523",
+      "node": "8283:2608",
+      "action": "mono",
+      "index": 50
+    },
+    {
+      "frame": "8283:2523",
+      "node": "8283:2613",
+      "action": "uppercase",
+      "index": 55,
+      "before": "Data",
+      "after": "DATA"
+    },
+    {
+      "frame": "8283:2523",
+      "node": "8283:2619",
+      "action": "mono",
+      "index": 58
+    },
+    {
+      "frame": "8283:2523",
+      "node": "8283:2625",
+      "action": "mono",
+      "index": 62
+    },
+    {
+      "frame": "8283:2523",
+      "node": "8283:2633",
+      "action": "mono",
+      "index": 66
+    },
+    {
+      "frame": "8283:2523",
+      "node": "8283:2640",
+      "action": "ellipsis",
+      "index": 72,
+      "before": "Audit persisted page",
+      "after": "Audit persisted p…"
+    },
+    {
+      "frame": "8283:2523",
+      "node": "8283:2641",
+      "action": "ellipsis",
+      "index": 73,
+      "before": "Audit after checkpoint",
+      "after": "Audit after check…"
+    },
+    {
+      "frame": "8283:2523",
+      "node": "8283:2647",
+      "action": "shadow",
+      "index": 76
+    },
+    {
+      "frame": "8283:2523",
+      "node": "8283:2657",
+      "action": "shadow",
+      "index": 83
+    },
+    {
+      "frame": "8283:2523",
+      "node": "8283:2659",
+      "action": "shadow",
+      "index": 84
+    },
+    {
+      "frame": "8283:2523",
+      "node": "8283:2660",
+      "action": "shadow",
+      "index": 85
+    },
+    {
+      "frame": "8283:2523",
+      "node": "8283:2661",
+      "action": "shadow",
+      "index": 86
+    },
+    {
+      "frame": "8283:2523",
+      "node": "8283:2662",
+      "action": "shadow",
+      "index": 87
+    },
+    {
+      "frame": "8283:2523",
+      "node": "8283:2663",
+      "action": "shadow",
+      "index": 88
+    },
+    {
+      "frame": "8283:2523",
+      "node": "8283:2732",
+      "action": "uppercase",
+      "index": 129,
+      "before": "Title",
+      "after": "TITLE"
+    },
+    {
+      "frame": "8283:2523",
+      "node": "8283:2733",
+      "action": "uppercase",
+      "index": 130,
+      "before": "Updated",
+      "after": "UPDATED"
+    },
+    {
+      "frame": "8283:2523",
+      "node": "8283:2742",
+      "action": "shadow",
+      "index": 138
+    }
+  ],
+  "errors": [],
+  "transparentShadowStacksSkipped": 21,
+  "counts": {
+    "shadow": 106,
+    "ellipsis": 18,
+    "hideSrOnly": 14,
+    "mono": 47,
+    "uppercase": 4
+  }
+}

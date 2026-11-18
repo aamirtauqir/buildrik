@@ -1,0 +1,51 @@
+[
+  {
+    "x": 720,
+    "y": 293,
+    "shot": "r35-input-email.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-18380&starting-point-node-id=8843%3A18380&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 1155,
+    "y": 117,
+    "shot": "r35-input-style-final.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-18380&starting-point-node-id=8843%3A18380&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 1390,
+    "y": 90,
+    "shot": "r35-input-context-retained.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-18380&starting-point-node-id=8843%3A18380&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "goto": "8850:17366",
+    "wait": 5000,
+    "shot": "r35-media-1024-start.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8850-17366&starting-point-node-id=8850%3A17366&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 600,
+    "y": 315,
+    "shot": "r35-media-1024-details.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8850-17366&starting-point-node-id=8850%3A17366&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 1050,
+    "y": 72,
+    "shot": "r35-media-1024-return.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8850-17366&starting-point-node-id=8850%3A17366&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "goto": "8884:17236",
+    "wait": 5000,
+    "shot": "r35-layers-start.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8884-17236&starting-point-node-id=8884%3A17236&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

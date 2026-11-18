@@ -1,0 +1,9 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "[{\"frame\":\"8293:1528\",\"node\":\"8293:1829\",\"action\":\"oklab placeholder paint\",\"source\":\"oklab(0.210081 -0.00294439 -0.0316202 / 0.5)\",\"y\":481.81561279296875},{\"frame\":\"8293:2168\",\"node\":\"8293:2463\",\"action\":\"oklab placeholder paint\",\"source\":\"oklab(0.210081 -0.00294439 -0.0316202 / 0.5)\",\"y\":563.1599731445312},{\"frame\":\"8293:2168\",\"node\":\"8306:241558\",\"action\":\"md toggle thumb\",\"sourceIndex\":193},{\"frame\":\"8293:2168\",\"node\":\"8306:241559\",\"action\":\"md toggle thumb\",\"sourceIndex\":196}]"
+    }
+  ],
+  "isError": false
+}

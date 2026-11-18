@@ -1,0 +1,73 @@
+[
+  {
+    "key": "R01",
+    "id": "8318:243977",
+    "cards": [
+      "8318:243980",
+      "8318:243991"
+    ],
+    "noteId": "8318:244002",
+    "actions": {
+      "libraryRetry": "8318:243986",
+      "libraryBack": "8318:243988",
+      "componentRetry": "8318:243997",
+      "componentBack": "8318:243999"
+    },
+    "createdNodeIds": [
+      "8318:243977",
+      "8318:243978",
+      "8318:243979",
+      "8318:243980",
+      "8318:243981",
+      "8318:243982",
+      "8318:243983",
+      "8318:243984",
+      "8318:243985",
+      "8318:243986",
+      "I8318:243986;8314:4",
+      "8318:243988",
+      "I8318:243988;8314:6",
+      "8318:243990",
+      "8318:243991",
+      "8318:243992",
+      "8318:243993",
+      "8318:243994",
+      "8318:243995",
+      "8318:243996",
+      "8318:243997",
+      "I8318:243997;8314:4",
+      "8318:243999",
+      "I8318:243999;8314:6",
+      "8318:244001",
+      "8318:244002",
+      "8318:244003",
+      "8318:244004"
+    ],
+    "types": {
+      "FRAME": 6,
+      "TEXT": 18,
+      "INSTANCE": 4
+    },
+    "imageFills": [],
+    "fonts": [
+      "Inter"
+    ],
+    "x": 3400,
+    "y": 7500,
+    "width": 1440,
+    "height": 760,
+    "findings": [
+      "WS-02",
+      "WS-03"
+    ],
+    "screenshot": "tobe-root-validation/R01-recovery.png",
+    "validation": "Screenshot inspected; editable native Auto Layout cards; shared button instances; no app/backend action. Retry and caller-return are proposed design controls.",
+    "sourceEvidence": [
+      "src/services/componentSync.ts:37",
+      "src/services/syncRetryQueue.ts:58",
+      "WORKSPACES-SERVICES-COVERAGE.md#ws-02",
+      "WORKSPACES-SERVICES-COVERAGE.md#ws-03",
+      "src/services/componentSync.ts:184-193 fetchComponentLibrary catch returns []"
+    ]
+  }
+]

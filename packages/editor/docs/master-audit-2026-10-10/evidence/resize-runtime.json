@@ -1,0 +1,142 @@
+{
+  "method": "Disposable demo; fixture width/height/zoom set through Composer, gestures use actual DOM handles and Playwright pointer/keyboard",
+  "resizeResults": [
+    {
+      "zoom": 50,
+      "gesture": "right edge +20 screen px",
+      "before": {
+        "zoom": 50,
+        "model": {
+          "font-size": "var(--buildrick-design-font-size-4xl)",
+          "font-weight": "700",
+          "line-height": "1.2",
+          "margin-bottom": "var(--buildrick-design-space-5)",
+          "width": "400px",
+          "height": "80px"
+        },
+        "computed": {
+          "width": "400px",
+          "height": "80px"
+        },
+        "rect": {
+          "x": 494,
+          "y": 304.75,
+          "width": 200,
+          "height": 40
+        }
+      },
+      "after": {
+        "zoom": 50,
+        "model": {
+          "font-size": "var(--buildrick-design-font-size-4xl)",
+          "font-weight": "700",
+          "line-height": "1.2",
+          "margin-bottom": "var(--buildrick-design-space-5)",
+          "width": "220px",
+          "height": "40px"
+        },
+        "computed": {
+          "width": "220px",
+          "height": "40px"
+        },
+        "rect": {
+          "x": 494,
+          "y": 304.75,
+          "width": 110,
+          "height": 20
+        }
+      }
+    },
+    {
+      "zoom": 100,
+      "gesture": "right edge +20 screen px",
+      "before": {
+        "zoom": 100,
+        "model": {
+          "font-size": "var(--buildrick-design-font-size-4xl)",
+          "font-weight": "700",
+          "line-height": "1.2",
+          "margin-bottom": "var(--buildrick-design-space-5)",
+          "width": "400px",
+          "height": "80px"
+        },
+        "computed": {
+          "width": "400px",
+          "height": "80px"
+        },
+        "rect": {
+          "x": 384,
+          "y": 136,
+          "width": 400,
+          "height": 80
+        }
+      },
+      "after": {
+        "zoom": 100,
+        "model": {
+          "font-size": "var(--buildrick-design-font-size-4xl)",
+          "font-weight": "700",
+          "line-height": "1.2",
+          "margin-bottom": "var(--buildrick-design-space-5)",
+          "width": "420px",
+          "height": "80px"
+        },
+        "computed": {
+          "width": "420px",
+          "height": "80px"
+        },
+        "rect": {
+          "x": 384,
+          "y": 136,
+          "width": 420,
+          "height": 80
+        }
+      }
+    }
+  ],
+  "keyboardResize": {
+    "before": {
+      "zoom": 100,
+      "model": {
+        "font-size": "var(--buildrick-design-font-size-4xl)",
+        "font-weight": "700",
+        "line-height": "1.2",
+        "margin-bottom": "var(--buildrick-design-space-5)",
+        "width": "400px",
+        "height": "80px"
+      },
+      "computed": {
+        "width": "400px",
+        "height": "80px"
+      },
+      "rect": {
+        "x": 384,
+        "y": 136,
+        "width": 400,
+        "height": 80
+      }
+    },
+    "after": {
+      "zoom": 100,
+      "model": {
+        "font-size": "var(--buildrick-design-font-size-4xl)",
+        "font-weight": "700",
+        "line-height": "1.2",
+        "margin-bottom": "var(--buildrick-design-space-5)",
+        "width": "NaNpx",
+        "height": "80px"
+      },
+      "computed": {
+        "width": "984px",
+        "height": "80px"
+      },
+      "rect": {
+        "x": 384,
+        "y": 136,
+        "width": 984,
+        "height": 80
+      }
+    }
+  },
+  "pageErrors": []
+}

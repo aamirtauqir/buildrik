@@ -1,0 +1,72 @@
+{
+  "date": "2026-10-11T19:38:20.172Z",
+  "scope": "Finite Figma prototype playback. No service effects.",
+  "steps": [
+    {
+      "label": "Export close returns site menu",
+      "sourceNodeId": "8318:1512",
+      "xy": [
+        1023,
+        106
+      ],
+      "expected": "8318-911",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8318-911&starting-point-node-id=8318%3A1310&hide-ui=1",
+      "pass": true
+    },
+    {
+      "label": "Export cancel returns site menu",
+      "sourceNodeId": "8318:1566",
+      "xy": [
+        464,
+        786
+      ],
+      "expected": "8318-911",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8318-911&starting-point-node-id=8318%3A1310&hide-ui=1",
+      "pass": true
+    },
+    {
+      "label": "Media Use after caller repair",
+      "sourceNodeId": "8317:287",
+      "xy": [
+        1226,
+        734
+      ],
+      "expected": "8332-2360",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8332-2360&starting-point-node-id=8317%3A201&hide-ui=1",
+      "pass": true
+    },
+    {
+      "label": "Full library cancel preserves chooser",
+      "sourceNodeId": "8317:204",
+      "xy": [
+        94,
+        28
+      ],
+      "expected": "8318-751",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8318-751&starting-point-node-id=8317%3A201&hide-ui=1",
+      "pass": true
+    },
+    {
+      "label": "Chooser Escape restores Project image",
+      "sourceNodeId": "8318:751",
+      "xy": [
+        "Escape",
+        0
+      ],
+      "expected": "8317-242981",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8317-242981&starting-point-node-id=8317%3A201&hide-ui=1",
+      "pass": true
+    },
+    {
+      "label": "Invalid CMS Create remains inactive",
+      "sourceNodeId": "8318:243972",
+      "xy": [
+        955,
+        713
+      ],
+      "expected": "8318-243842",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8318-243842&starting-point-node-id=8318%3A243842&hide-ui=1",
+      "pass": true
+    }
+  ]
+}

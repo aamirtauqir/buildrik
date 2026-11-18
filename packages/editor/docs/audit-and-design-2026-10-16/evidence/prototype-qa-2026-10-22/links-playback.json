@@ -1,0 +1,15 @@
+[
+  {
+    "fixtureLoad": "423:100464",
+    "actual": "423:100464"
+  },
+  {
+    "origin": "423:100464",
+    "label": "Class-first styling \u2192",
+    "input": "Tab focus then Enter",
+    "expectedNode": "415:50289",
+    "actual": "415:50289",
+    "pass": true,
+    "navigation": "same tab"
+  }
+]

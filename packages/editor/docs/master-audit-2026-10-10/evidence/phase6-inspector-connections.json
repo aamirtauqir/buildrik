@@ -1,0 +1,667 @@
+{
+  "mutatedNodeIds": [
+    "8332:838",
+    "8332:975",
+    "8332:836",
+    "8332:1045",
+    "8332:1043",
+    "8332:1254",
+    "8332:1252",
+    "8332:1466",
+    "8332:1464",
+    "8332:1675",
+    "8332:1673",
+    "8332:1887",
+    "8332:1885",
+    "8332:2127",
+    "8332:2125",
+    "8332:2370",
+    "8332:2368",
+    "8317:247330",
+    "8317:247110",
+    "8317:247119",
+    "8317:247108",
+    "8332:1234",
+    "8332:1236",
+    "8332:1238",
+    "8332:1446",
+    "8332:1449",
+    "8332:1451",
+    "8332:1867",
+    "8332:1870",
+    "8332:1872",
+    "8332:2355",
+    "8332:930",
+    "8332:1579",
+    "8332:2000",
+    "8332:1035",
+    "8332:1244",
+    "8332:1665",
+    "8312:2"
+  ],
+  "flows": [
+    {
+      "nodeId": "8318:244368",
+      "name": "Pages · create blank page"
+    },
+    {
+      "nodeId": "8317:297",
+      "name": "Editor · Home Desktop"
+    },
+    {
+      "nodeId": "8317:243948",
+      "name": "Pages · switch page"
+    },
+    {
+      "nodeId": "8317:245051",
+      "name": "Publish · simulated checks"
+    },
+    {
+      "nodeId": "8317:245216",
+      "name": "Preview · Home Mobile"
+    },
+    {
+      "nodeId": "8317:246897",
+      "name": "Components · reset, detach and master"
+    },
+    {
+      "nodeId": "8317:247144",
+      "name": "Inspector · unlock selection"
+    }
+  ],
+  "connections": [
+    {
+      "sourceId": "8317:247330",
+      "destinationId": "8332:828",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8332:828",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8332:828",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ]
+    },
+    {
+      "sourceId": "8317:247110",
+      "destinationId": "8332:1035",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8332:1035",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8332:1035",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ]
+    },
+    {
+      "sourceId": "8317:247119",
+      "destinationId": "8332:1244",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8332:1244",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8332:1244",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ]
+    },
+    {
+      "sourceId": "8317:247108",
+      "destinationId": "8332:2117",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8332:2117",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8332:2117",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ]
+    },
+    {
+      "sourceId": "8332:1234",
+      "destinationId": "8317:246897",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8317:246897",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8317:246897",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ]
+    },
+    {
+      "sourceId": "8332:1236",
+      "destinationId": "8332:1244",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8332:1244",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8332:1244",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ]
+    },
+    {
+      "sourceId": "8332:1238",
+      "destinationId": "8332:1665",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8332:1665",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8332:1665",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ]
+    },
+    {
+      "sourceId": "8332:1446",
+      "destinationId": "8317:246897",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8317:246897",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8317:246897",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ]
+    },
+    {
+      "sourceId": "8332:1449",
+      "destinationId": "8317:246897",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8317:246897",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8317:246897",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ]
+    },
+    {
+      "sourceId": "8332:1451",
+      "destinationId": "8332:1456",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8332:1456",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8332:1456",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ]
+    },
+    {
+      "sourceId": "8332:1867",
+      "destinationId": "8317:246897",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8317:246897",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8317:246897",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ]
+    },
+    {
+      "sourceId": "8332:1870",
+      "destinationId": "8317:246897",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8317:246897",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8317:246897",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ]
+    },
+    {
+      "sourceId": "8332:1872",
+      "destinationId": "8332:1877",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8332:1877",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8332:1877",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ]
+    },
+    {
+      "sourceId": "8332:2355",
+      "destinationId": "8317:246897",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8317:246897",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8317:246897",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ]
+    },
+    {
+      "sourceId": "8332:930",
+      "destinationId": "8317:247144",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8317:247144",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8317:247144",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ]
+    },
+    {
+      "sourceId": "8332:1579",
+      "destinationId": "8317:246897",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8317:246897",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8317:246897",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ]
+    },
+    {
+      "sourceId": "8332:2000",
+      "destinationId": "8317:246897",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8317:246897",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8317:246897",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ]
+    },
+    {
+      "sourceId": "8332:1035",
+      "destinationId": "8317:246897",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8317:246897",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8317:246897",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_KEY_DOWN",
+            "device": "KEYBOARD",
+            "keyCodes": [
+              27
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "sourceId": "8332:1244",
+      "destinationId": "8317:246897",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8317:246897",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8317:246897",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_KEY_DOWN",
+            "device": "KEYBOARD",
+            "keyCodes": [
+              27
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "sourceId": "8332:1665",
+      "destinationId": "8317:246897",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8317:246897",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8317:246897",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_KEY_DOWN",
+            "device": "KEYBOARD",
+            "keyCodes": [
+              27
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "limits": "Finite state transitions; no persistence, real undo transaction or master data update. Presentation traversal pending."
+}

@@ -1,0 +1,168 @@
+{
+  "date": "2026-10-12T09:17:06.738Z",
+  "scope": "Authored Figma transitions, no backend operations",
+  "steps": [
+    {
+      "from": "T01",
+      "label": "Use descriptive alt",
+      "to": "T02",
+      "x": 1265,
+      "y": 759,
+      "pass": true,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8507%3A2799&hide-ui=1"
+    },
+    {
+      "from": "T02",
+      "label": "Undo alt text",
+      "to": "T01",
+      "x": 1265,
+      "y": 759,
+      "pass": true,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-2799&starting-point-node-id=8507%3A2799&hide-ui=1"
+    },
+    {
+      "from": "T01",
+      "label": "View email field",
+      "to": "T03",
+      "x": 1265,
+      "y": 799,
+      "pass": true,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-246872&starting-point-node-id=8507%3A2799&hide-ui=1"
+    },
+    {
+      "from": "T03",
+      "label": "Make field required",
+      "to": "T04",
+      "x": 1265,
+      "y": 759,
+      "pass": true,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-247087&starting-point-node-id=8507%3A2799&hide-ui=1"
+    },
+    {
+      "from": "T04",
+      "label": "Undo required",
+      "to": "T03",
+      "x": 1265,
+      "y": 759,
+      "pass": true,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-246872&starting-point-node-id=8507%3A2799&hide-ui=1"
+    },
+    {
+      "from": "T03",
+      "label": "Form submission settings",
+      "to": "T05",
+      "x": 1265,
+      "y": 799,
+      "pass": true,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-247302&starting-point-node-id=8507%3A2799&hide-ui=1"
+    },
+    {
+      "from": "T05",
+      "label": "Review redirect",
+      "to": "T06",
+      "x": 1265,
+      "y": 759,
+      "pass": true,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-247507&starting-point-node-id=8507%3A2799&hide-ui=1"
+    },
+    {
+      "from": "T06",
+      "label": "Cancel redirect",
+      "to": "T05",
+      "x": 1265,
+      "y": 759,
+      "pass": true,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-247302&starting-point-node-id=8507%3A2799&hide-ui=1"
+    },
+    {
+      "from": "T05",
+      "label": "Project collection",
+      "to": "T07",
+      "x": 109,
+      "y": 541,
+      "pass": true,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-247712&starting-point-node-id=8507%3A2799&hide-ui=1"
+    },
+    {
+      "from": "T07",
+      "label": "Show 2 items",
+      "to": "T08",
+      "x": 1265,
+      "y": 585,
+      "pass": true,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-247900&starting-point-node-id=8507%3A2799&hide-ui=1"
+    },
+    {
+      "from": "T08",
+      "label": "Undo limit",
+      "to": "T07",
+      "x": 1265,
+      "y": 585,
+      "pass": true,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-247712&starting-point-node-id=8507%3A2799&hide-ui=1"
+    },
+    {
+      "from": "T07",
+      "label": "View component instance",
+      "to": "T09",
+      "x": 1265,
+      "y": 625,
+      "pass": true,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-248087&starting-point-node-id=8507%3A2799&hide-ui=1"
+    },
+    {
+      "from": "T09",
+      "label": "Review reset",
+      "to": "T10",
+      "x": 1265,
+      "y": 759,
+      "pass": true,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-248294&starting-point-node-id=8507%3A2799&hide-ui=1"
+    },
+    {
+      "from": "T10",
+      "label": "Cancel reset",
+      "to": "T09",
+      "x": 1265,
+      "y": 625,
+      "pass": true,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-248087&starting-point-node-id=8507%3A2799&hide-ui=1"
+    },
+    {
+      "from": "T09",
+      "label": "Review reset",
+      "to": "T10",
+      "x": 1265,
+      "y": 759,
+      "pass": true,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-248294&starting-point-node-id=8507%3A2799&hide-ui=1"
+    },
+    {
+      "from": "T10",
+      "label": "Reset this instance",
+      "to": "T11",
+      "x": 1265,
+      "y": 585,
+      "pass": true,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-248469&starting-point-node-id=8507%3A2799&hide-ui=1"
+    },
+    {
+      "from": "T11",
+      "label": "Undo reset",
+      "to": "T09",
+      "x": 1265,
+      "y": 759,
+      "pass": true,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-248087&starting-point-node-id=8507%3A2799&hide-ui=1"
+    },
+    {
+      "from": "T09",
+      "label": "View project image",
+      "to": "T01",
+      "x": 1265,
+      "y": 799,
+      "pass": true,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-2799&starting-point-node-id=8507%3A2799&hide-ui=1"
+    }
+  ]
+}

@@ -1,0 +1,202 @@
+[
+  {
+    "name": "Initial focus Cancel",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "Backward Tab reaches code",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "Code Enter does not approve",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "Approval reachable",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "Forward Tab wraps",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "Backward Tab wraps",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "Escape restores opener and code",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "Receipt focuses Return",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "Receipt Escape retains approved state",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "incorrect no approval, code retained",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "incorrect in-dialog assertive message",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "Incorrect focuses invalid field",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "incorrect returns opener",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "expired no approval, code retained",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "expired in-dialog assertive message",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "Expired focuses resend",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "Resend clears obsolete code",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "expired returns opener",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "failed no approval, code retained",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "failed in-dialog assertive message",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "Failure focuses retry",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "failed returns opener",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "offline no approval, code retained",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "offline in-dialog assertive message",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "offline cancel focus and disabled approval",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "offline reopen preserves restriction",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "offline recovery reachable",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "offline explicit recovery keeps code",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "offline returns opener",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "rate no approval, code retained",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "rate in-dialog assertive message",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "rate cancel focus and disabled approval",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "rate reopen preserves restriction",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "rate recovery reachable",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "rate explicit recovery keeps code",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "rate returns opener",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "Reset cleans label and busy state",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "Dialog fits 320x640",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "Dialog fits 768x640",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "Dialog fits 1440x640",
+    "pass": true,
+    "actual": "true"
+  }
+]

@@ -1,0 +1,558 @@
+{
+  "mutatedNodeIds": [
+    "8317:245208",
+    "8317:244137",
+    "8317:380",
+    "8318:244586",
+    "8317:245300",
+    "8317:314",
+    "8329:925",
+    "8329:927",
+    "8329:1079",
+    "8329:1081",
+    "8329:1137",
+    "8329:1406",
+    "8329:1422",
+    "8329:1708",
+    "8329:1389",
+    "8329:1393",
+    "8312:2"
+  ],
+  "flows": [
+    {
+      "nodeId": "8318:244368",
+      "name": "Flow 3"
+    },
+    {
+      "nodeId": "8317:297",
+      "name": "Editor · Home Desktop"
+    },
+    {
+      "nodeId": "8317:243948",
+      "name": "Pages · switch page"
+    },
+    {
+      "nodeId": "8317:245051",
+      "name": "Publish · simulated checks"
+    },
+    {
+      "nodeId": "8317:245216",
+      "name": "Preview · Home Mobile"
+    }
+  ],
+  "connections": [
+    {
+      "sourceId": "8317:245208",
+      "sourceName": "Save and run checks",
+      "destinationId": "8329:775",
+      "destinationName": "TO-BE P6-RD01 · Publish confirmation / simulated",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8329:775",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8329:775",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ],
+      "limitation": "Explicit switch to assumed ready prototype scenario; no actual save/check executed. Keep label explaining simulation visible."
+    },
+    {
+      "sourceId": "8317:244137",
+      "sourceName": "Row / About",
+      "destinationId": "8329:1083",
+      "destinationName": "TO-BE P6-RD03 · About page selected",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8329:1083",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8329:1083",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ],
+      "limitation": "Existing About page example, distinct from newly created About us."
+    },
+    {
+      "sourceId": "8317:380",
+      "sourceName": "About",
+      "destinationId": "8329:1083",
+      "destinationName": "TO-BE P6-RD03 · About page selected",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8329:1083",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8329:1083",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ],
+      "limitation": "Switches to About Pages-context specimen; no service operation."
+    },
+    {
+      "sourceId": "8318:244586",
+      "sourceName": "Action / Create blank page",
+      "destinationId": "8329:1288",
+      "destinationName": "TO-BE P6-RD04 · About us blank page created",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8329:1288",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8329:1288",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ],
+      "limitation": "Creates only finite named About us design state, not a persisted page."
+    },
+    {
+      "sourceId": "8317:245300",
+      "sourceName": "Back to editor",
+      "destinationId": "8329:1408",
+      "destinationName": "TO-BE P6-RD05 · Home Mobile editing",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8329:1408",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8329:1408",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ],
+      "limitation": "Mobile Home returns to same Mobile Home at100% with Heading selected."
+    },
+    {
+      "sourceId": "8317:314",
+      "sourceName": "Preview",
+      "destinationId": "8329:1629",
+      "destinationName": "TO-BE P6-RD06 · Home Desktop visual preview",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8329:1629",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8329:1629",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ],
+      "limitation": "Desktop Home must not navigate directly to Mobile Preview."
+    },
+    {
+      "sourceId": "8329:925",
+      "sourceName": "RD01 / simulate confirmation",
+      "destinationId": "8329:930",
+      "destinationName": "TO-BE P6-RD02 · Publish simulation boundary",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8329:930",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8329:930",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ],
+      "limitation": "No deployment sent; target/revision/checks are example assumptions."
+    },
+    {
+      "sourceId": "8329:927",
+      "sourceName": "RD01 / cancel to checks",
+      "destinationId": "8317:245051",
+      "destinationName": "TO-BE E09 · Publish / blocked release checks",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8317:245051",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8317:245051",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ],
+      "limitation": "Return to original blocked prototype scenario; does not change real checks."
+    },
+    {
+      "sourceId": "8329:1079",
+      "sourceName": "RD02 / back to editor",
+      "destinationId": "8317:297",
+      "destinationName": "TO-BE E01 · Editor / Heading Style",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8317:297",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8317:297",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ],
+      "limitation": "Finite design transition only"
+    },
+    {
+      "sourceId": "8329:1081",
+      "sourceName": "RD02 / back to checks",
+      "destinationId": "8317:245051",
+      "destinationName": "TO-BE E09 · Publish / blocked release checks",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8317:245051",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8317:245051",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ],
+      "limitation": "Finite design transition only"
+    },
+    {
+      "sourceId": "8329:1137",
+      "sourceName": "RD03 / switch Home",
+      "destinationId": "8317:243948",
+      "destinationName": "TO-BE E03 · Pages / structure and page settings",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8317:243948",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8317:243948",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ],
+      "limitation": "Finite design transition only"
+    },
+    {
+      "sourceId": "8329:1406",
+      "sourceName": "RD04 / return Home",
+      "destinationId": "8317:297",
+      "destinationName": "TO-BE E01 · Editor / Heading Style",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8317:297",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8317:297",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ],
+      "limitation": "Finite design transition only"
+    },
+    {
+      "sourceId": "8329:1422",
+      "sourceName": "RD05 / Preview same Home Mobile",
+      "destinationId": "8317:245216",
+      "destinationName": "TO-BE E10 · Preview / Mobile visual checks",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8317:245216",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8317:245216",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ],
+      "limitation": "Finite design transition only"
+    },
+    {
+      "sourceId": "8329:1708",
+      "sourceName": "RD06 / return Home Desktop",
+      "destinationId": "8317:297",
+      "destinationName": "TO-BE E01 · Editor / Heading Style",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8317:297",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8317:297",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ],
+      "limitation": "Finite design transition only"
+    },
+    {
+      "sourceId": "8329:1389",
+      "sourceName": "RD04 / Pages Home",
+      "destinationId": "8317:243948",
+      "destinationName": "TO-BE E03 · Pages / structure and page settings",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8317:243948",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8317:243948",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ],
+      "limitation": "Finite Home page return; new About us remains a prototype example."
+    },
+    {
+      "sourceId": "8329:1393",
+      "sourceName": "RD04 / Pages About",
+      "destinationId": "8329:1083",
+      "destinationName": "TO-BE P6-RD03 · About page selected",
+      "reactions": [
+        {
+          "action": {
+            "type": "NODE",
+            "destinationId": "8329:1083",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false,
+            "resetScrollPosition": true
+          },
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "8329:1083",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false,
+              "resetScrollPosition": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ],
+      "limitation": "Finite existing About page, distinct from About us."
+    }
+  ],
+  "validation": "Native readback only; presentation traversal pending"
+}

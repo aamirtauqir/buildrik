@@ -1,0 +1,132 @@
+[
+  {
+    "label": "Restore canvas readback",
+    "goto": "8662:13151"
+  },
+  {
+    "label": "Changed Home heading",
+    "x": 720,
+    "y": 839,
+    "shot": "r30-home-before-restore.png",
+    "expected": "8465:3"
+  },
+  {
+    "label": "History",
+    "x": 601,
+    "y": 28
+  },
+  {
+    "label": "Version details",
+    "x": 1264,
+    "y": 457
+  },
+  {
+    "label": "Restore",
+    "x": 720,
+    "y": 597
+  },
+  {
+    "label": "Confirm",
+    "x": 720,
+    "y": 573
+  },
+  {
+    "label": "Return to Editor",
+    "x": 720,
+    "y": 549,
+    "shot": "r30-home-after-restore.png"
+  },
+  {
+    "label": "Reset undo fixture",
+    "goto": "8662:13151"
+  },
+  {
+    "label": "Changed heading",
+    "x": 720,
+    "y": 839
+  },
+  {
+    "label": "History",
+    "x": 601,
+    "y": 28
+  },
+  {
+    "label": "Details",
+    "x": 1264,
+    "y": 457
+  },
+  {
+    "label": "Restore",
+    "x": 720,
+    "y": 597
+  },
+  {
+    "label": "Confirm",
+    "x": 720,
+    "y": 573
+  },
+  {
+    "label": "Undo",
+    "x": 720,
+    "y": 501
+  },
+  {
+    "label": "Return",
+    "x": 720,
+    "y": 525,
+    "shot": "r30-home-after-undo.png"
+  },
+  {
+    "label": "Indexing regression",
+    "goto": "8465:3"
+  },
+  {
+    "label": "Pages",
+    "x": 109,
+    "y": 157
+  },
+  {
+    "label": "Home SEO",
+    "x": 176,
+    "y": 501
+  },
+  {
+    "label": "Allow indexing opens Advanced",
+    "x": 1100,
+    "y": 248
+  },
+  {
+    "label": "Turn indexing Off",
+    "x": 538,
+    "y": 307
+  },
+  {
+    "label": "SEO overview",
+    "x": 116,
+    "y": 129,
+    "shot": "r30-indexing-shared-off.png"
+  },
+  {
+    "label": "SEO error fixture",
+    "goto": "8662:13151"
+  },
+  {
+    "label": "SEO failed request",
+    "x": 720,
+    "y": 647
+  },
+  {
+    "label": "Done",
+    "x": 546,
+    "y": 596,
+    "wait": 1200,
+    "shot": "r30-seo-error.png"
+  },
+  {
+    "label": "Retry save",
+    "x": 720,
+    "y": 501,
+    "wait": 1200,
+    "shot": "r30-seo-retry.png"
+  }
+]

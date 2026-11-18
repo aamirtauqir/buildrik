@@ -1,0 +1,181 @@
+{
+  "collectedDate": "2026-10-21 Asia/Karachi",
+  "webflow": {
+    "source": "https://api.ashbyhq.com/posting-api/job-board/webflow",
+    "careers": "https://webflow.com/company/careers",
+    "jobs": [
+      {
+        "title": "Sales Development Representative (SDR)",
+        "department": "Sales",
+        "jobUrl": "https://jobs.ashbyhq.com/webflow/9d364a71-84cd-4662-a002-8dfe8f5b9449",
+        "location": "Chicago, United States",
+        "isRemote": true
+      },
+      {
+        "title": "Senior Software Engineer, Fullstack",
+        "department": "Engineering",
+        "jobUrl": "https://jobs.ashbyhq.com/webflow/a88c5ceb-df72-471c-856a-a4867b80cd75",
+        "location": "Argentina",
+        "isRemote": true
+      },
+      {
+        "title": "Staff Product Manager, AI",
+        "department": "Product",
+        "jobUrl": "https://jobs.ashbyhq.com/webflow/e456638e-1bab-477d-8f67-024d99d748e9",
+        "location": "United States",
+        "isRemote": true
+      },
+      {
+        "title": "Senior Staff Machine Learning Scientist, Assets",
+        "department": "Engineering",
+        "jobUrl": "https://jobs.ashbyhq.com/webflow/2c7cee27-712c-474a-aa91-8fa168d37745",
+        "location": "United States",
+        "isRemote": true
+      },
+      {
+        "title": "Staff DevOps Engineer, Delivery Loop",
+        "department": "Engineering",
+        "jobUrl": "https://jobs.ashbyhq.com/webflow/906c9e90-3546-417f-a0e8-c60579b2f857",
+        "location": "Argentina",
+        "isRemote": true
+      },
+      {
+        "title": "Account Executive, EMEA (Germany)",
+        "department": "Sales",
+        "jobUrl": "https://jobs.ashbyhq.com/webflow/4c5e75cc-3733-4f8b-ae76-d6a52fef5861",
+        "location": "London, United Kingdom",
+        "isRemote": true
+      },
+      {
+        "title": "Senior Infrastructure Engineer ",
+        "department": "Engineering",
+        "jobUrl": "https://jobs.ashbyhq.com/webflow/01b00f28-8c54-4ced-84c4-6e7b3f0c6828",
+        "location": "Argentina",
+        "isRemote": true
+      },
+      {
+        "title": "Senior Manager, Corporate Sales - West",
+        "department": "Sales",
+        "jobUrl": "https://jobs.ashbyhq.com/webflow/a541de2d-8644-4619-a4e8-fcce390b92b9",
+        "location": "United States",
+        "isRemote": true
+      },
+      {
+        "title": "Senior Software Engineer, Build Loop",
+        "department": "Engineering",
+        "jobUrl": "https://jobs.ashbyhq.com/webflow/8569af2e-2e6e-4ec4-8573-1be336e66215",
+        "location": "Argentina",
+        "isRemote": true
+      },
+      {
+        "title": "Outbound Sales Development Representative (German Speaking) ",
+        "department": "Sales",
+        "jobUrl": "https://jobs.ashbyhq.com/webflow/f96305c7-36a4-45c1-8feb-320c8ac58394",
+        "location": "London, United Kingdom",
+        "isRemote": true
+      },
+      {
+        "title": "Senior Developer Educator",
+        "department": "Customer Education",
+        "jobUrl": "https://jobs.ashbyhq.com/webflow/1af4abdb-56e3-46a2-bf3e-983386fd4ad7",
+        "location": "United States",
+        "isRemote": true
+      },
+      {
+        "title": "Staff Product Designer, Agentic CMS",
+        "department": "Product",
+        "jobUrl": "https://jobs.ashbyhq.com/webflow/4e640a4d-ee08-4297-a479-43b9a0c55819",
+        "location": "United States",
+        "isRemote": true
+      },
+      {
+        "title": "Corporate Account Executive - East",
+        "department": "Sales",
+        "jobUrl": "https://jobs.ashbyhq.com/webflow/6733a6b0-e942-4e54-853a-ebe2e606ba2b",
+        "location": "United States",
+        "isRemote": true
+      },
+      {
+        "title": "Staff Product Manager, Governance",
+        "department": "Product",
+        "jobUrl": "https://jobs.ashbyhq.com/webflow/d4342ae1-fe23-4a3c-aa10-dc6bbff77859",
+        "location": "United States",
+        "isRemote": true
+      },
+      {
+        "title": "Lead Platform Engineer, Identity & Access",
+        "department": "Information Technology",
+        "jobUrl": "https://jobs.ashbyhq.com/webflow/0169b4e6-c993-42ab-a81f-4532f04bbfe5",
+        "location": "United States",
+        "isRemote": true
+      },
+      {
+        "title": "Senior Manager, AI Customer Success",
+        "department": "Sales",
+        "jobUrl": "https://jobs.ashbyhq.com/webflow/211970a8-6193-4a7f-a960-315bbba556be",
+        "location": "United States",
+        "isRemote": true
+      },
+      {
+        "title": "Senior Software Engineer, Cloud (Backend / Infrastructure)",
+        "department": "Engineering",
+        "jobUrl": "https://jobs.ashbyhq.com/webflow/e17b1dd7-001a-4b88-bfd7-65630fe40bcb",
+        "location": "Argentina",
+        "isRemote": true
+      },
+      {
+        "title": "Staff Data Engineer",
+        "department": "Product",
+        "jobUrl": "https://jobs.ashbyhq.com/webflow/4a58e033-f821-4d4e-9151-ea49ff28400b",
+        "location": "U.S. Remote",
+        "isRemote": true
+      }
+    ]
+  },
+  "framer": {
+    "source": "https://www.framer.com/careers/",
+    "jobs": [
+      {
+        "title": "Senior Backend Engineer",
+        "department": "Engineering",
+        "location": "Remote"
+      },
+      {
+        "title": "Senior Site Reliability Engineer",
+        "department": "Engineering",
+        "location": "Remote"
+      },
+      {
+        "title": "Staff Product Engineer",
+        "department": "Engineering",
+        "location": "Remote"
+      },
+      {
+        "title": "Staff/Principal Backend Engineer",
+        "department": "Engineering",
+        "location": "Remote"
+      },
+      {
+        "title": "Tech Lead",
+        "department": "Engineering",
+        "location": "Remote"
+      },
+      {
+        "title": "Analytics Engineer",
+        "department": "Growth",
+        "location": "Remote"
+      },
+      {
+        "title": "Product Designer",
+        "department": "Product",
+        "location": "Remote"
+      },
+      {
+        "title": "Senior Product Engineer",
+        "department": "Engineering",
+        "location": "Remote"
+      }
+    ]
+  },
+  "limits": "Public listings, not headcount or a confirmed roadmap."
+}

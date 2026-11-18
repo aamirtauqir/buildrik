@@ -1,0 +1,19 @@
+[
+  {
+    "label": "Matching media search",
+    "goto": "8819:14287",
+    "wait": 10000
+  },
+  {
+    "label": "Search gradient2",
+    "x": 902,
+    "y": 583,
+    "shot": "r34-media-matching-list-final.png"
+  },
+  {
+    "label": "Keep search in grid",
+    "x": 313,
+    "y": 229,
+    "shot": "r34-media-matching-grid-final.png"
+  }
+]

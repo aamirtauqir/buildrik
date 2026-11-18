@@ -1,0 +1,114 @@
+{
+  "createdNodeIds": [
+    "8627:621",
+    "8627:622",
+    "I8627:622;8314:4",
+    "8627:624",
+    "I8627:624;8314:8",
+    "8627:626",
+    "8627:627",
+    "I8627:627;8314:8",
+    "8627:629",
+    "I8627:629;8314:4",
+    "8627:631",
+    "8627:632",
+    "8627:633",
+    "8627:634",
+    "8627:635",
+    "8627:636",
+    "8627:637",
+    "8627:638",
+    "8627:639",
+    "8627:640",
+    "8627:641",
+    "8627:642",
+    "8627:643",
+    "8627:644",
+    "8627:645",
+    "8627:646",
+    "8627:647"
+  ],
+  "mutatedNodeIds": [],
+  "components": {
+    "switchSet": "8627:631",
+    "switches": [
+      {
+        "id": "8627:621",
+        "name": "Active=Editor"
+      },
+      {
+        "id": "8627:626",
+        "name": "Active=Build"
+      }
+    ],
+    "summarySet": "8627:647",
+    "summaries": [
+      {
+        "id": "8627:632",
+        "name": "State=Ready",
+        "w": 336,
+        "h": 100
+      },
+      {
+        "id": "8627:635",
+        "name": "State=Running",
+        "w": 336,
+        "h": 100
+      },
+      {
+        "id": "8627:638",
+        "name": "State=Draft",
+        "w": 336,
+        "h": 100
+      },
+      {
+        "id": "8627:641",
+        "name": "State=Applied",
+        "w": 336,
+        "h": 100
+      },
+      {
+        "id": "8627:644",
+        "name": "State=Failed",
+        "w": 336,
+        "h": 100
+      }
+    ]
+  },
+  "collection": {
+    "id": "VariableCollectionId:8627:648",
+    "mode": "8627:2"
+  },
+  "variables": [
+    {
+      "id": "VariableID:8627:649",
+      "name": "home-heading/committed",
+      "type": "STRING"
+    },
+    {
+      "id": "VariableID:8627:650",
+      "name": "home-heading/draft",
+      "type": "STRING"
+    },
+    {
+      "id": "VariableID:8627:651",
+      "name": "home-heading/previous",
+      "type": "STRING"
+    },
+    {
+      "id": "VariableID:8627:652",
+      "name": "navigation/editor-caller",
+      "type": "STRING"
+    },
+    {
+      "id": "VariableID:8627:653",
+      "name": "draft/is-pending",
+      "type": "BOOLEAN"
+    },
+    {
+      "id": "VariableID:8627:654",
+      "name": "fixture/fail-next-run",
+      "type": "BOOLEAN"
+    }
+  ]
+}

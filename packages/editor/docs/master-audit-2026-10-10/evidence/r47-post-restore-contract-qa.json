@@ -1,0 +1,625 @@
+{
+  "scope": "R47 post-shell read-only preservation audit. Existing exact reaction signatures; known critical logical bindings; new icon action equivalence; receipt mutation ancestry. Not browser functionality or complete original-page byte comparison.",
+  "summary": [
+    {
+      "id": "8843:16808",
+      "contractNodes": 146,
+      "reactionsUnchanged": 146,
+      "allBindingsUnchanged": 44
+    },
+    {
+      "id": "8843:20467",
+      "contractNodes": 149,
+      "reactionsUnchanged": 149,
+      "allBindingsUnchanged": 36
+    },
+    {
+      "id": "8841:14864",
+      "contractNodes": 235,
+      "reactionsUnchanged": 235,
+      "allBindingsUnchanged": 235
+    }
+  ],
+  "missing": [],
+  "reactionChanges": [],
+  "bindingChangeCount": 215,
+  "bindingChangesSample": [
+    {
+      "id": "8843:16819",
+      "name": "Action / Preview",
+      "functional": "{\"fills\":[{\"type\":\"VARIABLE_ALIAS\",\"id\":\"VariableID:8322:789\"}],\"strokes\":[{\"type\":\"VARIABLE_ALIAS\",\"id\":\"VariableID:8322:786\"}]}"
+    },
+    {
+      "id": "I8843:16819;8314:6",
+      "name": "Button",
+      "functional": "{}"
+    },
+    {
+      "id": "8843:16820",
+      "name": "Action / Publish",
+      "functional": "{\"fills\":[{\"type\":\"VARIABLE_ALIAS\",\"id\":\"VariableID:2:3\"}],\"strokes\":[{\"type\":\"VARIABLE_ALIAS\",\"id\":\"VariableID:8322:786\"}]}"
+    },
+    {
+      "id": "I8843:16820;8314:6",
+      "name": "Button",
+      "functional": "{\"fills\":[{\"type\":\"VARIABLE_ALIAS\",\"id\":\"VariableID:2:6\"}]}"
+    },
+    {
+      "id": "8843:16822",
+      "name": "Layers panel",
+      "functional": "{\"fills\":[{\"type\":\"VARIABLE_ALIAS\",\"id\":\"VariableID:8322:789\"}],\"strokes\":[{\"type\":\"VARIABLE_ALIAS\",\"id\":\"VariableID:8322:784\"}]}"
+    },
+    {
+      "id": "8843:16823",
+      "name": "Navigator",
+      "functional": "{}"
+    },
+    {
+      "id": "8843:16824",
+      "name": "Action / Layers",
+      "functional": "{}"
+    },
+    {
+      "id": "I8843:16824;8314:8",
+      "name": "Button",
+      "functional": "{}"
+    },
+    {
+      "id": "8843:16825",
+      "name": "Action / Pages",
+      "functional": "{}"
+    },
+    {
+      "id": "I8843:16825;8314:8",
+      "name": "Button",
+      "functional": "{}"
+    },
+    {
+      "id": "8843:16826",
+      "name": "Action / Assets",
+      "functional": "{}"
+    },
+    {
+      "id": "I8843:16826;8314:8",
+      "name": "Button",
+      "functional": "{}"
+    },
+    {
+      "id": "8843:16827",
+      "name": "Action / CMS",
+      "functional": "{}"
+    },
+    {
+      "id": "I8843:16827;8314:8",
+      "name": "Button",
+      "functional": "{}"
+    },
+    {
+      "id": "8843:16828",
+      "name": "Action / Brand variables",
+      "functional": "{}"
+    },
+    {
+      "id": "I8843:16828;8314:8",
+      "name": "Button",
+      "functional": "{}"
+    },
+    {
+      "id": "8843:16831",
+      "name": "Action / Body",
+      "functional": "{}"
+    },
+    {
+      "id": "I8843:16831;8314:8",
+      "name": "Button",
+      "functional": "{}"
+    },
+    {
+      "id": "8843:16832",
+      "name": "Action /   Main section",
+      "functional": "{}"
+    },
+    {
+      "id": "I8843:16832;8314:8",
+      "name": "Button",
+      "functional": "{}"
+    },
+    {
+      "id": "8843:16833",
+      "name": "Action / Heading",
+      "functional": "{}"
+    },
+    {
+      "id": "I8843:16833;8314:8",
+      "name": "Button",
+      "functional": "{}"
+    },
+    {
+      "id": "8843:16834",
+      "name": "Action /     Paragraph",
+      "functional": "{}"
+    },
+    {
+      "id": "I8843:16834;8314:8",
+      "name": "Button",
+      "functional": "{}"
+    },
+    {
+      "id": "8843:16835",
+      "name": "Action /     Primary button",
+      "functional": "{}"
+    },
+    {
+      "id": "I8843:16835;8314:8",
+      "name": "Button",
+      "functional": "{}"
+    },
+    {
+      "id": "8843:16836",
+      "name": "Action /   Project grid",
+      "functional": "{}"
+    },
+    {
+      "id": "I8843:16836;8314:8",
+      "name": "Button",
+      "functional": "{}"
+    },
+    {
+      "id": "8843:16837",
+      "name": "Action / 1 selected element",
+      "functional": "{}"
+    },
+    {
+      "id": "I8843:16837;8314:8",
+      "name": "Button",
+      "functional": "{}"
+    },
+    {
+      "id": "8843:16838",
+      "name": "Studio North\n3 pages \u00b7 Draft site",
+      "functional": "{}"
+    },
+    {
+      "id": "8870:17212",
+      "name": "Action / Element library",
+      "functional": "{}"
+    },
+    {
+      "id": "I8870:17212;8314:8",
+      "name": "Button",
+      "functional": "{}"
+    },
+    {
+      "id": "9064:20040",
+      "name": "Visible on Desktop",
+      "functional": "{\"characters\":{\"type\":\"VARIABLE_ALIAS\",\"id\":\"VariableID:9064:17523\"}}"
+    },
+    {
+      "id": "8843:16839",
+      "name": "Main workspace",
+      "functional": "{\"fills\":[{\"type\":\"VARIABLE_ALIAS\",\"id\":\"VariableID:8322:788\"}]}"
+    }
+  ],
+  "criticalBindings": [
+    {
+      "id": "8843:17103",
+      "key": "width",
+      "expected": "VariableID:8843:17104",
+      "actual": "VariableID:8843:17104",
+      "pass": true
+    },
+    {
+      "id": "8843:20774",
+      "key": "width",
+      "expected": "VariableID:8843:20775",
+      "actual": "VariableID:8843:20775",
+      "pass": true
+    },
+    {
+      "id": "8843:17107",
+      "key": "visible",
+      "expected": "VariableID:9064:17517",
+      "actual": "VariableID:9064:17517",
+      "pass": true
+    },
+    {
+      "id": "8843:20778",
+      "key": "visible",
+      "expected": "VariableID:9064:17554",
+      "actual": "VariableID:9064:17554",
+      "pass": true
+    },
+    {
+      "id": "8843:17018",
+      "key": "visible",
+      "expected": "VariableID:9064:17519",
+      "actual": "VariableID:9064:17519",
+      "pass": true
+    },
+    {
+      "id": "8843:17020",
+      "key": "visible",
+      "expected": "VariableID:9064:17519",
+      "actual": "VariableID:9064:17519",
+      "pass": true
+    },
+    {
+      "id": "8843:20677",
+      "key": "visible",
+      "expected": "VariableID:9064:17556",
+      "actual": "VariableID:9064:17556",
+      "pass": true
+    },
+    {
+      "id": "8843:20679",
+      "key": "visible",
+      "expected": "VariableID:9064:17556",
+      "actual": "VariableID:9064:17556",
+      "pass": true
+    },
+    {
+      "id": "8843:17106",
+      "key": "visible",
+      "expected": "VariableID:8945:17388",
+      "actual": "VariableID:8945:17388",
+      "pass": true
+    },
+    {
+      "id": "8843:17024",
+      "key": "characters",
+      "expected": "VariableID:8905:17366",
+      "actual": "VariableID:8905:17366",
+      "pass": true
+    },
+    {
+      "id": "8843:20683",
+      "key": "characters",
+      "expected": "VariableID:8905:17554",
+      "actual": "VariableID:8905:17554",
+      "pass": true
+    }
+  ],
+  "icons": [
+    {
+      "id": "9091:17651",
+      "buttonId": "8870:17212",
+      "sameActions": true,
+      "descendantReactions": []
+    },
+    {
+      "id": "9091:17656",
+      "buttonId": "8843:16824",
+      "sameActions": true,
+      "descendantReactions": []
+    },
+    {
+      "id": "9091:17662",
+      "buttonId": "8843:16825",
+      "sameActions": true,
+      "descendantReactions": []
+    },
+    {
+      "id": "9091:17667",
+      "buttonId": "8843:16826",
+      "sameActions": true,
+      "descendantReactions": []
+    },
+    {
+      "id": "9091:17673",
+      "buttonId": "8843:16827",
+      "sameActions": true,
+      "descendantReactions": []
+    },
+    {
+      "id": "9091:17680",
+      "buttonId": "8843:16828",
+      "sameActions": true,
+      "descendantReactions": []
+    },
+    {
+      "id": "9091:17689",
+      "buttonId": "8843:16831",
+      "sameActions": true,
+      "descendantReactions": []
+    },
+    {
+      "id": "9091:17695",
+      "buttonId": "8843:16832",
+      "sameActions": true,
+      "descendantReactions": []
+    },
+    {
+      "id": "9091:17701",
+      "buttonId": "8843:16833",
+      "sameActions": true,
+      "descendantReactions": []
+    },
+    {
+      "id": "9091:17707",
+      "buttonId": "8843:16834",
+      "sameActions": true,
+      "descendantReactions": []
+    },
+    {
+      "id": "9091:17713",
+      "buttonId": "8843:16835",
+      "sameActions": true,
+      "descendantReactions": []
+    },
+    {
+      "id": "9091:17719",
+      "buttonId": "8843:16836",
+      "sameActions": true,
+      "descendantReactions": []
+    },
+    {
+      "id": "9091:17731",
+      "buttonId": "8870:17377",
+      "sameActions": true,
+      "descendantReactions": []
+    },
+    {
+      "id": "9091:17736",
+      "buttonId": "8843:20483",
+      "sameActions": true,
+      "descendantReactions": []
+    },
+    {
+      "id": "9091:17742",
+      "buttonId": "8843:20484",
+      "sameActions": true,
+      "descendantReactions": []
+    },
+    {
+      "id": "9091:17747",
+      "buttonId": "8843:20485",
+      "sameActions": true,
+      "descendantReactions": []
+    },
+    {
+      "id": "9091:17753",
+      "buttonId": "8843:20486",
+      "sameActions": true,
+      "descendantReactions": []
+    },
+    {
+      "id": "9091:17760",
+      "buttonId": "8843:20487",
+      "sameActions": true,
+      "descendantReactions": []
+    },
+    {
+      "id": "9091:17769",
+      "buttonId": "8843:20490",
+      "sameActions": true,
+      "descendantReactions": []
+    },
+    {
+      "id": "9091:17775",
+      "buttonId": "8843:20491",
+      "sameActions": true,
+      "descendantReactions": []
+    },
+    {
+      "id": "9091:17781",
+      "buttonId": "8843:20492",
+      "sameActions": true,
+      "descendantReactions": []
+    },
+    {
+      "id": "9091:17787",
+      "buttonId": "8843:20493",
+      "sameActions": true,
+      "descendantReactions": []
+    },
+    {
+      "id": "9091:17793",
+      "buttonId": "8843:20494",
+      "sameActions": true,
+      "descendantReactions": []
+    },
+    {
+      "id": "9091:17799",
+      "buttonId": "8843:20495",
+      "sameActions": true,
+      "descendantReactions": []
+    }
+  ],
+  "devicePaint": [
+    {
+      "id": "8843:16842",
+      "fills": [
+        {
+          "color": {
+            "type": "VARIABLE_ALIAS",
+            "id": "VariableID:8914:17382"
+          }
+        }
+      ],
+      "textFills": [
+        {
+          "id": "I8843:16842;8314:6",
+          "fills": [
+            {}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "9064:20045",
+      "fills": [
+        {
+          "color": {
+            "type": "VARIABLE_ALIAS",
+            "id": "VariableID:9065:19911"
+          }
+        }
+      ],
+      "textFills": [
+        {
+          "id": "I9064:20045;8314:6",
+          "fills": [
+            {}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "8843:16843",
+      "fills": [
+        {
+          "color": {
+            "type": "VARIABLE_ALIAS",
+            "id": "VariableID:8914:17383"
+          }
+        }
+      ],
+      "textFills": [
+        {
+          "id": "I8843:16843;8314:8",
+          "fills": [
+            {}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "8843:20501",
+      "fills": [
+        {
+          "color": {
+            "type": "VARIABLE_ALIAS",
+            "id": "VariableID:8914:17583"
+          }
+        }
+      ],
+      "textFills": [
+        {
+          "id": "I8843:20501;8314:6",
+          "fills": [
+            {}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "9064:20101",
+      "fills": [
+        {
+          "color": {
+            "type": "VARIABLE_ALIAS",
+            "id": "VariableID:9065:19916"
+          }
+        }
+      ],
+      "textFills": [
+        {
+          "id": "I9064:20101;8314:6",
+          "fills": [
+            {}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "8843:20502",
+      "fills": [
+        {
+          "color": {
+            "type": "VARIABLE_ALIAS",
+            "id": "VariableID:8914:17584"
+          }
+        }
+      ],
+      "textFills": [
+        {
+          "id": "I8843:20502;8314:8",
+          "fills": [
+            {}
+          ]
+        }
+      ]
+    }
+  ],
+  "masterMutationIds": [],
+  "originalMutationIds": [],
+  "limitations": [
+    "Combined pre-binding fingerprints include intentionally changed paints/padding/radii; changed hashes cannot alone establish exact logical binding equality. Critical logical aliases verified against earlier manifests.",
+    "No before-byte snapshot of original masters was captured; original/master claim is based on author script plus receipt mutation ancestry, not whole-original equality.",
+    "Semantic Style/Behaviour/Effects integration remains outside this shell audit."
+  ],
+  "mutatedNodeIds": [],
+  "mutatedVariableIds": [],
+  "checkpoint": "Full logical audit after initial shell commit; later targeted foreground correction re-read passes all six aliases.",
+  "evaluatorCorrections": [
+    "Initial three missing header descendant IDs were hidden instance children excluded by API traversal; setting skipInvisibleInstanceChildren=false resolves all three with unchanged reaction signatures.",
+    "Initial direct fontSize expectation predated R38 size variants. Native R38 Heading36 text retains fixed36 and visible alias8945:17388; current expectation passes."
+  ],
+  "pendingVisualStateFix": null,
+  "foregroundCorrection": {
+    "checks": [
+      {
+        "id": "8843:16842",
+        "expected": "VariableID:8914:17384",
+        "actual": [
+          [
+            "VariableID:8914:17384"
+          ]
+        ],
+        "pass": true
+      },
+      {
+        "id": "8843:16843",
+        "expected": "VariableID:8914:17385",
+        "actual": [
+          [
+            "VariableID:8914:17385"
+          ]
+        ],
+        "pass": true
+      },
+      {
+        "id": "9064:20045",
+        "expected": "VariableID:9065:19912",
+        "actual": [
+          [
+            "VariableID:9065:19912"
+          ]
+        ],
+        "pass": true
+      },
+      {
+        "id": "8843:20501",
+        "expected": "VariableID:8914:17585",
+        "actual": [
+          [
+            "VariableID:8914:17585"
+          ]
+        ],
+        "pass": true
+      },
+      {
+        "id": "8843:20502",
+        "expected": "VariableID:8914:17586",
+        "actual": [
+          [
+            "VariableID:8914:17586"
+          ]
+        ],
+        "pass": true
+      },
+      {
+        "id": "9064:20101",
+        "expected": "VariableID:9065:19917",
+        "actual": [
+          [
+            "VariableID:9065:19917"
+          ]
+        ],
+        "pass": true
+      }
+    ],
+    "allPassed": true,
+    "scope": "Targeted six-alias re-read after root correction; prior full action audit was not repeated."
+  }
+}

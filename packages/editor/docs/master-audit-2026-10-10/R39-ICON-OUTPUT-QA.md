@@ -1,0 +1,45 @@
+# R39 — Icon appearance and recovery
+
+13 October 2026. Design-only work in existing improved Figma page `8463:2`, file `g4GzQFqzNYz5sosz1QtZXC`. The root agent authored Figma; two independent agents audited source contracts and remaining coverage. Original baseline and application source were preserved. All 14 module gates remain **OPEN**.
+
+## Authored contract
+
+[Icon entry](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8843-21669) now renders an actual outline glyph instead of using “Studio mark” as its specimen. Settings Icon size and Stroke width are navigation links to the existing canonical Style panel. Identity remains in Settings as Change icon.
+
+| Property / task | Finite behavior and scope | Nodes |
+|---|---|---|
+| Width / Height | Existing canonical fields show numeric px plus Fixed. Independent 32 / 48 px choices; Desktop values and Mobile per-axis override presence are stored separately. Mobile Reset size removes both overrides and exposes Desktop; Desktop reset uses fixture defaults 32 × 32. | Settings `8843:21895`; Style Width `8841:14994`, Height `8841:14999`; dimension chooser `8844:265243`; reset `8975:17675`; origin `8975:17674` |
+| Glyph stroke | Conditional Icon appearance group; eight unitless choices 0.5–4 by 0.5. “This icon · all breakpoints” is explicit. Reset stroke uses this fixture's default 2. Stroke is separate from CSS box border. | Settings `8843:21901`; group `8975:17677`; field `8975:17681`; chooser `8844:265268`; reset `8975:17685` |
+| Change icon | Arrow right / Check; replacement changes identity while preserving authored dimensions, overrides and stroke. Cancel preserves identity and appearance. This corrects the source picker’s stale-appearance overwrite risk; it does not certify existing implementation. | Settings `8843:21889`; chooser `8975:17923`; Arrow `8975:17946`, Check `8975:17949`, Cancel `8975:17952` |
+| Undo | One previous logical icon edit: both base dimensions, both Mobile values and override flags, glyph and stroke. Current device is retained. Same-value choices and reset-at-default do not consume useful Undo. Setting an explicit Mobile value equal to the inherited value still creates an override and is undoable. | Style `8975:17687`; Settings `8975:17961` |
+| Reset icon | Resets this fixture's glyph, appearance and Mobile dimension overrides, with Undo. Renamed from Reset sample; arbitrary advanced attributes are outside this narrower action. | `8843:21941` |
+
+There are 64 native SVG specimens: two glyphs × two widths × two heights × eight strokes. Exactly one matches the effective state. SVG viewBox proportions are retained for nonsquare dimensions. The blue selection border remains separate from glyph stroke. Native inspection confirms, for example, SVG stroke 2 at 32px produces a 2.667px vector stroke, and SVG stroke 3 at 48px produces 6px: the property is unitless in a 24-unit viewBox.
+
+Existing shared field/action masters were reused. Existing Icon min/max dimension controls remain after size recovery in the scrolling panel; their behavior is not newly certified. Other callers retain their original Width/Height mode choosers. The Icon group is cleared on 59 inspected direct Style entry instances from the other R35 Inspector roots; uninspected legacy routes are not covered by that isolation claim.
+
+## Verification and corrections
+
+The Icon fixture’s inherited navigation summary was corrected to `1 selected element` (`I8843:21698;8314:8`) after the captured walks; it previously displayed an unrelated three-selection label. This label-only correction was read back natively.
+
+- [Final Icon authored-action checks](evidence/r39-icon-state-qa-final.json): **153 passed**, including all 64 visible-state combinations, per-axis inheritance, reset, replacement, cancel, return/reopen, Undo and repeated-value edge cases. [Executable read-only interpreter](evidence/r39-icon-state-qa.js). This is action-model evidence, not runtime execution.
+- [R38 typography regression](evidence/r39-typography-regression.json): **112 checks passed** after the shared Style changes. No full application tests were run for design-only changes.
+- [Native inspection](evidence/r39-icon-native-qa.json): five roots, 154 instances, no missing inspected master, 64 glyph variants with matching static geometry and exactly one default-visible specimen. This is not an all-state layout/interaction audit.
+- [Dimension/stroke browser walk](evidence/r39-icon-final-walk.json.receipt.json): reviewed 32px default, Mobile inheritance, independent width change, 48 × 48 output and visibly thicker stroke 3. Evidence: [48px / stroke 2](evidence/r39-size48-final.png), [48px / stroke 3](evidence/r39-stroke3-final.png).
+- [Recovery browser walk](evidence/r39-icon-recovery-walk.json.receipt.json): reviewed [stroke reset to 2](evidence/r39-reset-stroke2.png), [Mobile reset to inherited 32](evidence/r39-reset-mobile32.png), [Undo to local 48](evidence/r39-undo-mobile48.png), Close and [Check replacement preserving appearance](evidence/r39-check-preserves48-stroke3.png).
+- [Return browser walk](evidence/r39-icon-return-walk.json.receipt.json): Desktop visibly retains 32px while sharing glyph/stroke; Mobile retains 48px; Cancel preserves Check; reopening Style retains dimensions and stroke. [Desktop specimen](evidence/r39-desktop32-check-global3.png), [reopened values](evidence/r39-reopen48-with-minmax.png). The latter capture predates the browser’s refreshed min/max layout despite its filename; native retention was checked separately.
+- [Fresh no-op browser walk](evidence/r39-icon-noop-walk.json.receipt.json): stroke 2 → 3 → select 3 again → Undo returns to 2, with a visibly thinner glyph. [Before](evidence/r39-noop-before3.png), [same-value selection](evidence/r39-noop-repeat3.png), [Undo result](evidence/r39-noop-undo2.png). These refreshed captures also show retained min/max controls below size recovery.
+
+Initial playback exposed a 352px recovery row inside a 318px panel and an unnecessary 100px row height; corrected to Fill/Hug, 318 × 32. Four-argument AND expressions updated the displayed values but did not update the glyph in the observed prototype. Normalizing them to nested binary conjunctions produced the visually verified output above. [Expression correction receipt](evidence/r39-icon-expression-fix.json). Early `*-probe.png`, `r39-width48.png` and initial walks are diagnostic failures, not acceptance evidence.
+
+Independent review then found unconditional snapshots consuming Undo on no-op selections. [No-op fix](evidence/r39-icon-noop-fix.js) guards both snapshots and writes by actual stored-state change. [Mutation receipt](evidence/r39-icon-noop-fix.json); nine additional checks exercise repeated choices/resets and explicit Mobile override creation. The authoring script is historical and non-idempotent; do not rerun it on the current nodes. The final authored state also includes layout/expression/no-op corrections.
+
+## Remaining design and runtime work
+
+This is a bounded fixture, not complete Icon capability parity. Dimension coverage is only 32/48 px; source Settings has 16/20/24/32/48/64 and the picker permits 12–96. General CSS sizing also supports additional units, empty/removal, zero, Fill/Hug, constraints and arbitrary aspect ratios. Preserve those capabilities in the completed contract; the finite dimension picker is not an approved production restriction. Min/max fields retain prior behavior without new rendered-output proof.
+
+Color editing, full glyph catalog/search, Brand token binding, per-axis origin/reset, arbitrary units/input validation, Tablet cascade, pseudo states, mixed/locked/missing targets, keyboard/focus/Escape, full Undo/Redo and other caller routes remain open. Replacement preserves this fixture's constant color; it does not test editable-color preservation. Global glyph stroke is intentionally distinct from responsive dimension overrides. Reset-to-default stroke is not remove-Mobile-override.
+
+Source metadata (`data-icon-size`, `data-icon-stroke`) does not establish embedded SVG synchronization. Current source picker can rewrite base width/height/color from stale metadata, and its default SVG has separate dimensions/stroke/color. These implementation contracts require explicit reconciliation and real canvas/preview/export tests before runtime parity can be accepted. Details and source anchors: [independent source audit](R39-INSPECTOR-SOURCE-CONTRACT-AUDIT.md).
+
+Next Inspector work: [Columns count / content-removal contract](R40-COLUMNS-CONTRACT-PLAN.md), including confirmation, Cancel, exact-identity Undo and locked-content behavior, separately from responsive CSS Gap. Continue remaining Inspector contracts, then the [14-module acceptance queue](R39-COVERAGE-HANDOFF-AUDIT.md). [Saved Components task plan](R40-SAVED-COMPONENTS-TASK-PLAN.md) identifies an early route-inventory check and separates insertion, master update, override reset, detach and remote recovery. Those reports are plans/source evidence, not completed Figma tasks.

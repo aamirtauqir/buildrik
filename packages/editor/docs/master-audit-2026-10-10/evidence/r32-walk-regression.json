@@ -1,0 +1,85 @@
+[
+  {
+    "label": "Reset at review",
+    "goto": "8690:13237",
+    "wait": 2500
+  },
+  {
+    "label": "Remaining flows review → Pages / folders, selection and order",
+    "x": 720,
+    "y": 510,
+    "wait": 2500
+  },
+  {
+    "label": "Pages / organize → Select pages…",
+    "x": 720,
+    "y": 600,
+    "wait": 2500
+  },
+  {
+    "label": "Pages / bulk → Duplicate selected",
+    "x": 720,
+    "y": 559,
+    "shot": "r32-bulk-copies-retry.png",
+    "wait": 15000
+  },
+  {
+    "label": "Pages / bulk copies → Review copied Journal content",
+    "x": 720,
+    "y": 551,
+    "shot": "r32-journal-copy-retry.png",
+    "wait": 10000
+  },
+  {
+    "label": "Journal copy to Build",
+    "x": 411,
+    "y": 28,
+    "wait": 2500
+  },
+  {
+    "label": "Return to copied Journal",
+    "x": 320,
+    "y": 28,
+    "expected": "8730:13385",
+    "shot": "r32-copy-build-return-retry.png",
+    "wait": 6000
+  },
+  {
+    "label": "Reset at review",
+    "goto": "8690:13237",
+    "wait": 2000
+  },
+  {
+    "label": "Remaining flows review → CMS / records, schema and dynamic pages",
+    "x": 720,
+    "y": 558,
+    "wait": 2000
+  },
+  {
+    "label": "8539:9881 → Add record",
+    "x": 1348,
+    "y": 329,
+    "wait": 2000
+  },
+  {
+    "label": "Edit new article title",
+    "x": 720,
+    "y": 227,
+    "wait": 2000,
+    "shot": "r32-cms-title-draft-final.png"
+  },
+  {
+    "label": "CMS / record → Save draft",
+    "x": 720,
+    "y": 480,
+    "shot": "r32-cms-saved-final.png",
+    "wait": 2000
+  },
+  {
+    "label": "CMS / record saved → Back to records",
+    "x": 720,
+    "y": 569,
+    "shot": "r32-cms-new-record-final.png",
+    "wait": 2000
+  }
+]

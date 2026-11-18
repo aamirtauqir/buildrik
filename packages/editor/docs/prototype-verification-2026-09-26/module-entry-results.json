@@ -1,0 +1,178 @@
+[
+  {
+    "test": 1,
+    "label": "Add · Insert content",
+    "expected": "4418:99611",
+    "actual": "4418:99611",
+    "result": "PASS",
+    "evidence": "hub-01.png"
+  },
+  {
+    "test": 2,
+    "label": "Layers · Structure the page",
+    "expected": "4418:79139",
+    "actual": "4418:79139",
+    "result": "PASS",
+    "evidence": "hub-retry-02.png"
+  },
+  {
+    "test": 3,
+    "label": "Pages · Manage routes",
+    "expected": "4418:90494",
+    "actual": "4418:90494",
+    "result": "PASS",
+    "evidence": "hub-retry-03.png"
+  },
+  {
+    "test": 4,
+    "label": "Templates · Start a page",
+    "expected": "4418:54134",
+    "actual": "4418:54134",
+    "result": "PASS",
+    "evidence": "hub-04.png"
+  },
+  {
+    "test": 5,
+    "label": "Components · Manage reusable blocks",
+    "expected": "4418:142419",
+    "actual": "4418:142419",
+    "result": "PASS",
+    "evidence": "hub-05.png"
+  },
+  {
+    "test": 6,
+    "label": "Inspector · Edit selection",
+    "expected": "4428:141170",
+    "actual": "4428:141170",
+    "result": "PASS",
+    "evidence": "hub-06.png"
+  },
+  {
+    "test": 7,
+    "label": "Assets · Choose media",
+    "expected": "4418:59771",
+    "actual": "4418:59771",
+    "result": "PASS",
+    "evidence": "hub-07.png"
+  },
+  {
+    "test": 8,
+    "label": "Full Media · Manage library",
+    "expected": "4418:58292",
+    "actual": "4418:58292",
+    "result": "PASS",
+    "evidence": "hub-08.png"
+  },
+  {
+    "test": 9,
+    "label": "CMS · Manage records",
+    "expected": "4428:140486",
+    "actual": "4428:140486",
+    "result": "PASS",
+    "evidence": "hub-09.png"
+  },
+  {
+    "test": 10,
+    "label": "Brand · Shared identity",
+    "expected": "7315:80955",
+    "actual": "7315:80955",
+    "result": "PASS",
+    "evidence": "hub-10.png"
+  },
+  {
+    "test": 11,
+    "label": "Forms · Read submissions",
+    "expected": "7889:196284",
+    "actual": "7889:196284",
+    "result": "PASS",
+    "evidence": "hub-11.png"
+  },
+  {
+    "test": 12,
+    "label": "Settings · Configure site",
+    "expected": "4418:128917",
+    "actual": "4418:128917",
+    "result": "PASS",
+    "evidence": "hub-12.png"
+  },
+  {
+    "test": 13,
+    "label": "AI assistant · Page or site",
+    "expected": "4418:104313",
+    "actual": "4418:104313",
+    "result": "PASS",
+    "evidence": "hub-13.png"
+  },
+  {
+    "test": 14,
+    "label": "Review · Client approval",
+    "expected": "4418:115784",
+    "actual": "4418:115784",
+    "result": "PASS",
+    "evidence": "hub-14.png"
+  },
+  {
+    "test": 15,
+    "label": "Issues · Resolve findings",
+    "expected": "4418:147641",
+    "actual": "4418:147641",
+    "result": "PASS",
+    "evidence": "hub-retry-15.png"
+  },
+  {
+    "test": 16,
+    "label": "History · Restore drafts",
+    "expected": "4418:73545",
+    "actual": "4418:73545",
+    "result": "PASS",
+    "evidence": "hub-16.png"
+  },
+  {
+    "test": 17,
+    "label": "Activity · Site events",
+    "expected": "4418:140587",
+    "actual": "4418:140587",
+    "result": "PASS",
+    "evidence": "hub-17.png"
+  },
+  {
+    "test": 18,
+    "label": "Publish · Release site",
+    "expected": "4418:97118",
+    "actual": "4418:97118",
+    "result": "PASS",
+    "evidence": "hub-18.png"
+  },
+  {
+    "test": 19,
+    "label": "AI · Selected element",
+    "expected": "4418:104454",
+    "actual": "4418:104454",
+    "result": "PASS",
+    "evidence": "hub-retry-19.png"
+  },
+  {
+    "test": 20,
+    "label": "AI · Generate a block",
+    "expected": "5946:51667",
+    "actual": "5946:51667",
+    "result": "PASS",
+    "evidence": "hub-20.png"
+  },
+  {
+    "test": 21,
+    "label": "Visibility · Selected element",
+    "expected": "4428:141642",
+    "actual": "4428:141642",
+    "result": "PASS",
+    "evidence": "hub-retry-21.png"
+  },
+  {
+    "test": 22,
+    "label": "Publish · Versions",
+    "expected": "4418:74024",
+    "actual": "4418:74024",
+    "result": "PASS",
+    "evidence": "hub-22.png"
+  }
+]

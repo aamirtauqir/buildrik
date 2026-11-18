@@ -1,0 +1,52 @@
+{
+  "mutatedNodeIds": [
+    "423:100472",
+    "425:99651"
+  ],
+  "out": [
+    {
+      "id": "423:100472",
+      "reactions": [
+        {
+          "action": {
+            "type": "URL",
+            "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick?node-id=415-61494&starting-point-node-id=415%3A61494&scaling=scale-down",
+            "openInNewTab": true
+          },
+          "actions": [
+            {
+              "type": "URL",
+              "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick?node-id=415-61494&starting-point-node-id=415%3A61494&scaling=scale-down",
+              "openInNewTab": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ]
+    },
+    {
+      "id": "425:99651",
+      "reactions": [
+        {
+          "action": {
+            "type": "URL",
+            "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick?node-id=424-337803&starting-point-node-id=424%3A337803&scaling=scale-down",
+            "openInNewTab": true
+          },
+          "actions": [
+            {
+              "type": "URL",
+              "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick?node-id=424-337803&starting-point-node-id=424%3A337803&scaling=scale-down",
+              "openInNewTab": true
+            }
+          ],
+          "trigger": {
+            "type": "ON_CLICK"
+          }
+        }
+      ]
+    }
+  ]
+}

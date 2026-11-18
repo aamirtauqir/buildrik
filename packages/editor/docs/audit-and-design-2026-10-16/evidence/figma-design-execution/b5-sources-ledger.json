@@ -1,0 +1,258 @@
+{
+  "createdNodeIds": [
+    "166:1751",
+    "166:1966",
+    "166:2184",
+    "166:2400",
+    "166:2616",
+    "166:2832",
+    "166:3052",
+    "166:3279",
+    "166:3488",
+    "166:3723",
+    "166:3952",
+    "166:4182",
+    "166:4410",
+    "166:4640",
+    "166:4873",
+    "166:5094",
+    "166:5315",
+    "166:5522",
+    "166:5736",
+    "166:5960",
+    "166:6165",
+    "166:6386"
+  ],
+  "mutatedNodeIds": [
+    "165:4137",
+    "I166:2934;4:547",
+    "166:2934",
+    "I166:3154;4:547",
+    "166:3154",
+    "166:3268",
+    "165:4345",
+    "166:1960",
+    "166:2391",
+    "166:2182",
+    "166:2823",
+    "I166:3381;4:547",
+    "166:3381",
+    "166:3713",
+    "166:3716",
+    "166:3719",
+    "166:2180",
+    "166:3945",
+    "166:3948",
+    "166:1962",
+    "166:4175",
+    "166:4178",
+    "166:2396",
+    "166:4403",
+    "166:4406",
+    "166:2612",
+    "166:4633",
+    "166:4636",
+    "166:2828",
+    "166:4866",
+    "166:4869",
+    "166:3266",
+    "165:4400",
+    "I166:5196;4:547",
+    "166:5196",
+    "166:5091",
+    "I166:5417;4:547",
+    "166:5417",
+    "166:5731",
+    "166:5727",
+    "165:4358",
+    "166:5954",
+    "166:5725",
+    "I166:6062;4:547",
+    "166:6062",
+    "166:6378",
+    "166:5729",
+    "I166:6488;4:547",
+    "166:6488"
+  ],
+  "frames": [
+    {
+      "id": "166:1751",
+      "name": "B5-S01 · CMS / Add source / paste JSON",
+      "w": 1440,
+      "h": 900,
+      "nodes": 209,
+      "images": []
+    },
+    {
+      "id": "166:1966",
+      "name": "B5-S02 · CMS / Add source / checked data",
+      "w": 1440,
+      "h": 900,
+      "nodes": 212,
+      "images": []
+    },
+    {
+      "id": "166:2184",
+      "name": "B5-S03 · CMS / Add source / invalid JSON",
+      "w": 1440,
+      "h": 900,
+      "nodes": 210,
+      "images": []
+    },
+    {
+      "id": "166:2400",
+      "name": "B5-S04 · CMS / Add source / top-level array refused",
+      "w": 1440,
+      "h": 900,
+      "nodes": 210,
+      "images": []
+    },
+    {
+      "id": "166:2616",
+      "name": "B5-S05 · CMS / Add source / duplicate key blocks entire batch",
+      "w": 1440,
+      "h": 900,
+      "nodes": 210,
+      "images": []
+    },
+    {
+      "id": "166:2832",
+      "name": "B5-S06 · CMS / Add source / waiting for receipt",
+      "w": 1440,
+      "h": 900,
+      "nodes": 212,
+      "images": []
+    },
+    {
+      "id": "166:3052",
+      "name": "B5-S07 · CMS / Add source / failed save retains data",
+      "w": 1440,
+      "h": 900,
+      "nodes": 213,
+      "images": []
+    },
+    {
+      "id": "166:3279",
+      "name": "B5-S08 · CMS / source added after receipt",
+      "w": 1440,
+      "h": 900,
+      "nodes": 203,
+      "images": []
+    },
+    {
+      "id": "166:3488",
+      "name": "B5-S09 · CMS / unsaved source guard",
+      "w": 1440,
+      "h": 900,
+      "nodes": 207,
+      "images": []
+    },
+    {
+      "id": "166:3723",
+      "name": "Guard · B5-S01 · CMS / Add source / paste JSON",
+      "w": 1440,
+      "h": 900,
+      "nodes": 205,
+      "images": []
+    },
+    {
+      "id": "166:3952",
+      "name": "Guard · B5-S03 · CMS / Add source / invalid JSON",
+      "w": 1440,
+      "h": 900,
+      "nodes": 205,
+      "images": []
+    },
+    {
+      "id": "166:4182",
+      "name": "Guard · B5-S04 · CMS / Add source / top-level array refused",
+      "w": 1440,
+      "h": 900,
+      "nodes": 205,
+      "images": []
+    },
+    {
+      "id": "166:4410",
+      "name": "Guard · B5-S05 · CMS / Add source / duplicate key blocks entire batch",
+      "w": 1440,
+      "h": 900,
+      "nodes": 205,
+      "images": []
+    },
+    {
+      "id": "166:4640",
+      "name": "Guard · B5-S07 · CMS / Add source / failed save retains data",
+      "w": 1440,
+      "h": 900,
+      "nodes": 205,
+      "images": []
+    },
+    {
+      "id": "166:4873",
+      "name": "B5-S10 · CMS / Replace data / missing-path consequence",
+      "w": 1440,
+      "h": 900,
+      "nodes": 212,
+      "images": []
+    },
+    {
+      "id": "166:5094",
+      "name": "B5-S11 · CMS / replacement saving",
+      "w": 1440,
+      "h": 900,
+      "nodes": 212,
+      "images": []
+    },
+    {
+      "id": "166:5315",
+      "name": "B5-S12 · CMS / replacement acknowledged",
+      "w": 1440,
+      "h": 900,
+      "nodes": 196,
+      "images": []
+    },
+    {
+      "id": "166:5522",
+      "name": "B5-S13 · CMS / source actions",
+      "w": 1440,
+      "h": 900,
+      "nodes": 205,
+      "images": []
+    },
+    {
+      "id": "166:5736",
+      "name": "B5-S14 · CMS / rename source by stable ID",
+      "w": 1440,
+      "h": 900,
+      "nodes": 210,
+      "images": []
+    },
+    {
+      "id": "166:5960",
+      "name": "B5-S15 · CMS / renamed source acknowledged",
+      "w": 1440,
+      "h": 900,
+      "nodes": 196,
+      "images": []
+    },
+    {
+      "id": "166:6165",
+      "name": "B5-S16 · CMS / used-source delete consequence",
+      "w": 1440,
+      "h": 900,
+      "nodes": 207,
+      "images": []
+    },
+    {
+      "id": "166:6386",
+      "name": "B5-S17 · CMS / Sources offline, readable cache",
+      "w": 1440,
+      "h": 900,
+      "nodes": 199,
+      "images": []
+    }
+  ],
+  "allAffectedNodeIds": "affected-nodes.json (includes inherited instance descendants)",
+  "createdNodeCount": 4570,
+  "createdNodeIdsScope": "Root IDs only; full descendant IDs in artifact"
+}

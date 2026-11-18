@@ -1,0 +1,275 @@
+--- BEGIN UNTRUSTED EXTERNAL CONTENT (source: http://localhost:3000/edit/cmv8uviql000bucorbmjjol97) ---
+--- BEGIN UNTRUSTED EXTERNAL C​ONTENT (source: http://localhost:3000/edit/cmv8uviql000bucorbmjjol97) ---
+    @e1 [button] "‹ Exit"
+    @e2 [button] "s0-qa site"
+    @e3 [button] "Home"
+    @e4 [button] "History ›"
+    @e5 [button] "Review"
+    @e6 [button] "Comments"
+    @e7 [button] "Notifications, 2 unread"
+    @e8 [button] "Preview"
+    @e9 [button] "Site menu"
+@e10 [link] "Skip to Canvas"
+    @e11 [tab] "Add elements, blocks and components to your page": Add
+    @e12 [tab] "View and reorder page structure": Layers
+    @e13 [tab] "Manage all pages in your site": Pages
+    @e14 [tab] "Upload and manage images, videos, and fonts": Assets
+    @e15 [tab] "Collections, records and data sources for dynamic content": CMS
+    @e16 [tab] "Brand — global colors, fonts, spacing tokens": Brand
+    @e17 [button] "Help — keyboard shortcuts": Help
+    @e18 [tab] "Home, Homepage" [selected]: Home
+    @e19 [tab] "Home Copy"
+  @e20 [button] "Add page"
+  @e21 [radio] "Small"
+  @e22 [radio] "Large"
+  @e23 [button] "Send"
+  @e24 [button] "Click Me"
+  @e25 [link] "Link"
+  @e26 [button] "Resize from top-left corner"
+  @e27 [button] "Resize from top-right corner"
+  @e28 [button] "Resize from bottom-left corner"
+  @e29 [button] "Resize from bottom-right corner"
+  @e30 [button] "Resize from top edge"
+  @e31 [button] "Resize from bottom edge"
+  @e32 [button] "Resize from left edge"
+  @e33 [button] "Resize from right edge"
+  @e34 [slider] "Rotation handle - drag to rotate element"
+  @e35 [button] "Duplicate (⌘D)"
+  @e36 [button] "Delete (⌫)"
+  @e37 [button] "More"
+  @e38 [button] "Undo" [disabled]
+  @e39 [button] "Redo" [disabled]
+  @e40 [button] "View" [expanded]: View · 1 ▾
+      @e41 [menuitemcheckbox] "Snap guides ⌘;" [checked]
+      @e42 [menuitemcheckbox] "Spacing ⌘⇧;"
+      @e43 [menuitemcheckbox] "Grid 10 px ▸"
+      @e44 [menuitemcheckbox] "Rulers ⌘R"
+      @e45 [menuitemcheckbox] "Badges ⌘B"
+      @e46 [menuitemcheckbox] "X-Ray ⌘⇧X"
+        @e47 [menuitem] "Breakpoint Desktop ▸"
+        @e48 [menuitem] "Zoom 100% ▸"
+  @e49 [button] "Zoom 100%": 100% ▾
+        @e50 [button] "Home"
+  @e51 [button] "Ask AI about this element": ✦ AI
+  @e52 [button] "Element actions"
+  @e53 [button] "Hide inspector (⌘\\)"
+    @e54 [tab] "Style"
+    @e55 [tab] "Behaviour" [selected]
+    @e56 [tab] "Effects"
+    @e57 [button] "Fields section, expanded" [expanded]: Fields
+    @e58 [button] "bk44size · radio — edit field": bk44size · radio
+    @e59 [button] "bk44size · radio — edit field": bk44size · radio
+    @e60 [button] "+ Add field"
+    @e61 [button] "After submit section, expanded" [expanded]: After submit
+    @e62 [combobox] "Then"
+      @e63 [option] "Show message" [selected]
+      @e64 [option] "Redirect"
+    @e65 [textbox] "Message"
+    @e66 [textbox] "Send to"
+    @e67 [checkbox] "Spam protection" [checked]
+    @e68 [button] "Visibility section, expanded" [expanded]: Visibility
+      @e69 [checkbox] "Desktop" [checked]
+      @e70 [checkbox] "Tablet" [checked]
+      @e71 [checkbox] "Mobile" [checked]
+    @e72 [button] "Interactions section, expanded" [expanded]: Interactions
+    @e73 [button] "+ Add interaction"
+    @e74 [button] "CSS classes section, expanded" [expanded]: CSS classes
+    @e75 [textbox] "Add class"
+    @e76 [button] "Attributes section, collapsed": Attributes
+@e77 [button] "Get started — 3 of 7 complete. Click to expand.": 3/7
+@e78 [button] "v3.0.2 Output Detail Standard React Components Hide Until Restart Marker Color Clear on copy/send Block page interactions Manage MCP & Webhooks Manage MCP & Webhooks MCP Connection MCP connection allows agents to receive and act on annotations. Learn more Webhooks Auto-Send The webhook URL will receive live annotation changes and annotation data."
+  @e79 [button]
+  @e80 [button]
+  @e81 [button] [disabled]
+  @e82 [button] [disabled]
+  @e83 [button] [disabled]
+  @e84 [button] [disabled]
+  @e85 [button]
+  @e86 [button]
+  @e87 [link]
+  @e88 [button] "Switch to light mode"
+  @e89 [button] "Standard"
+  @e90 [checkbox] [checked]
+  @e91 [checkbox]
+  @e92 [button] "Indigo"
+  @e93 [button] "Blue"
+  @e94 [button] "Cyan"
+  @e95 [button] "Green"
+  @e96 [button] "Yellow"
+  @e97 [button] "Orange"
+  @e98 [button] "Red"
+  @e99 [checkbox] "Clear on copy/send"
+  @e100 [checkbox] "Block page interactions" [checked]
+  @e101 [button] "Manage MCP & Webhooks"
+  @e102 [button] "Manage MCP & Webhooks"
+    @e103 [link] "Learn more"
+  @e104 [checkbox] "Auto-Send" [checked] [disabled]
+  @e105 [textbox] "Webhook URL"
+
+── cursor-interactive (not in ARIA tree) ──
+@c1 [cursor:pointer] "Review"
+@c2 [cursor:pointer] "›"
+@c3 [cursor:pointer] "Add"
+@c4 [cursor:pointer] "Layers"
+@c5 [cursor:pointer] "Pages"
+@c6 [cursor:pointer] "Assets"
+@c7 [cursor:pointer] "CMS"
+@c8 [cursor:pointer] "Brand"
+@c9 [cursor:pointer] "Help"
+@c10 [cursor:pointer] "Home"
+@c11 [cursor:pointer] "Home Copy"
+@c12 [tabindex=0] "s4 locked
+
+s4 locked
+
+s4 locked
+
+s4 probe
+
+s4 probe
+
+s4 probe
+
+s4 probe
+
+s1 stal"
+@c13 [cursor:pointer] "s4 locked
+
+s4 locked
+
+s4 locked
+
+s4 probe
+
+s4 probe
+
+s4 probe
+
+s4 probe
+
+s1 stal"
+@c14 [popover-child, tabindex=0, role=button] "div"
+@c15 [popover-child, tabindex=0, role=button] "div"
+@c16 [popover-child, tabindex=0, role=button] "div"
+@c17 [popover-child, tabindex=0, role=button] "div"
+@c18 [popover-child, tabindex=0, role=button] "div"
+@c19 [popover-child, tabindex=0, role=button] "div"
+@c20 [popover-child, tabindex=0, role=button] "div"
+@c21 [popover-child, tabindex=0, role=button] "div"
+@c22 [popover-child, cursor:pointer] "Snap guides"
+@c23 [popover-child, cursor:pointer] "⌘;"
+@c24 [popover-child, cursor:pointer] "✓"
+@c25 [popover-child, cursor:pointer] "Spacing"
+@c26 [popover-child, cursor:pointer] "⌘⇧;"
+@c27 [popover-child, cursor:pointer] "span"
+@c28 [popover-child, cursor:pointer] "Grid"
+@c29 [popover-child, cursor:pointer] "10 px ▸"
+@c30 [popover-child, cursor:pointer] "span"
+@c31 [popover-child, cursor:pointer] "Rulers"
+@c32 [popover-child, cursor:pointer] "⌘R"
+@c33 [popover-child, cursor:pointer] "span"
+@c34 [popover-child, cursor:pointer] "Badges"
+@c35 [popover-child, cursor:pointer] "⌘B"
+@c36 [popover-child, cursor:pointer] "span"
+@c37 [popover-child, cursor:pointer] "X-Ray"
+@c38 [popover-child, cursor:pointer] "⌘⇧X"
+@c39 [popover-child, cursor:pointer] "span"
+@c40 [popover-child, cursor:pointer] "Breakpoint"
+@c41 [popover-child, cursor:pointer] "Desktop ▸"
+@c42 [popover-child, cursor:pointer] "Zoom"
+@c43 [popover-child, cursor:pointer] "100% ▸"
+@c44 [popover-child, tabindex=0, role=complementary] "Form selected
+Home
+›
+Form
+Form
+✦ AI
+Style
+Behaviour
+Effects
+Fields
+bk44size · ra"
+@c45 [popover-child, tabindex=0] "Form"
+@c46 [popover-child, cursor:pointer] "Fields"
+@c47 [popover-child, cursor:pointer, tabindex=0, role=button] "Fields"
+@c48 [popover-child, cursor:pointer] "Fields"
+@c49 [popover-child, cursor:pointer, tabindex=0, role=button] "bk44size · radio"
+@c50 [popover-child, cursor:pointer] "bk44size · radio"
+@c51 [popover-child, cursor:pointer, tabindex=0, role=button] "bk44size · radio"
+@c52 [popover-child, cursor:pointer] "bk44size · radio"
+@c53 [popover-child, cursor:pointer] "After submit"
+@c54 [popover-child, cursor:pointer, tabindex=0, role=button] "After submit"
+@c55 [popover-child, cursor:pointer] "After submit"
+@c56 [popover-child, cursor:pointer] "Show message
+Redirect"
+@c57 [popover-child, cursor:pointer] "Show message
+Redirect"
+@c58 [popover-child, cursor:pointer] "Show message
+Redirect"
+@c59 [popover-child, cursor:pointer] "Spam protection"
+@c60 [popover-child, cursor:pointer] "Visibility"
+@c61 [popover-child, cursor:pointer, tabindex=0, role=button] "Visibility"
+@c62 [popover-child, cursor:pointer] "Visibility"
+@c63 [popover-child, cursor:pointer] "Desktop"
+@c64 [popover-child, cursor:pointer] "Tablet"
+@c65 [popover-child, cursor:pointer] "Mobile"
+@c66 [popover-child, cursor:pointer] "Interactions"
+@c67 [popover-child, cursor:pointer, tabindex=0, role=button] "Interactions"
+@c68 [popover-child, cursor:pointer] "Interactions"
+@c69 [popover-child, cursor:pointer] "CSS classes"
+@c70 [popover-child, cursor:pointer, tabindex=0, role=button] "CSS classes"
+@c71 [popover-child, cursor:pointer] "CSS classes"
+@c72 [popover-child, cursor:pointer] "Attributes"
+@c73 [popover-child, cursor:pointer, tabindex=0, role=button] "Attributes"
+@c74 [popover-child, cursor:pointer] "Attributes"
+@c75 [popover-child, cursor:pointer] "span"
+@c76 [popover-child, cursor:pointer] "3/7"
+@c77 [popover-child, cursor:pointer, tabindex=0, role=button] "v3.0.2
+
+Output Detail
+Standard
+React Components
+Hide Until Restart
+Marker Color
+"
+@c78 [popover-child, cursor:pointer] "div"
+@c79 [popover-child, cursor:pointer] "div"
+@c80 [popover-child, cursor:pointer] "div"
+@c81 [popover-child, cursor:pointer] "span"
+@c82 [popover-child, cursor:pointer] "span"
+@c83 [popover-child, cursor:pointer] "div"
+@c84 [popover-child, cursor:pointer] "span"
+@c85 [popover-child, cursor:pointer] "span"
+@c86 [popover-child, cursor:pointer] "div"
+@c87 [popover-child, cursor:pointer] "span"
+@c88 [popover-child, cursor:pointer] "span"
+@c89 [popover-child, cursor:pointer] "div"
+@c90 [popover-child, cursor:pointer] "span"
+@c91 [popover-child, cursor:pointer] "span"
+@c92 [popover-child, cursor:pointer] "div"
+@c93 [popover-child, cursor:pointer] "span"
+@c94 [popover-child, cursor:pointer] "span"
+@c95 [popover-child, cursor:pointer] "div"
+@c96 [popover-child, cursor:pointer] "span"
+@c97 [popover-child, cursor:pointer] "span"
+@c98 [popover-child, cursor:pointer] "div"
+@c99 [popover-child, cursor:pointer] "span"
+@c100 [popover-child, cursor:pointer] "div"
+@c101 [popover-child, cursor:pointer] "div"
+@c102 [popover-child, cursor:pointer] "span"
+@c103 [popover-child, cursor:pointer] "span"
+@c104 [popover-child, cursor:pointer] "span"
+@c105 [popover-child, cursor:pointer] "span"
+@c106 [popover-child, cursor:pointer] "Standard"
+@c107 [popover-child, cursor:pointer] "span"
+@c108 [popover-child, cursor:pointer] "span"
+@c109 [popover-child, cursor:pointer] "span"
+@c110 [popover-child, cursor:pointer] "span"
+@c111 [popover-child, cursor:pointer] "span"
+@c112 [popover-child, cursor:pointer] "Clear on copy/send"
+@c113 [popover-child, cursor:pointer] "Block page interactions"
+@c114 [popover-child, cursor:pointer] "Manage MCP & Webhooks"
+@c115 [popover-child, cursor:pointer] "span"
+@c116 [popover-child, cursor:pointer] "Manage MCP & Webhooks"
+--- END UNTRUSTED EXTERNAL C​ONTENT ---
+--- END UNTRUSTED EXTERNAL CONTENT ---

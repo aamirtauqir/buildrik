@@ -1,0 +1,37 @@
+{
+  "mutatedVariableIds": [
+    "VariableID:8322:790",
+    "VariableID:8322:791",
+    "VariableID:8322:792",
+    "VariableID:8322:851",
+    "VariableID:8322:852",
+    "VariableID:8322:853",
+    "VariableID:8322:854"
+  ],
+  "semanticCount": 62,
+  "aliasedCount": 62,
+  "withWebSyntax": 62,
+  "allScopes": [],
+  "durationScopes": [
+    {
+      "name": "motion/fast",
+      "scopes": []
+    },
+    {
+      "name": "motion/base",
+      "scopes": []
+    },
+    {
+      "name": "motion/slow",
+      "scopes": []
+    },
+    {
+      "name": "motion/reduced",
+      "scopes": []
+    }
+  ],
+  "boundSwatches": 19,
+  "textCount": 53,
+  "pageId": "8322:855",
+  "boardId": "8322:856"
+}

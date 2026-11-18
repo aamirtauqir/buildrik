@@ -1,0 +1,107 @@
+[
+  {
+    "label": "Editor entry",
+    "goto": "8465:3"
+  },
+  {
+    "label": "I02 / Design / Typography → Pages",
+    "x": 109,
+    "y": 157
+  },
+  {
+    "label": "R29 / Editor overlay / Pages → + New page",
+    "x": 176,
+    "y": 944,
+    "shot": "r30-new-template.png"
+  },
+  {
+    "label": "R30 / Pages · new-template → Cancel",
+    "x": 720,
+    "y": 656,
+    "shot": "r30-cancel-no-new-page.png"
+  },
+  {
+    "label": "R29 / Editor overlay / Pages → + New page",
+    "x": 176,
+    "y": 944
+  },
+  {
+    "label": "R30 / Pages · new-template → Blank · Empty canvas",
+    "x": 568,
+    "y": 478
+  },
+  {
+    "label": "R30 / Pages · new-blank → Add to site navigation · On",
+    "x": 720,
+    "y": 526,
+    "shot": "r30-navigation-off.png"
+  },
+  {
+    "label": "R30 / Pages · new-blank → Create page",
+    "x": 720,
+    "y": 608,
+    "shot": "r30-created-blank.png",
+    "expected": "8663:12975"
+  },
+  {
+    "label": "R30 / Editor / Contact blank → Preview",
+    "x": 805,
+    "y": 28,
+    "shot": "r30-blank-preview.png"
+  },
+  {
+    "label": "R30 / Preview / blank → Button / TO-BE",
+    "x": 82,
+    "y": 28
+  },
+  {
+    "label": "R30 / Editor / Contact blank → Manage pages",
+    "x": 1264,
+    "y": 189,
+    "shot": "r30-contact-in-pages.png"
+  },
+  {
+    "label": "Select Home page",
+    "x": 176,
+    "y": 183
+  },
+  {
+    "label": "I02 / Design / Typography → Pages",
+    "x": 109,
+    "y": 157
+  },
+  {
+    "label": "R29 / Editor overlay / Pages → + New page",
+    "x": 176,
+    "y": 944
+  },
+  {
+    "label": "R30 / Pages · new-template → Choose template",
+    "x": 720,
+    "y": 608
+  },
+  {
+    "label": "R26 overlay / templates → Portfolio",
+    "x": 538,
+    "y": 262,
+    "shot": "r30-template-preview.png"
+  },
+  {
+    "label": "R30 / Pages · Template preview → Use template · Create Contact",
+    "x": 720,
+    "y": 553,
+    "shot": "r30-created-template.png",
+    "expected": "8663:13173"
+  },
+  {
+    "label": "R30 / Editor / Contact from template → Preview",
+    "x": 805,
+    "y": 28,
+    "shot": "r30-contact-preview.png"
+  },
+  {
+    "label": "R30 / Preview / template → Button / TO-BE",
+    "x": 82,
+    "y": 28
+  }
+]

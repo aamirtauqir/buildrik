@@ -1,0 +1,135 @@
+[
+  {
+    "label": "Review",
+    "goto": "8690:13237",
+    "shot": "r33-review.png"
+  },
+  {
+    "label": "Open schema",
+    "x": 952,
+    "y": 490,
+    "expected": "8771:13537",
+    "shot": "r33-schema.png"
+  },
+  {
+    "label": "Add field",
+    "x": 342,
+    "y": 186,
+    "expected": "8771:13598"
+  },
+  {
+    "label": "Number",
+    "x": 538,
+    "y": 451,
+    "expected": "8771:13676"
+  },
+  {
+    "label": "Conflicting key",
+    "x": 720,
+    "y": 465
+  },
+  {
+    "label": "Save conflict",
+    "x": 902,
+    "y": 736,
+    "expected": "8771:13679",
+    "shot": "r33-schema-conflict.png"
+  },
+  {
+    "label": "Use unique key",
+    "x": 720,
+    "y": 527,
+    "expected": "8771:13676"
+  },
+  {
+    "label": "Set minimum",
+    "x": 538,
+    "y": 633
+  },
+  {
+    "label": "Save number",
+    "x": 902,
+    "y": 736,
+    "expected": "8771:13537",
+    "shot": "r33-schema-saved.png"
+  },
+  {
+    "label": "Brand primary",
+    "goto": "8772:16083",
+    "shot": "r33-brand-primary.png"
+  },
+  {
+    "label": "Change background",
+    "x": 498,
+    "y": 408
+  },
+  {
+    "label": "Review preset",
+    "x": 942,
+    "y": 743,
+    "expected": "8772:16092",
+    "shot": "r33-brand-review.png"
+  },
+  {
+    "label": "Apply preset",
+    "x": 902,
+    "y": 793,
+    "expected": "8772:16083"
+  },
+  {
+    "label": "Secondary isolated",
+    "x": 675,
+    "y": 291,
+    "expected": "8772:16190",
+    "shot": "r33-brand-secondary.png"
+  },
+  {
+    "label": "Return primary",
+    "x": 409,
+    "y": 333,
+    "expected": "8772:16083",
+    "shot": "r33-brand-saved.png"
+  },
+  {
+    "label": "Undo preset",
+    "x": 720,
+    "y": 791,
+    "shot": "r33-brand-undo.png"
+  },
+  {
+    "label": "Media grid",
+    "goto": "8539:9786"
+  },
+  {
+    "label": "Media list",
+    "x": 401,
+    "y": 229,
+    "expected": "8773:13794",
+    "shot": "r33-media-list.png"
+  },
+  {
+    "label": "Select unused asset",
+    "x": 633,
+    "y": 419
+  },
+  {
+    "label": "Delete asset",
+    "x": 1225,
+    "y": 655,
+    "expected": "8773:13784",
+    "shot": "r33-media-delete.png"
+  },
+  {
+    "label": "Confirm deletion",
+    "x": 720,
+    "y": 535,
+    "expected": "8773:13788"
+  },
+  {
+    "label": "Undo deletion",
+    "x": 720,
+    "y": 517,
+    "expected": "8773:13794",
+    "shot": "r33-media-undo.png"
+  }
+]

@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-21",
+  "method": "Product-designer skill: bounded Figma critique",
+  "fileKey": "2L9OTGzBrL6kYmU18yA1c7",
+  "metadata": [
+    "302:3396",
+    "302:11636",
+    "302:19069",
+    "303:32296",
+    "307:14695"
+  ],
+  "screenshots": [
+    "302:3396",
+    "303:32296",
+    "307:14695"
+  ],
+  "counts": {
+    "pass": 15,
+    "fail": 2,
+    "not_tested": 35
+  },
+  "warning": "Upstream summary grade is not an accessibility, usability or whole-editor score. Only assessed items are passed to its aggregation; full checklist preserves unknowns.",
+  "script_source": "https://raw.githubusercontent.com/borghei/Claude-Skills/main/product-team/product-designer/scripts/design_critique.py",
+  "script_sha256": "5216e67c9875e5cf6630087debbfeef7e774a23c71efa8079e88352ffa3736e7"
+}

@@ -1,0 +1,932 @@
+{
+  "date": "2026-10-10",
+  "scope": "Read-only snapshot before Phase6 consolidation; later root mutations may supersede",
+  "masters": [
+    {
+      "id": "8314:3",
+      "type": "COMPONENT",
+      "name": "Button / primary",
+      "parent": {
+        "id": "8314:2",
+        "type": "FRAME",
+        "name": "TO-BE draft shared controls"
+      },
+      "size": [
+        180,
+        30
+      ],
+      "layout": "HORIZONTAL",
+      "bindings": {},
+      "children": [
+        {
+          "id": "8314:4",
+          "type": "TEXT",
+          "name": "Button",
+          "bindings": {},
+          "style": "",
+          "text": "Button"
+        }
+      ],
+      "reactions": []
+    },
+    {
+      "id": "8314:5",
+      "type": "COMPONENT",
+      "name": "Button / secondary",
+      "parent": {
+        "id": "8314:2",
+        "type": "FRAME",
+        "name": "TO-BE draft shared controls"
+      },
+      "size": [
+        180,
+        30
+      ],
+      "layout": "HORIZONTAL",
+      "bindings": {},
+      "children": [
+        {
+          "id": "8314:6",
+          "type": "TEXT",
+          "name": "Button",
+          "bindings": {},
+          "style": "",
+          "text": "Button"
+        }
+      ],
+      "reactions": []
+    },
+    {
+      "id": "8314:7",
+      "type": "COMPONENT",
+      "name": "Button / ghost",
+      "parent": {
+        "id": "8314:2",
+        "type": "FRAME",
+        "name": "TO-BE draft shared controls"
+      },
+      "size": [
+        180,
+        30
+      ],
+      "layout": "HORIZONTAL",
+      "bindings": {},
+      "children": [
+        {
+          "id": "8314:8",
+          "type": "TEXT",
+          "name": "Button",
+          "bindings": {},
+          "style": "",
+          "text": "Button"
+        }
+      ],
+      "reactions": []
+    },
+    {
+      "id": "8314:9",
+      "type": "COMPONENT",
+      "name": "Button / danger",
+      "parent": {
+        "id": "8314:2",
+        "type": "FRAME",
+        "name": "TO-BE draft shared controls"
+      },
+      "size": [
+        180,
+        30
+      ],
+      "layout": "HORIZONTAL",
+      "bindings": {},
+      "children": [
+        {
+          "id": "8314:10",
+          "type": "TEXT",
+          "name": "Button",
+          "bindings": {},
+          "style": "",
+          "text": "Button"
+        }
+      ],
+      "reactions": []
+    },
+    {
+      "id": "8314:11",
+      "type": "COMPONENT",
+      "name": "Button / disabled",
+      "parent": {
+        "id": "8314:2",
+        "type": "FRAME",
+        "name": "TO-BE draft shared controls"
+      },
+      "size": [
+        180,
+        30
+      ],
+      "layout": "HORIZONTAL",
+      "bindings": {},
+      "children": [
+        {
+          "id": "8314:12",
+          "type": "TEXT",
+          "name": "Button",
+          "bindings": {},
+          "style": "",
+          "text": "Button"
+        }
+      ],
+      "reactions": []
+    },
+    {
+      "id": "8316:11",
+      "type": "COMPONENT",
+      "name": "Inspector property / default",
+      "parent": {
+        "id": "8316:9",
+        "type": "FRAME",
+        "name": "TO-BE / Inspector reusable controls"
+      },
+      "size": [
+        272,
+        34
+      ],
+      "layout": "HORIZONTAL",
+      "bindings": {},
+      "children": [
+        {
+          "id": "8316:12",
+          "type": "TEXT",
+          "name": "Label",
+          "bindings": {},
+          "style": "",
+          "text": "Property"
+        },
+        {
+          "id": "8316:13",
+          "type": "FRAME",
+          "name": "Input",
+          "bindings": {
+            "fills": [
+              {
+                "type": "VARIABLE_ALIAS",
+                "id": "VariableID:2:10"
+              }
+            ]
+          },
+          "style": null,
+          "text": null
+        }
+      ],
+      "reactions": []
+    },
+    {
+      "id": "8316:16",
+      "type": "COMPONENT",
+      "name": "Inspector property / inherited",
+      "parent": {
+        "id": "8316:9",
+        "type": "FRAME",
+        "name": "TO-BE / Inspector reusable controls"
+      },
+      "size": [
+        272,
+        34
+      ],
+      "layout": "HORIZONTAL",
+      "bindings": {},
+      "children": [
+        {
+          "id": "8316:17",
+          "type": "TEXT",
+          "name": "Label",
+          "bindings": {},
+          "style": "",
+          "text": "Property"
+        },
+        {
+          "id": "8316:18",
+          "type": "FRAME",
+          "name": "Input",
+          "bindings": {
+            "fills": [
+              {
+                "type": "VARIABLE_ALIAS",
+                "id": "VariableID:2:10"
+              }
+            ]
+          },
+          "style": null,
+          "text": null
+        }
+      ],
+      "reactions": []
+    },
+    {
+      "id": "8316:21",
+      "type": "COMPONENT",
+      "name": "Inspector property / mixed",
+      "parent": {
+        "id": "8316:9",
+        "type": "FRAME",
+        "name": "TO-BE / Inspector reusable controls"
+      },
+      "size": [
+        272,
+        34
+      ],
+      "layout": "HORIZONTAL",
+      "bindings": {},
+      "children": [
+        {
+          "id": "8316:22",
+          "type": "TEXT",
+          "name": "Label",
+          "bindings": {},
+          "style": "",
+          "text": "Property"
+        },
+        {
+          "id": "8316:23",
+          "type": "FRAME",
+          "name": "Input",
+          "bindings": {
+            "fills": [
+              {
+                "type": "VARIABLE_ALIAS",
+                "id": "VariableID:2:10"
+              }
+            ]
+          },
+          "style": null,
+          "text": null
+        }
+      ],
+      "reactions": []
+    },
+    {
+      "id": "8316:26",
+      "type": "COMPONENT",
+      "name": "Inspector property / disabled",
+      "parent": {
+        "id": "8316:9",
+        "type": "FRAME",
+        "name": "TO-BE / Inspector reusable controls"
+      },
+      "size": [
+        272,
+        34
+      ],
+      "layout": "HORIZONTAL",
+      "bindings": {},
+      "children": [
+        {
+          "id": "8316:27",
+          "type": "TEXT",
+          "name": "Label",
+          "bindings": {},
+          "style": "",
+          "text": "Property"
+        },
+        {
+          "id": "8316:28",
+          "type": "FRAME",
+          "name": "Input",
+          "bindings": {},
+          "style": null,
+          "text": null
+        }
+      ],
+      "reactions": []
+    }
+  ],
+  "styles": [
+    {
+      "id": "S:420eb6c0570d23f23a008371feb0afa4b726ea15,",
+      "name": "ui/11 · caption",
+      "font": {
+        "family": "Inter",
+        "style": "Regular",
+        "variationSettings": {
+          "wght": 400,
+          "slnt": 0
+        }
+      },
+      "size": 11,
+      "line": {
+        "unit": "PIXELS",
+        "value": 16
+      }
+    },
+    {
+      "id": "S:bd4d4cbe4fdb5cf32548b8dffb56b260446bd287,",
+      "name": "ui/12 · small",
+      "font": {
+        "family": "Inter",
+        "style": "Regular",
+        "variationSettings": {
+          "wght": 400,
+          "slnt": 0
+        }
+      },
+      "size": 12,
+      "line": {
+        "unit": "PIXELS",
+        "value": 18
+      }
+    },
+    {
+      "id": "S:a9bad46fd41cb02a6af92da966de15bf2e3482ff,",
+      "name": "ui/13 · row label",
+      "font": {
+        "family": "Inter",
+        "style": "Regular",
+        "variationSettings": {
+          "wght": 400,
+          "slnt": 0
+        }
+      },
+      "size": 13,
+      "line": {
+        "unit": "PIXELS",
+        "value": 20
+      }
+    },
+    {
+      "id": "S:beb15dcfa10e0538d3ad4e88325b8d7c1e0245c0,",
+      "name": "ui/13 · row label medium",
+      "font": {
+        "family": "Inter",
+        "style": "Medium",
+        "variationSettings": {
+          "wght": 500,
+          "slnt": 0
+        }
+      },
+      "size": 13,
+      "line": {
+        "unit": "PIXELS",
+        "value": 20
+      }
+    },
+    {
+      "id": "S:dea37b5fd3de366c368b48f5ca1cc72c5f22f3f5,",
+      "name": "ui/14 · panel title",
+      "font": {
+        "family": "Inter",
+        "style": "Medium",
+        "variationSettings": {
+          "wght": 500,
+          "slnt": 0
+        }
+      },
+      "size": 14,
+      "line": {
+        "unit": "PIXELS",
+        "value": 20
+      }
+    },
+    {
+      "id": "S:630c40b351bc50e9ff7ba16d8b49690f659b8d23,",
+      "name": "ui/16 · heading",
+      "font": {
+        "family": "Inter",
+        "style": "Semi Bold",
+        "variationSettings": {
+          "wght": 600,
+          "slnt": 0
+        }
+      },
+      "size": 16,
+      "line": {
+        "unit": "PIXELS",
+        "value": 24
+      }
+    },
+    {
+      "id": "S:a6e9e8d014e9ec33d8adf054294441c6bc10fa75,",
+      "name": "ui/20 · heading lg",
+      "font": {
+        "family": "Inter",
+        "style": "Semi Bold",
+        "variationSettings": {
+          "wght": 600,
+          "slnt": 0
+        }
+      },
+      "size": 20,
+      "line": {
+        "unit": "PIXELS",
+        "value": 30
+      }
+    },
+    {
+      "id": "S:279ab02db0e5076f6144ea0021921e06bb5c4ddf,",
+      "name": "ui/24 · title",
+      "font": {
+        "family": "Inter",
+        "style": "Semi Bold",
+        "variationSettings": {
+          "wght": 600,
+          "slnt": 0
+        }
+      },
+      "size": 24,
+      "line": {
+        "unit": "PIXELS",
+        "value": 32
+      }
+    },
+    {
+      "id": "S:bb3fe06f220c95d7d499812a740ea7351bbe20df,",
+      "name": "data/11 · mono small",
+      "font": {
+        "family": "Geist Mono",
+        "style": "Medium",
+        "variationSettings": {
+          "wght": 500
+        }
+      },
+      "size": 11,
+      "line": {
+        "unit": "PIXELS",
+        "value": 16
+      }
+    },
+    {
+      "id": "S:8d40fbeed47399bdd31c2529fa9969bafd4340c2,",
+      "name": "data/12 · mono",
+      "font": {
+        "family": "Geist Mono",
+        "style": "Regular",
+        "variationSettings": {
+          "wght": 400
+        }
+      },
+      "size": 12,
+      "line": {
+        "unit": "PIXELS",
+        "value": 16
+      }
+    },
+    {
+      "id": "S:bece2bd9c27afea6d82fdabbcf72c2255e8890ff,",
+      "name": "data/13 · mono",
+      "font": {
+        "family": "Geist Mono",
+        "style": "Regular",
+        "variationSettings": {
+          "wght": 400
+        }
+      },
+      "size": 13,
+      "line": {
+        "unit": "PIXELS",
+        "value": 20
+      }
+    },
+    {
+      "id": "S:bd306a93111bb1590e430cf2881e9a2055212951,",
+      "name": "ui/11 · caption medium",
+      "font": {
+        "family": "Inter",
+        "style": "Medium",
+        "variationSettings": {
+          "wght": 500,
+          "slnt": 0
+        }
+      },
+      "size": 11,
+      "line": {
+        "unit": "PIXELS",
+        "value": 16
+      }
+    },
+    {
+      "id": "S:2b5b6328c80b96dcd7c0c64f092eab433c7f8c1c,",
+      "name": "ui/11 · section header",
+      "font": {
+        "family": "Inter",
+        "style": "Medium",
+        "variationSettings": {
+          "wght": 500,
+          "slnt": 0
+        }
+      },
+      "size": 11,
+      "line": {
+        "unit": "PIXELS",
+        "value": 16
+      }
+    },
+    {
+      "id": "S:5ee0cb3c3c63bb60e2c1cd116cf8c419f68b3831,",
+      "name": "ui/12 · small strong",
+      "font": {
+        "family": "Inter",
+        "style": "Semi Bold",
+        "variationSettings": {
+          "wght": 600,
+          "slnt": 0
+        }
+      },
+      "size": 12,
+      "line": {
+        "unit": "PIXELS",
+        "value": 18
+      }
+    },
+    {
+      "id": "S:472b6f0b5f23f000c1bc7b6bb9b3b89092b95b6d,",
+      "name": "ui/14 · body",
+      "font": {
+        "family": "Inter",
+        "style": "Regular",
+        "variationSettings": {
+          "wght": 400,
+          "slnt": 0
+        }
+      },
+      "size": 14,
+      "line": {
+        "unit": "PIXELS",
+        "value": 20
+      }
+    },
+    {
+      "id": "S:5dd00400dbe8b3ba45fdcaabd94f5e5f1f4b9bec,",
+      "name": "ui/14 · panel title strong",
+      "font": {
+        "family": "Inter",
+        "style": "Semi Bold",
+        "variationSettings": {
+          "wght": 600,
+          "slnt": 0
+        }
+      },
+      "size": 14,
+      "line": {
+        "unit": "PIXELS",
+        "value": 20
+      }
+    },
+    {
+      "id": "S:6f1ae67351b50c133d58e46741d6b402c3b86e35,",
+      "name": "ui/28 · page title",
+      "font": {
+        "family": "Inter",
+        "style": "Semi Bold",
+        "variationSettings": {
+          "wght": 600,
+          "slnt": 0
+        }
+      },
+      "size": 28,
+      "line": {
+        "unit": "PIXELS",
+        "value": 36
+      }
+    },
+    {
+      "id": "S:d473e45d92afcd4588454de8ac800be1405f7dcf,",
+      "name": "ui/12 · small medium",
+      "font": {
+        "family": "Inter",
+        "style": "Medium",
+        "variationSettings": {
+          "wght": 500,
+          "slnt": 0
+        }
+      },
+      "size": 12,
+      "line": {
+        "unit": "PIXELS",
+        "value": 18
+      }
+    }
+  ],
+  "collections": [
+    {
+      "id": "VariableCollectionId:2:2",
+      "name": "Package",
+      "count": 77,
+      "modes": [
+        {
+          "name": "Editor",
+          "modeId": "2:0"
+        },
+        {
+          "name": "Dashboard",
+          "modeId": "2:1"
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:2:8",
+      "name": "Primitives",
+      "count": 156,
+      "modes": [
+        {
+          "name": "Default",
+          "modeId": "2:2"
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:3476:15922",
+      "name": "Editor v1 Clone / Prototype scenarios",
+      "count": 129,
+      "modes": [
+        {
+          "name": "Mode 1",
+          "modeId": "3476:0"
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:3720:43309",
+      "name": "Media verification state",
+      "count": 5,
+      "modes": [
+        {
+          "name": "Mode 1",
+          "modeId": "3720:0"
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:3721:20493",
+      "name": "CMS media field prototype",
+      "count": 16,
+      "modes": [
+        {
+          "name": "Mode 1",
+          "modeId": "3721:0"
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:3721:43069",
+      "name": "Media · Font integration",
+      "count": 4,
+      "modes": [
+        {
+          "name": "Mode 1",
+          "modeId": "3721:2"
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:3721:43509",
+      "name": "Media editor prototype draft",
+      "count": 61,
+      "modes": [
+        {
+          "name": "Mode 1",
+          "modeId": "3721:3"
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:3724:44889",
+      "name": "Media · Video reference fixture",
+      "count": 1,
+      "modes": [
+        {
+          "name": "Mode 1",
+          "modeId": "3724:0"
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:3737:43622",
+      "name": "Settings prototype state",
+      "count": 6,
+      "modes": [
+        {
+          "name": "Mode 1",
+          "modeId": "3737:0"
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:3737:43711",
+      "name": "Domain verification prototype",
+      "count": 1,
+      "modes": [
+        {
+          "name": "Mode 1",
+          "modeId": "3737:1"
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:3737:44853",
+      "name": "Localization prototype state",
+      "count": 5,
+      "modes": [
+        {
+          "name": "Mode 1",
+          "modeId": "3737:3"
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:3737:47273",
+      "name": "Content completion",
+      "count": 22,
+      "modes": [
+        {
+          "name": "Mode 1",
+          "modeId": "3737:4"
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:3737:48339",
+      "name": "Release design journeys",
+      "count": 56,
+      "modes": [
+        {
+          "name": "Mode 1",
+          "modeId": "3737:5"
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:3737:55314",
+      "name": "Editor / Canvas utilities",
+      "count": 17,
+      "modes": [
+        {
+          "name": "Mode 1",
+          "modeId": "3737:7"
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:3737:56967",
+      "name": "Activity filter",
+      "count": 7,
+      "modes": [
+        {
+          "name": "Mode 1",
+          "modeId": "3737:10"
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:3739:48577",
+      "name": "Editor clone · command availability",
+      "count": 7,
+      "modes": [
+        {
+          "name": "Mode 1",
+          "modeId": "3739:3"
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:3739:48582",
+      "name": "Prototype · French translation progress",
+      "count": 5,
+      "modes": [
+        {
+          "name": "Mode 1",
+          "modeId": "3739:4"
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:3743:24336",
+      "name": "Brand prototype state",
+      "count": 89,
+      "modes": [
+        {
+          "name": "Mode 1",
+          "modeId": "3743:1"
+        },
+        {
+          "name": "States · selected + saved",
+          "modeId": "3747:0"
+        },
+        {
+          "name": "States · selected + error",
+          "modeId": "3766:0"
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:3759:24990",
+      "name": "Components · confirmation context",
+      "count": 9,
+      "modes": [
+        {
+          "name": "Mode 1",
+          "modeId": "3759:0"
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:3856:25564",
+      "name": "Integrations prototype state",
+      "count": 17,
+      "modes": [
+        {
+          "name": "Mode 1",
+          "modeId": "3856:0"
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:4643:45292",
+      "name": "Editor v3 · Inspector state",
+      "count": 9,
+      "modes": [
+        {
+          "name": "Mode 1",
+          "modeId": "4643:0"
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:6471:53047",
+      "name": "Editor v3 · Surface contract",
+      "count": 11,
+      "modes": [
+        {
+          "name": "Mode 1",
+          "modeId": "6471:0"
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:6688:55329",
+      "name": "Editor v3 · Navigation",
+      "count": 22,
+      "modes": [
+        {
+          "name": "Mode 1",
+          "modeId": "6688:0"
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:7897:196558",
+      "name": "Editor v3 · Ownership interactions",
+      "count": 5,
+      "modes": [
+        {
+          "name": "Default",
+          "modeId": "7897:0"
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:7952:197176",
+      "name": "Prototype · Editor v3 · draft state",
+      "count": 9,
+      "modes": [
+        {
+          "name": "Mode 1",
+          "modeId": "7952:3"
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:7978:197163",
+      "name": "Code alignment · CMS field draft",
+      "count": 2,
+      "modes": [
+        {
+          "name": "Mode 1",
+          "modeId": "7978:0"
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:7982:198533",
+      "name": "Code alignment · Brand selection",
+      "count": 36,
+      "modes": [
+        {
+          "name": "Mode 1",
+          "modeId": "7982:0"
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:7985:198572",
+      "name": "Code alignment · Inspector custom attributes",
+      "count": 10,
+      "modes": [
+        {
+          "name": "Mode 1",
+          "modeId": "7985:0"
+        }
+      ]
+    }
+  ],
+  "sampleInstanceCount": 8,
+  "sampleReactionNodes": [],
+  "startingPoints": []
+}

@@ -1,0 +1,514 @@
+{
+  "variables": [
+    {
+      "id": "VariableID:9064:17499",
+      "name": "r45/visibility/active"
+    },
+    {
+      "id": "VariableID:9064:17500",
+      "name": "r45/visibility/display-eligible"
+    },
+    {
+      "id": "VariableID:9064:17501",
+      "name": "r45/visibility/extras"
+    },
+    {
+      "id": "VariableID:9064:17502",
+      "name": "r45/visibility/origin"
+    },
+    {
+      "id": "VariableID:9064:17503",
+      "name": "r45/visibility/result"
+    },
+    {
+      "id": "VariableID:9064:17504",
+      "name": "r45/visibility/undo"
+    },
+    {
+      "id": "VariableID:9064:17505",
+      "name": "r45/visibility/reason"
+    },
+    {
+      "id": "VariableID:9064:17506",
+      "name": "r45/visibility/allowed"
+    },
+    {
+      "id": "VariableID:9064:17507",
+      "name": "r45/visibility/changed"
+    },
+    {
+      "id": "VariableID:9064:17508",
+      "name": "r45/visibility/captured-caller"
+    },
+    {
+      "id": "VariableID:9064:17509",
+      "name": "r45/visibility/captured-device"
+    },
+    {
+      "id": "VariableID:9064:17510",
+      "name": "r45/visibility/captured-generation"
+    },
+    {
+      "id": "VariableID:9064:17511",
+      "name": "r45/visibility/captured-revision"
+    },
+    {
+      "id": "VariableID:9064:17512",
+      "name": "r45/visibility/heading/device"
+    },
+    {
+      "id": "VariableID:9064:17513",
+      "name": "r45/visibility/heading/generation"
+    },
+    {
+      "id": "VariableID:9064:17514",
+      "name": "r45/visibility/heading/locked"
+    },
+    {
+      "id": "VariableID:9064:17515",
+      "name": "r45/visibility/heading/mixed"
+    },
+    {
+      "id": "VariableID:9064:17516",
+      "name": "r45/visibility/heading/exists"
+    },
+    {
+      "id": "VariableID:9064:17517",
+      "name": "r45/visibility/heading/visible"
+    },
+    {
+      "id": "VariableID:9064:17518",
+      "name": "r45/visibility/heading/hidden"
+    },
+    {
+      "id": "VariableID:9064:17519",
+      "name": "r45/visibility/heading/normal"
+    },
+    {
+      "id": "VariableID:9064:17520",
+      "name": "r45/visibility/heading/tablet"
+    },
+    {
+      "id": "VariableID:9064:17521",
+      "name": "r45/visibility/heading/effective"
+    },
+    {
+      "id": "VariableID:9064:17522",
+      "name": "r45/visibility/heading/origin"
+    },
+    {
+      "id": "VariableID:9064:17523",
+      "name": "r45/visibility/heading/result"
+    },
+    {
+      "id": "VariableID:9064:17524",
+      "name": "r45/visibility/heading/layer"
+    },
+    {
+      "id": "VariableID:9064:17525",
+      "name": "r45/visibility/heading/undo"
+    },
+    {
+      "id": "VariableID:9064:17526",
+      "name": "r45/visibility/heading/before-key"
+    },
+    {
+      "id": "VariableID:9064:17527",
+      "name": "r45/visibility/heading/before-present"
+    },
+    {
+      "id": "VariableID:9064:17528",
+      "name": "r45/visibility/heading/before-raw"
+    },
+    {
+      "id": "VariableID:9064:17529",
+      "name": "r45/visibility/heading/before-generation"
+    },
+    {
+      "id": "VariableID:9064:17530",
+      "name": "r45/visibility/heading/undo-revision"
+    },
+    {
+      "id": "VariableID:9064:17531",
+      "name": "r45/visibility/heading/display-Desktop-present"
+    },
+    {
+      "id": "VariableID:9064:17532",
+      "name": "r45/visibility/heading/display-Desktop-raw"
+    },
+    {
+      "id": "VariableID:9064:17533",
+      "name": "r45/visibility/heading/display-Desktop-revision"
+    },
+    {
+      "id": "VariableID:9064:17534",
+      "name": "r45/visibility/heading/flag-Desktop-present"
+    },
+    {
+      "id": "VariableID:9064:17535",
+      "name": "r45/visibility/heading/flag-Desktop-raw"
+    },
+    {
+      "id": "VariableID:9064:17536",
+      "name": "r45/visibility/heading/flag-Desktop-revision"
+    },
+    {
+      "id": "VariableID:9064:17537",
+      "name": "r45/visibility/heading/display-Tablet-present"
+    },
+    {
+      "id": "VariableID:9064:17538",
+      "name": "r45/visibility/heading/display-Tablet-raw"
+    },
+    {
+      "id": "VariableID:9064:17539",
+      "name": "r45/visibility/heading/display-Tablet-revision"
+    },
+    {
+      "id": "VariableID:9064:17540",
+      "name": "r45/visibility/heading/flag-Tablet-present"
+    },
+    {
+      "id": "VariableID:9064:17541",
+      "name": "r45/visibility/heading/flag-Tablet-raw"
+    },
+    {
+      "id": "VariableID:9064:17542",
+      "name": "r45/visibility/heading/flag-Tablet-revision"
+    },
+    {
+      "id": "VariableID:9064:17543",
+      "name": "r45/visibility/heading/display-Mobile-present"
+    },
+    {
+      "id": "VariableID:9064:17544",
+      "name": "r45/visibility/heading/display-Mobile-raw"
+    },
+    {
+      "id": "VariableID:9064:17545",
+      "name": "r45/visibility/heading/display-Mobile-revision"
+    },
+    {
+      "id": "VariableID:9064:17546",
+      "name": "r45/visibility/heading/flag-Mobile-present"
+    },
+    {
+      "id": "VariableID:9064:17547",
+      "name": "r45/visibility/heading/flag-Mobile-raw"
+    },
+    {
+      "id": "VariableID:9064:17548",
+      "name": "r45/visibility/heading/flag-Mobile-revision"
+    },
+    {
+      "id": "VariableID:9064:17549",
+      "name": "r45/visibility/image/device"
+    },
+    {
+      "id": "VariableID:9064:17550",
+      "name": "r45/visibility/image/generation"
+    },
+    {
+      "id": "VariableID:9064:17551",
+      "name": "r45/visibility/image/locked"
+    },
+    {
+      "id": "VariableID:9064:17552",
+      "name": "r45/visibility/image/mixed"
+    },
+    {
+      "id": "VariableID:9064:17553",
+      "name": "r45/visibility/image/exists"
+    },
+    {
+      "id": "VariableID:9064:17554",
+      "name": "r45/visibility/image/visible"
+    },
+    {
+      "id": "VariableID:9064:17555",
+      "name": "r45/visibility/image/hidden"
+    },
+    {
+      "id": "VariableID:9064:17556",
+      "name": "r45/visibility/image/normal"
+    },
+    {
+      "id": "VariableID:9064:17557",
+      "name": "r45/visibility/image/tablet"
+    },
+    {
+      "id": "VariableID:9064:17558",
+      "name": "r45/visibility/image/effective"
+    },
+    {
+      "id": "VariableID:9064:17559",
+      "name": "r45/visibility/image/origin"
+    },
+    {
+      "id": "VariableID:9064:17560",
+      "name": "r45/visibility/image/result"
+    },
+    {
+      "id": "VariableID:9064:17561",
+      "name": "r45/visibility/image/layer"
+    },
+    {
+      "id": "VariableID:9064:17562",
+      "name": "r45/visibility/image/undo"
+    },
+    {
+      "id": "VariableID:9064:17563",
+      "name": "r45/visibility/image/before-key"
+    },
+    {
+      "id": "VariableID:9064:17564",
+      "name": "r45/visibility/image/before-present"
+    },
+    {
+      "id": "VariableID:9064:17565",
+      "name": "r45/visibility/image/before-raw"
+    },
+    {
+      "id": "VariableID:9064:17566",
+      "name": "r45/visibility/image/before-generation"
+    },
+    {
+      "id": "VariableID:9064:17567",
+      "name": "r45/visibility/image/undo-revision"
+    },
+    {
+      "id": "VariableID:9064:17568",
+      "name": "r45/visibility/image/display-Desktop-present"
+    },
+    {
+      "id": "VariableID:9064:17569",
+      "name": "r45/visibility/image/display-Desktop-raw"
+    },
+    {
+      "id": "VariableID:9064:17570",
+      "name": "r45/visibility/image/display-Desktop-revision"
+    },
+    {
+      "id": "VariableID:9064:17571",
+      "name": "r45/visibility/image/flag-Desktop-present"
+    },
+    {
+      "id": "VariableID:9064:17572",
+      "name": "r45/visibility/image/flag-Desktop-raw"
+    },
+    {
+      "id": "VariableID:9064:17573",
+      "name": "r45/visibility/image/flag-Desktop-revision"
+    },
+    {
+      "id": "VariableID:9064:17574",
+      "name": "r45/visibility/image/display-Tablet-present"
+    },
+    {
+      "id": "VariableID:9064:17575",
+      "name": "r45/visibility/image/display-Tablet-raw"
+    },
+    {
+      "id": "VariableID:9064:17576",
+      "name": "r45/visibility/image/display-Tablet-revision"
+    },
+    {
+      "id": "VariableID:9064:17577",
+      "name": "r45/visibility/image/flag-Tablet-present"
+    },
+    {
+      "id": "VariableID:9064:17578",
+      "name": "r45/visibility/image/flag-Tablet-raw"
+    },
+    {
+      "id": "VariableID:9064:17579",
+      "name": "r45/visibility/image/flag-Tablet-revision"
+    },
+    {
+      "id": "VariableID:9064:17580",
+      "name": "r45/visibility/image/display-Mobile-present"
+    },
+    {
+      "id": "VariableID:9064:17581",
+      "name": "r45/visibility/image/display-Mobile-raw"
+    },
+    {
+      "id": "VariableID:9064:17582",
+      "name": "r45/visibility/image/display-Mobile-revision"
+    },
+    {
+      "id": "VariableID:9064:17583",
+      "name": "r45/visibility/image/flag-Mobile-present"
+    },
+    {
+      "id": "VariableID:9064:17584",
+      "name": "r45/visibility/image/flag-Mobile-raw"
+    },
+    {
+      "id": "VariableID:9064:17585",
+      "name": "r45/visibility/image/flag-Mobile-revision"
+    }
+  ],
+  "rows": [
+    {
+      "id": "8841:14865",
+      "children": [
+        {
+          "id": "8841:14866",
+          "name": "Panel header"
+        },
+        {
+          "id": "8841:14871",
+          "name": "Style values apply to the selected element. Check each property’s breakpoint and origin."
+        },
+        {
+          "id": "8841:14880",
+          "name": "Image · Desktop · Base"
+        },
+        {
+          "id": "9064:17586",
+          "name": "R45 / Display and origin"
+        },
+        {
+          "id": "8841:15282",
+          "name": "Action / Visibility"
+        },
+        {
+          "id": "8841:15284",
+          "name": "Controls / Visibility"
+        },
+        {
+          "id": "9064:17593",
+          "name": "Style families / existing Desktop and Mobile previews"
+        },
+        {
+          "id": "8841:15383",
+          "name": "Action / Back to Settings"
+        }
+      ]
+    },
+    {
+      "id": "8843:16840",
+      "children": [
+        {
+          "id": "8843:16841",
+          "name": "Action / Home"
+        },
+        {
+          "id": "8843:16842",
+          "name": "Action / Desktop"
+        },
+        {
+          "id": "9064:20045",
+          "name": "Action / Desktop"
+        },
+        {
+          "id": "8843:16843",
+          "name": "Action / Mobile"
+        },
+        {
+          "id": "8843:16844",
+          "name": "61% · 1200px · Desktop · Base"
+        }
+      ]
+    },
+    {
+      "id": "8843:20499",
+      "children": [
+        {
+          "id": "8843:20500",
+          "name": "Action / Home"
+        },
+        {
+          "id": "8843:20501",
+          "name": "Action / Desktop"
+        },
+        {
+          "id": "9064:20101",
+          "name": "Action / Desktop"
+        },
+        {
+          "id": "8843:20502",
+          "name": "Action / Mobile"
+        },
+        {
+          "id": "8843:20503",
+          "name": "61% · 1200px · Desktop · Base"
+        }
+      ]
+    },
+    {
+      "id": "8843:16873",
+      "children": [
+        {
+          "id": "8843:17014",
+          "name": "Heading"
+        },
+        {
+          "id": "8843:17015",
+          "name": "Inspector tabs"
+        },
+        {
+          "id": "8843:17024",
+          "name": "Heading · Desktop · Base"
+        },
+        {
+          "id": "9064:20048",
+          "name": "Existing property previews / Desktop and Mobile"
+        },
+        {
+          "id": "9064:20049",
+          "name": "Tablet preview scope"
+        },
+        {
+          "id": "9064:20054",
+          "name": "Hidden element recovery"
+        }
+      ]
+    },
+    {
+      "id": "8843:20532",
+      "children": [
+        {
+          "id": "8843:20673",
+          "name": "Image"
+        },
+        {
+          "id": "8843:20674",
+          "name": "Inspector tabs"
+        },
+        {
+          "id": "8843:20683",
+          "name": "Image · Desktop · Base"
+        },
+        {
+          "id": "9064:20104",
+          "name": "Existing property previews / Desktop and Mobile"
+        },
+        {
+          "id": "9064:20105",
+          "name": "Tablet preview scope"
+        },
+        {
+          "id": "9064:20110",
+          "name": "Hidden element recovery"
+        }
+      ]
+    }
+  ],
+  "roots": [
+    {
+      "id": "9064:17601",
+      "name": "R45 / Visibility / Change unavailable"
+    },
+    {
+      "id": "9064:20058",
+      "name": "R45 / Review / heading visibility"
+    },
+    {
+      "id": "9064:20114",
+      "name": "R45 / Review / image visibility"
+    }
+  ],
+  "fieldParent": "9064:17586"
+}

@@ -1,0 +1,82 @@
+{
+  "counts": {
+    "shadow": 106,
+    "ellipsis": 18,
+    "hideSrOnly": 14,
+    "mono": 47,
+    "uppercase": 4
+  },
+  "failures": [],
+  "screens": [
+    {
+      "id": "8281:2",
+      "name": "AS-IS 01 · Review / empty · 1280",
+      "w": 1280,
+      "h": 720,
+      "parent": "8280:2"
+    },
+    {
+      "id": "8283:2",
+      "name": "AS-IS 02 · Heading / Style",
+      "w": 1280,
+      "h": 720,
+      "parent": "8280:2"
+    },
+    {
+      "id": "8283:299",
+      "name": "AS-IS 03 · Selected element actions",
+      "w": 1280,
+      "h": 720,
+      "parent": "8280:2"
+    },
+    {
+      "id": "8283:610",
+      "name": "AS-IS 04 · Layers",
+      "w": 1280,
+      "h": 720,
+      "parent": "8280:2"
+    },
+    {
+      "id": "8283:935",
+      "name": "AS-IS 05 · Pages",
+      "w": 1280,
+      "h": 720,
+      "parent": "8280:2"
+    },
+    {
+      "id": "8283:1249",
+      "name": "AS-IS 06 · Add catalog",
+      "w": 1280,
+      "h": 720,
+      "parent": "8280:2"
+    },
+    {
+      "id": "8283:1654",
+      "name": "AS-IS 07 · Saved components",
+      "w": 1280,
+      "h": 720,
+      "parent": "8280:2"
+    },
+    {
+      "id": "8283:1998",
+      "name": "AS-IS 08 · Assets quick chooser",
+      "w": 1280,
+      "h": 720,
+      "parent": "8280:2"
+    },
+    {
+      "id": "8283:2325",
+      "name": "AS-IS 09 · Full Media",
+      "w": 1280,
+      "h": 720,
+      "parent": "8280:2"
+    },
+    {
+      "id": "8283:2523",
+      "name": "AS-IS 10 · CMS records",
+      "w": 1280,
+      "h": 720,
+      "parent": "8280:2"
+    }
+  ]
+}

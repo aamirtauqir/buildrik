@@ -1,0 +1,157 @@
+[
+  {
+    "label": "Members",
+    "goto": "8539:10714",
+    "shot": "r33-members.png"
+  },
+  {
+    "label": "Invite member",
+    "x": 352,
+    "y": 182,
+    "shot": "r33-invite.png"
+  },
+  {
+    "label": "Reject blank email",
+    "x": 902,
+    "y": 684,
+    "shot": "r33-invite-invalid.png"
+  },
+  {
+    "label": "Return invite",
+    "x": 720,
+    "y": 551
+  },
+  {
+    "label": "Set email",
+    "x": 720,
+    "y": 433
+  },
+  {
+    "label": "Open roles",
+    "x": 720,
+    "y": 517
+  },
+  {
+    "label": "Choose Viewer",
+    "x": 720,
+    "y": 623
+  },
+  {
+    "label": "Restrict site access",
+    "x": 720,
+    "y": 635,
+    "shot": "r33-invite-scoped.png"
+  },
+  {
+    "label": "Send sample invitation",
+    "x": 902,
+    "y": 684,
+    "shot": "r33-invite-pending.png"
+  },
+  {
+    "label": "Billing",
+    "goto": "8539:10742"
+  },
+  {
+    "label": "Change plan",
+    "x": 422,
+    "y": 298
+  },
+  {
+    "label": "Business draft",
+    "x": 720,
+    "y": 547,
+    "shot": "r33-billing-draft.png"
+  },
+  {
+    "label": "Cancel plan change",
+    "x": 538,
+    "y": 631,
+    "shot": "r33-billing-unchanged.png"
+  },
+  {
+    "label": "Integrations",
+    "goto": "8539:10770"
+  },
+  {
+    "label": "Configure Mailchimp",
+    "x": 1194,
+    "y": 260
+  },
+  {
+    "label": "Set API key only",
+    "x": 720,
+    "y": 486
+  },
+  {
+    "label": "Reject missing audience",
+    "x": 902,
+    "y": 619,
+    "wait": 1500,
+    "shot": "r33-mailchimp-invalid.png"
+  },
+  {
+    "label": "Back to config",
+    "x": 720,
+    "y": 551
+  },
+  {
+    "label": "Set audience",
+    "x": 720,
+    "y": 570
+  },
+  {
+    "label": "Connect sample",
+    "x": 902,
+    "y": 619,
+    "wait": 1500,
+    "shot": "r33-mailchimp-connected.png"
+  },
+  {
+    "label": "Site administration",
+    "goto": "8777:14104"
+  },
+  {
+    "label": "Delete site",
+    "x": 720,
+    "y": 553
+  },
+  {
+    "label": "Reject blank confirmation",
+    "x": 902,
+    "y": 583,
+    "shot": "r33-site-delete-invalid.png"
+  },
+  {
+    "label": "Return confirmation",
+    "x": 720,
+    "y": 541
+  },
+  {
+    "label": "Cancel deletion",
+    "x": 538,
+    "y": 583
+  },
+  {
+    "label": "Share draft",
+    "x": 720,
+    "y": 649
+  },
+  {
+    "label": "Set one day",
+    "x": 447,
+    "y": 619
+  },
+  {
+    "label": "Create sample link",
+    "x": 720,
+    "y": 667,
+    "shot": "r33-sharing-link.png"
+  },
+  {
+    "label": "Revoke link",
+    "x": 720,
+    "y": 571,
+    "shot": "r33-sharing-revoke-confirm.png"
+  }
+]

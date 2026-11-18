@@ -1,0 +1,150 @@
+{
+  "createdNodeIds": [
+    "153:79518",
+    "153:80019",
+    "153:80516",
+    "153:81012",
+    "153:81506",
+    "153:82009",
+    "153:82477",
+    "153:82970",
+    "153:83468",
+    "153:83943",
+    "153:84447"
+  ],
+  "mutatedNodeIds": [
+    "153:79999",
+    "153:80000",
+    "153:79992",
+    "146:73268",
+    "153:80496",
+    "153:80497",
+    "153:80489",
+    "146:74143",
+    "153:80992",
+    "153:80993",
+    "153:80985",
+    "146:74581",
+    "153:81493",
+    "153:81487",
+    "153:81988",
+    "153:81989",
+    "153:81981",
+    "145:69468",
+    "145:69733",
+    "I153:82202;4:547",
+    "153:82202",
+    "153:82952",
+    "153:82946",
+    "153:82213",
+    "153:82950",
+    "146:75446",
+    "146:75447",
+    "146:75450",
+    "153:83448",
+    "153:83439",
+    "I153:83661;4:547",
+    "153:83661",
+    "153:83449",
+    "145:69039",
+    "153:84427",
+    "153:84418",
+    "I153:84641;4:547",
+    "153:84641",
+    "153:84428",
+    "145:69475"
+  ],
+  "frames": [
+    {
+      "id": "153:79518",
+      "name": "B3-C28 · Canvas / inspect guide, failed sync retained",
+      "w": 1440,
+      "h": 900,
+      "nodes": 454,
+      "images": []
+    },
+    {
+      "id": "153:80019",
+      "name": "B3-C29 · Canvas / inspect guide, offline status retained",
+      "w": 1440,
+      "h": 900,
+      "nodes": 454,
+      "images": []
+    },
+    {
+      "id": "153:80516",
+      "name": "B3-C30 · Canvas / inspect guide, acknowledged status retained",
+      "w": 1440,
+      "h": 900,
+      "nodes": 454,
+      "images": []
+    },
+    {
+      "id": "153:81012",
+      "name": "B3-C31 · Canvas / inspect original guide after adding another",
+      "w": 1440,
+      "h": 900,
+      "nodes": 452,
+      "images": []
+    },
+    {
+      "id": "153:81506",
+      "name": "B3-C32 · Canvas / inspect added guide, original retained",
+      "w": 1440,
+      "h": 900,
+      "nodes": 455,
+      "images": []
+    },
+    {
+      "id": "153:82009",
+      "name": "B3-C33 · Canvas / 320px guide locked, sync pending",
+      "w": 1440,
+      "h": 900,
+      "nodes": 460,
+      "images": []
+    },
+    {
+      "id": "153:82477",
+      "name": "B3-C34 · Canvas / locked 320px guide detail",
+      "w": 1440,
+      "h": 900,
+      "nodes": 451,
+      "images": []
+    },
+    {
+      "id": "153:82970",
+      "name": "B3-C35 · Canvas / add guide after moving existing guide",
+      "w": 1440,
+      "h": 900,
+      "nodes": 461,
+      "images": []
+    },
+    {
+      "id": "153:83468",
+      "name": "B3-C36 · Canvas / second guide added after move",
+      "w": 1440,
+      "h": 900,
+      "nodes": 465,
+      "images": []
+    },
+    {
+      "id": "153:83943",
+      "name": "B3-C37 · Canvas / add another guide with all previous guides kept",
+      "w": 1440,
+      "h": 900,
+      "nodes": 462,
+      "images": []
+    },
+    {
+      "id": "153:84447",
+      "name": "B3-C38 · Canvas / four guides retained",
+      "w": 1440,
+      "h": 900,
+      "nodes": 470,
+      "images": []
+    }
+  ],
+  "allAffectedNodeIds": "affected-nodes.json (includes inherited instance descendants)",
+  "createdNodeCount": 5049,
+  "createdNodeIdsScope": "Root IDs only; full descendant IDs in artifact"
+}

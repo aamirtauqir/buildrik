@@ -1,0 +1,113 @@
+{
+  "date": "2026-10-11T19:35:35.243Z",
+  "scope": "Finite Figma prototype playback. No service effects.",
+  "steps": [
+    {
+      "label": "Editor scope disclosure",
+      "xy": [
+        720,
+        28
+      ],
+      "expected": "8441-1665",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8441-1665&starting-point-node-id=8317%3A297&hide-ui=1",
+      "pass": true
+    },
+    {
+      "label": "Scope returns same editor",
+      "sourceNodeId": "I8441:1666;8343:249",
+      "xy": [
+        519,
+        552
+      ],
+      "expected": "8317-297",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8317-297&starting-point-node-id=8317%3A297&hide-ui=1",
+      "pass": true
+    },
+    {
+      "label": "Collapsed panels scope disclosure",
+      "xy": [
+        720,
+        28
+      ],
+      "expected": "8441-1665",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8441-1665&starting-point-node-id=8377%3A1674&hide-ui=1",
+      "pass": true
+    },
+    {
+      "label": "Scope Escape retains both collapsed panels",
+      "sourceNodeId": "8441:1665",
+      "xy": [
+        "Escape",
+        0
+      ],
+      "expected": "8377-1674",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8377-1674&starting-point-node-id=8377%3A1674&hide-ui=1",
+      "pass": true
+    },
+    {
+      "label": "Applied Brand scope disclosure",
+      "xy": [
+        720,
+        28
+      ],
+      "expected": "8441-1698",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8441-1698&starting-point-node-id=8387%3A1701&hide-ui=1",
+      "pass": true
+    },
+    {
+      "label": "Scope Escape retains applied token",
+      "sourceNodeId": "8441:1698",
+      "xy": [
+        "Escape",
+        0
+      ],
+      "expected": "8387-1701",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8387-1701&starting-point-node-id=8387%3A1701&hide-ui=1",
+      "pass": true
+    },
+    {
+      "label": "Brand applied header return",
+      "sourceNodeId": "8387:1704",
+      "xy": [
+        94,
+        28
+      ],
+      "expected": "8387-1810",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8387-1810&starting-point-node-id=8387%3A1701&hide-ui=1",
+      "pass": true
+    },
+    {
+      "label": "AI Escape returns selected Heading",
+      "sourceNodeId": "8317:244162",
+      "xy": [
+        "Escape",
+        0
+      ],
+      "expected": "8317-297",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8317-297&starting-point-node-id=8317%3A244162&hide-ui=1",
+      "pass": true
+    },
+    {
+      "label": "Export Escape returns site menu",
+      "sourceNodeId": "8318:1310",
+      "xy": [
+        "Escape",
+        0
+      ],
+      "expected": "8318-911",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8318-911&starting-point-node-id=8318%3A1310&hide-ui=1",
+      "pass": true
+    },
+    {
+      "label": "Site menu Escape returns editor",
+      "sourceNodeId": "8318:911",
+      "xy": [
+        "Escape",
+        0
+      ],
+      "expected": "8317-297",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8317-297&starting-point-node-id=8318%3A1310&hide-ui=1",
+      "pass": true
+    }
+  ]
+}

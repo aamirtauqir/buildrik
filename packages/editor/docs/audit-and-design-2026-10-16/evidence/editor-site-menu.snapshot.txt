@@ -1,0 +1,201 @@
+--- BEGIN UNTRUSTED EXTERNAL CONTENT (source: http://localhost:3000/edit/cmv8uviql000bucorbmjjol97) ---
+--- BEGIN UNTRUSTED EXTERNAL C​ONTENT (source: http://localhost:3000/edit/cmv8uviql000bucorbmjjol97) ---
+    @e1 [button] "‹ Exit"
+    @e2 [button] "s0-qa site"
+    @e3 [button] "CMS"
+    @e4 [button] "History ›"
+    @e5 [button] "Review"
+    @e6 [button] "Comments"
+    @e7 [button] "Notifications, 2 unread"
+    @e8 [button] "Preview"
+    @e9 [button] "Site menu" [expanded]
+          @e10 [menuitem] "Site settings ⌃,"
+          @e11 [menuitem] "Export site…"
+          @e12 [menuitem] "Duplicate site"
+          @e13 [menuitem] "Issues"
+          @e14 [menuitem] "Activity log"
+          @e15 [menuitem] "Command palette ⌘K"
+          @e16 [menuitem] "Enter view mode"
+          @e17 [menuitem] "Keyboard shortcuts ⌘/"
+          @e18 [menuitem] "Share preview link"
+          @e19 [menuitem] "Copy live URL"
+          @e20 [menuitem] "Getting started"
+          @e21 [menuitem] "Start collaboration Planned" [disabled]
+          @e22 [menuitem] "Unpublish site…"
+          @e23 [menuitem] "View live site ↗"
+          @e24 [menuitem] "Site health ↗"
+          @e25 [menuitem] "Invite teammates ↗"
+          @e26 [menuitem] "Account settings ↗"
+@e27 [link] "Skip to Canvas"
+    @e28 [tab] "Add elements, blocks and components to your page": Add
+    @e29 [tab] "View and reorder page structure": Layers
+    @e30 [tab] "Manage all pages in your site": Pages
+    @e31 [tab] "Upload and manage images, videos, and fonts": Assets
+    @e32 [tab] "Collections, records and data sources for dynamic content" [selected]: CMS
+    @e33 [tab] "Brand — global colors, fonts, spacing tokens": Brand
+    @e34 [button] "Help — keyboard shortcuts": Help
+    @e35 [button] "Close CMS": ✕
+    @e36 [button] "Create a collection"
+    @e37 [button] "Open Sources"
+    @e38 [button] "Open Variables"
+    @e39 [button] "Open Conditions"
+    @e40 [tab] "Home, Homepage" [selected]: Home
+    @e41 [tab] "Home Copy"
+  @e42 [button] "Add page"
+  @e43 [radio] "Small"
+  @e44 [radio] "Large"
+  @e45 [button] "Send"
+  @e46 [button] "Click Me"
+  @e47 [link] "Link"
+  @e48 [button] "Undo" [disabled]
+  @e49 [button] "Redo" [disabled]
+  @e50 [button] "View": View · 1 ▾
+  @e51 [button] "Zoom 100%": 100% ▾
+  @e52 [button] "+ New collection"
+@e53 [button] "Get started — 3 of 7 complete. Click to expand.": 3/7
+@e54 [button] "v3.0.2 Output Detail Standard React Components Hide Until Restart Marker Color Clear on copy/send Block page interactions Manage MCP & Webhooks Manage MCP & Webhooks MCP Connection MCP connection allows agents to receive and act on annotations. Learn more Webhooks Auto-Send The webhook URL will receive live annotation changes and annotation data."
+  @e55 [button]
+  @e56 [button]
+  @e57 [button] [disabled]
+  @e58 [button] [disabled]
+  @e59 [button] [disabled]
+  @e60 [button] [disabled]
+  @e61 [button]
+  @e62 [button]
+  @e63 [link]
+  @e64 [button] "Switch to light mode"
+  @e65 [button] "Standard"
+  @e66 [checkbox] [checked]
+  @e67 [checkbox]
+  @e68 [button] "Indigo"
+  @e69 [button] "Blue"
+  @e70 [button] "Cyan"
+  @e71 [button] "Green"
+  @e72 [button] "Yellow"
+  @e73 [button] "Orange"
+  @e74 [button] "Red"
+  @e75 [checkbox] "Clear on copy/send"
+  @e76 [checkbox] "Block page interactions" [checked]
+  @e77 [button] "Manage MCP & Webhooks"
+  @e78 [button] "Manage MCP & Webhooks"
+    @e79 [link] "Learn more"
+  @e80 [checkbox] "Auto-Send" [checked] [disabled]
+  @e81 [textbox] "Webhook URL"
+
+── cursor-interactive (not in ARIA tree) ──
+@c1 [cursor:pointer] "Review"
+@c2 [cursor:pointer] "›"
+@c3 [popover-child, cursor:pointer] "Site settings"
+@c4 [popover-child, cursor:pointer] "⌃,"
+@c5 [popover-child, cursor:pointer] "Export site…"
+@c6 [popover-child, cursor:pointer] "Duplicate site"
+@c7 [popover-child, cursor:pointer] "Issues"
+@c8 [popover-child, cursor:pointer] "Activity log"
+@c9 [popover-child, cursor:pointer] "Command palette"
+@c10 [popover-child, cursor:pointer] "⌘K"
+@c11 [popover-child, cursor:pointer] "Enter view mode"
+@c12 [popover-child, cursor:pointer] "Keyboard shortcuts"
+@c13 [popover-child, cursor:pointer] "⌘/"
+@c14 [popover-child, cursor:pointer] "Share preview link"
+@c15 [popover-child, cursor:pointer] "Copy live URL"
+@c16 [popover-child, cursor:pointer] "Getting started"
+@c17 [popover-child, cursor:pointer] "Unpublish site…"
+@c18 [popover-child, cursor:pointer] "View live site ↗"
+@c19 [popover-child, cursor:pointer] "Site health ↗"
+@c20 [popover-child, cursor:pointer] "Invite teammates ↗"
+@c21 [popover-child, cursor:pointer] "Account settings ↗"
+@c22 [cursor:pointer] "Add"
+@c23 [cursor:pointer] "Layers"
+@c24 [cursor:pointer] "Pages"
+@c25 [cursor:pointer] "Assets"
+@c26 [cursor:pointer] "div"
+@c27 [cursor:pointer] "CMS"
+@c28 [cursor:pointer] "Brand"
+@c29 [cursor:pointer] "Help"
+@c30 [cursor:pointer] "Home"
+@c31 [cursor:pointer] "Home Copy"
+@c32 [tabindex=0] "s4 locked
+
+s4 locked
+
+s4 locked
+
+s4 probe
+
+s4 probe
+
+s4 probe
+
+s4 probe
+
+s1 stal"
+@c33 [popover-child, cursor:pointer] "Fill"
+@c34 [popover-child, cursor:pointer, tabindex=0, role=button] "Fill"
+@c35 [popover-child, cursor:pointer] "Fill"
+@c36 [popover-child, cursor:pointer] "span"
+@c37 [popover-child, cursor:pointer] "span"
+@c38 [popover-child, cursor:pointer] "Size"
+@c39 [popover-child, cursor:pointer, tabindex=0, role=button] "Size"
+@c40 [popover-child, cursor:pointer] "Size"
+@c41 [popover-child, cursor:pointer] "span"
+@c42 [popover-child, cursor:pointer] "span"
+@c43 [popover-child, cursor:pointer] "Typography"
+@c44 [popover-child, cursor:pointer, tabindex=0, role=button] "Typography"
+@c45 [popover-child, cursor:pointer] "Typography"
+@c46 [popover-child, cursor:pointer] "Inter"
+@c47 [popover-child, cursor:pointer] "span"
+@c48 [popover-child, cursor:pointer] "span"
+@c49 [popover-child, cursor:pointer] "Spacing"
+@c50 [popover-child, cursor:pointer, tabindex=0, role=button] "Spacing"
+@c51 [popover-child, cursor:pointer] "Spacing"
+@c52 [popover-child, cursor:pointer] "span"
+@c53 [popover-child, cursor:pointer] "3/7"
+@c54 [popover-child, cursor:pointer, tabindex=0, role=button] "v3.0.2
+
+Output Detail
+Standard
+React Components
+Hide Until Restart
+Marker Color
+"
+@c55 [popover-child, cursor:pointer] "div"
+@c56 [popover-child, cursor:pointer] "div"
+@c57 [popover-child, cursor:pointer] "div"
+@c58 [popover-child, cursor:pointer] "span"
+@c59 [popover-child, cursor:pointer] "span"
+@c60 [popover-child, cursor:pointer] "div"
+@c61 [popover-child, cursor:pointer] "span"
+@c62 [popover-child, cursor:pointer] "span"
+@c63 [popover-child, cursor:pointer] "div"
+@c64 [popover-child, cursor:pointer] "span"
+@c65 [popover-child, cursor:pointer] "span"
+@c66 [popover-child, cursor:pointer] "div"
+@c67 [popover-child, cursor:pointer] "span"
+@c68 [popover-child, cursor:pointer] "span"
+@c69 [popover-child, cursor:pointer] "div"
+@c70 [popover-child, cursor:pointer] "span"
+@c71 [popover-child, cursor:pointer] "span"
+@c72 [popover-child, cursor:pointer] "div"
+@c73 [popover-child, cursor:pointer] "span"
+@c74 [popover-child, cursor:pointer] "span"
+@c75 [popover-child, cursor:pointer] "div"
+@c76 [popover-child, cursor:pointer] "span"
+@c77 [popover-child, cursor:pointer] "div"
+@c78 [popover-child, cursor:pointer] "div"
+@c79 [popover-child, cursor:pointer] "span"
+@c80 [popover-child, cursor:pointer] "span"
+@c81 [popover-child, cursor:pointer] "span"
+@c82 [popover-child, cursor:pointer] "span"
+@c83 [popover-child, cursor:pointer] "Standard"
+@c84 [popover-child, cursor:pointer] "span"
+@c85 [popover-child, cursor:pointer] "span"
+@c86 [popover-child, cursor:pointer] "span"
+@c87 [popover-child, cursor:pointer] "span"
+@c88 [popover-child, cursor:pointer] "span"
+@c89 [popover-child, cursor:pointer] "Clear on copy/send"
+@c90 [popover-child, cursor:pointer] "Block page interactions"
+@c91 [popover-child, cursor:pointer] "Manage MCP & Webhooks"
+@c92 [popover-child, cursor:pointer] "span"
+@c93 [popover-child, cursor:pointer] "Manage MCP & Webhooks"
+--- END UNTRUSTED EXTERNAL C​ONTENT ---
+--- END UNTRUSTED EXTERNAL CONTENT ---

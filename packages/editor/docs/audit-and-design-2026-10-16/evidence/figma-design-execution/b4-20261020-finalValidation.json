@@ -1,0 +1,10 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"roots\":62,\"counts\":{\"FRAME\":4435,\"INSTANCE\":3991,\"TEXT\":4262,\"VECTOR\":3062,\"RECTANGLE\":102,\"ELLIPSE\":1},\"fonts\":[\"Inter\",\"Geist Mono\"],\"imageNodes\":[],\"horizontalErrors\":[],\"pageTopLevelCount\":158,\"limits\":\"Horizontal authored bounds only; vertical scrolling intentional; no runtime or keyboard playback.\"}"
+    }
+  ],
+  "structuredContent": null,
+  "isError": false
+}

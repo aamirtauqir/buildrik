@@ -1,0 +1,145 @@
+[
+  {
+    "label": "Per-page SEO",
+    "goto": "8690:13237"
+  },
+  {
+    "label": "Manage",
+    "x": 720,
+    "y": 282
+  },
+  {
+    "label": "About options",
+    "x": 970,
+    "y": 420
+  },
+  {
+    "label": "Settings",
+    "x": 720,
+    "y": 413,
+    "shot": "r31-about-seo.png"
+  },
+  {
+    "label": "Title picker",
+    "x": 538,
+    "y": 343
+  },
+  {
+    "label": "Title sample",
+    "x": 720,
+    "y": 421
+  },
+  {
+    "label": "Social",
+    "x": 116,
+    "y": 177
+  },
+  {
+    "label": "OG title",
+    "x": 538,
+    "y": 343
+  },
+  {
+    "label": "OG title sample",
+    "x": 720,
+    "y": 397
+  },
+  {
+    "label": "OG description",
+    "x": 538,
+    "y": 435
+  },
+  {
+    "label": "Description sample",
+    "x": 720,
+    "y": 445
+  },
+  {
+    "label": "Social image",
+    "x": 538,
+    "y": 251
+  },
+  {
+    "label": "Select image sample",
+    "x": 720,
+    "y": 493,
+    "shot": "r31-social-draft.png"
+  },
+  {
+    "label": "Advanced",
+    "x": 116,
+    "y": 225
+  },
+  {
+    "label": "Head input",
+    "x": 1110,
+    "y": 251
+  },
+  {
+    "label": "Invalid Head",
+    "x": 720,
+    "y": 637
+  },
+  {
+    "label": "Save invalid",
+    "x": 546,
+    "y": 562,
+    "wait": 1800,
+    "shot": "r31-head-invalid.png"
+  },
+  {
+    "label": "Fix Head",
+    "x": 720,
+    "y": 517
+  },
+  {
+    "label": "Save fixed",
+    "x": 546,
+    "y": 562,
+    "wait": 2200,
+    "shot": "r31-page-settings-saved.png"
+  },
+  {
+    "label": "Manage pages",
+    "x": 720,
+    "y": 501
+  },
+  {
+    "label": "Home options",
+    "x": 970,
+    "y": 372
+  },
+  {
+    "label": "Home settings",
+    "x": 720,
+    "y": 413,
+    "shot": "r31-home-seo-isolated.png"
+  },
+  {
+    "label": "Cancel Home draft",
+    "x": 354,
+    "y": 596
+  },
+  {
+    "label": "Discard",
+    "x": 720,
+    "y": 527
+  },
+  {
+    "label": "About options",
+    "x": 970,
+    "y": 420
+  },
+  {
+    "label": "About settings reopened",
+    "x": 720,
+    "y": 413,
+    "shot": "r31-about-seo-retained.png"
+  },
+  {
+    "label": "Social retained",
+    "x": 116,
+    "y": 177,
+    "shot": "r31-social-retained.png"
+  }
+]

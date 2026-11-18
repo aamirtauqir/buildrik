@@ -1,0 +1,19 @@
+[
+  {
+    "label": "Input settings",
+    "wait": 10000,
+    "shot": "r35-input-settings.png"
+  },
+  {
+    "label": "Style tab",
+    "x": 1155,
+    "y": 117,
+    "shot": "r35-style-open.png"
+  },
+  {
+    "label": "Close style",
+    "x": 1390,
+    "y": 90,
+    "shot": "r35-style-return.png"
+  }
+]

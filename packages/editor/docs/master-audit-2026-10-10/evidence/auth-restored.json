@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-10",
+  "source": "User explicitly requested locating their localhost dashboard session",
+  "method": "browse cookie-import-browser chrome --domain localhost; auto-selected Default; 5 cookies copied without exposing values",
+  "verified": "Navigated to /dashboard/projects and observed authenticated site list and account/workspace controls",
+  "testSite": {
+    "name": "Master audit 1010 disposable",
+    "id": "cmv1z8k860002yulrh29dr5fw",
+    "creation": "UI New site \u2192 Start from Scratch; draft listed in projects"
+  },
+  "limits": "Happy-path authenticated creation/save/reload verified. Remaining Phase 2 coverage still open.",
+  "authenticatedWorkflow": {
+    "heading": "UI inserted Heading; Meta+S; Saved feedback; reload retained el-mv1za85t-1mf6w4zthru at 36px",
+    "page": "UI Add page \u2192 Audit persisted page \u2192 Blank \u2192 Create; became active; Meta+S and reload retained Home and Audit persisted page",
+    "network": "Multiple POST sites.saveProject HTTP 200; subsequent GET batch sites.get/pages.list/siteDetail.settings.get HTTP 200",
+    "scope": "Existing authenticated account; local Next app and backend. No offline, concurrent save, cross-role or deployed-output proof."
+  }
+}

@@ -1,0 +1,8 @@
+--- BEGIN UNTRUSTED EXTERNAL CONTENT (source: file:///Users/shahg/Desktop/pencil/buildrik/packages/editor/docs/audit-and-design-2026-10-16/workflow-sketch.html) ---
+--- BEGIN UNTRUSTED EXTERNAL C​ONTENT (source: file:///Users/shahg/Desktop/pencil/buildrik/packages/editor/docs/audit-and-design-2026-10-16/workflow-sketch.html) ---
+    @e1 [link] "1 · Form editing"
+    @e2 [link] "2 · CMS and return context"
+    @e3 [link] "3 · Component master impact"
+    @e4 [link] "Full specification"
+--- END UNTRUSTED EXTERNAL C​ONTENT ---
+--- END UNTRUSTED EXTERNAL CONTENT ---

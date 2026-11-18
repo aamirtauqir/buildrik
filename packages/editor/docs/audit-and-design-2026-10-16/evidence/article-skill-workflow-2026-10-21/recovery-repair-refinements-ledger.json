@@ -1,0 +1,101 @@
+{
+  "date": "2026-10-21",
+  "controllerLabels": {
+    "mutatedNodeIds": [
+      "I376:25149;4:254",
+      "I376:25427;4:254",
+      "376:25150",
+      "376:25428"
+    ]
+  },
+  "statusCopy": {
+    "mutatedNodeIds": [
+      "I376:25249;4:547",
+      "I308:27454;4:547"
+    ],
+    "labels": [
+      "Replacement cancelled",
+      "Image deleted · not replaced"
+    ]
+  },
+  "composerCopy": {
+    "mutatedNodeIds": [
+      "377:25528",
+      "377:25581",
+      "377:25639",
+      "377:25777",
+      "377:25830",
+      "377:25888"
+    ]
+  },
+  "unknownStatus": {
+    "mutatedNodeIds": [
+      "303:37745",
+      "I303:37745;4:239"
+    ],
+    "width": 130,
+    "height": 32,
+    "root": "303:37723"
+  },
+  "pins": {
+    "createdNodeIds": [
+      "380:25594",
+      "380:25595",
+      "380:25596",
+      "380:25597",
+      "380:25598",
+      "380:25599",
+      "380:25600",
+      "380:25601",
+      "380:25602",
+      "380:25603",
+      "380:25604",
+      "380:25605",
+      "380:25606",
+      "380:25607",
+      "380:25608",
+      "380:25609",
+      "380:25610",
+      "380:25611",
+      "380:25612",
+      "380:25613",
+      "380:25614",
+      "380:25615",
+      "380:25616",
+      "380:25617",
+      "380:25618",
+      "380:25619",
+      "380:25620",
+      "380:25621"
+    ],
+    "mutatedNodeIds": [
+      "380:25597",
+      "380:25601",
+      "380:25605",
+      "380:25607",
+      "380:25611",
+      "380:25615",
+      "380:25619",
+      "380:25621"
+    ],
+    "removedNodeIds": [
+      "377:25721",
+      "377:25728",
+      "377:25735",
+      "377:25738"
+    ],
+    "note": "Proper original-status and draft/ack pin2 frames positioned absolutely inside snapshot; replaced erroneous standalone text clones."
+  },
+  "cancelledPublishStatus": {
+    "mutatedNodeIds": [
+      "303:39474",
+      "I303:39495;4:552"
+    ],
+    "labels": [
+      "Lena approved Round 2 · edited since",
+      "Publish cancelled · v12 kept"
+    ],
+    "root": "303:39317",
+    "validation": "Native screenshot inspected after copy-only edit; no reaction changes. Added after independent review."
+  }
+}

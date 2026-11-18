@@ -1,0 +1,8 @@
+[
+ {"x":1320,"y":212},
+ {"x":720,"y":403},
+ {"x":720,"y":379,"shot":"r42-form-cancel-preview.png"},
+ {"x":720,"y":657,"shot":"r42-form-cancel-unchanged.png"},
+ {"x":590,"y":715,"shot":"r42-form-field-locked.png"},
+ {"x":720,"y":403,"shot":"r42-form-locked-conversion-refusal.png"}
+]

@@ -1,0 +1,193 @@
+[
+  {
+    "number": 86,
+    "key": "component-create",
+    "nodeId": "8309:2",
+    "sourceLayout": "docs/master-audit-2026-10-10/evidence/figma-86-99-86-source-layout.json",
+    "capturedAt": "2026-10-10T15:59:16.373Z",
+    "sourceSha256": "bf2e705da15c55969a7346b1b0e18d6f71987013623dd0086436d89f1cf70f2d",
+    "sourceWarnings": [
+      {
+        "name": "create-component-scope",
+        "reason": "Four-value SVG background position unsupported."
+      }
+    ],
+    "comparison": "direct browser PNG / Figma before and after"
+  },
+  {
+    "number": 87,
+    "key": "component-instance",
+    "nodeId": "8309:461",
+    "sourceLayout": "docs/master-audit-2026-10-10/evidence/figma-86-99-87-source-layout.json",
+    "capturedAt": "2026-10-10T15:59:34.810Z",
+    "sourceSha256": "e3c9ec000d06bf4b3493dabec83ba327675daa106779b6f9910bba890c4f5c50",
+    "sourceWarnings": [],
+    "comparison": "direct browser PNG / Figma before and after"
+  },
+  {
+    "number": 88,
+    "key": "component-menu",
+    "nodeId": "8309:887",
+    "sourceLayout": "docs/master-audit-2026-10-10/evidence/figma-86-99-88-source-layout.json",
+    "capturedAt": "2026-10-10T15:59:35.473Z",
+    "sourceSha256": "27f30c99b1f671543ec63d486ca2c65150313d8aa26b3b32489e86cb5b4a92d5",
+    "sourceWarnings": [],
+    "comparison": "direct browser PNG / Figma before and after"
+  },
+  {
+    "number": 89,
+    "key": "component-expanded",
+    "nodeId": "8309:242881",
+    "sourceLayout": "docs/master-audit-2026-10-10/evidence/figma-86-99-89-source-layout.json",
+    "capturedAt": "2026-10-10T16:00:15.903Z",
+    "sourceSha256": "8236b26c26a6cd580ed470c248f54609423046d8c4c32b39b3de367bdeac745a",
+    "sourceWarnings": [],
+    "comparison": "direct browser PNG / Figma before and after"
+  },
+  {
+    "number": 90,
+    "key": "component-detail",
+    "nodeId": "8309:243286",
+    "sourceLayout": "docs/master-audit-2026-10-10/evidence/figma-86-99-90-source-layout.json",
+    "capturedAt": "2026-10-10T16:01:35.914Z",
+    "sourceSha256": "6d8f31e94056c4d6a3e7fc3df09892f5021e348b9ad01e42a13b2c69c19fdb7d",
+    "sourceWarnings": [
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      }
+    ],
+    "comparison": "direct browser PNG / Figma before and after"
+  },
+  {
+    "number": 91,
+    "key": "component-master",
+    "nodeId": "8309:243704",
+    "sourceLayout": "docs/master-audit-2026-10-10/evidence/figma-86-99-91-source-layout.json",
+    "capturedAt": "2026-10-10T16:01:36.563Z",
+    "sourceSha256": "6bd7896e8dab04b9a1513f47a303882874bcc08686dabcb15458e75202dc1a46",
+    "sourceWarnings": [
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      }
+    ],
+    "comparison": "direct browser PNG / Figma before and after"
+  },
+  {
+    "number": 92,
+    "key": "cms-binding",
+    "nodeId": "8309:244123",
+    "sourceLayout": "docs/master-audit-2026-10-10/evidence/figma-86-99-92-source-layout.json",
+    "capturedAt": "2026-10-10T16:02:36.232Z",
+    "sourceSha256": "23a92bd7e6266501630f6970efa8fb54448f29a7d738d7be747ec0845b7a6738",
+    "sourceWarnings": [
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      }
+    ],
+    "comparison": "direct browser PNG / Figma before and after"
+  },
+  {
+    "number": 93,
+    "key": "interaction-add",
+    "nodeId": "8309:244434",
+    "sourceLayout": "docs/master-audit-2026-10-10/evidence/figma-86-99-93-source-layout.json",
+    "capturedAt": "2026-10-10T16:02:43.249Z",
+    "sourceSha256": "c67648b6e46f6c732e84fd330f8f2fa227a18e2567f9da3610c1a3230572461d",
+    "sourceWarnings": [
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      }
+    ],
+    "comparison": "direct browser PNG / Figma before and after"
+  },
+  {
+    "number": 94,
+    "key": "form-behaviour",
+    "nodeId": "8309:244811",
+    "sourceLayout": "docs/master-audit-2026-10-10/evidence/figma-86-99-94-source-layout.json",
+    "capturedAt": "2026-10-10T16:03:33.439Z",
+    "sourceSha256": "f22b608ad8bd432900699133a491207b2289a26db7a9c3fe2b22d47288925114",
+    "sourceWarnings": [],
+    "comparison": "direct browser PNG / Figma before and after"
+  },
+  {
+    "number": 95,
+    "key": "property-image",
+    "nodeId": "8309:245270",
+    "sourceLayout": "docs/master-audit-2026-10-10/evidence/figma-86-99-95-source-layout.json",
+    "capturedAt": "2026-10-10T16:04:52.607Z",
+    "sourceSha256": "59995769c3a41c46f11e4686ba9f32bf8cfa6b0b6076e55ecdfb920c1278653f",
+    "sourceWarnings": [
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      },
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      },
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      }
+    ],
+    "comparison": "direct browser PNG / Figma before and after"
+  },
+  {
+    "number": 96,
+    "key": "token-picker",
+    "nodeId": "8309:245692",
+    "sourceLayout": "docs/master-audit-2026-10-10/evidence/figma-86-99-96-source-layout.json",
+    "capturedAt": "2026-10-10T16:04:53.544Z",
+    "sourceSha256": "42e1fec5235f142a899de3152a0feba56bc7ed639ec7347c9bc4752305cca2bb",
+    "sourceWarnings": [
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      },
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      },
+      {
+        "name": "img",
+        "reason": "Raster img requires separately supplied authorized image fill; not fetched."
+      }
+    ],
+    "comparison": "direct browser PNG / Figma before and after"
+  },
+  {
+    "number": 97,
+    "key": "heading-mobile",
+    "nodeId": "8309:246171",
+    "sourceLayout": "docs/master-audit-2026-10-10/evidence/figma-86-99-97-source-layout.json",
+    "capturedAt": "2026-10-10T16:06:28.545Z",
+    "sourceSha256": "18586e871407f75e6f1ae00071380653050102317f1fc72a5c4aabb44db77950",
+    "sourceWarnings": [],
+    "comparison": "direct browser PNG / Figma before and after"
+  },
+  {
+    "number": 98,
+    "key": "template-confirm",
+    "nodeId": "8309:246610",
+    "sourceLayout": "docs/master-audit-2026-10-10/evidence/figma-86-99-98-source-layout.json",
+    "capturedAt": "2026-10-10T16:08:31.712Z",
+    "sourceSha256": "9efade588858e7e5bf4e4d20f169a18dea6ea2494301a01873d5bee7f12cacd2",
+    "sourceWarnings": [],
+    "comparison": "direct browser PNG / Figma before and after"
+  },
+  {
+    "number": 99,
+    "key": "template-replace-guard",
+    "nodeId": "8309:247369",
+    "sourceLayout": "docs/master-audit-2026-10-10/evidence/figma-86-99-99-source-layout.json",
+    "capturedAt": "2026-10-10T16:09:44.825Z",
+    "sourceSha256": "16624840e012dfbb61e6e377f0bd07d5a07cf79e2638e65d509f0673c4f415c4",
+    "sourceWarnings": [],
+    "comparison": "direct browser PNG / Figma before and after"
+  }
+]

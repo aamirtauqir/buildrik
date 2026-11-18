@@ -1,0 +1,19 @@
+[
+  {
+    "label": "Choose fixture file after validation",
+    "x": 720,
+    "y": 509,
+    "shot": "walk-upload-file.png"
+  },
+  {
+    "label": "Start fixture upload",
+    "x": 720,
+    "y": 557,
+    "shot": "walk-upload-running.png",
+    "wait": 3500
+  },
+  {
+    "label": "Inspect upload outcome",
+    "shot": "walk-upload-outcome.png"
+  }
+]

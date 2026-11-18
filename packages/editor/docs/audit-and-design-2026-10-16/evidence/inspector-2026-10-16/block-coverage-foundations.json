@@ -1,0 +1,1706 @@
+{
+  "record": "FD-INS-03 / BIC-01",
+  "date": "2026-10-16",
+  "scope": "Basic12 + Layout6 + Forms16",
+  "authority": "Selected design; not implemented. BIC-C06 governs native transition/transport edge cases.",
+  "rows": [
+    {
+      "id": "B69-container",
+      "block_id": "container",
+      "category": "Basic",
+      "source": "src/blocks/Basic/Container.tsx",
+      "architecture": "Observed generated native tree: <div>. Returned selection: container / div.",
+      "evidence_status": "Builder/current Inspector paths inspected in source. block-runtime-survey.json verifies insertion/tree/returned selection/default panel only. Redesigned controls, save/reopen and output NOT RUN.",
+      "disposition": "Keep + Regroup",
+      "owner": "Selected container owns children and box; parent owns its placement context.",
+      "homes": "Content \u2192 Children/Attributes; Style \u2192 Children layout/placement/box.",
+      "gap": "Generic type does not authorize every native tag or arbitrary nesting.",
+      "controls": [
+        "Semantic tag readout uses actual native tag; existing valid tag retained. Children list derived from tree, Add validates native + engine nesting. Empty container offers existing Add path.",
+        "Display and flex/grid controls share existing Style writer; current class membership stays one source. Do not write defaults on selection."
+      ],
+      "workflow": "Canvas/Layers select \u2192 Content Children \u2192 select child \u2192 edit actual child \u2192 Back to container. Add/reorder/remove through BIC-C02; invalid target explains restriction and keeps tree.",
+      "permissions_batch_focus": "BIC-C01\u201307 and IC/II apply: actual target, descendants, ancestor locks, component scope, command/server authorization; structure single owner only; scalar batch explicitly compatible subtypes and accurate mixed state. Exclude native ID/label association, structural/type conversion, CMS binding, form transport and radio group/default actions from batch; deduplicate shortcuts and directly selected controls by actual write target. Keyboard Add/Edit/Move up/down/Remove; Enter applies, invalid draft retained, Escape cancels current interaction per II-02. Return restores exact parent/row focus.",
+      "compatibility": "No schema change required for regrouping; preserve IDs/native tags/content, styles, safe attrs and references. Structural corrections use atomic commands, not a new parallel property store.",
+      "acceptance": [
+        {
+          "id": "T-B69-container-01",
+          "criterion": "Empty container stays empty until Add; selecting it makes no mutation.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-container-02",
+          "criterion": "Child return restores container ID/scroll; delete/Undo preserves descendants.",
+          "status": "Specified, NOT RUN for redesigned application"
+        }
+      ],
+      "contracts": [
+        "BIC-C01\u201307",
+        "IC-01\u201313 as applicable",
+        "II-01",
+        "II-02",
+        "II-09",
+        "INS-D11"
+      ],
+      "sources": [
+        "src/blocks/Basic/Container.tsx",
+        "src/shared/constants/elementCapabilities.ts",
+        "src/editor/inspector/config/typeBlocks.ts",
+        "src/editor/inspector/sections/typeBlock/bodies/layoutBodies.tsx"
+      ]
+    },
+    {
+      "id": "B69-text",
+      "block_id": "text",
+      "category": "Basic",
+      "source": "src/blocks/Basic/Text.tsx",
+      "architecture": "Observed generated native tree: <span>. Returned selection: text / span.",
+      "evidence_status": "Builder/current Inspector paths inspected in source. block-runtime-survey.json verifies insertion/tree/returned selection/default panel only. Redesigned controls, save/reopen and output NOT RUN.",
+      "disposition": "Move + Keep",
+      "owner": "Actual text element or inline range in parent content.",
+      "homes": "Content \u2192 Text/semantics; Style \u2192 Typography; binding under Content.",
+      "gap": "Inline rich text must not be flattened by a plain root text replacement.",
+      "controls": [
+        "Edit text on canvas targets real content; preserve inline links/emphasis/marks unless explicitly replaced. Empty text is authored empty, not default sample text.",
+        "Applicable CMS binding controls retain exact field/source; bound content editing follows IC-07. Typography/token controls use existing supported values and actual provenance."
+      ],
+      "workflow": "Select \u2192 Edit text \u2192 canvas text mode \u2192 valid edit commit \u2192 Escape exits/cancels current interaction per II-02 \u2192 return same Inspector. Bound text opens binding detail or explicit disconnect before static replacement.",
+      "permissions_batch_focus": "BIC-C01\u201307 and IC/II apply: actual target, descendants, ancestor locks, component scope, command/server authorization; structure single owner only; scalar batch explicitly compatible subtypes and accurate mixed state. Exclude native ID/label association, structural/type conversion, CMS binding, form transport and radio group/default actions from batch; deduplicate shortcuts and directly selected controls by actual write target. Keyboard Add/Edit/Move up/down/Remove; Enter applies, invalid draft retained, Escape cancels current interaction per II-02. Return restores exact parent/row focus.",
+      "compatibility": "No schema change required for regrouping; preserve IDs/native tags/content, styles, safe attrs and references. Structural corrections use atomic commands, not a new parallel property store.",
+      "acceptance": [
+        {
+          "id": "T-B69-text-01",
+          "criterion": "Edit inline emphasis preserves nested markup and other properties.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-text-02",
+          "criterion": "Empty text stays empty through reopen; Undo exact.",
+          "status": "Specified, NOT RUN for redesigned application"
+        }
+      ],
+      "contracts": [
+        "BIC-C01\u201307",
+        "IC-01\u201313 as applicable",
+        "II-01",
+        "II-02",
+        "II-09",
+        "INS-D11"
+      ],
+      "sources": [
+        "src/blocks/Basic/Text.tsx",
+        "src/shared/constants/elementCapabilities.ts",
+        "src/editor/inspector/config/typeBlocks.ts",
+        "src/editor/inspector/sections/typeBlock/bodies/layoutBodies.tsx"
+      ]
+    },
+    {
+      "id": "B69-heading",
+      "block_id": "heading",
+      "category": "Basic",
+      "source": "src/blocks/Basic/Heading.tsx",
+      "architecture": "Observed generated native tree: <h2>. Returned selection: heading / h2.",
+      "evidence_status": "Builder/current Inspector paths inspected in source. block-runtime-survey.json verifies insertion/tree/returned selection/default panel only. Redesigned controls, save/reopen and output NOT RUN.",
+      "disposition": "Move + Fix",
+      "owner": "Selected heading owns native h1\u2013h6 and content.",
+      "homes": "Content \u2192 Text/Heading level; Style \u2192 Typography.",
+      "gap": "Multi-selection current primary-level display is not valid mixed-state behavior.",
+      "controls": [
+        "Heading level H1/H2/H3/H4/H5/H6, default preset H2; native tag change retains ID/content. Existing semantic level applies across breakpoints, not only current viewport.",
+        "Show Mixed for different tags; batch writes only explicit compatible headings, with no change on focus. Empty/default level is not a silent H2 reset; Reset semantic level is not inherited CSS."
+      ],
+      "workflow": "Select heading \u2192 Content choose level \u2192 one Undo; Edit text mode same target. Return from exact font/token source preserves heading, tab, breakpoint and draft.",
+      "permissions_batch_focus": "BIC-C01\u201307 and IC/II apply: actual target, descendants, ancestor locks, component scope, command/server authorization; structure single owner only; scalar batch explicitly compatible subtypes and accurate mixed state. Exclude native ID/label association, structural/type conversion, CMS binding, form transport and radio group/default actions from batch; deduplicate shortcuts and directly selected controls by actual write target. Keyboard Add/Edit/Move up/down/Remove; Enter applies, invalid draft retained, Escape cancels current interaction per II-02. Return restores exact parent/row focus.",
+      "compatibility": "No schema change required for regrouping; preserve IDs/native tags/content, styles, safe attrs and references. Structural corrections use atomic commands, not a new parallel property store.",
+      "acceptance": [
+        {
+          "id": "T-B69-heading-01",
+          "criterion": "H1+H3 show Mixed and no mutation until choose.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-heading-02",
+          "criterion": "Level change preserves ID/inline content and all style layers.",
+          "status": "Specified, NOT RUN for redesigned application"
+        }
+      ],
+      "contracts": [
+        "BIC-C01\u201307",
+        "IC-01\u201313 as applicable",
+        "II-01",
+        "II-02",
+        "II-09",
+        "INS-D11"
+      ],
+      "sources": [
+        "src/blocks/Basic/Heading.tsx",
+        "src/shared/constants/elementCapabilities.ts",
+        "src/editor/inspector/config/typeBlocks.ts",
+        "src/editor/inspector/sections/typeBlock/bodies/layoutBodies.tsx"
+      ]
+    },
+    {
+      "id": "B69-paragraph",
+      "block_id": "paragraph",
+      "category": "Basic",
+      "source": "src/blocks/Basic/Paragraph.tsx",
+      "architecture": "Observed generated native tree: <p>. Returned selection: paragraph / p.",
+      "evidence_status": "Builder/current Inspector paths inspected in source. block-runtime-survey.json verifies insertion/tree/returned selection/default panel only. Redesigned controls, save/reopen and output NOT RUN.",
+      "disposition": "Move + Keep",
+      "owner": "Native paragraph content and styles; any inline child range owns its semantic text.",
+      "homes": "Content \u2192 Text; Style \u2192 Typography.",
+      "gap": "Generic text actions must not erase inline markup or convert paragraph to span.",
+      "controls": [
+        "Preset p text is placeholder sample only, not fallback on empty. Content editing preserves native p and inline structures.",
+        "Advanced safe attrs/lang/dir preserved; no heading-level field for p. Empty placeholder text not automatically regenerated."
+      ],
+      "workflow": "Select p \u2192 edit text \u2192 commit/cancel \u2192 return same p. Linking inline range uses existing text/link capability only; unrelated paragraphs not affected.",
+      "permissions_batch_focus": "BIC-C01\u201307 and IC/II apply: actual target, descendants, ancestor locks, component scope, command/server authorization; structure single owner only; scalar batch explicitly compatible subtypes and accurate mixed state. Exclude native ID/label association, structural/type conversion, CMS binding, form transport and radio group/default actions from batch; deduplicate shortcuts and directly selected controls by actual write target. Keyboard Add/Edit/Move up/down/Remove; Enter applies, invalid draft retained, Escape cancels current interaction per II-02. Return restores exact parent/row focus.",
+      "compatibility": "No schema change required for regrouping; preserve IDs/native tags/content, styles, safe attrs and references. Structural corrections use atomic commands, not a new parallel property store.",
+      "acceptance": [
+        {
+          "id": "T-B69-paragraph-01",
+          "criterion": "Empty and multiline paragraph preserve semantics.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-paragraph-02",
+          "criterion": "Styled inline links and CMS values survive unrelated typography change.",
+          "status": "Specified, NOT RUN for redesigned application"
+        }
+      ],
+      "contracts": [
+        "BIC-C01\u201307",
+        "IC-01\u201313 as applicable",
+        "II-01",
+        "II-02",
+        "II-09",
+        "INS-D11"
+      ],
+      "sources": [
+        "src/blocks/Basic/Paragraph.tsx",
+        "src/shared/constants/elementCapabilities.ts",
+        "src/editor/inspector/config/typeBlocks.ts",
+        "src/editor/inspector/sections/typeBlock/bodies/layoutBodies.tsx"
+      ]
+    },
+    {
+      "id": "B69-button",
+      "block_id": "button",
+      "category": "Basic",
+      "source": "src/blocks/Basic/Button.tsx",
+      "architecture": "Observed generated native tree: <button>. Returned selection: button / button.",
+      "evidence_status": "Builder/current Inspector paths inspected in source. block-runtime-survey.json verifies insertion/tree/returned selection/default panel only. Redesigned controls, save/reopen and output NOT RUN.",
+      "disposition": "Move + Fix",
+      "owner": "Button owns text/children, native button type and supported action.",
+      "homes": "Content \u2192 Label/semantics; Behaviour \u2192 action; Style/Effects current fields.",
+      "gap": "Preset has no type attr; inside form browser semantics can submit. A button href alone is not proof of navigation.",
+      "controls": [
+        "Type button/submit/reset, plus existing absent state shown Native default; new generic Button preset should explicitly use button. Existing absent attrs are not rewritten on open.",
+        "Text label edits text-bearing child or native content without deleting icon/count children. Navigation is a deliberate Convert to link command: preview native button\u2192a and internal type\u2192link, retain stable engine/DOM IDs, content/children, classes, style layers and compatible references, and set destination via existing Link writer. Remove button-only type only on confirmed Apply; one Undo restores the exact button. Show effect on tag selectors and interaction/component references. An effective native submit/reset role (including absent type inside a form), an authored disabled button, or a form/popovertarget/invoker/button-only reference blocks this shortcut and routes to its action/disabled settings for an intentional change first; never transfer disabled to an anchor and claim the behavior is preserved. If any reference or child structure cannot survive losslessly, refuse before mutation. Cancel retains the button. Never author href on an unchanged button or silently attach an unevidenced click runtime."
+      ],
+      "workflow": "Select button \u2192 Content label/type \u2192 Behaviour supported action \u2192 explicit Preview to exercise. Editor click selects and cannot submit. Type change with form consequences shown; one Undo.",
+      "permissions_batch_focus": "BIC-C01\u201307 and IC/II apply: actual target, descendants, ancestor locks, component scope, command/server authorization; structure single owner only; scalar batch explicitly compatible subtypes and accurate mixed state. Exclude native ID/label association, structural/type conversion, CMS binding, form transport and radio group/default actions from batch; deduplicate shortcuts and directly selected controls by actual write target. Keyboard Add/Edit/Move up/down/Remove; Enter applies, invalid draft retained, Escape cancels current interaction per II-02. Return restores exact parent/row focus.",
+      "compatibility": "No schema change required for regrouping; preserve IDs/native tags/content, styles, safe attrs and references. Structural corrections use atomic commands, not a new parallel property store.",
+      "acceptance": [
+        {
+          "id": "T-B69-button-01",
+          "criterion": "Button in form does not accidentally submit during editor selection.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-button-02",
+          "criterion": "Existing missing type remains absent until intentional edit; label preserves nested icon.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-button-03",
+          "criterion": "Preview/output action matches authored setting; no claim from href attribute alone.",
+          "status": "Specified, NOT RUN for redesigned application"
+        }
+      ],
+      "contracts": [
+        "BIC-C01\u201307",
+        "IC-01\u201313 as applicable",
+        "II-01",
+        "II-02",
+        "II-09",
+        "INS-D11"
+      ],
+      "sources": [
+        "src/blocks/Basic/Button.tsx",
+        "src/shared/constants/elementCapabilities.ts",
+        "src/editor/inspector/config/typeBlocks.ts",
+        "src/editor/inspector/sections/typeBlock/bodies/layoutBodies.tsx"
+      ]
+    },
+    {
+      "id": "B69-link",
+      "block_id": "link",
+      "category": "Basic",
+      "source": "src/blocks/Basic/Link.tsx",
+      "architecture": "Observed generated native tree: <a>. Returned selection: link / a.",
+      "evidence_status": "Builder/current Inspector paths inspected in source. block-runtime-survey.json verifies insertion/tree/returned selection/default panel only. Redesigned controls, save/reopen and output NOT RUN.",
+      "disposition": "Move + Fix",
+      "owner": "Anchor owns destination/target/rel; page/section IDs point to their resource owner.",
+      "homes": "Content \u2192 Label; Behaviour \u2192 Link; Style/Effects appearance.",
+      "gap": "Primary-only link edits and stale input after Undo already verified in prior runtime record.",
+      "controls": [
+        "Destination types URL/Page/Section/Email/Phone from existing Link model; preserve internal #page:id and section references. URL safe scheme validation; missing referenced resource stays visible with Choose/Clear.",
+        "Open same/new tab; rel merge preserves user values and required safe target tokens. Existing # is placeholder. No nested interactive content. Mixed multi-link reads/writes/Undo reflect every eligible target."
+      ],
+      "workflow": "Select link \u2192 Behaviour \u2192 choose destination \u2192 commit \u2192 navigate source page/resource only via explicit link \u2192 return. Unavailable reference retains previous saved value until chosen correction; cancel draft retains prior destination.",
+      "permissions_batch_focus": "BIC-C01\u201307 and IC/II apply: actual target, descendants, ancestor locks, component scope, command/server authorization; structure single owner only; scalar batch explicitly compatible subtypes and accurate mixed state. Exclude native ID/label association, structural/type conversion, CMS binding, form transport and radio group/default actions from batch; deduplicate shortcuts and directly selected controls by actual write target. Keyboard Add/Edit/Move up/down/Remove; Enter applies, invalid draft retained, Escape cancels current interaction per II-02. Return restores exact parent/row focus.",
+      "compatibility": "No schema change required for regrouping; preserve IDs/native tags/content, styles, safe attrs and references. Structural corrections use atomic commands, not a new parallel property store.",
+      "acceptance": [
+        {
+          "id": "T-B69-link-01",
+          "criterion": "Two links edit and Undo both targets; inputs re-read actual values.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-link-02",
+          "criterion": "Deleted page reference shown missing; never rebound by matching name.",
+          "status": "Specified, NOT RUN for redesigned application"
+        }
+      ],
+      "contracts": [
+        "BIC-C01\u201307",
+        "IC-01\u201313 as applicable",
+        "II-01",
+        "II-02",
+        "II-09",
+        "INS-D11"
+      ],
+      "sources": [
+        "src/blocks/Basic/Link.tsx",
+        "src/shared/constants/elementCapabilities.ts",
+        "src/editor/inspector/config/typeBlocks.ts",
+        "src/editor/inspector/sections/typeBlock/bodies/layoutBodies.tsx"
+      ]
+    },
+    {
+      "id": "B69-list",
+      "block_id": "list",
+      "category": "Basic",
+      "source": "src/blocks/Basic/List.tsx",
+      "architecture": "Observed generated native tree: <ul> \u2192 [<li>, <li>, <li>]. Returned selection: list / ul.",
+      "evidence_status": "Builder/current Inspector paths inspected in source. block-runtime-survey.json verifies insertion/tree/returned selection/default panel only. Redesigned controls, save/reopen and output NOT RUN.",
+      "disposition": "Extend + Fix",
+      "owner": "List root owns ul/ol; li owns item content, native numbering and nested lists.",
+      "homes": "Content \u2192 List type/items; Style \u2192 marker and actual list layout.",
+      "gap": "Root is generic container family; item content/ordering needs semantic li units.",
+      "controls": [
+        "Type Unordered/Ordered (ul/ol), preserve existing menu/dl through native route rather than converting. Ordered start signed integer/absent, reversed presence/absent; per-li value signed integer/absent in native attrs. No zero-as-empty.",
+        "Items Add/Edit/Duplicate/Move/Remove preserve actual li ID and arbitrary nested content. New item is li with editable text; empty list valid. Nested lists remain inside li, never directly relabelled as text."
+      ],
+      "workflow": "Select list \u2192 choose item \u2192 Edit text or child \u2192 Back to list \u2192 reorder li. Changing type preserves items; unavailable ol-only attrs retained safely with scope note until explicit removal, not silently deleted.",
+      "permissions_batch_focus": "BIC-C01\u201307 and IC/II apply: actual target, descendants, ancestor locks, component scope, command/server authorization; structure single owner only; scalar batch explicitly compatible subtypes and accurate mixed state. Exclude native ID/label association, structural/type conversion, CMS binding, form transport and radio group/default actions from batch; deduplicate shortcuts and directly selected controls by actual write target. Keyboard Add/Edit/Move up/down/Remove; Enter applies, invalid draft retained, Escape cancels current interaction per II-02. Return restores exact parent/row focus.",
+      "compatibility": "No schema change required for regrouping; preserve IDs/native tags/content, styles, safe attrs and references. Structural corrections use atomic commands, not a new parallel property store.",
+      "acceptance": [
+        {
+          "id": "T-B69-list-01",
+          "criterion": "Reorder populated li preserves nested list; Undo exact.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-list-02",
+          "criterion": "ul\u2192ol does not rewrite text/IDs; start=0 distinct absent.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-list-03",
+          "criterion": "Invalid non-li direct drop rejected without tree mutation.",
+          "status": "Specified, NOT RUN for redesigned application"
+        }
+      ],
+      "contracts": [
+        "BIC-C01\u201307",
+        "IC-01\u201313 as applicable",
+        "II-01",
+        "II-02",
+        "II-09",
+        "INS-D11"
+      ],
+      "sources": [
+        "src/blocks/Basic/List.tsx",
+        "src/shared/constants/elementCapabilities.ts",
+        "src/editor/inspector/config/typeBlocks.ts",
+        "src/editor/inspector/sections/typeBlock/bodies/layoutBodies.tsx"
+      ]
+    },
+    {
+      "id": "B69-divider",
+      "block_id": "divider",
+      "category": "Basic",
+      "source": "src/blocks/Basic/Divider.tsx",
+      "architecture": "Observed generated native tree: <hr>. Returned selection: divider / hr.",
+      "evidence_status": "Builder/current Inspector paths inspected in source. block-runtime-survey.json verifies insertion/tree/returned selection/default panel only. Redesigned controls, save/reopen and output NOT RUN.",
+      "disposition": "Keep + Regroup",
+      "owner": "Native hr and its local style.",
+      "homes": "Content \u2192 semantic readout/Attributes; Style \u2192 width/border/spacing.",
+      "gap": "Void hr cannot accept children; container controls inappropriate.",
+      "controls": [
+        "Keep native hr with no content/children row. Visual thickness uses existing border/size property, not a duplicate thickness store; authored custom styles preserved.",
+        "Decorative versus semantic treatment explicit native accessibility attrs; no arbitrary heading/link controls."
+      ],
+      "workflow": "Select divider \u2192 Style edit actual property \u2192 source/reset via II-01 \u2192 Undo. Attempted insertion inside hr is rejected and offers a valid adjacent location.",
+      "permissions_batch_focus": "BIC-C01\u201307 and IC/II apply: actual target, descendants, ancestor locks, component scope, command/server authorization; structure single owner only; scalar batch explicitly compatible subtypes and accurate mixed state. Exclude native ID/label association, structural/type conversion, CMS binding, form transport and radio group/default actions from batch; deduplicate shortcuts and directly selected controls by actual write target. Keyboard Add/Edit/Move up/down/Remove; Enter applies, invalid draft retained, Escape cancels current interaction per II-02. Return restores exact parent/row focus.",
+      "compatibility": "No schema change required for regrouping; preserve IDs/native tags/content, styles, safe attrs and references. Structural corrections use atomic commands, not a new parallel property store.",
+      "acceptance": [
+        {
+          "id": "T-B69-divider-01",
+          "criterion": "No children created inside hr.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-divider-02",
+          "criterion": "Border/width edit preserves spacing and resets only active layer.",
+          "status": "Specified, NOT RUN for redesigned application"
+        }
+      ],
+      "contracts": [
+        "BIC-C01\u201307",
+        "IC-01\u201313 as applicable",
+        "II-01",
+        "II-02",
+        "II-09",
+        "INS-D11"
+      ],
+      "sources": [
+        "src/blocks/Basic/Divider.tsx",
+        "src/shared/constants/elementCapabilities.ts",
+        "src/editor/inspector/config/typeBlocks.ts",
+        "src/editor/inspector/sections/typeBlock/bodies/layoutBodies.tsx"
+      ]
+    },
+    {
+      "id": "B69-row",
+      "block_id": "row",
+      "category": "Basic",
+      "source": "src/blocks/Basic/Row.tsx",
+      "architecture": "Observed generated native tree: <div>. Returned selection: columns / div.",
+      "evidence_status": "Builder/current Inspector paths inspected in source. block-runtime-survey.json verifies insertion/tree/returned selection/default panel only. Redesigned controls, save/reopen and output NOT RUN.",
+      "disposition": "Fix + Regroup",
+      "owner": "Empty columns-typed div owns actual child list and its layout.",
+      "homes": "Content \u2192 Columns/Children; Style \u2192 Children layout/gap.",
+      "gap": "Row builder creates zero children; showing default2 hides actual structure.",
+      "controls": [
+        "Display actual count0 for new Row, custom count when outside preset2\u20136. Adding columns is explicit structural action, not initial render side effect.",
+        "Same column-count contract as columns/columns3; gap style and responsive read from actual CSS, not stale data-gap. Existing arbitrary children preserved; destructive shrink INS-D05."
+      ],
+      "workflow": "Select empty Row \u2192 Add column(s) \u2192 select new child \u2192 edit \u2192 Back. Count change previews contents affected; cancel/invalid nesting no changes.",
+      "permissions_batch_focus": "BIC-C01\u201307 and IC/II apply: actual target, descendants, ancestor locks, component scope, command/server authorization; structure single owner only; scalar batch explicitly compatible subtypes and accurate mixed state. Exclude native ID/label association, structural/type conversion, CMS binding, form transport and radio group/default actions from batch; deduplicate shortcuts and directly selected controls by actual write target. Keyboard Add/Edit/Move up/down/Remove; Enter applies, invalid draft retained, Escape cancels current interaction per II-02. Return restores exact parent/row focus.",
+      "compatibility": "No schema change required for regrouping; preserve IDs/native tags/content, styles, safe attrs and references. Structural corrections use atomic commands, not a new parallel property store.",
+      "acceptance": [
+        {
+          "id": "T-B69-row-01",
+          "criterion": "Row stays0 until explicit insertion.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-row-02",
+          "criterion": "Gap reselect and Undo match saved style; no arbitrary child loss.",
+          "status": "Specified, NOT RUN for redesigned application"
+        }
+      ],
+      "contracts": [
+        "BIC-C01\u201307",
+        "IC-01\u201313 as applicable",
+        "II-01",
+        "II-02",
+        "II-09",
+        "INS-D11"
+      ],
+      "sources": [
+        "src/blocks/Basic/Row.tsx",
+        "src/shared/constants/elementCapabilities.ts",
+        "src/editor/inspector/config/typeBlocks.ts",
+        "src/editor/inspector/sections/typeBlock/bodies/layoutBodies.tsx"
+      ]
+    },
+    {
+      "id": "B69-column",
+      "block_id": "column",
+      "category": "Basic",
+      "source": "src/blocks/Basic/Column.tsx",
+      "architecture": "Observed generated native tree: <div>. Returned selection: container / div.",
+      "evidence_status": "Builder/current Inspector paths inspected in source. block-runtime-survey.json verifies insertion/tree/returned selection/default panel only. Redesigned controls, save/reopen and output NOT RUN.",
+      "disposition": "Keep + Regroup",
+      "owner": "Selected column owns box/content; row/grid/flex parent owns sibling layout.",
+      "homes": "Content \u2192 Children; Style \u2192 Placement in parent + box.",
+      "gap": "Column class is not a separate fixed 12-column grid system.",
+      "controls": [
+        "Expose relevant flex-item/grid-item placement through existing fields only when parent layout matches; do not force child display or width.",
+        "Children edit via same generic container route. Type label and parent breadcrumb distinguish root Row from selected Column."
+      ],
+      "workflow": "Select column \u2192 parent breadcrumb for layout or Content child edit \u2192 Back restores column. Reorder uses parent siblings with native restrictions.",
+      "permissions_batch_focus": "BIC-C01\u201307 and IC/II apply: actual target, descendants, ancestor locks, component scope, command/server authorization; structure single owner only; scalar batch explicitly compatible subtypes and accurate mixed state. Exclude native ID/label association, structural/type conversion, CMS binding, form transport and radio group/default actions from batch; deduplicate shortcuts and directly selected controls by actual write target. Keyboard Add/Edit/Move up/down/Remove; Enter applies, invalid draft retained, Escape cancels current interaction per II-02. Return restores exact parent/row focus.",
+      "compatibility": "No schema change required for regrouping; preserve IDs/native tags/content, styles, safe attrs and references. Structural corrections use atomic commands, not a new parallel property store.",
+      "acceptance": [
+        {
+          "id": "T-B69-column-01",
+          "criterion": "Column style does not mutate parent gap.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-column-02",
+          "criterion": "Parent layout entry returns to exact column ID, preserving child drafts.",
+          "status": "Specified, NOT RUN for redesigned application"
+        }
+      ],
+      "contracts": [
+        "BIC-C01\u201307",
+        "IC-01\u201313 as applicable",
+        "II-01",
+        "II-02",
+        "II-09",
+        "INS-D11"
+      ],
+      "sources": [
+        "src/blocks/Basic/Column.tsx",
+        "src/shared/constants/elementCapabilities.ts",
+        "src/editor/inspector/config/typeBlocks.ts",
+        "src/editor/inspector/sections/typeBlock/bodies/layoutBodies.tsx"
+      ]
+    },
+    {
+      "id": "B69-spacer",
+      "block_id": "spacer",
+      "category": "Basic",
+      "source": "src/blocks/Basic/Spacer.tsx",
+      "architecture": "Observed generated native tree: <div>. Returned selection: spacer / div.",
+      "evidence_status": "Builder/current Inspector paths inspected in source. block-runtime-survey.json verifies insertion/tree/returned selection/default panel only. Redesigned controls, save/reopen and output NOT RUN.",
+      "disposition": "Keep + Regroup",
+      "owner": "Spacer element height/width and layout position.",
+      "homes": "Style \u2192 Size/Spacing; Content \u2192 semantic identity/Attributes.",
+      "gap": "Empty spacer is intentional, not failed content; imported custom children must not be deleted.",
+      "controls": [
+        "Preset height40px; other supported CSS units/raw expressions preserved. Zero valid; remove override exposes fallback, not necessarily40.",
+        "No automatic blank-text insertion. If existing unexpected children present show Custom structure and normal Layers route, not silent cleanup."
+      ],
+      "workflow": "Select spacer \u2192 Size \u2192 change height \u2192 check active breakpoint/source \u2192 Undo. Drag/reorder is parent structure command, not height edit.",
+      "permissions_batch_focus": "BIC-C01\u201307 and IC/II apply: actual target, descendants, ancestor locks, component scope, command/server authorization; structure single owner only; scalar batch explicitly compatible subtypes and accurate mixed state. Exclude native ID/label association, structural/type conversion, CMS binding, form transport and radio group/default actions from batch; deduplicate shortcuts and directly selected controls by actual write target. Keyboard Add/Edit/Move up/down/Remove; Enter applies, invalid draft retained, Escape cancels current interaction per II-02. Return restores exact parent/row focus.",
+      "compatibility": "No schema change required for regrouping; preserve IDs/native tags/content, styles, safe attrs and references. Structural corrections use atomic commands, not a new parallel property store.",
+      "acceptance": [
+        {
+          "id": "T-B69-spacer-01",
+          "criterion": "0/40px/auto/rem values represented without default coercion.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-spacer-02",
+          "criterion": "No imported child removal when Inspector opens.",
+          "status": "Specified, NOT RUN for redesigned application"
+        }
+      ],
+      "contracts": [
+        "BIC-C01\u201307",
+        "IC-01\u201313 as applicable",
+        "II-01",
+        "II-02",
+        "II-09",
+        "INS-D11"
+      ],
+      "sources": [
+        "src/blocks/Basic/Spacer.tsx",
+        "src/shared/constants/elementCapabilities.ts",
+        "src/editor/inspector/config/typeBlocks.ts",
+        "src/editor/inspector/sections/typeBlock/bodies/layoutBodies.tsx"
+      ]
+    },
+    {
+      "id": "B69-theme-toggle",
+      "block_id": "theme-toggle",
+      "category": "Basic",
+      "source": "src/blocks/Basic/ThemeToggle.ts",
+      "architecture": "Observed generated native tree: <div> \u2192 [<button>, <button>]. Returned selection: container / div.",
+      "evidence_status": "Builder/current Inspector paths inspected in source. block-runtime-survey.json verifies insertion/tree/returned selection/default panel only. Redesigned controls, save/reopen and output NOT RUN.",
+      "disposition": "Keep special context + Fix scope",
+      "owner": "Site Brand owns mode/tokens; group+two buttons own local content/styles; visitor preference is runtime state.",
+      "homes": "Existing Theme toggle special Inspector \u2192 exact Brand Colour mode; child styling via explicit parts/Layers.",
+      "gap": "Auto-only Add eligibility and off-mode publish hiding must be visible; not local element theme setting.",
+      "controls": [
+        "Group has light/dark data-bk-tt button roles and type=button. Show site Dark mode Off/Auto from canonical Brand; current Inspector explains hidden-on-publish when disabled.",
+        "Open Brand \u2192 Colour mode preserves origin; requires Brand permission to change site mode. No duplicated local mode toggle. Local labels/accessibility edits target actual buttons, preserve runtime markers. Light/Dark visitor choice is distinct from site Auto/Off. Removing or changing a required light/dark part shows the functional consequence and explicit repair route; never automatically reconstruct the group."
+      ],
+      "workflow": "Select toggle \u2192 see site mode/status \u2192 exact Brand mode \u2192 save through existing Brand flow \u2192 Back to toggle. Cancel returns without site mutation; existing toggle stored even when not currently offered in Add.",
+      "permissions_batch_focus": "BIC-C01\u201307 and IC/II apply: actual target, descendants, ancestor locks, component scope, command/server authorization; structure single owner only; scalar batch explicitly compatible subtypes and accurate mixed state. Exclude native ID/label association, structural/type conversion, CMS binding, form transport and radio group/default actions from batch; deduplicate shortcuts and directly selected controls by actual write target. Keyboard Add/Edit/Move up/down/Remove; Enter applies, invalid draft retained, Escape cancels current interaction per II-02. Return restores exact parent/row focus.",
+      "compatibility": "No schema change required for regrouping; preserve IDs/native tags/content, styles, safe attrs and references. Structural corrections use atomic commands, not a new parallel property store.",
+      "acceptance": [
+        {
+          "id": "T-B69-theme-toggle-01",
+          "criterion": "Off-mode existing toggle remains inspectable/stored and publish limit explicit.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-theme-toggle-02",
+          "criterion": "Brand mode update is site scope, not element override.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-theme-toggle-03",
+          "criterion": "Light/dark button marker IDs survive label edits.",
+          "status": "Specified, NOT RUN for redesigned application"
+        }
+      ],
+      "contracts": [
+        "BIC-C01\u201307",
+        "IC-01\u201313 as applicable",
+        "II-01",
+        "II-02",
+        "II-09",
+        "INS-D11"
+      ],
+      "sources": [
+        "src/blocks/Basic/ThemeToggle.ts",
+        "src/shared/constants/elementCapabilities.ts",
+        "src/editor/inspector/config/typeBlocks.ts",
+        "src/editor/inspector/sections/typeBlock/bodies/layoutBodies.tsx"
+      ]
+    },
+    {
+      "id": "B69-section",
+      "block_id": "section",
+      "category": "Layout",
+      "source": "src/blocks/Layout/Section.tsx",
+      "architecture": "Observed generated native tree: <section> \u2192 [<div>]. Returned selection: section / section.",
+      "evidence_status": "Builder/current Inspector paths inspected in source. block-runtime-survey.json verifies insertion/tree/returned selection/default panel only. Redesigned controls, save/reopen and output NOT RUN.",
+      "disposition": "Keep + Regroup",
+      "owner": "Section landmark root and nested content container are separate style owners.",
+      "homes": "Content \u2192 section children; Style root spacing/fill; inner container layout via explicit child.",
+      "gap": "A nested content max-width must not be mistaken for section width.",
+      "controls": [
+        "Section label/native attrs on section; Content container row targets actual nested div. Existing landmark/accessibility names preserved.",
+        "Root Fill/spacing and inner max-width/children layout remain distinct, each with source/reset. No new root max-width alias that writes a different owner."
+      ],
+      "workflow": "Select section \u2192 Content container \u2192 style max-width or edit child \u2192 Back to section. Delete section impact includes complete subtree.",
+      "permissions_batch_focus": "BIC-C01\u201307 and IC/II apply: actual target, descendants, ancestor locks, component scope, command/server authorization; structure single owner only; scalar batch explicitly compatible subtypes and accurate mixed state. Exclude native ID/label association, structural/type conversion, CMS binding, form transport and radio group/default actions from batch; deduplicate shortcuts and directly selected controls by actual write target. Keyboard Add/Edit/Move up/down/Remove; Enter applies, invalid draft retained, Escape cancels current interaction per II-02. Return restores exact parent/row focus.",
+      "compatibility": "No schema change required for regrouping; preserve IDs/native tags/content, styles, safe attrs and references. Structural corrections use atomic commands, not a new parallel property store.",
+      "acceptance": [
+        {
+          "id": "T-B69-section-01",
+          "criterion": "Changing inner max-width leaves section full-width/background unchanged.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-section-02",
+          "criterion": "Nested return retains correct owner and Undo targets.",
+          "status": "Specified, NOT RUN for redesigned application"
+        }
+      ],
+      "contracts": [
+        "BIC-C01\u201307",
+        "IC-01\u201313 as applicable",
+        "II-01",
+        "II-02",
+        "II-09",
+        "INS-D11"
+      ],
+      "sources": [
+        "src/blocks/Layout/Section.tsx",
+        "src/shared/constants/elementCapabilities.ts",
+        "src/editor/inspector/config/typeBlocks.ts",
+        "src/editor/inspector/sections/typeBlock/bodies/layoutBodies.tsx"
+      ]
+    },
+    {
+      "id": "B69-columns",
+      "block_id": "columns",
+      "category": "Layout",
+      "source": "src/blocks/Layout/Columns.tsx",
+      "architecture": "Observed generated native tree: <div> \u2192 [<div>, <div>]. Returned selection: columns / div.",
+      "evidence_status": "Builder/current Inspector paths inspected in source. block-runtime-survey.json verifies insertion/tree/returned selection/default panel only. Redesigned controls, save/reopen and output NOT RUN.",
+      "disposition": "Move + Fix",
+      "owner": "Columns root owns ordered column nodes; root CSS owns gap/layout.",
+      "homes": "Content \u2192 Column count/items; Style \u2192 gap/layout.",
+      "gap": "2-column preset structure exists; current attribute reads can disagree with actual children/CSS.",
+      "controls": [
+        "Preset creates2 real columns. Read actual count;2\u20136 convenience choices; preserve any custom/legacy count. Setting larger adds empty column units; no cloning populated user content implicitly.",
+        "Reducing populated columns requires Move contents to last remaining column / Remove contents with impact / Cancel (INS-D05). Move preserves the removed column own text/content as well as descendants in order; never drop direct Column 1 caption content. If a lossless valid nesting transformation is unavailable, block Move with a reason and preserve the tree. Validate nesting, locks, component/CMS refs first. One transaction/Undo.",
+        "Gap presets0/8/16/24/32px plus preserved custom CSS/units; actual active-layer gap owns value, no independent data-gap copy."
+      ],
+      "workflow": "Select root \u2192 count change \u2192 review affected children \u2192 choose explicit content treatment \u2192 atomic commit \u2192 select surviving column or return root. Invalid operation preserves original structure.",
+      "permissions_batch_focus": "BIC-C01\u201307 and IC/II apply: actual target, descendants, ancestor locks, component scope, command/server authorization; structure single owner only; scalar batch explicitly compatible subtypes and accurate mixed state. Exclude native ID/label association, structural/type conversion, CMS binding, form transport and radio group/default actions from batch; deduplicate shortcuts and directly selected controls by actual write target. Keyboard Add/Edit/Move up/down/Remove; Enter applies, invalid draft retained, Escape cancels current interaction per II-02. Return restores exact parent/row focus.",
+      "compatibility": "No schema change required for regrouping; preserve IDs/native tags/content, styles, safe attrs and references. Structural corrections use atomic commands, not a new parallel property store.",
+      "acceptance": [
+        {
+          "id": "T-B69-columns-01",
+          "criterion": "Preset 2 reads2 after reselect; gap24px reads24px.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-columns-02",
+          "criterion": "Shrink populated columns Cancel exact; Move preserves IDs; Remove+Undo restores all.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-columns-03",
+          "criterion": "Mobile gap does not change Desktop or structural count.",
+          "status": "Specified, NOT RUN for redesigned application"
+        }
+      ],
+      "contracts": [
+        "BIC-C01\u201307",
+        "IC-01\u201313 as applicable",
+        "II-01",
+        "II-02",
+        "II-09",
+        "INS-D11"
+      ],
+      "sources": [
+        "src/blocks/Layout/Columns.tsx",
+        "src/shared/constants/elementCapabilities.ts",
+        "src/editor/inspector/config/typeBlocks.ts",
+        "src/editor/inspector/sections/typeBlock/bodies/layoutBodies.tsx"
+      ]
+    },
+    {
+      "id": "B69-columns3",
+      "block_id": "columns3",
+      "category": "Layout",
+      "source": "src/blocks/Layout/Columns.tsx",
+      "architecture": "Observed generated native tree: <div> \u2192 [<div>, <div>, <div>]. Returned selection: columns / div.",
+      "evidence_status": "Builder/current Inspector paths inspected in source. block-runtime-survey.json verifies insertion/tree/returned selection/default panel only. Redesigned controls, save/reopen and output NOT RUN.",
+      "disposition": "Move + Fix",
+      "owner": "Columns root owns ordered column nodes; root CSS owns gap/layout.",
+      "homes": "Content \u2192 Column count/items; Style \u2192 gap/layout.",
+      "gap": "3-column preset structure exists; current attribute reads can disagree with actual children/CSS.",
+      "controls": [
+        "Preset creates3 real columns. Read actual count;2\u20136 convenience choices; preserve any custom/legacy count. Setting larger adds empty column units; no cloning populated user content implicitly.",
+        "Reducing populated columns requires Move contents to last remaining column / Remove contents with impact / Cancel (INS-D05). Move preserves the removed column own text/content as well as descendants in order; never drop direct Column 1 caption content. If a lossless valid nesting transformation is unavailable, block Move with a reason and preserve the tree. Validate nesting, locks, component/CMS refs first. One transaction/Undo.",
+        "Gap presets0/8/16/24/32px plus preserved custom CSS/units; actual active-layer gap owns value, no independent data-gap copy."
+      ],
+      "workflow": "Select root \u2192 count change \u2192 review affected children \u2192 choose explicit content treatment \u2192 atomic commit \u2192 select surviving column or return root. Invalid operation preserves original structure.",
+      "permissions_batch_focus": "BIC-C01\u201307 and IC/II apply: actual target, descendants, ancestor locks, component scope, command/server authorization; structure single owner only; scalar batch explicitly compatible subtypes and accurate mixed state. Exclude native ID/label association, structural/type conversion, CMS binding, form transport and radio group/default actions from batch; deduplicate shortcuts and directly selected controls by actual write target. Keyboard Add/Edit/Move up/down/Remove; Enter applies, invalid draft retained, Escape cancels current interaction per II-02. Return restores exact parent/row focus.",
+      "compatibility": "No schema change required for regrouping; preserve IDs/native tags/content, styles, safe attrs and references. Structural corrections use atomic commands, not a new parallel property store.",
+      "acceptance": [
+        {
+          "id": "T-B69-columns3-01",
+          "criterion": "Preset 3 reads3 after reselect; gap24px reads24px.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-columns3-02",
+          "criterion": "Shrink populated columns Cancel exact; Move preserves IDs; Remove+Undo restores all.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-columns3-03",
+          "criterion": "Mobile gap does not change Desktop or structural count.",
+          "status": "Specified, NOT RUN for redesigned application"
+        }
+      ],
+      "contracts": [
+        "BIC-C01\u201307",
+        "IC-01\u201313 as applicable",
+        "II-01",
+        "II-02",
+        "II-09",
+        "INS-D11"
+      ],
+      "sources": [
+        "src/blocks/Layout/Columns.tsx",
+        "src/shared/constants/elementCapabilities.ts",
+        "src/editor/inspector/config/typeBlocks.ts",
+        "src/editor/inspector/sections/typeBlock/bodies/layoutBodies.tsx"
+      ]
+    },
+    {
+      "id": "B69-grid",
+      "block_id": "grid",
+      "category": "Layout",
+      "source": "src/blocks/Layout/Grid.tsx",
+      "architecture": "Observed generated native tree: <div> \u2192 [<div>, <div>, <div>]. Returned selection: grid / div.",
+      "evidence_status": "Builder/current Inspector paths inspected in source. block-runtime-survey.json verifies insertion/tree/returned selection/default panel only. Redesigned controls, save/reopen and output NOT RUN.",
+      "disposition": "Keep + Fix lossless tracks",
+      "owner": "Grid root CSS owns tracks/gaps; children own placement/content.",
+      "homes": "Style \u2192 Children layout/Grid; Content \u2192 child items.",
+      "gap": "Simple count can erase custom track expression; structure count differs from column count.",
+      "controls": [
+        "Count1\u201324 is convenience for repeat(N,1fr), not child deletion. Custom tracks/rows (minmax/auto-fill/auto-fit etc) remain exact Custom; editing count explicitly replaces track expression only.",
+        "Flow row/column/row dense/column dense; alignments and row/column gap from existing GridControls, supported CSS units. Advanced values preserved, no array mirror.",
+        "Child placement opens actual child; do not flatten intrinsic sizing or explicit grid areas."
+      ],
+      "workflow": "Select grid \u2192 Style tracks/gap \u2192 explicit replacement if Custom \u2192 commit \u2192 child placement \u2192 Back. Undo restores entire original expression and layer.",
+      "permissions_batch_focus": "BIC-C01\u201307 and IC/II apply: actual target, descendants, ancestor locks, component scope, command/server authorization; structure single owner only; scalar batch explicitly compatible subtypes and accurate mixed state. Exclude native ID/label association, structural/type conversion, CMS binding, form transport and radio group/default actions from batch; deduplicate shortcuts and directly selected controls by actual write target. Keyboard Add/Edit/Move up/down/Remove; Enter applies, invalid draft retained, Escape cancels current interaction per II-02. Return restores exact parent/row focus.",
+      "compatibility": "No schema change required for regrouping; preserve IDs/native tags/content, styles, safe attrs and references. Structural corrections use atomic commands, not a new parallel property store.",
+      "acceptance": [
+        {
+          "id": "T-B69-grid-01",
+          "criterion": "Three children remain when grid columns count changes.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-grid-02",
+          "criterion": "auto-fill/minmax survives opening and unrelated gap edit.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-grid-03",
+          "criterion": "Invalid count retains draft and no style rewrite.",
+          "status": "Specified, NOT RUN for redesigned application"
+        }
+      ],
+      "contracts": [
+        "BIC-C01\u201307",
+        "IC-01\u201313 as applicable",
+        "II-01",
+        "II-02",
+        "II-09",
+        "INS-D11"
+      ],
+      "sources": [
+        "src/blocks/Layout/Grid.tsx",
+        "src/shared/constants/elementCapabilities.ts",
+        "src/editor/inspector/config/typeBlocks.ts",
+        "src/editor/inspector/sections/typeBlock/bodies/layoutBodies.tsx"
+      ]
+    },
+    {
+      "id": "B69-flex",
+      "block_id": "flex",
+      "category": "Layout",
+      "source": "src/blocks/Layout/Flex.tsx",
+      "architecture": "Observed generated native tree: <div> \u2192 [<div>, <div>, <div>]. Returned selection: flex / div.",
+      "evidence_status": "Builder/current Inspector paths inspected in source. block-runtime-survey.json verifies insertion/tree/returned selection/default panel only. Redesigned controls, save/reopen and output NOT RUN.",
+      "disposition": "Keep + Regroup",
+      "owner": "Flex root owns direction/wrap/gap/alignment; each child owns order/grow/shrink/basis.",
+      "homes": "Style \u2192 Children layout/Flex; Content \u2192 Children; child Style \u2192 Placement.",
+      "gap": "Visual reverse/order is not native document order or keyboard order.",
+      "controls": [
+        "Row/Column + reverse; wrap/nowrap/wrap-reverse and existing alignment enums; gap same shared CSS units/source.",
+        "Child list remains document order and indicates when visual ordering differs. Reorder document children is explicit structural command; toggling reverse changes CSS only."
+      ],
+      "workflow": "Select flex \u2192 direction/wrap \u2192 choose child for sizing \u2192 Back. Move up/down changes document order with warning when CSS order differs; one Undo.",
+      "permissions_batch_focus": "BIC-C01\u201307 and IC/II apply: actual target, descendants, ancestor locks, component scope, command/server authorization; structure single owner only; scalar batch explicitly compatible subtypes and accurate mixed state. Exclude native ID/label association, structural/type conversion, CMS binding, form transport and radio group/default actions from batch; deduplicate shortcuts and directly selected controls by actual write target. Keyboard Add/Edit/Move up/down/Remove; Enter applies, invalid draft retained, Escape cancels current interaction per II-02. Return restores exact parent/row focus.",
+      "compatibility": "No schema change required for regrouping; preserve IDs/native tags/content, styles, safe attrs and references. Structural corrections use atomic commands, not a new parallel property store.",
+      "acceptance": [
+        {
+          "id": "T-B69-flex-01",
+          "criterion": "Reverse does not reorder saved children.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-flex-02",
+          "criterion": "Gap and child basis changes target distinct owners.",
+          "status": "Specified, NOT RUN for redesigned application"
+        }
+      ],
+      "contracts": [
+        "BIC-C01\u201307",
+        "IC-01\u201313 as applicable",
+        "II-01",
+        "II-02",
+        "II-09",
+        "INS-D11"
+      ],
+      "sources": [
+        "src/blocks/Layout/Flex.tsx",
+        "src/shared/constants/elementCapabilities.ts",
+        "src/editor/inspector/config/typeBlocks.ts",
+        "src/editor/inspector/sections/typeBlock/bodies/layoutBodies.tsx"
+      ]
+    },
+    {
+      "id": "B69-collection-list",
+      "block_id": "collection-list",
+      "category": "Layout",
+      "source": "src/blocks/Layout/CollectionList.tsx",
+      "architecture": "Observed generated native tree: <div> \u2192 [<div> \u2192 [<div>, <h3>, <p>]]. Returned selection: collection-list / div.",
+      "evidence_status": "Builder/current Inspector paths inspected in source. block-runtime-survey.json verifies insertion/tree/returned selection/default panel only. Redesigned controls, save/reopen and output NOT RUN.",
+      "disposition": "Move + Fix boundaries",
+      "owner": "Selected list/site document owns collection reference, limit/query configuration and item-template tree; CMSBindingManager is the canonical engine writer, not the resource owner. Collection schema and records remain CMS-owned.",
+      "homes": "Content \u2192 Collection, Show items, template, New collection and Open collection; Style \u2192 list layout; exact CMS workspace return.",
+      "gap": "Repeated runtime instances are not independent saved children; placeholder source is not configured collection.",
+      "controls": [
+        "Choose real stable collection ID; show loading/no collections/missing collection/no results distinctly. CollectionListSection currently exposes Collection, New collection when callback exists, Show items, and Open collection; no filter/sort authoring there. Preserve stored query/filter/sort fields without inventing mounted controls or binding by name. Show items is All or integer 1\u2026CMS_COLLECTION_LIMIT_MAX (currently 10,000); preserve legacy zero sentinel on read. Reject fractional/out-of-range drafts, never parseInt/clamp. Patch limit only, preserving all other binding/template configuration.",
+        "Select repeated result for template edit must say Editing item template \u00b7 affects all results. Record editing goes exact CMS record if permitted; no text overwrite of resolved record output.",
+        "Disconnect retains the authored item-template tree, not materialized rendered records. Rebind reviews incompatible descendant field references and offers explicit mapping / Retain unresolved / Cancel; missing fields show their fallback, never silent arbitrary mapping. Binding and affected template edits commit in one history transaction. Initial {{item.name}}/{{item.description}} are template placeholders, not evidence of data."
+      ],
+      "workflow": "Select list \u2192 choose collection \u2192 preview results \u2192 edit template child \u2192 Back to list. New collection opens the existing creation route only with callback/permission and returns the original list; bind the confirmed created ID only after explicit successful result. Open collection/record targets the exact CMS resource and returns original page/list/query/draft; failed data fetch does not clear binding.",
+      "permissions_batch_focus": "BIC-C01\u201307 and IC/II apply: actual target, descendants, ancestor locks, component scope, command/server authorization; structure single owner only; scalar batch explicitly compatible subtypes and accurate mixed state. Exclude native ID/label association, structural/type conversion, CMS binding, form transport and radio group/default actions from batch; deduplicate shortcuts and directly selected controls by actual write target. Keyboard Add/Edit/Move up/down/Remove; Enter applies, invalid draft retained, Escape cancels current interaction per II-02. Return restores exact parent/row focus.",
+      "compatibility": "Preserve canonical CMS binding manager ID/query/template, all custom children and tokens. Existing catalog collection-list is separate from reserved product-grid; no conversion/data migration implied.",
+      "acceptance": [
+        {
+          "id": "T-B69-collection-list-01",
+          "criterion": "No configured source distinct from empty results and error.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-collection-list-02",
+          "criterion": "Template edit affects all repeated results; record change stays in CMS.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-collection-list-03",
+          "criterion": "Deleted/retyped field retains missing binding and safe fallback; Undo restores reference.",
+          "status": "Specified, NOT RUN for redesigned application"
+        }
+      ],
+      "contracts": [
+        "BIC-C01\u201307",
+        "IC-01\u201313 as applicable",
+        "II-01",
+        "II-02",
+        "II-09",
+        "INS-D11"
+      ],
+      "sources": [
+        "src/blocks/Layout/CollectionList.tsx",
+        "src/shared/constants/elementCapabilities.ts",
+        "src/editor/inspector/config/typeBlocks.ts",
+        "src/editor/inspector/sections/typeBlock/bodies/layoutBodies.tsx"
+      ]
+    },
+    {
+      "id": "B69-form",
+      "block_id": "form",
+      "category": "Forms",
+      "source": "src/blocks/Forms/Form.tsx",
+      "architecture": "Observed generated native tree: <form> \u2192 [<input>, <input>, <button>]. Returned selection: form / form.",
+      "evidence_status": "Builder/current Inspector paths inspected in source. block-runtime-survey.json verifies insertion/tree/returned selection/default panel only. Redesigned controls, save/reopen and output NOT RUN.",
+      "disposition": "Move + Fix",
+      "owner": "Form element owns native fields/transport; service record owns delivery/settings and permissions.",
+      "homes": "Content \u2192 Fields/structure; Behaviour \u2192 Submission/after-submit; service exact setup subview.",
+      "gap": "Field discovery/reordering/conversion and delivery must not imply nonexistent file service or duplicate native attrs.",
+      "controls": [
+        "Fields rows identify actual native tag/type, including select and textarea; associated label is separate owner. Move entire proven wrapper, never move input into adjacent wrapper. Complex shared wrapper requires explicit grouping route.",
+        "Submission Managed/action absent versus Native current document/action empty versus Custom endpoint/action nonempty per BIC-C06. Preserve method GET/POST and encoding urlencoded/multipart/text-plain only as native-supported values; managed actual service imposes own transport.",
+        "Service message/redirect/spam/recipient controls keep existing permission+save behavior; form content and service save status remain distinct. File field warns built-in delivery unavailable, native compatible custom endpoint may be configured intentionally."
+      ],
+      "workflow": "Select form \u2192 Fields \u2192 field settings/label \u2192 Back \u2192 Submission mode/setup \u2192 confirm service save \u2192 Preview limited to configured mode. Cancel setting draft preserves previous delivery; backend failure keeps document fields/draft. Deletion removes form content, not submission records without separate action.",
+      "permissions_batch_focus": "BIC-C01\u201307 and IC/II apply: actual target, descendants, ancestor locks, component scope, command/server authorization; structure single owner only; scalar batch explicitly compatible subtypes and accurate mixed state. Exclude native ID/label association, structural/type conversion, CMS binding, form transport and radio group/default actions from batch; deduplicate shortcuts and directly selected controls by actual write target. Keyboard Add/Edit/Move up/down/Remove; Enter applies, invalid draft retained, Escape cancels current interaction per II-02. Return restores exact parent/row focus.",
+      "compatibility": "No schema change required for regrouping; preserve IDs/native tags/content, styles, safe attrs and references. Structural corrections use atomic commands, not a new parallel property store.",
+      "acceptance": [
+        {
+          "id": "T-B69-form-01",
+          "criterion": "Stock field list classifies select correctly.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-form-02",
+          "criterion": "Move label+input wrapper preserves association, layout and IDs.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-form-03",
+          "criterion": "Absent/empty/custom action survives Undo/reopen/publish distinction.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-form-04",
+          "criterion": "No success claim for multipart/file delivery absent service.",
+          "status": "Specified, NOT RUN for redesigned application"
+        }
+      ],
+      "contracts": [
+        "BIC-C01\u201307",
+        "IC-01\u201313 as applicable",
+        "II-01",
+        "II-02",
+        "II-09",
+        "INS-D11"
+      ],
+      "sources": [
+        "src/blocks/Forms/Form.tsx",
+        "src/shared/constants/elementCapabilities.ts",
+        "src/editor/inspector/config/typeBlocks.ts",
+        "src/editor/inspector/sections/typeBlock/bodies/formBodies.tsx"
+      ]
+    },
+    {
+      "id": "B69-input",
+      "block_id": "input",
+      "category": "Forms",
+      "source": "src/blocks/Forms/Input.tsx",
+      "architecture": "Observed generated native tree: <input>. Returned selection: input / input.",
+      "evidence_status": "Builder/current Inspector paths inspected in source. block-runtime-survey.json verifies insertion/tree/returned selection/default panel only. Redesigned controls, save/reopen and output NOT RUN.",
+      "disposition": "Move + Fix subtype dispatch",
+      "owner": "Actual native form control owns name/default/constraints; associated label owns visible text; form owns submission.",
+      "homes": "Content \u2192 Field/subtype and validation; Style \u2192 native field appearance.",
+      "gap": "Internal ElementType alone does not identify native input subtype. Generic Default/Placeholder rows may be invalid or incomplete for this field.",
+      "controls": [
+        "Name is submission key, not visible label. Empty/absent preserved and not submitted as a named field; duplicate names may be intentional and must not be deduplicated. BIC-C07 blocks newly entered names removed by the canonical sanitizer, while legacy names remain visible. Existing PropertyField has only a local five-name warning set; the canonical validator is proposed, not implemented. Label target via native id/for or containing label; placeholder never substitutes for label.",
+        "BIC-C07 native eligibility matrix governs Required, Disabled, Read-only, Placeholder, lengths, pattern, multiple and bounds. Do not show flags with no native effect as functional controls; preserve stored unsupported attributes through native/custom inspection. Eligible booleans use presence/removal. Eligible Read-only/autocomplete/lengths/pattern live in Content \u2192 Advanced attributes; no silent empty-string removal. Attributes apply across breakpoints.",
+        "Type conversion preserves engine/native IDs, association, data/CMS/interaction refs and compatible attrs/styles. Show affected unsupported attrs/content before Apply; retain them as legacy data if safe, or refuse conversion if lossless transformation cannot be supported. Never recreate node with only five attrs; no implicit multi-type conversion.",
+        "Type selector preserves current14 supported choices: text,email,password,number,tel,url,date,time,datetime-local,search,file,hidden,range,color. Existing other native types stay Custom and editable through applicable safe routes; do not coerce.",
+        "Text default string and placeholder independent; empty default is explicit empty attr, Reset removes. Pattern stays raw valid pattern with local error on invalid syntax; default does not need to match example placeholder. Hidden type selection stays accessible in Layers."
+      ],
+      "workflow": "Select actual field or Form \u2192 Fields row \u2192 same subtype controls \u2192 valid edit/inline validation \u2192 Back to form/associated label. Required/type/constraint change identifies scope across breakpoints; invalid input retained, Cancel restores current interaction, one Undo restores exact attr presence and dependent constraints. ",
+      "permissions_batch_focus": "BIC-C01\u201307 and IC/II apply: actual target, descendants, ancestor locks, component scope, command/server authorization; structure single owner only; scalar batch explicitly compatible subtypes and accurate mixed state. Exclude native ID/label association, structural/type conversion, CMS binding, form transport and radio group/default actions from batch; deduplicate shortcuts and directly selected controls by actual write target. Keyboard Add/Edit/Move up/down/Remove; Enter applies, invalid draft retained, Escape cancels current interaction per II-02. Return restores exact parent/row focus.",
+      "compatibility": "No schema change required for regrouping; preserve IDs/native tags/content, styles, safe attrs and references. Structural corrections use atomic commands, not a new parallel property store.",
+      "acceptance": [
+        {
+          "id": "T-B69-input-01",
+          "criterion": "Default empty versus removed survives Undo.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-input-02",
+          "criterion": "Converting text\u2192textarea preserves ID/for/refs or refuses before mutation.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-input-03",
+          "criterion": "Selecting file/range immediately changes eligible controls, not only type label.",
+          "status": "Specified, NOT RUN for redesigned application"
+        }
+      ],
+      "contracts": [
+        "BIC-C01\u201307",
+        "IC-01\u201313 as applicable",
+        "II-01",
+        "II-02",
+        "II-09",
+        "INS-D11"
+      ],
+      "sources": [
+        "src/blocks/Forms/Input.tsx",
+        "src/shared/constants/elementCapabilities.ts",
+        "src/editor/inspector/config/typeBlocks.ts",
+        "src/editor/inspector/sections/typeBlock/bodies/formBodies.tsx"
+      ]
+    },
+    {
+      "id": "B69-textarea",
+      "block_id": "textarea",
+      "category": "Forms",
+      "source": "src/blocks/Forms/Textarea.tsx",
+      "architecture": "Observed generated native tree: <textarea>. Returned selection: textarea / textarea.",
+      "evidence_status": "Builder/current Inspector paths inspected in source. block-runtime-survey.json verifies insertion/tree/returned selection/default panel only. Redesigned controls, save/reopen and output NOT RUN.",
+      "disposition": "Move + Fix subtype dispatch",
+      "owner": "Actual native form control owns name/default/constraints; associated label owns visible text; form owns submission.",
+      "homes": "Content \u2192 Field/subtype and validation; Style \u2192 native field appearance.",
+      "gap": "Internal ElementType alone does not identify native input subtype. Generic Default/Placeholder rows may be invalid or incomplete for this field.",
+      "controls": [
+        "Name is submission key, not visible label. Empty/absent preserved and not submitted as a named field; duplicate names may be intentional and must not be deduplicated. BIC-C07 blocks newly entered names removed by the canonical sanitizer, while legacy names remain visible. Existing PropertyField has only a local five-name warning set; the canonical validator is proposed, not implemented. Label target via native id/for or containing label; placeholder never substitutes for label.",
+        "BIC-C07 native eligibility matrix governs Required, Disabled, Read-only, Placeholder, lengths, pattern, multiple and bounds. Do not show flags with no native effect as functional controls; preserve stored unsupported attributes through native/custom inspection. Eligible booleans use presence/removal. Eligible Read-only/autocomplete/lengths/pattern live in Content \u2192 Advanced attributes; no silent empty-string removal. Attributes apply across breakpoints.",
+        "Type conversion preserves engine/native IDs, association, data/CMS/interaction refs and compatible attrs/styles. Show affected unsupported attrs/content before Apply; retain them as legacy data if safe, or refuse conversion if lossless transformation cannot be supported. Never recreate node with only five attrs; no implicit multi-type conversion.",
+        "Default native text content is canonical; legacy value attr conflict and repair per BIC-C06. Rich imported children remain visible and protected; no blind root setContent that loses structure.",
+        "Rows positive integer; preset has no rows attribute (4 is only the current Inspector placeholder). Show Browser default when absent, distinct from explicitly authored 4. minlength/maxlength nonnegative integers/absent with max\u2265min when both; placeholder optional. Required/disabled/readOnly supported native flags."
+      ],
+      "workflow": "Select actual field or Form \u2192 Fields row \u2192 same subtype controls \u2192 valid edit/inline validation \u2192 Back to form/associated label. Required/type/constraint change identifies scope across breakpoints; invalid input retained, Cancel restores current interaction, one Undo restores exact attr presence and dependent constraints. ",
+      "permissions_batch_focus": "BIC-C01\u201307 and IC/II apply: actual target, descendants, ancestor locks, component scope, command/server authorization; structure single owner only; scalar batch explicitly compatible subtypes and accurate mixed state. Exclude native ID/label association, structural/type conversion, CMS binding, form transport and radio group/default actions from batch; deduplicate shortcuts and directly selected controls by actual write target. Keyboard Add/Edit/Move up/down/Remove; Enter applies, invalid draft retained, Escape cancels current interaction per II-02. Return restores exact parent/row focus.",
+      "compatibility": "No schema change required for regrouping; preserve IDs/native tags/content, styles, safe attrs and references. Structural corrections use atomic commands, not a new parallel property store.",
+      "acceptance": [
+        {
+          "id": "T-B69-textarea-01",
+          "criterion": "Conflicting content/value opens unchanged with visible conflict.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-textarea-02",
+          "criterion": "Rows0 invalid, empty removes attr; default empty remains empty.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-textarea-03",
+          "criterion": "Typing/Undo preserves native content, ID, associated label.",
+          "status": "Specified, NOT RUN for redesigned application"
+        }
+      ],
+      "contracts": [
+        "BIC-C01\u201307",
+        "IC-01\u201313 as applicable",
+        "II-01",
+        "II-02",
+        "II-09",
+        "INS-D11"
+      ],
+      "sources": [
+        "src/blocks/Forms/Textarea.tsx",
+        "src/shared/constants/elementCapabilities.ts",
+        "src/editor/inspector/config/typeBlocks.ts",
+        "src/editor/inspector/sections/typeBlock/bodies/formBodies.tsx"
+      ]
+    },
+    {
+      "id": "B69-select",
+      "block_id": "select",
+      "category": "Forms",
+      "source": "src/blocks/Forms/Select.tsx",
+      "architecture": "Observed generated native tree: <select> \u2192 [<option>, <option>]. Returned selection: select / select.",
+      "evidence_status": "Builder/current Inspector paths inspected in source. block-runtime-survey.json verifies insertion/tree/returned selection/default panel only. Redesigned controls, save/reopen and output NOT RUN.",
+      "disposition": "Move + Fix subtype dispatch",
+      "owner": "Actual native form control owns name/default/constraints; associated label owns visible text; form owns submission.",
+      "homes": "Content \u2192 Field/subtype and validation; Style \u2192 native field appearance.",
+      "gap": "Internal ElementType alone does not identify native input subtype. Generic Default/Placeholder rows may be invalid or incomplete for this field.",
+      "controls": [
+        "Name is submission key, not visible label. Empty/absent preserved and not submitted as a named field; duplicate names may be intentional and must not be deduplicated. BIC-C07 blocks newly entered names removed by the canonical sanitizer, while legacy names remain visible. Existing PropertyField has only a local five-name warning set; the canonical validator is proposed, not implemented. Label target via native id/for or containing label; placeholder never substitutes for label.",
+        "BIC-C07 native eligibility matrix governs Required, Disabled, Read-only, Placeholder, lengths, pattern, multiple and bounds. Do not show flags with no native effect as functional controls; preserve stored unsupported attributes through native/custom inspection. Eligible booleans use presence/removal. Eligible Read-only/autocomplete/lengths/pattern live in Content \u2192 Advanced attributes; no silent empty-string removal. Attributes apply across breakpoints.",
+        "Type conversion preserves engine/native IDs, association, data/CMS/interaction refs and compatible attrs/styles. Show affected unsupported attrs/content before Apply; retain them as legacy data if safe, or refuse conversion if lossless transformation cannot be supported. Never recreate node with only five attrs; no implicit multi-type conversion.",
+        "Tree-backed Options list: text, optional label attribute, optional submission value, selected default, disabled, optgroup; preserve all native IDs/attrs. Absent value uses option text, not label attr; explicit empty is not absence.",
+        "Options Add/Duplicate/Move/Remove act actual option/optgroup nodes. New option has editable text, absent value by default; no raw content-only rewrite. Multiple\u2192single choice per BIC-C06, optgroup/selected flags preserved; size positive integer/absent via advanced.",
+        "Required and Multiple flags alter native selection, not number of document children. Batch option-structure edit not supported."
+      ],
+      "workflow": "Select actual field or Form \u2192 Fields row \u2192 same subtype controls \u2192 valid edit/inline validation \u2192 Back to form/associated label. Required/type/constraint change identifies scope across breakpoints; invalid input retained, Cancel restores current interaction, one Undo restores exact attr presence and dependent constraints. ",
+      "permissions_batch_focus": "BIC-C01\u201307 and IC/II apply: actual target, descendants, ancestor locks, component scope, command/server authorization; structure single owner only; scalar batch explicitly compatible subtypes and accurate mixed state. Exclude native ID/label association, structural/type conversion, CMS binding, form transport and radio group/default actions from batch; deduplicate shortcuts and directly selected controls by actual write target. Keyboard Add/Edit/Move up/down/Remove; Enter applies, invalid draft retained, Escape cancels current interaction per II-02. Return restores exact parent/row focus.",
+      "compatibility": "No schema change required for regrouping; preserve IDs/native tags/content, styles, safe attrs and references. Structural corrections use atomic commands, not a new parallel property store.",
+      "acceptance": [
+        {
+          "id": "T-B69-select-01",
+          "criterion": "Stock two options read as two; rename first still exactlytwo with sameIDs.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-select-02",
+          "criterion": "Optgroup/label/text/value/disabled/selected survive reorder+Undo.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-select-03",
+          "criterion": "Multiple\u2192single requires explicit default choice and respects locked option.",
+          "status": "Specified, NOT RUN for redesigned application"
+        }
+      ],
+      "contracts": [
+        "BIC-C01\u201307",
+        "IC-01\u201313 as applicable",
+        "II-01",
+        "II-02",
+        "II-09",
+        "INS-D11"
+      ],
+      "sources": [
+        "src/blocks/Forms/Select.tsx",
+        "src/shared/constants/elementCapabilities.ts",
+        "src/editor/inspector/config/typeBlocks.ts",
+        "src/editor/inspector/sections/typeBlock/bodies/formBodies.tsx"
+      ]
+    },
+    {
+      "id": "B69-checkbox",
+      "block_id": "checkbox",
+      "category": "Forms",
+      "source": "src/blocks/Forms/Checkbox.tsx",
+      "architecture": "Observed generated native tree: <label> \u2192 [<input>, <span>]. Returned selection: checkbox / label.",
+      "evidence_status": "Builder/current Inspector paths inspected in source. block-runtime-survey.json verifies insertion/tree/returned selection/default panel only. Redesigned controls, save/reopen and output NOT RUN.",
+      "disposition": "Move + Fix subtype dispatch",
+      "owner": "Actual native form control owns name/default/constraints; associated label owns visible text; form owns submission.",
+      "homes": "Content \u2192 Field/subtype and validation; Style \u2192 native field appearance.",
+      "gap": "Internal ElementType alone does not identify native input subtype. Generic Default/Placeholder rows may be invalid or incomplete for this field.",
+      "controls": [
+        "Name is submission key, not visible label. Empty/absent preserved and not submitted as a named field; duplicate names may be intentional and must not be deduplicated. BIC-C07 blocks newly entered names removed by the canonical sanitizer, while legacy names remain visible. Existing PropertyField has only a local five-name warning set; the canonical validator is proposed, not implemented. Label target via native id/for or containing label; placeholder never substitutes for label.",
+        "BIC-C07 native eligibility matrix governs Required, Disabled, Read-only, Placeholder, lengths, pattern, multiple and bounds. Do not show flags with no native effect as functional controls; preserve stored unsupported attributes through native/custom inspection. Eligible booleans use presence/removal. Eligible Read-only/autocomplete/lengths/pattern live in Content \u2192 Advanced attributes; no silent empty-string removal. Attributes apply across breakpoints.",
+        "Type conversion preserves engine/native IDs, association, data/CMS/interaction refs and compatible attrs/styles. Show affected unsupported attrs/content before Apply; retain them as legacy data if safe, or refuse conversion if lossless transformation cannot be supported. Never recreate node with only five attrs; no implicit multi-type conversion.",
+        "Wrapper label contains native input[type=checkbox] + caption. Direct inner-input selection and wrapper shortcut reach same native owner. Submission value string: absent native default, explicit empty, nonempty all distinct.",
+        "Checked by default/Required/Disabled at native input; visible label text actual caption. Do not pick arbitrary first non-input node in custom structure. Checkbox same-name multi-values use actual transport encoding limits."
+      ],
+      "workflow": "Select actual field or Form \u2192 Fields row \u2192 same subtype controls \u2192 valid edit/inline validation \u2192 Back to form/associated label. Required/type/constraint change identifies scope across breakpoints; invalid input retained, Cancel restores current interaction, one Undo restores exact attr presence and dependent constraints. ",
+      "permissions_batch_focus": "BIC-C01\u201307 and IC/II apply: actual target, descendants, ancestor locks, component scope, command/server authorization; structure single owner only; scalar batch explicitly compatible subtypes and accurate mixed state. Exclude native ID/label association, structural/type conversion, CMS binding, form transport and radio group/default actions from batch; deduplicate shortcuts and directly selected controls by actual write target. Keyboard Add/Edit/Move up/down/Remove; Enter applies, invalid draft retained, Escape cancels current interaction per II-02. Return restores exact parent/row focus.",
+      "compatibility": "No schema change required for regrouping; preserve IDs/native tags/content, styles, safe attrs and references. Structural corrections use atomic commands, not a new parallel property store.",
+      "acceptance": [
+        {
+          "id": "T-B69-checkbox-01",
+          "criterion": "Wrapper and direct input show same value/checked; lock on either prevents shortcutwrite.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-checkbox-02",
+          "criterion": "Label text edit leaves input and styling intact.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-checkbox-03",
+          "criterion": "Default checked changes saved default, not temporary visitor state.",
+          "status": "Specified, NOT RUN for redesigned application"
+        }
+      ],
+      "contracts": [
+        "BIC-C01\u201307",
+        "IC-01\u201313 as applicable",
+        "II-01",
+        "II-02",
+        "II-09",
+        "INS-D11"
+      ],
+      "sources": [
+        "src/blocks/Forms/Checkbox.tsx",
+        "src/shared/constants/elementCapabilities.ts",
+        "src/editor/inspector/config/typeBlocks.ts",
+        "src/editor/inspector/sections/typeBlock/bodies/formBodies.tsx"
+      ]
+    },
+    {
+      "id": "B69-radio",
+      "block_id": "radio",
+      "category": "Forms",
+      "source": "src/blocks/Forms/Radio.tsx",
+      "architecture": "Observed generated native tree: <label> \u2192 [<input>, <span>]. Returned selection: radio / label.",
+      "evidence_status": "Builder/current Inspector paths inspected in source. block-runtime-survey.json verifies insertion/tree/returned selection/default panel only. Redesigned controls, save/reopen and output NOT RUN.",
+      "disposition": "Move + Fix subtype dispatch",
+      "owner": "Actual native form control owns name/default/constraints; associated label owns visible text; form owns submission.",
+      "homes": "Content \u2192 Field/subtype and validation; Style \u2192 native field appearance.",
+      "gap": "Internal ElementType alone does not identify native input subtype. Generic Default/Placeholder rows may be invalid or incomplete for this field.",
+      "controls": [
+        "Name is submission key, not visible label. Empty/absent preserved and not submitted as a named field; duplicate names may be intentional and must not be deduplicated. BIC-C07 blocks newly entered names removed by the canonical sanitizer, while legacy names remain visible. Existing PropertyField has only a local five-name warning set; the canonical validator is proposed, not implemented. Label target via native id/for or containing label; placeholder never substitutes for label.",
+        "BIC-C07 native eligibility matrix governs Required, Disabled, Read-only, Placeholder, lengths, pattern, multiple and bounds. Do not show flags with no native effect as functional controls; preserve stored unsupported attributes through native/custom inspection. Eligible booleans use presence/removal. Eligible Read-only/autocomplete/lengths/pattern live in Content \u2192 Advanced attributes; no silent empty-string removal. Attributes apply across breakpoints.",
+        "Type conversion preserves engine/native IDs, association, data/CMS/interaction refs and compatible attrs/styles. Show affected unsupported attrs/content before Apply; retain them as legacy data if safe, or refuse conversion if lossless transformation cannot be supported. Never recreate node with only five attrs; no implicit multi-type conversion.",
+        "Native radio input within label wrapper, caption separate. Name defines group with resolved form owner, not nearest visual row; Default checked single-winner atomic action per BIC-C06.",
+        "Submission value absent/empty/nonempty distinct. Renaming/moving checked field into another checked group requires explicit keep-default choice, with every affected member authorized."
+      ],
+      "workflow": "Select actual field or Form \u2192 Fields row \u2192 same subtype controls \u2192 valid edit/inline validation \u2192 Back to form/associated label. Required/type/constraint change identifies scope across breakpoints; invalid input retained, Cancel restores current interaction, one Undo restores exact attr presence and dependent constraints. ",
+      "permissions_batch_focus": "BIC-C01\u201307 and IC/II apply: actual target, descendants, ancestor locks, component scope, command/server authorization; structure single owner only; scalar batch explicitly compatible subtypes and accurate mixed state. Exclude native ID/label association, structural/type conversion, CMS binding, form transport and radio group/default actions from batch; deduplicate shortcuts and directly selected controls by actual write target. Keyboard Add/Edit/Move up/down/Remove; Enter applies, invalid draft retained, Escape cancels current interaction per II-02. Return restores exact parent/row focus.",
+      "compatibility": "No schema change required for regrouping; preserve IDs/native tags/content, styles, safe attrs and references. Structural corrections use atomic commands, not a new parallel property store.",
+      "acceptance": [
+        {
+          "id": "T-B69-radio-01",
+          "criterion": "Selecting default clears grouppeers inoneUndo; lockedpeer blocksall.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-radio-02",
+          "criterion": "Two forms same name do not change eachother.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-radio-03",
+          "criterion": "Rename/move conflict reviewed; caption/input IDs preserved.",
+          "status": "Specified, NOT RUN for redesigned application"
+        }
+      ],
+      "contracts": [
+        "BIC-C01\u201307",
+        "IC-01\u201313 as applicable",
+        "II-01",
+        "II-02",
+        "II-09",
+        "INS-D11"
+      ],
+      "sources": [
+        "src/blocks/Forms/Radio.tsx",
+        "src/shared/constants/elementCapabilities.ts",
+        "src/editor/inspector/config/typeBlocks.ts",
+        "src/editor/inspector/sections/typeBlock/bodies/formBodies.tsx"
+      ]
+    },
+    {
+      "id": "B69-file",
+      "block_id": "file",
+      "category": "Forms",
+      "source": "src/blocks/Forms/FileInput.tsx",
+      "architecture": "Observed generated native tree: <input>. Returned selection: input / input.",
+      "evidence_status": "Builder/current Inspector paths inspected in source. block-runtime-survey.json verifies insertion/tree/returned selection/default panel only. Redesigned controls, save/reopen and output NOT RUN.",
+      "disposition": "Move + Fix subtype dispatch",
+      "owner": "Actual native form control owns name/default/constraints; associated label owns visible text; form owns submission.",
+      "homes": "Content \u2192 Field/subtype and validation; Style \u2192 native field appearance.",
+      "gap": "Internal ElementType alone does not identify native input subtype. Generic Default/Placeholder rows may be invalid or incomplete for this field.",
+      "controls": [
+        "Name is submission key, not visible label. Empty/absent preserved and not submitted as a named field; duplicate names may be intentional and must not be deduplicated. BIC-C07 blocks newly entered names removed by the canonical sanitizer, while legacy names remain visible. Existing PropertyField has only a local five-name warning set; the canonical validator is proposed, not implemented. Label target via native id/for or containing label; placeholder never substitutes for label.",
+        "BIC-C07 native eligibility matrix governs Required, Disabled, Read-only, Placeholder, lengths, pattern, multiple and bounds. Do not show flags with no native effect as functional controls; preserve stored unsupported attributes through native/custom inspection. Eligible booleans use presence/removal. Eligible Read-only/autocomplete/lengths/pattern live in Content \u2192 Advanced attributes; no silent empty-string removal. Attributes apply across breakpoints.",
+        "Type conversion preserves engine/native IDs, association, data/CMS/interaction refs and compatible attrs/styles. Show affected unsupported attrs/content before Apply; retain them as legacy data if safe, or refuse conversion if lossless transformation cannot be supported. Never recreate node with only five attrs; no implicit multi-type conversion.",
+        "File native control: accept comma-separated valid extensions/MIME tokens or audio/*/video/*/image/*; blank removes accept, means any file. Invalid token retains draft; picker hint is not server validation.",
+        "Multiple boolean; required/disabled; no authored nonempty default file/path. Previously stored value surfaced legacy/inert and preserved until explicit clear; uploaded editor Assets are a different resource.",
+        "Built-in route/schema does not establish multipart bytes. Submission card shows file-delivery limitation and existing native compatible custom endpoint route; no imagined upload storage or size-limit guarantee."
+      ],
+      "workflow": "Select actual field or Form \u2192 Fields row \u2192 same subtype controls \u2192 valid edit/inline validation \u2192 Back to form/associated label. Required/type/constraint change identifies scope across breakpoints; invalid input retained, Cancel restores current interaction, one Undo restores exact attr presence and dependent constraints. ",
+      "permissions_batch_focus": "BIC-C01\u201307 and IC/II apply: actual target, descendants, ancestor locks, component scope, command/server authorization; structure single owner only; scalar batch explicitly compatible subtypes and accurate mixed state. Exclude native ID/label association, structural/type conversion, CMS binding, form transport and radio group/default actions from batch; deduplicate shortcuts and directly selected controls by actual write target. Keyboard Add/Edit/Move up/down/Remove; Enter applies, invalid draft retained, Escape cancels current interaction per II-02. Return restores exact parent/row focus.",
+      "compatibility": "No schema change required for regrouping; preserve IDs/native tags/content, styles, safe attrs and references. Structural corrections use atomic commands, not a new parallel property store.",
+      "acceptance": [
+        {
+          "id": "T-B69-file-01",
+          "criterion": "No settabledefaultfile or path exposed.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-file-02",
+          "criterion": "accept/multiple serialize faithfully; invalidtoken rejected locally.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-file-03",
+          "criterion": "Manageddelivery configuration never claims filebytes supported.",
+          "status": "Specified, NOT RUN for redesigned application"
+        }
+      ],
+      "contracts": [
+        "BIC-C01\u201307",
+        "IC-01\u201313 as applicable",
+        "II-01",
+        "II-02",
+        "II-09",
+        "INS-D11"
+      ],
+      "sources": [
+        "src/blocks/Forms/FileInput.tsx",
+        "src/shared/constants/elementCapabilities.ts",
+        "src/editor/inspector/config/typeBlocks.ts",
+        "src/editor/inspector/sections/typeBlock/bodies/formBodies.tsx"
+      ]
+    },
+    {
+      "id": "B69-date",
+      "block_id": "date",
+      "category": "Forms",
+      "source": "src/blocks/Forms/DateInput.tsx",
+      "architecture": "Observed generated native tree: <input>. Returned selection: input / input.",
+      "evidence_status": "Builder/current Inspector paths inspected in source. block-runtime-survey.json verifies insertion/tree/returned selection/default panel only. Redesigned controls, save/reopen and output NOT RUN.",
+      "disposition": "Move + Fix subtype dispatch",
+      "owner": "Actual native form control owns name/default/constraints; associated label owns visible text; form owns submission.",
+      "homes": "Content \u2192 Field/subtype and validation; Style \u2192 native field appearance.",
+      "gap": "Internal ElementType alone does not identify native input subtype. Generic Default/Placeholder rows may be invalid or incomplete for this field.",
+      "controls": [
+        "Name is submission key, not visible label. Empty/absent preserved and not submitted as a named field; duplicate names may be intentional and must not be deduplicated. BIC-C07 blocks newly entered names removed by the canonical sanitizer, while legacy names remain visible. Existing PropertyField has only a local five-name warning set; the canonical validator is proposed, not implemented. Label target via native id/for or containing label; placeholder never substitutes for label.",
+        "BIC-C07 native eligibility matrix governs Required, Disabled, Read-only, Placeholder, lengths, pattern, multiple and bounds. Do not show flags with no native effect as functional controls; preserve stored unsupported attributes through native/custom inspection. Eligible booleans use presence/removal. Eligible Read-only/autocomplete/lengths/pattern live in Content \u2192 Advanced attributes; no silent empty-string removal. Attributes apply across breakpoints.",
+        "Type conversion preserves engine/native IDs, association, data/CMS/interaction refs and compatible attrs/styles. Show affected unsupported attrs/content before Apply; retain them as legacy data if safe, or refuse conversion if lossless transformation cannot be supported. Never recreate node with only five attrs; no implicit multi-type conversion.",
+        "Default/min/max are native date YYYY-MM-DD or absent, validate actual calendar date including leap days. No timezone conversion. Min\u2264Max; default ifnonempty must satisfy chosen bounds and step, otherwise keep draft; never clamp existing value.",
+        "Step positive integer days or any; absent native step1. Preserve custom valid old values; bounds edits that invalidate current default require explicit correction, no partial batch."
+      ],
+      "workflow": "Select actual field or Form \u2192 Fields row \u2192 same subtype controls \u2192 valid edit/inline validation \u2192 Back to form/associated label. Required/type/constraint change identifies scope across breakpoints; invalid input retained, Cancel restores current interaction, one Undo restores exact attr presence and dependent constraints. ",
+      "permissions_batch_focus": "BIC-C01\u201307 and IC/II apply: actual target, descendants, ancestor locks, component scope, command/server authorization; structure single owner only; scalar batch explicitly compatible subtypes and accurate mixed state. Exclude native ID/label association, structural/type conversion, CMS binding, form transport and radio group/default actions from batch; deduplicate shortcuts and directly selected controls by actual write target. Keyboard Add/Edit/Move up/down/Remove; Enter applies, invalid draft retained, Escape cancels current interaction per II-02. Return restores exact parent/row focus.",
+      "compatibility": "No schema change required for regrouping; preserve IDs/native tags/content, styles, safe attrs and references. Structural corrections use atomic commands, not a new parallel property store.",
+      "acceptance": [
+        {
+          "id": "T-B69-date-01",
+          "criterion": "Invalid2026-02-30 notcommitted; validleapdate preserved.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-date-02",
+          "criterion": "0/empty bound notconverted to1970; reset removesattr.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-date-03",
+          "criterion": "Min/max/default revision one atomic valid operation orblocked.",
+          "status": "Specified, NOT RUN for redesigned application"
+        }
+      ],
+      "contracts": [
+        "BIC-C01\u201307",
+        "IC-01\u201313 as applicable",
+        "II-01",
+        "II-02",
+        "II-09",
+        "INS-D11"
+      ],
+      "sources": [
+        "src/blocks/Forms/DateInput.tsx",
+        "src/shared/constants/elementCapabilities.ts",
+        "src/editor/inspector/config/typeBlocks.ts",
+        "src/editor/inspector/sections/typeBlock/bodies/formBodies.tsx"
+      ]
+    },
+    {
+      "id": "B69-time",
+      "block_id": "time",
+      "category": "Forms",
+      "source": "src/blocks/Forms/TimeInput.tsx",
+      "architecture": "Observed generated native tree: <input>. Returned selection: input / input.",
+      "evidence_status": "Builder/current Inspector paths inspected in source. block-runtime-survey.json verifies insertion/tree/returned selection/default panel only. Redesigned controls, save/reopen and output NOT RUN.",
+      "disposition": "Move + Fix subtype dispatch",
+      "owner": "Actual native form control owns name/default/constraints; associated label owns visible text; form owns submission.",
+      "homes": "Content \u2192 Field/subtype and validation; Style \u2192 native field appearance.",
+      "gap": "Internal ElementType alone does not identify native input subtype. Generic Default/Placeholder rows may be invalid or incomplete for this field.",
+      "controls": [
+        "Name is submission key, not visible label. Empty/absent preserved and not submitted as a named field; duplicate names may be intentional and must not be deduplicated. BIC-C07 blocks newly entered names removed by the canonical sanitizer, while legacy names remain visible. Existing PropertyField has only a local five-name warning set; the canonical validator is proposed, not implemented. Label target via native id/for or containing label; placeholder never substitutes for label.",
+        "BIC-C07 native eligibility matrix governs Required, Disabled, Read-only, Placeholder, lengths, pattern, multiple and bounds. Do not show flags with no native effect as functional controls; preserve stored unsupported attributes through native/custom inspection. Eligible booleans use presence/removal. Eligible Read-only/autocomplete/lengths/pattern live in Content \u2192 Advanced attributes; no silent empty-string removal. Attributes apply across breakpoints.",
+        "Type conversion preserves engine/native IDs, association, data/CMS/interaction refs and compatible attrs/styles. Show affected unsupported attrs/content before Apply; retain them as legacy data if safe, or refuse conversion if lossless transformation cannot be supported. Never recreate node with only five attrs; no implicit multi-type conversion.",
+        "Default/min/max HH:mm with optional seconds/fraction allowed by existing native semantics; preserve exact precision. Step positive finite seconds or any; absent native60seconds.",
+        "Time has periodic domain: min22:00/max06:00 may be an overnight range; show Overnight, do not use numeric min\u2264max rejection. No timezone field or automatic UTC conversion. Default validates interval/step before commit."
+      ],
+      "workflow": "Select actual field or Form \u2192 Fields row \u2192 same subtype controls \u2192 valid edit/inline validation \u2192 Back to form/associated label. Required/type/constraint change identifies scope across breakpoints; invalid input retained, Cancel restores current interaction, one Undo restores exact attr presence and dependent constraints. ",
+      "permissions_batch_focus": "BIC-C01\u201307 and IC/II apply: actual target, descendants, ancestor locks, component scope, command/server authorization; structure single owner only; scalar batch explicitly compatible subtypes and accurate mixed state. Exclude native ID/label association, structural/type conversion, CMS binding, form transport and radio group/default actions from batch; deduplicate shortcuts and directly selected controls by actual write target. Keyboard Add/Edit/Move up/down/Remove; Enter applies, invalid draft retained, Escape cancels current interaction per II-02. Return restores exact parent/row focus.",
+      "compatibility": "No schema change required for regrouping; preserve IDs/native tags/content, styles, safe attrs and references. Structural corrections use atomic commands, not a new parallel property store.",
+      "acceptance": [
+        {
+          "id": "T-B69-time-01",
+          "criterion": "22:00\u219206:00 range accepted asovernight;12:00default rejected.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-time-02",
+          "criterion": "Fractionalseconds/step and absentvalues roundtrip withouttruncation.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-time-03",
+          "criterion": "Timezone interpretation never silentlychanges on edit.",
+          "status": "Specified, NOT RUN for redesigned application"
+        }
+      ],
+      "contracts": [
+        "BIC-C01\u201307",
+        "IC-01\u201313 as applicable",
+        "II-01",
+        "II-02",
+        "II-09",
+        "INS-D11"
+      ],
+      "sources": [
+        "src/blocks/Forms/TimeInput.tsx",
+        "src/shared/constants/elementCapabilities.ts",
+        "src/editor/inspector/config/typeBlocks.ts",
+        "src/editor/inspector/sections/typeBlock/bodies/formBodies.tsx"
+      ]
+    },
+    {
+      "id": "B69-email",
+      "block_id": "email",
+      "category": "Forms",
+      "source": "src/blocks/Forms/EmailInput.tsx",
+      "architecture": "Observed generated native tree: <input>. Returned selection: input / input.",
+      "evidence_status": "Builder/current Inspector paths inspected in source. block-runtime-survey.json verifies insertion/tree/returned selection/default panel only. Redesigned controls, save/reopen and output NOT RUN.",
+      "disposition": "Move + Fix subtype dispatch",
+      "owner": "Actual native form control owns name/default/constraints; associated label owns visible text; form owns submission.",
+      "homes": "Content \u2192 Field/subtype and validation; Style \u2192 native field appearance.",
+      "gap": "Internal ElementType alone does not identify native input subtype. Generic Default/Placeholder rows may be invalid or incomplete for this field.",
+      "controls": [
+        "Name is submission key, not visible label. Empty/absent preserved and not submitted as a named field; duplicate names may be intentional and must not be deduplicated. BIC-C07 blocks newly entered names removed by the canonical sanitizer, while legacy names remain visible. Existing PropertyField has only a local five-name warning set; the canonical validator is proposed, not implemented. Label target via native id/for or containing label; placeholder never substitutes for label.",
+        "BIC-C07 native eligibility matrix governs Required, Disabled, Read-only, Placeholder, lengths, pattern, multiple and bounds. Do not show flags with no native effect as functional controls; preserve stored unsupported attributes through native/custom inspection. Eligible booleans use presence/removal. Eligible Read-only/autocomplete/lengths/pattern live in Content \u2192 Advanced attributes; no silent empty-string removal. Attributes apply across breakpoints.",
+        "Type conversion preserves engine/native IDs, association, data/CMS/interaction refs and compatible attrs/styles. Show affected unsupported attrs/content before Apply; retain them as legacy data if safe, or refuse conversion if lossless transformation cannot be supported. Never recreate node with only five attrs; no implicit multi-type conversion.",
+        "Default emailstring or explicitempty; native formatvalidation on committed nonempty draft, no assumption that address is deliverable. Multiple flag supports comma-separated email list; switching it off with multiple authored addresses requires explicit editing/selection of a valid single default or Cancel; never silently drop addresses. Preserve supported native attrs.",
+        "Placeholder optional; autocomplete values from native-supported token list/Custom existing. No password masking; existing invalid legacy default remains visible with repair, not deleted."
+      ],
+      "workflow": "Select actual field or Form \u2192 Fields row \u2192 same subtype controls \u2192 valid edit/inline validation \u2192 Back to form/associated label. Required/type/constraint change identifies scope across breakpoints; invalid input retained, Cancel restores current interaction, one Undo restores exact attr presence and dependent constraints. ",
+      "permissions_batch_focus": "BIC-C01\u201307 and IC/II apply: actual target, descendants, ancestor locks, component scope, command/server authorization; structure single owner only; scalar batch explicitly compatible subtypes and accurate mixed state. Exclude native ID/label association, structural/type conversion, CMS binding, form transport and radio group/default actions from batch; deduplicate shortcuts and directly selected controls by actual write target. Keyboard Add/Edit/Move up/down/Remove; Enter applies, invalid draft retained, Escape cancels current interaction per II-02. Return restores exact parent/row focus.",
+      "compatibility": "No schema change required for regrouping; preserve IDs/native tags/content, styles, safe attrs and references. Structural corrections use atomic commands, not a new parallel property store.",
+      "acceptance": [
+        {
+          "id": "T-B69-email-01",
+          "criterion": "Single vs multiple email validation matchesmode.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-email-02",
+          "criterion": "Emptydefault distinct absent; labels notplaceholder.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-email-03",
+          "criterion": "No backendemail verification claim.",
+          "status": "Specified, NOT RUN for redesigned application"
+        }
+      ],
+      "contracts": [
+        "BIC-C01\u201307",
+        "IC-01\u201313 as applicable",
+        "II-01",
+        "II-02",
+        "II-09",
+        "INS-D11"
+      ],
+      "sources": [
+        "src/blocks/Forms/EmailInput.tsx",
+        "src/shared/constants/elementCapabilities.ts",
+        "src/editor/inspector/config/typeBlocks.ts",
+        "src/editor/inspector/sections/typeBlock/bodies/formBodies.tsx"
+      ]
+    },
+    {
+      "id": "B69-password",
+      "block_id": "password",
+      "category": "Forms",
+      "source": "src/blocks/Forms/PasswordInput.tsx",
+      "architecture": "Observed generated native tree: <input>. Returned selection: input / input.",
+      "evidence_status": "Builder/current Inspector paths inspected in source. block-runtime-survey.json verifies insertion/tree/returned selection/default panel only. Redesigned controls, save/reopen and output NOT RUN.",
+      "disposition": "Move + Fix subtype dispatch",
+      "owner": "Actual native form control owns name/default/constraints; associated label owns visible text; form owns submission.",
+      "homes": "Content \u2192 Field/subtype and validation; Style \u2192 native field appearance.",
+      "gap": "Internal ElementType alone does not identify native input subtype. Generic Default/Placeholder rows may be invalid or incomplete for this field.",
+      "controls": [
+        "Name is submission key, not visible label. Empty/absent preserved and not submitted as a named field; duplicate names may be intentional and must not be deduplicated. BIC-C07 blocks newly entered names removed by the canonical sanitizer, while legacy names remain visible. Existing PropertyField has only a local five-name warning set; the canonical validator is proposed, not implemented. Label target via native id/for or containing label; placeholder never substitutes for label.",
+        "BIC-C07 native eligibility matrix governs Required, Disabled, Read-only, Placeholder, lengths, pattern, multiple and bounds. Do not show flags with no native effect as functional controls; preserve stored unsupported attributes through native/custom inspection. Eligible booleans use presence/removal. Eligible Read-only/autocomplete/lengths/pattern live in Content \u2192 Advanced attributes; no silent empty-string removal. Attributes apply across breakpoints.",
+        "Type conversion preserves engine/native IDs, association, data/CMS/interaction refs and compatible attrs/styles. Show affected unsupported attrs/content before Apply; retain them as legacy data if safe, or refuse conversion if lossless transformation cannot be supported. Never recreate node with only five attrs; no implicit multi-type conversion.",
+        "Default string is authored page content and visible in output data even if input masks it; explain before nonempty default commit. Existing defaults remain masked in Inspector until explicit Reveal; never include their literals in summaries or diagnostics. A password field and generic delivery service do not establish an authentication feature. Do not introduce automatic credential-storage semantics. No user secret required in audit.",
+        "Min/max length optionalnonnegative integers, max\u2265min; autocomplete existing values; no multi-line or numeric min/max controls. Existing value preserved onopen and canbe explicitlycleared."
+      ],
+      "workflow": "Select actual field or Form \u2192 Fields row \u2192 same subtype controls \u2192 valid edit/inline validation \u2192 Back to form/associated label. Required/type/constraint change identifies scope across breakpoints; invalid input retained, Cancel restores current interaction, one Undo restores exact attr presence and dependent constraints. ",
+      "permissions_batch_focus": "BIC-C01\u201307 and IC/II apply: actual target, descendants, ancestor locks, component scope, command/server authorization; structure single owner only; scalar batch explicitly compatible subtypes and accurate mixed state. Exclude native ID/label association, structural/type conversion, CMS binding, form transport and radio group/default actions from batch; deduplicate shortcuts and directly selected controls by actual write target. Keyboard Add/Edit/Move up/down/Remove; Enter applies, invalid draft retained, Escape cancels current interaction per II-02. Return restores exact parent/row focus.",
+      "compatibility": "No schema change required for regrouping; preserve IDs/native tags/content, styles, safe attrs and references. Structural corrections use atomic commands, not a new parallel property store.",
+      "acceptance": [
+        {
+          "id": "T-B69-password-01",
+          "criterion": "Maskingdoesnotclaimsecretstorage; existingvalue notchanged onopen.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-password-02",
+          "criterion": "Typeconversion totext warnsabout visibledefault, noimplicitconversion.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-password-03",
+          "criterion": "Clear/Undo exact withlabel/ID preserved.",
+          "status": "Specified, NOT RUN for redesigned application"
+        }
+      ],
+      "contracts": [
+        "BIC-C01\u201307",
+        "IC-01\u201313 as applicable",
+        "II-01",
+        "II-02",
+        "II-09",
+        "INS-D11"
+      ],
+      "sources": [
+        "src/blocks/Forms/PasswordInput.tsx",
+        "src/shared/constants/elementCapabilities.ts",
+        "src/editor/inspector/config/typeBlocks.ts",
+        "src/editor/inspector/sections/typeBlock/bodies/formBodies.tsx"
+      ]
+    },
+    {
+      "id": "B69-number",
+      "block_id": "number",
+      "category": "Forms",
+      "source": "src/blocks/Forms/NumberInput.tsx",
+      "architecture": "Observed generated native tree: <input>. Returned selection: input / input.",
+      "evidence_status": "Builder/current Inspector paths inspected in source. block-runtime-survey.json verifies insertion/tree/returned selection/default panel only. Redesigned controls, save/reopen and output NOT RUN.",
+      "disposition": "Move + Fix subtype dispatch",
+      "owner": "Actual native form control owns name/default/constraints; associated label owns visible text; form owns submission.",
+      "homes": "Content \u2192 Field/subtype and validation; Style \u2192 native field appearance.",
+      "gap": "Internal ElementType alone does not identify native input subtype. Generic Default/Placeholder rows may be invalid or incomplete for this field.",
+      "controls": [
+        "Name is submission key, not visible label. Empty/absent preserved and not submitted as a named field; duplicate names may be intentional and must not be deduplicated. BIC-C07 blocks newly entered names removed by the canonical sanitizer, while legacy names remain visible. Existing PropertyField has only a local five-name warning set; the canonical validator is proposed, not implemented. Label target via native id/for or containing label; placeholder never substitutes for label.",
+        "BIC-C07 native eligibility matrix governs Required, Disabled, Read-only, Placeholder, lengths, pattern, multiple and bounds. Do not show flags with no native effect as functional controls; preserve stored unsupported attributes through native/custom inspection. Eligible booleans use presence/removal. Eligible Read-only/autocomplete/lengths/pattern live in Content \u2192 Advanced attributes; no silent empty-string removal. Attributes apply across breakpoints.",
+        "Type conversion preserves engine/native IDs, association, data/CMS/interaction refs and compatible attrs/styles. Show affected unsupported attrs/content before Apply; retain them as legacy data if safe, or refuse conversion if lossless transformation cannot be supported. Never recreate node with only five attrs; no implicit multi-type conversion.",
+        "Default/min/max finite native numericstrings including valid decimals/exponent, unitsnotallowed. Step positivefinite or any, absent native1. Validate stepbase, bounds and default together; no rounding onload.",
+        "Min\u2264Max whenboth; default may beempty; zero isnotempty. Reject constraintexcluding currentvaliddefault rather thanclamp; editcoupledconstraints in explicit apply if needed."
+      ],
+      "workflow": "Select actual field or Form \u2192 Fields row \u2192 same subtype controls \u2192 valid edit/inline validation \u2192 Back to form/associated label. Required/type/constraint change identifies scope across breakpoints; invalid input retained, Cancel restores current interaction, one Undo restores exact attr presence and dependent constraints. ",
+      "permissions_batch_focus": "BIC-C01\u201307 and IC/II apply: actual target, descendants, ancestor locks, component scope, command/server authorization; structure single owner only; scalar batch explicitly compatible subtypes and accurate mixed state. Exclude native ID/label association, structural/type conversion, CMS binding, form transport and radio group/default actions from batch; deduplicate shortcuts and directly selected controls by actual write target. Keyboard Add/Edit/Move up/down/Remove; Enter applies, invalid draft retained, Escape cancels current interaction per II-02. Return restores exact parent/row focus.",
+      "compatibility": "No schema change required for regrouping; preserve IDs/native tags/content, styles, safe attrs and references. Structural corrections use atomic commands, not a new parallel property store.",
+      "acceptance": [
+        {
+          "id": "T-B69-number-01",
+          "criterion": "0 distinct empty; decimals withstepany valid.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-number-02",
+          "criterion": "min10/max5 rejected withunchangedactualattrs.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-number-03",
+          "criterion": "Changingstep preserves authoredvalue until explicitcompatiblechoice.",
+          "status": "Specified, NOT RUN for redesigned application"
+        }
+      ],
+      "contracts": [
+        "BIC-C01\u201307",
+        "IC-01\u201313 as applicable",
+        "II-01",
+        "II-02",
+        "II-09",
+        "INS-D11"
+      ],
+      "sources": [
+        "src/blocks/Forms/NumberInput.tsx",
+        "src/shared/constants/elementCapabilities.ts",
+        "src/editor/inspector/config/typeBlocks.ts",
+        "src/editor/inspector/sections/typeBlock/bodies/formBodies.tsx"
+      ]
+    },
+    {
+      "id": "B69-range",
+      "block_id": "range",
+      "category": "Forms",
+      "source": "src/blocks/Forms/RangeInput.tsx",
+      "architecture": "Observed generated native tree: <input>. Returned selection: input / input.",
+      "evidence_status": "Builder/current Inspector paths inspected in source. block-runtime-survey.json verifies insertion/tree/returned selection/default panel only. Redesigned controls, save/reopen and output NOT RUN.",
+      "disposition": "Move + Fix subtype dispatch",
+      "owner": "Actual native form control owns name/default/constraints; associated label owns visible text; form owns submission.",
+      "homes": "Content \u2192 Field/subtype and validation; Style \u2192 native field appearance.",
+      "gap": "Internal ElementType alone does not identify native input subtype. Generic Default/Placeholder rows may be invalid or incomplete for this field.",
+      "controls": [
+        "Name is submission key, not visible label. Empty/absent preserved and not submitted as a named field; duplicate names may be intentional and must not be deduplicated. BIC-C07 blocks newly entered names removed by the canonical sanitizer, while legacy names remain visible. Existing PropertyField has only a local five-name warning set; the canonical validator is proposed, not implemented. Label target via native id/for or containing label; placeholder never substitutes for label.",
+        "BIC-C07 native eligibility matrix governs Required, Disabled, Read-only, Placeholder, lengths, pattern, multiple and bounds. Do not show flags with no native effect as functional controls; preserve stored unsupported attributes through native/custom inspection. Eligible booleans use presence/removal. Eligible Read-only/autocomplete/lengths/pattern live in Content \u2192 Advanced attributes; no silent empty-string removal. Attributes apply across breakpoints.",
+        "Type conversion preserves engine/native IDs, association, data/CMS/interaction refs and compatible attrs/styles. Show affected unsupported attrs/content before Apply; retain them as legacy data if safe, or refuse conversion if lossless transformation cannot be supported. Never recreate node with only five attrs; no implicit multi-type conversion.",
+        "Preset min0/max100/default50, stepabsent native1. Finite bounds max\u2265min; Step positivefinite or any. Default must bewithinboundsandstep; changingbounds cannot silentlyclamp authoreddefault.",
+        "When valueabsent show Browser default (range algorithm), not an authored50. Empty defaultaction removesattr; input browserpickedlivevalue isnot saved default. Native min/max noCSSunits."
+      ],
+      "workflow": "Select actual field or Form \u2192 Fields row \u2192 same subtype controls \u2192 valid edit/inline validation \u2192 Back to form/associated label. Required/type/constraint change identifies scope across breakpoints; invalid input retained, Cancel restores current interaction, one Undo restores exact attr presence and dependent constraints. ",
+      "permissions_batch_focus": "BIC-C01\u201307 and IC/II apply: actual target, descendants, ancestor locks, component scope, command/server authorization; structure single owner only; scalar batch explicitly compatible subtypes and accurate mixed state. Exclude native ID/label association, structural/type conversion, CMS binding, form transport and radio group/default actions from batch; deduplicate shortcuts and directly selected controls by actual write target. Keyboard Add/Edit/Move up/down/Remove; Enter applies, invalid draft retained, Escape cancels current interaction per II-02. Return restores exact parent/row focus.",
+      "compatibility": "No schema change required for regrouping; preserve IDs/native tags/content, styles, safe attrs and references. Structural corrections use atomic commands, not a new parallel property store.",
+      "acceptance": [
+        {
+          "id": "T-B69-range-01",
+          "criterion": "Preset reads0/100/50; absentvalue shownnative default notsaved50.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-range-02",
+          "criterion": "Reduce maxbelow50 rejects until explicitcompatibledefault; Undoallattrs.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-range-03",
+          "criterion": "Visitor dragnever overwritesprojectdefault.",
+          "status": "Specified, NOT RUN for redesigned application"
+        }
+      ],
+      "contracts": [
+        "BIC-C01\u201307",
+        "IC-01\u201313 as applicable",
+        "II-01",
+        "II-02",
+        "II-09",
+        "INS-D11"
+      ],
+      "sources": [
+        "src/blocks/Forms/RangeInput.tsx",
+        "src/shared/constants/elementCapabilities.ts",
+        "src/editor/inspector/config/typeBlocks.ts",
+        "src/editor/inspector/sections/typeBlock/bodies/formBodies.tsx"
+      ]
+    },
+    {
+      "id": "B69-color",
+      "block_id": "color",
+      "category": "Forms",
+      "source": "src/blocks/Forms/ColorInput.tsx",
+      "architecture": "Observed generated native tree: <input>. Returned selection: input / input.",
+      "evidence_status": "Builder/current Inspector paths inspected in source. block-runtime-survey.json verifies insertion/tree/returned selection/default panel only. Redesigned controls, save/reopen and output NOT RUN.",
+      "disposition": "Move + Fix subtype dispatch",
+      "owner": "Actual native form control owns name/default/constraints; associated label owns visible text; form owns submission.",
+      "homes": "Content \u2192 Field/subtype and validation; Style \u2192 native field appearance.",
+      "gap": "Internal ElementType alone does not identify native input subtype. Generic Default/Placeholder rows may be invalid or incomplete for this field.",
+      "controls": [
+        "Name is submission key, not visible label. Empty/absent preserved and not submitted as a named field; duplicate names may be intentional and must not be deduplicated. BIC-C07 blocks newly entered names removed by the canonical sanitizer, while legacy names remain visible. Existing PropertyField has only a local five-name warning set; the canonical validator is proposed, not implemented. Label target via native id/for or containing label; placeholder never substitutes for label.",
+        "BIC-C07 native eligibility matrix governs Required, Disabled, Read-only, Placeholder, lengths, pattern, multiple and bounds. Do not show flags with no native effect as functional controls; preserve stored unsupported attributes through native/custom inspection. Eligible booleans use presence/removal. Eligible Read-only/autocomplete/lengths/pattern live in Content \u2192 Advanced attributes; no silent empty-string removal. Attributes apply across breakpoints.",
+        "Type conversion preserves engine/native IDs, association, data/CMS/interaction refs and compatible attrs/styles. Show affected unsupported attrs/content before Apply; retain them as legacy data if safe, or refuse conversion if lossless transformation cannot be supported. Never recreate node with only five attrs; no implicit multi-type conversion.",
+        "Native default supports selected Buildrick authoring contract #RRGGBB (casepreserved/read). Explicit shorthand entry may normalize after visible preview; CSSvar/Brandtoken isnot a native inputvalue. Currentpreset #1A56DB.",
+        "Current absence usesbrowserdefault; show distinct. Imported valid advancednative colour/alpha/colorspace attrs preserved asCustom withnativeattributes route; do not claimHTMLcannot representthose or auto-coerce. New expandedcolourauthoring deferred.",
+        "CSS Fill/Border is fieldappearance and separate from submitted defaultcolour."
+      ],
+      "workflow": "Select actual field or Form \u2192 Fields row \u2192 same subtype controls \u2192 valid edit/inline validation \u2192 Back to form/associated label. Required/type/constraint change identifies scope across breakpoints; invalid input retained, Cancel restores current interaction, one Undo restores exact attr presence and dependent constraints. ",
+      "permissions_batch_focus": "BIC-C01\u201307 and IC/II apply: actual target, descendants, ancestor locks, component scope, command/server authorization; structure single owner only; scalar batch explicitly compatible subtypes and accurate mixed state. Exclude native ID/label association, structural/type conversion, CMS binding, form transport and radio group/default actions from batch; deduplicate shortcuts and directly selected controls by actual write target. Keyboard Add/Edit/Move up/down/Remove; Enter applies, invalid draft retained, Escape cancels current interaction per II-02. Return restores exact parent/row focus.",
+      "compatibility": "No schema change required for regrouping; preserve IDs/native tags/content, styles, safe attrs and references. Structural corrections use atomic commands, not a new parallel property store.",
+      "acceptance": [
+        {
+          "id": "T-B69-color-01",
+          "criterion": "ChangeCSSfill leavesnativevalue unchanged.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-color-02",
+          "criterion": "var(--brand) rejected fornativevalue; customadvancedstoredattrs preserved.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-color-03",
+          "criterion": "Reset defaultremovesvalue only; Undo restorespresence.",
+          "status": "Specified, NOT RUN for redesigned application"
+        }
+      ],
+      "contracts": [
+        "BIC-C01\u201307",
+        "IC-01\u201313 as applicable",
+        "II-01",
+        "II-02",
+        "II-09",
+        "INS-D11"
+      ],
+      "sources": [
+        "src/blocks/Forms/ColorInput.tsx",
+        "src/shared/constants/elementCapabilities.ts",
+        "src/editor/inspector/config/typeBlocks.ts",
+        "src/editor/inspector/sections/typeBlock/bodies/formBodies.tsx"
+      ]
+    },
+    {
+      "id": "B69-label",
+      "block_id": "label",
+      "category": "Forms",
+      "source": "src/blocks/Forms/Label.tsx",
+      "architecture": "Observed generated native tree: <label>. Returned selection: label / label.",
+      "evidence_status": "Builder/current Inspector paths inspected in source. block-runtime-survey.json verifies insertion/tree/returned selection/default panel only. Redesigned controls, save/reopen and output NOT RUN.",
+      "disposition": "Move + Fix",
+      "owner": "Native label owns text and for reference; control owns DOMid/name/value.",
+      "homes": "Content \u2192 Label text/Associated control; exact Select control return.",
+      "gap": "Label text is neither placeholder nor submission key; associations must survive ID edits.",
+      "controls": [
+        "Associatedcontrol references unique native ID in same applicable document scope; wrappinglabel may use implicit target and showsit. Offer existing eligible labelable controls by name/type/path plus DOM ID, excluding hidden inputs. On explicit association only, reuse its unique DOM ID or generate one if absent in the same transaction as for; engine ID is separate. Undo restores former absence only if no later reference depends on it. Ambiguous/missing target retained with repair; no association batch.",
+        "Changingcontrol DOMid through canonicalrename updates allaffected label/ARIA refs atomically withpermissions; engineID separate. Label text usesactualcontent/nestedmarkup; keepselectablecontroloutsideeditrange."
+      ],
+      "workflow": "Select label \u2192 edittext orChoose associatedcontrol \u2192 verifytarget \u2192 Apply \u2192 Selectcontrol \u2192 Backtolabel. Missingtarget retainsfor until explicitchange; no name-basedrelink.",
+      "permissions_batch_focus": "BIC-C01\u201307 and IC/II apply: actual target, descendants, ancestor locks, component scope, command/server authorization; structure single owner only; scalar batch explicitly compatible subtypes and accurate mixed state. Exclude native ID/label association, structural/type conversion, CMS binding, form transport and radio group/default actions from batch; deduplicate shortcuts and directly selected controls by actual write target. Keyboard Add/Edit/Move up/down/Remove; Enter applies, invalid draft retained, Escape cancels current interaction per II-02. Return restores exact parent/row focus.",
+      "compatibility": "No schema change required for regrouping; preserve IDs/native tags/content, styles, safe attrs and references. Structural corrections use atomic commands, not a new parallel property store.",
+      "acceptance": [
+        {
+          "id": "T-B69-label-01",
+          "criterion": "Label+input rename preservesfor/id andengineID.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-label-02",
+          "criterion": "Missing/duplicateDOMid showsrepair, no arbitrarytarget.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-label-03",
+          "criterion": "Textedit leavescontrolname/placeholder/value unchanged.",
+          "status": "Specified, NOT RUN for redesigned application"
+        }
+      ],
+      "contracts": [
+        "BIC-C01\u201307",
+        "IC-01\u201313 as applicable",
+        "II-01",
+        "II-02",
+        "II-09",
+        "INS-D11"
+      ],
+      "sources": [
+        "src/blocks/Forms/Label.tsx",
+        "src/shared/constants/elementCapabilities.ts",
+        "src/editor/inspector/config/typeBlocks.ts",
+        "src/editor/inspector/sections/typeBlock/bodies/formBodies.tsx"
+      ]
+    },
+    {
+      "id": "B69-submit",
+      "block_id": "submit",
+      "category": "Forms",
+      "source": "src/blocks/Forms/SubmitButton.tsx",
+      "architecture": "Observed generated native tree: <button>. Returned selection: button / button.",
+      "evidence_status": "Builder/current Inspector paths inspected in source. block-runtime-survey.json verifies insertion/tree/returned selection/default panel only. Redesigned controls, save/reopen and output NOT RUN.",
+      "disposition": "Keep + Fix",
+      "owner": "Native submit button and containing/explicit form owner; service action remainsform-owned.",
+      "homes": "Content \u2192 Label/type/form association; Behaviour \u2192 supported native submit overrides inAdvanced.",
+      "gap": "Submit preset isbutton type=submit; clickingeditor must notexecute submission; no generic linkreplacement.",
+      "controls": [
+        "Label text and type=submit preserved. Explicit form attrresolvesformID, otherwiseancestor; outsideform saysNoassociatedform. formaction/formmethod/formenctype/formtarget/formnovalidate preservedwherealready authored, native-safeattributesroute; no simulatedserviceoverride.",
+        "Do not show URLlink as primary submitaction; intentionaltypechange isformconsequence operation. Native disabled separatefromeditorreadonly."
+      ],
+      "workflow": "Select Submit \u2192 label/formassociation \u2192 exactformSubmission fordelivery \u2192 Back. Preview only explicitservice/nativeconfigured path; noauditdelivery. Removebutton leavesformandrecords intact; Undo restoresbutton.",
+      "permissions_batch_focus": "BIC-C01\u201307 and IC/II apply: actual target, descendants, ancestor locks, component scope, command/server authorization; structure single owner only; scalar batch explicitly compatible subtypes and accurate mixed state. Exclude native ID/label association, structural/type conversion, CMS binding, form transport and radio group/default actions from batch; deduplicate shortcuts and directly selected controls by actual write target. Keyboard Add/Edit/Move up/down/Remove; Enter applies, invalid draft retained, Escape cancels current interaction per II-02. Return restores exact parent/row focus.",
+      "compatibility": "No schema change required for regrouping; preserve IDs/native tags/content, styles, safe attrs and references. Structural corrections use atomic commands, not a new parallel property store.",
+      "acceptance": [
+        {
+          "id": "T-B69-submit-01",
+          "criterion": "Submit ineditor never sendsrequest.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-submit-02",
+          "criterion": "Outsideform stateclear; associationpreservedonreorder.",
+          "status": "Specified, NOT RUN for redesigned application"
+        },
+        {
+          "id": "T-B69-submit-03",
+          "criterion": "Nativeoverrides andtypepersist; no accidentalhrefconversion.",
+          "status": "Specified, NOT RUN for redesigned application"
+        }
+      ],
+      "contracts": [
+        "BIC-C01\u201307",
+        "IC-01\u201313 as applicable",
+        "II-01",
+        "II-02",
+        "II-09",
+        "INS-D11"
+      ],
+      "sources": [
+        "src/blocks/Forms/SubmitButton.tsx",
+        "src/shared/constants/elementCapabilities.ts",
+        "src/editor/inspector/config/typeBlocks.ts",
+        "src/editor/inspector/sections/typeBlock/bodies/formBodies.tsx"
+      ]
+    }
+  ],
+  "remaining_verification": "Redesigned per-control mutation, authorization, undo/save/reopen/preview/output and accessibility not run."
+}

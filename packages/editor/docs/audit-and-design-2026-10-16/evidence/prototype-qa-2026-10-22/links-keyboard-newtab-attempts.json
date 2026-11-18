@@ -1,0 +1,38 @@
+[
+  {
+    "fixtureAlreadyOpen": "423:100464",
+    "actual": "423:100464"
+  },
+  {
+    "origin": "423:100464",
+    "label": "Class-first styling \u2192",
+    "input": "Tab focus then Enter",
+    "expectedNode": "415-50289",
+    "openedTabs": [],
+    "pass": false
+  },
+  {
+    "origin": "423:100464",
+    "label": "All class and recovery states \u2192",
+    "input": "Tab focus then Enter",
+    "expectedNode": "415-61494",
+    "openedTabs": [],
+    "pass": false
+  },
+  {
+    "origin": "423:100464",
+    "label": "Original five connected journeys \u2192",
+    "input": "Tab focus then Enter",
+    "expectedNode": "302-3370",
+    "openedTabs": [],
+    "pass": false
+  },
+  {
+    "origin": "423:100464",
+    "label": "Current-release CMS",
+    "input": "Tab focus then Enter",
+    "expectedNode": "424-337803",
+    "openedTabs": [],
+    "pass": false
+  }
+]

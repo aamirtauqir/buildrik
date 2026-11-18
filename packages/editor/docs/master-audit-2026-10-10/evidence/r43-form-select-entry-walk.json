@@ -1,0 +1,5 @@
+[
+ {"goto":"8843:30589","wait":6500,"shot":"r43-form-service-field.png"},
+ {"x":1320,"y":212,"shot":"r43-form-four-field-selector.png"},
+ {"x":915,"y":319,"shot":"r43-form-service-detail.png"}
+]

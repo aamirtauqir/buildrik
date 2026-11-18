@@ -1,0 +1,27 @@
+[
+  {
+    "label": "Mobile padding caller",
+    "goto": "8584:12241",
+    "shot": "r28-mobile-padding-before-build.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8584-12241&starting-point-node-id=8584%3A12241&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Build captures Main section Mobile context",
+    "x": 411,
+    "y": 28,
+    "shot": "r28-build-mobile-context.png",
+    "expected": "8628:12592",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8628-12592&starting-point-node-id=8584%3A12241&hide-ui=1",
+    "verification": "URL_MATCH"
+  },
+  {
+    "label": "Return to same Mobile padding caller",
+    "x": 319,
+    "y": 28,
+    "shot": "r28-mobile-padding-return.png",
+    "expected": "8584:12241",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8584-12241&starting-point-node-id=8584%3A12241&hide-ui=1",
+    "verification": "URL_MATCH"
+  }
+]

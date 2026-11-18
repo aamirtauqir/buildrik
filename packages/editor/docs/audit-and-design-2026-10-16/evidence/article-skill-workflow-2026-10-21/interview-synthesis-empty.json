@@ -1,0 +1,20 @@
+{
+  "schema": "pm/interview-synthesis/v1",
+  "generated_at": "2026-10-20T20:13:46+00:00",
+  "data": {
+    "study": {
+      "title": "Buildrick first-run evidence audit",
+      "outcome": "First committed edit within two minutes and Preview in first session \u2014 target, not observed"
+    },
+    "outcome": "First committed edit within two minutes and Preview in first session \u2014 target, not observed",
+    "stats": {
+      "interview_count": 0,
+      "snippet_count": 0,
+      "theme_count": 0,
+      "opportunity_count": 0
+    },
+    "themes": [],
+    "opportunities": [],
+    "followups": []
+  }
+}

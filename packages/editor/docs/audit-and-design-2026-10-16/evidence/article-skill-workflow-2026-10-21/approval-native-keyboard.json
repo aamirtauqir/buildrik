@@ -1,0 +1,116 @@
+{
+  "snapshotBefore": "--- BEGIN UNTRUSTED EXTERNAL CONTENT (source: https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-21249&starting-point-node-id=307%3A21191&scaling=scale-down) ---\n--- BEGIN UNTRUSTED EXTERNAL C\u200bONTENT (source: https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-21249&starting-point-node-id=307%3A21191&scaling=scale-down) ---\n    @e1 [button] \"Previous frame\"\n    @e2 [button] \"Next frame\"\n  @e3 [button] \"Restart\"\n\n\u2500\u2500 cursor-interactive (not in ARIA tree) \u2500\u2500\n@c1 [popover-child, cursor:pointer] \"span\"\n--- END UNTRUSTED EXTERNAL C\u200bONTENT ---\n--- END UNTRUSTED EXTERNAL CONTENT ---",
+  "keys": [
+    {
+      "key": "Tab",
+      "state": {
+        "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-21249&starting-point-node-id=307%3A21191&scaling=scale-down",
+        "tag": "BUTTON",
+        "role": null,
+        "label": "Previous frame",
+        "text": ""
+      }
+    },
+    {
+      "key": "Tab",
+      "state": {
+        "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-21249&starting-point-node-id=307%3A21191&scaling=scale-down",
+        "tag": "BUTTON",
+        "role": null,
+        "label": "Restart",
+        "text": "RestartR"
+      }
+    },
+    {
+      "key": "Tab",
+      "state": {
+        "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-21249&starting-point-node-id=307%3A21191&scaling=scale-down",
+        "tag": "BODY",
+        "role": null,
+        "label": null,
+        "text": "\n\n    Skip to contentBuildrick \u00b7 Editor design \u00b7 2026-10-18\n  @layer css-modules {\n    .multiplayer-"
+      }
+    },
+    {
+      "key": "Tab",
+      "state": {
+        "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-21249&starting-point-node-id=307%3A21191&scaling=scale-down",
+        "tag": "BUTTON",
+        "role": null,
+        "label": null,
+        "text": "Skip to content"
+      }
+    },
+    {
+      "key": "Tab",
+      "state": {
+        "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-21249&starting-point-node-id=307%3A21191&scaling=scale-down",
+        "tag": "A",
+        "role": null,
+        "label": "File browser",
+        "text": ""
+      }
+    },
+    {
+      "key": "Tab",
+      "state": {
+        "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-21249&starting-point-node-id=307%3A21191&scaling=scale-down",
+        "tag": "BUTTON",
+        "role": null,
+        "label": "Open flows list",
+        "text": ""
+      }
+    },
+    {
+      "key": "Tab",
+      "state": {
+        "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-21249&starting-point-node-id=307%3A21191&scaling=scale-down",
+        "tag": "BUTTON",
+        "role": null,
+        "label": "Comment",
+        "text": ""
+      }
+    },
+    {
+      "key": "Tab",
+      "state": {
+        "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-21249&starting-point-node-id=307%3A21191&scaling=scale-down",
+        "tag": "BUTTON",
+        "role": null,
+        "label": "Multiplayer tools",
+        "text": ""
+      }
+    },
+    {
+      "key": "Shift+Tab",
+      "state": {
+        "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-21249&starting-point-node-id=307%3A21191&scaling=scale-down",
+        "tag": "BUTTON",
+        "role": null,
+        "label": "Comment",
+        "text": ""
+      }
+    },
+    {
+      "key": "Enter",
+      "state": {
+        "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-21249&starting-point-node-id=307%3A21191&scaling=scale-down",
+        "tag": "H1",
+        "role": null,
+        "label": null,
+        "text": "Log in or create an account to leave comments on Buildrick \u00b7 Editor design \u00b7 2026-10-18."
+      }
+    },
+    {
+      "key": "Escape",
+      "state": {
+        "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-21249&starting-point-node-id=307%3A21191&scaling=scale-down",
+        "tag": "BUTTON",
+        "role": null,
+        "label": "Comment",
+        "text": ""
+      }
+    }
+  ],
+  "snapshotAfter": "--- BEGIN UNTRUSTED EXTERNAL CONTENT (source: https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-21249&starting-point-node-id=307%3A21191&scaling=scale-down) ---\n--- BEGIN UNTRUSTED EXTERNAL C\u200bONTENT (source: https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-21249&starting-point-node-id=307%3A21191&scaling=scale-down) ---\n  @e1 [button] \"Skip to content\"\n  @e2 [link] \"File browser\"\n  @e3 [button] \"Open flows list\"\n  @e4 [button] \"Comment\"\n  @e5 [button] \"Multiplayer tools\"\n  @e6 [button] \"Log in or create account\"\n  @e7 [button] \"Continue with Google\"\n  @e8 [button] \"Options\"\n  @e9 [button] \"Enter full screen (F)\"\n    @e10 [button] \"Previous frame\"\n    @e11 [button] \"Next frame\"\n  @e12 [button] \"Restart\"\n\n\u2500\u2500 cursor-interactive (not in ARIA tree) \u2500\u2500\n@c1 [popover-child, cursor:pointer] \"span\"\n--- END UNTRUSTED EXTERNAL C\u200bONTENT ---\n--- END UNTRUSTED EXTERNAL CONTENT ---"
+}

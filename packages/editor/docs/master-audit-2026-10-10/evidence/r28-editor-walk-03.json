@@ -1,0 +1,9 @@
+[
+ {"label":"Detached button caller","goto":"8543:9508"},
+ {"label":"Open shared CMS","x":109,"y":236,"shot":"r28-cms-records.png"},
+ {"label":"Articles Fields","x":401,"y":179,"shot":"r28-cms-fields.png"},
+ {"label":"Articles Dynamic pages","x":116,"y":225,"shot":"r28-cms-dynamic.png"},
+ {"label":"Articles Settings","x":116,"y":273,"shot":"r28-cms-settings.png"},
+ {"label":"Return to Articles Records","x":116,"y":129,"shot":"r28-cms-records-return.png"},
+ {"label":"Restore detached button caller","x":114,"y":967,"shot":"r28-cms-caller-return.png","expected":"8543:9508"}
+]

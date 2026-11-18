@@ -1,0 +1,30 @@
+[
+  {
+    "label": "Connections",
+    "x": 201,
+    "y": 872,
+    "shot": "r34-mcp-entry-retry.png"
+  },
+  {
+    "label": "Set server URL",
+    "x": 720,
+    "y": 534
+  },
+  {
+    "label": "Review tools",
+    "x": 902,
+    "y": 619,
+    "shot": "r34-mcp-authorize-retry.png"
+  },
+  {
+    "label": "Allow proposal scope",
+    "x": 720,
+    "y": 552
+  },
+  {
+    "label": "Authorize",
+    "x": 902,
+    "y": 637,
+    "shot": "r34-mcp-connected-retry.png"
+  }
+]

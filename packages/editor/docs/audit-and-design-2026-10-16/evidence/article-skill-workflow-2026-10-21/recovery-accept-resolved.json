@@ -1,0 +1,52 @@
+[
+  {
+    "from": "307:21191",
+    "to": "377:25747",
+    "shot": "recovery-second-resolved-draft.png"
+  },
+  {
+    "from": "377:25747",
+    "to": "307:21191"
+  },
+  {
+    "from": "307:21191",
+    "to": "377:25747",
+    "shot": "recovery-second-resolved-draft.png"
+  },
+  {
+    "from": "377:25747",
+    "to": "377:25798"
+  },
+  {
+    "from": "377:25798",
+    "to": "377:25858",
+    "shot": "recovery-second-resolved-failed.png"
+  },
+  {
+    "from": "377:25858",
+    "to": "377:25747",
+    "shot": "recovery-second-resolved-draft.png"
+  },
+  {
+    "from": "377:25747",
+    "to": "377:25798"
+  },
+  {
+    "from": "377:25798",
+    "to": "377:25858",
+    "shot": "recovery-second-resolved-failed.png"
+  },
+  {
+    "from": "377:25858",
+    "to": "377:25798"
+  },
+  {
+    "from": "377:25798",
+    "to": "377:25918",
+    "shot": "recovery-second-resolved-ack.png"
+  },
+  {
+    "from": "377:25918",
+    "to": "302:3370"
+  }
+]

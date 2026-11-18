@@ -1,0 +1,40 @@
+{
+  "exportedRoots": 19,
+  "reachableRoots": [
+    "423:100171",
+    "423:100464",
+    "423:96903",
+    "423:97218",
+    "423:97552",
+    "423:97866",
+    "423:98182",
+    "423:98532",
+    "423:98884",
+    "423:99224",
+    "423:99545",
+    "423:99859",
+    "425:98763",
+    "425:99052",
+    "425:99342"
+  ],
+  "reachableControls": 63,
+  "invalidReachable": [],
+  "outsideHubRoots": [
+    {
+      "id": "63:6393",
+      "name": "B3-P01 \u00b7 Pages / manage without switching"
+    },
+    {
+      "id": "101:29978",
+      "name": "B3-P54 \u00b7 New page / choose source"
+    },
+    {
+      "id": "101:36828",
+      "name": "B3-P55 \u00b7 New page / Blank default"
+    },
+    {
+      "id": "101:38980",
+      "name": "B3-P58 \u00b7 New page / checking capacity"
+    }
+  ]
+}

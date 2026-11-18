@@ -1,0 +1,75 @@
+[
+  {
+    "goto": "8843:16808",
+    "shot": "r38-heading-desktop.png"
+  },
+  {
+    "x": 476,
+    "y": 96,
+    "shot": "r38-heading-mobile.png"
+  },
+  {
+    "x": 1330,
+    "y": 254,
+    "shot": "r38-heading-style.png"
+  },
+  {
+    "x": 1230,
+    "y": 310
+  },
+  {
+    "x": 720,
+    "y": 443,
+    "wait": 1200
+  },
+  {
+    "x": 1390,
+    "y": 88,
+    "wait": 1500,
+    "shot": "r38-close-mobile24.png"
+  },
+  {
+    "x": 380,
+    "y": 96,
+    "shot": "r38-desktop36-unaffected.png"
+  },
+  {
+    "x": 476,
+    "y": 96,
+    "shot": "r38-mobile24-retained.png"
+  },
+  {
+    "x": 1330,
+    "y": 254,
+    "shot": "r38-reopen24.png"
+  },
+  {
+    "x": 1230,
+    "y": 310
+  },
+  {
+    "x": 720,
+    "y": 723,
+    "shot": "r38-cancel24.png"
+  },
+  {
+    "goto": "8842:14345",
+    "wait": 3000
+  },
+  {
+    "x": 1330,
+    "y": 214,
+    "wait": 1000
+  },
+  {
+    "x": 1230,
+    "y": 310,
+    "shot": "r38-text-chooser.png"
+  },
+  {
+    "x": 720,
+    "y": 643,
+    "wait": 1500,
+    "shot": "r38-text-caption-xs.png"
+  }
+]

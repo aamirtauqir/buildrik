@@ -1,0 +1,207 @@
+{
+  "mutatedNodeIds": [
+    "8688:13112",
+    "8468:98",
+    "I8468:117;8314:8",
+    "8663:13390",
+    "8663:13560",
+    "I8663:13401;8314:8",
+    "8663:13551",
+    "8676:13429",
+    "8676:13438",
+    "I8676:13441;8314:8",
+    "8676:13500",
+    "8668:13202",
+    "8676:13579",
+    "8688:13210",
+    "8688:13219",
+    "I8688:13222;8314:8",
+    "8688:13281",
+    "8697:13159",
+    "8697:13168",
+    "I8697:13171;8314:8",
+    "8697:13230",
+    "8697:13305",
+    "8697:13404",
+    "8697:13492",
+    "I8697:13495;8314:8",
+    "8697:13554",
+    "8697:13629",
+    "8697:13728",
+    "8663:12997",
+    "8663:13170",
+    "I8663:13008;8314:8",
+    "8663:13161",
+    "8663:13195",
+    "8663:13365",
+    "I8663:13206;8314:8",
+    "8663:13356",
+    "8676:12980",
+    "8676:12989",
+    "I8676:12992;8314:8",
+    "8676:13052",
+    "8676:13204",
+    "8676:13213",
+    "I8676:13216;8314:8",
+    "8676:13275"
+  ],
+  "rootCount": 35,
+  "roots": [
+    {
+      "id": "8688:13047",
+      "name": "R31 / Pages · manage"
+    },
+    {
+      "id": "8688:13080",
+      "name": "R31 / Pages · actions"
+    },
+    {
+      "id": "8688:13101",
+      "name": "R31 / Pages · rename"
+    },
+    {
+      "id": "8688:13117",
+      "name": "R31 / Pages · deleted"
+    },
+    {
+      "id": "8688:13124",
+      "name": "R31 / Pages · delete confirm"
+    },
+    {
+      "id": "8688:13133",
+      "name": "R31 / Pages · protected"
+    },
+    {
+      "id": "8688:13141",
+      "name": "R31 / Pages · duplicated"
+    },
+    {
+      "id": "8688:13147",
+      "name": "R31 / Pages · homepage"
+    },
+    {
+      "id": "8688:13154",
+      "name": "R31 / Pages · link"
+    },
+    {
+      "id": "8688:13161",
+      "name": "R31 / Pages · search"
+    },
+    {
+      "id": "8688:13170",
+      "name": "R31 / Pages · search results"
+    },
+    {
+      "id": "8688:13178",
+      "name": "R31 / Pages · no results"
+    },
+    {
+      "id": "8688:13188",
+      "name": "R31 / Editor / journal"
+    },
+    {
+      "id": "8688:13308",
+      "name": "R31 / Editor / copy"
+    },
+    {
+      "id": "8689:13289",
+      "name": "R31 / SEO · commit"
+    },
+    {
+      "id": "8689:13293",
+      "name": "R31 / SEO · invalid head"
+    },
+    {
+      "id": "8689:13309",
+      "name": "R31 / SEO · social and head input"
+    },
+    {
+      "id": "8689:13338",
+      "name": "R31 / SEO · site defaults"
+    },
+    {
+      "id": "8690:13131",
+      "name": "R31 / Templates · preview"
+    },
+    {
+      "id": "8690:13145",
+      "name": "R31 / Templates · replace confirmation"
+    },
+    {
+      "id": "8690:13158",
+      "name": "R31 / Templates · backup failed"
+    },
+    {
+      "id": "8690:13168",
+      "name": "R31 / Templates · applying"
+    },
+    {
+      "id": "8690:13171",
+      "name": "R31 / Templates · applied"
+    },
+    {
+      "id": "8690:13180",
+      "name": "R31 / Templates · undone"
+    },
+    {
+      "id": "8690:13185",
+      "name": "R31 / Templates · premium"
+    },
+    {
+      "id": "8690:13195",
+      "name": "R31 / Templates · new page"
+    },
+    {
+      "id": "8690:13227",
+      "name": "R31 / Templates · reload"
+    },
+    {
+      "id": "8690:13237",
+      "name": "R31 / Review fixtures"
+    },
+    {
+      "id": "8691:261399",
+      "name": "R31 / Templates · saved backup"
+    },
+    {
+      "id": "8697:13137",
+      "name": "R31 / Mobile / journal"
+    },
+    {
+      "id": "8697:13257",
+      "name": "R31 / Preview / journal"
+    },
+    {
+      "id": "8697:13356",
+      "name": "R31 / Mobile preview / journal"
+    },
+    {
+      "id": "8697:13461",
+      "name": "R31 / Mobile / copy"
+    },
+    {
+      "id": "8697:13581",
+      "name": "R31 / Preview / copy"
+    },
+    {
+      "id": "8697:13680",
+      "name": "R31 / Mobile preview / copy"
+    }
+  ],
+  "activeInstances": 155,
+  "texts": 301,
+  "images": 0,
+  "components": {
+    "8314:5": 62,
+    "8314:7": 62,
+    "8314:9": 4,
+    "8531:318": 3,
+    "8314:3": 19,
+    "8314:11": 1,
+    "8627:621": 4
+  },
+  "badFonts": [],
+  "overflow": [],
+  "missingDestinations": [],
+  "uniqueDestinations": 49
+}

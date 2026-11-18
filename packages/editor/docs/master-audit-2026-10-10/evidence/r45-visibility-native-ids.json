@@ -1,0 +1,762 @@
+{
+  "nodes": [
+    {
+      "id": "9064:17586",
+      "name": "R45 / Display and origin"
+    },
+    {
+      "id": "8841:14888",
+      "name": "Display",
+      "text": "Display",
+      "parent": "9064:17586"
+    },
+    {
+      "id": "8841:14889",
+      "name": "Field / Display",
+      "parent": "9064:17586"
+    },
+    {
+      "id": "I8841:14889;8531:319",
+      "name": "Value",
+      "text": "Block",
+      "parent": "8841:14889"
+    },
+    {
+      "id": "9064:17589",
+      "name": "Default · Block",
+      "text": "Default · Block",
+      "parent": "9064:17588"
+    },
+    {
+      "id": "9064:17590",
+      "name": "Normal state · Reset removes only this breakpoint’s Display declaration.",
+      "text": "Normal state · Reset removes only this breakpoint’s Display declaration.",
+      "parent": "9064:17588"
+    },
+    {
+      "id": "9064:17591",
+      "name": "Action / Reset Display",
+      "parent": "9064:17588"
+    },
+    {
+      "id": "I9064:17591;8314:6",
+      "name": "Button",
+      "text": "Reset Display",
+      "parent": "9064:17591"
+    },
+    {
+      "id": "8841:15284",
+      "name": "Controls / Visibility"
+    },
+    {
+      "id": "9064:17597",
+      "name": "Each choice affects its named device, regardless of the preview. Display can still hide an enabled device.",
+      "text": "Each choice affects its named device, regardless of the preview. Display can still hide an enabled device.",
+      "parent": "9064:17596"
+    },
+    {
+      "id": "9064:17598",
+      "name": "Visible on Desktop",
+      "text": "Visible on Desktop",
+      "parent": "9064:17596"
+    },
+    {
+      "id": "9064:17599",
+      "name": "Action / Undo visibility or Display",
+      "parent": "9064:17596"
+    },
+    {
+      "id": "I9064:17599;8314:6",
+      "name": "Button",
+      "text": "Undo visibility or Display",
+      "parent": "9064:17599"
+    },
+    {
+      "id": "8841:15288",
+      "name": "Show on desktop",
+      "text": "Show on desktop",
+      "parent": "8841:15284"
+    },
+    {
+      "id": "8841:15289",
+      "name": "Field / Show on desktop",
+      "parent": "8841:15284"
+    },
+    {
+      "id": "I8841:15289;8531:319",
+      "name": "Value",
+      "text": "Yes",
+      "parent": "8841:15289"
+    },
+    {
+      "id": "9064:17621",
+      "name": "Action / Reset Show on Desktop",
+      "parent": "8841:15284"
+    },
+    {
+      "id": "I9064:17621;8314:6",
+      "name": "Button",
+      "text": "Reset Show on Desktop",
+      "parent": "9064:17621"
+    },
+    {
+      "id": "8841:15293",
+      "name": "Show on tablet",
+      "text": "Show on tablet",
+      "parent": "8841:15284"
+    },
+    {
+      "id": "8841:15294",
+      "name": "Field / Show on tablet",
+      "parent": "8841:15284"
+    },
+    {
+      "id": "I8841:15294;8531:319",
+      "name": "Value",
+      "text": "Yes",
+      "parent": "8841:15294"
+    },
+    {
+      "id": "9064:17627",
+      "name": "Action / Reset Show on Tablet",
+      "parent": "8841:15284"
+    },
+    {
+      "id": "I9064:17627;8314:6",
+      "name": "Button",
+      "text": "Reset Show on Tablet",
+      "parent": "9064:17627"
+    },
+    {
+      "id": "8841:15298",
+      "name": "Show on mobile",
+      "text": "Show on mobile",
+      "parent": "8841:15284"
+    },
+    {
+      "id": "8841:15299",
+      "name": "Field / Show on mobile",
+      "parent": "8841:15284"
+    },
+    {
+      "id": "I8841:15299;8531:319",
+      "name": "Value",
+      "text": "Yes",
+      "parent": "8841:15299"
+    },
+    {
+      "id": "9064:17631",
+      "name": "Action / Reset Show on Mobile",
+      "parent": "8841:15284"
+    },
+    {
+      "id": "I9064:17631;8314:6",
+      "name": "Button",
+      "text": "Reset Show on Mobile",
+      "parent": "9064:17631"
+    },
+    {
+      "id": "9064:17601",
+      "name": "R45 / Visibility / Change unavailable"
+    },
+    {
+      "id": "9064:17609",
+      "name": "Element unchanged",
+      "text": "Element unchanged",
+      "parent": "9064:17601"
+    },
+    {
+      "id": "9064:17610",
+      "name": "No changes were made.",
+      "text": "No changes were made.",
+      "parent": "9064:17601"
+    },
+    {
+      "id": "9064:17611",
+      "name": "Action / Back to Style",
+      "parent": "9064:17601"
+    },
+    {
+      "id": "I9064:17611;8314:6",
+      "name": "Button",
+      "text": "Back to Style",
+      "parent": "9064:17611"
+    },
+    {
+      "id": "9064:20058",
+      "name": "R45 / Review / heading visibility"
+    },
+    {
+      "id": "9064:20066",
+      "name": "Heading · visibility scenarios",
+      "text": "Heading · visibility scenarios",
+      "parent": "9064:20058"
+    },
+    {
+      "id": "9064:20067",
+      "name": "Review only. Loading a fixture clears this element’s visibility recovery; the active preview is retained.",
+      "text": "Review only. Loading a fixture clears this element’s visibility recovery; the active preview is retained.",
+      "parent": "9064:20058"
+    },
+    {
+      "id": "9064:20068",
+      "name": "Action / All devices shown",
+      "parent": "9064:20058"
+    },
+    {
+      "id": "I9064:20068;8314:6",
+      "name": "Button",
+      "text": "All devices shown",
+      "parent": "9064:20068"
+    },
+    {
+      "id": "9064:20071",
+      "name": "Action / Tablet Display None",
+      "parent": "9064:20058"
+    },
+    {
+      "id": "I9064:20071;8314:6",
+      "name": "Button",
+      "text": "Tablet Display None",
+      "parent": "9064:20071"
+    },
+    {
+      "id": "9064:20074",
+      "name": "Action / Mobile: Display and flag hidden",
+      "parent": "9064:20058"
+    },
+    {
+      "id": "I9064:20074;8314:6",
+      "name": "Button",
+      "text": "Mobile: Display and flag hidden",
+      "parent": "9064:20074"
+    },
+    {
+      "id": "9064:20077",
+      "name": "Action / Locked element",
+      "parent": "9064:20058"
+    },
+    {
+      "id": "I9064:20077;8314:6",
+      "name": "Button",
+      "text": "Locked element",
+      "parent": "9064:20077"
+    },
+    {
+      "id": "9064:20080",
+      "name": "Action / Mixed selection",
+      "parent": "9064:20058"
+    },
+    {
+      "id": "I9064:20080;8314:6",
+      "name": "Button",
+      "text": "Mixed selection",
+      "parent": "9064:20080"
+    },
+    {
+      "id": "9064:20083",
+      "name": "Action / Missing element",
+      "parent": "9064:20058"
+    },
+    {
+      "id": "I9064:20083;8314:6",
+      "name": "Button",
+      "text": "Missing element",
+      "parent": "9064:20083"
+    },
+    {
+      "id": "9064:20086",
+      "name": "Action / Open Image example",
+      "parent": "9064:20058"
+    },
+    {
+      "id": "I9064:20086;8314:6",
+      "name": "Button",
+      "text": "Open Image example",
+      "parent": "9064:20086"
+    },
+    {
+      "id": "9064:20089",
+      "name": "Action / Cancel",
+      "parent": "9064:20058"
+    },
+    {
+      "id": "I9064:20089;8314:6",
+      "name": "Button",
+      "text": "Cancel",
+      "parent": "9064:20089"
+    },
+    {
+      "id": "9064:20114",
+      "name": "R45 / Review / image visibility"
+    },
+    {
+      "id": "9064:20122",
+      "name": "Image · visibility scenarios",
+      "text": "Image · visibility scenarios",
+      "parent": "9064:20114"
+    },
+    {
+      "id": "9064:20123",
+      "name": "Review only. Loading a fixture clears this element’s visibility recovery; the active preview is retained.",
+      "text": "Review only. Loading a fixture clears this element’s visibility recovery; the active preview is retained.",
+      "parent": "9064:20114"
+    },
+    {
+      "id": "9064:20124",
+      "name": "Action / All devices shown",
+      "parent": "9064:20114"
+    },
+    {
+      "id": "I9064:20124;8314:6",
+      "name": "Button",
+      "text": "All devices shown",
+      "parent": "9064:20124"
+    },
+    {
+      "id": "9064:20127",
+      "name": "Action / Tablet Display None",
+      "parent": "9064:20114"
+    },
+    {
+      "id": "I9064:20127;8314:6",
+      "name": "Button",
+      "text": "Tablet Display None",
+      "parent": "9064:20127"
+    },
+    {
+      "id": "9064:20130",
+      "name": "Action / Mobile: Display and flag hidden",
+      "parent": "9064:20114"
+    },
+    {
+      "id": "I9064:20130;8314:6",
+      "name": "Button",
+      "text": "Mobile: Display and flag hidden",
+      "parent": "9064:20130"
+    },
+    {
+      "id": "9064:20133",
+      "name": "Action / Locked element",
+      "parent": "9064:20114"
+    },
+    {
+      "id": "I9064:20133;8314:6",
+      "name": "Button",
+      "text": "Locked element",
+      "parent": "9064:20133"
+    },
+    {
+      "id": "9064:20136",
+      "name": "Action / Mixed selection",
+      "parent": "9064:20114"
+    },
+    {
+      "id": "I9064:20136;8314:6",
+      "name": "Button",
+      "text": "Mixed selection",
+      "parent": "9064:20136"
+    },
+    {
+      "id": "9064:20139",
+      "name": "Action / Missing element",
+      "parent": "9064:20114"
+    },
+    {
+      "id": "I9064:20139;8314:6",
+      "name": "Button",
+      "text": "Missing element",
+      "parent": "9064:20139"
+    },
+    {
+      "id": "9064:20142",
+      "name": "Action / Open Heading example",
+      "parent": "9064:20114"
+    },
+    {
+      "id": "I9064:20142;8314:6",
+      "name": "Button",
+      "text": "Open Heading example",
+      "parent": "9064:20142"
+    },
+    {
+      "id": "9064:20145",
+      "name": "Action / Cancel",
+      "parent": "9064:20114"
+    },
+    {
+      "id": "I9064:20145;8314:6",
+      "name": "Button",
+      "text": "Cancel",
+      "parent": "9064:20145"
+    },
+    {
+      "id": "9064:20049",
+      "name": "Tablet preview scope"
+    },
+    {
+      "id": "9064:20050",
+      "name": "Tablet preview covers Visibility and Display. Switch to Desktop or Mobile for other property previews.",
+      "text": "Tablet preview covers Visibility and Display. Switch to Desktop or Mobile for other property previews.",
+      "parent": "9064:20049"
+    },
+    {
+      "id": "9064:20051",
+      "name": "Action / Visibility & Display",
+      "parent": "9064:20049"
+    },
+    {
+      "id": "I9064:20051;8314:6",
+      "name": "Button",
+      "text": "Visibility & Display",
+      "parent": "9064:20051"
+    },
+    {
+      "id": "9064:20105",
+      "name": "Tablet preview scope"
+    },
+    {
+      "id": "9064:20106",
+      "name": "Tablet preview covers Visibility and Display. Switch to Desktop or Mobile for other property previews.",
+      "text": "Tablet preview covers Visibility and Display. Switch to Desktop or Mobile for other property previews.",
+      "parent": "9064:20105"
+    },
+    {
+      "id": "9064:20107",
+      "name": "Action / Visibility & Display",
+      "parent": "9064:20105"
+    },
+    {
+      "id": "I9064:20107;8314:6",
+      "name": "Button",
+      "text": "Visibility & Display",
+      "parent": "9064:20107"
+    }
+  ],
+  "style": [
+    {
+      "id": "8843:16842",
+      "colors": [
+        {
+          "type": "SET_VARIABLE",
+          "variableId": "VariableID:8914:17382",
+          "variableValue": {
+            "value": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:8322:790"
+            },
+            "type": "VARIABLE_ALIAS",
+            "resolvedType": "COLOR"
+          }
+        },
+        {
+          "type": "SET_VARIABLE",
+          "variableId": "VariableID:8914:17383",
+          "variableValue": {
+            "value": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:8322:789"
+            },
+            "type": "VARIABLE_ALIAS",
+            "resolvedType": "COLOR"
+          }
+        },
+        {
+          "type": "SET_VARIABLE",
+          "variableId": "VariableID:8914:17384",
+          "variableValue": {
+            "value": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:8322:789"
+            },
+            "type": "VARIABLE_ALIAS",
+            "resolvedType": "COLOR"
+          }
+        },
+        {
+          "type": "SET_VARIABLE",
+          "variableId": "VariableID:8914:17385",
+          "variableValue": {
+            "value": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:8322:778"
+            },
+            "type": "VARIABLE_ALIAS",
+            "resolvedType": "COLOR"
+          }
+        }
+      ],
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 0.10196078568696976,
+            "g": 0.33725491166114807,
+            "b": 0.8588235378265381
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:8914:17382"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "8843:16843",
+      "colors": [
+        {
+          "type": "SET_VARIABLE",
+          "variableId": "VariableID:8914:17382",
+          "variableValue": {
+            "value": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:8322:789"
+            },
+            "type": "VARIABLE_ALIAS",
+            "resolvedType": "COLOR"
+          }
+        },
+        {
+          "type": "SET_VARIABLE",
+          "variableId": "VariableID:8914:17383",
+          "variableValue": {
+            "value": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:8322:790"
+            },
+            "type": "VARIABLE_ALIAS",
+            "resolvedType": "COLOR"
+          }
+        },
+        {
+          "type": "SET_VARIABLE",
+          "variableId": "VariableID:8914:17384",
+          "variableValue": {
+            "value": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:8322:778"
+            },
+            "type": "VARIABLE_ALIAS",
+            "resolvedType": "COLOR"
+          }
+        },
+        {
+          "type": "SET_VARIABLE",
+          "variableId": "VariableID:8914:17385",
+          "variableValue": {
+            "value": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:8322:789"
+            },
+            "type": "VARIABLE_ALIAS",
+            "resolvedType": "COLOR"
+          }
+        }
+      ],
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:8914:17383"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "8843:20501",
+      "colors": [
+        {
+          "type": "SET_VARIABLE",
+          "variableId": "VariableID:8914:17583",
+          "variableValue": {
+            "value": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:8322:790"
+            },
+            "type": "VARIABLE_ALIAS",
+            "resolvedType": "COLOR"
+          }
+        },
+        {
+          "type": "SET_VARIABLE",
+          "variableId": "VariableID:8914:17584",
+          "variableValue": {
+            "value": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:8322:789"
+            },
+            "type": "VARIABLE_ALIAS",
+            "resolvedType": "COLOR"
+          }
+        },
+        {
+          "type": "SET_VARIABLE",
+          "variableId": "VariableID:8914:17585",
+          "variableValue": {
+            "value": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:8322:789"
+            },
+            "type": "VARIABLE_ALIAS",
+            "resolvedType": "COLOR"
+          }
+        },
+        {
+          "type": "SET_VARIABLE",
+          "variableId": "VariableID:8914:17586",
+          "variableValue": {
+            "value": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:8322:778"
+            },
+            "type": "VARIABLE_ALIAS",
+            "resolvedType": "COLOR"
+          }
+        }
+      ],
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 0.10196078568696976,
+            "g": 0.33725491166114807,
+            "b": 0.8588235378265381
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:8914:17583"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "8843:20502",
+      "colors": [
+        {
+          "type": "SET_VARIABLE",
+          "variableId": "VariableID:8914:17583",
+          "variableValue": {
+            "value": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:8322:789"
+            },
+            "type": "VARIABLE_ALIAS",
+            "resolvedType": "COLOR"
+          }
+        },
+        {
+          "type": "SET_VARIABLE",
+          "variableId": "VariableID:8914:17584",
+          "variableValue": {
+            "value": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:8322:790"
+            },
+            "type": "VARIABLE_ALIAS",
+            "resolvedType": "COLOR"
+          }
+        },
+        {
+          "type": "SET_VARIABLE",
+          "variableId": "VariableID:8914:17585",
+          "variableValue": {
+            "value": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:8322:778"
+            },
+            "type": "VARIABLE_ALIAS",
+            "resolvedType": "COLOR"
+          }
+        },
+        {
+          "type": "SET_VARIABLE",
+          "variableId": "VariableID:8914:17586",
+          "variableValue": {
+            "value": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:8322:789"
+            },
+            "type": "VARIABLE_ALIAS",
+            "resolvedType": "COLOR"
+          }
+        }
+      ],
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:8914:17584"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "tabs": [
+    {
+      "id": "8843:17015",
+      "children": [
+        {
+          "id": "8843:17016",
+          "name": "Action / Style"
+        },
+        {
+          "id": "8843:17018",
+          "name": "Action / Settings"
+        },
+        {
+          "id": "8843:17020",
+          "name": "Action / Interactions"
+        }
+      ]
+    },
+    {
+      "id": "8843:20674",
+      "children": [
+        {
+          "id": "8843:20675",
+          "name": "Action / Style"
+        },
+        {
+          "id": "8843:20677",
+          "name": "Action / Settings"
+        },
+        {
+          "id": "8843:20679",
+          "name": "Action / Interactions"
+        }
+      ]
+    }
+  ]
+}

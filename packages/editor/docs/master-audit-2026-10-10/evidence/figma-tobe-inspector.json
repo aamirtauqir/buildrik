@@ -1,0 +1,2611 @@
+[
+  {
+    "code": "IN-01",
+    "key": "image",
+    "id": "8317:242981",
+    "note": "8317:243206",
+    "x": 12000,
+    "y": 0,
+    "width": 1440,
+    "height": 900,
+    "body": "8317:243120",
+    "anchors": [
+      {
+        "id": "8317:242992",
+        "name": "⌘ K"
+      },
+      {
+        "id": "8317:242994",
+        "name": "History"
+      },
+      {
+        "id": "8317:242996",
+        "name": "Review"
+      },
+      {
+        "id": "8317:242998",
+        "name": "Preview"
+      },
+      {
+        "id": "8317:243000",
+        "name": "Publish"
+      },
+      {
+        "id": "8317:243003",
+        "name": "Open Add"
+      },
+      {
+        "id": "8317:243007",
+        "name": "Open Layers"
+      },
+      {
+        "id": "8317:243011",
+        "name": "Open Pages"
+      },
+      {
+        "id": "8317:243015",
+        "name": "Open Media"
+      },
+      {
+        "id": "8317:243019",
+        "name": "Open CMS"
+      },
+      {
+        "id": "8317:243023",
+        "name": "Open Brand"
+      },
+      {
+        "id": "8317:243027",
+        "name": "Action / help"
+      },
+      {
+        "id": "8317:243138",
+        "name": "Action / close"
+      },
+      {
+        "id": "8317:243145",
+        "name": "Row / Body"
+      },
+      {
+        "id": "8317:243149",
+        "name": "Row / Main section"
+      },
+      {
+        "id": "8317:243153",
+        "name": "Row / Heading"
+      },
+      {
+        "id": "8317:243157",
+        "name": "Row / Paragraph"
+      },
+      {
+        "id": "8317:243161",
+        "name": "Row / Project image"
+      },
+      {
+        "id": "8317:245433",
+        "name": "Explore our work"
+      },
+      {
+        "id": "8317:243093",
+        "name": "Action / undo"
+      },
+      {
+        "id": "8317:243096",
+        "name": "Action / redo"
+      },
+      {
+        "id": "8317:243099",
+        "name": "63% ⌄"
+      },
+      {
+        "id": "8317:243104",
+        "name": "Action / more"
+      },
+      {
+        "id": "8317:243107",
+        "name": "Action / close"
+      },
+      {
+        "id": "8317:243111",
+        "name": "Style"
+      },
+      {
+        "id": "8317:243112",
+        "name": "Content"
+      },
+      {
+        "id": "8317:243114",
+        "name": "Effects"
+      },
+      {
+        "id": "8318:567",
+        "name": "Property / Source / default"
+      },
+      {
+        "id": "8318:571",
+        "name": "Property / Alt text / default"
+      },
+      {
+        "id": "8318:575",
+        "name": "Replace image"
+      },
+      {
+        "id": "8318:579",
+        "name": "Property / Fit / default"
+      },
+      {
+        "id": "8318:583",
+        "name": "Property / Loading / default"
+      },
+      {
+        "id": "8318:589",
+        "name": "Property / Source / default"
+      },
+      {
+        "id": "8318:561",
+        "name": "Open selected-element AI"
+      }
+    ],
+    "name": "TO-BE IN-01 · Image content",
+    "autoLayoutCount": 24,
+    "instances": 14,
+    "aiEntry": "8318:561",
+    "bodyGroups": [
+      {
+        "id": "8318:565",
+        "name": "Property group / Image",
+        "y": 44,
+        "height": 118
+      },
+      {
+        "id": "8318:577",
+        "name": "Property group / Display",
+        "y": 210,
+        "height": 118
+      },
+      {
+        "id": "8318:587",
+        "name": "Property group / CMS binding",
+        "y": 332,
+        "height": 81
+      },
+      {
+        "id": "8318:593",
+        "name": "Property group / Accessibility",
+        "y": 417,
+        "height": 79
+      },
+      {
+        "id": "8318:596",
+        "name": "Property group / Attributes",
+        "y": 500,
+        "height": 63
+      }
+    ],
+    "paper": [
+      {
+        "id": "8317:243072",
+        "width": 752,
+        "height": 706
+      }
+    ],
+    "textCount": 59,
+    "evidence": "figma-tobe-inspector-IN-01.png",
+    "status": "Native proposal; visually checked; Phase 6 wiring pending"
+  },
+  {
+    "code": "IN-02",
+    "key": "flex",
+    "id": "8317:243209",
+    "note": "8317:243459",
+    "x": 13600,
+    "y": 0,
+    "width": 1440,
+    "height": 900,
+    "body": "8317:243348",
+    "anchors": [
+      {
+        "id": "8317:243220",
+        "name": "⌘ K"
+      },
+      {
+        "id": "8317:243222",
+        "name": "History"
+      },
+      {
+        "id": "8317:243224",
+        "name": "Review"
+      },
+      {
+        "id": "8317:243226",
+        "name": "Preview"
+      },
+      {
+        "id": "8317:243228",
+        "name": "Publish"
+      },
+      {
+        "id": "8317:243231",
+        "name": "Open Add"
+      },
+      {
+        "id": "8317:243235",
+        "name": "Open Layers"
+      },
+      {
+        "id": "8317:243239",
+        "name": "Open Pages"
+      },
+      {
+        "id": "8317:243243",
+        "name": "Open Media"
+      },
+      {
+        "id": "8317:243247",
+        "name": "Open CMS"
+      },
+      {
+        "id": "8317:243251",
+        "name": "Open Brand"
+      },
+      {
+        "id": "8317:243255",
+        "name": "Action / help"
+      },
+      {
+        "id": "8317:243372",
+        "name": "Action / close"
+      },
+      {
+        "id": "8317:243379",
+        "name": "Row / Body"
+      },
+      {
+        "id": "8317:243383",
+        "name": "Row / Main section"
+      },
+      {
+        "id": "8317:243387",
+        "name": "Row / Heading"
+      },
+      {
+        "id": "8317:243391",
+        "name": "Row / Paragraph"
+      },
+      {
+        "id": "8317:243395",
+        "name": "Row / Project grid"
+      },
+      {
+        "id": "8317:243399",
+        "name": "Row / Quiet spaces"
+      },
+      {
+        "id": "8317:243403",
+        "name": "Row / Natural light"
+      },
+      {
+        "id": "8317:243407",
+        "name": "Row / Simple living"
+      },
+      {
+        "id": "8317:243321",
+        "name": "Action / undo"
+      },
+      {
+        "id": "8317:243324",
+        "name": "Action / redo"
+      },
+      {
+        "id": "8317:243327",
+        "name": "63% ⌄"
+      },
+      {
+        "id": "8317:243332",
+        "name": "Action / more"
+      },
+      {
+        "id": "8317:243335",
+        "name": "Action / close"
+      },
+      {
+        "id": "8317:243339",
+        "name": "Style"
+      },
+      {
+        "id": "8317:243341",
+        "name": "Content"
+      },
+      {
+        "id": "8317:243342",
+        "name": "Effects"
+      },
+      {
+        "id": "8317:245446",
+        "name": "Property / Display / default"
+      },
+      {
+        "id": "8317:245450",
+        "name": "Property / Direction / default"
+      },
+      {
+        "id": "8317:245454",
+        "name": "Property / Align / default"
+      },
+      {
+        "id": "8317:245458",
+        "name": "Property / Wrap / default"
+      },
+      {
+        "id": "8317:245462",
+        "name": "Property / Gap / default"
+      },
+      {
+        "id": "8317:245468",
+        "name": "Property / Width / default"
+      },
+      {
+        "id": "8317:245472",
+        "name": "Property / Height / default"
+      },
+      {
+        "id": "8317:245478",
+        "name": "Property / Padding / default"
+      },
+      {
+        "id": "8317:245482",
+        "name": "Property / Margin / default"
+      },
+      {
+        "id": "8318:599",
+        "name": "Open selected-element AI"
+      }
+    ],
+    "name": "TO-BE IN-02 · Container · Flex",
+    "autoLayoutCount": 29,
+    "instances": 16,
+    "aiEntry": "8318:599",
+    "bodyGroups": [
+      {
+        "id": "8317:245444",
+        "name": "Property group / Layout",
+        "y": 44,
+        "height": 229
+      },
+      {
+        "id": "8317:245466",
+        "name": "Property group / Size",
+        "y": 277,
+        "height": 118
+      },
+      {
+        "id": "8317:245476",
+        "name": "Property group / Spacing",
+        "y": 399,
+        "height": 118
+      },
+      {
+        "id": "8317:245486",
+        "name": "Property group / Text inside",
+        "y": 521,
+        "height": 63
+      }
+    ],
+    "paper": [
+      {
+        "id": "8317:243300",
+        "width": 752,
+        "height": 706
+      }
+    ],
+    "textCount": 72,
+    "evidence": "figma-tobe-inspector-IN-02.png",
+    "status": "Native proposal; visually checked; Phase 6 wiring pending"
+  },
+  {
+    "code": "IN-03",
+    "key": "grid",
+    "id": "8317:243462",
+    "note": "8317:243713",
+    "x": 15200,
+    "y": 0,
+    "width": 1440,
+    "height": 900,
+    "body": "8317:243601",
+    "anchors": [
+      {
+        "id": "8317:243473",
+        "name": "⌘ K"
+      },
+      {
+        "id": "8317:243475",
+        "name": "History"
+      },
+      {
+        "id": "8317:243477",
+        "name": "Review"
+      },
+      {
+        "id": "8317:243479",
+        "name": "Preview"
+      },
+      {
+        "id": "8317:243481",
+        "name": "Publish"
+      },
+      {
+        "id": "8317:243484",
+        "name": "Open Add"
+      },
+      {
+        "id": "8317:243488",
+        "name": "Open Layers"
+      },
+      {
+        "id": "8317:243492",
+        "name": "Open Pages"
+      },
+      {
+        "id": "8317:243496",
+        "name": "Open Media"
+      },
+      {
+        "id": "8317:243500",
+        "name": "Open CMS"
+      },
+      {
+        "id": "8317:243504",
+        "name": "Open Brand"
+      },
+      {
+        "id": "8317:243508",
+        "name": "Action / help"
+      },
+      {
+        "id": "8317:243625",
+        "name": "Action / close"
+      },
+      {
+        "id": "8317:243632",
+        "name": "Row / Body"
+      },
+      {
+        "id": "8317:243636",
+        "name": "Row / Main section"
+      },
+      {
+        "id": "8317:243640",
+        "name": "Row / Heading"
+      },
+      {
+        "id": "8317:243644",
+        "name": "Row / Paragraph"
+      },
+      {
+        "id": "8317:243648",
+        "name": "Row / Project grid"
+      },
+      {
+        "id": "8317:243652",
+        "name": "Row / Quiet spaces"
+      },
+      {
+        "id": "8317:243656",
+        "name": "Row / Natural light"
+      },
+      {
+        "id": "8317:243660",
+        "name": "Row / Simple living"
+      },
+      {
+        "id": "8317:243574",
+        "name": "Action / undo"
+      },
+      {
+        "id": "8317:243577",
+        "name": "Action / redo"
+      },
+      {
+        "id": "8317:243580",
+        "name": "63% ⌄"
+      },
+      {
+        "id": "8317:243585",
+        "name": "Action / more"
+      },
+      {
+        "id": "8317:243588",
+        "name": "Action / close"
+      },
+      {
+        "id": "8317:243592",
+        "name": "Style"
+      },
+      {
+        "id": "8317:243594",
+        "name": "Content"
+      },
+      {
+        "id": "8317:243595",
+        "name": "Effects"
+      },
+      {
+        "id": "8317:245515",
+        "name": "Property / Display / default"
+      },
+      {
+        "id": "8317:245519",
+        "name": "Property / Columns / default"
+      },
+      {
+        "id": "8317:245523",
+        "name": "Property / Gap / default"
+      },
+      {
+        "id": "8317:245529",
+        "name": "Property / Column tracks / default"
+      },
+      {
+        "id": "8317:245533",
+        "name": "Property / Rows / default"
+      },
+      {
+        "id": "8317:245537",
+        "name": "Property / Flow / default"
+      },
+      {
+        "id": "8317:245541",
+        "name": "Property / Items / default"
+      },
+      {
+        "id": "8317:245545",
+        "name": "Property / Justify / default"
+      },
+      {
+        "id": "8317:245551",
+        "name": "Property / Width / default"
+      },
+      {
+        "id": "8317:245555",
+        "name": "Property / Height / default"
+      },
+      {
+        "id": "8318:601",
+        "name": "Open selected-element AI"
+      }
+    ],
+    "name": "TO-BE IN-03 · Container · Grid",
+    "autoLayoutCount": 30,
+    "instances": 17,
+    "aiEntry": "8318:601",
+    "bodyGroups": [
+      {
+        "id": "8317:245513",
+        "name": "Property group / Layout",
+        "y": 44,
+        "height": 155
+      },
+      {
+        "id": "8317:245527",
+        "name": "Property group / Grid settings",
+        "y": 203,
+        "height": 229
+      },
+      {
+        "id": "8317:245549",
+        "name": "Property group / Size",
+        "y": 436,
+        "height": 118
+      }
+    ],
+    "paper": [
+      {
+        "id": "8317:243553",
+        "width": 752,
+        "height": 706
+      }
+    ],
+    "textCount": 72,
+    "evidence": "figma-tobe-inspector-IN-03.png",
+    "status": "Native proposal; visually checked; Phase 6 wiring pending"
+  },
+  {
+    "code": "IN-04",
+    "key": "form",
+    "id": "8317:246429",
+    "note": "8317:246655",
+    "x": 12000,
+    "y": 1100,
+    "width": 1440,
+    "height": 900,
+    "body": "8317:246568",
+    "anchors": [
+      {
+        "id": "8317:246440",
+        "name": "⌘ K"
+      },
+      {
+        "id": "8317:246442",
+        "name": "History"
+      },
+      {
+        "id": "8317:246444",
+        "name": "Review"
+      },
+      {
+        "id": "8317:246446",
+        "name": "Preview"
+      },
+      {
+        "id": "8317:246448",
+        "name": "Publish"
+      },
+      {
+        "id": "8317:246451",
+        "name": "Open Add"
+      },
+      {
+        "id": "8317:246455",
+        "name": "Open Layers"
+      },
+      {
+        "id": "8317:246459",
+        "name": "Open Pages"
+      },
+      {
+        "id": "8317:246463",
+        "name": "Open Media"
+      },
+      {
+        "id": "8317:246467",
+        "name": "Open CMS"
+      },
+      {
+        "id": "8317:246471",
+        "name": "Open Brand"
+      },
+      {
+        "id": "8317:246475",
+        "name": "Action / help"
+      },
+      {
+        "id": "8317:246589",
+        "name": "Action / close"
+      },
+      {
+        "id": "8317:246596",
+        "name": "Row / Body"
+      },
+      {
+        "id": "8317:246600",
+        "name": "Row / Main section"
+      },
+      {
+        "id": "8317:246604",
+        "name": "Row / Heading"
+      },
+      {
+        "id": "8317:246608",
+        "name": "Row / Paragraph"
+      },
+      {
+        "id": "8317:246612",
+        "name": "Row / Contact form"
+      },
+      {
+        "id": "8317:246579",
+        "name": "Send enquiry"
+      },
+      {
+        "id": "8317:246541",
+        "name": "Action / undo"
+      },
+      {
+        "id": "8317:246544",
+        "name": "Action / redo"
+      },
+      {
+        "id": "8317:246547",
+        "name": "63% ⌄"
+      },
+      {
+        "id": "8317:246552",
+        "name": "Action / more"
+      },
+      {
+        "id": "8317:246555",
+        "name": "Action / close"
+      },
+      {
+        "id": "8317:246559",
+        "name": "Style"
+      },
+      {
+        "id": "8317:246560",
+        "name": "Content"
+      },
+      {
+        "id": "8317:246562",
+        "name": "Effects"
+      },
+      {
+        "id": "8317:246621",
+        "name": "Property / Name / default"
+      },
+      {
+        "id": "8317:246625",
+        "name": "Property / Email / default"
+      },
+      {
+        "id": "8317:246629",
+        "name": "+ Add field"
+      },
+      {
+        "id": "8317:246633",
+        "name": "Property / Then / default"
+      },
+      {
+        "id": "8317:246637",
+        "name": "Property / Message / default"
+      },
+      {
+        "id": "8317:246641",
+        "name": "Property / Send to / default"
+      },
+      {
+        "id": "8318:603",
+        "name": "Open selected-element AI"
+      }
+    ],
+    "name": "TO-BE IN-04 · Form content and submission",
+    "autoLayoutCount": 24,
+    "instances": 14,
+    "aiEntry": "8318:603",
+    "bodyGroups": [
+      {
+        "id": "8317:246619",
+        "name": "Property group / Fields",
+        "y": 44,
+        "height": 118
+      },
+      {
+        "id": "8317:246631",
+        "name": "Property group / After submit",
+        "y": 210,
+        "height": 155
+      },
+      {
+        "id": "8317:246652",
+        "name": "Property group / Permissions",
+        "y": 474,
+        "height": 63
+      }
+    ],
+    "paper": [
+      {
+        "id": "8317:246520",
+        "width": 752,
+        "height": 706
+      }
+    ],
+    "textCount": 60,
+    "evidence": "figma-tobe-inspector-IN-04.png",
+    "status": "Native proposal; visually checked; Phase 6 wiring pending"
+  },
+  {
+    "code": "IN-05",
+    "key": "cms",
+    "id": "8317:246658",
+    "note": "8317:246880",
+    "x": 13600,
+    "y": 1100,
+    "width": 1440,
+    "height": 900,
+    "body": "8317:246797",
+    "anchors": [
+      {
+        "id": "8317:246669",
+        "name": "⌘ K"
+      },
+      {
+        "id": "8317:246671",
+        "name": "History"
+      },
+      {
+        "id": "8317:246673",
+        "name": "Review"
+      },
+      {
+        "id": "8317:246675",
+        "name": "Preview"
+      },
+      {
+        "id": "8317:246677",
+        "name": "Publish"
+      },
+      {
+        "id": "8317:246680",
+        "name": "Open Add"
+      },
+      {
+        "id": "8317:246684",
+        "name": "Open Layers"
+      },
+      {
+        "id": "8317:246688",
+        "name": "Open Pages"
+      },
+      {
+        "id": "8317:246692",
+        "name": "Open Media"
+      },
+      {
+        "id": "8317:246696",
+        "name": "Open CMS"
+      },
+      {
+        "id": "8317:246700",
+        "name": "Open Brand"
+      },
+      {
+        "id": "8317:246704",
+        "name": "Action / help"
+      },
+      {
+        "id": "8317:246815",
+        "name": "Action / close"
+      },
+      {
+        "id": "8317:246822",
+        "name": "Row / Body"
+      },
+      {
+        "id": "8317:246826",
+        "name": "Row / Main section"
+      },
+      {
+        "id": "8317:246830",
+        "name": "Row / Heading"
+      },
+      {
+        "id": "8317:246834",
+        "name": "Row / Paragraph"
+      },
+      {
+        "id": "8317:246838",
+        "name": "Row / Project grid"
+      },
+      {
+        "id": "8317:246805",
+        "name": "Explore our work"
+      },
+      {
+        "id": "8317:246770",
+        "name": "Action / undo"
+      },
+      {
+        "id": "8317:246773",
+        "name": "Action / redo"
+      },
+      {
+        "id": "8317:246776",
+        "name": "63% ⌄"
+      },
+      {
+        "id": "8317:246781",
+        "name": "Action / more"
+      },
+      {
+        "id": "8317:246784",
+        "name": "Action / close"
+      },
+      {
+        "id": "8317:246788",
+        "name": "Style"
+      },
+      {
+        "id": "8317:246789",
+        "name": "Content"
+      },
+      {
+        "id": "8317:246791",
+        "name": "Effects"
+      },
+      {
+        "id": "8317:246847",
+        "name": "Property / Source / default"
+      },
+      {
+        "id": "8317:246851",
+        "name": "Property / Collection / default"
+      },
+      {
+        "id": "8317:246855",
+        "name": "Property / Field / default"
+      },
+      {
+        "id": "8317:246859",
+        "name": "Property / Record / default"
+      },
+      {
+        "id": "8317:246866",
+        "name": "Open record"
+      },
+      {
+        "id": "8317:246868",
+        "name": "Unbind"
+      },
+      {
+        "id": "8317:246873",
+        "name": "Property / Visibility / default"
+      },
+      {
+        "id": "8318:605",
+        "name": "Open selected-element AI"
+      }
+    ],
+    "name": "TO-BE IN-05 · CMS-bound heading",
+    "autoLayoutCount": 24,
+    "instances": 15,
+    "aiEntry": "8318:605",
+    "bodyGroups": [
+      {
+        "id": "8317:246845",
+        "name": "Property group / CMS binding",
+        "y": 44,
+        "height": 192
+      },
+      {
+        "id": "8317:246863",
+        "name": "Property group / Content preview",
+        "y": 240,
+        "height": 63
+      },
+      {
+        "id": "8317:246871",
+        "name": "Property group / Accessibility",
+        "y": 397,
+        "height": 81
+      },
+      {
+        "id": "8317:246877",
+        "name": "Property group / Attributes",
+        "y": 482,
+        "height": 63
+      }
+    ],
+    "paper": [
+      {
+        "id": "8317:246749",
+        "width": 752,
+        "height": 706
+      }
+    ],
+    "textCount": 60,
+    "evidence": "figma-tobe-inspector-IN-05.png",
+    "status": "Native proposal; visually checked; Phase 6 wiring pending"
+  },
+  {
+    "code": "IN-06",
+    "key": "component",
+    "id": "8317:246897",
+    "note": "8317:247141",
+    "x": 15200,
+    "y": 1100,
+    "width": 1440,
+    "height": 900,
+    "body": "8317:247036",
+    "anchors": [
+      {
+        "id": "8317:246908",
+        "name": "⌘ K"
+      },
+      {
+        "id": "8317:246910",
+        "name": "History"
+      },
+      {
+        "id": "8317:246912",
+        "name": "Review"
+      },
+      {
+        "id": "8317:246914",
+        "name": "Preview"
+      },
+      {
+        "id": "8317:246916",
+        "name": "Publish"
+      },
+      {
+        "id": "8317:246919",
+        "name": "Open Add"
+      },
+      {
+        "id": "8317:246923",
+        "name": "Open Layers"
+      },
+      {
+        "id": "8317:246927",
+        "name": "Open Pages"
+      },
+      {
+        "id": "8317:246931",
+        "name": "Open Media"
+      },
+      {
+        "id": "8317:246935",
+        "name": "Open CMS"
+      },
+      {
+        "id": "8317:246939",
+        "name": "Open Brand"
+      },
+      {
+        "id": "8317:246943",
+        "name": "Action / help"
+      },
+      {
+        "id": "8317:247060",
+        "name": "Action / close"
+      },
+      {
+        "id": "8317:247067",
+        "name": "Row / Body"
+      },
+      {
+        "id": "8317:247071",
+        "name": "Row / Main section"
+      },
+      {
+        "id": "8317:247075",
+        "name": "Row / Heading"
+      },
+      {
+        "id": "8317:247079",
+        "name": "Row / Paragraph"
+      },
+      {
+        "id": "8317:247083",
+        "name": "Row / Project grid"
+      },
+      {
+        "id": "8317:247087",
+        "name": "Row / Quiet spaces"
+      },
+      {
+        "id": "8317:247091",
+        "name": "Row / Natural light"
+      },
+      {
+        "id": "8317:247095",
+        "name": "Row / Simple living"
+      },
+      {
+        "id": "8317:247009",
+        "name": "Action / undo"
+      },
+      {
+        "id": "8317:247012",
+        "name": "Action / redo"
+      },
+      {
+        "id": "8317:247015",
+        "name": "63% ⌄"
+      },
+      {
+        "id": "8317:247020",
+        "name": "Action / more"
+      },
+      {
+        "id": "8317:247023",
+        "name": "Action / close"
+      },
+      {
+        "id": "8317:247027",
+        "name": "Style"
+      },
+      {
+        "id": "8317:247029",
+        "name": "Content"
+      },
+      {
+        "id": "8317:247030",
+        "name": "Effects"
+      },
+      {
+        "id": "8317:247104",
+        "name": "Property / Variant / default"
+      },
+      {
+        "id": "8317:247108",
+        "name": "Edit master"
+      },
+      {
+        "id": "8317:247110",
+        "name": "Actions ⌄"
+      },
+      {
+        "id": "8317:247114",
+        "name": "Property / Padding / default"
+      },
+      {
+        "id": "8317:247119",
+        "name": "Reset to master…"
+      },
+      {
+        "id": "8317:247123",
+        "name": "Property / Width / inherited"
+      },
+      {
+        "id": "8317:247127",
+        "name": "Property / Height / inherited"
+      },
+      {
+        "id": "8317:247133",
+        "name": "Property / Padding / default"
+      },
+      {
+        "id": "8317:247137",
+        "name": "Property / Margin / inherited"
+      },
+      {
+        "id": "8318:607",
+        "name": "Open selected-element AI"
+      }
+    ],
+    "name": "TO-BE IN-06 · Component instance",
+    "autoLayoutCount": 26,
+    "instances": 16,
+    "aiEntry": "8318:607",
+    "bodyGroups": [
+      {
+        "id": "8317:247102",
+        "name": "Property group / Component",
+        "y": 44,
+        "height": 81
+      },
+      {
+        "id": "8317:247112",
+        "name": "Property group / Overrides",
+        "y": 174,
+        "height": 100
+      },
+      {
+        "id": "8317:247121",
+        "name": "Property group / Size",
+        "y": 322,
+        "height": 118
+      },
+      {
+        "id": "8317:247131",
+        "name": "Property group / Spacing",
+        "y": 444,
+        "height": 118
+      }
+    ],
+    "paper": [
+      {
+        "id": "8317:246988",
+        "width": 752,
+        "height": 706
+      }
+    ],
+    "textCount": 69,
+    "evidence": "figma-tobe-inspector-IN-06.png",
+    "status": "Native proposal; visually checked; Phase 6 wiring pending"
+  },
+  {
+    "code": "IN-07",
+    "key": "locked",
+    "id": "8317:247144",
+    "note": "8317:247367",
+    "x": 12000,
+    "y": 2200,
+    "width": 1440,
+    "height": 900,
+    "body": "8317:247283",
+    "anchors": [
+      {
+        "id": "8317:247155",
+        "name": "⌘ K"
+      },
+      {
+        "id": "8317:247157",
+        "name": "History"
+      },
+      {
+        "id": "8317:247159",
+        "name": "Review"
+      },
+      {
+        "id": "8317:247161",
+        "name": "Preview"
+      },
+      {
+        "id": "8317:247163",
+        "name": "Publish"
+      },
+      {
+        "id": "8317:247166",
+        "name": "Open Add"
+      },
+      {
+        "id": "8317:247170",
+        "name": "Open Layers"
+      },
+      {
+        "id": "8317:247174",
+        "name": "Open Pages"
+      },
+      {
+        "id": "8317:247178",
+        "name": "Open Media"
+      },
+      {
+        "id": "8317:247182",
+        "name": "Open CMS"
+      },
+      {
+        "id": "8317:247186",
+        "name": "Open Brand"
+      },
+      {
+        "id": "8317:247190",
+        "name": "Action / help"
+      },
+      {
+        "id": "8318:646",
+        "name": "Action / close"
+      },
+      {
+        "id": "8318:653",
+        "name": "Row / Body"
+      },
+      {
+        "id": "8318:657",
+        "name": "Row / Main section"
+      },
+      {
+        "id": "8318:661",
+        "name": "Row / Heading"
+      },
+      {
+        "id": "8318:665",
+        "name": "Row / Paragraph"
+      },
+      {
+        "id": "8318:669",
+        "name": "Row / Project grid"
+      },
+      {
+        "id": "8318:640",
+        "name": "Explore our work"
+      },
+      {
+        "id": "8317:247256",
+        "name": "Action / undo"
+      },
+      {
+        "id": "8317:247259",
+        "name": "Action / redo"
+      },
+      {
+        "id": "8317:247262",
+        "name": "63% ⌄"
+      },
+      {
+        "id": "8317:247267",
+        "name": "Action / more"
+      },
+      {
+        "id": "8317:247270",
+        "name": "Action / close"
+      },
+      {
+        "id": "8317:247274",
+        "name": "Style"
+      },
+      {
+        "id": "8317:247276",
+        "name": "Content"
+      },
+      {
+        "id": "8317:247277",
+        "name": "Effects"
+      },
+      {
+        "id": "8317:247330",
+        "name": "Unlock"
+      },
+      {
+        "id": "8317:247334",
+        "name": "Property / Font / disabled"
+      },
+      {
+        "id": "8317:247338",
+        "name": "Property / Size / disabled"
+      },
+      {
+        "id": "8317:247342",
+        "name": "Property / Weight / disabled"
+      },
+      {
+        "id": "8317:247346",
+        "name": "Property / Line height / disabled"
+      },
+      {
+        "id": "8317:247352",
+        "name": "Property / Width / disabled"
+      },
+      {
+        "id": "8317:247356",
+        "name": "Property / Height / disabled"
+      },
+      {
+        "id": "8317:247362",
+        "name": "Property / Text / disabled"
+      },
+      {
+        "id": "8318:631",
+        "name": "Open selected-element AI"
+      }
+    ],
+    "name": "TO-BE IN-07 · Locked heading",
+    "autoLayoutCount": 26,
+    "instances": 16,
+    "aiEntry": "8318:631",
+    "bodyGroups": [
+      {
+        "id": "8317:247332",
+        "name": "Property group / Typography",
+        "y": 110,
+        "height": 192
+      },
+      {
+        "id": "8317:247350",
+        "name": "Property group / Size",
+        "y": 306,
+        "height": 118
+      },
+      {
+        "id": "8317:247360",
+        "name": "Property group / Colour",
+        "y": 428,
+        "height": 100
+      }
+    ],
+    "paper": [
+      {
+        "id": "8317:247235",
+        "width": 752,
+        "height": 706
+      }
+    ],
+    "textCount": 60,
+    "evidence": "figma-tobe-inspector-IN-07.png",
+    "status": "Native proposal; visually checked; Phase 6 wiring pending"
+  },
+  {
+    "code": "IN-08",
+    "key": "mixed",
+    "id": "8317:247370",
+    "note": "8317:247613",
+    "x": 13600,
+    "y": 2200,
+    "width": 1440,
+    "height": 900,
+    "body": "8317:247509",
+    "anchors": [
+      {
+        "id": "8317:247381",
+        "name": "⌘ K"
+      },
+      {
+        "id": "8317:247383",
+        "name": "History"
+      },
+      {
+        "id": "8317:247385",
+        "name": "Review"
+      },
+      {
+        "id": "8317:247387",
+        "name": "Preview"
+      },
+      {
+        "id": "8317:247389",
+        "name": "Publish"
+      },
+      {
+        "id": "8317:247392",
+        "name": "Open Add"
+      },
+      {
+        "id": "8317:247396",
+        "name": "Open Layers"
+      },
+      {
+        "id": "8317:247400",
+        "name": "Open Pages"
+      },
+      {
+        "id": "8317:247404",
+        "name": "Open Media"
+      },
+      {
+        "id": "8317:247408",
+        "name": "Open CMS"
+      },
+      {
+        "id": "8317:247412",
+        "name": "Open Brand"
+      },
+      {
+        "id": "8317:247416",
+        "name": "Action / help"
+      },
+      {
+        "id": "8318:709",
+        "name": "Action / close"
+      },
+      {
+        "id": "8318:716",
+        "name": "Row / Body"
+      },
+      {
+        "id": "8318:720",
+        "name": "Row / Main section"
+      },
+      {
+        "id": "8318:724",
+        "name": "Row / Heading"
+      },
+      {
+        "id": "8318:728",
+        "name": "Row / Paragraph"
+      },
+      {
+        "id": "8318:732",
+        "name": "Row / Image"
+      },
+      {
+        "id": "8318:736",
+        "name": "Row / CTA container"
+      },
+      {
+        "id": "8318:685",
+        "name": "Explore our work"
+      },
+      {
+        "id": "8317:247482",
+        "name": "Action / undo"
+      },
+      {
+        "id": "8317:247485",
+        "name": "Action / redo"
+      },
+      {
+        "id": "8317:247488",
+        "name": "63% ⌄"
+      },
+      {
+        "id": "8317:247493",
+        "name": "Action / more"
+      },
+      {
+        "id": "8317:247496",
+        "name": "Action / close"
+      },
+      {
+        "id": "8317:247500",
+        "name": "Style"
+      },
+      {
+        "id": "8317:247502",
+        "name": "Content"
+      },
+      {
+        "id": "8317:247503",
+        "name": "Effects"
+      },
+      {
+        "id": "8317:247574",
+        "name": "Align ⌄"
+      },
+      {
+        "id": "8317:247576",
+        "name": "Distribute ⌄"
+      },
+      {
+        "id": "8317:247578",
+        "name": "Group selected elements"
+      },
+      {
+        "id": "8317:247582",
+        "name": "Property / Width / mixed"
+      },
+      {
+        "id": "8317:247586",
+        "name": "Property / Height / mixed"
+      },
+      {
+        "id": "8317:247592",
+        "name": "Property / Padding / mixed"
+      },
+      {
+        "id": "8317:247596",
+        "name": "Property / Margin / default"
+      },
+      {
+        "id": "8317:247602",
+        "name": "Property / Colour / mixed"
+      },
+      {
+        "id": "8317:247608",
+        "name": "Property / Width / default"
+      },
+      {
+        "id": "8318:676",
+        "name": "Open selected-element AI"
+      }
+    ],
+    "name": "TO-BE IN-08 · Mixed selection",
+    "autoLayoutCount": 28,
+    "instances": 17,
+    "aiEntry": "8318:676",
+    "bodyGroups": [
+      {
+        "id": "8317:247571",
+        "name": "Property group / Arrange",
+        "y": 44,
+        "height": 63
+      },
+      {
+        "id": "8317:247580",
+        "name": "Property group / Size",
+        "y": 198,
+        "height": 118
+      },
+      {
+        "id": "8317:247590",
+        "name": "Property group / Spacing",
+        "y": 320,
+        "height": 118
+      },
+      {
+        "id": "8317:247600",
+        "name": "Property group / Fill",
+        "y": 442,
+        "height": 81
+      },
+      {
+        "id": "8317:247606",
+        "name": "Property group / Border",
+        "y": 527,
+        "height": 81
+      }
+    ],
+    "paper": [
+      {
+        "id": "8317:247461",
+        "width": 752,
+        "height": 706
+      }
+    ],
+    "textCount": 66,
+    "evidence": "figma-tobe-inspector-IN-08.png",
+    "status": "Native proposal; visually checked; Phase 6 wiring pending"
+  },
+  {
+    "code": "IN-09",
+    "key": "context",
+    "id": "8317:247616",
+    "note": "8317:247867",
+    "x": 15200,
+    "y": 2200,
+    "width": 1440,
+    "height": 900,
+    "body": "8317:247755",
+    "anchors": [
+      {
+        "id": "8317:247627",
+        "name": "⌘ K"
+      },
+      {
+        "id": "8317:247629",
+        "name": "History"
+      },
+      {
+        "id": "8317:247631",
+        "name": "Review"
+      },
+      {
+        "id": "8317:247633",
+        "name": "Preview"
+      },
+      {
+        "id": "8317:247635",
+        "name": "Publish"
+      },
+      {
+        "id": "8317:247638",
+        "name": "Open Add"
+      },
+      {
+        "id": "8317:247642",
+        "name": "Open Layers"
+      },
+      {
+        "id": "8317:247646",
+        "name": "Open Pages"
+      },
+      {
+        "id": "8317:247650",
+        "name": "Open Media"
+      },
+      {
+        "id": "8317:247654",
+        "name": "Open CMS"
+      },
+      {
+        "id": "8317:247658",
+        "name": "Open Brand"
+      },
+      {
+        "id": "8317:247662",
+        "name": "Action / help"
+      },
+      {
+        "id": "8317:247779",
+        "name": "Action / close"
+      },
+      {
+        "id": "8317:247786",
+        "name": "Row / Body"
+      },
+      {
+        "id": "8317:247790",
+        "name": "Row / Main section"
+      },
+      {
+        "id": "8317:247794",
+        "name": "Row / Heading"
+      },
+      {
+        "id": "8317:247798",
+        "name": "Row / Paragraph"
+      },
+      {
+        "id": "8317:247802",
+        "name": "Row / Project grid"
+      },
+      {
+        "id": "8317:247728",
+        "name": "Action / undo"
+      },
+      {
+        "id": "8317:247731",
+        "name": "Action / redo"
+      },
+      {
+        "id": "8317:247734",
+        "name": "63% ⌄"
+      },
+      {
+        "id": "8317:247739",
+        "name": "Action / more"
+      },
+      {
+        "id": "8317:247742",
+        "name": "Action / close"
+      },
+      {
+        "id": "8317:247746",
+        "name": "Style"
+      },
+      {
+        "id": "8317:247748",
+        "name": "Content"
+      },
+      {
+        "id": "8317:247749",
+        "name": "Effects"
+      },
+      {
+        "id": "8317:247811",
+        "name": "Property / Display / default"
+      },
+      {
+        "id": "8317:247815",
+        "name": "Property / Columns / default"
+      },
+      {
+        "id": "8317:247819",
+        "name": "Property / Gap / default"
+      },
+      {
+        "id": "8317:247825",
+        "name": "Property / Width / default"
+      },
+      {
+        "id": "8317:247829",
+        "name": "Property / Height / default"
+      },
+      {
+        "id": "8317:247835",
+        "name": "Property / Padding / default"
+      },
+      {
+        "id": "8318:741",
+        "name": "Open selected-element AI"
+      },
+      {
+        "id": "8317:247839",
+        "name": "Context menu / Project grid"
+      },
+      {
+        "id": "8317:247842",
+        "name": "Menu action / Copy"
+      },
+      {
+        "id": "8317:247845",
+        "name": "Menu action / Duplicate"
+      },
+      {
+        "id": "8317:247848",
+        "name": "Menu action / Paste style"
+      },
+      {
+        "id": "8317:247851",
+        "name": "Menu action / Arrange in parent"
+      },
+      {
+        "id": "8317:247854",
+        "name": "Menu action / Save as component…"
+      },
+      {
+        "id": "8317:247856",
+        "name": "Menu action / Lock"
+      },
+      {
+        "id": "8317:247859",
+        "name": "Menu action / Delete"
+      },
+      {
+        "id": "8317:247862",
+        "name": "Arrange submenu / opens left"
+      }
+    ],
+    "name": "TO-BE IN-09 · Context menu · viewport edge",
+    "autoLayoutCount": 22,
+    "instances": 13,
+    "aiEntry": "8318:741",
+    "bodyGroups": [
+      {
+        "id": "8317:247809",
+        "name": "Property group / Layout",
+        "y": 44,
+        "height": 155
+      },
+      {
+        "id": "8317:247823",
+        "name": "Property group / Size",
+        "y": 203,
+        "height": 118
+      },
+      {
+        "id": "8317:247833",
+        "name": "Property group / Spacing",
+        "y": 325,
+        "height": 81
+      }
+    ],
+    "paper": [
+      {
+        "id": "8317:247707",
+        "width": 752,
+        "height": 706
+      }
+    ],
+    "textCount": 79,
+    "evidence": "figma-tobe-inspector-IN-09.png",
+    "status": "Native proposal; visually checked; Phase 6 wiring pending"
+  },
+  {
+    "code": "IN-10",
+    "key": "drop",
+    "id": "8317:247870",
+    "note": "8317:248082",
+    "x": 12000,
+    "y": 3300,
+    "width": 1440,
+    "height": 900,
+    "body": "8317:247988",
+    "anchors": [
+      {
+        "id": "8317:247881",
+        "name": "⌘ K"
+      },
+      {
+        "id": "8317:247883",
+        "name": "History"
+      },
+      {
+        "id": "8317:247885",
+        "name": "Review"
+      },
+      {
+        "id": "8317:247887",
+        "name": "Preview"
+      },
+      {
+        "id": "8317:247889",
+        "name": "Publish"
+      },
+      {
+        "id": "8317:247892",
+        "name": "Open Add"
+      },
+      {
+        "id": "8317:247896",
+        "name": "Open Layers"
+      },
+      {
+        "id": "8317:247900",
+        "name": "Open Pages"
+      },
+      {
+        "id": "8317:247904",
+        "name": "Open Media"
+      },
+      {
+        "id": "8317:247908",
+        "name": "Open CMS"
+      },
+      {
+        "id": "8317:247912",
+        "name": "Open Brand"
+      },
+      {
+        "id": "8317:247916",
+        "name": "Action / help"
+      },
+      {
+        "id": "8317:248018",
+        "name": "Action / close"
+      },
+      {
+        "id": "8317:248025",
+        "name": "Row / Heading"
+      },
+      {
+        "id": "8317:248029",
+        "name": "Row / Text"
+      },
+      {
+        "id": "8317:248033",
+        "name": "Row / Button"
+      },
+      {
+        "id": "8317:248037",
+        "name": "Row / Image"
+      },
+      {
+        "id": "8317:248041",
+        "name": "Row / Container"
+      },
+      {
+        "id": "8317:248045",
+        "name": "Row / Form"
+      },
+      {
+        "id": "8317:248014",
+        "name": "Button"
+      },
+      {
+        "id": "8317:247961",
+        "name": "Action / undo"
+      },
+      {
+        "id": "8317:247964",
+        "name": "Action / redo"
+      },
+      {
+        "id": "8317:247967",
+        "name": "63% ⌄"
+      },
+      {
+        "id": "8317:247972",
+        "name": "Action / more"
+      },
+      {
+        "id": "8317:247975",
+        "name": "Action / close"
+      },
+      {
+        "id": "8317:247979",
+        "name": "Style"
+      },
+      {
+        "id": "8317:247981",
+        "name": "Content"
+      },
+      {
+        "id": "8317:247982",
+        "name": "Effects"
+      },
+      {
+        "id": "8317:248054",
+        "name": "Property / Display / default"
+      },
+      {
+        "id": "8317:248058",
+        "name": "Property / Direction / default"
+      },
+      {
+        "id": "8317:248062",
+        "name": "Property / Gap / default"
+      },
+      {
+        "id": "8317:248068",
+        "name": "Property / Width / default"
+      },
+      {
+        "id": "8317:248072",
+        "name": "Property / Height / default"
+      },
+      {
+        "id": "8317:248078",
+        "name": "Property / Padding / default"
+      },
+      {
+        "id": "8318:743",
+        "name": "Open selected-element AI"
+      }
+    ],
+    "name": "TO-BE IN-10 · Canvas · valid drop target",
+    "autoLayoutCount": 23,
+    "instances": 14,
+    "aiEntry": "8318:743",
+    "bodyGroups": [
+      {
+        "id": "8317:248052",
+        "name": "Property group / Layout",
+        "y": 44,
+        "height": 155
+      },
+      {
+        "id": "8317:248066",
+        "name": "Property group / Size",
+        "y": 203,
+        "height": 118
+      },
+      {
+        "id": "8317:248076",
+        "name": "Property group / Spacing",
+        "y": 325,
+        "height": 81
+      }
+    ],
+    "paper": [
+      {
+        "id": "8317:247940",
+        "width": 752,
+        "height": 706
+      }
+    ],
+    "textCount": 65,
+    "evidence": "figma-tobe-inspector-IN-10.png",
+    "status": "Native proposal; visually checked; Phase 6 wiring pending"
+  },
+  {
+    "code": "IN-11",
+    "key": "resize",
+    "id": "8317:248085",
+    "note": "8317:248332",
+    "x": 13600,
+    "y": 3300,
+    "width": 1440,
+    "height": 900,
+    "body": "8317:248224",
+    "anchors": [
+      {
+        "id": "8317:248096",
+        "name": "⌘ K"
+      },
+      {
+        "id": "8317:248098",
+        "name": "History"
+      },
+      {
+        "id": "8317:248100",
+        "name": "Review"
+      },
+      {
+        "id": "8317:248102",
+        "name": "Preview"
+      },
+      {
+        "id": "8317:248104",
+        "name": "Publish"
+      },
+      {
+        "id": "8317:248107",
+        "name": "Open Add"
+      },
+      {
+        "id": "8317:248111",
+        "name": "Open Layers"
+      },
+      {
+        "id": "8317:248115",
+        "name": "Open Pages"
+      },
+      {
+        "id": "8317:248119",
+        "name": "Open Media"
+      },
+      {
+        "id": "8317:248123",
+        "name": "Open CMS"
+      },
+      {
+        "id": "8317:248127",
+        "name": "Open Brand"
+      },
+      {
+        "id": "8317:248131",
+        "name": "Action / help"
+      },
+      {
+        "id": "8317:248251",
+        "name": "Action / close"
+      },
+      {
+        "id": "8317:248258",
+        "name": "Row / Body"
+      },
+      {
+        "id": "8317:248262",
+        "name": "Row / Main section"
+      },
+      {
+        "id": "8317:248266",
+        "name": "Row / Heading"
+      },
+      {
+        "id": "8317:248270",
+        "name": "Row / Paragraph"
+      },
+      {
+        "id": "8317:248274",
+        "name": "Row / Project grid"
+      },
+      {
+        "id": "8317:248278",
+        "name": "Row / Quiet spaces"
+      },
+      {
+        "id": "8317:248282",
+        "name": "Row / Natural light"
+      },
+      {
+        "id": "8317:248286",
+        "name": "Row / Simple living"
+      },
+      {
+        "id": "8317:248197",
+        "name": "Action / undo"
+      },
+      {
+        "id": "8317:248200",
+        "name": "Action / redo"
+      },
+      {
+        "id": "8317:248203",
+        "name": "63% ⌄"
+      },
+      {
+        "id": "8317:248208",
+        "name": "Action / more"
+      },
+      {
+        "id": "8317:248211",
+        "name": "Action / close"
+      },
+      {
+        "id": "8317:248215",
+        "name": "Style"
+      },
+      {
+        "id": "8317:248217",
+        "name": "Content"
+      },
+      {
+        "id": "8317:248218",
+        "name": "Effects"
+      },
+      {
+        "id": "8317:248295",
+        "name": "Property / Width / default"
+      },
+      {
+        "id": "8317:248299",
+        "name": "Property / Height / default"
+      },
+      {
+        "id": "8317:248303",
+        "name": "Property / Min width / default"
+      },
+      {
+        "id": "8317:248307",
+        "name": "Property / Max width / default"
+      },
+      {
+        "id": "8317:248313",
+        "name": "Property / Display / default"
+      },
+      {
+        "id": "8317:248317",
+        "name": "Property / Columns / default"
+      },
+      {
+        "id": "8317:248321",
+        "name": "Property / Gap / default"
+      },
+      {
+        "id": "8317:248327",
+        "name": "Property / Padding / default"
+      },
+      {
+        "id": "8318:745",
+        "name": "Open selected-element AI"
+      }
+    ],
+    "name": "TO-BE IN-11 · Canvas · resize state",
+    "autoLayoutCount": 26,
+    "instances": 15,
+    "aiEntry": "8318:745",
+    "bodyGroups": [
+      {
+        "id": "8317:248293",
+        "name": "Property group / Size",
+        "y": 44,
+        "height": 192
+      },
+      {
+        "id": "8317:248311",
+        "name": "Property group / Layout",
+        "y": 240,
+        "height": 155
+      },
+      {
+        "id": "8317:248325",
+        "name": "Property group / Spacing",
+        "y": 399,
+        "height": 81
+      }
+    ],
+    "paper": [
+      {
+        "id": "8317:248176",
+        "width": 752,
+        "height": 706
+      }
+    ],
+    "textCount": 71,
+    "evidence": "figma-tobe-inspector-IN-11.png",
+    "status": "Native proposal; visually checked; Phase 6 wiring pending"
+  },
+  {
+    "code": "IN-12",
+    "key": "effects",
+    "id": "8318:1573",
+    "note": "8318:1804",
+    "x": 12000,
+    "y": 5800,
+    "width": 1440,
+    "height": 900,
+    "body": "8318:1714",
+    "anchors": [
+      {
+        "id": "8318:1584",
+        "name": "⌘ K"
+      },
+      {
+        "id": "8318:1586",
+        "name": "History"
+      },
+      {
+        "id": "8318:1588",
+        "name": "Review"
+      },
+      {
+        "id": "8318:1590",
+        "name": "Preview"
+      },
+      {
+        "id": "8318:1592",
+        "name": "Publish"
+      },
+      {
+        "id": "8318:1595",
+        "name": "Open Add"
+      },
+      {
+        "id": "8318:1599",
+        "name": "Open Layers"
+      },
+      {
+        "id": "8318:1603",
+        "name": "Open Pages"
+      },
+      {
+        "id": "8318:1607",
+        "name": "Open Media"
+      },
+      {
+        "id": "8318:1611",
+        "name": "Open CMS"
+      },
+      {
+        "id": "8318:1615",
+        "name": "Open Brand"
+      },
+      {
+        "id": "8318:1619",
+        "name": "Action / help"
+      },
+      {
+        "id": "8318:1732",
+        "name": "Action / close"
+      },
+      {
+        "id": "8318:1739",
+        "name": "Row / Body"
+      },
+      {
+        "id": "8318:1743",
+        "name": "Row / Main section"
+      },
+      {
+        "id": "8318:1747",
+        "name": "Row / Heading"
+      },
+      {
+        "id": "8318:1751",
+        "name": "Row / Paragraph"
+      },
+      {
+        "id": "8318:1755",
+        "name": "Row / Project grid"
+      },
+      {
+        "id": "8318:1722",
+        "name": "Explore our work"
+      },
+      {
+        "id": "8318:1685",
+        "name": "Action / undo"
+      },
+      {
+        "id": "8318:1688",
+        "name": "Action / redo"
+      },
+      {
+        "id": "8318:1691",
+        "name": "63% ⌄"
+      },
+      {
+        "id": "8318:1696",
+        "name": "Open selected-element AI"
+      },
+      {
+        "id": "8318:1698",
+        "name": "Action / more"
+      },
+      {
+        "id": "8318:1701",
+        "name": "Action / close"
+      },
+      {
+        "id": "8318:1705",
+        "name": "Style"
+      },
+      {
+        "id": "8318:1706",
+        "name": "Content"
+      },
+      {
+        "id": "8318:1707",
+        "name": "Effects"
+      },
+      {
+        "id": "8318:1764",
+        "name": "Property / Opacity / default"
+      },
+      {
+        "id": "8318:1779",
+        "name": "Property / On click / default"
+      },
+      {
+        "id": "8318:1783",
+        "name": "Property / Duration / default"
+      },
+      {
+        "id": "8318:1787",
+        "name": "Property / Delay / default"
+      },
+      {
+        "id": "8318:1791",
+        "name": "Property / Easing / default"
+      },
+      {
+        "id": "8318:1795",
+        "name": "Preview"
+      },
+      {
+        "id": "8318:1797",
+        "name": "Disable"
+      },
+      {
+        "id": "8318:1799",
+        "name": "+ Add interaction"
+      },
+      {
+        "id": "8318:1801",
+        "name": "Remove interaction"
+      }
+    ],
+    "name": "TO-BE IN-12 · Effects and interactions",
+    "autoLayoutCount": 27,
+    "instances": 17,
+    "aiEntry": "8318:1696",
+    "bodyGroups": [
+      {
+        "id": "8318:1762",
+        "name": "Property group / Opacity",
+        "y": 44,
+        "height": 81
+      },
+      {
+        "id": "8318:1768",
+        "name": "Property group / Shadow",
+        "y": 129,
+        "height": 63
+      },
+      {
+        "id": "8318:1771",
+        "name": "Property group / Filters",
+        "y": 196,
+        "height": 63
+      },
+      {
+        "id": "8318:1774",
+        "name": "Property group / Transform & motion",
+        "y": 263,
+        "height": 63
+      },
+      {
+        "id": "8318:1777",
+        "name": "Property group / Interactions",
+        "y": 330,
+        "height": 192
+      }
+    ],
+    "paper": [
+      {
+        "id": "8318:1664",
+        "width": 752,
+        "height": 706
+      }
+    ],
+    "textCount": 64,
+    "evidence": "figma-tobe-inspector-IN-12.png",
+    "status": "Native proposal; visually checked; Phase 6 wiring pending"
+  },
+  {
+    "code": "IN-13",
+    "key": "advanced",
+    "id": "8318:1807",
+    "note": "8318:2039",
+    "x": 13600,
+    "y": 5800,
+    "width": 1440,
+    "height": 900,
+    "body": "8318:1948",
+    "anchors": [
+      {
+        "id": "8318:1818",
+        "name": "⌘ K"
+      },
+      {
+        "id": "8318:1820",
+        "name": "History"
+      },
+      {
+        "id": "8318:1822",
+        "name": "Review"
+      },
+      {
+        "id": "8318:1824",
+        "name": "Preview"
+      },
+      {
+        "id": "8318:1826",
+        "name": "Publish"
+      },
+      {
+        "id": "8318:1829",
+        "name": "Open Add"
+      },
+      {
+        "id": "8318:1833",
+        "name": "Open Layers"
+      },
+      {
+        "id": "8318:1837",
+        "name": "Open Pages"
+      },
+      {
+        "id": "8318:1841",
+        "name": "Open Media"
+      },
+      {
+        "id": "8318:1845",
+        "name": "Open CMS"
+      },
+      {
+        "id": "8318:1849",
+        "name": "Open Brand"
+      },
+      {
+        "id": "8318:1853",
+        "name": "Action / help"
+      },
+      {
+        "id": "8318:1966",
+        "name": "Action / close"
+      },
+      {
+        "id": "8318:1973",
+        "name": "Row / Body"
+      },
+      {
+        "id": "8318:1977",
+        "name": "Row / Main section"
+      },
+      {
+        "id": "8318:1981",
+        "name": "Row / Heading"
+      },
+      {
+        "id": "8318:1985",
+        "name": "Row / Paragraph"
+      },
+      {
+        "id": "8318:1989",
+        "name": "Row / Project image"
+      },
+      {
+        "id": "8318:1956",
+        "name": "Explore our work"
+      },
+      {
+        "id": "8318:1919",
+        "name": "Action / undo"
+      },
+      {
+        "id": "8318:1922",
+        "name": "Action / redo"
+      },
+      {
+        "id": "8318:1925",
+        "name": "63% ⌄"
+      },
+      {
+        "id": "8318:1930",
+        "name": "Open selected-element AI"
+      },
+      {
+        "id": "8318:1932",
+        "name": "Action / more"
+      },
+      {
+        "id": "8318:1935",
+        "name": "Action / close"
+      },
+      {
+        "id": "8318:1939",
+        "name": "Style"
+      },
+      {
+        "id": "8318:1940",
+        "name": "Content"
+      },
+      {
+        "id": "8318:1942",
+        "name": "Effects"
+      },
+      {
+        "id": "8318:1998",
+        "name": "Property / Alt text / default"
+      },
+      {
+        "id": "8318:2002",
+        "name": "Property / Tab index / default"
+      },
+      {
+        "id": "8318:2009",
+        "name": "Property / ID / default"
+      },
+      {
+        "id": "8318:2013",
+        "name": "Property / Title / default"
+      },
+      {
+        "id": "8318:2017",
+        "name": "Property / Decoding / default"
+      },
+      {
+        "id": "8318:2027",
+        "name": "Property / Class / default"
+      },
+      {
+        "id": "8318:2033",
+        "name": "Property / data-project / default"
+      },
+      {
+        "id": "8318:2037",
+        "name": "+ Add attribute"
+      }
+    ],
+    "name": "TO-BE IN-13 · Content · accessibility and advanced",
+    "autoLayoutCount": 28,
+    "instances": 16,
+    "aiEntry": "8318:1930",
+    "bodyGroups": [
+      {
+        "id": "8318:1996",
+        "name": "Property group / Accessibility",
+        "y": 44,
+        "height": 153
+      },
+      {
+        "id": "8318:2007",
+        "name": "Property group / Attributes",
+        "y": 201,
+        "height": 155
+      },
+      {
+        "id": "8318:2021",
+        "name": "Property group / CSS classes",
+        "y": 360,
+        "height": 44
+      },
+      {
+        "id": "8318:2025",
+        "name": "Property group / Add class",
+        "y": 428,
+        "height": 81
+      },
+      {
+        "id": "8318:2031",
+        "name": "Property group / Custom attributes",
+        "y": 513,
+        "height": 81
+      }
+    ],
+    "paper": [
+      {
+        "id": "8318:1898",
+        "width": 752,
+        "height": 706
+      }
+    ],
+    "textCount": 63,
+    "evidence": "figma-tobe-inspector-IN-13.png",
+    "status": "Native proposal; visually checked; Phase 6 wiring pending"
+  }
+]

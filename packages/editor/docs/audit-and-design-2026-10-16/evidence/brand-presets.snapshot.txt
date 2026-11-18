@@ -1,0 +1,273 @@
+--- BEGIN UNTRUSTED EXTERNAL CONTENT (source: http://localhost:3000/edit/cmv8uviql000bucorbmjjol97) ---
+--- BEGIN UNTRUSTED EXTERNAL C​ONTENT (source: http://localhost:3000/edit/cmv8uviql000bucorbmjjol97) ---
+    @e1 [button] "‹ Exit"
+    @e2 [button] "s0-qa site"
+    @e3 [button] "Home"
+    @e4 [button] "History ›"
+    @e5 [button] "Review"
+    @e6 [button] "Comments"
+    @e7 [button] "Notifications, 2 unread"
+    @e8 [button] "Preview"
+    @e9 [button] "Site menu"
+@e10 [link] "Skip to Canvas"
+    @e11 [tab] "Add elements, blocks and components to your page": Add
+    @e12 [tab] "View and reorder page structure": Layers
+    @e13 [tab] "Manage all pages in your site": Pages
+    @e14 [tab] "Upload and manage images, videos, and fonts": Assets
+    @e15 [tab] "Collections, records and data sources for dynamic content": CMS
+    @e16 [tab] "Brand — global colors, fonts, spacing tokens": Brand
+    @e17 [button] "Help — keyboard shortcuts": Help
+@e18 [button] "Get started — 3 of 7 complete. Click to expand.": 3/7
+@e19 [button] "v3.0.2 Output Detail Standard React Components Hide Until Restart Marker Color Clear on copy/send Block page interactions Manage MCP & Webhooks Manage MCP & Webhooks MCP Connection MCP connection allows agents to receive and act on annotations. Learn more Webhooks Auto-Send The webhook URL will receive live annotation changes and annotation data."
+  @e20 [button]
+  @e21 [button]
+  @e22 [button] [disabled]
+  @e23 [button] [disabled]
+  @e24 [button] [disabled]
+  @e25 [button] [disabled]
+  @e26 [button]
+  @e27 [button]
+  @e28 [link]
+  @e29 [button] "Switch to light mode"
+  @e30 [button] "Standard"
+  @e31 [checkbox] [checked]
+  @e32 [checkbox]
+  @e33 [button] "Indigo"
+  @e34 [button] "Blue"
+  @e35 [button] "Cyan"
+  @e36 [button] "Green"
+  @e37 [button] "Yellow"
+  @e38 [button] "Orange"
+  @e39 [button] "Red"
+  @e40 [checkbox] "Clear on copy/send"
+  @e41 [checkbox] "Block page interactions" [checked]
+  @e42 [button] "Manage MCP & Webhooks"
+  @e43 [button] "Manage MCP & Webhooks"
+    @e44 [link] "Learn more"
+  @e45 [checkbox] "Auto-Send" [checked] [disabled]
+  @e46 [textbox] "Webhook URL"
+  @e47 [button] "Back to canvas"
+    @e48 [button] "Colours 58"
+    @e49 [button] "Colour mode"
+    @e50 [button] "Fonts & type styles"
+    @e51 [button] "Styles"
+    @e52 [button] "Component styles"
+    @e53 [button] "Classes"
+    @e54 [button] "Presets"
+    @e55 [button] "Brand checks"
+    @e56 [button] "Starters"
+    @e57 [button] "Spacing"
+    @e58 [button] "Import / export"
+  @e59 [button] "Review changes · 0"
+  @e60 [button] "Restore points"
+      @e61 [button] "Buttons 3 variants"
+      @e62 [button] "Cards 2 variants"
+      @e63 [button] "Forms 1 variant"
+      @e64 [button] "Links 2 variants"
+      @e65 [button] "Badges 2 variants"
+      @e66 [button] "Alerts 2 variants"
+      @e67 [button] "Tooltips 1 variant"
+      @e68 [button] "Modals 1 variant"
+      @e69 [button] "Nav 1 variant"
+      @e70 [button] "Tables 1 variant"
+      @e71 [button] "Layouts 2 variants"
+      @e72 [tab] "Light" [selected]
+      @e73 [tab] "Dark" [disabled]
+    @e74 [combobox] "Preview zoom"
+      @e75 [option] "25%"
+      @e76 [option] "50%" [selected]
+      @e77 [option] "100%"
+
+── cursor-interactive (not in ARIA tree) ──
+@c1 [cursor:pointer] "Review"
+@c2 [cursor:pointer] "›"
+@c3 [cursor:pointer] "Add"
+@c4 [cursor:pointer] "Layers"
+@c5 [cursor:pointer] "Pages"
+@c6 [cursor:pointer] "Assets"
+@c7 [cursor:pointer] "CMS"
+@c8 [cursor:pointer] "Brand"
+@c9 [cursor:pointer] "Help"
+@c10 [cursor:pointer] "span"
+@c11 [cursor:pointer] "span"
+@c12 [tabindex=0] "div"
+@c13 [popover-child, cursor:pointer] "div"
+@c14 [popover-child, cursor:pointer, tabindex=0, role=button] "span"
+@c15 [popover-child, cursor:pointer] "span"
+@c16 [popover-child, cursor:pointer] "span"
+@c17 [popover-child, cursor:pointer] "span"
+@c18 [popover-child, cursor:pointer] "div"
+@c19 [popover-child, cursor:pointer, tabindex=0, role=button] "span"
+@c20 [popover-child, cursor:pointer] "span"
+@c21 [popover-child, cursor:pointer] "span"
+@c22 [popover-child, cursor:pointer] "span"
+@c23 [popover-child, cursor:pointer] "div"
+@c24 [popover-child, cursor:pointer, tabindex=0, role=button] "span"
+@c25 [popover-child, cursor:pointer] "span"
+@c26 [popover-child, cursor:pointer] "span"
+@c27 [popover-child, cursor:pointer] "span"
+@c28 [popover-child, cursor:pointer] "span"
+@c29 [popover-child, cursor:pointer] "div"
+@c30 [popover-child, cursor:pointer, tabindex=0, role=button] "span"
+@c31 [popover-child, cursor:pointer] "span"
+@c32 [popover-child, cursor:pointer] "span"
+@c33 [popover-child, cursor:pointer] "3/7"
+@c34 [popover-child, cursor:pointer, tabindex=0, role=button] "v3.0.2
+
+Output Detail
+Standard
+React Components
+Hide Until Restart
+Marker Color
+"
+@c35 [popover-child, cursor:pointer] "div"
+@c36 [popover-child, cursor:pointer] "div"
+@c37 [popover-child, cursor:pointer] "div"
+@c38 [popover-child, cursor:pointer] "span"
+@c39 [popover-child, cursor:pointer] "span"
+@c40 [popover-child, cursor:pointer] "div"
+@c41 [popover-child, cursor:pointer] "span"
+@c42 [popover-child, cursor:pointer] "span"
+@c43 [popover-child, cursor:pointer] "div"
+@c44 [popover-child, cursor:pointer] "span"
+@c45 [popover-child, cursor:pointer] "span"
+@c46 [popover-child, cursor:pointer] "div"
+@c47 [popover-child, cursor:pointer] "span"
+@c48 [popover-child, cursor:pointer] "span"
+@c49 [popover-child, cursor:pointer] "div"
+@c50 [popover-child, cursor:pointer] "span"
+@c51 [popover-child, cursor:pointer] "span"
+@c52 [popover-child, cursor:pointer] "div"
+@c53 [popover-child, cursor:pointer] "span"
+@c54 [popover-child, cursor:pointer] "span"
+@c55 [popover-child, cursor:pointer] "div"
+@c56 [popover-child, cursor:pointer] "span"
+@c57 [popover-child, cursor:pointer] "div"
+@c58 [popover-child, cursor:pointer] "div"
+@c59 [popover-child, cursor:pointer] "span"
+@c60 [popover-child, cursor:pointer] "span"
+@c61 [popover-child, cursor:pointer] "span"
+@c62 [popover-child, cursor:pointer] "span"
+@c63 [popover-child, cursor:pointer] "Standard"
+@c64 [popover-child, cursor:pointer] "span"
+@c65 [popover-child, cursor:pointer] "span"
+@c66 [popover-child, cursor:pointer] "span"
+@c67 [popover-child, cursor:pointer] "span"
+@c68 [popover-child, cursor:pointer] "span"
+@c69 [popover-child, cursor:pointer] "Clear on copy/send"
+@c70 [popover-child, cursor:pointer] "Block page interactions"
+@c71 [popover-child, cursor:pointer] "Manage MCP & Webhooks"
+@c72 [popover-child, cursor:pointer] "span"
+@c73 [popover-child, cursor:pointer] "Manage MCP & Webhooks"
+@c74 [popover-child, cursor:pointer, tabindex=0, role=button] "Buttons
+3 variants
+›"
+@c75 [popover-child, cursor:pointer] "Buttons
+3 variants"
+@c76 [popover-child, cursor:pointer] "Buttons"
+@c77 [popover-child, cursor:pointer] "Buttons"
+@c78 [popover-child, cursor:pointer] "3 variants"
+@c79 [popover-child, cursor:pointer] "3 variants"
+@c80 [popover-child, cursor:pointer] "›"
+@c81 [popover-child, cursor:pointer, tabindex=0, role=button] "Cards
+2 variants
+›"
+@c82 [popover-child, cursor:pointer] "Cards
+2 variants"
+@c83 [popover-child, cursor:pointer] "Cards"
+@c84 [popover-child, cursor:pointer] "Cards"
+@c85 [popover-child, cursor:pointer] "2 variants"
+@c86 [popover-child, cursor:pointer] "2 variants"
+@c87 [popover-child, cursor:pointer] "›"
+@c88 [popover-child, cursor:pointer, tabindex=0, role=button] "Forms
+1 variant
+›"
+@c89 [popover-child, cursor:pointer] "Forms
+1 variant"
+@c90 [popover-child, cursor:pointer] "Forms"
+@c91 [popover-child, cursor:pointer] "Forms"
+@c92 [popover-child, cursor:pointer] "1 variant"
+@c93 [popover-child, cursor:pointer] "1 variant"
+@c94 [popover-child, cursor:pointer] "›"
+@c95 [popover-child, cursor:pointer, tabindex=0, role=button] "Links
+2 variants
+›"
+@c96 [popover-child, cursor:pointer] "Links
+2 variants"
+@c97 [popover-child, cursor:pointer] "Links"
+@c98 [popover-child, cursor:pointer] "Links"
+@c99 [popover-child, cursor:pointer] "2 variants"
+@c100 [popover-child, cursor:pointer] "2 variants"
+@c101 [popover-child, cursor:pointer] "›"
+@c102 [popover-child, cursor:pointer, tabindex=0, role=button] "Badges
+2 variants
+›"
+@c103 [popover-child, cursor:pointer] "Badges
+2 variants"
+@c104 [popover-child, cursor:pointer] "Badges"
+@c105 [popover-child, cursor:pointer] "Badges"
+@c106 [popover-child, cursor:pointer] "2 variants"
+@c107 [popover-child, cursor:pointer] "2 variants"
+@c108 [popover-child, cursor:pointer] "›"
+@c109 [popover-child, cursor:pointer, tabindex=0, role=button] "Alerts
+2 variants
+›"
+@c110 [popover-child, cursor:pointer] "Alerts
+2 variants"
+@c111 [popover-child, cursor:pointer] "Alerts"
+@c112 [popover-child, cursor:pointer] "Alerts"
+@c113 [popover-child, cursor:pointer] "2 variants"
+@c114 [popover-child, cursor:pointer] "2 variants"
+@c115 [popover-child, cursor:pointer] "›"
+@c116 [popover-child, cursor:pointer, tabindex=0, role=button] "Tooltips
+1 variant
+›"
+@c117 [popover-child, cursor:pointer] "Tooltips
+1 variant"
+@c118 [popover-child, cursor:pointer] "Tooltips"
+@c119 [popover-child, cursor:pointer] "Tooltips"
+@c120 [popover-child, cursor:pointer] "1 variant"
+@c121 [popover-child, cursor:pointer] "1 variant"
+@c122 [popover-child, cursor:pointer] "›"
+@c123 [popover-child, cursor:pointer, tabindex=0, role=button] "Modals
+1 variant
+›"
+@c124 [popover-child, cursor:pointer] "Modals
+1 variant"
+@c125 [popover-child, cursor:pointer] "Modals"
+@c126 [popover-child, cursor:pointer] "Modals"
+@c127 [popover-child, cursor:pointer] "1 variant"
+@c128 [popover-child, cursor:pointer] "1 variant"
+@c129 [popover-child, cursor:pointer] "›"
+@c130 [popover-child, cursor:pointer, tabindex=0, role=button] "Nav
+1 variant
+›"
+@c131 [popover-child, cursor:pointer] "Nav
+1 variant"
+@c132 [popover-child, cursor:pointer] "Nav"
+@c133 [popover-child, cursor:pointer] "Nav"
+@c134 [popover-child, cursor:pointer] "1 variant"
+@c135 [popover-child, cursor:pointer] "1 variant"
+@c136 [popover-child, cursor:pointer] "›"
+@c137 [popover-child, cursor:pointer, tabindex=0, role=button] "Tables
+1 variant
+›"
+@c138 [popover-child, cursor:pointer] "Tables
+1 variant"
+@c139 [popover-child, cursor:pointer] "Tables"
+@c140 [popover-child, cursor:pointer] "Tables"
+@c141 [popover-child, cursor:pointer] "1 variant"
+@c142 [popover-child, cursor:pointer] "1 variant"
+@c143 [popover-child, cursor:pointer] "›"
+@c144 [popover-child, cursor:pointer, tabindex=0, role=button] "Layouts
+2 variants
+›"
+@c145 [popover-child, cursor:pointer] "Layouts
+2 variants"
+@c146 [popover-child, cursor:pointer] "Layouts"
+@c147 [popover-child, cursor:pointer] "Layouts"
+@c148 [popover-child, cursor:pointer] "2 variants"
+@c149 [popover-child, cursor:pointer] "2 variants"
+@c150 [popover-child, cursor:pointer] "›"
+--- END UNTRUSTED EXTERNAL C​ONTENT ---
+--- END UNTRUSTED EXTERNAL CONTENT ---

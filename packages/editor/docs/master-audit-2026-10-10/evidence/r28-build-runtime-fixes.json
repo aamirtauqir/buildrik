@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-13",
+  "handoverFrame": "8645:26",
+  "workspaceSwitchInstanceCount": 88,
+  "editorWorkspaceCount": 82,
+  "buildStateCount": 6,
+  "committedHeadingBindings": 51,
+  "timing": {
+    "buildFrame": "8628:12674",
+    "writtenTimeout": 1.5,
+    "uploadFrame": "8579:11766",
+    "urlCheckFrame": "8579:11841",
+    "imageWrittenTimeout": 0.8,
+    "reason": "Through the current tool bridge, 1500 persisted but did not transition in a four-second playback wait; 1.5 did. The official Figma Plugin API documentation describes timeout milliseconds, so this is an observed tool-bridge behavior, not a general API units recommendation."
+  },
+  "returnRouting": {
+    "buttons": ["I8628:12611;8627:627", "I8628:12693;8627:627", "I8628:12768;8627:627", "I8628:12845;8627:627", "I8628:12934;8627:627", "I8628:13011;8627:627"],
+    "conditionalsPerButton": 82,
+    "reason": "A single conditional with 87 blocks persisted as only first and last blocks. Replaced with one two-block conditional action per caller. Readback preserves all 82. Mobile caller return passed subsequent browser playback."
+  },
+  "statusComponent": {
+    "set": "8627:647",
+    "propertiesRemoved": ["Title#8627:34", "Description#8627:35"],
+    "reason": "Set-wide text defaults overrode variant-specific status text. Each State now owns its fixed title and description."
+  },
+  "previewChromeHidden": ["8628:12666", "8628:12741", "8628:12818", "8628:12893", "8628:12984", "8628:13061"],
+  "gridThirdCardTextNormalized": ["8623:12612", "8623:12613", "8623:12615", "8623:12616"],
+  "consoleSize": {"id":"8633:12844", "width":1440, "height":1000},
+  "booleanScopeException": "Figma rejected empty/specialized BOOLEAN scopes. The two prototype booleans explicitly use ALL_SCOPES and hiddenFromPublishing=true.",
+  "selectLabel": {"id":"8531:331", "textTruncation":"ENDING", "textAutoResize":"TRUNCATE", "maxLines":null, "note":"The bridge normalized the requested single-line truncation into fixed-height TRUNCATE. Instance readback and long filename playback confirmed no second line."}
+}

@@ -1,0 +1,7903 @@
+[
+  {
+    "id": "3:4",
+    "name": "03 · Editor",
+    "frames": [
+      {
+        "id": "7:18654",
+        "name": "J-F1.01 · Open existing Home",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "7:18981",
+        "name": "J-F1.02 · Add / target Hero",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "7:19448",
+        "name": "J-F1.03 · Text inserted / receipt",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "7:19791",
+        "name": "J-F1.04 · Select Text in Layers",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "7:20283",
+        "name": "J-F1.05 · Edit content",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "7:20634",
+        "name": "J-F1.06 · Style / Desktop 24px",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "8:1282",
+        "name": "J-F1.07 · Tablet / inherited 24px",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "8:1705",
+        "name": "J-F1.08 · Tablet / override 20px",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "8:2272",
+        "name": "J-F1.09 · Remove override / fallback 24px",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "8:2695",
+        "name": "J-F1.10 · Undo removal / restored 20px",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "8:3262",
+        "name": "J-F1.11 · Preview / current Tablet",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "8:3298",
+        "name": "J-F1.12 · Return / same context",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "63:6393",
+        "name": "B3-P01 · Pages / manage without switching",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "63:13820",
+        "name": "B3-P02 · About / page actions",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "63:14567",
+        "name": "B3-P03 · Rename / URL choice",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "63:15255",
+        "name": "B3-P04 · Live URL / consequence",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "63:15939",
+        "name": "B3-P05 · Page settings / SEO",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "63:16507",
+        "name": "B3-P06 · Page settings / Social",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "63:17061",
+        "name": "B3-P07 · Page settings / Advanced",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "63:17617",
+        "name": "B3-P08 · URL changed / redirect offer",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "63:18189",
+        "name": "B3-P09 · Settings / save failed",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "63:18758",
+        "name": "B3-P10 · Settings / unsaved close",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "63:19334",
+        "name": "B3-P11 · About deleted / Undo",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "63:20001",
+        "name": "B3-P12 · Recently deleted / Restore",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "63:20585",
+        "name": "B3-P13 · About restored",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "63:21262",
+        "name": "B3-P14 · Pages / Listings",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "63:21939",
+        "name": "B3-P15 · Pages / Structure",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "63:22616",
+        "name": "B3-P16 · Pages / no results",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "63:23182",
+        "name": "B3-P17 · Rename saved / keep URL",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "64:10927",
+        "name": "B3-P18 · URL changed / return to Pages",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "64:18356",
+        "name": "B3-P19 · Page settings saved / exact return",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "65:17148",
+        "name": "B3-P20 · Pages / more actions",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "65:17860",
+        "name": "B3-P21 · SEO score / breakdown",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "65:18435",
+        "name": "B3-P22 · Redirect / captured repair",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "65:18981",
+        "name": "B3-P23 · Redirect saved / return",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "67:11341",
+        "name": "B3-P24 · Redirect saved / exact SEO return",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "67:11915",
+        "name": "B3-P25 · Home retained / page renamed",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "67:12583",
+        "name": "B3-P26 · Home retained / About deleted",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "69:19044",
+        "name": "B3-P27 · Home retained / URL kept",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "94:12846",
+        "name": "B3-P28 · Open About / first visit",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "94:13447",
+        "name": "B3-P29 · Pages / About active",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "94:14750",
+        "name": "B3-P30 · Pages / offline loaded pages",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "94:15445",
+        "name": "B3-P31 · Offline / About opened",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "94:15802",
+        "name": "B3-P32 · Pages / 100-page fixture",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "94:18181",
+        "name": "B3-P33 · 100 pages / short viewport",
+        "w": 1440,
+        "h": 600
+      },
+      {
+        "id": "94:20973",
+        "name": "B3-P34 · Viewer / Home",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "94:21526",
+        "name": "B3-P35 · Viewer / About",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "94:28891",
+        "name": "B3-P36 · Offline / page actions",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "94:29621",
+        "name": "B3-P37 · About / page settings return",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "94:30029",
+        "name": "B3-P38 · Offline / page settings save unavailable",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "94:30772",
+        "name": "B3-P39 · Offline / Home retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "94:31301",
+        "name": "B3-P40 · 100 pages / manager closed",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "94:33551",
+        "name": "B3-P41 · 100 pages / short manager closed",
+        "w": 1440,
+        "h": 600
+      },
+      {
+        "id": "94:35825",
+        "name": "B3-P42 · Offline / Pages on About",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "95:20851",
+        "name": "B3-P43 · About settings / exact manager return",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "101:22426",
+        "name": "B3-P44 · About settings / retained draft",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "101:23017",
+        "name": "B3-P45 · About settings / saving before return",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "101:23620",
+        "name": "B3-P46 · About settings / save rejected",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "101:24231",
+        "name": "B3-P47 · About settings / offline close",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "101:24836",
+        "name": "B3-P48 · About settings / invalid URL with return pending",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "101:25436",
+        "name": "B3-P49 · About settings / corrected draft with return pending",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "101:27566",
+        "name": "B3-P50 · About settings / offline draft retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "101:28183",
+        "name": "B3-P51 · About settings / navigation cancelled, save continues",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "101:28780",
+        "name": "B3-P52 · About settings / saved, remain in settings",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "101:29372",
+        "name": "B3-P53 · Offline draft guard / 600px workspace",
+        "w": 1440,
+        "h": 600
+      },
+      {
+        "id": "101:29978",
+        "name": "B3-P54 · New page / choose source",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "101:36828",
+        "name": "B3-P55 · New page / blank",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "101:37542",
+        "name": "B3-P56 · New page / missing name",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "101:38257",
+        "name": "B3-P57 · New page / capacity reached",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "101:38980",
+        "name": "B3-P58 · New page / checking capacity",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "101:39695",
+        "name": "B3-P59 · New page / capacity unavailable",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "101:40412",
+        "name": "B3-P60 · New page / creation rejected",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "101:41127",
+        "name": "B3-P61 · New page / offline",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "101:41858",
+        "name": "B3-P62 · New page / creating Services",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "101:42581",
+        "name": "B3-P63 · Services created / blank page",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "104:28892",
+        "name": "B3-P64 · Templates / create Services",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "105:29094",
+        "name": "B3-P65 · SaaS Landing preview / create Services",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "106:29182",
+        "name": "B3-P66 · Create Services from SaaS Landing?",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "106:37032",
+        "name": "B3-P67 · Creating Services…",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "106:37213",
+        "name": "B3-P68 · Taking longer than usual…",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "106:37394",
+        "name": "B3-P69 · Services was created, but its layout wasn’t applied",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "106:37579",
+        "name": "B3-P70 · Services created from SaaS Landing",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "107:29742",
+        "name": "B3-P71 · Services page settings / exact return",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "107:30125",
+        "name": "B3-P72 · Services empty page deleted",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "107:30807",
+        "name": "B3-P73 · Services / empty page after template failure",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "107:31110",
+        "name": "B3-P74 · Preparing SaaS Landing…",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "107:31291",
+        "name": "B3-P76 · Applying SaaS Landing to Services…",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "107:39139",
+        "name": "B3-P75 · We couldn’t confirm the result",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "109:30868",
+        "name": "B3-P77 · Pages / capacity inventory retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "109:31658",
+        "name": "B3-P78 · About settings / invalid URL draft retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "109:32246",
+        "name": "B3-P79 · About settings / close with invalid URL draft",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "109:32916",
+        "name": "B3-P80 · New page / template source with name still empty",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "109:42059",
+        "name": "B3-P81 · Services restored / Home stays open",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "109:44109",
+        "name": "B3-P82 · Offline draft retained / 600px workspace",
+        "w": 1440,
+        "h": 600
+      },
+      {
+        "id": "109:44764",
+        "name": "B3-P83 · Offline Pages / 600px workspace",
+        "w": 1440,
+        "h": 600
+      },
+      {
+        "id": "118:33757",
+        "name": "B3-P84 · Reconciliation / Services has content",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "118:33946",
+        "name": "B3-P85 · Reconciliation / operation still running",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "118:34132",
+        "name": "B3-P86 · Reconciliation / access unavailable",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "118:34321",
+        "name": "B3-P87 · Reconciliation / confirmed not created",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "122:34115",
+        "name": "B3-P92 · Services inspection / result not confirmed",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "122:34465",
+        "name": "B3-P93 · Services / checking access again",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "122:34651",
+        "name": "B3-P94 · Services / creation remains pending",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "122:43331",
+        "name": "B3-P88 · CMS / Studio launch draft",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "122:43815",
+        "name": "B3-P89 · CMS / Pages opened without losing draft",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "122:44151",
+        "name": "B3-P90 · CMS / fixed About navigation guard",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "122:44343",
+        "name": "B3-P91 · CMS / save rejected, About still pending",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "125:35023",
+        "name": "B3-P95 · CMS / validation with About pending",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "125:35215",
+        "name": "B3-P96 · CMS / discard failed, input retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "125:35409",
+        "name": "B3-P97 · CMS / queued record does not complete leave",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "125:35603",
+        "name": "B3-P98 · CMS / remembered Home still runs draft guard",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "125:35799",
+        "name": "B3-P99 · About opened / Studio launch save confirmed",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "125:36161",
+        "name": "B3-P100 · CMS / corrected title, About still pending",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "126:35760",
+        "name": "B3-P101 · CMS / queued revision retained after cancelling navigation",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "126:35945",
+        "name": "B3-P102 · CMS / failed save retained after cancelling navigation",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "126:36130",
+        "name": "B3-P103 · CMS / saving record before opening About",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "126:36340",
+        "name": "B3-P104 · Home opened / Studio launch save confirmed",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "126:36751",
+        "name": "B3-P105 · CMS / About removed before navigation",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "126:36945",
+        "name": "B3-P106 · CMS / second owner failed after settings saved",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "126:37142",
+        "name": "B3-P107 · CMS / late save confirmed, stay on record",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "126:37330",
+        "name": "B3-P108 · CMS / navigation cancelled while save continues",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "127:36696",
+        "name": "B3-P109 · Pages / name a private folder",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "127:37393",
+        "name": "B3-P110 · Pages / private folder created",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "127:38098",
+        "name": "B3-P111 · Pages / move About to private folder",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "127:38819",
+        "name": "B3-P112 · Pages / About moved, Home retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "127:39528",
+        "name": "B3-P113 · Pages / in-folder reorder unavailable",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "127:40244",
+        "name": "B3-P114 · Pages / About returned to top level",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "128:39389",
+        "name": "B3-P115 · CMS / invalid title retained, navigation cancelled",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "128:39584",
+        "name": "B3-P116 · CMS / draft retained after About was removed",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "131:39598",
+        "name": "B3-P117 · Pages / Studio folder selected",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "131:40341",
+        "name": "B3-P118 · Pages / already at top level",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "131:41086",
+        "name": "B3-P119 · Pages / About moved into Studio",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "131:41791",
+        "name": "B3-P120 · Pages / About organization menu",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "134:41466",
+        "name": "B3-P121 · Home / Client projects folder retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "134:42185",
+        "name": "B3-P122 · Home / About remains in Client projects",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "134:42905",
+        "name": "B3-P123 · Home / About remains at top level",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "134:43625",
+        "name": "B3-P124 · Home / About remains in Studio",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "134:44345",
+        "name": "B3-P125 · Pages / Studio member actions",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "137:52464",
+        "name": "B3-P126 · Pages / About removed from Studio",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "137:53190",
+        "name": "B3-P127 · Home / Studio removal retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "137:53911",
+        "name": "B3-P128 · Pages / About moved down one position",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "137:54622",
+        "name": "B3-P129 · Home / page order retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "137:55343",
+        "name": "B3-P130 · Pages / reorder About with menu",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "137:56060",
+        "name": "B3-P131 · Pages / About last root page",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "137:56781",
+        "name": "B3-P132 · Pages / first root page order boundary",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "137:57493",
+        "name": "B3-P133 · Pages / Client projects folder actions",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "137:58206",
+        "name": "B3-P134 · Pages / private folder deleted, About kept",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "137:58919",
+        "name": "B3-P135 · Home / deleted folder stays removed",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "137:59625",
+        "name": "B3-P136 · Pages / Home reordered without changing homepage",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "139:47668",
+        "name": "B3-P137 · Pages / three selected, grouped bulk actions",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "139:48427",
+        "name": "B3-P138 · Pages / bulk delete partial result",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "139:49184",
+        "name": "B3-P139 · Pages / undo only successful bulk deletions",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "139:49899",
+        "name": "B3-P140 · Pages / retry only failed deletion",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "139:50620",
+        "name": "B3-P141 · Pages / three pages duplicated",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "139:51389",
+        "name": "B3-P142 · Pages / move three selected pages",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "139:52176",
+        "name": "B3-P143 · Pages / three pages moved to private folder",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "139:52895",
+        "name": "B3-P144 · Pages / homepage selected, deletion unavailable",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "139:53653",
+        "name": "B3-P145 · Pages / bulk selection at 1440 × 600",
+        "w": 1440,
+        "h": 600
+      },
+      {
+        "id": "142:51838",
+        "name": "B3-P146 · Pages / About deleted, Work kept",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "142:52543",
+        "name": "B3-P147 · Pages / successful retry undone",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "142:53229",
+        "name": "B3-P148 · Pages / recently deleted About · ADMIN scenario",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "142:53954",
+        "name": "B3-P149 · Pages / restore slug already used",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "142:54521",
+        "name": "B3-P150 · Pages / About restored with new slug",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "142:55231",
+        "name": "B3-P151 · Pages / recovery offline · ADMIN scenario",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "142:55781",
+        "name": "B3-P152 · Pages / permanent deletion typed confirm · ADMIN scenario",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "142:56347",
+        "name": "B3-P153 · Pages / permanent deletion name matches · ADMIN scenario",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "142:56910",
+        "name": "B3-P154 · Pages / no deleted pages after permanent delete",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "142:57466",
+        "name": "B3-P155 · Pages / restore failed, item retained · ADMIN scenario",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "142:58015",
+        "name": "B3-P156 · Pages / loading deleted pages",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "142:58571",
+        "name": "B3-P157 · Pages / restored page above active-page limit",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "142:59267",
+        "name": "B3-P158 · Pages / cleared selection at 1440 × 600",
+        "w": 1440,
+        "h": 600
+      },
+      {
+        "id": "142:59972",
+        "name": "B3-P159 · Pages / About restored at original top level",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "142:60682",
+        "name": "B3-P160 · About / opened after restore",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "142:61042",
+        "name": "B3-P161 · About / restored new URL opened",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "142:61405",
+        "name": "B3-P162 · About / restored page view only",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "142:61796",
+        "name": "B3-P163 · Pages / Admin recovery actions · ADMIN scenario",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "142:62396",
+        "name": "Return · Pages / About deleted, Work kept",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "142:63098",
+        "name": "Return · Pages / successful retry undone",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "142:63798",
+        "name": "Return · Pages / recently deleted About",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "142:64362",
+        "name": "Return · Pages / About restored with new slug",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "142:65068",
+        "name": "Return · Pages / recovery offline",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "142:65629",
+        "name": "Return · Pages / no deleted pages after permanent delete",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "142:66187",
+        "name": "Return · Pages / restore failed, item retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "142:66751",
+        "name": "Return · Pages / loading deleted pages",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "142:67309",
+        "name": "Return · Pages / restored page above active-page limit",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "142:68015",
+        "name": "Return · Pages / cleared selection at 1440 × 600",
+        "w": 1440,
+        "h": 600
+      },
+      {
+        "id": "142:68730",
+        "name": "Return · Pages / About restored, folder retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "144:64089",
+        "name": "B3-P164 · Pages / occupied URL, former folder removed",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "144:64795",
+        "name": "B3-P165 · Pages / collision recovery retained · ADMIN scenario",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "144:65617",
+        "name": "B3-P166 · Pages / restore retained, plan options",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:64586",
+        "name": "B3-C01 · Canvas / View menu",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:65011",
+        "name": "B3-C02 · Canvas / grid size and snap off",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:65448",
+        "name": "B3-C03 · Canvas / invalid fractional grid draft",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:65889",
+        "name": "B3-C04 · Canvas / grid and snapping on at 7px",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:66698",
+        "name": "B3-C05 · Canvas / ruler guides shared across site",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:67134",
+        "name": "B3-C06 · Canvas / add guide without dragging",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:67569",
+        "name": "B3-C07 · Canvas / locked guide detail",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:67997",
+        "name": "B3-C08 · Canvas / edit guide position",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:68426",
+        "name": "B3-C09 · Canvas / guide position draft retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:68858",
+        "name": "B3-C10 · Canvas / guide moved, selection preserved",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:69294",
+        "name": "B3-C11 · Canvas / guide added with stable existing guides",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:69735",
+        "name": "B3-C12 · Canvas / guide removed with Undo",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:70156",
+        "name": "B3-C13 · Canvas / guide changed while editing",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:70590",
+        "name": "B3-C14 · Canvas / no ruler guides",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:71013",
+        "name": "B3-C15 · Canvas / authoring width presets",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:71444",
+        "name": "B3-C16 · Canvas / invalid custom width remains draft",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:71878",
+        "name": "B3-C17 · Canvas / Viewer inspects shared guides",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:72343",
+        "name": "Return · Canvas / View menu",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:72772",
+        "name": "Return · Canvas / grid size and snap off",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:73215",
+        "name": "Return · Canvas / invalid fractional grid draft",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:73657",
+        "name": "Return · Canvas / grid and snapping on at 7px",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:74465",
+        "name": "Return · Canvas / ruler guides shared across site",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:74905",
+        "name": "Return · Canvas / add guide without dragging",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:75344",
+        "name": "Return · Canvas / locked guide detail",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:75774",
+        "name": "Return · Canvas / edit guide position",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:76210",
+        "name": "Return · Canvas / guide position draft retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:76644",
+        "name": "Return · Canvas / guide moved, selection preserved",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:77080",
+        "name": "Return · Canvas / guide added with stable existing guides",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:77521",
+        "name": "Return · Canvas / guide removed with Undo",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:77943",
+        "name": "Return · Canvas / guide changed while editing",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:78378",
+        "name": "Return · Canvas / no ruler guides",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:78804",
+        "name": "Return · Canvas / authoring width presets",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:79239",
+        "name": "Return · Canvas / invalid custom width remains draft",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:79674",
+        "name": "Return · Canvas / Viewer inspects shared guides",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "145:80116",
+        "name": "B3-P167 · About / plan options with exact return",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "146:71776",
+        "name": "B3-C18 · Canvas / unlocked guide retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "146:72215",
+        "name": "B3-C19 · Canvas / compare remote guide change",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "146:72655",
+        "name": "B3-C20 · Canvas / remote guide position retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "146:73094",
+        "name": "B3-C21 · Canvas / guide sync failed with local value kept",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "146:73535",
+        "name": "B3-C22 · Canvas / edit retained draft against updated guide",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "146:73969",
+        "name": "B3-C23 · Canvas / pending guide sync offline",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "146:74407",
+        "name": "B3-C24 · Canvas / server acknowledged guide position",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "146:74844",
+        "name": "B3-C25 · Canvas / inspect guide without edit access",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "146:75275",
+        "name": "B3-C26 · Canvas / edit committed 320px guide",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "146:75710",
+        "name": "B3-C27 · Canvas / edit committed remote 280px guide",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "146:77066",
+        "name": "Return · Canvas / unlocked guide retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "146:77535",
+        "name": "Return · Canvas / remote guide position retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "146:78004",
+        "name": "Return · Canvas / guide sync failed with local value kept",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "146:78477",
+        "name": "Return · Canvas / edit retained draft against updated guide",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "146:78944",
+        "name": "Return · Canvas / pending guide sync offline",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "146:79413",
+        "name": "Return · Canvas / server acknowledged guide position",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "146:79881",
+        "name": "Return · Canvas / inspect guide without edit access",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "146:80257",
+        "name": "Return · Canvas / edit committed 320px guide",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "146:80723",
+        "name": "Return · Canvas / edit committed remote 280px guide",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "147:75914",
+        "name": "B3-L01 · Layers / stable tool with selection footer",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "147:76329",
+        "name": "B3-L02 · Layers / personal display preferences",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "147:76773",
+        "name": "B3-L03 · Layers / compact 28px rows",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "147:77189",
+        "name": "B3-L04 · Layers / search results with parent paths",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "147:77668",
+        "name": "B3-L05 · Layers / Text locked by Hero",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "147:78110",
+        "name": "B3-L06 · Layers / locking ancestor revealed",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "147:78484",
+        "name": "B3-L07 · Layers / Hero unlocked, Text available",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "147:78900",
+        "name": "B3-L08 · Layers / Text dimmed only in editor",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "147:79328",
+        "name": "B3-L09 · Layers / no search matches",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "147:79728",
+        "name": "B3-L10 · Layers / large search at 1440 × 600",
+        "w": 1440,
+        "h": 600
+      },
+      {
+        "id": "152:78185",
+        "name": "B3-L11 · Layers / tree commands",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "152:78614",
+        "name": "B3-L12 · Layers / collapsed branches retain selection",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "152:79032",
+        "name": "B3-L13 · Layers / 5000-layer fixture search cleared",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "152:79448",
+        "name": "B3-L14 · Layers / 5000-layer fixture at 600px",
+        "w": 1440,
+        "h": 600
+      },
+      {
+        "id": "152:79864",
+        "name": "B3-L15 · Layers / compact preference remains open",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "153:79518",
+        "name": "B3-C28 · Canvas / inspect guide, failed sync retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "153:80019",
+        "name": "B3-C29 · Canvas / inspect guide, offline status retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "153:80516",
+        "name": "B3-C30 · Canvas / inspect guide, acknowledged status retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "153:81012",
+        "name": "B3-C31 · Canvas / inspect original guide after adding another",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "153:81506",
+        "name": "B3-C32 · Canvas / inspect added guide, original retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "153:82009",
+        "name": "B3-C33 · Canvas / 320px guide locked, sync pending",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "153:82477",
+        "name": "B3-C34 · Canvas / locked 320px guide detail",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "153:82970",
+        "name": "B3-C35 · Canvas / add guide after moving existing guide",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "153:83468",
+        "name": "B3-C36 · Canvas / second guide added after move",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "153:83943",
+        "name": "B3-C37 · Canvas / add another guide with all previous guides kept",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "153:84447",
+        "name": "B3-C38 · Canvas / four guides retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "155:82271",
+        "name": "B3-C39 · Canvas / remove320 with exact undo",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "155:82724",
+        "name": "Return · remove320",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "155:83177",
+        "name": "Return · guide detail 153:79518",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "155:83650",
+        "name": "B3-C40 · Canvas / lock320 from 153:79518",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "155:84124",
+        "name": "Return · B3-C40 · Canvas / lock320 from 153:79518",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "155:84592",
+        "name": "B3-C41 · Canvas / remove320 from 153:79518",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "155:85065",
+        "name": "B3-C42 · Canvas / undo restores320 and other guides",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "155:85542",
+        "name": "Return · B3-C41 · Canvas / remove320 from 153:79518",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "155:86012",
+        "name": "Return · B3-C42 · Canvas / undo restores320 and other guides",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "155:86480",
+        "name": "Return · guide detail 153:80019",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "155:86949",
+        "name": "B3-C43 · Canvas / lock320 from 153:80019",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "155:87420",
+        "name": "Return · B3-C43 · Canvas / lock320 from 153:80019",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "155:87889",
+        "name": "B3-C44 · Canvas / remove320 from 153:80019",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "155:88359",
+        "name": "B3-C45 · Canvas / undo restores320 and other guides",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "155:88833",
+        "name": "Return · B3-C44 · Canvas / remove320 from 153:80019",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "155:89304",
+        "name": "Return · B3-C45 · Canvas / undo restores320 and other guides",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "155:89773",
+        "name": "Return · guide detail 153:80516",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "155:90241",
+        "name": "B3-C46 · Canvas / lock320 from 153:80516",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "155:90710",
+        "name": "Return · B3-C46 · Canvas / lock320 from 153:80516",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "155:91178",
+        "name": "B3-C47 · Canvas / remove320 from 153:80516",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "155:91646",
+        "name": "B3-C48 · Canvas / undo restores320 and other guides",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "155:92118",
+        "name": "Return · B3-C47 · Canvas / remove320 from 153:80516",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "155:92588",
+        "name": "Return · B3-C48 · Canvas / undo restores320 and other guides",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "155:93056",
+        "name": "Return · guide detail 153:81012",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "155:93531",
+        "name": "B3-C49 · Canvas / unlock240 from 153:81012",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "155:94007",
+        "name": "Return · B3-C49 · Canvas / unlock240 from 153:81012",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "155:94482",
+        "name": "Return · guide detail 153:81506",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "155:94957",
+        "name": "B3-C50 · Canvas / lock320 from 153:81506",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "155:95433",
+        "name": "Return · B3-C50 · Canvas / lock320 from 153:81506",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "155:95908",
+        "name": "B3-C51 · Canvas / remove320 from 153:81506",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "155:96383",
+        "name": "B3-C52 · Canvas / undo restores320 and other guides",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "155:96862",
+        "name": "Return · B3-C51 · Canvas / remove320 from 153:81506",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "155:97334",
+        "name": "Return · B3-C52 · Canvas / undo restores320 and other guides",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:249222",
+        "name": "B3-N00 · Editor / exact command and Help origin",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:249638",
+        "name": "B3-N01 · Site menu / one Search door",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:250083",
+        "name": "B3-N02 · Command palette / recent and selection context",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:250542",
+        "name": "B3-N03 · Command palette / ranked settings results",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:250988",
+        "name": "B3-N04 · Command palette / nested pages and exact return",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:251434",
+        "name": "B3-N05 · About opened from palette / page identity preserved",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:251794",
+        "name": "B3-N06 · Command palette / disabled row retains reason",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:252230",
+        "name": "B3-N07 · Assets / command origin",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:252510",
+        "name": "B3-N08 · Command palette / Assets scoped query",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:252811",
+        "name": "B3-N09 · Command palette / scoped no results and no AI",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:253111",
+        "name": "B3-N10 · Command palette / global no results retains Assets origin",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:253409",
+        "name": "B3-N11 · Command palette / components loading",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:253840",
+        "name": "B3-N12 · Command palette / component search failed",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:254275",
+        "name": "B3-N13 · Owner view mode / exact read-only origin",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:254659",
+        "name": "B3-N14 · Command palette / owner view mode capabilities",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:255084",
+        "name": "B3-N15 · Help / anchored two-row menu",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:255509",
+        "name": "B3-N16 · Help / view mode hides Getting started",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:255899",
+        "name": "B3-N17 · Keyboard shortcuts / macOS current SC12",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:256463",
+        "name": "B3-N18 · Keyboard shortcuts / Windows printed keys",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:257027",
+        "name": "B3-N19 · Keyboard shortcuts / single-key preference off",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:257591",
+        "name": "B3-N20 · Keyboard shortcuts / searched focus mode",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:258033",
+        "name": "B3-N21 · Keyboard shortcuts / no matching shortcut",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:258914",
+        "name": "B3-N23 · Editor / Tablet768 preview origin",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:259330",
+        "name": "B3-N24 · Preview / building current Tablet page",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:259379",
+        "name": "B3-N25 · Preview / Home Tablet768 and origin return",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:259428",
+        "name": "B3-N26 · Preview / build failed retains origin",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:259482",
+        "name": "B3-N27 · Share preview / link loading",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:259540",
+        "name": "B3-N28 · Share preview / current saved design",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:259601",
+        "name": "B3-N29 · Share preview / clipboard acknowledged",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:259663",
+        "name": "B3-N30 · Share preview / copy failure keeps selectable URL",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:259725",
+        "name": "B3-N31 · Share preview / link service error",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:259792",
+        "name": "B3-N32 · Share from site menu / loading with Editor return",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:260229",
+        "name": "B3-N33 · Share from site menu / exact Editor return",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:260669",
+        "name": "B3-N34 · Share from site menu / copied and Editor return",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:261113",
+        "name": "B3-N35 · Public preview / expired",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:261535",
+        "name": "B3-N36 · Public preview / revoked",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:261957",
+        "name": "B3-N37 · Public preview / unknown",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:262420",
+        "name": "B3-N38 · Keyboard shortcuts / view-mode exact return",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:262956",
+        "name": "B3-N39 · Command palette / scope removed keeps studio query",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "263:263259",
+        "name": "B3-N40 · Keyboard shortcuts / Windows with single keys off",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "265:119612",
+        "name": "B3-N42 · Design-only public saved preview / Tablet source",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "265:119657",
+        "name": "B3-N43 · Design-only public saved preview / menu source",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "265:119746",
+        "name": "B3-N41 · REVIEW ONLY / navigation outcome selection",
+        "w": 1200,
+        "h": 662
+      }
+    ]
+  },
+  {
+    "id": "3:5",
+    "name": "04 · Inspector",
+    "frames": [
+      {
+        "id": "36:2",
+        "name": "Refinement / Inspector contexts",
+        "w": 1360,
+        "h": 2094
+      },
+      {
+        "id": "39:9114",
+        "name": "Refinement / Color scope and safe commits",
+        "w": 952,
+        "h": 1160
+      },
+      {
+        "id": "156:716",
+        "name": "B4-F01 · Contact form / canonical child list",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "156:1316",
+        "name": "B4-F02 · Email field / label, placeholder and submission key",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "156:1911",
+        "name": "B4-F03 · Duplicate submission key / draft retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "156:2506",
+        "name": "B4-F04 · Associated label changed",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "156:3109",
+        "name": "B4-F05 · Add field / supported field types",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "156:3684",
+        "name": "B4-F06 · Field added / new key and associated label",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "156:4279",
+        "name": "B4-F07 · Contact form / added child retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "156:4859",
+        "name": "B4-F08 · Legacy Password / non-dismissible warning",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "156:5458",
+        "name": "B4-F09 · Existing unlabeled field / accessible label repair",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "156:6055",
+        "name": "B4-F10 · Form delivery / Admin configuration",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "156:6643",
+        "name": "B4-F11 · Form settings / saving",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "156:7230",
+        "name": "B4-F12 · Form settings / failed save, draft retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "156:7819",
+        "name": "B4-F13 · Form settings / acknowledged save",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "156:8406",
+        "name": "B4-F14 · Form settings / offline, document editing available",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "156:9001",
+        "name": "B4-F15 · Form settings / recipient requires Admin",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "156:9584",
+        "name": "B4-F16 · Form settings / loading",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "156:10131",
+        "name": "B4-F17 · After submit / choose destination",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "156:10723",
+        "name": "B4-F18 · After submit / saved redirect",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "156:11319",
+        "name": "B4-F19 · Redirect / shared page picker",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "156:11902",
+        "name": "B4 Forms / implementation and prototype boundaries",
+        "w": 1440,
+        "h": 234
+      },
+      {
+        "id": "157:102776",
+        "name": "Return · Content with Form settings / saving",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "157:103125",
+        "name": "Return · Email with Form settings / saving",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "157:103493",
+        "name": "Return · Content with Form settings / failed save, draft retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "157:103842",
+        "name": "Return · Email with Form settings / failed save, draft retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "157:104210",
+        "name": "Return · Content with Form settings / offline, document editing available",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "157:104559",
+        "name": "Return · Email with Form settings / offline, document editing available",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "157:104927",
+        "name": "Return · Content with After submit / choose destination",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "157:105276",
+        "name": "Return · Email with After submit / choose destination",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "157:105715",
+        "name": "B4-F20 · Viewer / existing role disclosure only",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "159:6780",
+        "name": "B4-F21 · Email / added sibling retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "159:7279",
+        "name": "B4-F22 · Contact form / Email reorder menu",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "159:7646",
+        "name": "B4-F23 · Email moved before Name",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "159:8041",
+        "name": "B4-F24 · Email moved after Message",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "159:8570",
+        "name": "B4-F25 · Redirect URL / invalid draft retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "159:8959",
+        "name": "B4-F26 · Redirect URL / valid draft",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "159:9347",
+        "name": "B4-F27 · Redirect URL / saving atomically",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "159:9710",
+        "name": "B4-F28 · Redirect URL / acknowledged save",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "160:8757",
+        "name": "B4-V / 375px / Ready",
+        "w": 375,
+        "h": 812
+      },
+      {
+        "id": "160:8779",
+        "name": "B4-V / 375px / Sending",
+        "w": 375,
+        "h": 812
+      },
+      {
+        "id": "160:8801",
+        "name": "B4-V / 375px / Validation error",
+        "w": 375,
+        "h": 812
+      },
+      {
+        "id": "160:8824",
+        "name": "B4-V / 375px / Network failure",
+        "w": 375,
+        "h": 812
+      },
+      {
+        "id": "160:8847",
+        "name": "B4-V / 375px / Rate limited",
+        "w": 375,
+        "h": 812
+      },
+      {
+        "id": "160:8870",
+        "name": "B4-V / 375px / Plan capacity",
+        "w": 375,
+        "h": 812
+      },
+      {
+        "id": "160:8893",
+        "name": "B4-V / 375px / Success",
+        "w": 375,
+        "h": 812
+      },
+      {
+        "id": "160:8900",
+        "name": "B4-V / 320px / Ready",
+        "w": 320,
+        "h": 812
+      },
+      {
+        "id": "160:8922",
+        "name": "B4-V / 320px / Sending",
+        "w": 320,
+        "h": 812
+      },
+      {
+        "id": "160:8944",
+        "name": "B4-V / 320px / Validation error",
+        "w": 320,
+        "h": 812
+      },
+      {
+        "id": "160:8967",
+        "name": "B4-V / 320px / Network failure",
+        "w": 320,
+        "h": 812
+      },
+      {
+        "id": "160:8990",
+        "name": "B4-V / 320px / Rate limited",
+        "w": 320,
+        "h": 812
+      },
+      {
+        "id": "160:9013",
+        "name": "B4-V / 320px / Plan capacity",
+        "w": 320,
+        "h": 812
+      },
+      {
+        "id": "160:9036",
+        "name": "B4-V / 320px / Success",
+        "w": 320,
+        "h": 812
+      },
+      {
+        "id": "160:9047",
+        "name": "B4 visitor forms / state and accessibility handoff",
+        "w": 1440,
+        "h": 202
+      },
+      {
+        "id": "161:8480",
+        "name": "B4-I01 · Text / content and semantics",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "161:8940",
+        "name": "B4-I02 · Text / Style and legal CSS units",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "161:9467",
+        "name": "B4-I03 · Font size / invalid draft retains24px",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "161:10007",
+        "name": "B4-I04 · Font size / committed28px",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "161:10541",
+        "name": "B4-I05 · Invalid draft / tab switch guard",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "161:11006",
+        "name": "B4-I06 · Font size / property-specific unit menu",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "161:11470",
+        "name": "B4-I07 · Font size /24px converted to1.5rem",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "161:12005",
+        "name": "B4-I08 · Custom width / exact expression preserved",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "161:12525",
+        "name": "B4-I09 · Text / Effects preserve compound values",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "161:13037",
+        "name": "B4-I10 · Filters / edit exact expression",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "161:13481",
+        "name": "B4-I11 · Filters / first term changed, sequence retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "161:13919",
+        "name": "B4-I12 · Text / device visibility and interactions",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "161:14383",
+        "name": "B4-I13 · Text / hidden on Desktop, editor selection kept",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "161:14772",
+        "name": "B4-I14 · Interactions / presets first",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "161:15179",
+        "name": "B4-I15 · Interaction / Fade in on scroll",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "161:15688",
+        "name": "B4-I16 · Interactions / one interaction",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "161:16082",
+        "name": "B4-I17 · Interaction / temporary playback",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "161:16511",
+        "name": "B4-I18 · Interaction / reduced motion",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "161:16940",
+        "name": "B4-I19 · Interaction / missing target",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "161:17404",
+        "name": "B4 Inspector / precision and interaction handoff",
+        "w": 1440,
+        "h": 182
+      },
+      {
+        "id": "165:17822",
+        "name": "B4-I20 · Interaction / contextual commands",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "165:18272",
+        "name": "B4-I21 · Interaction / disabled, configuration kept",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "165:18662",
+        "name": "B4-I22 · Interaction / deleted with exact undo",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "165:19056",
+        "name": "B4-I23 · Interaction / add undone",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "165:19449",
+        "name": "B4-I24 · Interaction / duplicated",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "170:121692",
+        "name": "B4-F29 · Field type / lossless change",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "170:122069",
+        "name": "B4-F30 · Email to Text / direct apply with Undo",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "170:122442",
+        "name": "B4-F31 · Select field / options before conversion",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "170:122820",
+        "name": "B4-F32 · Contact form / Topic fixture",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "170:123180",
+        "name": "B4-F33 · Select to Text / choose type",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "170:123569",
+        "name": "B4-F34 · Select to Text / data-loss consequence",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "170:123968",
+        "name": "B4-F35 · Select converted / current default kept",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "170:124352",
+        "name": "BD-29 / conversion acceptance",
+        "w": 1440,
+        "h": 182
+      },
+      {
+        "id": "171:25296",
+        "name": "B4-F36 · Contact form / Email as Text",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "171:25654",
+        "name": "B4-F37 · Contact form / Topic as Text",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "241:16522",
+        "name": "B4-IC01 · Instance selected / identity, variant, reset with overrides",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "241:17060",
+        "name": "B4-IC02 · Reset to main component / consequence confirm",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "241:17608",
+        "name": "B4-IC03 · No overrides / Reset disabled with reason",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "241:18146",
+        "name": "B4-IC04 · Variant unavailable / no silent fallback",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "241:18683",
+        "name": "B4-IC05 · Tablet override on an instance / three SC-13 signals",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "241:19230",
+        "name": "B4-IC06 · Detach instance / Undo only, no dialog",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "241:19772",
+        "name": "B4 Instance inspector / IC01–IC06 handoff",
+        "w": 1440,
+        "h": 194
+      },
+      {
+        "id": "245:36832",
+        "name": "B4-C01 · Tabs / explicit pairs and initial state",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:37366",
+        "name": "B4-C02 · Tabs / unlinked legacy nodes",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:37877",
+        "name": "B4-C03 · Tabs / choose a pair explicitly",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:38385",
+        "name": "B4-C04 · Tabs / pair repaired",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:38888",
+        "name": "B4-C05 · Tabs / edit a closed panel temporarily",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:39392",
+        "name": "B4-C06 · Tabs / visitor activation and initial pair",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:39899",
+        "name": "B4-C07 · Modal / local trigger and page-root dialog",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:40398",
+        "name": "B4-C08 · Modal / dialog authoring and exact return",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:40932",
+        "name": "B4-C09 · Modal / shared-component reference refused",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:41419",
+        "name": "B4-C10 · Modal / explicit local insertion result",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:41919",
+        "name": "B4-C11 · Modal / missing dialog recovery",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:42414",
+        "name": "B4-C12 · Dialog / close policy and visitor state",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:42929",
+        "name": "B4-C13 · Table / rectangular structure and exact cell",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:43495",
+        "name": "B4-C14 · Table / native cell and header semantics",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:44049",
+        "name": "B4-C15 · Table / independent scroll-wrapper style",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:44573",
+        "name": "B4-C16 · Table / merged structure refuses unsafe commands",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "247:21216",
+        "name": "B4-A01 · Style / children layout and positioning",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "247:21762",
+        "name": "B4-A02 · Style / grid tracks and item placement",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "247:22310",
+        "name": "B4-A03 · Style / advanced layout and own-element sizing",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "247:22853",
+        "name": "B4-A04 · Style / spacing tokens and flex-item controls",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "247:23404",
+        "name": "B4-A05 · Style / full typography and inherited text inside",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "247:23966",
+        "name": "B4-A06 · Style / gradient preservation and image fill",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "247:24493",
+        "name": "B4-A07 · Style / independent borders corners and outline",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "247:25026",
+        "name": "B4-A08 · Effects / lossless shadow transform and transition",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "247:25554",
+        "name": "B4-A09 · Effects / advanced authored values",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "247:26063",
+        "name": "B4-A10 · Behavior / legacy CSS animation and conflicts",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "247:26594",
+        "name": "B4-A11 · Content / semantic native attributes and protected keys",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "247:27113",
+        "name": "B4-A12 · Semantic conversion / preserve or review impact",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "247:27602",
+        "name": "B4-A13 · Semantic conversion / paragraph result and Undo",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "247:28097",
+        "name": "B4-B01 · Batch / eligibility and mixed values",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "247:28584",
+        "name": "B4-B02 · Batch / progress maximum rejects whole operation",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "247:29083",
+        "name": "B4-B03 · Batch / progress maxima changed independently",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "247:29578",
+        "name": "B4-B04 · Batch / geometry eligibility and zero-property no-op",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "247:30075",
+        "name": "B4-B05 · Color / same visible value different sources",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "247:30567",
+        "name": "B4-R01 · Font picker / source-aware selection",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "247:31047",
+        "name": "B4-R02 · Font picker / manage preserves origin",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "247:31533",
+        "name": "B4-R03 · Site fonts / availability-only management",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "247:32025",
+        "name": "B4-R04 · Font picker / returned family requires explicit Use",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "247:32505",
+        "name": "B4-R05 · Font / intended source saved loading failed",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "247:32989",
+        "name": "B4-R06 · Resource picker / stale target refuses assignment",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "249:71560",
+        "name": "B4-B69 / 01 · Individual block control references",
+        "w": 2080,
+        "h": 1106
+      },
+      {
+        "id": "249:71797",
+        "name": "B4-B69 / 02 · Individual block control references",
+        "w": 2080,
+        "h": 1106
+      },
+      {
+        "id": "249:72047",
+        "name": "B4-B69 / 03 · Individual block control references",
+        "w": 2080,
+        "h": 1106
+      },
+      {
+        "id": "249:72335",
+        "name": "B4-B69 / 04 · Individual block control references",
+        "w": 2080,
+        "h": 1106
+      },
+      {
+        "id": "249:72598",
+        "name": "B4-B69 / 05 · Individual block control references",
+        "w": 2080,
+        "h": 1106
+      },
+      {
+        "id": "249:72907",
+        "name": "B4-B69 / 06 · Individual block control references",
+        "w": 2080,
+        "h": 1106
+      },
+      {
+        "id": "249:73201",
+        "name": "B4-B69 / 07 · Individual block control references",
+        "w": 2080,
+        "h": 1106
+      },
+      {
+        "id": "249:73469",
+        "name": "B4-B69 / 08 · Individual block control references",
+        "w": 2080,
+        "h": 1106
+      },
+      {
+        "id": "249:73725",
+        "name": "B4-B69 / 09 · Individual block control references",
+        "w": 2080,
+        "h": 1106
+      },
+      {
+        "id": "249:73974",
+        "name": "B4-B69 / 10 · Individual block control references",
+        "w": 2080,
+        "h": 1106
+      },
+      {
+        "id": "249:74252",
+        "name": "B4-B69 / 11 · Individual block control references",
+        "w": 2080,
+        "h": 1106
+      },
+      {
+        "id": "249:74541",
+        "name": "B4-B69 / 12 · Individual block control references",
+        "w": 2080,
+        "h": 1106
+      },
+      {
+        "id": "249:74672",
+        "name": "B4-Native / 1 · Semantic support routes",
+        "w": 1080,
+        "h": 828
+      },
+      {
+        "id": "249:74769",
+        "name": "B4-Native / 2 · Semantic support routes",
+        "w": 1080,
+        "h": 840
+      },
+      {
+        "id": "249:74874",
+        "name": "B4-Native / 3 · Semantic support routes",
+        "w": 1080,
+        "h": 900
+      },
+      {
+        "id": "249:74983",
+        "name": "B4-Native / 4 · Semantic support routes",
+        "w": 1080,
+        "h": 892
+      },
+      {
+        "id": "251:76342",
+        "name": "B4-R07 · Site fonts owner / exact Inspector continuation",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "251:76737",
+        "name": "B4-R08 · Font loaded / exact saved source",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "251:77000",
+        "name": "B4-B06 · Progress original values / exact Undo result",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "252:46432",
+        "name": "B4-R09 · Assets Fonts / pinned Hero heading origin",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "252:46614",
+        "name": "B4-C17 · Local inserted dialog / return to insertion context",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "252:46927",
+        "name": "B4-C18 · Local inserted dialog behavior / exact return",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "255:82447",
+        "name": "B4-S01 · Project loading / no writable default controls",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "255:82909",
+        "name": "B4-S02 · Project load failure / retry preserves saved work",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "255:83370",
+        "name": "B4-S03 · Inspector error boundary / target preserved",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "255:83852",
+        "name": "B4-S04 · Inspector recovered / original target and Style",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "255:84358",
+        "name": "B4-S05 · Section render failure / other controls remain usable",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "255:84855",
+        "name": "B4-S06 · Page appearance / no selection and exact page owner",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "255:85352",
+        "name": "B4-S07 · Template applied notice / page-scoped dismissal",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "255:85835",
+        "name": "B4-S08 · Element menu / shared registry and no AI entries",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "255:86352",
+        "name": "B4-S09 · Element deletion / one Undo and surviving page context",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "255:86840",
+        "name": "B4-S10 · Element duplicate / explicit new selection",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "255:87335",
+        "name": "B4-S11 · Apply style / explicit categories eligibility and layer",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "255:87841",
+        "name": "B4-S12 · Apply style result / declared properties only",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "255:88341",
+        "name": "B4-S13 · Hover layer / inspect exact overrides before removal",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "255:88837",
+        "name": "B4-S14 · Hover layer reset / actual fallbacks and Undo",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "255:89334",
+        "name": "B4-S15 · Tablet layer / exact property set and inheritance",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "255:89827",
+        "name": "B4-S16 · Tablet layer reset / other layers preserved",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "255:90324",
+        "name": "B4-S17 · Jump to property / scoped search and disabled reason",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "255:90822",
+        "name": "B4-S18 · Property search result / exact field revealed",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "255:91321",
+        "name": "B4-S19 · Apply style / no selected properties creates no history",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "255:91826",
+        "name": "B4-S20 · Reset style / named active layer and actual properties",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "255:92313",
+        "name": "B4-S21 · Reset style / resolved inherited result and Undo",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "255:92819",
+        "name": "B4-S22 · Lock / inspect through Layers and exact unlock",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "255:93321",
+        "name": "B4-D01 · Property binding / current owner",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "255:93677",
+        "name": "B4-D02 · Property binding subview / exact return",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "255:94031",
+        "name": "B4-D03 · Bind property / source picker",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "255:94411",
+        "name": "B4-D04 · Content Conditions / current owner",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "255:94775",
+        "name": "B4-D05 · Legacy Conditions / inactive preserved",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "255:95134",
+        "name": "B4-D06 · Legacy Conditions / explicitly activated",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "258:31477",
+        "name": "B4-S23 · Bind Hero heading / exact Home origin",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "258:31982",
+        "name": "B4-S24 · Specific Blog record / compatible Title field",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "258:32482",
+        "name": "B4-S25 · Bound Hero heading / one binding and stable target",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "258:32981",
+        "name": "B4-S26 · Hero Title binding / exact return and Unbind",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "258:33493",
+        "name": "B4-S27 · Unbound Hero heading / value retained and Undo",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "258:33994",
+        "name": "B4-D07 · Legacy condition / review before activation",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "258:34343",
+        "name": "B4-D08 · Legacy activation / false record ghost and Undo",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "258:34707",
+        "name": "B4-D09 · Active condition / edit exact JSON path",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "258:35104",
+        "name": "B4-D10 · Condition removed / original target and Undo",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "258:35441",
+        "name": "B4-D11 · Template binding removed / static value retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "258:35802",
+        "name": "B4-S28 · Rename display name / Enter commits Escape cancels",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "258:36291",
+        "name": "B4-S29 · Rename committed / Layers and breadcrumb agree",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "258:36770",
+        "name": "B4-S30 · Inspector hidden / preserved target and return",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "258:37248",
+        "name": "B4-S31 · Ancestor overflow / exact hierarchy and navigation",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "258:37744",
+        "name": "B4-S32 · Inspector scroll restoration / selected target and tab",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "258:38255",
+        "name": "B4-S33 · Video embed invalid draft / committed URL retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "258:38731",
+        "name": "B4-S34 · Inline SVG replacement / explicit content loss",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "258:39198",
+        "name": "B4-S35 · SVG replaced by image / one Undo restores paths",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "258:39679",
+        "name": "B4-S36 · Binding source deleted / retain mapping and fallback",
+        "w": 1440,
+        "h": 900
+      }
+    ]
+  },
+  {
+    "id": "3:6",
+    "name": "05 · Resources",
+    "frames": [
+      {
+        "id": "165:2",
+        "name": "B5-C01 · CMS / Blog records at scale",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "165:520",
+        "name": "B5-C02 · CMS / Record / unsaved edit",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "165:797",
+        "name": "B5-C03 · CMS / Record / saving",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "165:1072",
+        "name": "B5-C04 · CMS / Record / failed save with draft retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "165:1350",
+        "name": "B5-C05 · CMS / Record / acknowledged save",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "165:1625",
+        "name": "B5-C06 · CMS / Record / offline draft retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "165:1903",
+        "name": "B5-C07 · CMS / Record / changed elsewhere",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "165:2184",
+        "name": "B5-C08 · CMS / record leave guard",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "165:2414",
+        "name": "B5-C09 · CMS / conflict field diff",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "165:2648",
+        "name": "B5-C10 · CMS / Schema fields",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "165:2917",
+        "name": "B5-C11 · CMS / used field protected, display name editable",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "165:3173",
+        "name": "B5-C12 · CMS / exact field usages",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "165:3432",
+        "name": "B5-C13 · CMS / Dynamic pages / page and SEO patterns",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "165:3693",
+        "name": "B5-C14 · CMS / URL collision blocks save",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "165:3894",
+        "name": "B5-C15 · CMS / Collection settings and safe deletion",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "165:4137",
+        "name": "B5-C16 · CMS / Sources / persisted JSON data",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "165:4419",
+        "name": "B5 CMS / source and scope handoff",
+        "w": 1440,
+        "h": 182
+      },
+      {
+        "id": "166:1751",
+        "name": "B5-S01 · CMS / Add source / paste JSON",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "166:1966",
+        "name": "B5-S02 · CMS / Add source / checked data",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "166:2184",
+        "name": "B5-S03 · CMS / Add source / invalid JSON",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "166:2400",
+        "name": "B5-S04 · CMS / Add source / top-level array refused",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "166:2616",
+        "name": "B5-S05 · CMS / Add source / duplicate key blocks entire batch",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "166:2832",
+        "name": "B5-S06 · CMS / Add source / waiting for receipt",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "166:3052",
+        "name": "B5-S07 · CMS / Add source / failed save retains data",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "166:3279",
+        "name": "B5-S08 · CMS / source added after receipt",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "166:3488",
+        "name": "B5-S09 · CMS / unsaved source guard",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "166:3723",
+        "name": "Guard · B5-S01 · CMS / Add source / paste JSON",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "166:3952",
+        "name": "Guard · B5-S03 · CMS / Add source / invalid JSON",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "166:4182",
+        "name": "Guard · B5-S04 · CMS / Add source / top-level array refused",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "166:4410",
+        "name": "Guard · B5-S05 · CMS / Add source / duplicate key blocks entire batch",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "166:4640",
+        "name": "Guard · B5-S07 · CMS / Add source / failed save retains data",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "166:4873",
+        "name": "B5-S10 · CMS / Replace data / missing-path consequence",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "166:5094",
+        "name": "B5-S11 · CMS / replacement saving",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "166:5315",
+        "name": "B5-S12 · CMS / replacement acknowledged",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "166:5522",
+        "name": "B5-S13 · CMS / source actions",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "166:5736",
+        "name": "B5-S14 · CMS / rename source by stable ID",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "166:5960",
+        "name": "B5-S15 · CMS / renamed source acknowledged",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "166:6165",
+        "name": "B5-S16 · CMS / used-source delete consequence",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "166:6386",
+        "name": "B5-S17 · CMS / Sources offline, readable cache",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "167:3871",
+        "name": "B5-T01 · CMS / Add field, all16 stored types",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "167:4135",
+        "name": "B5-T02 · CMS / new Text field",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "167:4412",
+        "name": "B5-T03 · CMS / new Long text field",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "167:4689",
+        "name": "B5-T04 · CMS / new Rich text field",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "167:4956",
+        "name": "B5-T05 · CMS / new Email field",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "167:5224",
+        "name": "B5-T06 · CMS / new URL field",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "167:5492",
+        "name": "B5-T07 · CMS / new Slug field",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "167:5760",
+        "name": "B5-T08 · CMS / new Number field",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "167:6038",
+        "name": "B5-T09 · CMS / new Date field",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "167:6306",
+        "name": "B5-T10 · CMS / new Date & time field",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "167:6574",
+        "name": "B5-T11 · CMS / new Yes/no field",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "167:6844",
+        "name": "B5-T12 · CMS / new Option field",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "167:7125",
+        "name": "B5-T13 · CMS / new Options field",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "167:7406",
+        "name": "B5-T14 · CMS / new Image field",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "167:7671",
+        "name": "B5-T15 · CMS / new File field",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "167:7936",
+        "name": "B5-T16 · CMS / new Reference field",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "167:8207",
+        "name": "B5-T17 · CMS / new Color field",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "167:8474",
+        "name": "B5-T18 · CMS / Summary field saving",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "167:8747",
+        "name": "B5-T19 · CMS / Summary save failed, draft retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "167:9021",
+        "name": "B5-T20 · CMS / Summary field acknowledged",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "167:9237",
+        "name": "B5-T21 · CMS / required-field impact",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "168:20773",
+        "name": "B5-C17 · Return to Editor / Home and Text preserved",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "168:21194",
+        "name": "B5-C18 · CMS / latest server record accepted",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "168:21408",
+        "name": "Guard · record to Fields",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "168:21620",
+        "name": "Pending · save record then Fields",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "168:21848",
+        "name": "Guard · record to Dynamic pages",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "168:22061",
+        "name": "Pending · save record then Dynamic pages",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "168:22290",
+        "name": "Guard · record to Collection settings",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "168:22504",
+        "name": "Pending · save record then Collection settings",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "168:22734",
+        "name": "Guard · record to ‹ Back to Editor · Home",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "168:22949",
+        "name": "Pending · save record then ‹ Back to Editor · Home",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "168:23180",
+        "name": "Guard · unsaved replacement paths retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "168:23417",
+        "name": "B5-S18 · CMS / rename source saving",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "168:23639",
+        "name": "B5-S19 · CMS / used source deleted after receipt",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "168:23851",
+        "name": "B5-S20 · CMS / deleting source, waiting for receipt",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "168:24061",
+        "name": "B5-S21 · CMS / Recently deleted / source recovery",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "168:24289",
+        "name": "B5-S22 · CMS / restoring original source ID",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "168:24453",
+        "name": "B5-S23 · CMS / source restored with original ID",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "170:9596",
+        "name": "B5-C19 · CMS / saved-record preview excludes draft",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "173:8463",
+        "name": "B5-D01 · Template heading / static text",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "173:9019",
+        "name": "B5-D02 · Bind text / source groups",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "173:9389",
+        "name": "B5-D03 · Bind text / compatible Blog fields",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "173:9757",
+        "name": "B5-D04 · Heading bound to this page’s Title",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "173:10329",
+        "name": "B5-D05 · Title text / binding subview",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "173:10713",
+        "name": "B5-D06 · Change bound field / preserve origin",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "173:11096",
+        "name": "B5-D07 · Bound text / contextual commands",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "173:11458",
+        "name": "B5-D08 · Unbind / visible value retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "173:12022",
+        "name": "B5-D09 · Canvas record picker / view preference",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "173:12390",
+        "name": "B5-D10 · Preview another record / same Title binding",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "173:12958",
+        "name": "B5-D11 · Empty title / fallback visible",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "173:13534",
+        "name": "B5-D12 · Loading",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "173:14104",
+        "name": "B5-D13 · Load failed",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "173:14676",
+        "name": "B5-D14 · Field missing",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "173:15249",
+        "name": "B5-D15 · Incompatible field",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "173:15823",
+        "name": "B5-D21 · Return after record save / refreshed preview",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "173:16169",
+        "name": "B5-D16 · CMS record / return to Heading binding",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "173:16399",
+        "name": "B5-D17 · CMS record / edited excerpt from binding",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "173:16635",
+        "name": "B5-D19 · CMS record / saving then return intention",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "173:16863",
+        "name": "B5-D20 · CMS record / saved new excerpt",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "173:17098",
+        "name": "B5-D18 · Record draft / fixed return to Heading",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "173:17364",
+        "name": "B5 dynamic binding / execution contract",
+        "w": 1440,
+        "h": 234
+      },
+      {
+        "id": "174:12411",
+        "name": "B5-D22 · Bound title after record save / updated excerpt",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "174:12766",
+        "name": "B5-D23 · Change source / bound origin kept",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "174:13155",
+        "name": "B5-D24 · Record picker / drafts visible",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "174:13529",
+        "name": "B5-D25 · Binding fallback / committed with Undo",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "174:13882",
+        "name": "B5-D26 · Record save / stay in record",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "174:14111",
+        "name": "B5-D27 · Record return save failed / edits retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "176:17207",
+        "name": "B5-D28 · Heading / no visibility conditions",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "176:17568",
+        "name": "B5-D29 · Condition rule / choose source",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "176:17956",
+        "name": "B5-D30 · Condition sources / CMS, page and stored JSON",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "176:18323",
+        "name": "B5-D31 · Condition source / opening_hours paths",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "176:18696",
+        "name": "B5-D32 · Stored JSON condition / false on current record",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "176:19089",
+        "name": "B5-D33 · Canvas View / show hidden elements",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "176:19451",
+        "name": "B5-D34 · Hidden ghost off / selection retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "176:19804",
+        "name": "B5-D35 · Missing source path / binding kept, output shown",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "176:20156",
+        "name": "B5-D36 · Legacy condition / inactive until reviewed",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "176:20542",
+        "name": "B5-D41 · Legacy condition explicitly activated",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "176:20912",
+        "name": "B5-D40 · Source manager / return to exact condition",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "176:21119",
+        "name": "B5-D37 · Add CMS fields / template insertion context",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "176:21523",
+        "name": "B5-D38 · CMS Excerpt inserted / bound paragraph selected",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "176:21830",
+        "name": "B5-D39 · CMS Conditions / read-only index",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "176:22052",
+        "name": "B5 Conditions and Add / acceptance",
+        "w": 1440,
+        "h": 182
+      },
+      {
+        "id": "177:16471",
+        "name": "B5-D42 · Heading / Dynamic bindings summary",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "177:16850",
+        "name": "B5-D43 · Return cancelled / record save still pending",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "177:17091",
+        "name": "B5-D44 · Record picker / second record retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "177:17469",
+        "name": "B5-D45 · Missing path / repair chooser keeps original rule",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "177:17866",
+        "name": "B5-D46 · Condition repaired / existing rule now true",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "178:17224",
+        "name": "B5-D47 · Binding summary after record save",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "178:17605",
+        "name": "B5-D48 · Rebind retained static text / source groups",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "178:17995",
+        "name": "B5-D49 · Rebind retained text / Blog fields",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "180:17867",
+        "name": "B5-D50 · CMS record / 1280×640",
+        "w": 1280,
+        "h": 640
+      },
+      {
+        "id": "180:18105",
+        "name": "B5-D51 · Narrow record / live unsaved preview",
+        "w": 1280,
+        "h": 640
+      },
+      {
+        "id": "180:18354",
+        "name": "B5-D52 · Bound Heading / 1280×640",
+        "w": 1280,
+        "h": 640
+      },
+      {
+        "id": "180:18742",
+        "name": "B5-D53 · Narrow View / record preview controls",
+        "w": 1280,
+        "h": 640
+      },
+      {
+        "id": "182:18493",
+        "name": "B5-D54 · Content / Active condition",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "182:18901",
+        "name": "B5-D55 · Content / Inactive legacy condition",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "182:19295",
+        "name": "B5-D56 · Content / Activated legacy condition",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "182:19702",
+        "name": "B5-D57 · Content / Repaired condition",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "182:20108",
+        "name": "B5-D58 · Content / Missing path condition",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "182:20512",
+        "name": "B5-D59 · Content / Hidden ghost off",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "182:20917",
+        "name": "B5-D60 · Edit active condition / retain rule",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "182:21319",
+        "name": "B5-D61 · Condition removed / Undo restores rule",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "183:20735",
+        "name": "B5-D62 · Compact CMS navigation / record draft retained",
+        "w": 1280,
+        "h": 640
+      },
+      {
+        "id": "183:20974",
+        "name": "B5-D63 · Compact CMS / saved preview excludes draft",
+        "w": 1280,
+        "h": 640
+      },
+      {
+        "id": "187:20406",
+        "name": "B5-D64 · Team Dynamic pages / no collection page",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "187:20616",
+        "name": "B5-D65 · Create collection page / Team Profile",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "187:20858",
+        "name": "B5-D66 · Collection page / creating document and link",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "187:21035",
+        "name": "B5-D67 · Page created / collection link not saved",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "187:21245",
+        "name": "B5-D68 · Retry collection link / existing page retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "187:21418",
+        "name": "B5-D69 · Team profile / generated ordinary page",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "187:21853",
+        "name": "B5-D70 · Team Dynamic pages / linked template",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "187:22071",
+        "name": "B5-D71 · Generated page remains after link failure",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "187:22375",
+        "name": "B5-D72 · Generated page removed / saved link needs repair",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "187:22586",
+        "name": "B5-D73 · Generated page Undo / previous editor page retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "187:23017",
+        "name": "B5 collection-page generation / two-owner acceptance",
+        "w": 1440,
+        "h": 182
+      },
+      {
+        "id": "189:21741",
+        "name": "B5-D74 · Add / generated collection lists on Home",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "189:22181",
+        "name": "B5-D75 · List of Blog / generated editable cards",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "189:22915",
+        "name": "B5-D76 · List filter / choose category",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "189:23428",
+        "name": "B5-D77 · List filtered / 6 of14 Design records",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "189:24174",
+        "name": "B5-D78 · Empty list / editable No items slot",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "189:24890",
+        "name": "B5-D79 · List / three sort keys",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "189:25445",
+        "name": "B5-D80 · List pagination / three static pages",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "189:25985",
+        "name": "B5-D81 · Pagination URL collision / publish blocked",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "189:26518",
+        "name": "B5-D82 · Related list / template query and pagination disabled",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "189:27274",
+        "name": "B5-D83 · First card / template editing and record link",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "189:27792",
+        "name": "B5-D84 · Card record link / Behavior owner",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "189:28227",
+        "name": "B5-D85 · Blog records / exact list return",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "189:28673",
+        "name": "B5 collection lists / source and state contract",
+        "w": 1440,
+        "h": 182
+      },
+      {
+        "id": "191:31132",
+        "name": "B5-D86 · Recreate missing collection page / exact Cancel",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "193:25438",
+        "name": "B5-D87 · Team card / no page per record",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "193:25921",
+        "name": "B5-D88 · Create Team page / Link-row origin",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "193:26469",
+        "name": "B5-D89 · Link-row creation / pending at origin",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "193:26952",
+        "name": "B5-D90 · Link-row creation / returned to same Card",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "193:27447",
+        "name": "B5-D91 · Team link / choose generated record page",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "193:27938",
+        "name": "B5-D92 · Team card linked / ordinary document binding",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "193:28433",
+        "name": "B5-D93 · Link-row page created / collection link failed",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "193:28917",
+        "name": "B5 Link-row generation / distinct origin handoff",
+        "w": 1440,
+        "h": 182
+      },
+      {
+        "id": "195:27443",
+        "name": "B5-D94 · Related list / record picker keeps query",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "195:28058",
+        "name": "B5-D95 · Related list / second record preview",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "195:28651",
+        "name": "B5-D96 · Related record picker / second preview retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "195:29268",
+        "name": "B5-D97 · Retry only Team link / existing page retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "195:29753",
+        "name": "B5-D98 · Generated page / return to originating Card",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "197:28410",
+        "name": "B5-D99 · Team Card / Content before page creation",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "197:28869",
+        "name": "B5-D100 · Team Card / Content after page creation",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "197:29333",
+        "name": "B5-D101 · Team Card / Content binding index",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "199:37199",
+        "name": "B6-A01 · Assets / selected asset",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "199:37822",
+        "name": "B6-A02 · Asset usage / known placements",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "199:38433",
+        "name": "B6-A03 · Asset version family",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "199:39042",
+        "name": "B6-A04 · Upload menu",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "199:39336",
+        "name": "B6-A05 · Upload / transfer in progress",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "199:39965",
+        "name": "B6-A06 · Upload / registering asset",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "199:40594",
+        "name": "B6-A07 · Upload / registration failed",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "199:41227",
+        "name": "B6-A08 · Upload / acknowledged saved",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "199:41851",
+        "name": "B6-A09 · Replace across site / impact review",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "199:42134",
+        "name": "B6-A10 · Replace blocked / no partial changes",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "199:42418",
+        "name": "B6-A11 · Replaced page images / one document undo",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "199:42695",
+        "name": "B6-A12 · Used asset deletion / interim consequence",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "199:42990",
+        "name": "B6-A13 · Asset deleted / 8-second undo grace",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "199:43595",
+        "name": "B6-A14 · Selected image / exact replacement origin",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "199:44095",
+        "name": "B6-A15 · Replace picker / captured target",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "199:44414",
+        "name": "B6-A16 · Replace picker / choice without mutation",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "199:44733",
+        "name": "B6-A17 · Replacement applied / selection and Layers restored",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "199:45018",
+        "name": "B6-A18 · Captured image target locked / asset retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "199:45286",
+        "name": "B6 Assets / flow and implementation handoff",
+        "w": 1440,
+        "h": 354
+      },
+      {
+        "id": "200:31384",
+        "name": "B6-A19 · Asset actions menu",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "200:31693",
+        "name": "B6-A20 · Image editor / save a new version",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "200:32049",
+        "name": "B6-A21 · Image version / saving",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "200:32240",
+        "name": "B6-A22 · New image version saved / optional page replacement",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "200:32519",
+        "name": "B6-A23 · Assets Fonts / site availability versus personal files",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "200:32832",
+        "name": "B6-A24 · Text font / Manage site fonts origin",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "200:33295",
+        "name": "B6-A25 · Manage site fonts / quick selection",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "200:33697",
+        "name": "B6-A26 · Fonts management / return to exact Inspector picker",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "200:33875",
+        "name": "B6-A27 · Place asset / choose insertion target",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "200:34170",
+        "name": "B6-A28 · Insert image / captured Selected work position",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "200:34422",
+        "name": "B6-A29 · Inserted asset / new sibling selected",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "201:32973",
+        "name": "B6-A30 · New version 3 / review page replacement",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "201:33257",
+        "name": "B6-A31 · Version 3 replacement acknowledged",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "201:33532",
+        "name": "B6-A32 · Assets at 1280 × 640 / navigation collapsed",
+        "w": 1280,
+        "h": 640
+      },
+      {
+        "id": "201:33823",
+        "name": "B6-A33 · Compact Assets navigation",
+        "w": 1280,
+        "h": 640
+      },
+      {
+        "id": "201:34124",
+        "name": "B6-A34 · Replacement target selection / retained chosen asset",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "203:33565",
+        "name": "B6-B01 · Brand / colors",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "203:34125",
+        "name": "B6-B02 · Semantic primary token / exact edit target",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "203:34679",
+        "name": "B6-B03 · Token edit committed / applied locally",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "203:34892",
+        "name": "B6-B04 · Invalid color / retained local field draft",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "203:35106",
+        "name": "B6-B05 · Pending Brand save / leave guard",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "203:35333",
+        "name": "B6-B06 · Brand token / acknowledged saved",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "203:35546",
+        "name": "B6-B07 · Brand starters / preview before apply",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "203:36082",
+        "name": "B6-B08 · Starter preview / no writes yet",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "203:36613",
+        "name": "B6-B09 · Starter apply / creating restore point",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "203:36801",
+        "name": "B6-B10 · Starter applied / one shared Undo",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "203:37025",
+        "name": "B6-B11 · Starter checkpoint failed / no changes",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "203:37214",
+        "name": "B6-B12 · Dark mode / paired values and one owner",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "203:37790",
+        "name": "B6-B13 · Enable Auto / impact preview",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "203:38036",
+        "name": "B6-B14 · Dark mode Auto / applied locally",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "203:38272",
+        "name": "B6-B15 · Brand Import and export",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "203:38814",
+        "name": "B6-B16 · Import dry-run / fidelity and preview",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "203:39366",
+        "name": "B6-B17 · Import / local recovery notice",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "203:39584",
+        "name": "B6-B18 · Brand checks / exact finding actions",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "203:40130",
+        "name": "B6-B19 · Connect to Brand colors / captured scope",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "203:40662",
+        "name": "B6-B20 · Connected colors / one remaining finding",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "203:40929",
+        "name": "B6 Brand / checkpoint and interaction handoff",
+        "w": 1440,
+        "h": 330
+      },
+      {
+        "id": "207:38460",
+        "name": "B6-B21 · Typography / families and font-size tokens",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "207:38727",
+        "name": "B6-B22 · Spacing / presets and steps",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "207:38995",
+        "name": "B6-B23 · Other kinds / eleven token pages",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "207:39217",
+        "name": "B6-B24 · Radius / add, rename and delete",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "207:39439",
+        "name": "B6-B25 · Radius / invalid value stays local",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "207:39789",
+        "name": "B6-B26 · Type styles · Presets / read-only catalogue",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "207:40046",
+        "name": "B6-B27 · Classes / reusable class list",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "207:40289",
+        "name": "B6-B28 · Delete color / replace before delete",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "207:40532",
+        "name": "B6-B29 · Delete blocked / usage unknown",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "207:40771",
+        "name": "B6-B30 · Widely used token / first-edit reach note",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "207:40997",
+        "name": "B6-B31 · Opened from Inspector / Back to Heading",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "210:36861",
+        "name": "B6-B32 · From logo or URL / starter source",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "210:37078",
+        "name": "B6-B33 · From logo or URL / reading website",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "210:37301",
+        "name": "B6-B34 · From logo or URL / site refused",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "210:37520",
+        "name": "B6-B35 · From logo or URL / timed out",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "210:37740",
+        "name": "B6-B36 · From logo or URL / preview before apply",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "210:37943",
+        "name": "B6-B37 · From logo or URL / applied with one Undo",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "210:38222",
+        "name": "B6-B38 · From logo or URL / offline",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "210:38443",
+        "name": "B6-B39 · Restore points / choose a checkpoint",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "210:38670",
+        "name": "B6-B40 · Restore point restored / one Undo",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "210:38897",
+        "name": "B6-B41 · Review changes / revert one change",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "212:37895",
+        "name": "B6-B42 · Brand loading / skeleton and disabled history",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "212:38135",
+        "name": "B6-B43 · Brand offline / edits apply locally",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "212:38369",
+        "name": "B6-B44 · Brand save failed / edit kept, retry in status",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "212:38600",
+        "name": "B6-B45 · Leave Brand after failed save / guard",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "212:38857",
+        "name": "B6-B46 · Brand update held / read-only, not a permission",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "212:39093",
+        "name": "B6-B47 · No brand set / first run",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "212:39331",
+        "name": "B6-B48 · Export tokens / CSS, JSON or Tailwind",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "212:39590",
+        "name": "B6-B49 · Import applied / counts match dry-run",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "212:39840",
+        "name": "B6-B50 · Discard preview / another preview requested",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "212:40091",
+        "name": "B6-B51 · Brand at 1280 × 640 / navigation and preview collapsed",
+        "w": 1280,
+        "h": 640
+      },
+      {
+        "id": "212:40324",
+        "name": "B6-B52 · Compact Brand navigation open",
+        "w": 1280,
+        "h": 640
+      },
+      {
+        "id": "212:40564",
+        "name": "B6-B53 · Compact Brand / preview shown instead of list",
+        "w": 1280,
+        "h": 640
+      },
+      {
+        "id": "213:39075",
+        "name": "B6 Brand completion / B21–B53 handoff",
+        "w": 1440,
+        "h": 394
+      },
+      {
+        "id": "215:43301",
+        "name": "B6-K01 · Add / Components › door",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "215:43588",
+        "name": "B6-K02 · Components / This site with summary",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "215:43978",
+        "name": "B6-K03 · Components / This page section",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "215:44300",
+        "name": "B6-K04 · Components / Component library, not on this site",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "215:44647",
+        "name": "B6-K05 · Hero card / Review update v4 → v5",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "215:45056",
+        "name": "B6-K06 · Hero card / v5 applied, one receipt",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "215:45456",
+        "name": "B6-K07 · Project card / local changes, share update (Admin)",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "215:45851",
+        "name": "B6-K08 · Project card / local changes, Editor role",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "215:46247",
+        "name": "B6-K09 · Create component / scope chosen before commit",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "215:46667",
+        "name": "B6-K10 · Create component / duplicate name warning",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "215:47088",
+        "name": "B6-K11 · Create component / at capacity",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "217:40171",
+        "name": "B6-K12 · Hero card / Update from selection review",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "217:40475",
+        "name": "B6-K13 · Editor / choose source on canvas",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "217:40648",
+        "name": "B6-K14 · Editor / source chosen, return to review",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "217:40825",
+        "name": "B6-K15 · Hero card / review with chosen source",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "217:41149",
+        "name": "B6-K16 · Hero card updated from selection / Undo",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "217:41451",
+        "name": "B6-K17 · Detach all / Undo receipt, no dialog",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "217:41750",
+        "name": "B6-K19 · Components / Recently deleted with bulk selection",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "217:42047",
+        "name": "B6-K18 · Delete component / Undo and Recently deleted",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "217:42370",
+        "name": "B6-K20 · Delete permanently / typed confirm (Admin)",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "217:42594",
+        "name": "B6-K21 · Hero card / Used on with exact Locate",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "217:42918",
+        "name": "B6-K22 · Layers / instance link to main component",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "217:43115",
+        "name": "B6-K23 · Components offline / server actions need a connection",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "217:43415",
+        "name": "B6-K24 · Component library failed to load / Retry",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "217:43651",
+        "name": "B6-K25 · This page / no components yet",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "217:43947",
+        "name": "B6-K26 · Long component name / truncation and tooltip",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "217:44243",
+        "name": "B6-K27 · Components at 1280 × 640 / navigation collapsed",
+        "w": 1280,
+        "h": 640
+      },
+      {
+        "id": "219:41687",
+        "name": "B6-B54 · Radius / row menu, rename and delete",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "219:41918",
+        "name": "B6-B55 · Radius / inline rename with validation",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "219:42151",
+        "name": "B6-B56 · Brand failed to load / server",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "219:42387",
+        "name": "B6-B57 · Brand not loaded / offline",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "219:42625",
+        "name": "B6-B58 · Leave Brand offline / pending save guard",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "219:42880",
+        "name": "B6-B59 · Usage can’t be counted / Retry on cards",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "219:43113",
+        "name": "B6-B60 · Generate scale / preview before apply",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "219:43368",
+        "name": "B6-B61 · Dark preview off / reason shown",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "219:43600",
+        "name": "B6-B62 · Undo tooltip / names the last action",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "220:42592",
+        "name": "B6-K28 · Export Hero card / blocked by inaccessible image",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "220:42920",
+        "name": "B6-K29 · Export Hero card / ready to download",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "220:43248",
+        "name": "B6-K30 · Export / download started",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "220:43545",
+        "name": "B6-K31 · Import package / choose file",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "220:43877",
+        "name": "B6-K32 · Import package / roots and destination",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "220:44222",
+        "name": "B6-K33 · Import package / check before any write",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "220:44560",
+        "name": "B6-K34 · Import package / map styles and CMS fields",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "220:44900",
+        "name": "B6-K35 · Import package / review before import",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "220:45240",
+        "name": "B6-K36 · Import package / importing, close keeps it running",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "220:45566",
+        "name": "B6-K37 · Import package / outcome unknown, checking receipt",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "220:45883",
+        "name": "B6-K38 · Import package / receipt with Undo or review",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "220:46207",
+        "name": "B6-K39 · Imported, but Insert failed / retry insert",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "221:43842",
+        "name": "B6 Components / K01–K39 handoff",
+        "w": 1440,
+        "h": 438
+      },
+      {
+        "id": "222:43842",
+        "name": "B6-T01 · Templates / catalogue, Creating About",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "222:44210",
+        "name": "B6-T02 · Templates / Creating name already used",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "222:44591",
+        "name": "B6-T03 · Template preview / Create page primary",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "222:44984",
+        "name": "B6-T04 · Template preview / Pro template on Free",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "222:45381",
+        "name": "B6-T05 · Template preview / Pro included in trial",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "222:45775",
+        "name": "B6-T06 · Create page / running, cancel only before import",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "222:46181",
+        "name": "B6-T07 · Create page / taking longer, keep waiting",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "222:46586",
+        "name": "B6-T08 · About created / Page settings and Connect to Brand colors",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "222:46761",
+        "name": "B6-T09 · Applied with import report / Keep or Undo",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "222:47163",
+        "name": "B6-T10 · Create page failed / nothing was changed",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "222:47567",
+        "name": "B6-T11 · Templates / Replacing Home, backup first",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "223:44891",
+        "name": "B6-T12 · Replace Home / consequence confirm, backup on",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "223:45184",
+        "name": "B6-T13 · Backup failed / choose how to continue",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "223:45479",
+        "name": "B6-T14 · Replace target changed / choose it again",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "223:45775",
+        "name": "B6-T15 · Templates / Saved filter with card menu",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "223:46043",
+        "name": "B6-T16 · Saved template deleted / Undo and Recently deleted",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "223:46314",
+        "name": "B6-T17 · Save page as template / name and description",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "223:46516",
+        "name": "B6-T18 · Templates offline / apply needs a connection",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "223:46702",
+        "name": "B6-T19 · Viewer / actions disabled with reason",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "223:46886",
+        "name": "B6-T20 · Role unknown / checking access",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "223:47068",
+        "name": "B6-T21 · No templates match / clear search",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "223:47331",
+        "name": "B6-T22 · Saved filter empty / how to save",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "223:47597",
+        "name": "B6-T23 · Templates at 1280 × 640 / Show filter in header",
+        "w": 1280,
+        "h": 640
+      },
+      {
+        "id": "223:47858",
+        "name": "B6 Templates / T01–T23 handoff",
+        "w": 1440,
+        "h": 330
+      },
+      {
+        "id": "228:46016",
+        "name": "B6-K40 · Components opened from Layers / Back to Layers",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "228:46316",
+        "name": "B6-K41 · Row menu / Insert, Rename, Duplicate, Export, Delete",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "228:46627",
+        "name": "B6-K42 · Restored from Recently deleted / instances re-linked",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "251:73352",
+        "name": "B6-T24 · Recently deleted / saved-template recovery",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "251:73542",
+        "name": "B6-T25 · Saved-template restore / awaiting server acknowledgment",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "251:73732",
+        "name": "B6-T26 · Saved template restored / same identity and counts",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "251:73919",
+        "name": "B6-T27 · Saved-template restore failed / retry retains identity",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "251:74110",
+        "name": "B6-T28 · Recently deleted offline / writes disabled",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "251:74301",
+        "name": "B6-T29 · Recently deleted / empty",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "251:74485",
+        "name": "B6-T30 · Delete template permanently / typed confirmation",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "251:74692",
+        "name": "B6-T31 · Delete template permanently / exact name entered",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "251:74899",
+        "name": "B6-T32 · Permanent deletion / awaiting acknowledgment",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "251:75097",
+        "name": "B6-T33 · Permanent deletion acknowledged / recovery list empty",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "251:75291",
+        "name": "B6-T34 · Partial template import kept / explicit omitted content",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "251:75461",
+        "name": "B6-T35 · Partial import Undo / removing created page and navigation",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "251:75655",
+        "name": "B6-T36 · Partial import undone / template context retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "251:75920",
+        "name": "B6 · Template recovery and import outcomes · 2026-10-20",
+        "w": 1440,
+        "h": 242
+      },
+      {
+        "id": "254:74075",
+        "name": "B5-N01 · CMS / New Events collection / empty records",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "254:74310",
+        "name": "B5-N02 · CMS / New Events collection / starter fields",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "254:74551",
+        "name": "B5-N03 · New collection / name and starter schema",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "254:75060",
+        "name": "B5-N04 · New collection / name already used",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "254:75572",
+        "name": "B5-N05 · New collection / creating",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "254:76081",
+        "name": "B5-N06 · New collection / failure retains inputs",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "254:76593",
+        "name": "B5-N07 · New collection / page per record selected",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "254:77105",
+        "name": "B5-N08 · CMS / Collection created / page template still missing",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "254:77338",
+        "name": "B5-N09 · Events created / collection page setup",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "254:77544",
+        "name": "B5-N10 · Events collection page / page creation pending",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "254:77717",
+        "name": "B5-N11 · CMS / Events / collection page linked",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "254:77963",
+        "name": "B5-M01 · CSV import / choose file",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "254:78146",
+        "name": "B5-M02 · CSV import / server preview pending",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "254:78324",
+        "name": "B5-M03 · CSV import / preview and column mapping",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "254:78534",
+        "name": "B5-M04 · CSV import / no fields mapped",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "254:78740",
+        "name": "B5-M05 · CSV import / rows submitted",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "254:78920",
+        "name": "B5-M06 · CSV import / 2 saved, 1 refused",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "254:79102",
+        "name": "B5-M07 · CSV import / all 3 acknowledged",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "254:79282",
+        "name": "B5-M08 · CSV preview / file refused before import",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "254:79464",
+        "name": "B5-M09 · CSV import / response lost, inspect records",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "254:79645",
+        "name": "B5-M10 · JSON records import / choose file",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "254:79829",
+        "name": "B5-M11 · JSON records import / invalid syntax",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "254:80011",
+        "name": "B5-M12 · JSON records import / wrong top-level shape",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "254:80193",
+        "name": "B5-M13 · JSON records import / per-row progress",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "254:80371",
+        "name": "B5-M14 · JSON records import / skipped rows named",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "254:80553",
+        "name": "B5-M15 · CMS / Events / imported records acknowledged",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "254:80790",
+        "name": "B5-M16 · CMS / Events / imported records acknowledged",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "254:81032",
+        "name": "B5-M17 · CMS / Events / imported records acknowledged",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "254:81264",
+        "name": "B5-M19 · CMS / Events / checking records after unknown import",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "254:81490",
+        "name": "B5-N12 · CMS / Events / new draft record",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "254:81738",
+        "name": "B5-N13 · Events / new record awaiting acknowledgment",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "254:81923",
+        "name": "B5-N14 · Events / new record leave guard",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "254:82143",
+        "name": "B5-M18 · Events collection menu / imports and planned providers",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "254:82329",
+        "name": "B5 · Collection creation and record import outcomes · 2026-10-20",
+        "w": 1440,
+        "h": 262
+      },
+      {
+        "id": "255:81856",
+        "name": "B5-N15 · Creating Events / page-per-record option retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:51073",
+        "name": "B5-F21 · CMS / Fields / stored values and usage",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:51318",
+        "name": "B5-F22 · Change Reading time type",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:51516",
+        "name": "B5-F23 · Clear Reading time values?",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:51711",
+        "name": "B5-F24 · Clear Reading time values?",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:51906",
+        "name": "B5-F25 · Converting Reading time…",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:52092",
+        "name": "B5-F37 · Clearing Reading time values…",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:52278",
+        "name": "B5-F26 · CMS / Reading time / conversion acknowledged",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:52512",
+        "name": "B5-F27 · Couldn’t change Reading time",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:52702",
+        "name": "B5-F28 · Type change unavailable",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:52890",
+        "name": "B5-F29 · Delete Summary?",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:53085",
+        "name": "B5-F30 · Delete Summary?",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:53280",
+        "name": "B5-F31 · Deleting Summary…",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:53466",
+        "name": "B5-F32 · Summary can’t be deleted yet",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:53654",
+        "name": "B5-F33 · Make Subtitle required?",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:53846",
+        "name": "B5-F34 · Default Subtitle value",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:54041",
+        "name": "B5-F35 · CMS / Subtitle / required for new records",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:54274",
+        "name": "B5-F36 · Saving Subtitle…",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:54485",
+        "name": "B5-R21 · CMS / Recently deleted / all object types",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:54735",
+        "name": "B5-R22 · Choose a new slug",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:54936",
+        "name": "B5-R23 · Restoring Spring launch…",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:55127",
+        "name": "B5-R24 · CMS / Spring launch / exact ID restored",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:55358",
+        "name": "B5-R25 · Couldn’t restore Spring launch",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:55553",
+        "name": "B5-R26 · CMS / Recently deleted / interim record recovery",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:55771",
+        "name": "B5-R27 · Restore as a new record?",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:55939",
+        "name": "B5-R28 · Creating recovered copy…",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:56098",
+        "name": "B5-R29 · Restoring Summary…",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:56289",
+        "name": "B5-R30 · Restoring Archive…",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:56480",
+        "name": "B5-R31 · CMS / Summary / field restored",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:56704",
+        "name": "B5-R32 · CMS / Archive / collection restored",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:56930",
+        "name": "B5-R33 · CMS / Recently deleted / empty",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:57145",
+        "name": "B5-R34 · CMS / Recently deleted / loading",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:57359",
+        "name": "B5-R35 · CMS / Recently deleted / load failure",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:57589",
+        "name": "B5-K21 · CMS / Collection settings / URL impact",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:57832",
+        "name": "B5-K22 · Blog is still in use",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:58023",
+        "name": "B5-K23 · CMS / Blog / usages before deletion",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:58253",
+        "name": "B5-K24 · Delete Blog?",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:58446",
+        "name": "B5-K25 · Delete Blog?",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:58639",
+        "name": "B5-K26 · Deleting Blog…",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:58823",
+        "name": "B5-K27 · Couldn’t delete Blog",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:59011",
+        "name": "B5-K28 · Delete Blog? · recovery unavailable",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:59204",
+        "name": "B5-K29 · CMS Blog slug / Site settings Redirects exact handoff",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "257:59452",
+        "name": "B5 · Stored-data protection and recovery review · 2026-10-20",
+        "w": 1440,
+        "h": 286
+      },
+      {
+        "id": "259:89873",
+        "name": "Return · CMS protection and recovery to Editor Home",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "259:90261",
+        "name": "B5-F38 · Fields / converted Text retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "259:90449",
+        "name": "B5-F39 · Fields / Summary deleted",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "259:90634",
+        "name": "B5-F40 · Fields / Summary restored values retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "259:90820",
+        "name": "B5-R36 · Recently deleted / Spring launch restored",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "259:91009",
+        "name": "B5-R37 · Recently deleted / Summary restored",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "259:91198",
+        "name": "B5-R38 · Recently deleted / Archive restored",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "259:91389",
+        "name": "B5-R39 · Recently deleted / Availability restored",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "259:91582",
+        "name": "B5-R40 · Archive / restored Fields",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "259:91750",
+        "name": "B5-R41 · Archive / restored Collection settings",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "259:91934",
+        "name": "B5-R42 · Restoring Availability / pending",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "259:92134",
+        "name": "B5-R43 · CMS / Availability / source restored",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "259:92373",
+        "name": "B5-R44 · Recently deleted / Type filter",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "259:92582",
+        "name": "B5-R45-Record · Recently deleted / Records",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "259:92794",
+        "name": "B5-R45-Field · Recently deleted / Fields",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "259:93006",
+        "name": "B5-R45-Collection · Recently deleted / Collections",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "259:93218",
+        "name": "B5-R45-Source · Recently deleted / Sources",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "259:93434",
+        "name": "B5-R46 · Recently deleted / two selected",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "259:93668",
+        "name": "B5-R47 · Recently deleted / bulk restore pending",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "259:93901",
+        "name": "B5-R48 · Recently deleted / bulk partial result",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "259:94099",
+        "name": "B5-R49 · Recently deleted / search no results",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "259:94362",
+        "name": "B5-K30 · Blog slug redirects / saving",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "259:94578",
+        "name": "B5-K31 · Blog slug / consequential change",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "259:94780",
+        "name": "B5-K32 · Blog slug / saving",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "259:94976",
+        "name": "B5-K33 · Blog slug / failed save draft retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "259:95177",
+        "name": "B5-K34 · Blog slug / acknowledged",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "259:95361",
+        "name": "B5-K35 · Redirects draft / saved Blog slug origin",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "259:95573",
+        "name": "B5-F41 · Fields / 20 values cleared acknowledged",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "259:95758",
+        "name": "B5-F42 · Subtitle / new-record requirement saved",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "259:95932",
+        "name": "B5-F43 · Subtitle / default values saved",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "259:96112",
+        "name": "B5 · Recovery continuity review · 2026-10-20",
+        "w": 1440,
+        "h": 546
+      },
+      {
+        "id": "260:235689",
+        "name": "B5-V01 · CMS / Site variables / list and scope",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "260:235928",
+        "name": "B5-V02 · CMS / Site variables / empty",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "260:236147",
+        "name": "B5-V03 · CMS / Add site variable",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "260:236411",
+        "name": "B5-V04 · CMS / Add site variable",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "260:236677",
+        "name": "B5-V05 · CMS / Add site variable",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "260:236943",
+        "name": "B5-V06 · CMS / Site variable / added and saving",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "260:237185",
+        "name": "B5-V07 · Site variable / save acknowledged",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "260:237363",
+        "name": "B5-V08 · Site variable / save failed draft retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "260:237547",
+        "name": "B5-V09 · Site variable / offline local draft retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "260:237728",
+        "name": "B5-V10 · phone / row actions",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "260:237910",
+        "name": "B5-V11 · phone / edit value",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "260:238091",
+        "name": "B5-V12 · phone / value applied and saving",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "260:238267",
+        "name": "B5-V13 · CMS / phone / placeholder usages",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "260:238513",
+        "name": "B5-V14 · phone / rename with usage impact",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "260:238707",
+        "name": "B5-V15 · contact_phone / renamed and saving",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "260:238886",
+        "name": "B5-V16 · phone / delete consequence",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "260:239074",
+        "name": "B5-V17 · phone / removed with document Undo",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "260:239253",
+        "name": "B5-V18 · phone / Undo restored value",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "260:239443",
+        "name": "B5 · Site variables review · 2026-10-20",
+        "w": 1440,
+        "h": 438
+      },
+      {
+        "id": "261:59913",
+        "name": "B5-R50-Record · Recently deleted / one record selected",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "261:60139",
+        "name": "B5-R50-Field · Recently deleted / one field selected",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "261:60365",
+        "name": "B5-R50-Collection · Recently deleted / one collection selected",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "261:60591",
+        "name": "B5-R50-Source · Recently deleted / one source selected",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "261:60821",
+        "name": "B5-R51 · Bulk partial / record slug conflict with Summary restored",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "261:61023",
+        "name": "B5-R52 · Bulk partial / record restoration pending",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "261:61215",
+        "name": "B5-R53 · Recently deleted / Summary and Spring launch restored",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "261:61396",
+        "name": "B5-R54 · Bulk partial / both items restored",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "261:61569",
+        "name": "B5 · Bulk recovery retained results · 2026-10-20",
+        "w": 1440,
+        "h": 166
+      }
+    ]
+  },
+  {
+    "id": "3:7",
+    "name": "06 · Site delivery",
+    "frames": [
+      {
+        "id": "233:2",
+        "name": "B8-PB01 · Publish / one blocking check, reason under CTA",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "233:649",
+        "name": "B8-PB02 · Publish / ready, tips only",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "233:1237",
+        "name": "B8-PB03 · Publish / What will change subview",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "233:1802",
+        "name": "B8-PB04 · Review and publish dialog / boxes not ticked",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "233:2418",
+        "name": "B8-PB05 · Review and publish / Editor, stale approval",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "233:3034",
+        "name": "B8-PB06 · Review and publish / Admin ticked, Publish enabled",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "233:3648",
+        "name": "B8-PB07 · Publishing / step 2 of 3, topbar progress",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "233:4197",
+        "name": "B8-PB08 · Publishing / queued, Admin can cancel",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "233:4748",
+        "name": "B8-PB09 · Published / live with See what changed",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "233:5303",
+        "name": "B8-PB10 · Publish failed / specific reason, live site unchanged",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "233:5851",
+        "name": "B8-PB11 · Start timed out / checking before any retry",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "233:6396",
+        "name": "B8-PB12 · Lost track of this publish / check status",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "233:6942",
+        "name": "B8-PB13 · Live but not recorded / check status, no redeploy",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "233:7488",
+        "name": "B8-PB14 · Simulation mode / nothing deployed",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "233:8034",
+        "name": "B8-PB15 · Publish gate / changes requested, open Review",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "233:8594",
+        "name": "B8-PB16 · Password protection on Free / blocking with two ways out",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "233:9161",
+        "name": "B8-PB17 · Remove protection and publish / consequence confirm",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "233:9714",
+        "name": "B8-PB18 · Unpublish site / typed confirm, Admin only",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "233:10270",
+        "name": "B8-PB19 · Viewer / read-only, disabled with reason",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "233:10827",
+        "name": "B8-PB20 · Publishing not switched on / flag off",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "233:11377",
+        "name": "B8-PB21 · Offline / needs a connection",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "233:11934",
+        "name": "B8-PB22 · Site over the Free limit / publish locked",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "233:12491",
+        "name": "B8-PB23 · Checks loading / nothing actionable while unknown",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "233:13038",
+        "name": "B8 Publish / PB01–PB23 handoff",
+        "w": 1440,
+        "h": 278
+      },
+      {
+        "id": "236:4951",
+        "name": "B8-EX01 · Export site / Preview tab, ZIP",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "236:5523",
+        "name": "B8-EX02 · Export site / Code tab with Copy",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "236:6085",
+        "name": "B8-EX03 · Export site / Options, Free custom-code note",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "236:6656",
+        "name": "B8-EX04 · Export site / preparing, button busy",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "236:7208",
+        "name": "B8-EX05 · Export site / ready only after the file exists",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "236:7760",
+        "name": "B8-EX06 · Export site / failed with reason, options kept",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "236:8312",
+        "name": "B8-EX07 · Export site / offline, Preview and Code still work",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "236:8864",
+        "name": "B8-EX08 · Export site / preview failed to load",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "236:9417",
+        "name": "B8-IS01 · Issues / blocking first, Fix opens the exact target",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "236:9961",
+        "name": "B8-IS02 · Fix opened the target / Back to Issues",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "236:10492",
+        "name": "B8-IS03 · Back in Issues / one fixed, list updated",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "236:11031",
+        "name": "B8 Export and Issues / handoff",
+        "w": 1440,
+        "h": 214
+      },
+      {
+        "id": "237:8258",
+        "name": "B8-R01 · Review task / round card, filters, comments by page",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "237:8840",
+        "name": "B8-R02 · Review task / link expired, re-send",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "237:9422",
+        "name": "B8-R03 · Comment located / Edit Logo, Back to Review",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "237:9951",
+        "name": "B8-R04 · Reply to the client / audience To Lena",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "237:10534",
+        "name": "B8-R05 · Changes requested / Send Round 3 footer",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "237:11120",
+        "name": "B8-R06 · Unsent reply / leave without saving guard",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "237:11712",
+        "name": "B8-R07 · Send round / preview render failed, nothing sent",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "237:12304",
+        "name": "B8-R08 · Client page / desktop with pins and comments",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "237:12354",
+        "name": "B8-R09 · Client page / add comment, anchored composer",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "237:12411",
+        "name": "B8-R10 · Client page / approve with 6-digit code",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "237:12474",
+        "name": "B8-R11 · Client page / offline, comment kept",
+        "w": 1440,
+        "h": 940
+      },
+      {
+        "id": "237:12524",
+        "name": "B8-R12 · Client page / link revoked",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "237:12576",
+        "name": "B8-R13 · Client page / tablet, comments as a sheet",
+        "w": 834,
+        "h": 1112
+      },
+      {
+        "id": "237:12609",
+        "name": "B8-R14 · Client page / phone 375, sticky actions",
+        "w": 375,
+        "h": 812
+      },
+      {
+        "id": "237:12639",
+        "name": "B8 Review / R01–R14 handoff",
+        "w": 1440,
+        "h": 234
+      },
+      {
+        "id": "238:9980",
+        "name": "B8-S01 · Site settings / Overview with plan card",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "238:10283",
+        "name": "B8-S02 · General / unsaved changes in footer",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "238:10586",
+        "name": "B8-S03 · General / saving",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "238:10889",
+        "name": "B8-S04 · General / couldn’t save, edits kept",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "238:11192",
+        "name": "B8-S05 · General / offline, save needs a connection",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "238:11495",
+        "name": "B8-S06 · Leave without saving / Keep editing default",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "238:11810",
+        "name": "B8-S07 · Languages / default staged, locales saved now",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "238:12118",
+        "name": "B8-S08 · SEO / site defaults, pages can override",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "238:12413",
+        "name": "B8-S09 · Domains / live now, DNS shown read-only",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "238:12721",
+        "name": "B8-S10 · Redirects / delete with Undo",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "238:13017",
+        "name": "B8-S11 · Access / password protection (Pro)",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "238:13310",
+        "name": "B8-S12 · Access off and Publish now / consequence confirm",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "238:13598",
+        "name": "B8-S13 · Form submissions / filter, export, retention",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "238:13898",
+        "name": "B8-S14 · Delete submissions / permanent, consequence confirm",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "238:14186",
+        "name": "B8-S15 · Custom code / on Free, saved but not published",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "238:14472",
+        "name": "B8-S16 · Danger zone / archive, transfer, delete",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "238:14765",
+        "name": "B8-S17 · Delete site / typed confirm, 30-day restore",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "238:15056",
+        "name": "B8-S18 · Change site URL / consequence confirm",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "238:15344",
+        "name": "B8-S19 · Domains as Editor / read-only with reason",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "238:15632",
+        "name": "B8-S20 · Search settings / results jump to the exact field",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "238:15920",
+        "name": "B8-S21 · Site settings at 1280 × 640 / navigation collapsed",
+        "w": 1280,
+        "h": 640
+      },
+      {
+        "id": "238:16303",
+        "name": "B8 Site settings / S01–S21 handoff",
+        "w": 1440,
+        "h": 298
+      },
+      {
+        "id": "239:12234",
+        "name": "B8-S22 · Account › Privacy / usage data on",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "239:12256",
+        "name": "B8-S23 · Account › Privacy / turned off, saved",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "239:12280",
+        "name": "B8-S24 · Account › Privacy / couldn’t save, setting unchanged",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:45159",
+        "name": "B8-AN01 · Analytics / configured, verify available",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:45416",
+        "name": "B8-AN02 · Analytics / checking tracker status",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:45673",
+        "name": "B8-AN03 · Analytics / verified ID, waiting for data",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:45931",
+        "name": "B8-AN04 · Analytics / receiving tracker data",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:46189",
+        "name": "B8-AN05 · Analytics / invalid ID, draft retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:46449",
+        "name": "B8-AN06 · Analytics / verify error, retry retains values",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:46707",
+        "name": "B8-AN07 · Analytics / offline writes unavailable",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:46965",
+        "name": "B8-AN08 · Analytics / saving verification and provider settings",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:47222",
+        "name": "B8-AN09 · Analytics / save failed, values retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:47479",
+        "name": "B8-AN10 · Analytics / saved, applies on next publish",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:47736",
+        "name": "B8-AN11 · Analytics / not configured",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:47988",
+        "name": "B8-SH01 · Security headers / custom values preserved",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:48243",
+        "name": "B8-SH02 · Security headers / HSTS choices",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:48510",
+        "name": "B8-SH03 · Security headers / invalid server-refused policy",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:48768",
+        "name": "B8-SH04 · Security headers / offline draft retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:49024",
+        "name": "B8-SH05 · Security headers / Editor read-only",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:49280",
+        "name": "B8-SH06 · Security headers / unsaved values",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:49535",
+        "name": "B8-SH07 · Security headers / saving",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:49790",
+        "name": "B8-SH08 · Security headers / saved after acknowledgment",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:50045",
+        "name": "B8-SH09 · Security headers / checking access, drafts allowed",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:50300",
+        "name": "B8-PM01 · Permissions / minimum roles by settings area",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:50545",
+        "name": "B8-CF01 · Settings conflict / yours and server value",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:50779",
+        "name": "B8-CF02 · Settings conflict / keep mine, save still required",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:51002",
+        "name": "B8-CF03 · Settings conflict / use theirs, confirmed server value",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:51225",
+        "name": "B8-SG01 · Analytics to Security / guard retains intended destination",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:51515",
+        "name": "Return · B8 settings to Home / retained editor context",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "245:51921",
+        "name": "B8 · Analytics, Security and settings recovery · 2026-10-20",
+        "w": 1440,
+        "h": 238
+      },
+      {
+        "id": "248:15601",
+        "name": "B8-AN12 · Analytics / Editor access, exact role continuation",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:15849",
+        "name": "B8-SH10 · General / Editor read-only return",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:16058",
+        "name": "B8-SH11 · HSTS / explicit preset change, unsaved",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:16302",
+        "name": "Permissions return · B8-S01 · Site settings / Overview with plan card",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:16547",
+        "name": "Permissions return · B8-S08 · SEO / site defaults, pages can override",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:16786",
+        "name": "Permissions return · B8-S09 · Domains / live now, DNS shown read-only",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:17038",
+        "name": "Permissions return · B8-S10 · Redirects / delete with Undo",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:17278",
+        "name": "Permissions return · B8-S13 · Form submissions / filter, export, retention",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:17522",
+        "name": "Permissions return · B8-S15 · Custom code / on Free, saved but not published",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:17752",
+        "name": "Permissions return · B8-S16 · Danger zone / archive, transfer, delete",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:17989",
+        "name": "Permissions return · B8-S19 · Domains as Editor / read-only with reason",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:18203",
+        "name": "Permissions return · B8-AN01 · Analytics / configured, verify available",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:18486",
+        "name": "Permissions return · B8-AN04 · Analytics / receiving tracker data",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:18768",
+        "name": "Permissions return · B8-AN10 · Analytics / saved, applies on next publish",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:19049",
+        "name": "Permissions return · B8-AN11 · Analytics / not configured",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:19325",
+        "name": "Permissions return · B8-SH01 · Security headers / custom values preserved",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:19606",
+        "name": "Permissions return · B8-SH05 · Security headers / Editor read-only",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:19866",
+        "name": "Permissions return · B8-SH08 · Security headers / saved after acknowledgment",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:20145",
+        "name": "Permissions return · B8-AN12 · Analytics / Editor access, exact role continuation",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:20428",
+        "name": "Permissions return · B8-SH10 · General / Editor read-only return",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:20642",
+        "name": "B8-GUARD · General draft → Languages",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:20853",
+        "name": "B8-SAVING · General draft → Languages",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:21107",
+        "name": "B8-GUARD · General draft → SEO",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:21318",
+        "name": "B8-SAVING · General draft → SEO",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:21572",
+        "name": "B8-GUARD · General draft → Domains",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:21783",
+        "name": "B8-SAVING · General draft → Domains",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:22037",
+        "name": "B8-GUARD · General draft → Redirects",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:22248",
+        "name": "B8-SAVING · General draft → Redirects",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:22502",
+        "name": "B8-GUARD · General draft → Access",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:22713",
+        "name": "B8-SAVING · General draft → Access",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:22967",
+        "name": "B8-GUARD · General draft → Analytics",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:23178",
+        "name": "B8-SAVING · General draft → Analytics",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:23432",
+        "name": "B8-GUARD · General draft → Form submissions",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:23644",
+        "name": "B8-SAVING · General draft → Form submissions",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:23901",
+        "name": "B8-GUARD · General draft → Custom code",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:24113",
+        "name": "B8-SAVING · General draft → Custom code",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:24370",
+        "name": "B8-GUARD · General draft → Security headers",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:24582",
+        "name": "B8-SAVING · General draft → Security headers",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:24839",
+        "name": "B8-GUARD · General draft → Danger zone",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "248:25052",
+        "name": "B8-SAVING · General draft → Danger zone",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "252:47222",
+        "name": "B8-AN13 · Analytics / loading settings",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "252:47480",
+        "name": "B8-AN14 · Analytics / load failed, retry",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "252:47733",
+        "name": "B8-SH12 · Security headers / loading settings",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "252:47989",
+        "name": "B8-SH13 · Security headers / load failed, retry",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "252:48242",
+        "name": "B8-AN15 · Analytics / 1280×640, fixed footer and scrolling form",
+        "w": 1280,
+        "h": 640
+      },
+      {
+        "id": "252:48492",
+        "name": "B8-SH14 · Security headers / 1280×640, fixed footer and scrolling form",
+        "w": 1280,
+        "h": 640
+      },
+      {
+        "id": "252:48740",
+        "name": "B8-AN16 · Analytics / compact navigation popover",
+        "w": 1280,
+        "h": 640
+      },
+      {
+        "id": "252:48979",
+        "name": "B8-SH15 · Security / compact navigation popover",
+        "w": 1280,
+        "h": 640
+      },
+      {
+        "id": "252:49216",
+        "name": "B8-PM02 · Permissions / checking access",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "252:49487",
+        "name": "B8-PM03 · Permissions / access unavailable, retry",
+        "w": 1440,
+        "h": 900
+      }
+    ]
+  },
+  {
+    "id": "3:8",
+    "name": "07 · Recovery and access",
+    "frames": [
+      {
+        "id": "10:2",
+        "name": "C01 · Locked insertion",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "10:370",
+        "name": "C02 · Stale insertion target",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "10:1190",
+        "name": "C03 · Mixed multi-selection",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "10:1626",
+        "name": "C04 · Save pending",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "10:2199",
+        "name": "C05 · Save failed / edits retained",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "10:2647",
+        "name": "C06 · Focus mode / panels hidden",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "10:2795",
+        "name": "C07 · Restored panel arrangement",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "10:3228",
+        "name": "C08 · Narrow target / overlay",
+        "w": 1366,
+        "h": 768
+      },
+      {
+        "id": "10:3787",
+        "name": "C09 · Narrow insertion / Inspector stays closed",
+        "w": 1280,
+        "h": 720
+      },
+      {
+        "id": "225:2297",
+        "name": "B7-G01 · Editor opening / one skeleton, site name",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "225:2821",
+        "name": "B7-G02 · Site didn’t load / banner and read-only canvas",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "225:3353",
+        "name": "B7-G03 · Session expired / unsaved changes kept",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "225:3888",
+        "name": "B7-G04 · Session expired banner / edits keep queueing",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "225:4416",
+        "name": "B7-G05 · Signed in again / queued changes sent",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "225:4941",
+        "name": "B7-G06 · Different account signed in / nothing sent",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "225:5474",
+        "name": "B7-G07 · Unsaved work found / server older, restore allowed",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "225:6003",
+        "name": "B7-G08 · Unsaved work found / server newer, no restore",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "225:6532",
+        "name": "B7-G09 · Unsaved work found / server time unknown",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "225:7061",
+        "name": "B7-G10 · Discard kept copy / delete confirm",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "225:7600",
+        "name": "B7-G11 · Offline / page edits kept in this browser",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "225:8126",
+        "name": "B7-G12 · Can’t reach Buildrick / retry now",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "225:8654",
+        "name": "B7-G13 · Reconnecting / saving queued changes",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "225:9180",
+        "name": "B7-G14 · Conflict / this site changed somewhere else",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "225:9715",
+        "name": "B7-G15 · Reload latest / consequence confirm",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "225:10249",
+        "name": "B7-G16 · Overwrite / newer version kept in Saves first",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "225:10783",
+        "name": "B7-G17 · Overwrite stopped / newer version couldn’t be kept",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "227:7411",
+        "name": "B7-G18 · Role changed to Viewer / editing off, copy kept",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "227:7943",
+        "name": "B7-G19 · Role raised / reload to edit",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "227:8473",
+        "name": "B7-G20 · Workspace deletion scheduled / owner can cancel",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "227:9003",
+        "name": "B7-G21 · Workspace deletion scheduled / others ask owner",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "227:9531",
+        "name": "B7-G22 · Site deleted / changes kept, restore within 30 days",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "227:10063",
+        "name": "B7-G23 · New version ready / reload after saving",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "227:10593",
+        "name": "B7-G24 · New version / saving first before reload",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "227:11119",
+        "name": "B7-G25 · New version / reload stopped, save failed",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "227:11649",
+        "name": "B7-G26 · Editor stopped / unsaved changes, download first",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "227:12184",
+        "name": "B7-G27 · Part of the editor updated / reload that panel",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "227:12711",
+        "name": "B7-G28 · Also open in another tab / edit here",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "227:13239",
+        "name": "B7-G29 · Editing moved to another tab / read-only here",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "227:13769",
+        "name": "B7-G30 · Edit here refused / other tab couldn’t save",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "227:14297",
+        "name": "B7-G31 · Several conditions / one banner and N more",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "227:14836",
+        "name": "B7-G32 · Narrow window / never blocks",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "227:15364",
+        "name": "B7-G33 · Phone / needs a larger screen, open read-only",
+        "w": 390,
+        "h": 844
+      },
+      {
+        "id": "227:15894",
+        "name": "B7-G34 · Toasts / one transient, two persistent, more",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "227:16435",
+        "name": "B7-G35 · Notifications / This site then Other sites",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "227:16980",
+        "name": "B7-G36 · Site locked on Free / view, preview, export, delete",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "227:17512",
+        "name": "B7-G37 · Trial ended / one dismissible notice",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "227:18042",
+        "name": "B7 Global states / G01–G37 handoff",
+        "w": 1440,
+        "h": 350
+      },
+      {
+        "id": "230:12999",
+        "name": "B7-H01 · History / Session steps, verb target place",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "230:13557",
+        "name": "B7-H02 · Session / Restore to here, later steps warning",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "230:14116",
+        "name": "B7-H03 · Session restored / saving like any edit",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "230:14662",
+        "name": "B7-H04 · Saves / filter and save a version",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "230:15227",
+        "name": "B7-H05 · Saves / version details and inline compare",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "230:15797",
+        "name": "B7-H06 · Restore to draft / safety version and Undo restore",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "230:16354",
+        "name": "B7-H07 · Delete named version / interim confirm until RT-D1",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "230:16914",
+        "name": "B7-H08 · Delete named version / after RT-D1, Undo and Recently deleted",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "230:17468",
+        "name": "B7-H09 · Published / releases and Republish (Admin)",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "230:18022",
+        "name": "B7-H10 · Republish v13 / consequence confirm",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "230:18582",
+        "name": "B7-H11 · Compare / two versions side by side",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "230:19126",
+        "name": "B7-H12 · Time Travel / scrub this session",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "230:19664",
+        "name": "B7-H13 · Activity / chips, rows, Load more",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "230:20217",
+        "name": "B7-H14 · History opened from Activity / Back to Activity",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "230:20770",
+        "name": "B7-H15 · Saves offline / server actions need a connection",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "230:21326",
+        "name": "B7-H16 · Activity couldn’t load / Retry",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "231:16144",
+        "name": "B7-P01 · Site menu / Pro trial chip, owner",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "231:16683",
+        "name": "B7-P02 · Site menu / trial ending, warning tone",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "231:17222",
+        "name": "B7-P03 · Plan chip / non-owner explanation",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "231:17763",
+        "name": "B7-P04 · Site menu / payment failed, owner only",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "231:18302",
+        "name": "B7-P05 · Pages at the Free limit / New page disabled with reason",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "231:18866",
+        "name": "B7-P06 · Upgrade dialog / owner opens Billing in a new tab",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "231:19410",
+        "name": "B7-P07 · Upgrade dialog / others ask the owner",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "231:19951",
+        "name": "B7-P08 · Page over the Free limit / locked read-only",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "231:20481",
+        "name": "B7-P09 · Bell / workspace trial reminder on top",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "231:21019",
+        "name": "B7-P10 · Billing / Choose what stays active (Owner)",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "231:21072",
+        "name": "B7-P11 · Choose what stays active / consequence confirm",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "231:21134",
+        "name": "B7-P12 · Active set saved / next change in 30 days",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "231:21190",
+        "name": "B7 History, Activity and Plans / handoff",
+        "w": 1440,
+        "h": 306
+      },
+      {
+        "id": "232:18928",
+        "name": "B7-CL01 · Presence Phase A / People popover, N here",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "232:19504",
+        "name": "B7-CL02 · Live editing Phase B / Live pill and remote selection",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "232:20039",
+        "name": "B7-CL03 · Ana is typing here / Wait or Edit anyway",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "232:20582",
+        "name": "B7-CL04 · Following Ana / stop with Esc or Stop",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "232:21118",
+        "name": "B7-CL05 · Ana deleted Hero / my change not applied",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "232:21651",
+        "name": "B7-CL06 · Undo skips a step a teammate changed",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "232:22183",
+        "name": "B7-CL07 · Presence Phase A / Ana saved, Get latest",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "232:22718",
+        "name": "B7-CL08 · Collaboration flag off / Planned row, no presence",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "232:23250",
+        "name": "B7-CL09 · Viewer / People with redacted locations",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "232:23803",
+        "name": "B7-RJ01 · Recovery journey 1 / text changed in Editor",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "232:24328",
+        "name": "B7-RJ02 · Recovery journey 2 / CMS record deleted, toast Undo",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "232:24584",
+        "name": "B7-RJ03 · Recovery journey 3 / toast gone, ⌘Z in CMS",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "232:24836",
+        "name": "B7-RJ04 · Recovery journey 4 / Editor shows the undo it will run",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "232:25361",
+        "name": "B7 Collaboration and recovery journey / handoff",
+        "w": 1440,
+        "h": 266
+      },
+      {
+        "id": "250:48733",
+        "name": "B7-RJ05 · Undo CMS deletion / restore awaiting acknowledgment",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "250:48891",
+        "name": "B7-RJ06 · Undo CMS deletion / record restored",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "250:49052",
+        "name": "B7-RJ07 · Undo CMS deletion / restore failed, retry same record",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "250:49215",
+        "name": "B7 · Recovery operation outcomes · 2026-10-20",
+        "w": 1440,
+        "h": 182
+      }
+    ]
+  },
+  {
+    "id": "3:9",
+    "name": "08 · First run",
+    "frames": []
+  },
+  {
+    "id": "3:10",
+    "name": "09 · Journey review",
+    "frames": [
+      {
+        "id": "11:2",
+        "name": "R01 · 1024 × 768 / two-row toolbar",
+        "w": 1024,
+        "h": 768
+      },
+      {
+        "id": "11:311",
+        "name": "R02 · 1440 × 600 / short viewport",
+        "w": 1440,
+        "h": 600
+      },
+      {
+        "id": "11:870",
+        "name": "R03 · 1920 × 1080 / wide workspace",
+        "w": 1920,
+        "h": 1080
+      },
+      {
+        "id": "11:1297",
+        "name": "R04 · 1365 / overlay threshold below",
+        "w": 1365,
+        "h": 768
+      },
+      {
+        "id": "11:1866",
+        "name": "R05 · 1367 / docked threshold above",
+        "w": 1367,
+        "h": 768
+      },
+      {
+        "id": "11:2299",
+        "name": "R06 · 1280 / People and notifications",
+        "w": 1280,
+        "h": 720
+      },
+      {
+        "id": "15:2450",
+        "name": "T01 · 1440 / docked Review replaces Inspector",
+        "w": 1440,
+        "h": 900
+      },
+      {
+        "id": "15:3054",
+        "name": "T02 · 1281 / Review overlay",
+        "w": 1281,
+        "h": 768
+      },
+      {
+        "id": "15:8208",
+        "name": "T03 · 1279 / Review sheet",
+        "w": 1279,
+        "h": 768
+      },
+      {
+        "id": "15:8645",
+        "name": "T04 · 1279 / Locate collapses to 48px peek",
+        "w": 1279,
+        "h": 768
+      },
+      {
+        "id": "17:2170",
+        "name": "B2 / geometry and keyboard handoff",
+        "w": 1120,
+        "h": 746
+      },
+      {
+        "id": "78:19785",
+        "name": "BD25 · Compact Pages / 1440×600",
+        "w": 1440,
+        "h": 600
+      },
+      {
+        "id": "78:20392",
+        "name": "BD25 · Compact Pages / 1024×768",
+        "w": 1024,
+        "h": 768
+      }
+    ]
+  }
+]

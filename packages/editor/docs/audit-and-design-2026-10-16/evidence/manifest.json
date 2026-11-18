@@ -1,0 +1,2331 @@
+{
+  "date": "2026-10-16",
+  "baselineCommit": "19f964d5e7efda2c276a4c185782bb963da605ec",
+  "interpretation": "Screen captures prove only their visible content; no mutation or persistence is implied. Source inventories are discovery aids. See REPORT.md for claims.",
+  "exceptions": {
+    "content-sources-settled": "Mis-targeted capture; not positive evidence for Sources. Use content-sources instead.",
+    "settings-billing-pro": "Unsuccessful selector capture; does not establish the editor Billing door. Use dashboard-settings-billing-settled for the Billing page.",
+    "dashboard-agency-partner-settled": "Redirected to agency list. Partner-specific UI not inspected.",
+    "dashboard-agency-theme": "Initial shell superseded by dashboard-agency-theme-settled. Never evidence for dynamic agency/[id].",
+    "dashboard-settings-billing": "Initial shell superseded by dashboard-settings-billing-settled.",
+    "design-sketch-desktop": "D documentation rendering only. Meta JS was blocked by browser cookie-origin policy on file URL; screenshot and accessibility capture succeeded. No product behavior verified."
+  },
+  "files": [
+    {
+      "file": "asset-image-adjust.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:31:40.503098+00:00"
+    },
+    {
+      "file": "asset-image-adjust.snapshot.txt",
+      "bytes": 7852,
+      "sha256": "f5591015ef1e8253fbeaf96452bb93db19197411f274a29b5a4374f7d16b4e59",
+      "capturedOrWrittenAt": "2026-10-15T20:31:40.019924+00:00"
+    },
+    {
+      "file": "asset-image-adjust.text.txt",
+      "bytes": 6296,
+      "sha256": "df2c987d25f18d9247c72e9f4890e31b9fc97bb0955dcc34708127bdcd46455f",
+      "capturedOrWrittenAt": "2026-10-15T20:31:40.271558+00:00"
+    },
+    {
+      "file": "asset-image-editor.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:31:38.285634+00:00"
+    },
+    {
+      "file": "asset-image-editor.png",
+      "bytes": 76880,
+      "sha256": "f67f30041556584e95a6bcb2c3ba8a7e4be9802529aed70cdb742fbd483e6de2",
+      "capturedOrWrittenAt": "2026-10-15T20:31:38.027366+00:00"
+    },
+    {
+      "file": "asset-image-editor.snapshot.txt",
+      "bytes": 8382,
+      "sha256": "d89eb82b8a6874f75321da5344e133fb101604ee079c788531c0464b1a5939df",
+      "capturedOrWrittenAt": "2026-10-15T20:31:37.434585+00:00"
+    },
+    {
+      "file": "asset-image-editor.text.txt",
+      "bytes": 6376,
+      "sha256": "9918c05381121bf45ca581e978f5e7bf1720228be64249511c0093660c0901e1",
+      "capturedOrWrittenAt": "2026-10-15T20:31:37.651539+00:00"
+    },
+    {
+      "file": "asset-image-optimise.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:31:44.829884+00:00"
+    },
+    {
+      "file": "asset-image-optimise.snapshot.txt",
+      "bytes": 7699,
+      "sha256": "64bfa5086d73fca1b1016df66fcd5169ce4eb6fa661ca823578df132fbcb4a13",
+      "capturedOrWrittenAt": "2026-10-15T20:31:44.251633+00:00"
+    },
+    {
+      "file": "asset-image-optimise.text.txt",
+      "bytes": 6400,
+      "sha256": "3d3f616521ffcfbe7f6906399a3ae4a3d54e6429be4274e4da344ec844045986",
+      "capturedOrWrittenAt": "2026-10-15T20:31:44.511089+00:00"
+    },
+    {
+      "file": "asset-image-resize.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:31:42.546273+00:00"
+    },
+    {
+      "file": "asset-image-resize.snapshot.txt",
+      "bytes": 7773,
+      "sha256": "6a274d1e546a6cfa2b91f0e80dc4c7fa04da4b82757947bb6eeffc24ecd1b235",
+      "capturedOrWrittenAt": "2026-10-15T20:31:42.059411+00:00"
+    },
+    {
+      "file": "asset-image-resize.text.txt",
+      "bytes": 6347,
+      "sha256": "272b8c8a5dcad3f4950d05c87b147d502e1af2e17c25e4a04ffb6c0e5272d0d0",
+      "capturedOrWrittenAt": "2026-10-15T20:31:42.392154+00:00"
+    },
+    {
+      "file": "asset-library.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:30:59.977831+00:00"
+    },
+    {
+      "file": "asset-library.png",
+      "bytes": 47388,
+      "sha256": "b03d160dd62014e01509da0d796eb750ae87739b1b0cc409bb7a2802aba07435",
+      "capturedOrWrittenAt": "2026-10-15T20:30:59.767008+00:00"
+    },
+    {
+      "file": "asset-library.snapshot.txt",
+      "bytes": 7309,
+      "sha256": "056f12275916317c204defb56c01cf2e3de4367a4c3fc4be0fb2e5209ba108e0",
+      "capturedOrWrittenAt": "2026-10-15T20:30:59.234680+00:00"
+    },
+    {
+      "file": "asset-library.text.txt",
+      "bytes": 5926,
+      "sha256": "cf9db0a72b818ea18636d2b517021ba655aed5fcf9dae42815c4187d957b0cf1",
+      "capturedOrWrittenAt": "2026-10-15T20:30:59.387042+00:00"
+    },
+    {
+      "file": "auth-onboarding-source-index.json",
+      "bytes": 25092,
+      "sha256": "913e0793882379bbef4fb5f0fa100e5de6a2dc65c91b55590445f7411ff769eb",
+      "capturedOrWrittenAt": "2026-10-15T20:35:26.527223+00:00"
+    },
+    {
+      "file": "baseline-git-status.txt",
+      "bytes": 2255,
+      "sha256": "879a617aa878fe0cfaa9fcb3ea1335ad8cfdef82d0c080ce82c9feb8eb7bad8e",
+      "capturedOrWrittenAt": "2026-10-15T19:39:03.919987+00:00"
+    },
+    {
+      "file": "baseline.json",
+      "bytes": 173,
+      "sha256": "f1d61a19503bb49e55ca3223288d0f8f20ee5dddfd56ec95f41f4cb06bcc0591",
+      "capturedOrWrittenAt": "2026-10-15T19:39:04.006395+00:00"
+    },
+    {
+      "file": "brand-brand-checks.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:21:55.784844+00:00"
+    },
+    {
+      "file": "brand-brand-checks.snapshot.txt",
+      "bytes": 6734,
+      "sha256": "9ca37e0e744df632bf927787355b73677096f81482d361db4befb64469c8e3ea",
+      "capturedOrWrittenAt": "2026-10-15T20:21:55.474303+00:00"
+    },
+    {
+      "file": "brand-brand-checks.text.txt",
+      "bytes": 5837,
+      "sha256": "131291b91135b30d57b264af0ba531b187375eca576dd04c5383de174c6767e8",
+      "capturedOrWrittenAt": "2026-10-15T20:21:55.645187+00:00"
+    },
+    {
+      "file": "brand-classes.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:21:51.695009+00:00"
+    },
+    {
+      "file": "brand-classes.snapshot.txt",
+      "bytes": 6241,
+      "sha256": "282d0070fcd2b731a14688781c9aecd6c39b33339d924d532ce8d279ce69a531",
+      "capturedOrWrittenAt": "2026-10-15T20:21:51.215429+00:00"
+    },
+    {
+      "file": "brand-classes.text.txt",
+      "bytes": 5789,
+      "sha256": "b7052701a54c179b1ba78f0791cb81f36ff265d4c1ab79ba09e231204f6855ac",
+      "capturedOrWrittenAt": "2026-10-15T20:21:51.408922+00:00"
+    },
+    {
+      "file": "brand-colour-mode.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:21:43.176105+00:00"
+    },
+    {
+      "file": "brand-colour-mode.snapshot.txt",
+      "bytes": 6572,
+      "sha256": "361ca606a079895aaadb65b66186a70e2f1bad98c2eb61c9c4b79c1563cbcec9",
+      "capturedOrWrittenAt": "2026-10-15T20:21:42.663872+00:00"
+    },
+    {
+      "file": "brand-colour-mode.text.txt",
+      "bytes": 6957,
+      "sha256": "8b16075fc8e88c211dfb420ff54286959c2eb6dae401bef4197b0f00e75c6e97",
+      "capturedOrWrittenAt": "2026-10-15T20:21:42.955380+00:00"
+    },
+    {
+      "file": "brand-component-styles.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:21:49.376609+00:00"
+    },
+    {
+      "file": "brand-component-styles.snapshot.txt",
+      "bytes": 9990,
+      "sha256": "89d65a2e94ad11e58cc16c923a8a88f55dfc2523230f614bd8a44de8a1b2da0c",
+      "capturedOrWrittenAt": "2026-10-15T20:21:49.001629+00:00"
+    },
+    {
+      "file": "brand-component-styles.text.txt",
+      "bytes": 6039,
+      "sha256": "839cd32bbcf4d08cd126ad2db456da4c79b5dd8b511bfeb88f89d70fada6c0d5",
+      "capturedOrWrittenAt": "2026-10-15T20:21:49.213620+00:00"
+    },
+    {
+      "file": "brand-fonts-type-styles.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:21:45.197958+00:00"
+    },
+    {
+      "file": "brand-fonts-type-styles.snapshot.txt",
+      "bytes": 10833,
+      "sha256": "d269c7905f84fc40ed2cebd3defa036538f1add51b8faa5ef6eb787bbfe7afb0",
+      "capturedOrWrittenAt": "2026-10-15T20:21:44.860005+00:00"
+    },
+    {
+      "file": "brand-fonts-type-styles.text.txt",
+      "bytes": 6108,
+      "sha256": "090270d24eb860cc73c41bbca07b8f8e0c8040990401fe115459f0c0f8184b14",
+      "capturedOrWrittenAt": "2026-10-15T20:21:45.052384+00:00"
+    },
+    {
+      "file": "brand-import-export.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:22:01.978014+00:00"
+    },
+    {
+      "file": "brand-import-export.snapshot.txt",
+      "bytes": 6703,
+      "sha256": "71f08dba2e9cb1fe9e744338d2065c155ebe83c9a384c206c1916b6cff04f488",
+      "capturedOrWrittenAt": "2026-10-15T20:22:01.654864+00:00"
+    },
+    {
+      "file": "brand-import-export.text.txt",
+      "bytes": 13699,
+      "sha256": "f846cf39e4d8616520bf49172f6f3f35700537d3049d5d3e62a79fa9db97a4fb",
+      "capturedOrWrittenAt": "2026-10-15T20:22:01.852534+00:00"
+    },
+    {
+      "file": "brand-presets.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:21:53.931727+00:00"
+    },
+    {
+      "file": "brand-presets.snapshot.txt",
+      "bytes": 10823,
+      "sha256": "43fd5563d64ba252ce08ae1382030ee3c316b9695ecaa2f26c082ecedf3a0ec6",
+      "capturedOrWrittenAt": "2026-10-15T20:21:53.466276+00:00"
+    },
+    {
+      "file": "brand-presets.text.txt",
+      "bytes": 5932,
+      "sha256": "dfe1394000ee3cb3db676b103af07e095f6eab9ad76a93a3c86c7c59b208bce5",
+      "capturedOrWrittenAt": "2026-10-15T20:21:53.700956+00:00"
+    },
+    {
+      "file": "brand-spacing.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:21:59.973610+00:00"
+    },
+    {
+      "file": "brand-spacing.snapshot.txt",
+      "bytes": 10435,
+      "sha256": "148fb4a60f29a5d4dd6cfbe722432f9b6cd1e8e047d2545a614791d3b07875a9",
+      "capturedOrWrittenAt": "2026-10-15T20:21:59.600807+00:00"
+    },
+    {
+      "file": "brand-spacing.text.txt",
+      "bytes": 6126,
+      "sha256": "4be0c426f21fcfd40d0427dea119d4379431a2f5c8f03f6f5f90a898adedb310",
+      "capturedOrWrittenAt": "2026-10-15T20:21:59.777819+00:00"
+    },
+    {
+      "file": "brand-starters.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:21:57.833055+00:00"
+    },
+    {
+      "file": "brand-starters.snapshot.txt",
+      "bytes": 9043,
+      "sha256": "77da2f4896536cea5b88694e47dd021b567f06cba9c5cd8115c3809db2f97984",
+      "capturedOrWrittenAt": "2026-10-15T20:21:57.474889+00:00"
+    },
+    {
+      "file": "brand-starters.text.txt",
+      "bytes": 5995,
+      "sha256": "59978801d677bfd2390d4a48836831357b755fef7d70a9c3855d7e11025ef329",
+      "capturedOrWrittenAt": "2026-10-15T20:21:57.672692+00:00"
+    },
+    {
+      "file": "brand-styles.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:21:47.314439+00:00"
+    },
+    {
+      "file": "brand-styles.snapshot.txt",
+      "bytes": 16757,
+      "sha256": "f64cb3323b3cc3bca46823215d19d51cb5074c2656a09d039510072990ffdf7a",
+      "capturedOrWrittenAt": "2026-10-15T20:21:46.957998+00:00"
+    },
+    {
+      "file": "brand-styles.text.txt",
+      "bytes": 6788,
+      "sha256": "c8438ba22501fc2b493ace5c9ba07d5689195f93b4a6bd40bb0ae51354a8a181",
+      "capturedOrWrittenAt": "2026-10-15T20:21:47.126799+00:00"
+    },
+    {
+      "file": "content-conditions.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:39:43.981539+00:00"
+    },
+    {
+      "file": "content-conditions.png",
+      "bytes": 50868,
+      "sha256": "ea82e06212a3e804d9fb2a563984bb5a2903c804274e81258c33682f1d35652e",
+      "capturedOrWrittenAt": "2026-10-15T20:39:43.833500+00:00"
+    },
+    {
+      "file": "content-conditions.snapshot.txt",
+      "bytes": 7837,
+      "sha256": "f787e77ab9c9ddafc0787d530cd5feb6e3aba2d2dc9f60af4ecf276bd589111b",
+      "capturedOrWrittenAt": "2026-10-15T20:39:43.472221+00:00"
+    },
+    {
+      "file": "content-conditions.text.txt",
+      "bytes": 6216,
+      "sha256": "416e9b35929c25c17a288bdec46245351e1c7992a4ad1914a6be675f7f816f1c",
+      "capturedOrWrittenAt": "2026-10-15T20:39:43.637606+00:00"
+    },
+    {
+      "file": "content-sources-settled.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:35:40.921148+00:00"
+    },
+    {
+      "file": "content-sources-settled.png",
+      "bytes": 102988,
+      "sha256": "9baebfe9d3fbce5832936e4d11ca54bfcb8b48e47d28bee8662f6ef7b26b449f",
+      "capturedOrWrittenAt": "2026-10-15T20:35:40.625932+00:00"
+    },
+    {
+      "file": "content-sources-settled.snapshot.txt",
+      "bytes": 7965,
+      "sha256": "89bd9bab12167af771c22cf7bcaf93f7d6353e48548ecb6b13a914c720784434",
+      "capturedOrWrittenAt": "2026-10-15T20:35:40.109844+00:00"
+    },
+    {
+      "file": "content-sources-settled.text.txt",
+      "bytes": 6045,
+      "sha256": "ba7a1cb3d023be4e7908261452c061384b8315afe0fb6f4ac9105c94c1751a93",
+      "capturedOrWrittenAt": "2026-10-15T20:35:40.287424+00:00"
+    },
+    {
+      "file": "content-sources.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:36:03.682629+00:00"
+    },
+    {
+      "file": "content-sources.png",
+      "bytes": 49127,
+      "sha256": "1d90e313b2b3c781108bb9695ce07b6782327362f416c2bc14d178b761358c62",
+      "capturedOrWrittenAt": "2026-10-15T20:36:03.479035+00:00"
+    },
+    {
+      "file": "content-sources.snapshot.txt",
+      "bytes": 7834,
+      "sha256": "921cdddf2f4ce5220533a46c226f9830867759c04dfea104bf98dcb80ee2ecc9",
+      "capturedOrWrittenAt": "2026-10-15T20:36:02.988824+00:00"
+    },
+    {
+      "file": "content-sources.text.txt",
+      "bytes": 6154,
+      "sha256": "7cd40a630fcf1655d29136368f3779795892be1d09cfd1c22291bd049546fa6c",
+      "capturedOrWrittenAt": "2026-10-15T20:36:03.177782+00:00"
+    },
+    {
+      "file": "content-variables.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:36:18.747933+00:00"
+    },
+    {
+      "file": "content-variables.png",
+      "bytes": 51028,
+      "sha256": "ed3d0c03ff76e03b941f7781e1606be68d574ac22ea7dcbcae58f47896073678",
+      "capturedOrWrittenAt": "2026-10-15T20:36:18.283031+00:00"
+    },
+    {
+      "file": "content-variables.snapshot.txt",
+      "bytes": 7834,
+      "sha256": "cdc783631f5d4a08393bb751f3605b9e2da08819e799235079e61ac597f4d4aa",
+      "capturedOrWrittenAt": "2026-10-15T20:36:17.429845+00:00"
+    },
+    {
+      "file": "content-variables.text.txt",
+      "bytes": 6196,
+      "sha256": "f1b8c6a8978e07ca1b9025a756b63c5470828586c49e2c47a12cdc18ee96054a",
+      "capturedOrWrittenAt": "2026-10-15T20:36:17.822595+00:00"
+    },
+    {
+      "file": "control-inventory.json",
+      "bytes": 300144,
+      "sha256": "014959aa1f2664f2d1c1745d9973d0328d76be6d42eaad16f5ee999d92ba958d",
+      "capturedOrWrittenAt": "2026-10-15T20:00:18.591379+00:00"
+    },
+    {
+      "file": "dashboard-activity.meta.json",
+      "bytes": 116,
+      "sha256": "a684e1c25347916957b8fc992dda85362f0a60a8d77183f93250f6c084abe056",
+      "capturedOrWrittenAt": "2026-10-15T20:06:58.530835+00:00"
+    },
+    {
+      "file": "dashboard-activity.snapshot.txt",
+      "bytes": 4221,
+      "sha256": "7c1b841c65a97cf52d4db43d5573f15f2a008712e933260da15963c9d028f718",
+      "capturedOrWrittenAt": "2026-10-15T20:06:58.191789+00:00"
+    },
+    {
+      "file": "dashboard-activity.text.txt",
+      "bytes": 998,
+      "sha256": "506368d235d8f77a2217a2b6fda70f68ddf8b483a9475385224d3d3d84febe93",
+      "capturedOrWrittenAt": "2026-10-15T20:06:58.369534+00:00"
+    },
+    {
+      "file": "dashboard-agency-handover.meta.json",
+      "bytes": 123,
+      "sha256": "fc52b6884d2ee0578b9fcfd8410d6a607c01f0a274f2ae438099ed5940775237",
+      "capturedOrWrittenAt": "2026-10-15T20:04:56.183839+00:00"
+    },
+    {
+      "file": "dashboard-agency-handover.snapshot.txt",
+      "bytes": 4287,
+      "sha256": "bb4ab30b4087e3af198ee96a521ccc8399f8f77c7d30ae403f2d670dd8a46601",
+      "capturedOrWrittenAt": "2026-10-15T20:04:55.174565+00:00"
+    },
+    {
+      "file": "dashboard-agency-handover.text.txt",
+      "bytes": 1131,
+      "sha256": "b4b6055c6ab04ca9d878de7ff4bd1d123ede23935decd7a34d1da97ccd52d842",
+      "capturedOrWrittenAt": "2026-10-15T20:04:55.695066+00:00"
+    },
+    {
+      "file": "dashboard-agency-library.meta.json",
+      "bytes": 122,
+      "sha256": "931653365ba6552f787ec1d3d6b254de904e4d53ee4227fa7381c015fdc93158",
+      "capturedOrWrittenAt": "2026-10-15T20:05:06.065927+00:00"
+    },
+    {
+      "file": "dashboard-agency-library.snapshot.txt",
+      "bytes": 4129,
+      "sha256": "74a2b95889b50809cedea4c20e7f6311cd7d5970b41f34d5ef55a9733d086978",
+      "capturedOrWrittenAt": "2026-10-15T20:05:05.151093+00:00"
+    },
+    {
+      "file": "dashboard-agency-library.text.txt",
+      "bytes": 1150,
+      "sha256": "9ac498768ac7ac44389afcbdf207f6999b2ffb14c7badf94556cb2393243a607",
+      "capturedOrWrittenAt": "2026-10-15T20:05:05.502434+00:00"
+    },
+    {
+      "file": "dashboard-agency-partner-settled.meta.json",
+      "bytes": 114,
+      "sha256": "f14685890f8f2a1c52454bffbbf659ff647236c65ae084063d105d54c4dada58",
+      "capturedOrWrittenAt": "2026-10-15T20:43:02.576634+00:00"
+    },
+    {
+      "file": "dashboard-agency-partner-settled.png",
+      "bytes": 76841,
+      "sha256": "335e68eea19d42aec7481bfde5aafe885cb2dc1d431fd26d51131dbfa5633848",
+      "capturedOrWrittenAt": "2026-10-15T20:43:02.413717+00:00"
+    },
+    {
+      "file": "dashboard-agency-partner-settled.snapshot.txt",
+      "bytes": 4338,
+      "sha256": "dfca74e59dcea41ce040ca993dd03947887b13ed9c13db7a25d5986639a6b68f",
+      "capturedOrWrittenAt": "2026-10-15T20:43:01.992550+00:00"
+    },
+    {
+      "file": "dashboard-agency-partner-settled.text.txt",
+      "bytes": 1129,
+      "sha256": "8e0c63db9c64669ad272eaf5aa76464f0a12f181f5f850910b1470d4dfb28714",
+      "capturedOrWrittenAt": "2026-10-15T20:43:02.134709+00:00"
+    },
+    {
+      "file": "dashboard-agency-partner.meta.json",
+      "bytes": 122,
+      "sha256": "65c2669795c9d3789ba98cd536f0241e27e227eef54ce168456b0e0949f8137b",
+      "capturedOrWrittenAt": "2026-10-15T20:05:26.401706+00:00"
+    },
+    {
+      "file": "dashboard-agency-partner.snapshot.txt",
+      "bytes": 4077,
+      "sha256": "c9b7b7a8fc829c2a39ca7a293a39b3a92739f7488c54acf0f0fb24823211a5bf",
+      "capturedOrWrittenAt": "2026-10-15T20:05:25.717808+00:00"
+    },
+    {
+      "file": "dashboard-agency-partner.text.txt",
+      "bytes": 1016,
+      "sha256": "6385212aa051cd77506c3c56dd1ec35dbe44dfd3f7c37dab53aa40471106570a",
+      "capturedOrWrittenAt": "2026-10-15T20:05:26.109383+00:00"
+    },
+    {
+      "file": "dashboard-agency-reviews.meta.json",
+      "bytes": 122,
+      "sha256": "65d54502fae7ef04d50b2d2db9f40b9ceeb01ab04383a4107709475c3180dc25",
+      "capturedOrWrittenAt": "2026-10-15T20:04:46.313528+00:00"
+    },
+    {
+      "file": "dashboard-agency-reviews.snapshot.txt",
+      "bytes": 4088,
+      "sha256": "4710e4320312bde9de131d5f82f5417c2ae0c716174b3368ba6c7e7a5f5f706a",
+      "capturedOrWrittenAt": "2026-10-15T20:04:45.511387+00:00"
+    },
+    {
+      "file": "dashboard-agency-reviews.text.txt",
+      "bytes": 1043,
+      "sha256": "ec2d7bc7f0de682ebb42c1e30dcc9deb0c5d8b1b95abb0e67f9572abff3f3343",
+      "capturedOrWrittenAt": "2026-10-15T20:04:45.961752+00:00"
+    },
+    {
+      "file": "dashboard-agency-theme-settled.meta.json",
+      "bytes": 120,
+      "sha256": "217de263af46b7c3b7612a822f9790885807af5d8131b8a534f39a7367bf3556",
+      "capturedOrWrittenAt": "2026-10-15T20:42:58.095126+00:00"
+    },
+    {
+      "file": "dashboard-agency-theme-settled.png",
+      "bytes": 79105,
+      "sha256": "2b3dfe2abe8b4bb2aae7b81db4338490c80238716a6141510b06a85799531cd7",
+      "capturedOrWrittenAt": "2026-10-15T20:42:57.947355+00:00"
+    },
+    {
+      "file": "dashboard-agency-theme-settled.snapshot.txt",
+      "bytes": 4528,
+      "sha256": "8008469bb422806744b7e1dc13883dbbf1b9540007956d6bd455b11894b9f319",
+      "capturedOrWrittenAt": "2026-10-15T20:42:57.597254+00:00"
+    },
+    {
+      "file": "dashboard-agency-theme-settled.text.txt",
+      "bytes": 1139,
+      "sha256": "65d97323b677cc0204274a34ff9fcf33dd1ddde2d78338f67f04cdb6b4ec1895",
+      "capturedOrWrittenAt": "2026-10-15T20:42:57.744026+00:00"
+    },
+    {
+      "file": "dashboard-agency-theme.meta.json",
+      "bytes": 120,
+      "sha256": "217de263af46b7c3b7612a822f9790885807af5d8131b8a534f39a7367bf3556",
+      "capturedOrWrittenAt": "2026-10-15T20:05:18.251740+00:00"
+    },
+    {
+      "file": "dashboard-agency-theme.snapshot.txt",
+      "bytes": 4084,
+      "sha256": "ab8be59a03b22c57485d78463f6ec0f874a920408b9afa57ad06a6c986f17cf2",
+      "capturedOrWrittenAt": "2026-10-15T20:05:17.079646+00:00"
+    },
+    {
+      "file": "dashboard-agency-theme.text.txt",
+      "bytes": 877,
+      "sha256": "4937e386d435342f93f37179747de34ad1a2f7fd24ea7dc25d6ffa78a01bd6c7",
+      "capturedOrWrittenAt": "2026-10-15T20:05:17.600578+00:00"
+    },
+    {
+      "file": "dashboard-agency.meta.json",
+      "bytes": 114,
+      "sha256": "f14685890f8f2a1c52454bffbbf659ff647236c65ae084063d105d54c4dada58",
+      "capturedOrWrittenAt": "2026-10-15T20:04:38.276424+00:00"
+    },
+    {
+      "file": "dashboard-agency.snapshot.txt",
+      "bytes": 4309,
+      "sha256": "86a7f4b1d46e19c33f0477505076a43eb419bd5be7b33b8f617e6b9dfa0e9340",
+      "capturedOrWrittenAt": "2026-10-15T20:04:37.767176+00:00"
+    },
+    {
+      "file": "dashboard-agency.text.txt",
+      "bytes": 1018,
+      "sha256": "3820ffe756a244a60cc2edf5680a94f9b7a378f76586d30bc2d0311af720b4ba",
+      "capturedOrWrittenAt": "2026-10-15T20:04:38.024573+00:00"
+    },
+    {
+      "file": "dashboard-getting-started-settled.meta.json",
+      "bytes": 123,
+      "sha256": "c008bcfdebe3c8f6a04cb6c9a254de3ee03e3a6c640de7f07c5354b65af56f26",
+      "capturedOrWrittenAt": "2026-10-15T20:42:48.266048+00:00"
+    },
+    {
+      "file": "dashboard-getting-started-settled.png",
+      "bytes": 78759,
+      "sha256": "289a9aef07c0597f73a4bd3a26c3a1c4d4fb5794ec0ff6ba08137d984256d749",
+      "capturedOrWrittenAt": "2026-10-15T20:42:48.117278+00:00"
+    },
+    {
+      "file": "dashboard-getting-started-settled.snapshot.txt",
+      "bytes": 4188,
+      "sha256": "5a3a5c1b962cfebdd120f76cc8c4119f38e748118441ade1bb88b660d6cc52fe",
+      "capturedOrWrittenAt": "2026-10-15T20:42:47.730191+00:00"
+    },
+    {
+      "file": "dashboard-getting-started-settled.text.txt",
+      "bytes": 1084,
+      "sha256": "98cd70ac4205740c03d1a40400b3f838d2c63ee59515e2880113a7f6ff5606a6",
+      "capturedOrWrittenAt": "2026-10-15T20:42:47.876293+00:00"
+    },
+    {
+      "file": "dashboard-help.meta.json",
+      "bytes": 112,
+      "sha256": "ef0d564da04e32813574c3ae5e64b538b655afa6bad59cc99e491ed820ca67c2",
+      "capturedOrWrittenAt": "2026-10-15T20:07:24.364016+00:00"
+    },
+    {
+      "file": "dashboard-help.snapshot.txt",
+      "bytes": 5900,
+      "sha256": "cf21e763608f1888063b9ef2209c2a716c9f7534197b1b3e1f669865e4b2a153",
+      "capturedOrWrittenAt": "2026-10-15T20:07:24.026411+00:00"
+    },
+    {
+      "file": "dashboard-help.text.txt",
+      "bytes": 1460,
+      "sha256": "6d5479b66565ba8e6a8d9fa5813af354401e3d395d0bb06242204a0b45232ace",
+      "capturedOrWrittenAt": "2026-10-15T20:07:24.207366+00:00"
+    },
+    {
+      "file": "dashboard-learn.meta.json",
+      "bytes": 113,
+      "sha256": "1c4b9c97410ffcd10f702452c5294f615a6274dd51dd9a7edb269114badc51ee",
+      "capturedOrWrittenAt": "2026-10-15T20:07:14.285878+00:00"
+    },
+    {
+      "file": "dashboard-learn.snapshot.txt",
+      "bytes": 3854,
+      "sha256": "a3ea28fe0800c9db1c22fc9779d09121facdba63af32cddabcae03650c3c65b3",
+      "capturedOrWrittenAt": "2026-10-15T20:07:13.872169+00:00"
+    },
+    {
+      "file": "dashboard-learn.text.txt",
+      "bytes": 1428,
+      "sha256": "db462f43af265b53658104646c5b100088c6151c611d5ea3fdf479f3a4d2bfd0",
+      "capturedOrWrittenAt": "2026-10-15T20:07:14.126644+00:00"
+    },
+    {
+      "file": "dashboard-marketplace.meta.json",
+      "bytes": 119,
+      "sha256": "95c0544deb0433f244dc8511476071198b454b7a09b08b8a13350bf4a9325d69",
+      "capturedOrWrittenAt": "2026-10-15T20:07:03.990403+00:00"
+    },
+    {
+      "file": "dashboard-marketplace.snapshot.txt",
+      "bytes": 4404,
+      "sha256": "d84780451782babe48ffd36d209fecebe174ccfd7fe83eba7026335fe84829b5",
+      "capturedOrWrittenAt": "2026-10-15T20:07:03.666025+00:00"
+    },
+    {
+      "file": "dashboard-marketplace.text.txt",
+      "bytes": 2109,
+      "sha256": "653e381086b238ab606e2fd254fd2bca1c4e7e9aae63ef7a96c302ea867efbe3",
+      "capturedOrWrittenAt": "2026-10-15T20:07:03.840929+00:00"
+    },
+    {
+      "file": "dashboard-media.meta.json",
+      "bytes": 113,
+      "sha256": "75445980361f587de6db6450603efbe6695b9a65a3f7ffb24f9e7c4680904298",
+      "capturedOrWrittenAt": "2026-10-15T20:04:29.388667+00:00"
+    },
+    {
+      "file": "dashboard-media.snapshot.txt",
+      "bytes": 4070,
+      "sha256": "c0a33ac655a0f93325ab945b4c5cce8b54dd786f461c2dd4781c9579ef3d12f8",
+      "capturedOrWrittenAt": "2026-10-15T20:04:28.745310+00:00"
+    },
+    {
+      "file": "dashboard-media.text.txt",
+      "bytes": 996,
+      "sha256": "7d06099f73a6be8de8069f00c2b31f5d1f3c2ca2e9914dc6bb43f055bb847d08",
+      "capturedOrWrittenAt": "2026-10-15T20:04:29.121433+00:00"
+    },
+    {
+      "file": "dashboard-notifications.meta.json",
+      "bytes": 121,
+      "sha256": "eaf8f550562916b7af106624ca32ac7526ea19fffcaf3cdaaa43d4858dcf5809",
+      "capturedOrWrittenAt": "2026-10-15T20:06:53.907080+00:00"
+    },
+    {
+      "file": "dashboard-notifications.snapshot.txt",
+      "bytes": 4201,
+      "sha256": "1e63c561a5eeac75e3895bc550fac65e5531c8728ff794324e8c87f0858fcd5f",
+      "capturedOrWrittenAt": "2026-10-15T20:06:53.523521+00:00"
+    },
+    {
+      "file": "dashboard-notifications.text.txt",
+      "bytes": 993,
+      "sha256": "1e6a7a4253fe63cdec7e23cebe484441167aeb593ac4b237c0e3da149e7e17d4",
+      "capturedOrWrittenAt": "2026-10-15T20:06:53.725749+00:00"
+    },
+    {
+      "file": "dashboard-projects.meta.json",
+      "bytes": 116,
+      "sha256": "79d6b44e60230705fcc1694d835ec4844f929ed74cf122a6a8f64c543744c55b",
+      "capturedOrWrittenAt": "2026-10-15T20:04:16.987240+00:00"
+    },
+    {
+      "file": "dashboard-projects.png",
+      "bytes": 81897,
+      "sha256": "c35d23d5308803512b0059233da41ac6da31a93d5d8be8f6361f6337fe7f91d4",
+      "capturedOrWrittenAt": "2026-10-15T20:04:16.707830+00:00"
+    },
+    {
+      "file": "dashboard-projects.snapshot.txt",
+      "bytes": 4435,
+      "sha256": "9829f91b5bcc6489c1a67e3016722ad008b6e22188f2803f036a677a80e4a23d",
+      "capturedOrWrittenAt": "2026-10-15T20:04:15.721315+00:00"
+    },
+    {
+      "file": "dashboard-projects.text.txt",
+      "bytes": 1104,
+      "sha256": "45ba39daba3454e677f34712c52107ba2e33c322fc355d6144f25c23d6346866",
+      "capturedOrWrittenAt": "2026-10-15T20:04:16.190270+00:00"
+    },
+    {
+      "file": "dashboard-resources.meta.json",
+      "bytes": 117,
+      "sha256": "5021d6774b2810c31eeede63240e6f54b50f9da9445fe47f568d8849fcc1022f",
+      "capturedOrWrittenAt": "2026-10-15T20:07:19.007718+00:00"
+    },
+    {
+      "file": "dashboard-resources.snapshot.txt",
+      "bytes": 4394,
+      "sha256": "0d329c3b366c733c3243df80584319c82222f7102996c64ba54ae35bfe244616",
+      "capturedOrWrittenAt": "2026-10-15T20:07:18.658675+00:00"
+    },
+    {
+      "file": "dashboard-resources.text.txt",
+      "bytes": 1013,
+      "sha256": "fad5bb7cf4ab17d6eadd1e4347b8bb518cf2f9fa8888ce026dce1f02dcb097cb",
+      "capturedOrWrittenAt": "2026-10-15T20:07:18.835361+00:00"
+    },
+    {
+      "file": "dashboard-settings-account.meta.json",
+      "bytes": 124,
+      "sha256": "8986fc5f0e445b74d3676f3e2a4dfa4fd13b8676b4f7e77c180f011fd4fc083c",
+      "capturedOrWrittenAt": "2026-10-15T20:05:51.057685+00:00"
+    },
+    {
+      "file": "dashboard-settings-account.snapshot.txt",
+      "bytes": 4484,
+      "sha256": "0925fc5e3c7450a4cbbc0e031025943d19ef49873965a512877f3250bddf3a5f",
+      "capturedOrWrittenAt": "2026-10-15T20:05:50.740348+00:00"
+    },
+    {
+      "file": "dashboard-settings-account.text.txt",
+      "bytes": 1402,
+      "sha256": "a22c2dd5f7e258cf73a34e9c5c0c2605049b8fdcfc4e685bb38997ffe120dd8c",
+      "capturedOrWrittenAt": "2026-10-15T20:05:50.899546+00:00"
+    },
+    {
+      "file": "dashboard-settings-ai.meta.json",
+      "bytes": 119,
+      "sha256": "412f495b73059f8af2b49d4856842594f74e18777a344eaea227356ad1751b3d",
+      "capturedOrWrittenAt": "2026-10-15T20:06:31.004820+00:00"
+    },
+    {
+      "file": "dashboard-settings-ai.snapshot.txt",
+      "bytes": 4213,
+      "sha256": "80e1bbdc75feab4420a451d4187cacac8720e4465b6d5fe07656d295ff363029",
+      "capturedOrWrittenAt": "2026-10-15T20:06:30.486355+00:00"
+    },
+    {
+      "file": "dashboard-settings-ai.text.txt",
+      "bytes": 1635,
+      "sha256": "8feb441f936b2f82661ba709913bad35ca55c453877c53df2cb80dfc61e832b2",
+      "capturedOrWrittenAt": "2026-10-15T20:06:30.773990+00:00"
+    },
+    {
+      "file": "dashboard-settings-api-tokens.meta.json",
+      "bytes": 127,
+      "sha256": "c8818a4c26bb5e533b61644025ef54b26a5ee944c03204f4625f895e5388d0d9",
+      "capturedOrWrittenAt": "2026-10-15T20:06:37.677275+00:00"
+    },
+    {
+      "file": "dashboard-settings-api-tokens.snapshot.txt",
+      "bytes": 4234,
+      "sha256": "b3038a8fe09558d38e5092ac6ceef3cf993d169a79f48be615c7594d4f3a1b55",
+      "capturedOrWrittenAt": "2026-10-15T20:06:37.284133+00:00"
+    },
+    {
+      "file": "dashboard-settings-api-tokens.text.txt",
+      "bytes": 1272,
+      "sha256": "d7f5f666827ef2e0ef0f8eff71ae34864ffb0f71cba516efe9a435a887841212",
+      "capturedOrWrittenAt": "2026-10-15T20:06:37.508321+00:00"
+    },
+    {
+      "file": "dashboard-settings-billing-settled.meta.json",
+      "bytes": 124,
+      "sha256": "db1872fd31f25733522214a3b00c7a58a6f44441acd372eee2adc4bb001d43a8",
+      "capturedOrWrittenAt": "2026-10-15T20:42:53.032845+00:00"
+    },
+    {
+      "file": "dashboard-settings-billing-settled.png",
+      "bytes": 89720,
+      "sha256": "083296afecc5ad5e5c692793b77e3ebb363eff42cb46c5c2710a7882a9c98da6",
+      "capturedOrWrittenAt": "2026-10-15T20:42:52.875243+00:00"
+    },
+    {
+      "file": "dashboard-settings-billing-settled.snapshot.txt",
+      "bytes": 4363,
+      "sha256": "ec68445bef093e8712cdeba904af49297dffceb1ecdf6b6f9440f550f59a23c1",
+      "capturedOrWrittenAt": "2026-10-15T20:42:52.462776+00:00"
+    },
+    {
+      "file": "dashboard-settings-billing-settled.text.txt",
+      "bytes": 1182,
+      "sha256": "5b2288cc5c79d07c2f3212ab753dcb672beb28567f9672b9bfc9766fce9f5c73",
+      "capturedOrWrittenAt": "2026-10-15T20:42:52.606055+00:00"
+    },
+    {
+      "file": "dashboard-settings-billing.meta.json",
+      "bytes": 124,
+      "sha256": "db1872fd31f25733522214a3b00c7a58a6f44441acd372eee2adc4bb001d43a8",
+      "capturedOrWrittenAt": "2026-10-15T20:06:10.034702+00:00"
+    },
+    {
+      "file": "dashboard-settings-billing.snapshot.txt",
+      "bytes": 4106,
+      "sha256": "6ee4ea97a579a56e8c09296518dec95bd2f591f9a3bf4ba2fc4f4ddde85f1654",
+      "capturedOrWrittenAt": "2026-10-15T20:06:09.614249+00:00"
+    },
+    {
+      "file": "dashboard-settings-billing.text.txt",
+      "bytes": 965,
+      "sha256": "1d36bd62d7685f100d11b5b1e2d79d3db4d50d54197ffd7a9044fa2bfd59009c",
+      "capturedOrWrittenAt": "2026-10-15T20:06:09.861787+00:00"
+    },
+    {
+      "file": "dashboard-settings-danger.meta.json",
+      "bytes": 123,
+      "sha256": "27c8eb6ccf3851eb1c4bf99366ec600d4af8941bf7490fd2e31e879a3d0fa1f7",
+      "capturedOrWrittenAt": "2026-10-15T20:06:48.838476+00:00"
+    },
+    {
+      "file": "dashboard-settings-danger.snapshot.txt",
+      "bytes": 4354,
+      "sha256": "74051cbd6829733b849051d50dd3f7f16b9f66e637cf670b85869486867181a1",
+      "capturedOrWrittenAt": "2026-10-15T20:06:48.530228+00:00"
+    },
+    {
+      "file": "dashboard-settings-danger.text.txt",
+      "bytes": 2165,
+      "sha256": "4911afb0f1675a582988219680df5d8accb27aa9c21eea11008ebb16b342559b",
+      "capturedOrWrittenAt": "2026-10-15T20:06:48.703794+00:00"
+    },
+    {
+      "file": "dashboard-settings-domains-settled.meta.json",
+      "bytes": 124,
+      "sha256": "73d3e2a856a910b4e451c12dd75c5dcb5a4795c82ebd610d6ad40db1f24caee3",
+      "capturedOrWrittenAt": "2026-10-15T20:43:25.984994+00:00"
+    },
+    {
+      "file": "dashboard-settings-domains-settled.png",
+      "bytes": 70193,
+      "sha256": "908c63bfa33726193af11d00fa89c6b12163f31076d4ff98ef08e6d962f42160",
+      "capturedOrWrittenAt": "2026-10-15T20:43:25.841556+00:00"
+    },
+    {
+      "file": "dashboard-settings-domains-settled.snapshot.txt",
+      "bytes": 4158,
+      "sha256": "2fe7111cccf46dd12479a4505d9dc1457f1f89954d75b8035e775822d0060b1f",
+      "capturedOrWrittenAt": "2026-10-15T20:43:25.481762+00:00"
+    },
+    {
+      "file": "dashboard-settings-domains-settled.text.txt",
+      "bytes": 1051,
+      "sha256": "b8314094eabfe6acad025110ac57c5ada0554d3de6f449771d0c2255a1a6ce8e",
+      "capturedOrWrittenAt": "2026-10-15T20:43:25.653069+00:00"
+    },
+    {
+      "file": "dashboard-settings-integrations.meta.json",
+      "bytes": 129,
+      "sha256": "3eaf6f888d0b5d3fb9e9118dc0afc0a140657cb5ac9ef89409b6b3b6b245230d",
+      "capturedOrWrittenAt": "2026-10-15T20:06:43.881608+00:00"
+    },
+    {
+      "file": "dashboard-settings-integrations.snapshot.txt",
+      "bytes": 4188,
+      "sha256": "0fc732cf5a3d408821738b974446c61f70e0e0f80fbd48e9a1677e611dc55155",
+      "capturedOrWrittenAt": "2026-10-15T20:06:43.499351+00:00"
+    },
+    {
+      "file": "dashboard-settings-integrations.text.txt",
+      "bytes": 1141,
+      "sha256": "5357bd3f27de66bd6559469b9b74c3ac52610fffbe69c2ff36c036ff98d991a6",
+      "capturedOrWrittenAt": "2026-10-15T20:06:43.671311+00:00"
+    },
+    {
+      "file": "dashboard-settings-notifications.meta.json",
+      "bytes": 130,
+      "sha256": "c2e32820547ba073977923ae1e54b52825584e0eaa4a8a6463ca107784076883",
+      "capturedOrWrittenAt": "2026-10-15T20:06:01.306802+00:00"
+    },
+    {
+      "file": "dashboard-settings-notifications.snapshot.txt",
+      "bytes": 5846,
+      "sha256": "216cd1df4ec411b50452557c123902387e498753760eefe1d86ddd8b8984a564",
+      "capturedOrWrittenAt": "2026-10-15T20:06:01.011182+00:00"
+    },
+    {
+      "file": "dashboard-settings-notifications.text.txt",
+      "bytes": 1227,
+      "sha256": "e2f816784a78f8437f431a719daa2cd2cc82c92512ad3ef72246f99c5efca3d4",
+      "capturedOrWrittenAt": "2026-10-15T20:06:01.160081+00:00"
+    },
+    {
+      "file": "dashboard-settings-plans.meta.json",
+      "bytes": 122,
+      "sha256": "61cf3534e26b8f4e04adc33f5e833b740400ae22368b5dcf06352568eebb95f0",
+      "capturedOrWrittenAt": "2026-10-15T20:06:15.918341+00:00"
+    },
+    {
+      "file": "dashboard-settings-plans.snapshot.txt",
+      "bytes": 4340,
+      "sha256": "c4f1d95e1f18d4158d1e56a7e573490b729435666cbd269cb7c5b94ce7605de8",
+      "capturedOrWrittenAt": "2026-10-15T20:06:15.613610+00:00"
+    },
+    {
+      "file": "dashboard-settings-plans.text.txt",
+      "bytes": 1200,
+      "sha256": "d8c627c0a839a202a79bdef3896af108b1d1617e5719bc9be2cd153486ee5c48",
+      "capturedOrWrittenAt": "2026-10-15T20:06:15.770765+00:00"
+    },
+    {
+      "file": "dashboard-settings-profile.meta.json",
+      "bytes": 124,
+      "sha256": "bdb20788e4cf6c7e173b0c0ab3ff2a53addb2a8573b8304d82a03a5079f4f33c",
+      "capturedOrWrittenAt": "2026-10-15T20:05:34.871848+00:00"
+    },
+    {
+      "file": "dashboard-settings-profile.snapshot.txt",
+      "bytes": 4117,
+      "sha256": "adbc3cbb40da85a74e98d6397656e1c43aca4076ebd94a831a6ec3c1e4333d1d",
+      "capturedOrWrittenAt": "2026-10-15T20:05:34.285099+00:00"
+    },
+    {
+      "file": "dashboard-settings-profile.text.txt",
+      "bytes": 1409,
+      "sha256": "f5bd9071456a00e96afb3f95a87a16ce02387552a630569e6489a822f2edddef",
+      "capturedOrWrittenAt": "2026-10-15T20:05:34.614696+00:00"
+    },
+    {
+      "file": "dashboard-settings-security.meta.json",
+      "bytes": 125,
+      "sha256": "ec12ea6892ec542d221d960c430a859d71527baa09e3e235305835245666c5c3",
+      "capturedOrWrittenAt": "2026-10-15T20:05:56.787605+00:00"
+    },
+    {
+      "file": "dashboard-settings-security.snapshot.txt",
+      "bytes": 4423,
+      "sha256": "5387f1a7e6dbca097bc36ba40d20fbf17af5db56b5f8b6a9dd2890d3dc9a91e3",
+      "capturedOrWrittenAt": "2026-10-15T20:05:56.466297+00:00"
+    },
+    {
+      "file": "dashboard-settings-security.text.txt",
+      "bytes": 1402,
+      "sha256": "50048ea6d2a6347931e4d9a2d9bf0c0130059bec6002fe6829e721b3ad8063ef",
+      "capturedOrWrittenAt": "2026-10-15T20:05:56.638264+00:00"
+    },
+    {
+      "file": "dashboard-settings-settled.meta.json",
+      "bytes": 116,
+      "sha256": "7a34fc50a489016ed87241bf6f1fed21810556664196c16c2fa111d11278e9db",
+      "capturedOrWrittenAt": "2026-10-15T20:43:37.153361+00:00"
+    },
+    {
+      "file": "dashboard-settings-settled.png",
+      "bytes": 133503,
+      "sha256": "3c64d507c337d5222de20956cbba4c7433c5bc7d0f51a89ca8b2e90ceedfee44",
+      "capturedOrWrittenAt": "2026-10-15T20:43:36.973040+00:00"
+    },
+    {
+      "file": "dashboard-settings-settled.snapshot.txt",
+      "bytes": 7284,
+      "sha256": "8008b098609d23a06f2a1872c83b1ff57ab79676dcc1d7742f1f67b5dc6e03b2",
+      "capturedOrWrittenAt": "2026-10-15T20:43:36.427817+00:00"
+    },
+    {
+      "file": "dashboard-settings-settled.text.txt",
+      "bytes": 1574,
+      "sha256": "38a02dacba16461ca4017c45b96551e7bc662a24658fd82ebfa3b34ebb3a4bac",
+      "capturedOrWrittenAt": "2026-10-15T20:43:36.681567+00:00"
+    },
+    {
+      "file": "dashboard-settings-team.meta.json",
+      "bytes": 121,
+      "sha256": "3fd3686428d1ba6a5653732a145f9d6ea1586fc5f8686673b2a17dd12f3dc95d",
+      "capturedOrWrittenAt": "2026-10-15T20:06:06.104652+00:00"
+    },
+    {
+      "file": "dashboard-settings-team.snapshot.txt",
+      "bytes": 4172,
+      "sha256": "4b8a40488720774cf6a96b71b824466d0110da8518782c5d6ad85798c4377968",
+      "capturedOrWrittenAt": "2026-10-15T20:06:05.733542+00:00"
+    },
+    {
+      "file": "dashboard-settings-team.text.txt",
+      "bytes": 1386,
+      "sha256": "6829e311b08b0bc0fa998a43e2ff1bc6179577aaf157cb9031c86760065287e4",
+      "capturedOrWrittenAt": "2026-10-15T20:06:05.943615+00:00"
+    },
+    {
+      "file": "dashboard-settings-usage.meta.json",
+      "bytes": 122,
+      "sha256": "9eaea2380e209990ccf14372c0f57846b212399c6be173bb41dd1eb82f960b54",
+      "capturedOrWrittenAt": "2026-10-15T20:06:21.019701+00:00"
+    },
+    {
+      "file": "dashboard-settings-usage.snapshot.txt",
+      "bytes": 4208,
+      "sha256": "ba970198f0eafab5371a27eda22429f3ec69b90dadd42fa7202de84454bbd114",
+      "capturedOrWrittenAt": "2026-10-15T20:06:20.672882+00:00"
+    },
+    {
+      "file": "dashboard-settings-usage.text.txt",
+      "bytes": 1886,
+      "sha256": "035569ae5396b744bf079e77da635d9c2ae3ebc4bd1c50dcdd20b32108f75214",
+      "capturedOrWrittenAt": "2026-10-15T20:06:20.861414+00:00"
+    },
+    {
+      "file": "dashboard-settings-workspace.meta.json",
+      "bytes": 126,
+      "sha256": "651c4c47e03015810da72fa83da244ef28e497268587704a27feeb13b29cf44f",
+      "capturedOrWrittenAt": "2026-10-15T20:05:43.340459+00:00"
+    },
+    {
+      "file": "dashboard-settings-workspace.png",
+      "bytes": 153948,
+      "sha256": "7fdee2af56cbbc57892fb0a779f02387f6161a4bf7ee4af35352a0b2685b88d5",
+      "capturedOrWrittenAt": "2026-10-15T20:05:43.177029+00:00"
+    },
+    {
+      "file": "dashboard-settings-workspace.snapshot.txt",
+      "bytes": 4812,
+      "sha256": "26a4d3426c4ce26b24d718b0f4d0b6cb835b4b7e0b814d88be76e2394892d86e",
+      "capturedOrWrittenAt": "2026-10-15T20:05:42.612012+00:00"
+    },
+    {
+      "file": "dashboard-settings-workspace.text.txt",
+      "bytes": 1917,
+      "sha256": "592e83d51bf620ac9a0fbcb1772c84b5408b782a129df4810cfae6536128eed2",
+      "capturedOrWrittenAt": "2026-10-15T20:05:42.862620+00:00"
+    },
+    {
+      "file": "dashboard-sites-new-settled.meta.json",
+      "bytes": 117,
+      "sha256": "3e3c9b7024e49e8caaf6a511a47ab05e0edc02fd540e905ee835fbbf945a4c84",
+      "capturedOrWrittenAt": "2026-10-15T20:43:48.147520+00:00"
+    },
+    {
+      "file": "dashboard-sites-new-settled.png",
+      "bytes": 78295,
+      "sha256": "844a893830020e0724ac3000cea13f0eacf378c11447ca31c1552e2c20a110fd",
+      "capturedOrWrittenAt": "2026-10-15T20:43:47.964764+00:00"
+    },
+    {
+      "file": "dashboard-sites-new-settled.snapshot.txt",
+      "bytes": 4399,
+      "sha256": "a349e34571dde2c38dc967d57db6fb77c1e6a402943b16e3b37674e007bb2e74",
+      "capturedOrWrittenAt": "2026-10-15T20:43:47.503968+00:00"
+    },
+    {
+      "file": "dashboard-sites-new-settled.text.txt",
+      "bytes": 1117,
+      "sha256": "207642db06a6c8d233166ff657f59ca812ef61b36d9b35e3bb3f3fdd86ec3e97",
+      "capturedOrWrittenAt": "2026-10-15T20:43:47.664561+00:00"
+    },
+    {
+      "file": "dashboard-templates.meta.json",
+      "bytes": 117,
+      "sha256": "66ddb00f0dbdcc3c4b731ac3cf19d2bd72bb7e61733fdebe52edac8428e86a06",
+      "capturedOrWrittenAt": "2026-10-15T20:07:08.775579+00:00"
+    },
+    {
+      "file": "dashboard-templates.snapshot.txt",
+      "bytes": 4287,
+      "sha256": "345ee1ed2cb054b62e05a624f10a9cd2abb430bb95f9c55153c5132d7de2182f",
+      "capturedOrWrittenAt": "2026-10-15T20:07:08.435517+00:00"
+    },
+    {
+      "file": "dashboard-templates.text.txt",
+      "bytes": 1099,
+      "sha256": "7b80124fec94c1e990ed79038123d97bd7cf39260d18ede73e76fa29fa6e22f9",
+      "capturedOrWrittenAt": "2026-10-15T20:07:08.611271+00:00"
+    },
+    {
+      "file": "dashboard.meta.json",
+      "bytes": 107,
+      "sha256": "f9bf9f0335508a7f42cf14a588f74dbe0cf7febbbefdedeb534a872a6f97a31b",
+      "capturedOrWrittenAt": "2026-10-15T20:03:55.383961+00:00"
+    },
+    {
+      "file": "dashboard.png",
+      "bytes": 95109,
+      "sha256": "498bcd3dc3dd426014285559dbcb9006f2b72104783469e38f6b465988f9b756",
+      "capturedOrWrittenAt": "2026-10-15T20:03:54.735949+00:00"
+    },
+    {
+      "file": "dashboard.snapshot.txt",
+      "bytes": 4058,
+      "sha256": "7cdffc1a31bfeae92757317a743862c310f1d6db297aa9aa6312a47e7902ad2c",
+      "capturedOrWrittenAt": "2026-10-15T20:03:53.757245+00:00"
+    },
+    {
+      "file": "dashboard.text.txt",
+      "bytes": 1216,
+      "sha256": "8bad212ffdbb8e5a2cef135df7e45214cc7d9fdae1f06f92b026b8d1d09dccdd",
+      "capturedOrWrittenAt": "2026-10-15T20:03:54.350141+00:00"
+    },
+    {
+      "file": "design-sketch-desktop.meta.json",
+      "bytes": 226,
+      "sha256": "1d89c259c60fb93e75671974e06fbd7287a0b08eb0bdc6c8e5a660c277a27a70",
+      "capturedOrWrittenAt": "2026-10-15T20:44:24.381659+00:00"
+    },
+    {
+      "file": "design-sketch-desktop.png",
+      "bytes": 412245,
+      "sha256": "3cc5bc52dfea015ac471e012cd3dc7e437f7da78d0359374d4111381212deeae",
+      "capturedOrWrittenAt": "2026-10-15T20:44:24.179777+00:00"
+    },
+    {
+      "file": "design-sketch-desktop.snapshot.txt",
+      "bytes": 576,
+      "sha256": "a9005fa96025c7ef08cf973ee3fac5e78ce21cfe4e5ddf222a1c07d2fbcf71d0",
+      "capturedOrWrittenAt": "2026-10-15T20:44:23.438569+00:00"
+    },
+    {
+      "file": "design-sketch-desktop.text.txt",
+      "bytes": 3996,
+      "sha256": "b18c3b8a719473163c82563b41c0b730d33b6065f2be69b840f55278f69b41bd",
+      "capturedOrWrittenAt": "2026-10-15T20:44:23.587142+00:00"
+    },
+    {
+      "file": "editor-390.meta.json",
+      "bytes": 126,
+      "sha256": "b3eb2be4a94e7d4041050864e9fc530da860c0df88e254f04967c6fb5a049949",
+      "capturedOrWrittenAt": "2026-10-15T20:30:52.794989+00:00"
+    },
+    {
+      "file": "editor-390.png",
+      "bytes": 49510,
+      "sha256": "852f8aefb3a42e3fa625a579eddaa6dc98deada8d98ea9af37d480d3bb9e53cc",
+      "capturedOrWrittenAt": "2026-10-15T20:30:52.641186+00:00"
+    },
+    {
+      "file": "editor-390.snapshot.txt",
+      "bytes": 9737,
+      "sha256": "2b1065874c434fd6f30fda65fbe7c120681954ec3f9156bff724cb43d35673bb",
+      "capturedOrWrittenAt": "2026-10-15T20:30:51.587765+00:00"
+    },
+    {
+      "file": "editor-390.text.txt",
+      "bytes": 5766,
+      "sha256": "b0b5926fa813d76fe56e7070e302a1db4078fff7753eb8aacb60353a6f6ae0b6",
+      "capturedOrWrittenAt": "2026-10-15T20:30:51.739497+00:00"
+    },
+    {
+      "file": "editor-900.meta.json",
+      "bytes": 126,
+      "sha256": "a5f93edf15709bbc5a560458d9e9ed293433157fbe243ad83388ba3c3362f359",
+      "capturedOrWrittenAt": "2026-10-15T20:30:49.079364+00:00"
+    },
+    {
+      "file": "editor-900.png",
+      "bytes": 120263,
+      "sha256": "27c6479143c6cd9979d9d2d5c68d98aa0acbf0b8bac6b62e6e165bf87c0d5574",
+      "capturedOrWrittenAt": "2026-10-15T20:30:48.862871+00:00"
+    },
+    {
+      "file": "editor-900.snapshot.txt",
+      "bytes": 9737,
+      "sha256": "2b1065874c434fd6f30fda65fbe7c120681954ec3f9156bff724cb43d35673bb",
+      "capturedOrWrittenAt": "2026-10-15T20:30:48.434674+00:00"
+    },
+    {
+      "file": "editor-900.text.txt",
+      "bytes": 5766,
+      "sha256": "b0b5926fa813d76fe56e7070e302a1db4078fff7753eb8aacb60353a6f6ae0b6",
+      "capturedOrWrittenAt": "2026-10-15T20:30:48.593189+00:00"
+    },
+    {
+      "file": "editor-after-settings.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:23:10.203243+00:00"
+    },
+    {
+      "file": "editor-after-settings.snapshot.txt",
+      "bytes": 6290,
+      "sha256": "4ff02ebb655b5bcb283f1d6d8910d45b2fe9cf8c72776ef9c0cbc5e14feaa637",
+      "capturedOrWrittenAt": "2026-10-15T20:23:09.913729+00:00"
+    },
+    {
+      "file": "editor-after-settings.text.txt",
+      "bytes": 5748,
+      "sha256": "0034941ed823d12c06c8411759601ecc74d020e225be91ac3f5a730e1da81958",
+      "capturedOrWrittenAt": "2026-10-15T20:23:10.063762+00:00"
+    },
+    {
+      "file": "editor-ai.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:39:08.592599+00:00"
+    },
+    {
+      "file": "editor-ai.png",
+      "bytes": 117030,
+      "sha256": "7fa514f4a9aed95ad6a775f21c80e5e99a773d87dce3a97082c6f9ce9caee485",
+      "capturedOrWrittenAt": "2026-10-15T20:39:08.330305+00:00"
+    },
+    {
+      "file": "editor-ai.snapshot.txt",
+      "bytes": 8595,
+      "sha256": "4c4a71e5a219a50b1d7b88d73408f390159bd3fb771e6f7971ec40c6211b4507",
+      "capturedOrWrittenAt": "2026-10-15T20:39:07.914708+00:00"
+    },
+    {
+      "file": "editor-ai.text.txt",
+      "bytes": 6040,
+      "sha256": "5c63328b53452cb0c0500cce685167ac3d417830d80c2d83b9d7222d57c30ce8",
+      "capturedOrWrittenAt": "2026-10-15T20:39:08.094722+00:00"
+    },
+    {
+      "file": "editor-assets.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:19:03.102956+00:00"
+    },
+    {
+      "file": "editor-assets.png",
+      "bytes": 101234,
+      "sha256": "c82b91dd906b7fc94502e83bf19169deea6a0b32055f95f2092ac8eb7f6226f0",
+      "capturedOrWrittenAt": "2026-10-15T20:19:02.923794+00:00"
+    },
+    {
+      "file": "editor-assets.snapshot.txt",
+      "bytes": 7732,
+      "sha256": "4a69599fc23c6c23b530cb1cff65a6d8409061be60672c5453da681487d7c737",
+      "capturedOrWrittenAt": "2026-10-15T20:19:02.448595+00:00"
+    },
+    {
+      "file": "editor-assets.text.txt",
+      "bytes": 5680,
+      "sha256": "366fac1f791a2109fa83d0e4514fdc788693180d5a1e08f0c89ed8dfa88aadcc",
+      "capturedOrWrittenAt": "2026-10-15T20:19:02.643838+00:00"
+    },
+    {
+      "file": "editor-brand.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:19:12.312873+00:00"
+    },
+    {
+      "file": "editor-brand.png",
+      "bytes": 139284,
+      "sha256": "abc1e48748ae74e58d5692c88f778384495fab66302246b781456d5f329d3857",
+      "capturedOrWrittenAt": "2026-10-15T20:19:12.013767+00:00"
+    },
+    {
+      "file": "editor-brand.snapshot.txt",
+      "bytes": 35619,
+      "sha256": "2c051be3678ce061ef3a0fa8a9d9b1626005332e1a9c0397d9c3d87285b20caf",
+      "capturedOrWrittenAt": "2026-10-15T20:19:11.479956+00:00"
+    },
+    {
+      "file": "editor-brand.text.txt",
+      "bytes": 8445,
+      "sha256": "de87030fd52295cbf9c654c49958e65f0a0fb5bb2928ed39e1421c6f346e8524",
+      "capturedOrWrittenAt": "2026-10-15T20:19:11.653935+00:00"
+    },
+    {
+      "file": "editor-components.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:35:10.342215+00:00"
+    },
+    {
+      "file": "editor-components.png",
+      "bytes": 125745,
+      "sha256": "f56d2013f2613b96fd9c1fdfabec6d3871cd3b09af068755f5a5426deb49b90d",
+      "capturedOrWrittenAt": "2026-10-15T20:35:10.055460+00:00"
+    },
+    {
+      "file": "editor-components.snapshot.txt",
+      "bytes": 9926,
+      "sha256": "95ba87a9e5e8872773c791cef748c89b4c184cd359bce41d856d5956f63e899e",
+      "capturedOrWrittenAt": "2026-10-15T20:35:09.659332+00:00"
+    },
+    {
+      "file": "editor-components.text.txt",
+      "bytes": 5923,
+      "sha256": "0338f15308960812cca8bd4833a4fdefa73b8918a06045d4a70614f7cf2ab2c5",
+      "capturedOrWrittenAt": "2026-10-15T20:35:09.828785+00:00"
+    },
+    {
+      "file": "editor-content.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:19:06.646995+00:00"
+    },
+    {
+      "file": "editor-content.png",
+      "bytes": 55298,
+      "sha256": "bde8c573869fcdcb91cfc79a13571a48d4a2b36002ae66b76d7a386169836c96",
+      "capturedOrWrittenAt": "2026-10-15T20:19:06.488733+00:00"
+    },
+    {
+      "file": "editor-content.snapshot.txt",
+      "bytes": 6290,
+      "sha256": "4ff02ebb655b5bcb283f1d6d8910d45b2fe9cf8c72776ef9c0cbc5e14feaa637",
+      "capturedOrWrittenAt": "2026-10-15T20:19:06.134000+00:00"
+    },
+    {
+      "file": "editor-content.text.txt",
+      "bytes": 5752,
+      "sha256": "8d56e2a98f8c091f522559c88eafe67ae2ba6d56477f7537995eece7ae4fe1fa",
+      "capturedOrWrittenAt": "2026-10-15T20:19:06.284522+00:00"
+    },
+    {
+      "file": "editor-history.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:26:06.374734+00:00"
+    },
+    {
+      "file": "editor-history.png",
+      "bytes": 99202,
+      "sha256": "20ef797ccc9950339daaf107ae55ce494b7eef05f6f9a207d537efb3453b9745",
+      "capturedOrWrittenAt": "2026-10-15T20:26:06.106457+00:00"
+    },
+    {
+      "file": "editor-history.snapshot.txt",
+      "bytes": 6431,
+      "sha256": "9010a408897da2ac9ad0502b978c029947f1f1112c2c852117ee619ef215bec5",
+      "capturedOrWrittenAt": "2026-10-15T20:26:05.528036+00:00"
+    },
+    {
+      "file": "editor-history.text.txt",
+      "bytes": 5364,
+      "sha256": "d00f9ff599d9ccfb98fb0a564dd591634c530dd998495ffdd3fd62e50aee40b0",
+      "capturedOrWrittenAt": "2026-10-15T20:26:05.757702+00:00"
+    },
+    {
+      "file": "editor-initial.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:14:41.651212+00:00"
+    },
+    {
+      "file": "editor-initial.png",
+      "bytes": 118474,
+      "sha256": "a8677a41d6e1e5f183284dcd9dee8fedd2d97b8c5bd8ec3292b5886d75a368be",
+      "capturedOrWrittenAt": "2026-10-15T20:14:40.705414+00:00"
+    },
+    {
+      "file": "editor-initial.snapshot.txt",
+      "bytes": 14317,
+      "sha256": "0fdda29b2b9be6988582b34703d3c7fe52e06600c3411f4f5f0b8ab9bd3e26f6",
+      "capturedOrWrittenAt": "2026-10-15T20:14:40.250182+00:00"
+    },
+    {
+      "file": "editor-initial.text.txt",
+      "bytes": 6211,
+      "sha256": "bdf20207914d60d6a32d9dbae38ff9a310e51309161e08c3c27dd8019d3037af",
+      "capturedOrWrittenAt": "2026-10-15T20:14:40.419699+00:00"
+    },
+    {
+      "file": "editor-layers.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:18:56.586305+00:00"
+    },
+    {
+      "file": "editor-layers.png",
+      "bytes": 126421,
+      "sha256": "8452a75b041045261717983bfb9886dbdab72cf6a4b31400f5b709f9e724c2a9",
+      "capturedOrWrittenAt": "2026-10-15T20:18:56.370070+00:00"
+    },
+    {
+      "file": "editor-layers.snapshot.txt",
+      "bytes": 82473,
+      "sha256": "6f6729a53bd579d9bc8e760cf6e52484aa2f85efb5516374d469e6aacf1805fa",
+      "capturedOrWrittenAt": "2026-10-15T20:18:55.867891+00:00"
+    },
+    {
+      "file": "editor-layers.text.txt",
+      "bytes": 11645,
+      "sha256": "0ed9cf76f4d13a8fac49e6b4b19c827b2fac94b3fde3545165f62847fc071a03",
+      "capturedOrWrittenAt": "2026-10-15T20:18:56.091865+00:00"
+    },
+    {
+      "file": "editor-pages.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:18:59.993856+00:00"
+    },
+    {
+      "file": "editor-pages.png",
+      "bytes": 103805,
+      "sha256": "e64ad16382ca99f6d5920f7aa012fb0e23073ce2367b98e34e1fb5e9bede5927",
+      "capturedOrWrittenAt": "2026-10-15T20:18:59.818403+00:00"
+    },
+    {
+      "file": "editor-pages.snapshot.txt",
+      "bytes": 7968,
+      "sha256": "419eeee4b87cd7805e97910099e2c583509633d8289169b8fd50af8d6c72e2b6",
+      "capturedOrWrittenAt": "2026-10-15T20:18:59.331851+00:00"
+    },
+    {
+      "file": "editor-pages.text.txt",
+      "bytes": 5610,
+      "sha256": "100da041a7dc2cd83bc34b9fa1292a0347c1167c4be24e61a3d4258288dc3c02",
+      "capturedOrWrittenAt": "2026-10-15T20:18:59.527342+00:00"
+    },
+    {
+      "file": "editor-preview.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:27:47.382353+00:00"
+    },
+    {
+      "file": "editor-preview.png",
+      "bytes": 68953,
+      "sha256": "10c225eb7b348e744386d8bfeede6d8b7bba30cd19b855d0e81ab8882c455be9",
+      "capturedOrWrittenAt": "2026-10-15T20:27:47.136574+00:00"
+    },
+    {
+      "file": "editor-preview.snapshot.txt",
+      "bytes": 6783,
+      "sha256": "8151ab48046831aab221c9034d9b125c1fea79df4f5de6164811c3963187cf8b",
+      "capturedOrWrittenAt": "2026-10-15T20:27:46.640814+00:00"
+    },
+    {
+      "file": "editor-preview.text.txt",
+      "bytes": 5360,
+      "sha256": "4696e59842de01fae2190e76555eb10f3537dec73ab07ed29147609317a5cca2",
+      "capturedOrWrittenAt": "2026-10-15T20:27:46.842334+00:00"
+    },
+    {
+      "file": "editor-publish.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:35:14.606667+00:00"
+    },
+    {
+      "file": "editor-publish.png",
+      "bytes": 145547,
+      "sha256": "9e6870880aedcb71dfa706a7875d535eddafb5a202b29ae672e086f08f6ea073",
+      "capturedOrWrittenAt": "2026-10-15T20:35:13.904542+00:00"
+    },
+    {
+      "file": "editor-publish.snapshot.txt",
+      "bytes": 6499,
+      "sha256": "1c0dfb93476f1120b8b33b511f2cf1e1dcef7c24a2114961c611fa64078829c3",
+      "capturedOrWrittenAt": "2026-10-15T20:35:13.060108+00:00"
+    },
+    {
+      "file": "editor-publish.text.txt",
+      "bytes": 6199,
+      "sha256": "6ce12106d4f731225e2b2570e439dc83ce10d7a5adaf625bbabc0b7f147b7608",
+      "capturedOrWrittenAt": "2026-10-15T20:35:13.482873+00:00"
+    },
+    {
+      "file": "editor-review.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:27:41.856575+00:00"
+    },
+    {
+      "file": "editor-review.png",
+      "bytes": 92974,
+      "sha256": "da0458c897a423f4081dc4f34040d2b779198f591c620525818c30d4906c4f2a",
+      "capturedOrWrittenAt": "2026-10-15T20:27:41.683590+00:00"
+    },
+    {
+      "file": "editor-review.snapshot.txt",
+      "bytes": 6305,
+      "sha256": "0681f403b971983cb740485a406bf3ebd923aa56017989e26b216f9ad3d5dfee",
+      "capturedOrWrittenAt": "2026-10-15T20:27:41.314001+00:00"
+    },
+    {
+      "file": "editor-review.text.txt",
+      "bytes": 5281,
+      "sha256": "95ac3f6e4f37dbf7a094c325f3c986f111416f4345d5232b1c7444faa54546bf",
+      "capturedOrWrittenAt": "2026-10-15T20:27:41.473973+00:00"
+    },
+    {
+      "file": "editor-settings.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:22:22.695026+00:00"
+    },
+    {
+      "file": "editor-settings.png",
+      "bytes": 80904,
+      "sha256": "3552222f2ec6d3d46880cd4b5f1dfcd9ff41c1eca2a565ab52fe73ee8ad3261e",
+      "capturedOrWrittenAt": "2026-10-15T20:22:22.543526+00:00"
+    },
+    {
+      "file": "editor-settings.snapshot.txt",
+      "bytes": 6649,
+      "sha256": "85d5005a7286376c2cbb05dd1d7f2a5b1c17cfc6368f0c0c6f3b3976f16bb7ca",
+      "capturedOrWrittenAt": "2026-10-15T20:22:22.186968+00:00"
+    },
+    {
+      "file": "editor-settings.text.txt",
+      "bytes": 6129,
+      "sha256": "c0753749837113b21ad5db9da7ef23768a106bb345d0bfd959e990284c5d3cea",
+      "capturedOrWrittenAt": "2026-10-15T20:22:22.331631+00:00"
+    },
+    {
+      "file": "editor-site-menu.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:22:06.772302+00:00"
+    },
+    {
+      "file": "editor-site-menu.png",
+      "bytes": 84570,
+      "sha256": "cc07821c814de915aa8946984cbd02d1b59dbe6169455ae898b21929d39626fb",
+      "capturedOrWrittenAt": "2026-10-15T20:22:06.614083+00:00"
+    },
+    {
+      "file": "editor-site-menu.snapshot.txt",
+      "bytes": 8105,
+      "sha256": "fbab3a919d4e247aab1634f304eb7c89763709fba9c703dfaeb6b4d18ee9a7cb",
+      "capturedOrWrittenAt": "2026-10-15T20:22:06.239369+00:00"
+    },
+    {
+      "file": "editor-site-menu.text.txt",
+      "bytes": 6066,
+      "sha256": "2183178210486b8d519e6c7764117f9ce0ed443cf1bbe492d217f5121c3b2959",
+      "capturedOrWrittenAt": "2026-10-15T20:22:06.393768+00:00"
+    },
+    {
+      "file": "editor-templates.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:31:55.665132+00:00"
+    },
+    {
+      "file": "editor-templates.png",
+      "bytes": 166182,
+      "sha256": "925756ac20ddc8772da0612c3cc02402060419fb43099dfa7896b61844a583ba",
+      "capturedOrWrittenAt": "2026-10-15T20:31:55.428403+00:00"
+    },
+    {
+      "file": "editor-templates.snapshot.txt",
+      "bytes": 12220,
+      "sha256": "7552de2d58ed8638f0be967006e5523b3ae798029e4f59fbaa40e0e4ba4378be",
+      "capturedOrWrittenAt": "2026-10-15T20:31:54.907212+00:00"
+    },
+    {
+      "file": "editor-templates.text.txt",
+      "bytes": 6370,
+      "sha256": "9a1de52971e70d2791f11a9384ee87e43029e8acc62d360569d4fa1d7f14fa1a",
+      "capturedOrWrittenAt": "2026-10-15T20:31:55.082727+00:00"
+    },
+    {
+      "file": "editor-view-menu.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:26:02.964974+00:00"
+    },
+    {
+      "file": "editor-view-menu.png",
+      "bytes": 122564,
+      "sha256": "e4669c335fa6f0de010ea86f294c598a011c5fca4258c964486f1f8cd9348f5d",
+      "capturedOrWrittenAt": "2026-10-15T20:26:02.569052+00:00"
+    },
+    {
+      "file": "editor-view-menu.snapshot.txt",
+      "bytes": 10652,
+      "sha256": "5559bb36c8e1f88b147414ea6768dfdafe1c4df85e3069d38640e6e888f9cd62",
+      "capturedOrWrittenAt": "2026-10-15T20:26:02.136959+00:00"
+    },
+    {
+      "file": "editor-view-menu.text.txt",
+      "bytes": 5808,
+      "sha256": "c003e137e76efa1aee6fc453e5c7a5855d61c28ebd2661eee446c1ac4079c84b",
+      "capturedOrWrittenAt": "2026-10-15T20:26:02.286583+00:00"
+    },
+    {
+      "file": "file-inventory.txt",
+      "bytes": 174994,
+      "sha256": "eb8bb1c15d95a5762c63863f44250abf2af2d0c25768bb0126495f10cf643268",
+      "capturedOrWrittenAt": "2026-10-15T19:39:03.747125+00:00"
+    },
+    {
+      "file": "final-git-status.txt",
+      "bytes": 2255,
+      "sha256": "879a617aa878fe0cfaa9fcb3ea1335ad8cfdef82d0c080ce82c9feb8eb7bad8e",
+      "capturedOrWrittenAt": "2026-10-15T20:45:45.918593+00:00"
+    },
+    {
+      "file": "history-published.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:27:38.777327+00:00"
+    },
+    {
+      "file": "history-published.snapshot.txt",
+      "bytes": 8268,
+      "sha256": "97427eb2d807f1525ece91abc544a7d656ea9f6f6950013a52e8dbcc3d086691",
+      "capturedOrWrittenAt": "2026-10-15T20:27:38.136074+00:00"
+    },
+    {
+      "file": "history-published.text.txt",
+      "bytes": 5533,
+      "sha256": "ac84eac6b4ab6bc7a3dce7e99bba90a82a938618abda1f7d082864d9ba1d09b0",
+      "capturedOrWrittenAt": "2026-10-15T20:27:38.410689+00:00"
+    },
+    {
+      "file": "history-saves.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:27:36.691496+00:00"
+    },
+    {
+      "file": "history-saves.snapshot.txt",
+      "bytes": 8786,
+      "sha256": "75f12818e44a6268633c9f228544da9e035c0578335659e118c2629a98958293",
+      "capturedOrWrittenAt": "2026-10-15T20:27:36.373089+00:00"
+    },
+    {
+      "file": "history-saves.text.txt",
+      "bytes": 5445,
+      "sha256": "1718358463d1dace4235f65a0b62e8046cdd24f8b9049dd8f30107300bd68922",
+      "capturedOrWrittenAt": "2026-10-15T20:27:36.534218+00:00"
+    },
+    {
+      "file": "inspector-form.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:25:59.826727+00:00"
+    },
+    {
+      "file": "inspector-form.png",
+      "bytes": 121450,
+      "sha256": "3290a55a1035fd27cec5b16c7f6fdc89219b0708c4d7b19266c3487a7f05fcd7",
+      "capturedOrWrittenAt": "2026-10-15T20:25:59.680485+00:00"
+    },
+    {
+      "file": "inspector-form.snapshot.txt",
+      "bytes": 9322,
+      "sha256": "1a644e8daf73447767365600f9957ee3ce5f9a95a3c3ff1a66908df54df6c0d5",
+      "capturedOrWrittenAt": "2026-10-15T20:25:59.291168+00:00"
+    },
+    {
+      "file": "inspector-form.text.txt",
+      "bytes": 5702,
+      "sha256": "bc05675c7d5f8281220fe6200487f43490724e32f226a3f90d4ef63c71460d40",
+      "capturedOrWrittenAt": "2026-10-15T20:25:59.469578+00:00"
+    },
+    {
+      "file": "inspector-heading-behaviour.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:25:53.294379+00:00"
+    },
+    {
+      "file": "inspector-heading-behaviour.png",
+      "bytes": 98007,
+      "sha256": "33aabc68a2ffaf2580d67324489413ccc7fb91e9b3fbf7fb965ae23918036137",
+      "capturedOrWrittenAt": "2026-10-15T20:25:53.134513+00:00"
+    },
+    {
+      "file": "inspector-heading-behaviour.snapshot.txt",
+      "bytes": 8153,
+      "sha256": "c354bf6a582e6761f4cbe4b3da317243768bf1f8eea45ae65a9978b8f55047ad",
+      "capturedOrWrittenAt": "2026-10-15T20:25:52.708581+00:00"
+    },
+    {
+      "file": "inspector-heading-behaviour.text.txt",
+      "bytes": 5555,
+      "sha256": "9f7c35d9b155696a2f97535628cc19577e600bf8711e7933b9d150a916a52bc7",
+      "capturedOrWrittenAt": "2026-10-15T20:25:52.863295+00:00"
+    },
+    {
+      "file": "inspector-heading-effects.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:25:55.390667+00:00"
+    },
+    {
+      "file": "inspector-heading-effects.png",
+      "bytes": 90971,
+      "sha256": "3f059e11837ead6f9abff623b6291759a5090b5b6fcdd4b962be4c5913af3442",
+      "capturedOrWrittenAt": "2026-10-15T20:25:55.197003+00:00"
+    },
+    {
+      "file": "inspector-heading-effects.snapshot.txt",
+      "bytes": 7987,
+      "sha256": "b709e2492c696bfd6b7e572db1f5178acc4dbf1a8cd94a267daec0d918b72a5e",
+      "capturedOrWrittenAt": "2026-10-15T20:25:54.754812+00:00"
+    },
+    {
+      "file": "inspector-heading-effects.text.txt",
+      "bytes": 5522,
+      "sha256": "85b33f4455d0a195198990e6ebf386e335ce00f4a45bffb0124b6e175053ae8a",
+      "capturedOrWrittenAt": "2026-10-15T20:25:54.914378+00:00"
+    },
+    {
+      "file": "inspector-heading-style.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:25:31.362447+00:00"
+    },
+    {
+      "file": "inspector-heading-style.png",
+      "bytes": 108796,
+      "sha256": "67661064d29e58ea3c9928430835effd828e39a341fef51931a2b57618dd0060",
+      "capturedOrWrittenAt": "2026-10-15T20:25:31.206312+00:00"
+    },
+    {
+      "file": "inspector-heading-style.snapshot.txt",
+      "bytes": 11636,
+      "sha256": "5118bbf46eda40a0b348aa2eb791e293b7e0bcff9df199ece737e8076a2c692f",
+      "capturedOrWrittenAt": "2026-10-15T20:25:30.821553+00:00"
+    },
+    {
+      "file": "inspector-heading-style.text.txt",
+      "bytes": 5965,
+      "sha256": "271c502621577f372f10a725e684d60ee7590757196a6154a2e464c213719503",
+      "capturedOrWrittenAt": "2026-10-15T20:25:30.978418+00:00"
+    },
+    {
+      "file": "page-menu.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:37:01.507499+00:00"
+    },
+    {
+      "file": "page-menu.snapshot.txt",
+      "bytes": 8595,
+      "sha256": "4c4a71e5a219a50b1d7b88d73408f390159bd3fb771e6f7971ec40c6211b4507",
+      "capturedOrWrittenAt": "2026-10-15T20:37:00.945775+00:00"
+    },
+    {
+      "file": "page-menu.text.txt",
+      "bytes": 6046,
+      "sha256": "bf62a41e66d085e75b8f54c7103e467b6158af9994eb3f0098206a923597fcd4",
+      "capturedOrWrittenAt": "2026-10-15T20:37:01.232039+00:00"
+    },
+    {
+      "file": "page-settings-advanced.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:39:05.315249+00:00"
+    },
+    {
+      "file": "page-settings-advanced.png",
+      "bytes": 99119,
+      "sha256": "7a6ecc75acd857c22ef9bcff475b707fd141809aecf3d821ad65c8be8b56304e",
+      "capturedOrWrittenAt": "2026-10-15T20:39:05.059830+00:00"
+    },
+    {
+      "file": "page-settings-advanced.snapshot.txt",
+      "bytes": 9089,
+      "sha256": "7d0179ec462fa3d8b7451de58fe627e36f82dee8f20427446ac086c4c7745aa2",
+      "capturedOrWrittenAt": "2026-10-15T20:39:04.641860+00:00"
+    },
+    {
+      "file": "page-settings-advanced.text.txt",
+      "bytes": 6373,
+      "sha256": "8eb7cea4cad13b61dcb8cfa22828b5b4f4487f645f744184601408745e4d9296",
+      "capturedOrWrittenAt": "2026-10-15T20:39:04.842551+00:00"
+    },
+    {
+      "file": "page-settings-seo.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:39:01.228018+00:00"
+    },
+    {
+      "file": "page-settings-seo.png",
+      "bytes": 103571,
+      "sha256": "1a751e3b3e89aa9b4b64fc9ebbab50cd4362b97a989b2b92e6689b337799e7ab",
+      "capturedOrWrittenAt": "2026-10-15T20:39:01.013304+00:00"
+    },
+    {
+      "file": "page-settings-seo.snapshot.txt",
+      "bytes": 9173,
+      "sha256": "331fc305d3e4f9bf456d3b645b1f7757777b838807dbc17967609e8c81607514",
+      "capturedOrWrittenAt": "2026-10-15T20:39:00.637214+00:00"
+    },
+    {
+      "file": "page-settings-seo.text.txt",
+      "bytes": 6634,
+      "sha256": "38c441ce572b27a9a674563d8fe42260ad9407036c423cb68c6b1de61d2ed006",
+      "capturedOrWrittenAt": "2026-10-15T20:39:00.784612+00:00"
+    },
+    {
+      "file": "page-settings-social.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:39:03.100507+00:00"
+    },
+    {
+      "file": "page-settings-social.snapshot.txt",
+      "bytes": 8907,
+      "sha256": "7411a869275903a13ad03bcd535b127c8ba99df3d7f67c9d877f1c8d6f155a31",
+      "capturedOrWrittenAt": "2026-10-15T20:39:02.722976+00:00"
+    },
+    {
+      "file": "page-settings-social.text.txt",
+      "bytes": 6370,
+      "sha256": "573efd9339ceecfddfee0c8a336dae14f867317e1ede0907decb5da38d59bb73",
+      "capturedOrWrittenAt": "2026-10-15T20:39:02.956120+00:00"
+    },
+    {
+      "file": "preview-measurement.json",
+      "bytes": 205,
+      "sha256": "aa1ba4e56b88ddc4c4b815e4da26d75f6783a1cfb63e21626604992a87277562",
+      "capturedOrWrittenAt": "2026-10-15T20:30:36.289948+00:00"
+    },
+    {
+      "file": "preview-mobile.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:30:39.823493+00:00"
+    },
+    {
+      "file": "preview-mobile.png",
+      "bytes": 72667,
+      "sha256": "fafac56030a73251a77bae14904dd69965eed307aae897599000f5e35a92ff69",
+      "capturedOrWrittenAt": "2026-10-15T20:30:39.625424+00:00"
+    },
+    {
+      "file": "preview-mobile.snapshot.txt",
+      "bytes": 6783,
+      "sha256": "2190c3d82a6620a48aa9df353ae2da088559b6750c77b56f7340a2bbd256da02",
+      "capturedOrWrittenAt": "2026-10-15T20:30:39.124243+00:00"
+    },
+    {
+      "file": "preview-mobile.text.txt",
+      "bytes": 5360,
+      "sha256": "4696e59842de01fae2190e76555eb10f3537dec73ab07ed29147609317a5cca2",
+      "capturedOrWrittenAt": "2026-10-15T20:30:39.345397+00:00"
+    },
+    {
+      "file": "route-ledger.json",
+      "bytes": 22034,
+      "sha256": "668e402174bc26818404dd9b7fb5cc85b9f0cd3cb16961e929af4c1a553b6071",
+      "capturedOrWrittenAt": "2026-10-15T20:44:24.340875+00:00"
+    },
+    {
+      "file": "settings-access.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:22:48.410839+00:00"
+    },
+    {
+      "file": "settings-access.snapshot.txt",
+      "bytes": 6348,
+      "sha256": "7504e960ad80df4424578a5730bd468c7726fc547c4aab16a7a79e270e765f19",
+      "capturedOrWrittenAt": "2026-10-15T20:22:47.977046+00:00"
+    },
+    {
+      "file": "settings-access.text.txt",
+      "bytes": 6140,
+      "sha256": "516cde0c612e6fd0b8b9c2dd4b63a1ec94cbdd9bc00ff9e53b0adebb91041c51",
+      "capturedOrWrittenAt": "2026-10-15T20:22:48.135014+00:00"
+    },
+    {
+      "file": "settings-analytics.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:22:50.300793+00:00"
+    },
+    {
+      "file": "settings-analytics.snapshot.txt",
+      "bytes": 6733,
+      "sha256": "83a9baec6371d0bed04380c359c4a54ef7d11a9ba309e7b2dde0cb024d334fb4",
+      "capturedOrWrittenAt": "2026-10-15T20:22:49.961418+00:00"
+    },
+    {
+      "file": "settings-analytics.text.txt",
+      "bytes": 6173,
+      "sha256": "59c460ee1689f435d75ac814256e827313855d3f7cf0e749c0c6ffc3ba96eb98",
+      "capturedOrWrittenAt": "2026-10-15T20:22:50.133259+00:00"
+    },
+    {
+      "file": "settings-billing-pro.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:23:02.019463+00:00"
+    },
+    {
+      "file": "settings-billing-pro.snapshot.txt",
+      "bytes": 6231,
+      "sha256": "7109a34779b24b13f87a95751676c677734b72ac9e7311d9c864be061399770d",
+      "capturedOrWrittenAt": "2026-10-15T20:23:01.648218+00:00"
+    },
+    {
+      "file": "settings-billing-pro.text.txt",
+      "bytes": 6072,
+      "sha256": "90c01da39f45303f55bcd88e4f6fb2b535fe26fbb925c2bab4a1149de8d1b23b",
+      "capturedOrWrittenAt": "2026-10-15T20:23:01.866491+00:00"
+    },
+    {
+      "file": "settings-custom-code.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:22:54.409258+00:00"
+    },
+    {
+      "file": "settings-custom-code.png",
+      "bytes": 82900,
+      "sha256": "8384ea15cb58ababc4bb13fc41d2365b4c3c657ab1d6639fa08343da83df163b",
+      "capturedOrWrittenAt": "2026-10-15T20:22:54.251820+00:00"
+    },
+    {
+      "file": "settings-custom-code.snapshot.txt",
+      "bytes": 6364,
+      "sha256": "4086e2c65c975627ffc0268f6bc8226d55bf0068c0be518ce3e06c4c8654dd0a",
+      "capturedOrWrittenAt": "2026-10-15T20:22:53.765454+00:00"
+    },
+    {
+      "file": "settings-custom-code.text.txt",
+      "bytes": 5970,
+      "sha256": "b08c03c31687cd2c0aaac7d6bfd3a87f372658e0c1aaa7b49fa464ca03c39839",
+      "capturedOrWrittenAt": "2026-10-15T20:22:53.995016+00:00"
+    },
+    {
+      "file": "settings-danger-zone.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:22:58.146657+00:00"
+    },
+    {
+      "file": "settings-danger-zone.snapshot.txt",
+      "bytes": 6248,
+      "sha256": "79186f172d9b3bad59e0a03782406acce67c907d3b12f26db16a1ed8632a35b8",
+      "capturedOrWrittenAt": "2026-10-15T20:22:57.741504+00:00"
+    },
+    {
+      "file": "settings-danger-zone.text.txt",
+      "bytes": 6189,
+      "sha256": "64439cdafebaee3e0a3137a1f25b308bf25fb12f269210c21bad313780d71cf1",
+      "capturedOrWrittenAt": "2026-10-15T20:22:57.891511+00:00"
+    },
+    {
+      "file": "settings-domains.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:22:44.392794+00:00"
+    },
+    {
+      "file": "settings-domains.snapshot.txt",
+      "bytes": 6190,
+      "sha256": "2fe9de96ab694ff1d671fac71feb6af72ea92e1199fb3aaeb024817209019381",
+      "capturedOrWrittenAt": "2026-10-15T20:22:44.060144+00:00"
+    },
+    {
+      "file": "settings-domains.text.txt",
+      "bytes": 6027,
+      "sha256": "77c6070ac65013a4a514e2063c42a9ca69b3b489a7c045dddcbb68fede7f8b1e",
+      "capturedOrWrittenAt": "2026-10-15T20:22:44.229942+00:00"
+    },
+    {
+      "file": "settings-form-submissions.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:22:52.147838+00:00"
+    },
+    {
+      "file": "settings-form-submissions.snapshot.txt",
+      "bytes": 6199,
+      "sha256": "86e9d263e79c99b2694a99961f5881608d4a51b34b520b8b796dfddf573f3049",
+      "capturedOrWrittenAt": "2026-10-15T20:22:51.754665+00:00"
+    },
+    {
+      "file": "settings-form-submissions.text.txt",
+      "bytes": 6020,
+      "sha256": "9c81ba56a59ecca8c2acd4e65865f8c5baf476ae65330292a89ab27283a4fef2",
+      "capturedOrWrittenAt": "2026-10-15T20:22:51.997677+00:00"
+    },
+    {
+      "file": "settings-general.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:22:38.229302+00:00"
+    },
+    {
+      "file": "settings-general.snapshot.txt",
+      "bytes": 6470,
+      "sha256": "18025871c60805c1239aea2b809c4122aa46d9194c743e63d7d2f63b3398ffcc",
+      "capturedOrWrittenAt": "2026-10-15T20:22:37.933058+00:00"
+    },
+    {
+      "file": "settings-general.text.txt",
+      "bytes": 6061,
+      "sha256": "cd86cf22a864d37d014e705fa73cc536f0688225967e7d98e92194faab1a27cb",
+      "capturedOrWrittenAt": "2026-10-15T20:22:38.088005+00:00"
+    },
+    {
+      "file": "settings-integrations-webhooks.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:23:03.734149+00:00"
+    },
+    {
+      "file": "settings-integrations-webhooks.snapshot.txt",
+      "bytes": 6231,
+      "sha256": "7109a34779b24b13f87a95751676c677734b72ac9e7311d9c864be061399770d",
+      "capturedOrWrittenAt": "2026-10-15T20:23:03.441826+00:00"
+    },
+    {
+      "file": "settings-integrations-webhooks.text.txt",
+      "bytes": 6107,
+      "sha256": "d1da6b4ed497bf859d8fd1cf3fbdfc9fa8f9fae454a0cb9d5675c8daad9b4255",
+      "capturedOrWrittenAt": "2026-10-15T20:23:03.587577+00:00"
+    },
+    {
+      "file": "settings-languages-900.meta.json",
+      "bytes": 126,
+      "sha256": "a5f93edf15709bbc5a560458d9e9ed293433157fbe243ad83388ba3c3362f359",
+      "capturedOrWrittenAt": "2026-10-15T20:23:06.125503+00:00"
+    },
+    {
+      "file": "settings-languages-900.png",
+      "bytes": 84519,
+      "sha256": "3520f5ce7c30f0d8a3e832bd468bcdcdfbcfe3a82d590bc70b658fd7ef860315",
+      "capturedOrWrittenAt": "2026-10-15T20:23:05.970719+00:00"
+    },
+    {
+      "file": "settings-languages-900.snapshot.txt",
+      "bytes": 6369,
+      "sha256": "458c910bba764c95f5f82c9f33cf11c933c24e728a932a73958f4b07f530b432",
+      "capturedOrWrittenAt": "2026-10-15T20:23:05.613256+00:00"
+    },
+    {
+      "file": "settings-languages-900.text.txt",
+      "bytes": 6206,
+      "sha256": "2f7a6e3ce2b40f0ec1c48790fd48534d146ca33f4e04ac7401afa372ad6178ff",
+      "capturedOrWrittenAt": "2026-10-15T20:23:05.759889+00:00"
+    },
+    {
+      "file": "settings-languages.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:22:40.406044+00:00"
+    },
+    {
+      "file": "settings-languages.png",
+      "bytes": 79709,
+      "sha256": "c2de394df3f1f31cf29159aa05c11b51534fe5dd6dfa37e80fb386dd6820642a",
+      "capturedOrWrittenAt": "2026-10-15T20:22:40.211950+00:00"
+    },
+    {
+      "file": "settings-languages.snapshot.txt",
+      "bytes": 6369,
+      "sha256": "458c910bba764c95f5f82c9f33cf11c933c24e728a932a73958f4b07f530b432",
+      "capturedOrWrittenAt": "2026-10-15T20:22:39.706555+00:00"
+    },
+    {
+      "file": "settings-languages.text.txt",
+      "bytes": 6206,
+      "sha256": "2f7a6e3ce2b40f0ec1c48790fd48534d146ca33f4e04ac7401afa372ad6178ff",
+      "capturedOrWrittenAt": "2026-10-15T20:22:39.924994+00:00"
+    },
+    {
+      "file": "settings-members.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:22:59.958779+00:00"
+    },
+    {
+      "file": "settings-members.snapshot.txt",
+      "bytes": 6231,
+      "sha256": "7109a34779b24b13f87a95751676c677734b72ac9e7311d9c864be061399770d",
+      "capturedOrWrittenAt": "2026-10-15T20:22:59.565857+00:00"
+    },
+    {
+      "file": "settings-members.text.txt",
+      "bytes": 6072,
+      "sha256": "90c01da39f45303f55bcd88e4f6fb2b535fe26fbb925c2bab4a1149de8d1b23b",
+      "capturedOrWrittenAt": "2026-10-15T20:22:59.732442+00:00"
+    },
+    {
+      "file": "settings-redirects.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:22:46.415574+00:00"
+    },
+    {
+      "file": "settings-redirects.snapshot.txt",
+      "bytes": 6356,
+      "sha256": "2c590c785c5e1823f160123ccc754771af3a4dce276d88820269e7377215b33c",
+      "capturedOrWrittenAt": "2026-10-15T20:22:45.912468+00:00"
+    },
+    {
+      "file": "settings-redirects.text.txt",
+      "bytes": 6074,
+      "sha256": "716a8d244bd26604b2c875b0377444e23fe6600c71097865b2046a428e67f1bc",
+      "capturedOrWrittenAt": "2026-10-15T20:22:46.078597+00:00"
+    },
+    {
+      "file": "settings-security-headers.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:22:56.269925+00:00"
+    },
+    {
+      "file": "settings-security-headers.snapshot.txt",
+      "bytes": 6993,
+      "sha256": "82128241bcbfe87185bcc6fb7d7ed3b71cb692a9d5ad33981c02840c38f85a0c",
+      "capturedOrWrittenAt": "2026-10-15T20:22:55.895074+00:00"
+    },
+    {
+      "file": "settings-security-headers.text.txt",
+      "bytes": 6400,
+      "sha256": "b489ca46b90b7d5798e2feeecc5a7e85f386cc6454d52b27e072c3a50cdce2e8",
+      "capturedOrWrittenAt": "2026-10-15T20:22:56.053214+00:00"
+    },
+    {
+      "file": "settings-seo.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:22:42.278251+00:00"
+    },
+    {
+      "file": "settings-seo.snapshot.txt",
+      "bytes": 6611,
+      "sha256": "c7d56a0c62f03968cb4b90809f9d2a5064382744035eccf94d219f92c22a53ad",
+      "capturedOrWrittenAt": "2026-10-15T20:22:41.889301+00:00"
+    },
+    {
+      "file": "settings-seo.text.txt",
+      "bytes": 6065,
+      "sha256": "e056728d0f936a611f9a794d81bbdafca924da55b6dac31b67e921280332cece",
+      "capturedOrWrittenAt": "2026-10-15T20:22:42.116228+00:00"
+    },
+    {
+      "file": "site-access.meta.json",
+      "bytes": 146,
+      "sha256": "397266d4406776aa871e2db1b8459a7b6718dc4568278a87e517463d907107f4",
+      "capturedOrWrittenAt": "2026-10-15T20:14:04.707084+00:00"
+    },
+    {
+      "file": "site-access.snapshot.txt",
+      "bytes": 4756,
+      "sha256": "3a4a1561f54f6d628012c7985ce527ffc51845d80cd4c1bf8470e69cefef6f84",
+      "capturedOrWrittenAt": "2026-10-15T20:14:04.468099+00:00"
+    },
+    {
+      "file": "site-access.text.txt",
+      "bytes": 1433,
+      "sha256": "a176af2755b2e1c66dbd478173bc96c97126882d85ff2f58eb61058412dfecc2",
+      "capturedOrWrittenAt": "2026-10-15T20:14:04.585000+00:00"
+    },
+    {
+      "file": "site-analytics.meta.json",
+      "bytes": 149,
+      "sha256": "558b1f18751c08fd5f8253c6998d6095daf97175dbf7e6bd1aa5f2bfe5feb8ca",
+      "capturedOrWrittenAt": "2026-10-15T20:14:10.585384+00:00"
+    },
+    {
+      "file": "site-analytics.snapshot.txt",
+      "bytes": 4874,
+      "sha256": "eb449daeb23c2ae6062d10948c673d128a3e18336a30d4c1b03bb7d134b124c5",
+      "capturedOrWrittenAt": "2026-10-15T20:14:10.340863+00:00"
+    },
+    {
+      "file": "site-analytics.text.txt",
+      "bytes": 1289,
+      "sha256": "51aeb02cae84fea992d813b4782f32e34b46589ceb771e83ec370f8f2dbfd316",
+      "capturedOrWrittenAt": "2026-10-15T20:14:10.470937+00:00"
+    },
+    {
+      "file": "site-domains.meta.json",
+      "bytes": 147,
+      "sha256": "ee0675b431a22e3a45756bbe511df53d0d802c00b7925709349ac47af2347af8",
+      "capturedOrWrittenAt": "2026-10-15T20:13:54.956364+00:00"
+    },
+    {
+      "file": "site-domains.snapshot.txt",
+      "bytes": 4773,
+      "sha256": "63a1a3d57013c5aedf1ff74a003286c9a2f1c195383ac3b9f65ecf9c8ddd53c7",
+      "capturedOrWrittenAt": "2026-10-15T20:13:54.739900+00:00"
+    },
+    {
+      "file": "site-domains.text.txt",
+      "bytes": 1354,
+      "sha256": "4494f8d6dbb9d78b3802a25fb4ca4e984db1ccc2408c5e93be7f861fafe21368",
+      "capturedOrWrittenAt": "2026-10-15T20:13:54.847186+00:00"
+    },
+    {
+      "file": "site-feedback.meta.json",
+      "bytes": 148,
+      "sha256": "f7569e241d874c029ac7fd36a5f28297a88ff577a474972bb45763ea05adcd10",
+      "capturedOrWrittenAt": "2026-10-15T20:14:16.394537+00:00"
+    },
+    {
+      "file": "site-feedback.snapshot.txt",
+      "bytes": 4885,
+      "sha256": "e7e76ece99adb6dd4c3262f927a37be649d4c423d47c39bd584e438cf97cb3d1",
+      "capturedOrWrittenAt": "2026-10-15T20:14:16.072750+00:00"
+    },
+    {
+      "file": "site-feedback.text.txt",
+      "bytes": 1352,
+      "sha256": "9aa2469e24aa151465256774a416310be72930343e4cae1a72cc6f76494c0c41",
+      "capturedOrWrittenAt": "2026-10-15T20:14:16.235118+00:00"
+    },
+    {
+      "file": "site-overview.meta.json",
+      "bytes": 139,
+      "sha256": "8bbb4a163b6317b064f1055257f42223bb67b0f507729191964048900fbd7df8",
+      "capturedOrWrittenAt": "2026-10-15T20:13:39.016855+00:00"
+    },
+    {
+      "file": "site-overview.snapshot.txt",
+      "bytes": 5120,
+      "sha256": "e2282bd77539c7daa184255eccb542cb17b95810064e599a2550129c696e8b5d",
+      "capturedOrWrittenAt": "2026-10-15T20:13:38.786791+00:00"
+    },
+    {
+      "file": "site-overview.text.txt",
+      "bytes": 1545,
+      "sha256": "50ca5ed695051965d4a78723b8344f6b4ff4c832765c7482e2b543ca67c25894",
+      "capturedOrWrittenAt": "2026-10-15T20:13:38.900495+00:00"
+    },
+    {
+      "file": "site-redirects.meta.json",
+      "bytes": 149,
+      "sha256": "2604d3cc5fc7ff343c0cc57e8b8ac305693f838e0cc75d2a81fa80907a4dc653",
+      "capturedOrWrittenAt": "2026-10-15T20:13:59.778958+00:00"
+    },
+    {
+      "file": "site-redirects.snapshot.txt",
+      "bytes": 4777,
+      "sha256": "de3e557e20c08367e32d6c561e203f5025d5b368a6a9d3d7cd8ec852ba4a7640",
+      "capturedOrWrittenAt": "2026-10-15T20:13:59.550435+00:00"
+    },
+    {
+      "file": "site-redirects.text.txt",
+      "bytes": 1430,
+      "sha256": "0c67273079cc290c84c7156bb4aa94dcb69343b328897d9ffa6b42103ebaa785",
+      "capturedOrWrittenAt": "2026-10-15T20:13:59.664461+00:00"
+    },
+    {
+      "file": "site-seo.meta.json",
+      "bytes": 143,
+      "sha256": "27f3aa09e52665f512d08caebe76ab995711cf1cd7f0cbf6cfbe06d56ac55080",
+      "capturedOrWrittenAt": "2026-10-15T20:13:50.210575+00:00"
+    },
+    {
+      "file": "site-seo.snapshot.txt",
+      "bytes": 4795,
+      "sha256": "e96876a3b1c3839282c050fec70eca2ade97e7efb5d254491f811c9629a3baee",
+      "capturedOrWrittenAt": "2026-10-15T20:13:49.984643+00:00"
+    },
+    {
+      "file": "site-seo.text.txt",
+      "bytes": 1638,
+      "sha256": "58c0ebe5ef52316fd8d9ea7865de4232e1303913bcc98d5a29a1ca5192e4b484",
+      "capturedOrWrittenAt": "2026-10-15T20:13:50.101113+00:00"
+    },
+    {
+      "file": "site-settings.meta.json",
+      "bytes": 148,
+      "sha256": "e68e612fe2e8e4871f9b69f7e5d878655af57b216df5401578daf4467114ab3b",
+      "capturedOrWrittenAt": "2026-10-15T20:13:44.992528+00:00"
+    },
+    {
+      "file": "site-settings.snapshot.txt",
+      "bytes": 4847,
+      "sha256": "1b000dba9a4411e941a50ab2988c16d8ab016fb7aa37af251d2996afcc3cf1f6",
+      "capturedOrWrittenAt": "2026-10-15T20:13:44.688065+00:00"
+    },
+    {
+      "file": "site-settings.text.txt",
+      "bytes": 1524,
+      "sha256": "7587ce14957a4f938561c095c013056a9a6a1cd10eda0b9d0d674b0069515b72",
+      "capturedOrWrittenAt": "2026-10-15T20:13:44.851622+00:00"
+    },
+    {
+      "file": "spec-review.json",
+      "bytes": 378,
+      "sha256": "9069571804786b9a4f22df37ea8f9af50605365f4f515bba4a8de2608a901519",
+      "capturedOrWrittenAt": "2026-10-15T20:45:45.694231+00:00"
+    },
+    {
+      "file": "targeted-tests.json",
+      "bytes": 23362,
+      "sha256": "a39881e89190c2bd84e799d8fb98c94ac26776061a8fc06ec2492b19f73e5706",
+      "capturedOrWrittenAt": "2026-10-15T20:05:29.725165+00:00"
+    },
+    {
+      "file": "template-preview.meta.json",
+      "bytes": 128,
+      "sha256": "8f8332c3161a2ec30e856e28c5c79e4368332a13789d978a4a68e582e5717bf7",
+      "capturedOrWrittenAt": "2026-10-15T20:35:03.434901+00:00"
+    },
+    {
+      "file": "template-preview.png",
+      "bytes": 207836,
+      "sha256": "f87c56537c31a0690672628182da22545b9968938af0743c1a8233dfe7467a66",
+      "capturedOrWrittenAt": "2026-10-15T20:35:03.245786+00:00"
+    },
+    {
+      "file": "template-preview.snapshot.txt",
+      "bytes": 6127,
+      "sha256": "6a218ab73df5fadd983d37154ba61f5fcfc2a6a6be8d139f64f564e59e83cf05",
+      "capturedOrWrittenAt": "2026-10-15T20:35:02.665858+00:00"
+    },
+    {
+      "file": "template-preview.text.txt",
+      "bytes": 5941,
+      "sha256": "efd5c7ec319a44b764f19cd83ae47200ec2015614de9d88db7241af152d952d9",
+      "capturedOrWrittenAt": "2026-10-15T20:35:02.870383+00:00"
+    }
+  ]
+}

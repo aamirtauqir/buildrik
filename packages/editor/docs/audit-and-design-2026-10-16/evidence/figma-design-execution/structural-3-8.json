@@ -1,0 +1,178 @@
+[
+  {
+    "id": "10:2",
+    "name": "C01 · Locked insertion",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 86,
+      "INSTANCE": 92,
+      "TEXT": 71,
+      "VECTOR": 82,
+      "RECTANGLE": 4,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 71
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "10:370",
+    "name": "C02 · Stale insertion target",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 86,
+      "INSTANCE": 92,
+      "TEXT": 71,
+      "VECTOR": 82,
+      "RECTANGLE": 4,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 71
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "10:1190",
+    "name": "C03 · Mixed multi-selection",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 129,
+      "INSTANCE": 112,
+      "TEXT": 91,
+      "VECTOR": 92,
+      "RECTANGLE": 11,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 86,
+      "Geist Mono": 5
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "10:1626",
+    "name": "C04 · Save pending",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 128,
+      "INSTANCE": 108,
+      "TEXT": 85,
+      "VECTOR": 92,
+      "RECTANGLE": 13,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 79,
+      "Geist Mono": 6
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "10:2199",
+    "name": "C05 · Save failed / edits retained",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 130,
+      "INSTANCE": 110,
+      "TEXT": 87,
+      "VECTOR": 97,
+      "RECTANGLE": 13,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 81,
+      "Geist Mono": 6
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "10:2647",
+    "name": "C06 · Focus mode / panels hidden",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 26,
+      "INSTANCE": 14,
+      "VECTOR": 7,
+      "TEXT": 20,
+      "RECTANGLE": 4,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 20
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "10:2795",
+    "name": "C07 · Restored panel arrangement",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 128,
+      "INSTANCE": 108,
+      "TEXT": 85,
+      "VECTOR": 92,
+      "RECTANGLE": 13,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 79,
+      "Geist Mono": 6
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "10:3228",
+    "name": "C08 · Narrow target / overlay",
+    "width": 1366,
+    "height": 768,
+    "counts": {
+      "FRAME": 129,
+      "INSTANCE": 108,
+      "TEXT": 85,
+      "VECTOR": 91,
+      "RECTANGLE": 13,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 79,
+      "Geist Mono": 6
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "10:3787",
+    "name": "C09 · Narrow insertion / Inspector stays closed",
+    "width": 1280,
+    "height": 720,
+    "counts": {
+      "FRAME": 66,
+      "INSTANCE": 69,
+      "TEXT": 56,
+      "VECTOR": 66,
+      "RECTANGLE": 6,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 56
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  }
+]

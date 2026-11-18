@@ -1,0 +1,50 @@
+--- BEGIN UNTRUSTED EXTERNAL CONTENT (source: file:///Users/shahg/Desktop/pencil/buildrik/packages/editor/docs/audit-and-design-2026-10-16/evidence/article-skill-workflow-2026-10-21/approval-keyboard-specimen.html) ---
+--- BEGIN UNTRUSTED EXTERNAL C​ONTENT (source: file:///Users/shahg/Desktop/pencil/buildrik/packages/editor/docs/audit-and-design-2026-10-16/evidence/article-skill-workflow-2026-10-21/approval-keyboard-specimen.html) ---
+@e1 [paragraph]
+  @e2 [strong]: Keyboard interaction study
+  @e3 [text]: Local design specimen. No code, email or approval is sent. Figma remains the visual source.
+@e4 [text]: Simulated response
+@e5 [combobox] "Simulated response"
+  @e6 [option] "Approved" [selected]
+  @e7 [option] "Incorrect code"
+  @e8 [option] "Expired code"
+  @e9 [option] "Request failed"
+  @e10 [option] "Connection lost"
+  @e11 [option] "Rate limited"
+@e12 [button] "Reset study"
+@e13 [banner]
+  @e14 [heading] "Fieldwork Studio is asking for your feedback" [level=1]
+  @e15 [paragraph]: Atelier Nord · Home · Round 3
+@e16 [main] "Site preview"
+  @e17 [paragraph]: atelier nord
+  @e18 [heading] "Spaces made with patience." [level=2]
+  @e19 [paragraph]: Sent desktop snapshot · 20 October 2026
+  @e20 [paragraph]: Later draft edits are not shown in this approval.
+@e21 [complementary] "Comments"
+  @e22 [heading] "Comments (2)" [level=2]
+  @e23 [article]
+    @e24 [heading] "① Make the logo larger" [level=3]
+    @e25 [paragraph]: Home · Logo · Round 3 · Resolved
+    @e26 [paragraph]: "Studio: Logo enlarged to 28px in the draft."
+  @e27 [article]
+    @e28 [heading] "② Check logo spacing" [level=3]
+    @e29 [paragraph]: Home · Logo · Round 3 · Open
+  @e30 [paragraph]: Approval keeps both comments and their current status.
+@e31 [contentinfo] "Approval"
+  @e32 [heading] "Awaiting approval · Round 3" [level=2]
+  @e33 [paragraph]: Lena Weiss · Covers this sent version only.
+  @e34 [button] "Approve Round 3"
+@e35 [dialog] "Approve Round 3?"
+  @e36 [status]
+  @e37 [alert]
+  @e38 [heading] "Approve Round 3?" [level=2]
+  @e39 [paragraph]: Atelier Nord · Round 3 · sent 20 Oct 2026. Navigation and page layout · Home, Work, Contact. Lena Weiss · lena@atelier.example. Your approval covers this sent version only.
+  @e40 [text]: 6-digit approval code
+  @e41 [paragraph]: "Enter the code sent to l•••@atelier.example. Study code: 123456."
+  @e42 [textbox] "6-digit approval code"
+  @e43 [paragraph]
+  @e44 [button] "Cancel"
+  @e45 [button] "Approve Round 3" [disabled]
+  @e46 [button] "Send a new code"
+--- END UNTRUSTED EXTERNAL C​ONTENT ---
+--- END UNTRUSTED EXTERNAL CONTENT ---

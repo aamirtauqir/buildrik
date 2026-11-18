@@ -1,0 +1,221 @@
+{
+  "createdNodeIds": [
+    "165:2",
+    "165:520",
+    "165:797",
+    "165:1072",
+    "165:1350",
+    "165:1625",
+    "165:1903",
+    "165:2184",
+    "165:2414",
+    "165:2648",
+    "165:2917",
+    "165:3173",
+    "165:3432",
+    "165:3693",
+    "165:3894",
+    "165:4137",
+    "165:4419"
+  ],
+  "mutatedNodeIds": [
+    "I165:81;4:547",
+    "165:81",
+    "I165:599;4:547",
+    "165:599",
+    "I165:876;4:547",
+    "165:876",
+    "I165:1151;4:547",
+    "165:1151",
+    "I165:1429;4:547",
+    "165:1429",
+    "I165:1704;4:547",
+    "165:1704",
+    "I165:1982;4:547",
+    "165:1982",
+    "165:264",
+    "165:795",
+    "165:1348",
+    "165:2401",
+    "165:2404",
+    "165:2407",
+    "165:742",
+    "165:793",
+    "165:1572",
+    "165:1621",
+    "165:2632",
+    "165:2635",
+    "165:2638",
+    "165:2645",
+    "I165:2727;4:547",
+    "165:2727",
+    "165:2877",
+    "165:3428",
+    "165:3151",
+    "I165:3511;4:547",
+    "165:3511",
+    "165:3891",
+    "I165:3973;4:547",
+    "165:3973",
+    "I165:4216;4:547",
+    "165:4216",
+    "165:230",
+    "165:232",
+    "165:234",
+    "165:210",
+    "165:2861",
+    "165:2865",
+    "165:2867",
+    "165:2843",
+    "165:3645",
+    "165:3647",
+    "165:3651",
+    "165:3627",
+    "165:4107",
+    "165:4109",
+    "165:4111",
+    "165:4089",
+    "165:4324"
+  ],
+  "frames": [
+    {
+      "id": "165:2",
+      "name": "B5-C01 · CMS / Blog records at scale",
+      "w": 1440,
+      "h": 900,
+      "nodes": 434,
+      "images": []
+    },
+    {
+      "id": "165:520",
+      "name": "B5-C02 · CMS / Record / unsaved edit",
+      "w": 1440,
+      "h": 900,
+      "nodes": 206,
+      "images": []
+    },
+    {
+      "id": "165:797",
+      "name": "B5-C03 · CMS / Record / saving",
+      "w": 1440,
+      "h": 900,
+      "nodes": 206,
+      "images": []
+    },
+    {
+      "id": "165:1072",
+      "name": "B5-C04 · CMS / Record / failed save with draft retained",
+      "w": 1440,
+      "h": 900,
+      "nodes": 209,
+      "images": []
+    },
+    {
+      "id": "165:1350",
+      "name": "B5-C05 · CMS / Record / acknowledged save",
+      "w": 1440,
+      "h": 900,
+      "nodes": 206,
+      "images": []
+    },
+    {
+      "id": "165:1625",
+      "name": "B5-C06 · CMS / Record / offline draft retained",
+      "w": 1440,
+      "h": 900,
+      "nodes": 209,
+      "images": []
+    },
+    {
+      "id": "165:1903",
+      "name": "B5-C07 · CMS / Record / changed elsewhere",
+      "w": 1440,
+      "h": 900,
+      "nodes": 211,
+      "images": []
+    },
+    {
+      "id": "165:2184",
+      "name": "B5-C08 · CMS / record leave guard",
+      "w": 1440,
+      "h": 900,
+      "nodes": 217,
+      "images": []
+    },
+    {
+      "id": "165:2414",
+      "name": "B5-C09 · CMS / conflict field diff",
+      "w": 1440,
+      "h": 900,
+      "nodes": 224,
+      "images": []
+    },
+    {
+      "id": "165:2648",
+      "name": "B5-C10 · CMS / Schema fields",
+      "w": 1440,
+      "h": 900,
+      "nodes": 200,
+      "images": []
+    },
+    {
+      "id": "165:2917",
+      "name": "B5-C11 · CMS / used field protected, display name editable",
+      "w": 1440,
+      "h": 900,
+      "nodes": 243,
+      "images": []
+    },
+    {
+      "id": "165:3173",
+      "name": "B5-C12 · CMS / exact field usages",
+      "w": 1440,
+      "h": 900,
+      "nodes": 213,
+      "images": []
+    },
+    {
+      "id": "165:3432",
+      "name": "B5-C13 · CMS / Dynamic pages / page and SEO patterns",
+      "w": 1440,
+      "h": 900,
+      "nodes": 192,
+      "images": []
+    },
+    {
+      "id": "165:3693",
+      "name": "B5-C14 · CMS / URL collision blocks save",
+      "w": 1440,
+      "h": 900,
+      "nodes": 194,
+      "images": []
+    },
+    {
+      "id": "165:3894",
+      "name": "B5-C15 · CMS / Collection settings and safe deletion",
+      "w": 1440,
+      "h": 900,
+      "nodes": 174,
+      "images": []
+    },
+    {
+      "id": "165:4137",
+      "name": "B5-C16 · CMS / Sources / persisted JSON data",
+      "w": 1440,
+      "h": 900,
+      "nodes": 196,
+      "images": []
+    },
+    {
+      "id": "165:4419",
+      "name": "B5 CMS / source and scope handoff",
+      "w": 1440,
+      "h": 182,
+      "nodes": 3,
+      "images": []
+    }
+  ],
+  "allAffectedNodeIds": "affected-nodes.json (includes inherited instance descendants)",
+  "createdNodeCount": 3554,
+  "createdNodeIdsScope": "Root IDs only; full descendant IDs in artifact"
+}

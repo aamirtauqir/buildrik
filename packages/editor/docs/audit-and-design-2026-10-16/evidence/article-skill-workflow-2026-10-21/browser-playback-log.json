@@ -1,0 +1,760 @@
+{
+  "date": "2026-10-21 Asia/Karachi",
+  "method": "Canvas pointer/mouse events dispatched via browse; expected Figma node-id checked after each event sequence. No URL navigation between these recorded transitions.",
+  "viewport": {
+    "width": 1600,
+    "height": 1100
+  },
+  "transitions": [
+    {
+      "from": "302:3396",
+      "to": "302:3965",
+      "control": "Add",
+      "x": 120,
+      "y": 244,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-3965&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:03:02.952Z"
+    },
+    {
+      "from": "302:3965",
+      "to": "302:4542",
+      "control": "Text",
+      "x": 287,
+      "y": 427,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-4542&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:03:09.182Z"
+    },
+    {
+      "from": "302:4542",
+      "to": "302:5185",
+      "control": "Layers",
+      "x": 120,
+      "y": 299,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-5185&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:03:17.260Z"
+    },
+    {
+      "from": "302:5185",
+      "to": "302:5844",
+      "control": "Text",
+      "x": 1362,
+      "y": 487,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-5844&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:03:23.147Z"
+    },
+    {
+      "from": "302:5844",
+      "to": "302:6503",
+      "control": "Style",
+      "x": 1328,
+      "y": 340,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-6503&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:03:28.958Z"
+    },
+    {
+      "from": "302:6503",
+      "to": "302:7348",
+      "control": "",
+      "x": 947,
+      "y": 232,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-7348&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:03:33.646Z"
+    },
+    {
+      "from": "302:7348",
+      "to": "302:8193",
+      "control": "24 | px",
+      "x": 1292,
+      "y": 581,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-8193&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:03:50.123Z"
+    },
+    {
+      "from": "302:8193",
+      "to": "302:9044",
+      "control": "Remove Tablet override",
+      "x": 1334,
+      "y": 614,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-9044&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:03:56.896Z"
+    },
+    {
+      "from": "302:9044",
+      "to": "302:9889",
+      "control": "",
+      "x": 447,
+      "y": 232,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-9889&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:04:01.105Z"
+    },
+    {
+      "from": "302:9889",
+      "to": "302:9044",
+      "control": "",
+      "x": 482,
+      "y": 232,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-9044&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:04:02.112Z"
+    },
+    {
+      "from": "302:9044",
+      "to": "302:10740",
+      "control": "Preview",
+      "x": 1327,
+      "y": 182,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-10740&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:04:04.240Z"
+    },
+    {
+      "from": "302:10740",
+      "to": "302:10791",
+      "control": "Back to editor",
+      "x": 168,
+      "y": 182,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-10791&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:04:07.840Z"
+    },
+    {
+      "from": "302:10791",
+      "to": "302:3370",
+      "control": "All journeys",
+      "x": 158,
+      "y": 88,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-3370&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:04:18.927Z"
+    },
+    {
+      "from": "302:3370",
+      "to": "302:11636",
+      "control": "F2 · Bind content and edit a rec",
+      "x": 264,
+      "y": 402,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-11636&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:04:25.745Z"
+    },
+    {
+      "from": "302:11636",
+      "to": "302:12190",
+      "control": "",
+      "x": 1486,
+      "y": 490,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-12190&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:04:46.714Z"
+    },
+    {
+      "from": "302:12190",
+      "to": "302:12784",
+      "control": "This page’s record · Blog | Each",
+      "x": 1068,
+      "y": 493,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-12784&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:04:53.669Z"
+    },
+    {
+      "from": "302:12784",
+      "to": "302:13375",
+      "control": "Title | Text · title",
+      "x": 1068,
+      "y": 509,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-13375&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:04:57.758Z"
+    },
+    {
+      "from": "302:13375",
+      "to": "302:13946",
+      "control": "Title text · Blog.title ›",
+      "x": 1362,
+      "y": 451,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-13946&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:05:01.317Z"
+    },
+    {
+      "from": "302:13946",
+      "to": "302:14521",
+      "control": "Open record ›",
+      "x": 1362,
+      "y": 643,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-14521&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:05:03.997Z"
+    },
+    {
+      "from": "302:14521",
+      "to": "302:14879",
+      "control": "Excerpt | Good design helps peop",
+      "x": 739,
+      "y": 560,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-14879&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:05:07.154Z"
+    },
+    {
+      "from": "302:14879",
+      "to": "302:15235",
+      "control": "‹ Heading · Title binding",
+      "x": 521,
+      "y": 237,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-15235&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:05:21.569Z"
+    },
+    {
+      "from": "302:15235",
+      "to": "302:15605",
+      "control": "Save and leave",
+      "x": 1028,
+      "y": 544,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-15605&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:05:25.711Z"
+    },
+    {
+      "from": "302:15605",
+      "to": "302:17816",
+      "control": "Fixture: save rejected",
+      "x": 402,
+      "y": 127,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-17816&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:05:30.416Z"
+    },
+    {
+      "from": "302:17816",
+      "to": "302:15605",
+      "control": "Retry and return",
+      "x": 1386,
+      "y": 981,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-15605&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:05:38.901Z"
+    },
+    {
+      "from": "302:15605",
+      "to": "302:16675",
+      "control": "Fixture: save acknowledged",
+      "x": 205,
+      "y": 127,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-16675&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:05:43.830Z"
+    },
+    {
+      "from": "302:16675",
+      "to": "302:17250",
+      "control": "‹ Back to Content",
+      "x": 1350,
+      "y": 368,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-17250&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:05:48.145Z"
+    },
+    {
+      "from": "302:17250",
+      "to": "302:3370",
+      "control": "All journeys",
+      "x": 158,
+      "y": 88,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-3370&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:06:16.594Z"
+    },
+    {
+      "from": "302:3370",
+      "to": "302:19069",
+      "control": "F3 · Replace an image",
+      "x": 264,
+      "y": 506,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-19069&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:06:19.242Z"
+    },
+    {
+      "from": "302:19069",
+      "to": "302:19519",
+      "control": "Replace…",
+      "x": 1362,
+      "y": 419,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-19519&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:06:24.823Z"
+    },
+    {
+      "from": "302:19519",
+      "to": "302:19891",
+      "control": "Concrete forms.webp",
+      "x": 354,
+      "y": 493,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-19891&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:06:28.397Z"
+    },
+    {
+      "from": "302:19891",
+      "to": "302:20263",
+      "control": "Replace",
+      "x": 287,
+      "y": 742,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-20263&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:06:31.921Z"
+    },
+    {
+      "from": "302:20263",
+      "to": "302:19069",
+      "control": "Undo",
+      "x": 1428,
+      "y": 977,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-19069&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:06:43.148Z"
+    },
+    {
+      "from": "302:19069",
+      "to": "302:3370",
+      "control": "All journeys",
+      "x": 158,
+      "y": 88,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-3370&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:06:44.011Z"
+    },
+    {
+      "from": "302:3370",
+      "to": "303:32296",
+      "control": "F4 · Fix issues and publish",
+      "x": 264,
+      "y": 610,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=303-32296&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:06:46.304Z"
+    },
+    {
+      "from": "303:32296",
+      "to": "303:32650",
+      "control": "Fix ›",
+      "x": 1191,
+      "y": 356,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=303-32650&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:06:53.039Z"
+    },
+    {
+      "from": "303:32650",
+      "to": "303:33184",
+      "control": "Choose collection…",
+      "x": 1362,
+      "y": 466,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=303-33184&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:06:57.181Z"
+    },
+    {
+      "from": "303:33184",
+      "to": "303:33718",
+      "control": "Blog · 980 published",
+      "x": 924,
+      "y": 564,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=303-33718&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:07:01.781Z"
+    },
+    {
+      "from": "303:33718",
+      "to": "303:34252",
+      "control": "‹ Back to Issues",
+      "x": 1362,
+      "y": 238,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=303-34252&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:07:06.451Z"
+    },
+    {
+      "from": "303:34252",
+      "to": "303:34601",
+      "control": "Review and publish",
+      "x": 1275,
+      "y": 451,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=303-34601&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:07:20.585Z"
+    },
+    {
+      "from": "303:34601",
+      "to": "303:34999",
+      "control": "See all ›",
+      "x": 1441,
+      "y": 390,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=303-34999&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:07:24.901Z"
+    },
+    {
+      "from": "303:34999",
+      "to": "303:34601",
+      "control": "‹ Back to Publish",
+      "x": 1236,
+      "y": 285,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=303-34601&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:07:25.946Z"
+    },
+    {
+      "from": "303:34601",
+      "to": "303:35374",
+      "control": "Publish changes",
+      "x": 1345,
+      "y": 182,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=303-35374&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:07:34.576Z"
+    },
+    {
+      "from": "303:35374",
+      "to": "303:35797",
+      "control": "☐ I’ve seen these",
+      "x": 1034,
+      "y": 553,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=303-35797&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:07:39.858Z"
+    },
+    {
+      "from": "303:35797",
+      "to": "303:36220",
+      "control": "☐ Publish without a fresh review",
+      "x": 1034,
+      "y": 603,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=303-36220&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:07:47.225Z"
+    },
+    {
+      "from": "303:36220",
+      "to": "303:36642",
+      "control": "Publish",
+      "x": 1283,
+      "y": 226,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=303-36642&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:07:52.655Z"
+    },
+    {
+      "from": "303:36642",
+      "to": "303:37001",
+      "control": "Fixture: publish acknowledged",
+      "x": 216,
+      "y": 127,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=303-37001&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:07:57.360Z"
+    },
+    {
+      "from": "303:37001",
+      "to": "308:26044",
+      "control": "✕",
+      "x": 1454,
+      "y": 234,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=308-26044&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:08:07.958Z"
+    },
+    {
+      "from": "308:26044",
+      "to": "308:25079",
+      "control": "Open retained v13 publish status",
+      "x": 225,
+      "y": 127,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=308-25079&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:08:12.350Z"
+    },
+    {
+      "from": "308:25079",
+      "to": "302:3370",
+      "control": "All journeys",
+      "x": 158,
+      "y": 88,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-3370&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:08:22.103Z"
+    },
+    {
+      "from": "302:3370",
+      "to": "307:14695",
+      "control": "F5 · Send a review and respond",
+      "x": 264,
+      "y": 714,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-14695&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:08:29.448Z"
+    },
+    {
+      "from": "307:14695",
+      "to": "307:15315",
+      "control": "Send Round 3 to Lena",
+      "x": 1275,
+      "y": 940,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-15315&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:08:42.729Z"
+    },
+    {
+      "from": "307:15315",
+      "to": "307:15711",
+      "control": "Send for review",
+      "x": 973,
+      "y": 761,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-15711&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:08:48.708Z"
+    },
+    {
+      "from": "307:15711",
+      "to": "307:16503",
+      "control": "Fixture: preview ready",
+      "x": 191,
+      "y": 127,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-16503&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:08:53.471Z"
+    },
+    {
+      "from": "307:16503",
+      "to": "307:16899",
+      "control": "Fixture: round + invite acknowle",
+      "x": 239,
+      "y": 127,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-16899&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:09:02.933Z"
+    },
+    {
+      "from": "307:16899",
+      "to": "307:17295",
+      "control": "Switch role: open client review",
+      "x": 222,
+      "y": 127,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-17295&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:09:11.171Z"
+    },
+    {
+      "from": "307:17295",
+      "to": "307:17363",
+      "control": "＋ Add comment  C",
+      "x": 1066,
+      "y": 255,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-17363&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:09:18.316Z"
+    },
+    {
+      "from": "307:17363",
+      "to": "307:17442",
+      "control": "Send ⌘↵",
+      "x": 461,
+      "y": 429,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-17442&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:09:23.896Z"
+    },
+    {
+      "from": "307:17442",
+      "to": "307:17572",
+      "control": "Fixture: comment acknowledged",
+      "x": 216,
+      "y": 127,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-17572&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:09:29.647Z"
+    },
+    {
+      "from": "307:17572",
+      "to": "307:17630",
+      "control": "Switch role: designer opens Revi",
+      "x": 232,
+      "y": 127,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-17630&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:09:41.444Z"
+    },
+    {
+      "from": "307:17630",
+      "to": "307:18245",
+      "control": "Locate ›",
+      "x": 1214,
+      "y": 577,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-18245&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:09:48.858Z"
+    },
+    {
+      "from": "307:18245",
+      "to": "307:19091",
+      "control": "24",
+      "x": 1362,
+      "y": 417,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-19091&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:09:55.835Z"
+    },
+    {
+      "from": "307:19091",
+      "to": "307:19623",
+      "control": "‹ Back to Review",
+      "x": 1061,
+      "y": 273,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-19623&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:10:03.434Z"
+    },
+    {
+      "from": "307:19623",
+      "to": "307:20015",
+      "control": "Resolve",
+      "x": 1324,
+      "y": 577,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-20015&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:10:11.823Z"
+    },
+    {
+      "from": "307:20015",
+      "to": "307:20799",
+      "control": "Fixture: resolve acknowledged",
+      "x": 216,
+      "y": 127,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-20799&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:10:25.738Z"
+    },
+    {
+      "from": "307:20799",
+      "to": "307:21191",
+      "control": "Switch role: client reloads Roun",
+      "x": 236,
+      "y": 127,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-21191&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:10:41.418Z"
+    },
+    {
+      "from": "307:21191",
+      "to": "307:21249",
+      "control": "Approve Round 3",
+      "x": 1402,
+      "y": 1009,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-21249&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:10:50.400Z"
+    },
+    {
+      "from": "307:21249",
+      "to": "307:21337",
+      "control": "",
+      "x": 800,
+      "y": 641,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-21337&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:10:57.667Z"
+    },
+    {
+      "from": "307:21337",
+      "to": "307:21422",
+      "control": "Approve Round 3",
+      "x": 946,
+      "y": 715,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-21422&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:11:10.225Z"
+    },
+    {
+      "from": "307:21422",
+      "to": "307:21499",
+      "control": "Fixture: approval acknowledged",
+      "x": 218,
+      "y": 127,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-21499&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:11:22.558Z"
+    },
+    {
+      "from": "307:21499",
+      "to": "307:21571",
+      "control": "Return to review",
+      "x": 965,
+      "y": 696,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-21571&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:11:38.256Z"
+    },
+    {
+      "from": "307:21571",
+      "to": "307:22345",
+      "control": "Switch role: designer sees stale",
+      "x": 257,
+      "y": 127,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-22345&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:11:49.604Z"
+    },
+    {
+      "from": "307:22345",
+      "to": "307:22737",
+      "control": "Request fresh review",
+      "x": 1275,
+      "y": 613,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-22737&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:12:01.913Z"
+    },
+    {
+      "from": "307:22737",
+      "to": "307:23133",
+      "control": "Send for review",
+      "x": 973,
+      "y": 761,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-23133&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:12:11.997Z"
+    },
+    {
+      "from": "307:23133",
+      "to": "307:23529",
+      "control": "Fixture: Round 4 acknowledged",
+      "x": 216,
+      "y": 127,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=307-23529&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:12:21.161Z"
+    },
+    {
+      "from": "307:23529",
+      "to": "302:3370",
+      "control": "All journeys",
+      "x": 158,
+      "y": 88,
+      "ok": true,
+      "url": "https://www.figma.com/proto/2L9OTGzBrL6kYmU18yA1c7/Buildrick-%C2%B7-Editor-design-%C2%B7-2026-10-18?node-id=302-3370&starting-point-node-id=302%3A3370&scaling=scale-down",
+      "observedAt": "2026-10-20T21:12:32.426Z"
+    }
+  ]
+}

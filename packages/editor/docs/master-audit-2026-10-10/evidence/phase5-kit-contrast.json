@@ -1,0 +1,140 @@
+{
+  "tokens": {
+    "ink": "#172033",
+    "muted": "#667085",
+    "subtle": "#98A2B3",
+    "line": "#E4E8EF",
+    "bg": "#F4F6F9",
+    "panel": "#FFFFFF",
+    "blue": "#1A56DB",
+    "soft": "#EFF6FF",
+    "green": "#087A55",
+    "greenSoft": "#ECFDF3",
+    "red": "#B42318",
+    "redSoft": "#FEF3F2",
+    "amber": "#925C00",
+    "amberSoft": "#FFFAEB",
+    "purple": "#6941C6",
+    "control": "#8591A3"
+  },
+  "pairs": [
+    {
+      "foreground": "ink",
+      "background": "panel",
+      "hex": [
+        "#172033",
+        "#FFFFFF"
+      ],
+      "ratio": 16.268480224545662
+    },
+    {
+      "foreground": "muted",
+      "background": "panel",
+      "hex": [
+        "#667085",
+        "#FFFFFF"
+      ],
+      "ratio": 4.974752735406439
+    },
+    {
+      "foreground": "muted",
+      "background": "bg",
+      "hex": [
+        "#667085",
+        "#F4F6F9"
+      ],
+      "ratio": 4.594974621529962
+    },
+    {
+      "foreground": "subtle",
+      "background": "panel",
+      "hex": [
+        "#98A2B3",
+        "#FFFFFF"
+      ],
+      "ratio": 2.5753767213709535
+    },
+    {
+      "foreground": "subtle",
+      "background": "bg",
+      "hex": [
+        "#98A2B3",
+        "#F4F6F9"
+      ],
+      "ratio": 2.3787696203179727
+    },
+    {
+      "foreground": "blue",
+      "background": "panel",
+      "hex": [
+        "#1A56DB",
+        "#FFFFFF"
+      ],
+      "ratio": 6.180228824928861
+    },
+    {
+      "foreground": "blue",
+      "background": "soft",
+      "hex": [
+        "#1A56DB",
+        "#EFF6FF"
+      ],
+      "ratio": 5.67888022922729
+    },
+    {
+      "foreground": "green",
+      "background": "greenSoft",
+      "hex": [
+        "#087A55",
+        "#ECFDF3"
+      ],
+      "ratio": 5.072434965487588
+    },
+    {
+      "foreground": "red",
+      "background": "redSoft",
+      "hex": [
+        "#B42318",
+        "#FEF3F2"
+      ],
+      "ratio": 6.04726982551666
+    },
+    {
+      "foreground": "amber",
+      "background": "amberSoft",
+      "hex": [
+        "#925C00",
+        "#FFFAEB"
+      ],
+      "ratio": 5.362528478935913
+    },
+    {
+      "foreground": "purple",
+      "background": "panel",
+      "hex": [
+        "#6941C6",
+        "#FFFFFF"
+      ],
+      "ratio": 6.619982918713162
+    },
+    {
+      "foreground": "line",
+      "background": "panel",
+      "hex": [
+        "#E4E8EF",
+        "#FFFFFF"
+      ],
+      "ratio": 1.2289440781320935
+    }
+  ],
+  "method": "sRGB relative luminance; solid opaque tokens; WCAG 2.2 contrast formula; numerical token review only",
+  "controlFixVerification": {
+    "date": "2026-10-10",
+    "color": "#8591A3",
+    "whiteRatio": 3.193266814326046,
+    "backgroundRatio": 2.9494893016834984,
+    "nativeEvidence": "phase5-independent-followup-native.json",
+    "E01OutlinesVerified": 11,
+    "E01ButtonLabelsFILLVerified": 8
+  }
+}

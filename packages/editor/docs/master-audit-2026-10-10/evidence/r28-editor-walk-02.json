@@ -1,0 +1,10 @@
+[
+ {"label":"Authored-alt image entry","goto":"8507:3011"},
+ {"label":"Open source chooser","x":1241,"y":261,"shot":"r28-image-chooser.png"},
+ {"label":"Select upper gradient row","x":530,"y":422,"shot":"r28-image-selected.png"},
+ {"label":"Commit selected asset","x":545,"y":556,"shot":"r28-image-committed.png"},
+ {"label":"Reopen source for upload","x":1241,"y":261},
+ {"label":"Upload method","x":1100,"y":315,"shot":"r28-upload-form.png"},
+ {"label":"Choose sample file","x":720,"y":513,"shot":"r28-upload-file.png"},
+ {"label":"Upload sample file","x":720,"y":557,"wait":2200,"shot":"r28-upload-ready.png"}
+]

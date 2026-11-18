@@ -1,0 +1,13 @@
+[
+  {"x":720,"y":523,"shot":"r44-video-mobile-four-three.png"},
+  {"x":1390,"y":88},
+  {"x":380,"y":96,"shot":"r44-video-desktop-retains-four-three.png"},
+  {"x":1330,"y":254},
+  {"x":1310,"y":226},
+  {"x":720,"y":523,"shot":"r44-video-repeat-keeps-undo.png"},
+  {"x":1350,"y":323,"shot":"r44-video-undo-default-desktop.png"},
+  {"x":1310,"y":226},
+  {"x":720,"y":563,"shot":"r44-video-desktop-square.png"},
+  {"x":1170,"y":323,"shot":"r44-video-reset-default.png"},
+  {"x":1350,"y":323,"shot":"r44-video-reset-undo-square.png"}
+]

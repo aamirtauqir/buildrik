@@ -1,0 +1,174 @@
+{
+  "structural": {
+    "frames": [
+      {
+        "id": "8304:74",
+        "name": "AS-IS 58 · Brand / Colour mode",
+        "width": 1440,
+        "height": 900,
+        "clipsContent": true,
+        "nodes": 231,
+        "texts": 98,
+        "imageFills": 0,
+        "captions": [
+          {
+            "id": "8304:234",
+            "text": "Live preview · Home"
+          }
+        ]
+      },
+      {
+        "id": "8304:308",
+        "name": "AS-IS 59 · Brand / Styles",
+        "width": 1440,
+        "height": 900,
+        "clipsContent": true,
+        "nodes": 194,
+        "texts": 98,
+        "imageFills": 0,
+        "captions": [
+          {
+            "id": "8304:450",
+            "text": "Live preview · Home"
+          }
+        ]
+      },
+      {
+        "id": "8304:505",
+        "name": "AS-IS 60 · Brand / Component styles",
+        "width": 1440,
+        "height": 900,
+        "clipsContent": true,
+        "nodes": 182,
+        "texts": 71,
+        "imageFills": 0,
+        "captions": [
+          {
+            "id": "8304:633",
+            "text": "Live preview · Home"
+          }
+        ]
+      },
+      {
+        "id": "8304:690",
+        "name": "AS-IS 61 · Brand / Classes — empty",
+        "width": 1440,
+        "height": 900,
+        "clipsContent": true,
+        "nodes": 143,
+        "texts": 48,
+        "imageFills": 0,
+        "captions": [
+          {
+            "id": "8304:779",
+            "text": "Live preview · Home"
+          }
+        ]
+      },
+      {
+        "id": "8304:836",
+        "name": "AS-IS 62 · Brand / Presets",
+        "width": 1440,
+        "height": 900,
+        "clipsContent": true,
+        "nodes": 195,
+        "texts": 79,
+        "imageFills": 0,
+        "captions": [
+          {
+            "id": "8304:979",
+            "text": "Live preview · Home"
+          }
+        ]
+      },
+      {
+        "id": "8304:1034",
+        "name": "AS-IS 63 · Brand / Brand checks",
+        "width": 1440,
+        "height": 900,
+        "clipsContent": true,
+        "nodes": 147,
+        "texts": 52,
+        "imageFills": 0,
+        "captions": [
+          {
+            "id": "8304:1127",
+            "text": "Live preview · Home"
+          }
+        ]
+      },
+      {
+        "id": "8304:1184",
+        "name": "AS-IS 64 · Brand / Starters",
+        "width": 1440,
+        "height": 900,
+        "clipsContent": true,
+        "nodes": 170,
+        "texts": 64,
+        "imageFills": 0,
+        "captions": [
+          {
+            "id": "8304:1302",
+            "text": "Live preview · Home"
+          }
+        ]
+      },
+      {
+        "id": "8304:1357",
+        "name": "AS-IS 65 · Brand / Import / export",
+        "width": 1440,
+        "height": 900,
+        "clipsContent": true,
+        "nodes": 163,
+        "texts": 57,
+        "imageFills": 0,
+        "captions": []
+      }
+    ],
+    "codeClip": {
+      "id": "8304:1482",
+      "x": 499,
+      "y": 513.5,
+      "w": 698,
+      "h": 77.63
+    },
+    "newChevronIds": [
+      "8306:241556",
+      "8306:241557"
+    ]
+  },
+  "corrections": {
+    "mutatedNodeIds": [
+      "8304:234",
+      "8304:235",
+      "8304:450",
+      "8304:451",
+      "8304:475",
+      "8304:633",
+      "8304:634",
+      "8304:658",
+      "8304:779",
+      "8304:780",
+      "8304:979",
+      "8304:980",
+      "8304:921",
+      "8304:1127",
+      "8304:1128",
+      "8304:1302",
+      "8304:1303",
+      "8304:1441",
+      "8304:1442",
+      "8304:1443",
+      "8304:1475",
+      "8304:1481",
+      "8304:1482",
+      "8304:1269"
+    ],
+    "createdNodeIds": [
+      "8306:241556",
+      "8306:241557"
+    ],
+    "scope": "AS-IS58–65 only",
+    "exportGeometryNote": "Browser PNG shows top8/title24; supplied DOM extraction shows top40/title56 while all remaining content positions agree. Screenshot chosen as visible evidence."
+  }
+}

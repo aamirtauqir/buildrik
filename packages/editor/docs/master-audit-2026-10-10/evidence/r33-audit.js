@@ -1,0 +1,9 @@
+await figma.setCurrentPageAsync(await figma.getNodeByIdAsync('8463:2')); figma.skipInvisibleInstanceChildren=false;
+const p=figma.currentPage,roots=p.children.filter(n=>n.name.startsWith('R33')||['8539:10714','8539:10742','8539:10770','8539:9786'].includes(n.id)),all=roots.flatMap(r=>[r,...r.findAll()]);let instances=0;const masters={},dest=new Set(),missing=[],overflow=[],tall=[],badFonts=[];
+function actions(a){for(const x of a||[]){if(x.destinationId)dest.add(x.destinationId);if(x.conditionalBlocks)for(const b of x.conditionalBlocks)actions(b.actions);}}
+for(const n of all){if(n.type==='INSTANCE'){instances++;const m=await n.getMainComponentAsync();if(!m)missing.push(n.id);else masters[m.id]=(masters[m.id]||0)+1;}for(const r of n.reactions||[])actions(r.actions);
+if(n.type==='TEXT')for(const f of n.getStyledTextSegments(['fontName']))if(f.fontName.family!=='Inter')badFonts.push(n.id);
+if(n.layoutMode&&n.layoutMode!=='NONE'&&n.visible&&!n.clipsContent){for(const c of n.children.filter(c=>c.visible)){if(c.x<-.5||c.y<-.5||c.x+c.width>n.width+.5||c.y+c.height>n.height+.5)overflow.push([n.id,n.name,c.id,c.name]);}}
+}for(const r of roots)if(r.width<1440&&r.height>920)tall.push([r.id,r.name,r.height]);for(const d of dest)if(!await figma.getNodeByIdAsync(d))missing.push(d);
+const media=await Promise.all(['8539:9786','8773:13794'].map(async id=>{const r=await figma.getNodeByIdAsync(id);return {id,labels:r.findAll(n=>n.type==='TEXT'&&n.characters.includes('studio-gradient')).map(n=>({id:n.id,name:n.name,text:n.characters,b:n.boundVariables,par:n.parent.name})),cards:r.findAll(n=>n.name.includes('Asset card')).map(n=>[n.id,n.name])}}));
+return {scope:roots.map(n=>[n.id,n.name]),instances,masters,destinations:dest.size,missing,overflow,tall,badFonts,media};

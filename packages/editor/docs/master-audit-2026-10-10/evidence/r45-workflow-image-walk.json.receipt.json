@@ -1,0 +1,36 @@
+[
+  {
+    "x": 573,
+    "y": 96,
+    "shot": "r45-workflow-image-mobile.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-20467&starting-point-node-id=8843%3A20467&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 118,
+    "y": 984,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-20467&starting-point-node-id=8843%3A20467&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 720,
+    "y": 474,
+    "shot": "r45-workflow-image-hidden.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-20467&starting-point-node-id=8843%3A20467&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 108,
+    "y": 459,
+    "shot": "r45-workflow-hidden-layer-style.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-20467&starting-point-node-id=8843%3A20467&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 1260,
+    "y": 369,
+    "shot": "r45-workflow-display-reset-undo-access.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-20467&starting-point-node-id=8843%3A20467&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

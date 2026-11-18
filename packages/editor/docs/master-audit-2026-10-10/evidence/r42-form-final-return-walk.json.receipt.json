@@ -1,0 +1,34 @@
+[
+  {
+    "x": 720,
+    "y": 551,
+    "url": "about:blank",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 590,
+    "y": 715,
+    "url": "about:blank",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 720,
+    "y": 631,
+    "shot": "r42-form-unlocked-return.png",
+    "url": "about:blank",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 1320,
+    "y": 281,
+    "shot": "r42-form-admin-reopen-retained-recipient.png",
+    "url": "about:blank",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 720,
+    "y": 717,
+    "url": "about:blank",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

@@ -1,0 +1,1413 @@
+{
+  "page": [
+    "8280:2",
+    "01 — EXISTING APPLICATION / AS-IS"
+  ],
+  "count": 200,
+  "types": {
+    "FRAME": 200
+  },
+  "frames": [
+    [
+      "8281:2",
+      "AS-IS 01 · Review / empty · 1280",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8281:136",
+      "Evidence / AS-IS 01 · Review / empty · 1280",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8283:2",
+      "AS-IS 02 · Heading / Style",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8283:297",
+      "Evidence / AS-IS 02 · Heading / Style",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8283:299",
+      "AS-IS 03 · Selected element actions",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8283:608",
+      "Evidence / AS-IS 03 · Selected element actions",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8283:610",
+      "AS-IS 04 · Layers",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8283:933",
+      "Evidence / AS-IS 04 · Layers",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8283:935",
+      "AS-IS 05 · Pages",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8283:1247",
+      "Evidence / AS-IS 05 · Pages",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8283:1249",
+      "AS-IS 06 · Add catalog",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8283:1652",
+      "Evidence / AS-IS 06 · Add catalog",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8283:1654",
+      "AS-IS 07 · Saved components",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8283:1996",
+      "Evidence / AS-IS 07 · Saved components",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8283:1998",
+      "AS-IS 08 · Assets quick chooser",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8283:2323",
+      "Evidence / AS-IS 08 · Assets quick chooser",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8283:2325",
+      "AS-IS 09 · Full Media",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8283:2521",
+      "Evidence / AS-IS 09 · Full Media",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8283:2523",
+      "AS-IS 10 · CMS records",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8283:2752",
+      "Evidence / AS-IS 10 · CMS records",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8286:2",
+      "AS-IS 11 · CMS record / draft",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8286:270",
+      "Evidence / AS-IS 11 · CMS record / draft",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8286:272",
+      "AS-IS 12 · CMS fields",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8286:509",
+      "Evidence / AS-IS 12 · CMS fields",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8286:511",
+      "AS-IS 13 · Brand / colors",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8286:731",
+      "Evidence / AS-IS 13 · Brand / colors",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8286:733",
+      "AS-IS 14 · Brand color picker",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8286:983",
+      "Evidence / AS-IS 14 · Brand color picker",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8286:985",
+      "AS-IS 15 · Brand typography",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8286:1158",
+      "Evidence / AS-IS 15 · Brand typography",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8286:1160",
+      "AS-IS 16 · Brand spacing",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8286:1355",
+      "Evidence / AS-IS 16 · Brand spacing",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8286:1357",
+      "AS-IS 17 · Site menu",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8286:1611",
+      "Evidence / AS-IS 17 · Site menu",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8286:1613",
+      "AS-IS 18 · Settings / General",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8286:1816",
+      "Evidence / AS-IS 18 · Settings / General",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8290:2",
+      "AS-IS 19 · History / Session",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8290:176",
+      "Evidence / AS-IS 19 · History / Session",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8290:178",
+      "AS-IS 20 · History / Saves",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8290:362",
+      "Evidence / AS-IS 20 · History / Saves",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8290:364",
+      "AS-IS 21 · Notifications / empty",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8290:658",
+      "Evidence / AS-IS 21 · Notifications / empty",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8290:660",
+      "AS-IS 22 · Issues / six warnings",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8290:860",
+      "Evidence / AS-IS 22 · Issues / six warnings",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8290:862",
+      "AS-IS 23 · Activity / event",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8290:1031",
+      "Evidence / AS-IS 23 · Activity / event",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8290:1033",
+      "AS-IS 24 · Command palette",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8290:1231",
+      "Evidence / AS-IS 24 · Command palette",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8290:1233",
+      "AS-IS 25 · Publish / checks and targets",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8290:1461",
+      "Evidence / AS-IS 25 · Publish / checks and targets",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8290:1463",
+      "AS-IS 26 · AI / selected heading",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8290:1627",
+      "Evidence / AS-IS 26 · AI / selected heading",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8290:1629",
+      "AS-IS 27 · Templates / gallery",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8290:1809",
+      "Evidence / AS-IS 27 · Templates / gallery",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8290:1811",
+      "AS-IS 28 · Template preview",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8290:1950",
+      "Evidence / AS-IS 28 · Template preview",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8290:1952",
+      "AS-IS 29 · Components / manager empty",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8290:2248",
+      "Evidence / AS-IS 29 · Components / manager empty",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8290:2250",
+      "AS-IS 30 · Preview / Desktop",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8290:2516",
+      "Evidence / AS-IS 30 · Preview / Desktop",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8290:2518",
+      "AS-IS 31 · Preview / Mobile 375",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8290:2795",
+      "Evidence / AS-IS 31 · Preview / Mobile 375",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8290:2797",
+      "AS-IS 32 · Pages / page Inspector",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8290:3049",
+      "Evidence / AS-IS 32 · Pages / page Inspector",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8290:3051",
+      "AS-IS 33 · New page dialog",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8290:3330",
+      "Evidence / AS-IS 33 · New page dialog",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8290:3332",
+      "AS-IS 34 · Export dialog",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8290:3617",
+      "Evidence / AS-IS 34 · Export dialog",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8290:3619",
+      "AS-IS 35 · Keyboard shortcuts",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8290:3916",
+      "Evidence / AS-IS 35 · Keyboard shortcuts",
+      "FRAME",
+      1280,
+      69
+    ],
+    [
+      "8293:2",
+      "AS-IS 36 · Heading Style — 1440px",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8293:371",
+      "Evidence / AS-IS 36 · Heading Style — 1440px",
+      "FRAME",
+      1440,
+      69
+    ],
+    [
+      "8293:373",
+      "AS-IS 37 · Image Style — 1440px",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8293:732",
+      "Evidence / AS-IS 37 · Image Style — 1440px",
+      "FRAME",
+      1440,
+      69
+    ],
+    [
+      "8293:734",
+      "AS-IS 38 · Image Behaviour — current controls",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8293:992",
+      "Evidence / AS-IS 38 · Image Behaviour — current controls",
+      "FRAME",
+      1440,
+      69
+    ],
+    [
+      "8293:994",
+      "AS-IS 39 · Image Effects — current controls",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8293:1237",
+      "Evidence / AS-IS 39 · Image Effects — current controls",
+      "FRAME",
+      1440,
+      69
+    ],
+    [
+      "8293:1239",
+      "AS-IS 40 · Page Inspector — selected root",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8293:1526",
+      "Evidence / AS-IS 40 · Page Inspector — selected root",
+      "FRAME",
+      1440,
+      69
+    ],
+    [
+      "8293:1528",
+      "AS-IS 41 · Page settings — SEO",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8293:1856",
+      "Evidence / AS-IS 41 · Page settings — SEO",
+      "FRAME",
+      1440,
+      69
+    ],
+    [
+      "8293:1858",
+      "AS-IS 42 · Page settings — Social",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8293:2166",
+      "Evidence / AS-IS 42 · Page settings — Social",
+      "FRAME",
+      1440,
+      69
+    ],
+    [
+      "8293:2168",
+      "AS-IS 43 · Page settings — Advanced",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8293:2480",
+      "Evidence / AS-IS 43 · Page settings — Advanced",
+      "FRAME",
+      1440,
+      69
+    ],
+    [
+      "8302:2",
+      "AS-IS 44 · Settings / Overview",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8302:232",
+      "Evidence / AS-IS 44 · Settings / Overview",
+      "FRAME",
+      1440,
+      84
+    ],
+    [
+      "8302:234",
+      "AS-IS 45 · Settings / SEO",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8302:471",
+      "Evidence / AS-IS 45 · Settings / SEO",
+      "FRAME",
+      1440,
+      84
+    ],
+    [
+      "8302:473",
+      "AS-IS 46 · Settings / Redirects",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8302:680",
+      "Evidence / AS-IS 46 · Settings / Redirects",
+      "FRAME",
+      1440,
+      84
+    ],
+    [
+      "8302:682",
+      "AS-IS 47 · Settings / Domains — no custom domain",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8302:881",
+      "Evidence / AS-IS 47 · Settings / Domains — no custom domain",
+      "FRAME",
+      1440,
+      84
+    ],
+    [
+      "8302:883",
+      "AS-IS 48 · Settings / Access",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8302:1093",
+      "Evidence / AS-IS 48 · Settings / Access",
+      "FRAME",
+      1440,
+      84
+    ],
+    [
+      "8302:1095",
+      "AS-IS 49 · Settings / Analytics",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8302:1325",
+      "Evidence / AS-IS 49 · Settings / Analytics",
+      "FRAME",
+      1440,
+      84
+    ],
+    [
+      "8302:1327",
+      "AS-IS 50 · Settings / Form submissions — empty",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8302:1525",
+      "Evidence / AS-IS 50 · Settings / Form submissions — empty",
+      "FRAME",
+      1440,
+      84
+    ],
+    [
+      "8302:1527",
+      "AS-IS 51 · Settings / Languages",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8302:1746",
+      "Evidence / AS-IS 51 · Settings / Languages",
+      "FRAME",
+      1440,
+      84
+    ],
+    [
+      "8302:1748",
+      "AS-IS 52 · Settings / Custom code",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8302:1964",
+      "Evidence / AS-IS 52 · Settings / Custom code",
+      "FRAME",
+      1440,
+      84
+    ],
+    [
+      "8302:1966",
+      "AS-IS 53 · Settings / Security headers",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8302:2192",
+      "Evidence / AS-IS 53 · Settings / Security headers",
+      "FRAME",
+      1440,
+      84
+    ],
+    [
+      "8302:2194",
+      "AS-IS 54 · Settings / Danger zone",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8302:2402",
+      "Evidence / AS-IS 54 · Settings / Danger zone",
+      "FRAME",
+      1440,
+      84
+    ],
+    [
+      "8302:2404",
+      "AS-IS 55 · Settings / Members — workspace door",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8302:2606",
+      "Evidence / AS-IS 55 · Settings / Members — workspace door",
+      "FRAME",
+      1440,
+      84
+    ],
+    [
+      "8302:2608",
+      "AS-IS 56 · Settings / Billing — workspace door",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8302:2810",
+      "Evidence / AS-IS 56 · Settings / Billing — workspace door",
+      "FRAME",
+      1440,
+      84
+    ],
+    [
+      "8302:2812",
+      "AS-IS 57 · Settings / Integrations — workspace door",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8302:3014",
+      "Evidence / AS-IS 57 · Settings / Integrations — workspace door",
+      "FRAME",
+      1440,
+      84
+    ],
+    [
+      "8304:74",
+      "AS-IS 58 · Brand / Colour mode",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8304:199",
+      "Evidence / AS-IS 58 · Brand / Colour mode",
+      "FRAME",
+      1440,
+      69
+    ],
+    [
+      "8304:308",
+      "AS-IS 59 · Brand / Styles",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8304:417",
+      "Evidence / AS-IS 59 · Brand / Styles",
+      "FRAME",
+      1440,
+      69
+    ],
+    [
+      "8304:505",
+      "AS-IS 60 · Brand / Component styles",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8304:688",
+      "Evidence / AS-IS 60 · Brand / Component styles",
+      "FRAME",
+      1440,
+      69
+    ],
+    [
+      "8304:690",
+      "AS-IS 61 · Brand / Classes — empty",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8304:834",
+      "Evidence / AS-IS 61 · Brand / Classes — empty",
+      "FRAME",
+      1440,
+      69
+    ],
+    [
+      "8304:836",
+      "AS-IS 62 · Brand / Presets",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8304:1032",
+      "Evidence / AS-IS 62 · Brand / Presets",
+      "FRAME",
+      1440,
+      69
+    ],
+    [
+      "8304:1034",
+      "AS-IS 63 · Brand / Brand checks",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8304:1182",
+      "Evidence / AS-IS 63 · Brand / Brand checks",
+      "FRAME",
+      1440,
+      69
+    ],
+    [
+      "8304:1184",
+      "AS-IS 64 · Brand / Starters",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8304:1355",
+      "Evidence / AS-IS 64 · Brand / Starters",
+      "FRAME",
+      1440,
+      69
+    ],
+    [
+      "8304:1357",
+      "AS-IS 65 · Brand / Import / export",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8304:1449",
+      "Evidence / AS-IS 65 · Brand / Import / export",
+      "FRAME",
+      1440,
+      84
+    ],
+    [
+      "8306:241560",
+      "AS-IS 66 · CMS / No collection selected",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8306:241740",
+      "Evidence / AS-IS 66 · CMS / No collection selected",
+      "FRAME",
+      1440,
+      84
+    ],
+    [
+      "8307:241530",
+      "AS-IS 67 · CMS / Title field settings",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8307:241773",
+      "Evidence / AS-IS 67 · CMS / Title field settings",
+      "FRAME",
+      1440,
+      84
+    ],
+    [
+      "8307:241775",
+      "AS-IS 68 · CMS / Dynamic pages",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8307:241977",
+      "Evidence / AS-IS 68 · CMS / Dynamic pages",
+      "FRAME",
+      1440,
+      84
+    ],
+    [
+      "8307:241979",
+      "AS-IS 69 · CMS / Collection settings",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8307:242188",
+      "Evidence / AS-IS 69 · CMS / Collection settings",
+      "FRAME",
+      1440,
+      84
+    ],
+    [
+      "8307:242190",
+      "AS-IS 70 · Media / Selected asset",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8307:242409",
+      "Evidence / AS-IS 70 · Media / Selected asset",
+      "FRAME",
+      1440,
+      84
+    ],
+    [
+      "8308:2",
+      "AS-IS 71 · Media / Asset properties",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8308:226",
+      "Evidence / AS-IS 71 · Media / Asset properties",
+      "FRAME",
+      1440,
+      84
+    ],
+    [
+      "8308:228",
+      "AS-IS 72 · Media / Crop editor",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8308:385",
+      "Evidence / AS-IS 72 · Media / Crop editor",
+      "FRAME",
+      1440,
+      84
+    ],
+    [
+      "8308:505",
+      "AS-IS 73 · Media / Asset actions",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8308:735",
+      "Evidence / AS-IS 73 · Media / Asset actions",
+      "FRAME",
+      1440,
+      84
+    ],
+    [
+      "8308:737",
+      "AS-IS 74 · History / Published empty state",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8308:877",
+      "Evidence / AS-IS 74 · History / Published empty state",
+      "FRAME",
+      1440,
+      84
+    ],
+    [
+      "8308:879",
+      "AS-IS 75 · History / Version actions",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8308:1046",
+      "Evidence / AS-IS 75 · History / Version actions",
+      "FRAME",
+      1440,
+      84
+    ],
+    [
+      "8308:1048",
+      "AS-IS 76 · History / Compare with current",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8308:1225",
+      "Evidence / AS-IS 76 · History / Compare with current",
+      "FRAME",
+      1440,
+      84
+    ],
+    [
+      "8308:1227",
+      "AS-IS 77 · Canvas / View menu",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8308:1470",
+      "Evidence / AS-IS 77 · Canvas / View menu",
+      "FRAME",
+      1440,
+      84
+    ],
+    [
+      "8308:1472",
+      "AS-IS 78 · Canvas / Breakpoint menu",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8308:1699",
+      "Evidence / AS-IS 78 · Canvas / Breakpoint menu",
+      "FRAME",
+      1440,
+      84
+    ],
+    [
+      "8308:1701",
+      "AS-IS 79 · Canvas / Mobile viewport",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8308:1925",
+      "Evidence / AS-IS 79 · Canvas / Mobile viewport",
+      "FRAME",
+      1440,
+      84
+    ],
+    [
+      "8308:1927",
+      "AS-IS 80 · Inspector / Multiple selected",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8308:2108",
+      "Evidence / AS-IS 80 · Inspector / Multiple selected",
+      "FRAME",
+      1440,
+      84
+    ],
+    [
+      "8308:2246",
+      "AS-IS 81 · Inspector / Locked element",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8308:2473",
+      "Evidence / AS-IS 81 · Inspector / Locked element",
+      "FRAME",
+      1440,
+      84
+    ],
+    [
+      "8308:2638",
+      "AS-IS 82 · Inspector / Container",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8308:2884",
+      "Evidence / AS-IS 82 · Inspector / Container",
+      "FRAME",
+      1440,
+      84
+    ],
+    [
+      "8308:3082",
+      "AS-IS 83 · Inspector / Form",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8308:3368",
+      "Evidence / AS-IS 83 · Inspector / Form",
+      "FRAME",
+      1440,
+      84
+    ],
+    [
+      "8308:3572",
+      "AS-IS 84 · Pages / Empty page",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8308:3808",
+      "Evidence / AS-IS 84 · Pages / Empty page",
+      "FRAME",
+      1440,
+      84
+    ],
+    [
+      "8308:3973",
+      "AS-IS 85 · Pages / Page actions",
+      "FRAME",
+      1280,
+      720
+    ],
+    [
+      "8308:4257",
+      "Evidence / AS-IS 85 · Pages / Page actions",
+      "FRAME",
+      1280,
+      84
+    ],
+    [
+      "8309:2",
+      "AS-IS 86 · Components / Create dialog",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8309:139",
+      "Evidence / AS-IS 86 · Components / Create dialog",
+      "FRAME",
+      1440,
+      114
+    ],
+    [
+      "8309:461",
+      "AS-IS 87 · Components / Instance controls",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8309:588",
+      "Evidence / AS-IS 87 · Components / Instance controls",
+      "FRAME",
+      1440,
+      99
+    ],
+    [
+      "8309:887",
+      "AS-IS 88 · Components / Instance actions",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8309:1015",
+      "Evidence / AS-IS 88 · Components / Instance actions",
+      "FRAME",
+      1440,
+      99
+    ],
+    [
+      "8309:242881",
+      "AS-IS 89 · Components / Expanded manager",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8309:243088",
+      "Evidence / AS-IS 89 · Components / Expanded manager",
+      "FRAME",
+      1440,
+      99
+    ],
+    [
+      "8309:243286",
+      "AS-IS 90 · Components / Master detail",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8309:243406",
+      "Evidence / AS-IS 90 · Components / Master detail",
+      "FRAME",
+      1440,
+      114
+    ],
+    [
+      "8309:243704",
+      "AS-IS 91 · Components / Back to instance",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8309:243825",
+      "Evidence / AS-IS 91 · Components / Back to instance",
+      "FRAME",
+      1440,
+      114
+    ],
+    [
+      "8309:244123",
+      "AS-IS 92 · Inspector / CMS binding chooser",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8309:244284",
+      "Evidence / AS-IS 92 · Inspector / CMS binding chooser",
+      "FRAME",
+      1440,
+      114
+    ],
+    [
+      "8309:244434",
+      "AS-IS 93 · Inspector / Add interaction",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8309:244628",
+      "Evidence / AS-IS 93 · Inspector / Add interaction",
+      "FRAME",
+      1440,
+      114
+    ],
+    [
+      "8309:244811",
+      "AS-IS 94 · Inspector / Form behaviour",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8309:244930",
+      "Evidence / AS-IS 94 · Inspector / Form behaviour",
+      "FRAME",
+      1440,
+      99
+    ],
+    [
+      "8309:245270",
+      "AS-IS 95 · Inspector / Image chooser",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8309:245484",
+      "Evidence / AS-IS 95 · Inspector / Image chooser",
+      "FRAME",
+      1440,
+      144
+    ],
+    [
+      "8309:245692",
+      "AS-IS 96 · Inspector / Spacing token picker",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8309:245831",
+      "Evidence / AS-IS 96 · Inspector / Spacing token picker",
+      "FRAME",
+      1440,
+      144
+    ],
+    [
+      "8309:246171",
+      "AS-IS 97 · Inspector / Heading at Mobile",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8309:246291",
+      "Evidence / AS-IS 97 · Inspector / Heading at Mobile",
+      "FRAME",
+      1440,
+      99
+    ],
+    [
+      "8309:246610",
+      "AS-IS 98 · Templates / Empty page replacement applied",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8309:246793",
+      "Evidence / AS-IS 98 · Templates / Replace confirmation",
+      "FRAME",
+      1440,
+      129
+    ],
+    [
+      "8309:247369",
+      "AS-IS 99 · Templates / Replacement guard",
+      "FRAME",
+      1440,
+      900
+    ],
+    [
+      "8309:247467",
+      "Evidence / AS-IS 99 · Templates / Replacement guard",
+      "FRAME",
+      1440,
+      69
+    ],
+    [
+      "8309:247874",
+      "READ FIRST · AS-IS evidence and screen index",
+      "FRAME",
+      2600,
+      1460
+    ],
+    [
+      "8311:2",
+      "AUDIT ANNOTATIONS · 60 findings / evidence boundaries",
+      "FRAME",
+      2960,
+      6250
+    ]
+  ],
+  "notes": 0
+}

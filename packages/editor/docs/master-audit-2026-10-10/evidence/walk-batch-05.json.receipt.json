@@ -1,0 +1,25 @@
+[
+  {
+    "label": "Choose fixture file after validation",
+    "x": 720,
+    "y": 509,
+    "shot": "walk-upload-file.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8507%3A3011&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Start fixture upload",
+    "x": 720,
+    "y": 557,
+    "shot": "walk-upload-running.png",
+    "wait": 3500,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8507%3A3011&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Inspect upload outcome",
+    "shot": "walk-upload-outcome.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8507%3A3011&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

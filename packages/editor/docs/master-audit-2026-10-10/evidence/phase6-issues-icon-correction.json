@@ -1,0 +1,21 @@
+{
+  "initialCorrection": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"mutatedNodeIds\":[\"8391:1878\",\"8391:1879\",\"8391:1886\",\"8391:1887\",\"8391:2134\",\"8391:2135\",\"8391:2142\",\"8391:2143\"],\"reason\":\"Selected Image row and icon blue; unselected Heading uses normal ink. No route changes.\"}"
+      }
+    ],
+    "isError": false
+  },
+  "finalCorrection": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"mutatedNodeIds\":[\"8391:1878\",\"8391:1879\",\"8391:1886\",\"8391:1887\",\"8391:2134\",\"8391:2135\",\"8391:2142\",\"8391:2143\"],\"reason\":\"Restored source transparent icon container paints; only visible vector paints follow row text colour.\"}"
+      }
+    ],
+    "isError": false
+  },
+  "verification": "Initial recolour made transparent container fills opaque; restored transparent source paints and recoloured visible vector paints only. Final browser screenshot visually inspected, correct glyphs preserved."
+}

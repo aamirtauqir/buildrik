@@ -1,0 +1,39 @@
+[
+  {
+    "label": "About options from manager after Escape",
+    "x": 970,
+    "y": 420,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-3&starting-point-node-id=8465%3A3",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Duplicate About",
+    "x": 720,
+    "y": 509,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-3&starting-point-node-id=8465%3A3",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Open copied page",
+    "x": 720,
+    "y": 503,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-3&starting-point-node-id=8465%3A3",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Pages including copy",
+    "x": 109,
+    "y": 157,
+    "shot": "r31-drawer-copy-row.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-3&starting-point-node-id=8465%3A3",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Copy direct Options",
+    "x": 286,
+    "y": 327,
+    "shot": "r31-drawer-copy-options.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-3&starting-point-node-id=8465%3A3",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

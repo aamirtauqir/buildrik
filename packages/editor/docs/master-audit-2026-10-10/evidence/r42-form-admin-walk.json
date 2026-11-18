@@ -1,0 +1,5 @@
+[
+ {"goto":"9026:17615","wait":6500},
+ {"x":1320,"y":281,"wait":2600,"shot":"r42-form-admin-settings.png"},
+ {"x":720,"y":621,"shot":"r42-form-admin-email-picker.png"}
+]

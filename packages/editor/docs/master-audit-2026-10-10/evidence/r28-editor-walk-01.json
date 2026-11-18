@@ -1,0 +1,9 @@
+[
+ {"label":"Padding baseline","goto":"8465:6","shot":"r28-padding-start.png"},
+ {"label":"Open linked top picker","x":1239,"y":232},
+ {"label":"Apply linked 32px token","x":720,"y":622,"shot":"r28-padding-linked32.png"},
+ {"label":"Unlink all sides","x":1239,"y":334},
+ {"label":"Open independent left side","x":1149,"y":266,"shot":"r28-padding-left-picker.png"},
+ {"label":"Apply left 8px without changing right","x":720,"y":422,"shot":"r28-padding-left8.png"},
+ {"label":"Open independent right side","x":1330,"y":266,"shot":"r28-padding-right-picker.png"}
+]

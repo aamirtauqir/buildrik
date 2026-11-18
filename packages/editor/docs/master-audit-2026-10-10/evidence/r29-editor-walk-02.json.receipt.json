@@ -1,0 +1,57 @@
+[
+  {
+    "label": "Mobile Main section baseline",
+    "goto": "8584:12241",
+    "shot": "r29-mobile-before.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8584-12241&starting-point-node-id=8584%3A12241&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Mobile History preserves canvas",
+    "x": 600,
+    "y": 28,
+    "shot": "r29-mobile-history.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8584-12241&starting-point-node-id=8584%3A12241&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Close returns Mobile Main section",
+    "x": 1391,
+    "y": 87,
+    "shot": "r29-mobile-return.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8584-12241&starting-point-node-id=8584%3A12241&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Publish normalized field",
+    "x": 897,
+    "y": 28,
+    "shot": "r29-publish-final.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8584-12241&starting-point-node-id=8584%3A12241&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Destination opens specific targets",
+    "x": 1230,
+    "y": 266,
+    "shot": "r29-publish-targets.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8584-12241&starting-point-node-id=8584%3A12241&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Return from targets",
+    "x": 88,
+    "y": 28,
+    "shot": "r29-targets-return.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8584-12241&starting-point-node-id=8584%3A12241&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Pages normalized fields",
+    "x": 109,
+    "y": 157,
+    "shot": "r29-pages-final.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8584-12241&starting-point-node-id=8584%3A12241&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

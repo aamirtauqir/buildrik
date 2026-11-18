@@ -1,0 +1,63 @@
+[
+  {
+    "x": 1250,
+    "y": 390,
+    "wait": 1300,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-25014&starting-point-node-id=8843%3A25014&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 720,
+    "y": 613,
+    "wait": 1800,
+    "shot": "r40-final-gap32.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-25014&starting-point-node-id=8843%3A25014&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 1180,
+    "y": 477,
+    "wait": 1300,
+    "shot": "r40-final-gap-reset24.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-25014&starting-point-node-id=8843%3A25014&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 1340,
+    "y": 477,
+    "wait": 1300,
+    "shot": "r40-final-gap-undo32.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-25014&starting-point-node-id=8843%3A25014&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 1390,
+    "y": 88,
+    "wait": 1200,
+    "shot": "r40-final-gap-close-mobile.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-25014&starting-point-node-id=8843%3A25014&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 379,
+    "y": 96,
+    "shot": "r40-final-desktop-gap24.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-25014&starting-point-node-id=8843%3A25014&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 475,
+    "y": 96,
+    "shot": "r40-final-mobile-gap32-retained.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-25014&starting-point-node-id=8843%3A25014&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 1330,
+    "y": 302,
+    "wait": 1500,
+    "shot": "r40-final-gap-reopen32.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-25014&starting-point-node-id=8843%3A25014&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

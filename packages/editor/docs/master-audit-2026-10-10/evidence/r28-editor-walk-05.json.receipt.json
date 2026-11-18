@@ -1,0 +1,47 @@
+[
+  {
+    "label": "Open image failure review fixture",
+    "goto": "8593:12598",
+    "shot": "r28-image-failure-console.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8593-12598&starting-point-node-id=8593%3A12598&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Enable failed image source fixture",
+    "x": 720,
+    "y": 520,
+    "expected": "8507:3011",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8593%3A12598&hide-ui=1",
+    "verification": "URL_MATCH"
+  },
+  {
+    "label": "Open source chooser for failure",
+    "x": 1241,
+    "y": 261,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8593%3A12598&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Open upload method",
+    "x": 1100,
+    "y": 315,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8593%3A12598&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Choose sample file",
+    "x": 720,
+    "y": 513,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8593%3A12598&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Upload enters expected failure",
+    "x": 720,
+    "y": 557,
+    "wait": 2200,
+    "shot": "r28-upload-failed.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8593%3A12598&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

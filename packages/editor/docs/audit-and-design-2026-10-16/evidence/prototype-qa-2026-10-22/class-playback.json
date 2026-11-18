@@ -1,0 +1,8208 @@
+[
+  {
+    "fixtureLoad": "415:50289",
+    "at": 1792629587.252279
+  },
+  {
+    "origin": "415:50289",
+    "control": "415:50365",
+    "label": "Tab / Effects",
+    "to": "415:50616",
+    "x": 1396,
+    "y": 177,
+    "w": 1440,
+    "h": 900,
+    "pass": false,
+    "actual": "415:50289",
+    "clientX": 1476,
+    "clientY": 277,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629618478
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61498",
+    "label": "CF10 \u00b7 First edit",
+    "to": "415:53226",
+    "x": 216,
+    "y": 122,
+    "w": 1200,
+    "h": 1726,
+    "pass": false,
+    "actual": "415:54221",
+    "reason": "origin mismatch"
+  },
+  {
+    "origin": "415:50289",
+    "control": "415:50365",
+    "label": "Tab / Effects",
+    "to": "415:50616",
+    "x": 1396,
+    "y": 177,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50616",
+    "clientX": 1476,
+    "clientY": 277,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629668695
+  },
+  {
+    "origin": "415:50616",
+    "control": "415:50690",
+    "label": "Tab / Style",
+    "to": "415:50289",
+    "x": 1256,
+    "y": 177,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50289",
+    "clientX": 1336,
+    "clientY": 277,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629670734
+  },
+  {
+    "origin": "415:50289",
+    "control": "I415:50575;414:137511",
+    "label": "Selector trigger",
+    "to": "415:50937",
+    "x": 1291,
+    "y": 253,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50937",
+    "clientX": 1371,
+    "clientY": 353,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629671150
+  },
+  {
+    "origin": "415:50937",
+    "control": "415:51040",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629671562
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61501",
+    "label": "CF11 \u00b7 Migrated site",
+    "to": "415:53556",
+    "x": 592,
+    "y": 122,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:53556",
+    "clientX": 795.4577056778679,
+    "clientY": 129.26998841251452,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629671978
+  },
+  {
+    "origin": "415:53556",
+    "control": "415:53881",
+    "label": "Make class from this element",
+    "to": "419:53909",
+    "x": 1279,
+    "y": 641,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:53909",
+    "clientX": 1359,
+    "clientY": 741,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629675156
+  },
+  {
+    "origin": "419:53909",
+    "control": "419:54221",
+    "label": "\u2039 Hero heading \u00b7 Style / Tablet",
+    "to": "415:50289",
+    "x": 510,
+    "y": 96,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50289",
+    "clientX": 590,
+    "clientY": 196,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629675774
+  },
+  {
+    "origin": "415:50289",
+    "control": "415:50604",
+    "label": "Font size / 36 px",
+    "to": "415:58442",
+    "x": 1339,
+    "y": 517,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:58442",
+    "clientX": 1419,
+    "clientY": 617,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629676312
+  },
+  {
+    "origin": "415:58442",
+    "control": "415:58545",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629676725
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61504",
+    "label": "CF12 \u00b7 Mixed selection",
+    "to": "415:53883",
+    "x": 968,
+    "y": 122,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:53883",
+    "clientX": 1008.9455388180766,
+    "clientY": 129.26998841251452,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629677195
+  },
+  {
+    "origin": "415:53883",
+    "control": "415:54217",
+    "label": "Edit these elements only",
+    "to": "415:54221",
+    "x": 1279,
+    "y": 641,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:54221",
+    "clientX": 1359,
+    "clientY": 741,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629681090
+  },
+  {
+    "origin": "415:54221",
+    "control": "415:54546",
+    "label": "Select Hero heading",
+    "to": "415:50289",
+    "x": 1279,
+    "y": 641,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50289",
+    "clientX": 1359,
+    "clientY": 741,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629681563
+  },
+  {
+    "origin": "415:50289",
+    "control": "415:50607",
+    "label": "\u25cf Set here \u00b7 .hero-heading / Tablet",
+    "to": "421:50695",
+    "x": 1291,
+    "y": 557,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "421:50695",
+    "clientX": 1371,
+    "clientY": 657,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629682835
+  },
+  {
+    "origin": "421:50695",
+    "control": "421:50998",
+    "label": "Back to Typography",
+    "to": "415:50289",
+    "x": 1291,
+    "y": 781,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50289",
+    "clientX": 1371,
+    "clientY": 881,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629688876
+  },
+  {
+    "origin": "415:50289",
+    "control": "415:50614",
+    "label": "Open in Brand \u2192 Classes",
+    "to": "419:51523",
+    "x": 1279,
+    "y": 641,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:51523",
+    "clientX": 1359,
+    "clientY": 741,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629689464
+  },
+  {
+    "origin": "419:51523",
+    "control": "419:51835",
+    "label": "\u2039 Hero heading \u00b7 Style / Tablet",
+    "to": "415:50289",
+    "x": 510,
+    "y": 96,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50289",
+    "clientX": 590,
+    "clientY": 196,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629693996
+  },
+  {
+    "origin": "415:50289",
+    "control": "415:50392",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629694655
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61508",
+    "label": "CF13 \u00b7 Mixed selection",
+    "to": "415:54221",
+    "x": 216,
+    "y": 174,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:54221",
+    "clientX": 581.9698725376594,
+    "clientY": 158.79490150637315,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629695217
+  },
+  {
+    "origin": "415:54221",
+    "control": "415:54324",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629699384
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61511",
+    "label": "CF14 \u00b7 Locked selected element",
+    "to": "415:54548",
+    "x": 592,
+    "y": 174,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:54548",
+    "clientX": 795.4577056778679,
+    "clientY": 158.79490150637315,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629700398
+  },
+  {
+    "origin": "415:54548",
+    "control": "415:54887",
+    "label": "Unlock Hero heading",
+    "to": "415:50289",
+    "x": 1279,
+    "y": 641,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50289",
+    "clientX": 1359,
+    "clientY": 741,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629704691
+  },
+  {
+    "origin": "415:50289",
+    "control": "415:50365",
+    "label": "Tab / Effects",
+    "to": "415:50616",
+    "x": 1396,
+    "y": 177,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50616",
+    "clientX": 1476,
+    "clientY": 277,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629705586
+  },
+  {
+    "origin": "415:50616",
+    "control": "I415:50902;414:137511",
+    "label": "Selector trigger",
+    "to": "421:47803",
+    "x": 1291,
+    "y": 253,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "421:47803",
+    "clientX": 1371,
+    "clientY": 353,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629706428
+  },
+  {
+    "origin": "421:47803",
+    "control": "I433:51567;414:137511",
+    "label": "Selector trigger",
+    "to": "421:47803",
+    "x": 1291,
+    "y": 253,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "421:47803",
+    "clientX": 1371,
+    "clientY": 353,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629710820
+  },
+  {
+    "origin": "421:47803",
+    "control": "421:47904",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629711915
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61514",
+    "label": "CF15 \u00b7 Component child",
+    "to": "415:54889",
+    "x": 968,
+    "y": 174,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:54889",
+    "clientX": 1008.9455388180766,
+    "clientY": 158.79490150637315,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629712427
+  },
+  {
+    "origin": "415:54889",
+    "control": "415:55218",
+    "label": "Select Hero instance root",
+    "to": "415:55220",
+    "x": 1279,
+    "y": 753,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:55220",
+    "clientX": 1359,
+    "clientY": 853,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629713688
+  },
+  {
+    "origin": "415:55220",
+    "control": "415:55526",
+    "label": "Push to master",
+    "to": "415:55532",
+    "x": 1279,
+    "y": 537,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:55532",
+    "clientX": 1359,
+    "clientY": 637,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629718002
+  },
+  {
+    "origin": "415:55532",
+    "control": "415:55635",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629723230
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61518",
+    "label": "CF16 \u00b7 Component root",
+    "to": "415:55220",
+    "x": 216,
+    "y": 226,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:55220",
+    "clientX": 581.9698725376594,
+    "clientY": 188.3198146002318,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629723747
+  },
+  {
+    "origin": "415:55220",
+    "control": "415:55528",
+    "label": "Reset local override",
+    "to": "421:52495",
+    "x": 1279,
+    "y": 569,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "421:52495",
+    "clientX": 1359,
+    "clientY": 669,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629726690
+  },
+  {
+    "origin": "421:52495",
+    "control": "421:52591",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629732185
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61521",
+    "label": "CF17 \u00b7 Push to master",
+    "to": "415:55532",
+    "x": 592,
+    "y": 226,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:55532",
+    "clientX": 795.4577056778679,
+    "clientY": 188.3198146002318,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629732680
+  },
+  {
+    "origin": "415:55532",
+    "control": "415:55845",
+    "label": "Cancel",
+    "to": "415:55220",
+    "x": 770,
+    "y": 480,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:55220",
+    "clientX": 850,
+    "clientY": 580,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629736680
+  },
+  {
+    "origin": "415:55220",
+    "control": "415:55530",
+    "label": "Inspect heading child",
+    "to": "415:54889",
+    "x": 1279,
+    "y": 601,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:54889",
+    "clientX": 1359,
+    "clientY": 701,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629737195
+  },
+  {
+    "origin": "415:54889",
+    "control": "415:54992",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629739687
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61524",
+    "label": "CF18 \u00b7 Master updated",
+    "to": "415:55850",
+    "x": 968,
+    "y": 226,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:55850",
+    "clientX": 1008.9455388180766,
+    "clientY": 188.3198146002318,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629740623
+  },
+  {
+    "origin": "415:55850",
+    "control": "415:56156",
+    "label": "View component versions",
+    "to": "419:56721",
+    "x": 1279,
+    "y": 521,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:56721",
+    "clientX": 1359,
+    "clientY": 621,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629749107
+  },
+  {
+    "origin": "419:56721",
+    "control": "419:57033",
+    "label": "\u2039 Hero heading \u00b7 Style / Tablet",
+    "to": "415:50289",
+    "x": 510,
+    "y": 96,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50289",
+    "clientX": 590,
+    "clientY": 196,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629750048
+  },
+  {
+    "origin": "415:50289",
+    "control": "415:50365",
+    "label": "Tab / Effects",
+    "to": "415:50616",
+    "x": 1396,
+    "y": 177,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50616",
+    "clientX": 1476,
+    "clientY": 277,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629750607
+  },
+  {
+    "origin": "415:50616",
+    "control": "415:50935",
+    "label": "Open in Brand \u2192 Classes",
+    "to": "419:51881",
+    "x": 1291,
+    "y": 581,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:51881",
+    "clientX": 1371,
+    "clientY": 681,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629751081
+  },
+  {
+    "origin": "419:51881",
+    "control": "419:52193",
+    "label": "\u2039 Hero heading \u00b7 Effects / Tablet",
+    "to": "415:50616",
+    "x": 510,
+    "y": 96,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50616",
+    "clientX": 590,
+    "clientY": 196,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629752449
+  },
+  {
+    "origin": "415:50616",
+    "control": "415:50719",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629752980
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61528",
+    "label": "CF19 \u00b7 Inherited origin",
+    "to": "415:56160",
+    "x": 216,
+    "y": 278,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:56160",
+    "clientX": 581.9698725376594,
+    "clientY": 217.84472769409044,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629753474
+  },
+  {
+    "origin": "415:56160",
+    "control": "415:56485",
+    "label": "Go to inherited source",
+    "to": "415:56487",
+    "x": 1279,
+    "y": 641,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:56487",
+    "clientX": 1359,
+    "clientY": 741,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629755443
+  },
+  {
+    "origin": "415:56487",
+    "control": "415:56812",
+    "label": "Return to Tablet / Hover",
+    "to": "415:56160",
+    "x": 1279,
+    "y": 641,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:56160",
+    "clientX": 1359,
+    "clientY": 741,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629759086
+  },
+  {
+    "origin": "415:56160",
+    "control": "415:56263",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629763931
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61531",
+    "label": "CF20 \u00b7 Inherited source",
+    "to": "415:56487",
+    "x": 592,
+    "y": 278,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:56487",
+    "clientX": 795.4577056778679,
+    "clientY": 217.84472769409044,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629764400
+  },
+  {
+    "origin": "415:56487",
+    "control": "415:56590",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629768119
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61534",
+    "label": "CF21 \u00b7 Rename class",
+    "to": "415:56814",
+    "x": 968,
+    "y": 278,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:56814",
+    "clientX": 1008.9455388180766,
+    "clientY": 217.84472769409044,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629768647
+  },
+  {
+    "origin": "415:56814",
+    "control": "415:56917",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629772697
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61538",
+    "label": "CF22 \u00b7 Renamed class",
+    "to": "415:57134",
+    "x": 216,
+    "y": 330,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:57134",
+    "clientX": 581.9698725376594,
+    "clientY": 247.36964078794907,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629773187
+  },
+  {
+    "origin": "415:57134",
+    "control": "415:57237",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629774419
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61541",
+    "label": "CF23 \u00b7 Independent duplicate",
+    "to": "415:57464",
+    "x": 592,
+    "y": 330,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:57464",
+    "clientX": 795.4577056778679,
+    "clientY": 247.36964078794907,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629774951
+  },
+  {
+    "origin": "415:57464",
+    "control": "415:57567",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629776747
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61544",
+    "label": "CF24 \u00b7 Remove base",
+    "to": "415:57794",
+    "x": 968,
+    "y": 330,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:57794",
+    "clientX": 1008.9455388180766,
+    "clientY": 247.36964078794907,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629777227
+  },
+  {
+    "origin": "415:57794",
+    "control": "415:57897",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629778314
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61548",
+    "label": "CF25 \u00b7 Base removed",
+    "to": "415:58112",
+    "x": 216,
+    "y": 382,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:58112",
+    "clientX": 581.9698725376594,
+    "clientY": 276.8945538818077,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629778993
+  },
+  {
+    "origin": "415:58112",
+    "control": "415:58215",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629782687
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61551",
+    "label": "CF26 \u00b7 Shared edit",
+    "to": "415:58442",
+    "x": 592,
+    "y": 382,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:58442",
+    "clientX": 795.4577056778679,
+    "clientY": 276.8945538818077,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629783128
+  },
+  {
+    "origin": "415:58442",
+    "control": "415:58755",
+    "label": "Cancel",
+    "to": "415:50289",
+    "x": 784,
+    "y": 464,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50289",
+    "clientX": 864,
+    "clientY": 564,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629785283
+  },
+  {
+    "origin": "415:50289",
+    "control": "I415:50575;414:137511",
+    "label": "Selector trigger",
+    "to": "415:50937",
+    "x": 1291,
+    "y": 253,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50937",
+    "clientX": 1371,
+    "clientY": 353,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629785725
+  },
+  {
+    "origin": "415:50937",
+    "control": "415:51264",
+    "label": "Rename class",
+    "to": "415:56814",
+    "x": 982,
+    "y": 232,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:56814",
+    "clientX": 1062,
+    "clientY": 332,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629786191
+  },
+  {
+    "origin": "415:56814",
+    "control": "415:57126",
+    "label": "Cancel",
+    "to": "415:50937",
+    "x": 784,
+    "y": 460,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50937",
+    "clientX": 864,
+    "clientY": 560,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629786604
+  },
+  {
+    "origin": "415:50937",
+    "control": "415:51266",
+    "label": "Duplicate as new class",
+    "to": "415:57464",
+    "x": 982,
+    "y": 272,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:57464",
+    "clientX": 1062,
+    "clientY": 372,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629787148
+  },
+  {
+    "origin": "415:57464",
+    "control": "415:57791",
+    "label": "Undo",
+    "to": "415:50289",
+    "x": 1358,
+    "y": 836,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50289",
+    "clientX": 1438,
+    "clientY": 936,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629789385
+  },
+  {
+    "origin": "415:50289",
+    "control": "I415:50575;414:137511",
+    "label": "Selector trigger",
+    "to": "415:50937",
+    "x": 1291,
+    "y": 253,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50937",
+    "clientX": 1371,
+    "clientY": 353,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629789814
+  },
+  {
+    "origin": "415:50937",
+    "control": "415:51268",
+    "label": "Remove from this element",
+    "to": "421:51618",
+    "x": 982,
+    "y": 312,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "421:51618",
+    "clientX": 1062,
+    "clientY": 412,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629790397
+  },
+  {
+    "origin": "421:51618",
+    "control": "421:51720",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629793079
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61554",
+    "label": "CF27 \u00b7 Shared edit",
+    "to": "415:58760",
+    "x": 968,
+    "y": 382,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:58760",
+    "clientX": 1008.9455388180766,
+    "clientY": 276.8945538818077,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629793641
+  },
+  {
+    "origin": "415:58760",
+    "control": "415:58863",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629796631
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61558",
+    "label": "CF28 \u00b7 Reset class layer",
+    "to": "415:59090",
+    "x": 216,
+    "y": 434,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:59090",
+    "clientX": 581.9698725376594,
+    "clientY": 306.4194669756663,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629797216
+  },
+  {
+    "origin": "415:59090",
+    "control": "415:59193",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629802073
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61561",
+    "label": "CF29 \u00b7 Reset result",
+    "to": "415:59408",
+    "x": 592,
+    "y": 434,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:59408",
+    "clientX": 795.4577056778679,
+    "clientY": 306.4194669756663,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629802616
+  },
+  {
+    "origin": "415:59408",
+    "control": "415:59511",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629808073
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61564",
+    "label": "CF30 \u00b7 Conflict",
+    "to": "415:59738",
+    "x": 968,
+    "y": 434,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:59738",
+    "clientX": 1008.9455388180766,
+    "clientY": 306.4194669756663,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629809122
+  },
+  {
+    "origin": "415:59738",
+    "control": "415:60076",
+    "label": "Save local version to History",
+    "to": "421:48706",
+    "x": 1279,
+    "y": 753,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "421:48706",
+    "clientX": 1359,
+    "clientY": 853,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629813029
+  },
+  {
+    "origin": "421:48706",
+    "control": "421:48813",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629816367
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61568",
+    "label": "CF31 \u00b7 Stale editor",
+    "to": "415:60080",
+    "x": 216,
+    "y": 486,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:60080",
+    "clientX": 581.9698725376594,
+    "clientY": 335.9443800695249,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629816948
+  },
+  {
+    "origin": "415:60080",
+    "control": "415:60418",
+    "label": "Save local version to History",
+    "to": "421:49016",
+    "x": 1279,
+    "y": 737,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "421:49016",
+    "clientX": 1359,
+    "clientY": 837,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629818715
+  },
+  {
+    "origin": "421:49016",
+    "control": "421:49123",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629821257
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61571",
+    "label": "CF32 \u00b7 Save failed",
+    "to": "415:60422",
+    "x": 592,
+    "y": 486,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:60422",
+    "clientX": 795.4577056778679,
+    "clientY": 335.9443800695249,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629821808
+  },
+  {
+    "origin": "415:60422",
+    "control": "415:60747",
+    "label": "Retry save",
+    "to": "415:58760",
+    "x": 1279,
+    "y": 657,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:58760",
+    "clientX": 1359,
+    "clientY": 757,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629829429
+  },
+  {
+    "origin": "415:58760",
+    "control": "415:59087",
+    "label": "Undo",
+    "to": "415:50289",
+    "x": 1358,
+    "y": 836,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50289",
+    "clientX": 1438,
+    "clientY": 936,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629829934
+  },
+  {
+    "origin": "415:50289",
+    "control": "I415:50575;414:137511",
+    "label": "Selector trigger",
+    "to": "415:50937",
+    "x": 1291,
+    "y": 253,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50937",
+    "clientX": 1371,
+    "clientY": 353,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629924826
+  },
+  {
+    "origin": "415:50937",
+    "control": "415:51270",
+    "label": "Add combo class",
+    "to": "415:52267",
+    "x": 982,
+    "y": 352,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:52267",
+    "clientX": 1062,
+    "clientY": 452,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629925364
+  },
+  {
+    "origin": "415:52267",
+    "control": "415:52576",
+    "label": "Use is-large",
+    "to": "415:51609",
+    "x": 1291,
+    "y": 537,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:51609",
+    "clientX": 1371,
+    "clientY": 637,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629925881
+  },
+  {
+    "origin": "415:51609",
+    "control": "415:51934",
+    "label": "Add another combo",
+    "to": "415:51938",
+    "x": 1279,
+    "y": 641,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:51938",
+    "clientX": 1359,
+    "clientY": 741,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629926352
+  },
+  {
+    "origin": "415:51938",
+    "control": "415:52265",
+    "label": "Duplicate as new class",
+    "to": "415:57464",
+    "x": 1279,
+    "y": 689,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:57464",
+    "clientX": 1359,
+    "clientY": 789,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629926833
+  },
+  {
+    "origin": "415:57464",
+    "control": "415:57567",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629928167
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61498",
+    "label": "CF10 \u00b7 First edit",
+    "to": "415:53226",
+    "x": 216,
+    "y": 122,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:53226",
+    "clientX": 581.9698725376594,
+    "clientY": 129.26998841251452,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629928896
+  },
+  {
+    "origin": "415:53226",
+    "control": "415:53329",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629931423
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61574",
+    "label": "CF33 \u00b7 CMS binding",
+    "to": "415:60751",
+    "x": 968,
+    "y": 486,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:60751",
+    "clientX": 1008.9455388180766,
+    "clientY": 335.9443800695249,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629931841
+  },
+  {
+    "origin": "415:60751",
+    "control": "415:61089",
+    "label": "Open binding details",
+    "to": "419:57052",
+    "x": 1279,
+    "y": 753,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:57052",
+    "clientX": 1359,
+    "clientY": 853,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629932283
+  },
+  {
+    "origin": "419:57052",
+    "control": "419:57371",
+    "label": "Back to font size",
+    "to": "415:60751",
+    "x": 1291,
+    "y": 445,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:60751",
+    "clientX": 1371,
+    "clientY": 545,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629932769
+  },
+  {
+    "origin": "415:60751",
+    "control": "415:60854",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629933889
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61578",
+    "label": "CF34 \u00b7 Shared rule",
+    "to": "415:61091",
+    "x": 216,
+    "y": 538,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:61091",
+    "clientX": 581.9698725376594,
+    "clientY": 365.4692931633836,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629934332
+  },
+  {
+    "origin": "415:61091",
+    "control": "415:61416",
+    "label": "Continue styling",
+    "to": "415:50289",
+    "x": 1279,
+    "y": 641,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50289",
+    "clientX": 1359,
+    "clientY": 741,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629934867
+  },
+  {
+    "origin": "415:50289",
+    "control": "I415:50575;414:137511",
+    "label": "Selector trigger",
+    "to": "415:50937",
+    "x": 1291,
+    "y": 253,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50937",
+    "clientX": 1371,
+    "clientY": 353,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629935287
+  },
+  {
+    "origin": "415:50937",
+    "control": "415:51272",
+    "label": "Reset this class layer",
+    "to": "415:59090",
+    "x": 982,
+    "y": 392,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:59090",
+    "clientX": 1062,
+    "clientY": 492,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629935771
+  },
+  {
+    "origin": "415:59090",
+    "control": "415:59403",
+    "label": "Cancel",
+    "to": "415:50937",
+    "x": 791,
+    "y": 464,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50937",
+    "clientX": 871,
+    "clientY": 564,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629936191
+  },
+  {
+    "origin": "415:50937",
+    "control": "415:51274",
+    "label": "Open in Brand \u2192 Classes",
+    "to": "419:51523",
+    "x": 982,
+    "y": 432,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:51523",
+    "clientX": 1062,
+    "clientY": 532,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629937381
+  },
+  {
+    "origin": "419:51523",
+    "control": "419:51858",
+    "label": "Clean up unused",
+    "to": "419:52888",
+    "x": 490,
+    "y": 542,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:52888",
+    "clientX": 570,
+    "clientY": 642,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629937919
+  },
+  {
+    "origin": "419:52888",
+    "control": "419:52990",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629941374
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61581",
+    "label": "CF01 \u00b7 Class styling",
+    "to": "415:50289",
+    "x": 592,
+    "y": 538,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:50289",
+    "clientX": 795.4577056778679,
+    "clientY": 365.4692931633836,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629941811
+  },
+  {
+    "origin": "415:50289",
+    "control": "I415:50575;414:137511",
+    "label": "Selector trigger",
+    "to": "415:50937",
+    "x": 1291,
+    "y": 253,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50937",
+    "clientX": 1371,
+    "clientY": 353,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629943578
+  },
+  {
+    "origin": "415:50937",
+    "control": "415:51276",
+    "label": "Close",
+    "to": "415:50289",
+    "x": 982,
+    "y": 472,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50289",
+    "clientX": 1062,
+    "clientY": 572,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629944117
+  },
+  {
+    "origin": "415:50289",
+    "control": "415:50604",
+    "label": "Font size / 36 px",
+    "to": "415:58442",
+    "x": 1339,
+    "y": 517,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:58442",
+    "clientX": 1419,
+    "clientY": 617,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629945011
+  },
+  {
+    "origin": "415:58442",
+    "control": "415:58758",
+    "label": "Update class",
+    "to": "415:58760",
+    "x": 882,
+    "y": 464,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:58760",
+    "clientX": 962,
+    "clientY": 564,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629945425
+  },
+  {
+    "origin": "415:58760",
+    "control": "415:58863",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629945838
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61584",
+    "label": "CF02 \u00b7 Effects",
+    "to": "415:50616",
+    "x": 968,
+    "y": 538,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:50616",
+    "clientX": 1008.9455388180766,
+    "clientY": 365.4692931633836,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629946257
+  },
+  {
+    "origin": "415:50616",
+    "control": "I415:50902;414:137511",
+    "label": "Selector trigger",
+    "to": "421:47803",
+    "x": 1291,
+    "y": 253,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "421:47803",
+    "clientX": 1371,
+    "clientY": 353,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629948103
+  },
+  {
+    "origin": "421:47803",
+    "control": "I433:51567;414:137511",
+    "label": "Selector trigger",
+    "to": "415:50616",
+    "x": 1291,
+    "y": 253,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50616",
+    "clientX": 1371,
+    "clientY": 353,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629948594
+  },
+  {
+    "origin": "415:50616",
+    "control": "I415:50902;414:137511",
+    "label": "Selector trigger",
+    "to": "421:47803",
+    "x": 1291,
+    "y": 253,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "421:47803",
+    "clientX": 1371,
+    "clientY": 353,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629949746
+  },
+  {
+    "origin": "421:47803",
+    "control": "421:47913",
+    "label": "Close",
+    "to": "415:50616",
+    "x": 982,
+    "y": 472,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50616",
+    "clientX": 1062,
+    "clientY": 572,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629950195
+  },
+  {
+    "origin": "415:50616",
+    "control": "415:50935",
+    "label": "Open in Brand \u2192 Classes",
+    "to": "419:51881",
+    "x": 1291,
+    "y": 581,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:51881",
+    "clientX": 1371,
+    "clientY": 681,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629950607
+  },
+  {
+    "origin": "419:51881",
+    "control": "419:52226",
+    "label": "Edit shared styles",
+    "to": "415:50616",
+    "x": 870,
+    "y": 446,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50616",
+    "clientX": 950,
+    "clientY": 546,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629951025
+  },
+  {
+    "origin": "415:50616",
+    "control": "415:50935",
+    "label": "Open in Brand \u2192 Classes",
+    "to": "419:51881",
+    "x": 1291,
+    "y": 581,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:51881",
+    "clientX": 1371,
+    "clientY": 681,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629951455
+  },
+  {
+    "origin": "419:51881",
+    "control": "419:52234",
+    "label": "Select Home / Hero heading",
+    "to": "415:50616",
+    "x": 870,
+    "y": 678,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50616",
+    "clientX": 950,
+    "clientY": 778,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629951881
+  },
+  {
+    "origin": "415:50616",
+    "control": "415:50935",
+    "label": "Open in Brand \u2192 Classes",
+    "to": "419:51881",
+    "x": 1291,
+    "y": 581,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:51881",
+    "clientX": 1371,
+    "clientY": 681,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629952903
+  },
+  {
+    "origin": "419:51881",
+    "control": "419:51983",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629953315
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61588",
+    "label": "CF03 \u00b7 Selector menu",
+    "to": "415:50937",
+    "x": 216,
+    "y": 590,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:50937",
+    "clientX": 581.9698725376594,
+    "clientY": 394.99420625724224,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629953875
+  },
+  {
+    "origin": "415:50937",
+    "control": "415:51040",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629958324
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61591",
+    "label": "CF04 \u00b7 Local value",
+    "to": "415:51278",
+    "x": 592,
+    "y": 590,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:51278",
+    "clientX": 795.4577056778679,
+    "clientY": 394.99420625724224,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629958938
+  },
+  {
+    "origin": "415:51278",
+    "control": "415:51354",
+    "label": "Tab / Effects",
+    "to": "421:51306",
+    "x": 1396,
+    "y": 177,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "421:51306",
+    "clientX": 1476,
+    "clientY": 277,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629963164
+  },
+  {
+    "origin": "421:51306",
+    "control": "421:51380",
+    "label": "Tab / Style",
+    "to": "415:51278",
+    "x": 1256,
+    "y": 177,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:51278",
+    "clientX": 1336,
+    "clientY": 277,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629970141
+  },
+  {
+    "origin": "415:51278",
+    "control": "415:51607",
+    "label": "Move value to class",
+    "to": "421:48122",
+    "x": 1279,
+    "y": 753,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "421:48122",
+    "clientX": 1359,
+    "clientY": 853,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629974795
+  },
+  {
+    "origin": "421:48122",
+    "control": "421:48210",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629978905
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61594",
+    "label": "CF05 \u00b7 Combo class",
+    "to": "415:51609",
+    "x": 968,
+    "y": 590,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:51609",
+    "clientX": 1008.9455388180766,
+    "clientY": 394.99420625724224,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629979379
+  },
+  {
+    "origin": "415:51609",
+    "control": "415:51936",
+    "label": "Remove base class",
+    "to": "415:57794",
+    "x": 1279,
+    "y": 673,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:57794",
+    "clientX": 1359,
+    "clientY": 773,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629982534
+  },
+  {
+    "origin": "415:57794",
+    "control": "415:58107",
+    "label": "Cancel",
+    "to": "415:51609",
+    "x": 791,
+    "y": 464,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:51609",
+    "clientX": 871,
+    "clientY": 564,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629987037
+  },
+  {
+    "origin": "415:51609",
+    "control": "415:51712",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629987902
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61598",
+    "label": "CF06 \u00b7 Three-class cap",
+    "to": "415:51938",
+    "x": 216,
+    "y": 642,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:51938",
+    "clientX": 581.9698725376594,
+    "clientY": 424.51911935110087,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629988316
+  },
+  {
+    "origin": "415:51938",
+    "control": "415:52041",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629989944
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61601",
+    "label": "CF07 \u00b7 Add class",
+    "to": "415:52267",
+    "x": 592,
+    "y": 642,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:52267",
+    "clientX": 795.4577056778679,
+    "clientY": 424.51911935110087,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629990406
+  },
+  {
+    "origin": "415:52267",
+    "control": "415:52580",
+    "label": "Cancel",
+    "to": "415:50289",
+    "x": 1291,
+    "y": 577,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50289",
+    "clientX": 1371,
+    "clientY": 677,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629992312
+  },
+  {
+    "origin": "415:50289",
+    "control": "415:50607",
+    "label": "\u25cf Set here \u00b7 .hero-heading / Tablet",
+    "to": "421:50695",
+    "x": 1291,
+    "y": 557,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "421:50695",
+    "clientX": 1371,
+    "clientY": 657,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629993535
+  },
+  {
+    "origin": "421:50695",
+    "control": "421:50797",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629993969
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61604",
+    "label": "CF08 \u00b7 Invalid class name",
+    "to": "415:52582",
+    "x": 968,
+    "y": 642,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:52582",
+    "clientX": 1008.9455388180766,
+    "clientY": 424.51911935110087,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629994454
+  },
+  {
+    "origin": "415:52582",
+    "control": "415:52893",
+    "label": "Use suggested name",
+    "to": "433:50940",
+    "x": 1291,
+    "y": 553,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "433:50940",
+    "clientX": 1371,
+    "clientY": 653,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629995846
+  },
+  {
+    "origin": "433:50940",
+    "control": "433:51025",
+    "label": "Create hero",
+    "to": "433:51230",
+    "x": 1291,
+    "y": 553,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "433:51230",
+    "clientX": 1371,
+    "clientY": 653,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792629998190
+  },
+  {
+    "origin": "433:51230",
+    "control": "433:51331",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630000729
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61608",
+    "label": "CF09 \u00b7 New class-mode site",
+    "to": "415:52899",
+    "x": 216,
+    "y": 694,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:52899",
+    "clientX": 581.9698725376594,
+    "clientY": 454.0440324449595,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630001925
+  },
+  {
+    "origin": "415:52899",
+    "control": "415:53224",
+    "label": "Set font size to 40 px",
+    "to": "415:53226",
+    "x": 1279,
+    "y": 641,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:53226",
+    "clientX": 1359,
+    "clientY": 741,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630005806
+  },
+  {
+    "origin": "415:53226",
+    "control": "415:53553",
+    "label": "Undo",
+    "to": "415:52899",
+    "x": 1358,
+    "y": 836,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:52899",
+    "clientX": 1438,
+    "clientY": 936,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630006325
+  },
+  {
+    "origin": "415:52899",
+    "control": "415:53002",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630006784
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57406",
+    "label": "CF35 \u00b7 Brand Classes",
+    "to": "419:51523",
+    "x": 216,
+    "y": 818,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:51523",
+    "clientX": 581.9698725376594,
+    "clientY": 524.4495944380069,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630007198
+  },
+  {
+    "origin": "419:51523",
+    "control": "419:51860",
+    "label": "Find matching local styles",
+    "to": "419:53909",
+    "x": 490,
+    "y": 582,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:53909",
+    "clientX": 570,
+    "clientY": 682,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630008323
+  },
+  {
+    "origin": "419:53909",
+    "control": "419:54236",
+    "label": "Create class and move exact values",
+    "to": "419:54241",
+    "x": 500,
+    "y": 494,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:54241",
+    "clientX": 580,
+    "clientY": 594,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630012264
+  },
+  {
+    "origin": "419:54241",
+    "control": "419:54342",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630016506
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57409",
+    "label": "CF36 \u00b7 Brand Classes",
+    "to": "419:51881",
+    "x": 592,
+    "y": 818,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:51881",
+    "clientX": 795.4577056778679,
+    "clientY": 524.4495944380069,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630016957
+  },
+  {
+    "origin": "419:51881",
+    "control": "419:51983",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630018559
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57412",
+    "label": "CF37 \u00b7 Brand Classes",
+    "to": "419:52239",
+    "x": 968,
+    "y": 818,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:52239",
+    "clientX": 1008.9455388180766,
+    "clientY": 524.4495944380069,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630019004
+  },
+  {
+    "origin": "419:52239",
+    "control": "419:52551",
+    "label": "\u2039 Hero heading \u00b7 Style / Tablet",
+    "to": "415:50289",
+    "x": 510,
+    "y": 96,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50289",
+    "clientX": 590,
+    "clientY": 196,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630019673
+  },
+  {
+    "origin": "415:50289",
+    "control": "415:50614",
+    "label": "Open in Brand \u2192 Classes",
+    "to": "419:51523",
+    "x": 1279,
+    "y": 641,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:51523",
+    "clientX": 1359,
+    "clientY": 741,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630020660
+  },
+  {
+    "origin": "419:51523",
+    "control": "419:51868",
+    "label": "Edit shared styles",
+    "to": "415:50289",
+    "x": 870,
+    "y": 446,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50289",
+    "clientX": 950,
+    "clientY": 546,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630021098
+  },
+  {
+    "origin": "415:50289",
+    "control": "415:50614",
+    "label": "Open in Brand \u2192 Classes",
+    "to": "419:51523",
+    "x": 1279,
+    "y": 641,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:51523",
+    "clientX": 1359,
+    "clientY": 741,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630021509
+  },
+  {
+    "origin": "419:51523",
+    "control": "419:51870",
+    "label": "Rename class",
+    "to": "421:51921",
+    "x": 870,
+    "y": 518,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "421:51921",
+    "clientX": 950,
+    "clientY": 618,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630022013
+  },
+  {
+    "origin": "421:51921",
+    "control": "421:52009",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630023612
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57416",
+    "label": "CF38 \u00b7 Brand Classes",
+    "to": "419:52564",
+    "x": 216,
+    "y": 870,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:52564",
+    "clientX": 581.9698725376594,
+    "clientY": 553.9745075318656,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630024059
+  },
+  {
+    "origin": "419:52564",
+    "control": "419:52876",
+    "label": "\u2039 Hero heading \u00b7 Style / Tablet",
+    "to": "415:50289",
+    "x": 510,
+    "y": 96,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50289",
+    "clientX": 590,
+    "clientY": 196,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630025762
+  },
+  {
+    "origin": "415:50289",
+    "control": "415:50614",
+    "label": "Open in Brand \u2192 Classes",
+    "to": "419:51523",
+    "x": 1279,
+    "y": 641,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:51523",
+    "clientX": 1359,
+    "clientY": 741,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630026197
+  },
+  {
+    "origin": "419:51523",
+    "control": "419:51872",
+    "label": "Duplicate for selected element",
+    "to": "415:57464",
+    "x": 870,
+    "y": 562,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:57464",
+    "clientX": 950,
+    "clientY": 662,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630026609
+  },
+  {
+    "origin": "415:57464",
+    "control": "415:57567",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630027054
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57419",
+    "label": "CF39 \u00b7 Unused cleanup",
+    "to": "419:52888",
+    "x": 592,
+    "y": 870,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:52888",
+    "clientX": 795.4577056778679,
+    "clientY": 553.9745075318656,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630027474
+  },
+  {
+    "origin": "419:52888",
+    "control": "419:53254",
+    "label": "Cancel",
+    "to": "419:51523",
+    "x": 735,
+    "y": 416,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:51523",
+    "clientX": 815,
+    "clientY": 516,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630028155
+  },
+  {
+    "origin": "419:51523",
+    "control": "419:51876",
+    "label": "Select Home / Hero heading",
+    "to": "415:50289",
+    "x": 870,
+    "y": 678,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50289",
+    "clientX": 950,
+    "clientY": 778,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630029015
+  },
+  {
+    "origin": "415:50289",
+    "control": "415:50614",
+    "label": "Open in Brand \u2192 Classes",
+    "to": "419:51523",
+    "x": 1279,
+    "y": 641,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:51523",
+    "clientX": 1359,
+    "clientY": 741,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630029427
+  },
+  {
+    "origin": "419:51523",
+    "control": "419:51878",
+    "label": "Locate About / About heading",
+    "to": "421:51002",
+    "x": 870,
+    "y": 722,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "421:51002",
+    "clientX": 950,
+    "clientY": 822,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630029907
+  },
+  {
+    "origin": "421:51002",
+    "control": "421:51300",
+    "label": "Return to class in Brand",
+    "to": "419:51523",
+    "x": 1279,
+    "y": 689,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:51523",
+    "clientX": 1359,
+    "clientY": 789,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630032262
+  },
+  {
+    "origin": "419:51523",
+    "control": "419:51625",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630032703
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57422",
+    "label": "CF40 \u00b7 Unused cleanup",
+    "to": "419:53259",
+    "x": 968,
+    "y": 870,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:53259",
+    "clientX": 1008.9455388180766,
+    "clientY": 553.9745075318656,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630033178
+  },
+  {
+    "origin": "419:53259",
+    "control": "419:53571",
+    "label": "\u2039 Hero heading \u00b7 Style / Tablet",
+    "to": "415:50289",
+    "x": 510,
+    "y": 96,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50289",
+    "clientX": 590,
+    "clientY": 196,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630035317
+  },
+  {
+    "origin": "415:50289",
+    "control": "415:50392",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630035772
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57426",
+    "label": "CF41 \u00b7 Rename collision",
+    "to": "419:53619",
+    "x": 216,
+    "y": 922,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:53619",
+    "clientX": 581.9698725376594,
+    "clientY": 583.4994206257243,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630036283
+  },
+  {
+    "origin": "419:53619",
+    "control": "419:53707",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630037240
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57429",
+    "label": "CF42 \u00b7 Opt-in conversion",
+    "to": "419:53909",
+    "x": 592,
+    "y": 922,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:53909",
+    "clientX": 795.4577056778679,
+    "clientY": 583.4994206257243,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630037653
+  },
+  {
+    "origin": "419:53909",
+    "control": "419:54238",
+    "label": "Cancel",
+    "to": "415:53556",
+    "x": 380,
+    "y": 542,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:53556",
+    "clientX": 460,
+    "clientY": 642,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630038302
+  },
+  {
+    "origin": "415:53556",
+    "control": "415:53659",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630040499
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57432",
+    "label": "CF43 \u00b7 Conversion applied",
+    "to": "419:54241",
+    "x": 968,
+    "y": 922,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:54241",
+    "clientX": 1008.9455388180766,
+    "clientY": 583.4994206257243,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630040917
+  },
+  {
+    "origin": "419:54241",
+    "control": "419:54345",
+    "label": "Undo",
+    "to": "415:53556",
+    "x": 1358,
+    "y": 836,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:53556",
+    "clientX": 1438,
+    "clientY": 936,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630041812
+  },
+  {
+    "origin": "415:53556",
+    "control": "415:53881",
+    "label": "Make class from this element",
+    "to": "419:53909",
+    "x": 1279,
+    "y": 641,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:53909",
+    "clientX": 1359,
+    "clientY": 741,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630042231
+  },
+  {
+    "origin": "419:53909",
+    "control": "419:54011",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630042689
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57436",
+    "label": "CF44 \u00b7 Style-model switch",
+    "to": "419:54542",
+    "x": 216,
+    "y": 974,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:54542",
+    "clientX": 581.9698725376594,
+    "clientY": 613.024333719583,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630043186
+  },
+  {
+    "origin": "419:54542",
+    "control": "419:54854",
+    "label": "\u2039 Hero heading \u00b7 Style / Tablet",
+    "to": "415:50289",
+    "x": 510,
+    "y": 96,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50289",
+    "clientX": 590,
+    "clientY": 196,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630045454
+  },
+  {
+    "origin": "415:50289",
+    "control": "415:50392",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630045893
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57439",
+    "label": "CF45 \u00b7 Keep publish appearance",
+    "to": "419:54873",
+    "x": 592,
+    "y": 974,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:54873",
+    "clientX": 795.4577056778679,
+    "clientY": 613.024333719583,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630046339
+  },
+  {
+    "origin": "419:54873",
+    "control": "419:55185",
+    "label": "\u2039 Hero heading \u00b7 Style / Tablet",
+    "to": "415:50289",
+    "x": 510,
+    "y": 96,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50289",
+    "clientX": 590,
+    "clientY": 196,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630046901
+  },
+  {
+    "origin": "415:50289",
+    "control": "415:50392",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630047346
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57442",
+    "label": "CF46 \u00b7 History backup",
+    "to": "419:55203",
+    "x": 968,
+    "y": 974,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:55203",
+    "clientX": 1008.9455388180766,
+    "clientY": 613.024333719583,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630047838
+  },
+  {
+    "origin": "419:55203",
+    "control": "419:55508",
+    "label": "Open saved version",
+    "to": "419:55816",
+    "x": 1291,
+    "y": 365,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:55816",
+    "clientX": 1371,
+    "clientY": 465,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630050864
+  },
+  {
+    "origin": "419:55816",
+    "control": "419:56128",
+    "label": "\u2039 Hero heading \u00b7 Style / Tablet",
+    "to": "415:50289",
+    "x": 510,
+    "y": 96,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50289",
+    "clientX": 590,
+    "clientY": 196,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630051861
+  },
+  {
+    "origin": "415:50289",
+    "control": "415:50392",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630052277
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57446",
+    "label": "CF47 \u00b7 History backup failed",
+    "to": "419:55514",
+    "x": 216,
+    "y": 1026,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:55514",
+    "clientX": 581.9698725376594,
+    "clientY": 642.5492468134414,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630052752
+  },
+  {
+    "origin": "419:55514",
+    "control": "419:55610",
+    "label": "Save local version to History",
+    "to": "421:48706",
+    "x": 1279,
+    "y": 737,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "421:48706",
+    "clientX": 1359,
+    "clientY": 837,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630055114
+  },
+  {
+    "origin": "421:48706",
+    "control": "421:48813",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630055969
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57449",
+    "label": "CF48 \u00b7 History",
+    "to": "419:55816",
+    "x": 592,
+    "y": 1026,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:55816",
+    "clientX": 795.4577056778679,
+    "clientY": 642.5492468134414,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630056427
+  },
+  {
+    "origin": "419:55816",
+    "control": "419:56139",
+    "label": "Review restore",
+    "to": "421:49952",
+    "x": 440,
+    "y": 344,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "421:49952",
+    "clientX": 520,
+    "clientY": 444,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630057765
+  },
+  {
+    "origin": "421:49952",
+    "control": "421:50046",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630060113
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57452",
+    "label": "CF49 \u00b7 Push to master",
+    "to": "419:56147",
+    "x": 968,
+    "y": 1026,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:56147",
+    "clientX": 1008.9455388180766,
+    "clientY": 642.5492468134414,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630060610
+  },
+  {
+    "origin": "419:56147",
+    "control": "419:56235",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630068619
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57456",
+    "label": "CF50 \u00b7 Push failed",
+    "to": "419:56435",
+    "x": 216,
+    "y": 1078,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:56435",
+    "clientX": 581.9698725376594,
+    "clientY": 672.0741599073001,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630070202
+  },
+  {
+    "origin": "419:56435",
+    "control": "419:56523",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630071810
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57459",
+    "label": "CF51 \u00b7 Component detail",
+    "to": "419:56721",
+    "x": 592,
+    "y": 1078,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:56721",
+    "clientX": 795.4577056778679,
+    "clientY": 672.0741599073001,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630072279
+  },
+  {
+    "origin": "419:56721",
+    "control": "419:57044",
+    "label": "Return to Hero instance",
+    "to": "415:55220",
+    "x": 460,
+    "y": 334,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:55220",
+    "clientX": 540,
+    "clientY": 434,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630073089
+  },
+  {
+    "origin": "415:55220",
+    "control": "421:52368",
+    "label": "Open component",
+    "to": "419:56721",
+    "x": 1279,
+    "y": 633,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:56721",
+    "clientX": 1359,
+    "clientY": 733,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630076337
+  },
+  {
+    "origin": "419:56721",
+    "control": "419:57049",
+    "label": "Review previous definition",
+    "to": "421:50544",
+    "x": 460,
+    "y": 470,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "421:50544",
+    "clientX": 540,
+    "clientY": 570,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630077322
+  },
+  {
+    "origin": "421:50544",
+    "control": "421:50688",
+    "label": "Restore this definition",
+    "to": "433:51611",
+    "x": 470,
+    "y": 214,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "433:51611",
+    "clientX": 550,
+    "clientY": 314,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630079186
+  },
+  {
+    "origin": "433:51611",
+    "control": "433:51657",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630080367
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57462",
+    "label": "CF52 \u00b7 Bound style",
+    "to": "419:57052",
+    "x": 968,
+    "y": 1078,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:57052",
+    "clientX": 1008.9455388180766,
+    "clientY": 672.0741599073001,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630080798
+  },
+  {
+    "origin": "419:57052",
+    "control": "419:57158",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630081745
+  },
+  {
+    "origin": "415:61494",
+    "control": "421:52373",
+    "label": "CF53 \u00b7 Effects selector menu",
+    "to": "421:47803",
+    "x": 216,
+    "y": 1158,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "421:47803",
+    "clientX": 581.9698725376594,
+    "clientY": 717.4971031286211,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630082180
+  },
+  {
+    "origin": "421:47803",
+    "control": "421:47904",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630083667
+  },
+  {
+    "origin": "415:61494",
+    "control": "421:52376",
+    "label": "CF54 \u00b7 Move local value",
+    "to": "421:48122",
+    "x": 592,
+    "y": 1158,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "421:48122",
+    "clientX": 795.4577056778679,
+    "clientY": 717.4971031286211,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630084083
+  },
+  {
+    "origin": "421:48122",
+    "control": "421:48217",
+    "label": "Cancel",
+    "to": "415:51278",
+    "x": 784,
+    "y": 480,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:51278",
+    "clientX": 864,
+    "clientY": 580,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630084843
+  },
+  {
+    "origin": "415:51278",
+    "control": "415:51381",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630085253
+  },
+  {
+    "origin": "415:61494",
+    "control": "421:52379",
+    "label": "CF55 \u00b7 Move complete",
+    "to": "421:48406",
+    "x": 968,
+    "y": 1158,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "421:48406",
+    "clientX": 1008.9455388180766,
+    "clientY": 717.4971031286211,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630085725
+  },
+  {
+    "origin": "421:48406",
+    "control": "421:48507",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630087540
+  },
+  {
+    "origin": "415:61494",
+    "control": "421:52383",
+    "label": "CF56 \u00b7 Conflict backup",
+    "to": "421:48706",
+    "x": 216,
+    "y": 1210,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "421:48706",
+    "clientX": 581.9698725376594,
+    "clientY": 747.0220162224798,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630088229
+  },
+  {
+    "origin": "421:48706",
+    "control": "421:48813",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630089117
+  },
+  {
+    "origin": "415:61494",
+    "control": "421:52386",
+    "label": "CF57 \u00b7 Stale editor backup",
+    "to": "421:49016",
+    "x": 592,
+    "y": 1210,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "421:49016",
+    "clientX": 795.4577056778679,
+    "clientY": 747.0220162224798,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630089532
+  },
+  {
+    "origin": "421:49016",
+    "control": "421:49123",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630091758
+  },
+  {
+    "origin": "415:61494",
+    "control": "421:52389",
+    "label": "CF58 \u00b7 Stale editor",
+    "to": "421:49325",
+    "x": 968,
+    "y": 1210,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "421:49325",
+    "clientX": 1008.9455388180766,
+    "clientY": 747.0220162224798,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630092230
+  },
+  {
+    "origin": "421:49325",
+    "control": "421:49630",
+    "label": "Reload editor",
+    "to": "421:49634",
+    "x": 1291,
+    "y": 325,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "421:49634",
+    "clientX": 1371,
+    "clientY": 425,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630093019
+  },
+  {
+    "origin": "421:49634",
+    "control": "421:49741",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630095335
+  },
+  {
+    "origin": "415:61494",
+    "control": "421:52393",
+    "label": "CF59 \u00b7 Editor reload",
+    "to": "421:49634",
+    "x": 216,
+    "y": 1262,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "421:49634",
+    "clientX": 581.9698725376594,
+    "clientY": 776.5469293163383,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630095749
+  },
+  {
+    "origin": "421:49634",
+    "control": "421:49741",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630096513
+  },
+  {
+    "origin": "415:61494",
+    "control": "421:52396",
+    "label": "CF60 \u00b7 History restore",
+    "to": "421:49952",
+    "x": 592,
+    "y": 1262,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "421:49952",
+    "clientX": 795.4577056778679,
+    "clientY": 776.5469293163383,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630096927
+  },
+  {
+    "origin": "421:49952",
+    "control": "421:50228",
+    "label": "Cancel",
+    "to": "419:55816",
+    "x": 763,
+    "y": 464,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:55816",
+    "clientX": 843,
+    "clientY": 564,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630097821
+  },
+  {
+    "origin": "419:55816",
+    "control": "419:56141",
+    "label": "Return to conflict",
+    "to": "419:55203",
+    "x": 440,
+    "y": 392,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:55203",
+    "clientX": 520,
+    "clientY": 492,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630098232
+  },
+  {
+    "origin": "419:55203",
+    "control": "419:55510",
+    "label": "Load latest site",
+    "to": "421:49634",
+    "x": 1291,
+    "y": 405,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "421:49634",
+    "clientX": 1371,
+    "clientY": 505,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630099125
+  },
+  {
+    "origin": "421:49634",
+    "control": "421:49741",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630099538
+  },
+  {
+    "origin": "415:61494",
+    "control": "421:52399",
+    "label": "CF61 \u00b7 History restore",
+    "to": "421:50233",
+    "x": 968,
+    "y": 1262,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "421:50233",
+    "clientX": 1008.9455388180766,
+    "clientY": 776.5469293163383,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630100006
+  },
+  {
+    "origin": "421:50233",
+    "control": "421:50340",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630100693
+  },
+  {
+    "origin": "415:61494",
+    "control": "421:52403",
+    "label": "CF62 \u00b7 Component previous version",
+    "to": "421:50544",
+    "x": 216,
+    "y": 1314,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "421:50544",
+    "clientX": 581.9698725376594,
+    "clientY": 806.071842410197,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630101105
+  },
+  {
+    "origin": "421:50544",
+    "control": "421:50690",
+    "label": "Cancel",
+    "to": "419:56721",
+    "x": 380,
+    "y": 262,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:56721",
+    "clientX": 460,
+    "clientY": 362,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630101593
+  },
+  {
+    "origin": "419:56721",
+    "control": "419:56823",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630102565
+  },
+  {
+    "origin": "415:61494",
+    "control": "421:52406",
+    "label": "CF63 \u00b7 Current value source",
+    "to": "421:50695",
+    "x": 592,
+    "y": 1314,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "421:50695",
+    "clientX": 795.4577056778679,
+    "clientY": 806.071842410197,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630102987
+  },
+  {
+    "origin": "421:50695",
+    "control": "421:50797",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630103748
+  },
+  {
+    "origin": "415:61494",
+    "control": "421:52409",
+    "label": "CF64 \u00b7 Locate class use",
+    "to": "421:51002",
+    "x": 968,
+    "y": 1314,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "421:51002",
+    "clientX": 1008.9455388180766,
+    "clientY": 806.071842410197,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630104162
+  },
+  {
+    "origin": "421:51002",
+    "control": "421:51104",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630104990
+  },
+  {
+    "origin": "415:61494",
+    "control": "421:52413",
+    "label": "CF65 \u00b7 Local Effects",
+    "to": "421:51306",
+    "x": 216,
+    "y": 1366,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "421:51306",
+    "clientX": 581.9698725376594,
+    "clientY": 835.5967555040556,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630105404
+  },
+  {
+    "origin": "421:51306",
+    "control": "421:51412",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630106654
+  },
+  {
+    "origin": "415:61494",
+    "control": "421:52416",
+    "label": "CF66 \u00b7 Class removed",
+    "to": "421:51618",
+    "x": 592,
+    "y": 1366,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "421:51618",
+    "clientX": 795.4577056778679,
+    "clientY": 835.5967555040556,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630107071
+  },
+  {
+    "origin": "421:51618",
+    "control": "421:51917",
+    "label": "Undo",
+    "to": "415:50937",
+    "x": 1358,
+    "y": 836,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50937",
+    "clientX": 1438,
+    "clientY": 936,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630108806
+  },
+  {
+    "origin": "415:50937",
+    "control": "415:51040",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630111279
+  },
+  {
+    "origin": "415:61494",
+    "control": "421:52419",
+    "label": "CF67 \u00b7 Brand rename",
+    "to": "421:51921",
+    "x": 968,
+    "y": 1366,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "421:51921",
+    "clientX": 1008.9455388180766,
+    "clientY": 835.5967555040556,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630112028
+  },
+  {
+    "origin": "421:51921",
+    "control": "421:52016",
+    "label": "Cancel",
+    "to": "419:51523",
+    "x": 784,
+    "y": 460,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:51523",
+    "clientX": 864,
+    "clientY": 560,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630113645
+  },
+  {
+    "origin": "419:51523",
+    "control": "419:51858",
+    "label": "Clean up unused",
+    "to": "419:52888",
+    "x": 490,
+    "y": 542,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:52888",
+    "clientX": 570,
+    "clientY": 642,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630114501
+  },
+  {
+    "origin": "419:52888",
+    "control": "419:53257",
+    "label": "Delete unused class",
+    "to": "419:53259",
+    "x": 857.5,
+    "y": 416,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:53259",
+    "clientX": 937.5,
+    "clientY": 516,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630116345
+  },
+  {
+    "origin": "419:53259",
+    "control": "419:53590",
+    "label": "Clean up unused",
+    "to": "419:52888",
+    "x": 490,
+    "y": 458,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:52888",
+    "clientX": 570,
+    "clientY": 558,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630116863
+  },
+  {
+    "origin": "419:52888",
+    "control": "419:52990",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630117308
+  },
+  {
+    "origin": "415:61494",
+    "control": "421:52423",
+    "label": "CF68 \u00b7 Class-mode switch",
+    "to": "421:52209",
+    "x": 216,
+    "y": 1418,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "421:52209",
+    "clientX": 581.9698725376594,
+    "clientY": 865.1216685979143,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630117839
+  },
+  {
+    "origin": "421:52209",
+    "control": "421:52265",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630121371
+  },
+  {
+    "origin": "415:61494",
+    "control": "421:52791",
+    "label": "CF69 \u00b7 Instance root reset",
+    "to": "421:52495",
+    "x": 216,
+    "y": 1514,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "421:52495",
+    "clientX": 581.9698725376594,
+    "clientY": 919.6292004634995,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630122258
+  },
+  {
+    "origin": "421:52495",
+    "control": "421:52786",
+    "label": "Undo",
+    "to": "415:55220",
+    "x": 1358,
+    "y": 836,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:55220",
+    "clientX": 1438,
+    "clientY": 936,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630125947
+  },
+  {
+    "origin": "415:55220",
+    "control": "415:55323",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630126558
+  },
+  {
+    "origin": "415:61494",
+    "control": "422:51217",
+    "label": "1280 \u00d7 720",
+    "to": "422:50614",
+    "x": 157,
+    "y": 1566,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "422:50614",
+    "clientX": 548.4704519119351,
+    "clientY": 949.154113557358,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630127081
+  },
+  {
+    "origin": "422:50614",
+    "control": "422:50716",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1237,
+    "y": 703,
+    "w": 1280,
+    "h": 720,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1397,
+    "clientY": 893,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630128041
+  },
+  {
+    "origin": "415:61494",
+    "control": "422:51220",
+    "label": "1440 \u00d7 600",
+    "to": "422:50915",
+    "x": 415,
+    "y": 1566,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "422:50915",
+    "clientX": 694.9594438006952,
+    "clientY": 949.154113557358,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630128546
+  },
+  {
+    "origin": "422:50915",
+    "control": "422:51017",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 583,
+    "w": 1440,
+    "h": 600,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 833,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630132315
+  },
+  {
+    "origin": "415:61494",
+    "control": "433:51749",
+    "label": "CF72 \u00b7 Suggested name",
+    "to": "433:50940",
+    "x": 216,
+    "y": 1618,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "433:50940",
+    "clientX": 581.9698725376594,
+    "clientY": 978.6790266512166,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630132741
+  },
+  {
+    "origin": "433:50940",
+    "control": "433:51026",
+    "label": "Cancel",
+    "to": "415:50289",
+    "x": 1291,
+    "y": 593,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50289",
+    "clientX": 1371,
+    "clientY": 693,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630135188
+  },
+  {
+    "origin": "415:50289",
+    "control": "415:50392",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630135602
+  },
+  {
+    "origin": "415:61494",
+    "control": "433:51753",
+    "label": "CF73 \u00b7 Corrected name",
+    "to": "433:51230",
+    "x": 592,
+    "y": 1618,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "433:51230",
+    "clientX": 795.4577056778679,
+    "clientY": 978.6790266512166,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630136050
+  },
+  {
+    "origin": "433:51230",
+    "control": "433:51549",
+    "label": "Undo",
+    "to": "415:50289",
+    "x": 1358,
+    "y": 836,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50289",
+    "clientX": 1438,
+    "clientY": 936,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630137465
+  },
+  {
+    "origin": "415:50289",
+    "control": "415:50392",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630138324
+  },
+  {
+    "origin": "415:61494",
+    "control": "433:51757",
+    "label": "CF74 \u00b7 Restore Hero definition",
+    "to": "433:51611",
+    "x": 968,
+    "y": 1618,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "433:51611",
+    "clientX": 1008.9455388180766,
+    "clientY": 978.6790266512166,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630138776
+  },
+  {
+    "origin": "433:51611",
+    "control": "433:51657",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630139488
+  },
+  {
+    "origin": "415:61494",
+    "control": "439:51965",
+    "label": "CF75 \u00b7 Class manager / 1280 \u00d7 720",
+    "to": "439:51387",
+    "x": 216,
+    "y": 1670,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "439:51387",
+    "clientX": 581.9698725376594,
+    "clientY": 1008.2039397450753,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630139961
+  },
+  {
+    "origin": "439:51387",
+    "control": "439:51575",
+    "label": "Brand \u25be",
+    "to": "439:51767",
+    "x": 140,
+    "y": 96,
+    "w": 1280,
+    "h": 720,
+    "pass": true,
+    "actual": "439:51767",
+    "clientX": 300,
+    "clientY": 286,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630144593
+  },
+  {
+    "origin": "439:51767",
+    "control": "439:51839",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1237,
+    "y": 703,
+    "w": 1280,
+    "h": 720,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1397,
+    "clientY": 893,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630146961
+  },
+  {
+    "origin": "415:61494",
+    "control": "439:51968",
+    "label": "CF76 \u00b7 Class manager / 1440 \u00d7 600",
+    "to": "439:51578",
+    "x": 592,
+    "y": 1670,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "439:51578",
+    "clientX": 795.4577056778679,
+    "clientY": 1008.2039397450753,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630147946
+  },
+  {
+    "origin": "439:51578",
+    "control": "439:51656",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 583,
+    "w": 1440,
+    "h": 600,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 833,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630148704
+  },
+  {
+    "origin": "415:61494",
+    "control": "439:51971",
+    "label": "CF77 \u00b7 Class manager / narrow Brand navigation",
+    "to": "439:51767",
+    "x": 968,
+    "y": 1670,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "439:51767",
+    "clientX": 1008.9455388180766,
+    "clientY": 1008.2039397450753,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630149115
+  },
+  {
+    "origin": "439:51767",
+    "control": "439:51951",
+    "label": "Classes",
+    "to": "439:51387",
+    "x": 176,
+    "y": 320,
+    "w": 1280,
+    "h": 720,
+    "pass": true,
+    "actual": "439:51387",
+    "clientX": 336,
+    "clientY": 510,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630149785
+  },
+  {
+    "origin": "439:51387",
+    "control": "439:51465",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1237,
+    "y": 703,
+    "w": 1280,
+    "h": 720,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1397,
+    "clientY": 893,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630150242
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61504",
+    "label": "CF12 \u00b7 Mixed selection",
+    "to": "415:53883",
+    "x": 968,
+    "y": 122,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:53883",
+    "clientX": 1008.9455388180766,
+    "clientY": 129.26998841251452,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630151331
+  },
+  {
+    "origin": "415:53883",
+    "control": "415:54219",
+    "label": "Select Hero heading",
+    "to": "415:50289",
+    "x": 1279,
+    "y": 673,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50289",
+    "clientX": 1359,
+    "clientY": 773,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630152302
+  },
+  {
+    "origin": "415:50289",
+    "control": "I415:50575;414:137511",
+    "label": "Selector trigger",
+    "to": "415:50937",
+    "x": 1291,
+    "y": 253,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50937",
+    "clientX": 1371,
+    "clientY": 353,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630152729
+  },
+  {
+    "origin": "415:50937",
+    "control": "415:51264",
+    "label": "Rename class",
+    "to": "415:56814",
+    "x": 982,
+    "y": 232,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:56814",
+    "clientX": 1062,
+    "clientY": 332,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630153248
+  },
+  {
+    "origin": "415:56814",
+    "control": "415:57129",
+    "label": "Rename class",
+    "to": "415:57134",
+    "x": 882,
+    "y": 460,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:57134",
+    "clientX": 962,
+    "clientY": 560,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630155033
+  },
+  {
+    "origin": "415:57134",
+    "control": "415:57461",
+    "label": "Undo",
+    "to": "415:50289",
+    "x": 1358,
+    "y": 836,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50289",
+    "clientX": 1438,
+    "clientY": 936,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630156747
+  },
+  {
+    "origin": "415:50289",
+    "control": "I415:50575;414:137511",
+    "label": "Selector trigger",
+    "to": "415:50937",
+    "x": 1291,
+    "y": 253,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50937",
+    "clientX": 1371,
+    "clientY": 353,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630157904
+  },
+  {
+    "origin": "415:50937",
+    "control": "415:51270",
+    "label": "Add combo class",
+    "to": "415:52267",
+    "x": 982,
+    "y": 352,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:52267",
+    "clientX": 1062,
+    "clientY": 452,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630158316
+  },
+  {
+    "origin": "415:52267",
+    "control": "415:52370",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630159490
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61504",
+    "label": "CF12 \u00b7 Mixed selection",
+    "to": "415:53883",
+    "x": 968,
+    "y": 122,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:53883",
+    "clientX": 1008.9455388180766,
+    "clientY": 129.26998841251452,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630159903
+  },
+  {
+    "origin": "415:53883",
+    "control": "415:53986",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630161874
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61511",
+    "label": "CF14 \u00b7 Locked selected element",
+    "to": "415:54548",
+    "x": 592,
+    "y": 174,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:54548",
+    "clientX": 795.4577056778679,
+    "clientY": 158.79490150637315,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630162636
+  },
+  {
+    "origin": "415:54548",
+    "control": "415:54651",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630164915
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61521",
+    "label": "CF17 \u00b7 Push to master",
+    "to": "415:55532",
+    "x": 592,
+    "y": 226,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:55532",
+    "clientX": 795.4577056778679,
+    "clientY": 188.3198146002318,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630165329
+  },
+  {
+    "origin": "415:55532",
+    "control": "415:55848",
+    "label": "Push to master",
+    "to": "419:56147",
+    "x": 875,
+    "y": 480,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:56147",
+    "clientX": 955,
+    "clientY": 580,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630166628
+  },
+  {
+    "origin": "419:56147",
+    "control": "419:56235",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630167522
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61524",
+    "label": "CF18 \u00b7 Master updated",
+    "to": "415:55850",
+    "x": 968,
+    "y": 226,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:55850",
+    "clientX": 1008.9455388180766,
+    "clientY": 188.3198146002318,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630167954
+  },
+  {
+    "origin": "415:55850",
+    "control": "415:56158",
+    "label": "Back to instance",
+    "to": "415:55220",
+    "x": 1279,
+    "y": 553,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:55220",
+    "clientX": 1359,
+    "clientY": 653,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630169147
+  },
+  {
+    "origin": "415:55220",
+    "control": "421:52368",
+    "label": "Open component",
+    "to": "419:56721",
+    "x": 1279,
+    "y": 633,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:56721",
+    "clientX": 1359,
+    "clientY": 733,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630169613
+  },
+  {
+    "origin": "419:56721",
+    "control": "419:57049",
+    "label": "Review previous definition",
+    "to": "421:50544",
+    "x": 460,
+    "y": 470,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "421:50544",
+    "clientX": 540,
+    "clientY": 570,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630170066
+  },
+  {
+    "origin": "421:50544",
+    "control": "421:50596",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630170530
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61524",
+    "label": "CF18 \u00b7 Master updated",
+    "to": "415:55850",
+    "x": 968,
+    "y": 226,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:55850",
+    "clientX": 1008.9455388180766,
+    "clientY": 188.3198146002318,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630171481
+  },
+  {
+    "origin": "415:55850",
+    "control": "415:55953",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630173348
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61544",
+    "label": "CF24 \u00b7 Remove base",
+    "to": "415:57794",
+    "x": 968,
+    "y": 330,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:57794",
+    "clientX": 1008.9455388180766,
+    "clientY": 247.36964078794907,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630173762
+  },
+  {
+    "origin": "415:57794",
+    "control": "415:58110",
+    "label": "Remove base",
+    "to": "415:58112",
+    "x": 885.5,
+    "y": 464,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:58112",
+    "clientX": 965.5,
+    "clientY": 564,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630175853
+  },
+  {
+    "origin": "415:58112",
+    "control": "415:58439",
+    "label": "Undo",
+    "to": "415:51609",
+    "x": 1358,
+    "y": 836,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:51609",
+    "clientX": 1438,
+    "clientY": 936,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630178334
+  },
+  {
+    "origin": "415:51609",
+    "control": "415:51712",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630183147
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61558",
+    "label": "CF28 \u00b7 Reset class layer",
+    "to": "415:59090",
+    "x": 216,
+    "y": 434,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:59090",
+    "clientX": 581.9698725376594,
+    "clientY": 306.4194669756663,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630183601
+  },
+  {
+    "origin": "415:59090",
+    "control": "415:59406",
+    "label": "Reset layer",
+    "to": "415:59408",
+    "x": 885.5,
+    "y": 464,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:59408",
+    "clientX": 965.5,
+    "clientY": 564,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630188336
+  },
+  {
+    "origin": "415:59408",
+    "control": "415:59735",
+    "label": "Undo",
+    "to": "415:50289",
+    "x": 1358,
+    "y": 836,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50289",
+    "clientX": 1438,
+    "clientY": 936,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630190375
+  },
+  {
+    "origin": "415:50289",
+    "control": "415:50614",
+    "label": "Open in Brand \u2192 Classes",
+    "to": "419:51523",
+    "x": 1279,
+    "y": 641,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:51523",
+    "clientX": 1359,
+    "clientY": 741,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630191221
+  },
+  {
+    "origin": "419:51523",
+    "control": "419:51870",
+    "label": "Rename class",
+    "to": "421:51921",
+    "x": 870,
+    "y": 518,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "421:51921",
+    "clientX": 950,
+    "clientY": 618,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630191760
+  },
+  {
+    "origin": "421:51921",
+    "control": "421:52017",
+    "label": "Rename class",
+    "to": "415:57134",
+    "x": 882,
+    "y": 460,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:57134",
+    "clientX": 962,
+    "clientY": 560,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630193331
+  },
+  {
+    "origin": "415:57134",
+    "control": "415:57237",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630193753
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61564",
+    "label": "CF30 \u00b7 Conflict",
+    "to": "415:59738",
+    "x": 968,
+    "y": 434,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:59738",
+    "clientX": 1008.9455388180766,
+    "clientY": 306.4194669756663,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630194231
+  },
+  {
+    "origin": "415:59738",
+    "control": "415:59841",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630195102
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61568",
+    "label": "CF31 \u00b7 Stale editor",
+    "to": "415:60080",
+    "x": 216,
+    "y": 486,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:60080",
+    "clientX": 581.9698725376594,
+    "clientY": 335.9443800695249,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630195933
+  },
+  {
+    "origin": "415:60080",
+    "control": "415:60183",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630198336
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61571",
+    "label": "CF32 \u00b7 Save failed",
+    "to": "415:60422",
+    "x": 592,
+    "y": 486,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:60422",
+    "clientX": 795.4577056778679,
+    "clientY": 335.9443800695249,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630198787
+  },
+  {
+    "origin": "415:60422",
+    "control": "415:60749",
+    "label": "Undo local edit",
+    "to": "415:50289",
+    "x": 1279,
+    "y": 689,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50289",
+    "clientX": 1359,
+    "clientY": 789,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630205242
+  },
+  {
+    "origin": "415:50289",
+    "control": "415:50392",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630206604
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61571",
+    "label": "CF32 \u00b7 Save failed",
+    "to": "415:60422",
+    "x": 592,
+    "y": 486,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:60422",
+    "clientX": 795.4577056778679,
+    "clientY": 335.9443800695249,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630207021
+  },
+  {
+    "origin": "415:60422",
+    "control": "415:60525",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630207433
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61578",
+    "label": "CF34 \u00b7 Shared rule",
+    "to": "415:61091",
+    "x": 216,
+    "y": 538,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:61091",
+    "clientX": 581.9698725376594,
+    "clientY": 365.4692931633836,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630207847
+  },
+  {
+    "origin": "415:61091",
+    "control": "415:61194",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630212480
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61604",
+    "label": "CF08 \u00b7 Invalid class name",
+    "to": "415:52582",
+    "x": 968,
+    "y": 642,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:52582",
+    "clientX": 1008.9455388180766,
+    "clientY": 424.51911935110087,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630213628
+  },
+  {
+    "origin": "415:52582",
+    "control": "415:52897",
+    "label": "Cancel",
+    "to": "415:50289",
+    "x": 1291,
+    "y": 633,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50289",
+    "clientX": 1371,
+    "clientY": 733,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630217013
+  },
+  {
+    "origin": "415:50289",
+    "control": "415:50392",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630217465
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61604",
+    "label": "CF08 \u00b7 Invalid class name",
+    "to": "415:52582",
+    "x": 968,
+    "y": 642,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:52582",
+    "clientX": 1008.9455388180766,
+    "clientY": 424.51911935110087,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630217880
+  },
+  {
+    "origin": "415:52582",
+    "control": "415:52685",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630218343
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57412",
+    "label": "CF37 \u00b7 Brand Classes",
+    "to": "419:52239",
+    "x": 968,
+    "y": 818,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:52239",
+    "clientX": 1008.9455388180766,
+    "clientY": 524.4495944380069,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630219484
+  },
+  {
+    "origin": "419:52239",
+    "control": "419:52561",
+    "label": "Back to selected element",
+    "to": "415:52899",
+    "x": 440,
+    "y": 342,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:52899",
+    "clientX": 520,
+    "clientY": 442,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630220180
+  },
+  {
+    "origin": "415:52899",
+    "control": "415:53002",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630221779
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57412",
+    "label": "CF37 \u00b7 Brand Classes",
+    "to": "419:52239",
+    "x": 968,
+    "y": 818,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:52239",
+    "clientX": 1008.9455388180766,
+    "clientY": 524.4495944380069,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630222228
+  },
+  {
+    "origin": "419:52239",
+    "control": "419:52341",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630223719
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57416",
+    "label": "CF38 \u00b7 Brand Classes",
+    "to": "419:52564",
+    "x": 216,
+    "y": 870,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:52564",
+    "clientX": 581.9698725376594,
+    "clientY": 553.9745075318656,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630224997
+  },
+  {
+    "origin": "419:52564",
+    "control": "419:52885",
+    "label": "Clear search",
+    "to": "419:51523",
+    "x": 410,
+    "y": 306,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:51523",
+    "clientX": 490,
+    "clientY": 406,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630226248
+  },
+  {
+    "origin": "419:51523",
+    "control": "419:51858",
+    "label": "Clean up unused",
+    "to": "419:52888",
+    "x": 490,
+    "y": 542,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:52888",
+    "clientX": 570,
+    "clientY": 642,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630226725
+  },
+  {
+    "origin": "419:52888",
+    "control": "419:53257",
+    "label": "Delete unused class",
+    "to": "419:53259",
+    "x": 857.5,
+    "y": 416,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:53259",
+    "clientX": 937.5,
+    "clientY": 516,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630227200
+  },
+  {
+    "origin": "419:53259",
+    "control": "419:53592",
+    "label": "Find matching local styles",
+    "to": "419:53909",
+    "x": 490,
+    "y": 498,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:53909",
+    "clientX": 570,
+    "clientY": 598,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630227639
+  },
+  {
+    "origin": "419:53909",
+    "control": "419:54011",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630230929
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57416",
+    "label": "CF38 \u00b7 Brand Classes",
+    "to": "419:52564",
+    "x": 216,
+    "y": 870,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:52564",
+    "clientX": 581.9698725376594,
+    "clientY": 553.9745075318656,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630231341
+  },
+  {
+    "origin": "419:52564",
+    "control": "419:52666",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630232503
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57422",
+    "label": "CF40 \u00b7 Unused cleanup",
+    "to": "419:53259",
+    "x": 968,
+    "y": 870,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:53259",
+    "clientX": 1008.9455388180766,
+    "clientY": 553.9745075318656,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630232916
+  },
+  {
+    "origin": "419:53259",
+    "control": "419:53600",
+    "label": "Edit shared styles",
+    "to": "415:50289",
+    "x": 870,
+    "y": 446,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50289",
+    "clientX": 950,
+    "clientY": 546,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630233733
+  },
+  {
+    "origin": "415:50289",
+    "control": "415:50392",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630234800
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57422",
+    "label": "CF40 \u00b7 Unused cleanup",
+    "to": "419:53259",
+    "x": 968,
+    "y": 870,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:53259",
+    "clientX": 1008.9455388180766,
+    "clientY": 553.9745075318656,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630235216
+  },
+  {
+    "origin": "419:53259",
+    "control": "419:53602",
+    "label": "Rename class",
+    "to": "415:56814",
+    "x": 870,
+    "y": 518,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:56814",
+    "clientX": 950,
+    "clientY": 618,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630235633
+  },
+  {
+    "origin": "415:56814",
+    "control": "415:56917",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630236087
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57422",
+    "label": "CF40 \u00b7 Unused cleanup",
+    "to": "419:53259",
+    "x": 968,
+    "y": 870,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:53259",
+    "clientX": 1008.9455388180766,
+    "clientY": 553.9745075318656,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630236518
+  },
+  {
+    "origin": "419:53259",
+    "control": "419:53604",
+    "label": "Duplicate for selected element",
+    "to": "415:57464",
+    "x": 870,
+    "y": 562,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:57464",
+    "clientX": 950,
+    "clientY": 662,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630236936
+  },
+  {
+    "origin": "415:57464",
+    "control": "415:57567",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630239335
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57422",
+    "label": "CF40 \u00b7 Unused cleanup",
+    "to": "419:53259",
+    "x": 968,
+    "y": 870,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:53259",
+    "clientX": 1008.9455388180766,
+    "clientY": 553.9745075318656,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630239751
+  },
+  {
+    "origin": "419:53259",
+    "control": "419:53608",
+    "label": "Select Home / Hero heading",
+    "to": "415:50289",
+    "x": 870,
+    "y": 678,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50289",
+    "clientX": 950,
+    "clientY": 778,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630240164
+  },
+  {
+    "origin": "415:50289",
+    "control": "415:50392",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630240574
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57422",
+    "label": "CF40 \u00b7 Unused cleanup",
+    "to": "419:53259",
+    "x": 968,
+    "y": 870,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:53259",
+    "clientX": 1008.9455388180766,
+    "clientY": 553.9745075318656,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630240986
+  },
+  {
+    "origin": "419:53259",
+    "control": "419:53610",
+    "label": "Locate About / About heading",
+    "to": "421:51002",
+    "x": 870,
+    "y": 722,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "421:51002",
+    "clientX": 950,
+    "clientY": 822,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630241405
+  },
+  {
+    "origin": "421:51002",
+    "control": "421:51104",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630243424
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57422",
+    "label": "CF40 \u00b7 Unused cleanup",
+    "to": "419:53259",
+    "x": 968,
+    "y": 870,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:53259",
+    "clientX": 1008.9455388180766,
+    "clientY": 553.9745075318656,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630243837
+  },
+  {
+    "origin": "419:53259",
+    "control": "419:53361",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630244248
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57422",
+    "label": "CF40 \u00b7 Unused cleanup",
+    "to": "419:53259",
+    "x": 968,
+    "y": 870,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:53259",
+    "clientX": 1008.9455388180766,
+    "clientY": 553.9745075318656,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630244661
+  },
+  {
+    "origin": "419:53259",
+    "control": "419:53615",
+    "label": "Undo",
+    "to": "419:51523",
+    "x": 1358,
+    "y": 836,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:51523",
+    "clientX": 1438,
+    "clientY": 936,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630245072
+  },
+  {
+    "origin": "419:51523",
+    "control": "419:51625",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630245785
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57426",
+    "label": "CF41 \u00b7 Rename collision",
+    "to": "419:53619",
+    "x": 216,
+    "y": 922,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:53619",
+    "clientX": 581.9698725376594,
+    "clientY": 583.4994206257243,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630246198
+  },
+  {
+    "origin": "419:53619",
+    "control": "419:53714",
+    "label": "Cancel",
+    "to": "415:50937",
+    "x": 784,
+    "y": 508,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:50937",
+    "clientX": 864,
+    "clientY": 608,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630246980
+  },
+  {
+    "origin": "415:50937",
+    "control": "415:51040",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630247391
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57436",
+    "label": "CF44 \u00b7 Style-model switch",
+    "to": "419:54542",
+    "x": 216,
+    "y": 974,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:54542",
+    "clientX": 581.9698725376594,
+    "clientY": 613.024333719583,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630247805
+  },
+  {
+    "origin": "419:54542",
+    "control": "419:54866",
+    "label": "Switch using current canvas",
+    "to": "421:52209",
+    "x": 480,
+    "y": 450,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "421:52209",
+    "clientX": 560,
+    "clientY": 550,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630248878
+  },
+  {
+    "origin": "421:52209",
+    "control": "421:52265",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630249592
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57436",
+    "label": "CF44 \u00b7 Style-model switch",
+    "to": "419:54542",
+    "x": 216,
+    "y": 974,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:54542",
+    "clientX": 581.9698725376594,
+    "clientY": 613.024333719583,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630250028
+  },
+  {
+    "origin": "419:54542",
+    "control": "419:54868",
+    "label": "Keep publish appearance",
+    "to": "419:54873",
+    "x": 480,
+    "y": 498,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:54873",
+    "clientX": 560,
+    "clientY": 598,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630250482
+  },
+  {
+    "origin": "419:54873",
+    "control": "419:55195",
+    "label": "Apply value change and switch",
+    "to": "421:52209",
+    "x": 480,
+    "y": 362,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "421:52209",
+    "clientX": 560,
+    "clientY": 462,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630251396
+  },
+  {
+    "origin": "421:52209",
+    "control": "421:52265",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630252130
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57436",
+    "label": "CF44 \u00b7 Style-model switch",
+    "to": "419:54542",
+    "x": 216,
+    "y": 974,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:54542",
+    "clientX": 581.9698725376594,
+    "clientY": 613.024333719583,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630252547
+  },
+  {
+    "origin": "419:54542",
+    "control": "419:54870",
+    "label": "Cancel",
+    "to": "415:53556",
+    "x": 380,
+    "y": 546,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:53556",
+    "clientX": 460,
+    "clientY": 646,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630253280
+  },
+  {
+    "origin": "415:53556",
+    "control": "415:53659",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630256121
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57436",
+    "label": "CF44 \u00b7 Style-model switch",
+    "to": "419:54542",
+    "x": 216,
+    "y": 974,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:54542",
+    "clientX": 581.9698725376594,
+    "clientY": 613.024333719583,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630256536
+  },
+  {
+    "origin": "419:54542",
+    "control": "419:54644",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630256946
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57439",
+    "label": "CF45 \u00b7 Keep publish appearance",
+    "to": "419:54873",
+    "x": 592,
+    "y": 974,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:54873",
+    "clientX": 795.4577056778679,
+    "clientY": 613.024333719583,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630257964
+  },
+  {
+    "origin": "419:54873",
+    "control": "419:55197",
+    "label": "Cancel",
+    "to": "419:54542",
+    "x": 380,
+    "y": 410,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:54542",
+    "clientX": 460,
+    "clientY": 510,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630258460
+  },
+  {
+    "origin": "419:54542",
+    "control": "419:54868",
+    "label": "Keep publish appearance",
+    "to": "419:54873",
+    "x": 480,
+    "y": 498,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:54873",
+    "clientX": 560,
+    "clientY": 598,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630258870
+  },
+  {
+    "origin": "419:54873",
+    "control": "419:54975",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630259280
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57442",
+    "label": "CF46 \u00b7 History backup",
+    "to": "419:55203",
+    "x": 968,
+    "y": 974,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:55203",
+    "clientX": 1008.9455388180766,
+    "clientY": 613.024333719583,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630259703
+  },
+  {
+    "origin": "419:55203",
+    "control": "419:55310",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630261791
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57446",
+    "label": "CF47 \u00b7 History backup failed",
+    "to": "419:55514",
+    "x": 216,
+    "y": 1026,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:55514",
+    "clientX": 581.9698725376594,
+    "clientY": 642.5492468134414,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630262792
+  },
+  {
+    "origin": "419:55514",
+    "control": "419:55611",
+    "label": "Keep reviewing",
+    "to": "415:59738",
+    "x": 1279,
+    "y": 769,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:59738",
+    "clientX": 1359,
+    "clientY": 869,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630264839
+  },
+  {
+    "origin": "415:59738",
+    "control": "415:59841",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630266359
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57446",
+    "label": "CF47 \u00b7 History backup failed",
+    "to": "419:55514",
+    "x": 216,
+    "y": 1026,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:55514",
+    "clientX": 581.9698725376594,
+    "clientY": 642.5492468134414,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630266773
+  },
+  {
+    "origin": "419:55514",
+    "control": "419:55621",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630267184
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57449",
+    "label": "CF48 \u00b7 History",
+    "to": "419:55816",
+    "x": 592,
+    "y": 1026,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:55816",
+    "clientX": 795.4577056778679,
+    "clientY": 642.5492468134414,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630268009
+  },
+  {
+    "origin": "419:55816",
+    "control": "419:55918",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630269018
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57456",
+    "label": "CF50 \u00b7 Push failed",
+    "to": "419:56435",
+    "x": 216,
+    "y": 1078,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:56435",
+    "clientX": 581.9698725376594,
+    "clientY": 672.0741599073001,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630269432
+  },
+  {
+    "origin": "419:56435",
+    "control": "419:56530",
+    "label": "Cancel",
+    "to": "415:55220",
+    "x": 770,
+    "y": 512,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:55220",
+    "clientX": 850,
+    "clientY": 612,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630270330
+  },
+  {
+    "origin": "415:55220",
+    "control": "415:55323",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630271081
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57456",
+    "label": "CF50 \u00b7 Push failed",
+    "to": "419:56435",
+    "x": 216,
+    "y": 1078,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:56435",
+    "clientX": 581.9698725376594,
+    "clientY": 672.0741599073001,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630271494
+  },
+  {
+    "origin": "419:56435",
+    "control": "419:56531",
+    "label": "Push to master",
+    "to": "419:56147",
+    "x": 875,
+    "y": 512,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:56147",
+    "clientX": 955,
+    "clientY": 612,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630273364
+  },
+  {
+    "origin": "419:56147",
+    "control": "419:56235",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630273776
+  },
+  {
+    "origin": "415:61494",
+    "control": "421:52376",
+    "label": "CF54 \u00b7 Move local value",
+    "to": "421:48122",
+    "x": 592,
+    "y": 1158,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "421:48122",
+    "clientX": 795.4577056778679,
+    "clientY": 717.4971031286211,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630274190
+  },
+  {
+    "origin": "421:48122",
+    "control": "421:48218",
+    "label": "Update class",
+    "to": "421:48406",
+    "x": 882,
+    "y": 480,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "421:48406",
+    "clientX": 962,
+    "clientY": 580,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630274953
+  },
+  {
+    "origin": "421:48406",
+    "control": "421:48510",
+    "label": "Undo",
+    "to": "415:51278",
+    "x": 1358,
+    "y": 836,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:51278",
+    "clientX": 1438,
+    "clientY": 936,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630276833
+  },
+  {
+    "origin": "415:51278",
+    "control": "415:51381",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630278489
+  },
+  {
+    "origin": "415:61494",
+    "control": "421:52389",
+    "label": "CF58 \u00b7 Stale editor",
+    "to": "421:49325",
+    "x": 968,
+    "y": 1210,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "421:49325",
+    "clientX": 1008.9455388180766,
+    "clientY": 747.0220162224798,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630278910
+  },
+  {
+    "origin": "421:49325",
+    "control": "421:49432",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630279634
+  },
+  {
+    "origin": "415:61494",
+    "control": "421:52396",
+    "label": "CF60 \u00b7 History restore",
+    "to": "421:49952",
+    "x": 592,
+    "y": 1262,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "421:49952",
+    "clientX": 795.4577056778679,
+    "clientY": 776.5469293163383,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630280048
+  },
+  {
+    "origin": "421:49952",
+    "control": "421:50231",
+    "label": "Restore version",
+    "to": "421:50233",
+    "x": 871.5,
+    "y": 464,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "421:50233",
+    "clientX": 951.5,
+    "clientY": 564,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630280863
+  },
+  {
+    "origin": "421:50233",
+    "control": "421:50340",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630282995
+  },
+  {
+    "origin": "415:61494",
+    "control": "433:51749",
+    "label": "CF72 \u00b7 Suggested name",
+    "to": "433:50940",
+    "x": 216,
+    "y": 1618,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "433:50940",
+    "clientX": 581.9698725376594,
+    "clientY": 978.6790266512166,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630283408
+  },
+  {
+    "origin": "433:50940",
+    "control": "433:51036",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630284103
+  },
+  {
+    "origin": "415:61494",
+    "control": "439:51971",
+    "label": "CF77 \u00b7 Class manager / narrow Brand navigation",
+    "to": "439:51767",
+    "x": 968,
+    "y": 1670,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "439:51767",
+    "clientX": 1008.9455388180766,
+    "clientY": 1008.2039397450753,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630284515
+  },
+  {
+    "origin": "439:51767",
+    "control": "439:51958",
+    "label": "Close navigation",
+    "to": "439:51387",
+    "x": 176,
+    "y": 360,
+    "w": 1280,
+    "h": 720,
+    "pass": true,
+    "actual": "439:51387",
+    "clientX": 336,
+    "clientY": 550,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792630286382
+  },
+  {
+    "origin": "415:55220",
+    "control": "421:52368",
+    "label": "Open component",
+    "to": "462:51685",
+    "x": 1279,
+    "y": 633,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "462:51685",
+    "clientX": 1359,
+    "clientY": 733,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792632674902
+  },
+  {
+    "origin": "462:51685",
+    "control": "462:51717",
+    "label": "\u2039 Hero instance \u00b7 Style / Tablet",
+    "to": "415:55220",
+    "x": 510,
+    "y": 96,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:55220",
+    "clientX": 590,
+    "clientY": 196,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792632677849
+  },
+  {
+    "origin": "415:55220",
+    "control": "421:52368",
+    "label": "Open component",
+    "to": "462:51685",
+    "x": 1279,
+    "y": 633,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "462:51685",
+    "clientX": 1359,
+    "clientY": 733,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792632678136
+  },
+  {
+    "origin": "462:51685",
+    "control": "462:51724",
+    "label": "Return to Hero instance",
+    "to": "415:55220",
+    "x": 460,
+    "y": 334,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:55220",
+    "clientX": 540,
+    "clientY": 434,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792632679439
+  },
+  {
+    "origin": "415:55220",
+    "control": "421:52368",
+    "label": "Open component",
+    "to": "462:51685",
+    "x": 1279,
+    "y": 633,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "462:51685",
+    "clientX": 1359,
+    "clientY": 733,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792632679725
+  },
+  {
+    "origin": "462:51685",
+    "control": "462:51737",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792632686713
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61524",
+    "label": "CF18 \u00b7 Master updated",
+    "to": "415:55850",
+    "x": 968,
+    "y": 226,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:55850",
+    "clientX": 1008.9455388180766,
+    "clientY": 188.3198146002318,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792632690426
+  },
+  {
+    "origin": "415:55850",
+    "control": "415:56158",
+    "label": "Back to instance",
+    "to": "462:51821",
+    "x": 1279,
+    "y": 553,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "462:51821",
+    "clientX": 1359,
+    "clientY": 653,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792632705796
+  },
+  {
+    "origin": "462:51821",
+    "control": "462:51905",
+    "label": "Reset local override",
+    "to": "462:52099",
+    "x": 1279,
+    "y": 585,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "462:52099",
+    "clientX": 1359,
+    "clientY": 685,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792632706749
+  },
+  {
+    "origin": "462:52099",
+    "control": "462:52198",
+    "label": "Undo",
+    "to": "462:51821",
+    "x": 1358,
+    "y": 836,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "462:51821",
+    "clientX": 1438,
+    "clientY": 936,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792632712520
+  },
+  {
+    "origin": "462:51821",
+    "control": "462:51906",
+    "label": "Inspect heading child",
+    "to": "462:52381",
+    "x": 1279,
+    "y": 617,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "462:52381",
+    "clientX": 1359,
+    "clientY": 717,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792632713465
+  },
+  {
+    "origin": "462:52381",
+    "control": "462:52477",
+    "label": "Select Hero instance root",
+    "to": "462:51821",
+    "x": 1279,
+    "y": 753,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "462:51821",
+    "clientX": 1359,
+    "clientY": 853,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792632718449
+  },
+  {
+    "origin": "462:51821",
+    "control": "462:51907",
+    "label": "Open component",
+    "to": "419:56721",
+    "x": 1279,
+    "y": 649,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "419:56721",
+    "clientX": 1359,
+    "clientY": 749,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792632719581
+  },
+  {
+    "origin": "419:56721",
+    "control": "419:57033",
+    "label": "\u2039 Hero instance \u00b7 Style / Tablet",
+    "to": "462:51821",
+    "x": 510,
+    "y": 96,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "462:51821",
+    "clientX": 590,
+    "clientY": 196,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792632722361
+  },
+  {
+    "origin": "462:51821",
+    "control": "462:51917",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792632722648
+  },
+  {
+    "origin": "415:61494",
+    "control": "419:57459",
+    "label": "CF51 \u00b7 Component detail",
+    "to": "419:56721",
+    "x": 592,
+    "y": 1078,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "419:56721",
+    "clientX": 795.4577056778679,
+    "clientY": 672.0741599073001,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792632725077
+  },
+  {
+    "origin": "419:56721",
+    "control": "419:57044",
+    "label": "Return to Hero instance",
+    "to": "462:51821",
+    "x": 460,
+    "y": 334,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "462:51821",
+    "clientX": 540,
+    "clientY": 434,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792632725362
+  },
+  {
+    "origin": "462:51821",
+    "control": "462:51905",
+    "label": "Reset local override",
+    "to": "462:52099",
+    "x": 1279,
+    "y": 585,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "462:52099",
+    "clientX": 1359,
+    "clientY": 685,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792632726782
+  },
+  {
+    "origin": "462:52099",
+    "control": "462:52195",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792632728325
+  },
+  {
+    "origin": "415:61494",
+    "control": "415:61524",
+    "label": "CF18 \u00b7 Master updated",
+    "to": "415:55850",
+    "x": 968,
+    "y": 226,
+    "w": 1200,
+    "h": 1726,
+    "pass": true,
+    "actual": "415:55850",
+    "clientX": 1008.9455388180766,
+    "clientY": 188.3198146002318,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792632728618
+  },
+  {
+    "origin": "415:55850",
+    "control": "415:56158",
+    "label": "Back to instance",
+    "to": "462:51821",
+    "x": 1279,
+    "y": 553,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "462:51821",
+    "clientX": 1359,
+    "clientY": 653,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792632729997
+  },
+  {
+    "origin": "462:51821",
+    "control": "462:51906",
+    "label": "Inspect heading child",
+    "to": "462:52381",
+    "x": 1279,
+    "y": 617,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "462:52381",
+    "clientX": 1359,
+    "clientY": 717,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792632730284
+  },
+  {
+    "origin": "462:52381",
+    "control": "462:52487",
+    "label": "Prototype scenarios",
+    "to": "415:61494",
+    "x": 1397,
+    "y": 883,
+    "w": 1440,
+    "h": 900,
+    "pass": true,
+    "actual": "415:61494",
+    "clientX": 1477,
+    "clientY": 983,
+    "viewport": [
+      1600,
+      1100
+    ],
+    "at": 1792632731723
+  }
+]

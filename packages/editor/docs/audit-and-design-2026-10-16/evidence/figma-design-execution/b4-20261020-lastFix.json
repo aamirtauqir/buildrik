@@ -1,0 +1,10 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"mutatedNodeIds\":[\"245:39954\",\"245:41974\",\"245:44628\",\"251:76397\"],\"flows\":[{\"id\":\"251:76342\",\"name\":\"B4-R07 · Site fonts owner / exact Inspector continuation\",\"links\":[{\"id\":\"251:76492\",\"label\":\"Manage in Assets ›\",\"to\":[\"252:46432\"]},{\"id\":\"251:76495\",\"label\":\"Cancel\",\"to\":[\"247:31047\"]},{\"id\":\"251:76496\",\"label\":\"Done\",\"to\":[\"247:32025\"]}]},{\"id\":\"247:32025\",\"name\":\"B4-R04 · Font picker / returned family requires explicit Use\",\"links\":[{\"id\":\"247:32498\",\"label\":\"Use Studio Sans\",\"to\":[\"247:32505\"]},{\"id\":\"247:32501\",\"label\":\"Cancel\",\"to\":[\"247:30567\"]}]},{\"id\":\"247:32505\",\"name\":\"B4-R05 · Font / intended source saved loading failed\",\"links\":[{\"id\":\"247:32983\",\"label\":\"Retry font load\",\"to\":[\"251:76737\"]},{\"id\":\"247:32985\",\"label\":\"Undo font assignment\",\"to\":[\"247:30567\"]}]},{\"id\":\"245:41419\",\"name\":\"B4-C10 · Modal / explicit local insertion result\",\"links\":[{\"id\":\"245:41909\",\"label\":\"Edit Contact dialog\",\"to\":[\"252:46614\"]},{\"id\":\"245:41912\",\"label\":\"Back to Header component\",\"to\":[\"245:40932\"]},{\"id\":\"245:41917\",\"label\":\"Undo\",\"to\":[\"245:40932\"]}]},{\"id\":\"252:46614\",\"name\":\"B4-C17 · Local inserted dialog / return to insertion context\",\"links\":[{\"id\":\"252:46695\",\"label\":\"Tab / Behavior\",\"to\":[\"252:46927\"]},{\"id\":\"252:46706\",\"label\":\"Back to Contact trigger\",\"to\":[\"245:41419\"]}]},{\"id\":\"252:46927\",\"name\":\"B4-C18 · Local inserted dialog behavior / exact return\",\"links\":[{\"id\":\"252:47013\",\"label\":\"Back to dialog content\",\"to\":[\"252:46614\"]}]}]}"
+    }
+  ],
+  "structuredContent": null,
+  "isError": false
+}

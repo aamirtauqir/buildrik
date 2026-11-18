@@ -1,0 +1,115 @@
+[
+  {
+    "label": "SEO from current Editor",
+    "goto": "8465:3"
+  },
+  {
+    "label": "I02 / Design / Typography → Pages",
+    "x": 109,
+    "y": 157
+  },
+  {
+    "label": "R29 / Editor overlay / Pages → SEO & social settings",
+    "x": 176,
+    "y": 501
+  },
+  {
+    "label": "R26 overlay / page-seo → Meta title",
+    "x": 538,
+    "y": 343
+  },
+  {
+    "label": "R30 / SEO · Edit sample values → Title: Studio North — Thoughtful spaces",
+    "x": 720,
+    "y": 421,
+    "shot": "r30-seo-draft-title.png"
+  },
+  {
+    "label": "R26 overlay / page-seo → Navigate / Social",
+    "x": 116,
+    "y": 177
+  },
+  {
+    "label": "R26 overlay / page-social → Navigate / Advanced",
+    "x": 116,
+    "y": 225
+  },
+  {
+    "label": "R26 overlay / page-advanced → Hidden",
+    "x": 538,
+    "y": 466
+  },
+  {
+    "label": "R26 overlay / page-advanced → Allow indexing",
+    "x": 538,
+    "y": 307,
+    "shot": "r30-seo-advanced-draft.png"
+  },
+  {
+    "label": "R26 overlay / page-advanced → Navigate / SEO",
+    "x": 116,
+    "y": 129,
+    "shot": "r30-seo-tab-retained.png"
+  },
+  {
+    "label": "R26 overlay / page-seo → URL slug",
+    "x": 538,
+    "y": 251
+  },
+  {
+    "label": "R30 / SEO · Edit sample values → URL: journal · already used",
+    "x": 720,
+    "y": 517
+  },
+  {
+    "label": "R26 overlay / page-seo → Done",
+    "x": 546,
+    "y": 596,
+    "shot": "r30-seo-invalid.png",
+    "wait": 1200
+  },
+  {
+    "label": "R30 / SEO · Invalid URL → Use home and return to settings",
+    "x": 720,
+    "y": 501
+  },
+  {
+    "label": "R26 overlay / page-seo → Done",
+    "x": 546,
+    "y": 596,
+    "shot": "r30-seo-saved.png",
+    "wait": 1200
+  },
+  {
+    "label": "R30 / SEO · Saved → Back to Home settings",
+    "x": 720,
+    "y": 549
+  },
+  {
+    "label": "R26 overlay / page-seo → Meta description",
+    "x": 538,
+    "y": 435
+  },
+  {
+    "label": "R30 / SEO · Edit sample values → Description: Architecture and interior design by Studio North.",
+    "x": 720,
+    "y": 469
+  },
+  {
+    "label": "R26 overlay / page-seo → Cancel",
+    "x": 354,
+    "y": 596,
+    "shot": "r30-seo-discard-guard.png"
+  },
+  {
+    "label": "R30 / SEO · Discard changes → Discard changes",
+    "x": 720,
+    "y": 527
+  },
+  {
+    "label": "R29 / Editor overlay / Pages → SEO & social settings",
+    "x": 176,
+    "y": 501,
+    "shot": "r30-seo-after-discard.png"
+  }
+]

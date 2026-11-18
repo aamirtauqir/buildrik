@@ -1,0 +1,611 @@
+{
+  "date": "2026-10-16",
+  "authority": "FD-INS-03 / BIC-01; selected design, not implemented",
+  "scope": "9 Media + 8 Sections; 17 individual block records",
+  "rows": [
+    {
+      "id": "B69-image",
+      "block_id": "image",
+      "source": "src/blocks/Media/Image.tsx",
+      "type": "image",
+      "architecture": "img root; initial alt=\"Image\", no src. Empty source intentionally opens Assets pick flow. mediaBodies.tsx:65\u201376 and SourceRow.tsx:79\u2013117; binding remains M07 image binding.",
+      "gap": "An empty alt can mean intentional decoration or unfinished description; old hint treats both alike. Asset replacement must not change shared file or erase per-usage alt/binding.",
+      "disposition": "Move + Redesign",
+      "owner": "Selected image owns src, alt, loading/decoding and CMS binding. Asset record owns file/metadata; local alt stays local.",
+      "home": "Content \u2192 Image/source, accessibility and loading; Style \u2192 Fit/size; Behaviour \u2192 existing applicable actions.",
+      "controls": [
+        "Source: existing image Assets picker or safe existing URL through Attributes; empty is no file, not a successful image. Preserve image srcset/sizes on replacement; show responsive sources present and require explicit review before replacing the full source set.",
+        "Accessibility mode: Described / Decorative / Unset. Infer Described from nonempty alt, Decorative from existing empty alt, Unset from absent alt; do not rewrite existing files on opening. Proposed decorative switch sets alt=\"\"; disable description while retaining session draft. Described requires nonblank text on commit; unavailable description remains visibly Unset without blocking unrelated style edits.",
+        "Loading: Browser default (remove attr), Lazy, Eager. Decoding through existing advanced attributes (auto/async/sync); do not fabricate a new existing control. Fit cover/contain/fill plus preserved custom CSS; no unit conversion."
+      ],
+      "workflow": "Select image \u2192 Content \u2192 Choose/Replace \u2192 exact filtered Assets picker labelled For <image> \u2192 choose confirmed asset \u2192 revalidate target/permission \u2192 one local commit \u2192 return focus to Source. Cancel/failed upload retains current src and description; broken-file state offers Retry/Replace with existing reference intact.",
+      "preservation": "Preserve element ID, alt, source-set, binding, crop/fit/styles and all other asset usages. A bound source needs existing binding replacement/disconnect decision; never silently turn binding into static src.",
+      "acceptance": [
+        "Pick a new file on one of two usages: only that local src changes; Undo restores source/presence.",
+        "Absent alt, empty alt and meaningful alt remain distinct through reopen; selecting Decorative changes only alt.",
+        "Stale picker return, failed asset fetch and locked target cause no mutation; keep original binding."
+      ],
+      "evidence": "Builder and related consumers located in code. Registered insert, returned target and default Inspector observed in block-runtime-survey.json; proposed edits/output not runtime verified.",
+      "contracts": [
+        "BIC-C01",
+        "BIC-C02",
+        "BIC-C03",
+        "IC-01",
+        "IC-03",
+        "IC-04",
+        "IC-05",
+        "IC-13",
+        "II-01",
+        "II-02"
+      ]
+    },
+    {
+      "id": "B69-video",
+      "block_id": "video",
+      "source": "src/blocks/Media/Video.tsx",
+      "type": "video",
+      "architecture": "video > source(type=video/mp4, empty src). SourceRow reads parent src then first source; attributeWriter.ts:125\u2013143 writes parent and first source. mediaBodies.tsx:93\u2013120 controls playback and poster.",
+      "gap": "A replacement can leave stale source MIME and inconsistent fallback sources. Native source/track descendants are container types and cannot be treated as ordinary layout containers.",
+      "disposition": "Move + Fix",
+      "owner": "Video owns playback/poster; each native source owns URL/MIME/media query, each track owns captions. No duplicate independent parent/child sources.",
+      "home": "Content \u2192 Video/Source, Poster, Advanced sources/tracks; Behaviour \u2192 Playback; Style \u2192 Fit/size.",
+      "controls": [
+        "Primary source choice preserves legacy representation on read. For the simple one-source preset, replacement atomically updates parent src and first source src and MIME from trusted asset metadata (remove stale MIME if unknown). Never infer MIME from a filename. Multiple source or track children switch Source to \u201cMultiple sources\u201d with child rows; parent src continues to take precedence if present and is explicitly identified.",
+        "Sources rows: src URL, optional MIME type, optional media condition; existing raw custom values preserved. Add/reorder/remove via BIC-C02 with no automatic codec conversion. Parent src remove is a separate \u201cUse source list\u201d action with impact preview; no false claim fallback sources currently drive playback.",
+        "Poster: image URL/picker, Clear removes poster only. Playback: Autoplay, Muted, Loop, Show controls, Plays inline; absence off, controls starts on in preset. Boolean off removes native attribute (not string false). Warn when autoplay has sound; browser may refuse playback. Preload none/metadata/auto/absent in Content advanced attributes.",
+        "Caption track editing through native Attributes: src, kind(subtitles/captions/descriptions/chapters/metadata), srclang, label, default boolean. Keep other tracks. No invented caption-upload service."
+      ],
+      "workflow": "Choose video \u2192 inspect source name/error \u2192 choose poster independently \u2192 configure Playback \u2192 explicitly preview output \u2192 stop preview restores editor context and playhead is not saved content. Choosing source/track child opens its native content fields and Back to Video; failed request keeps previous file.",
+      "preservation": "Keep fallback text, all source/track IDs and ordering, poster and CMS/custom attrs. Replace-one-source is one Undo. Clearing media source never deletes the asset. Native-tag-aware controls are proposed extension.",
+      "acceptance": [
+        "Replace mp4 with different trusted MIME and Undo restores both src and type.",
+        "A two-source+captions import is not flattened by opening or changing poster.",
+        "Toggle each native boolean off: exported attr absent; edit mode never autoplay-submits or navigates."
+      ],
+      "evidence": "Builder and related consumers located in code. Registered insert, returned target and default Inspector observed in block-runtime-survey.json; proposed edits/output not runtime verified.",
+      "contracts": [
+        "BIC-C01",
+        "BIC-C02",
+        "BIC-C03",
+        "IC-01",
+        "IC-03",
+        "IC-04",
+        "IC-05",
+        "IC-13",
+        "II-01",
+        "II-02"
+      ]
+    },
+    {
+      "id": "B69-audio",
+      "block_id": "audio",
+      "source": "src/blocks/Media/Audio.tsx",
+      "type": "audio",
+      "architecture": "audio controls > source(type=audio/mpeg, empty src) plus fallback text. Audio uses same SourceRow and handleVideoSrcChange as video.",
+      "gap": "Shared source writer needs audio-specific MIME and all-source preservation; no poster/visual fit required.",
+      "disposition": "Move + Fix",
+      "owner": "Audio and its source children, same native media ownership as B69-video.",
+      "home": "Content \u2192 Audio/source/fallback text/preload; Behaviour \u2192 Playback; Style \u2192 element box.",
+      "controls": [
+        "Choose audio filtered asset picker; source list contract equals video with audio-compatible files. Existing fallback text remains editable as its actual child, not replacement of entire audio subtree.",
+        "Show controls, Loop, Autoplay; absent flag off and native off removes attr. Optional existing muted attr preserved in Advanced even where no current Audio toggle exists. Preload none/metadata/auto/absent. No poster control."
+      ],
+      "workflow": "Select audio \u2192 choose confirmed file \u2192 verify source reference \u2192 set playback flags \u2192 preview with user-initiated Play. Stop/Cancel returns same selection and draft. Source failure keeps file reference with Retry/Replace, not misleading No file.",
+      "preservation": "Preserve MIME/source fallback, track children if present, content and custom attrs. No conversion or new hosted audio service.",
+      "acceptance": [
+        "New audio file updates source MIME atomically; Undo matches original.",
+        "Audio controls never show video poster or icon stroke.",
+        "Fallback text and multiple sources survive file inspection, cancel and reopen."
+      ],
+      "evidence": "Builder and related consumers located in code. Registered insert, returned target and default Inspector observed in block-runtime-survey.json; proposed edits/output not runtime verified.",
+      "contracts": [
+        "BIC-C01",
+        "BIC-C02",
+        "BIC-C03",
+        "IC-01",
+        "IC-03",
+        "IC-04",
+        "IC-05",
+        "IC-13",
+        "II-01",
+        "II-02"
+      ]
+    },
+    {
+      "id": "B69-svg",
+      "block_id": "svg",
+      "source": "src/blocks/Media/SVG.tsx",
+      "type": "svg",
+      "architecture": "svg root contains circle child; inline editable vector markup. SourceRow.tsx:99\u2013107 removes shapes and changes native tag to img when choosing an SVG asset, while ElementType remains svg.",
+      "gap": "Existing Replace can silently destroy inline vector structure. A file-backed SVG with type=svg still needs image alt fields; a type-only switch is inadequate.",
+      "disposition": "Redesign + Fix",
+      "owner": "Inline SVG owns native subtree and vector attrs; file-backed img owns src/alt. Asset is a separate shared object.",
+      "home": "Content \u2192 SVG/source and representation; Style \u2192 box; native SVG child attributes in Content \u2192 Attributes.",
+      "controls": [
+        "Representation readout: Inline SVG / SVG image. Inline \u2192 Choose file opens explicit \u201cReplace inline drawing with SVG image\u201d impact showing descendant count, styles/references and Undo availability. Actions Keep inline / Replace with file. No mutation until confirmed asset is ready; ambiguous external refs block replacement and offer inspect usages.",
+        "For img representation expose image alt/accessibility/loading contract; for inline expose existing viewBox/role/aria-labelledby/title via attributes/child selection. Decorative inline is explicit aria-hidden=true; do not apply img-only alt to svg.",
+        "Unknown valid vector paths/transforms preserved. Vector-node/path authoring and file\u2192inline conversion are deferred; current native Attributes remain accessible with sanitizer rules, and no silent conversion."
+      ],
+      "workflow": "Select SVG \u2192 Content identifies actual representation \u2192 inspect native shape via Layers or choose file \u2192 review impact \u2192 commit complete subtree replacement in one Undo \u2192 return same element identity. Cancel/error keeps exact original shapes. Back to SVG restores context from shape.",
+      "preservation": "Retain root ID, surrounding layout and nonconflicting attributes. One Undo restores tag, content, child IDs and references; no partial removal on failed fetch. This documents correction to current destructive behavior, not implemented fix.",
+      "acceptance": [
+        "Inline circle\u2192asset Cancel yields byte-equivalent document; confirmed replacement\u2192Undo restores all children.",
+        "A legacy ElementType=svg/tag=img exposes alt and source; opening does not convert it again.",
+        "Referencing use/mask/title IDs cannot be orphaned by replacement."
+      ],
+      "evidence": "Builder and related consumers located in code. Registered insert, returned target and default Inspector observed in block-runtime-survey.json; proposed edits/output not runtime verified.",
+      "contracts": [
+        "BIC-C01",
+        "BIC-C02",
+        "BIC-C03",
+        "IC-01",
+        "IC-03",
+        "IC-04",
+        "IC-05",
+        "IC-13",
+        "II-01",
+        "II-02"
+      ]
+    },
+    {
+      "id": "B69-icon",
+      "block_id": "icon",
+      "source": "src/blocks/Media/Icon.tsx",
+      "type": "icon",
+      "architecture": "Icon build creates icon span with inline SVG string; data-icon-name/library/size/color/stroke. Default star32px, stroke2, white. mediaBodies.tsx:123\u2013173 + attributeWriter icon functions.",
+      "gap": "One body also serves SVG; icon-only actions must check actual target subtype. Glyph replacement currently targets primary element only; batch promises must be explicit.",
+      "disposition": "Move + Fix",
+      "owner": "Icon element owns glyph/config and local appearance. Icon library is source catalog, not component definition.",
+      "home": "Content \u2192 Icon/Change icon + accessible name; Style \u2192 Icon size, stroke, colour and box.",
+      "controls": [
+        "Change icon uses existing supported library picker. Preserve existing library/name identity; unavailable glyph reports unavailable with retained markup.",
+        "Size finite presets16/20/24/32/48/64px; stroke1/1.5/2/2.5/3 unitless. Custom saved values remain Custom, not auto-rounded. Keep existing config writer as authoritative and synchronize rendered SVG size/stroke/style; no independent CSS field with conflicting effective meaning.",
+        "Single icon glyph replacement initially supported; multi-selection appearance permitted only for actual icons with compatible writers. SVG+icon mixed selection never receives icon data attrs. Accessible name/decorative state uses span/svg relationships; icon inside labelled button may be decorative without clearing button text."
+      ],
+      "workflow": "Select actual icon \u2192 Change icon \u2192 existing picker opens current choice \u2192 choose \u2192 root identity/config preserved, SVG replaced \u2192 return. Cancel/stale request no change; selected unavailable glyph keeps old drawing until explicit replacement.",
+      "preservation": "Preserve role/name/decorative attrs and surrounding link/button. Do not treat repeated SVG markup as shared component edit. Default white icon low contrast is a preset validation issue; show contrast against actual surface, do not silently recolour saved icons.",
+      "acceptance": [
+        "Replace star and Undo restores exact SVG+config.",
+        "Custom size, unknown library and icon+SVG mixed selection are represented honestly.",
+        "Changing size/stroke updates intended rendered glyph and survives reopen without double size source."
+      ],
+      "evidence": "Builder and related consumers located in code. Registered insert, returned target and default Inspector observed in block-runtime-survey.json; proposed edits/output not runtime verified.",
+      "contracts": [
+        "BIC-C01",
+        "BIC-C02",
+        "BIC-C03",
+        "IC-01",
+        "IC-03",
+        "IC-04",
+        "IC-05",
+        "IC-13",
+        "II-01",
+        "II-02"
+      ]
+    },
+    {
+      "id": "B69-lottie",
+      "block_id": "lottie",
+      "source": "src/blocks/Media/Lottie.tsx",
+      "type": "lottie",
+      "architecture": "Marked div with data-lottie-src and placeholder span. embedBodies.tsx:100\u2013104; parseEmbedUrl.ts:154\u2013172 supports lottie.host UUID/(json|lottie) only; generated iframe is output, not stored child.",
+      "gap": "Generic \u201cAnimation URL\u201d implies arbitrary JSON hosting. Current provider is narrower; placeholder child must not masquerade as animation timeline.",
+      "disposition": "Move + Fix",
+      "owner": "Element data-lottie-src; provider owns playback; Buildrick owns outer box and saved source.",
+      "home": "Content \u2192 Animation/source; Style \u2192 size; Behaviour only existing applicable visibility/interactions.",
+      "controls": [
+        "Label \u201cLottieFiles URL\u201d; accept exactly current parseEmbedUrl lottie rules, max2048 characters, optional https scheme normalization through parser. Unsupported hosts/paths show \u201cUse a supported lottie.host file link\u201d; retain draft and prior preview until valid commit.",
+        "No new speed, frame range or autoplay controls: provider iframe has no traced authoring API. Preserve unknown saved attrs; do not claim raw local JSON upload. Clear source removes attr explicitly and returns placeholder, not a successful player."
+      ],
+      "workflow": "Select animation \u2192 paste supported link \u2192 identified provider \u2192 commit \u2192 generated frame loads or shows external-player failure with Retry. Return from Preview restores editor selection; provider internal playback state is not project content.",
+      "preservation": "Keep placeholder children and outer style; generated iframe is not selectable saved tree content. Native source and empty vs unavailable states persist distinctly.",
+      "acceptance": [
+        "Supported link generates allowed provider frame in canvas/preview/export.",
+        "Unsupported/raw JSON URL produces local error and no unsafe iframe; Cancel retains old source.",
+        "No controls imply unsupported playback/timeline capability."
+      ],
+      "evidence": "Builder and related consumers located in code. Registered insert, returned target and default Inspector observed in block-runtime-survey.json; proposed edits/output not runtime verified.",
+      "contracts": [
+        "BIC-C01",
+        "BIC-C02",
+        "BIC-C03",
+        "IC-01",
+        "IC-03",
+        "IC-04",
+        "IC-05",
+        "IC-13",
+        "II-01",
+        "II-02"
+      ]
+    },
+    {
+      "id": "B69-gallery",
+      "block_id": "gallery",
+      "source": "src/blocks/Media/ImageGallery.tsx",
+      "type": "gallery",
+      "architecture": "Gallery root > .buildrick-gallery-grid > three img children. Each img has its own src/alt; capability table treats gallery as container and live default panel is generic Layout.",
+      "gap": "Root family coverage does not provide image ordering, item target or grid-owner clarity. No traced lightbox/gallery service in inspected paths.",
+      "disposition": "Extend + Redesign",
+      "owner": "Root owns gallery container; inner grid owns layout; image children own source/alt/bindings.",
+      "home": "Content \u2192 Images; Style \u2192 Gallery layout (explicit target inner grid); actual image Inspector via Edit image.",
+      "controls": [
+        "Images rows display thumbnail, local alt/name, stable target ID; select one to reveal Edit image, Move up/down, Duplicate, Remove. Add images opens existing image picker multi-pick only if supported; otherwise repeat Add image, no invented asset API. Insert image child into proven grid only.",
+        "Empty images \u2192 Add image; search no results distinct from asset failure. No array mirror: list derived from actual tree, including linked/custom wrappers as preserved advanced items.",
+        "Columns/gap remain actual grid CSS via common Style writer and active breakpoint; current generated grid has no specialized data count. No hardcoded 3 fallback on read. No lightbox/timeline proposed."
+      ],
+      "workflow": "Select gallery \u2192 Images row \u2192 Edit image opens child Inspector with Gallery \u203a Image breadcrumb \u2192 source/alt \u2192 Back to Gallery restores list row/scroll. Reorder one ID atomically; remove reports affected bindings/references and Undo restores position. Unknown structures keep native children navigation until explicit safe adapter proof.",
+      "preservation": "Never flatten image wrappers or unrelated gallery children. Grid layout shortcut names real owner and uses same writer as direct grid selection; changing child source remains local.",
+      "acceptance": [
+        "Reorder image2 before1 preserves alt and ID, Undo restores original order.",
+        "Parent gap writes grid owner at active breakpoint, not gallery root.",
+        "Custom linked gallery image remains intact; broken/missing asset gives correct state."
+      ],
+      "evidence": "Builder and related consumers located in code. Registered insert, returned target and default Inspector observed in block-runtime-survey.json; proposed edits/output not runtime verified.",
+      "contracts": [
+        "BIC-C01",
+        "BIC-C02",
+        "BIC-C03",
+        "IC-01",
+        "IC-03",
+        "IC-04",
+        "IC-05",
+        "IC-13",
+        "II-01",
+        "II-02"
+      ]
+    },
+    {
+      "id": "B69-video-embed",
+      "block_id": "video-embed",
+      "source": "src/blocks/Media/VideoEmbed.tsx",
+      "type": "video-embed",
+      "architecture": "Marked div with placeholder children and legacy padding-bottom:56.25%/height0. Saved data-embed-url and ratio/player flags. embedBodies.tsx:64\u201393; embedFrameHTML.ts generates allowed iframe.",
+      "gap": "Ratio currently clears legacy base layout; layout/layer correction must be atomic and never destroy custom box. URL parse failure currently uses broad message for unrelated providers.",
+      "disposition": "Move + Fix",
+      "owner": "Element saved embed attrs own provider/flags/ratio; iframe is derived output. Outer CSS owns placement.",
+      "home": "Content \u2192 Video URL; Style \u2192 Embed ratio; Behaviour \u2192 Playback.",
+      "controls": [
+        "URL supports current YouTube/watch/embed/short/live and Vimeo/public/unlisted parser forms; max2048; preserve Vimeo hash. Invalid input message specific to YouTube/Vimeo. Do not fetch arbitrary iframe HTML.",
+        "Ratio16:9/4:3/1:1 stored data-embed-ratio applies across breakpoints; show \u201cAll breakpoints\u201d even in Style because model is attribute. Unknown stored ratio preserved Custom and not coerced on focus. Legacy padding/height removed only when exact legacy box is proved, in same transaction; unrelated author styles remain.",
+        "Autoplay/Muted default off; controls default on. Data boolean off representation must match parser: remove autoplay/muted, controls false explicitly; empty autoplay/muted means on. Warning sound autoplay may be blocked. No loop switch without parser support."
+      ],
+      "workflow": "Paste \u2192 provider detected \u2192 commit \u2192 render frame; change ratio shows scope and preserves current selection \u2192 preview explicitly; failure keeps accepted URL and allows Retry. Clearing URL is separate explicit action restoring existing placeholder. Stop preview returns context.",
+      "preservation": "Preserve source URL identity/hash, fallback children, custom dimensions and flags. All writers use parseEmbedUrl/embedFrameHTML shared output; no duplicated provider resolver.",
+      "acceptance": [
+        "YouTube/Vimeo ratio and flags produce matching canvas/preview/export config.",
+        "Autoplay off removes data attr, not empty on-value.",
+        "Legacy box cleanup and ratio one Undo; custom padding/height not deleted."
+      ],
+      "evidence": "Builder and related consumers located in code. Registered insert, returned target and default Inspector observed in block-runtime-survey.json; proposed edits/output not runtime verified.",
+      "contracts": [
+        "BIC-C01",
+        "BIC-C02",
+        "BIC-C03",
+        "IC-01",
+        "IC-03",
+        "IC-04",
+        "IC-05",
+        "IC-13",
+        "II-01",
+        "II-02"
+      ]
+    },
+    {
+      "id": "B69-map-embed",
+      "block_id": "map-embed",
+      "source": "src/blocks/Media/MapEmbed.tsx",
+      "type": "map-embed",
+      "architecture": "Marked div, height400px, placeholder content. data-embed-url accepts address, coordinates or supported Google Maps link; parseEmbedUrl.ts:100\u2013151 truncates query at200.",
+      "gap": "Current parser can silently shorten location. No zoom/style/geocoding precision control traced.",
+      "disposition": "Move + Fix",
+      "owner": "Element location string owns generated map target; third-party map owns interaction.",
+      "home": "Content \u2192 Location; Style \u2192 size; no untraced map settings.",
+      "controls": [
+        "Label \u201cAddress, coordinates or Google Maps link\u201d. Preserve raw source up to2048; for every decoded extracted query (plain address, URL q/query, place/search path or coordinates) longer200 reject commit with \u201cUse an address of 200 characters or fewer\u201d instead of silent truncation. Existing longer values read as Legacy value with exact text preserved until explicit correction; do not auto-rewrite on open.",
+        "Coordinate form if explicitly entered as lat,lng: finite numbers latitude\u221290\u202690, longitude\u2212180\u2026180. Noncoordinate address remains text; unsupported/short provider link says use full supported Google Maps link. Google Maps pb embed payload follows URL2048 limit separately and is not treated as a200-character query. No pretend location validation from client parser.",
+        "Clear restores placeholder. No API key, pins, multiple locations, zoom or paid service added."
+      ],
+      "workflow": "Enter location \u2192 validate supported syntax \u2192 identify Google Maps \u2192 commit \u2192 third-party load/failure; Retry retains location. Returning to canvas keeps breakpoint/zoom. Result correctness requires user preview, no geocoding success claim.",
+      "preservation": "Preserve iframe-generation boundary and custom dimensions. New validation is a proposed correction; shared parser must enforce same constraints across writers without deleting old data.",
+      "acceptance": [
+        "201-character plain query and decoded supported URL q/query/place/search query blocked without silent truncation; valid pb embed payload is not truncated;2049 URL blocked.",
+        "lat,lng bounds and unsupported host produce precise local feedback.",
+        "Load error distinct from empty source; saved location unchanged."
+      ],
+      "evidence": "Builder and related consumers located in code. Registered insert, returned target and default Inspector observed in block-runtime-survey.json; proposed edits/output not runtime verified.",
+      "contracts": [
+        "BIC-C01",
+        "BIC-C02",
+        "BIC-C03",
+        "IC-01",
+        "IC-03",
+        "IC-04",
+        "IC-05",
+        "IC-13",
+        "II-01",
+        "II-02"
+      ]
+    },
+    {
+      "id": "B69-hero",
+      "block_id": "hero",
+      "source": "src/blocks/Sections/HeroSection.tsx",
+      "type": "hero",
+      "architecture": "section.hero > content div > h1,p,a. Config declares attributes metadata title/subtitle/buttonText/buttonUrl/background/height, but insertBlock HTML branch does not materialize that metadata as editable properties.",
+      "gap": "Metadata must not be presented as authoritative values disconnected from child content.",
+      "disposition": "Keep + Regroup",
+      "owner": "Actual section/native descendants own their properties. Section presets are not automatically shared component definitions.",
+      "home": "Content \u2192 Children: Heading, Description, Link; Style root Fill/spacing, inner container layout; child Link Behaviour for destination.",
+      "controls": [
+        "Children shortcuts resolve actual stable IDs, not child position. Heading level H1\u2013H6 at child; description text at p; label/destination at link. Root background colour/image in Style through existing fill writer.",
+        "Custom or missing child becomes \u201cNot present\u201d with Select in Layers or existing Add path; do not regenerate preset on editing title. No new root title/buttonUrl store."
+      ],
+      "workflow": "Select Hero \u2192 Children \u2192 Heading \u2192 edit text/level \u2192 Back to Hero \u2192 Link \u2192 destination \u2192 Back. Child deletion is ordinary scoped deletion, not whole section. Reordering uses actual wrapper rules.",
+      "preservation": "Preserve tree IDs, classes, custom attrs, binding/style layers and content. No duplicated root property bag mirroring descendants. ",
+      "acceptance": [
+        "Change headline preserves link and child IDs; no root title divergence.",
+        "Set CTA internal page link then reorder Hero: link reference preserved.",
+        "Legacy metadata and extra children survive opening/editing."
+      ],
+      "evidence": "Builder and related consumers located in code. Registered insert, returned target and default Inspector observed in block-runtime-survey.json; proposed edits/output not runtime verified.",
+      "contracts": [
+        "BIC-C01",
+        "BIC-C02",
+        "BIC-C03",
+        "IC-01",
+        "IC-03",
+        "IC-04",
+        "IC-05",
+        "IC-13",
+        "II-01",
+        "II-02"
+      ]
+    },
+    {
+      "id": "B69-features",
+      "block_id": "features",
+      "source": "src/blocks/Sections/Features.tsx",
+      "type": "features",
+      "architecture": "section.features contains three item divs, each h3+p. Description promises icons, but current markup contains no icon.",
+      "gap": "Do not expose icon controls for nonexistent children or imply icon insertion already happened.",
+      "disposition": "Keep + Regroup + Fix",
+      "owner": "Actual section/native descendants own their properties. Section presets are not automatically shared component definitions.",
+      "home": "Content \u2192 Feature items; child heading/description; Style root grid/flex + item appearance.",
+      "controls": [
+        "Rows identify actual feature item containers; Select/Edit, Duplicate, Move up/down, Remove per BIC-C02. Add item duplicates selected item structure only after ID/reference remap; if no items use existing container + heading/paragraph insertion.",
+        "Optional icon uses existing Add Icon into selected item and then B69-icon; no phantom icon slot/value. Preset description corrected to actual generated content until icons are explicitly added."
+      ],
+      "workflow": "Select root \u2192 choose Feature2 \u2192 edit heading/description via actual child \u2192 return \u2192 duplicate/reorder whole item preserving nested text. Removing populated item shows content impact and Undo.",
+      "preservation": "Preserve tree IDs, classes, custom attrs, binding/style layers and content. No duplicated root property bag mirroring descendants. Preset description wording correction is implementation work; no existing capability removed.",
+      "acceptance": [
+        "Duplicate feature creates unique IDs and retains style; edit clone independent.",
+        "No icon field appears unless actual icon target exists.",
+        "Reorder moves item with both heading and paragraph."
+      ],
+      "evidence": "Builder and related consumers located in code. Registered insert, returned target and default Inspector observed in block-runtime-survey.json; proposed edits/output not runtime verified.",
+      "contracts": [
+        "BIC-C01",
+        "BIC-C02",
+        "BIC-C03",
+        "IC-01",
+        "IC-03",
+        "IC-04",
+        "IC-05",
+        "IC-13",
+        "II-01",
+        "II-02"
+      ]
+    },
+    {
+      "id": "B69-menu-grid",
+      "block_id": "menu-grid",
+      "source": "src/blocks/Sections/MenuGrid.tsx",
+      "type": "section",
+      "architecture": "Generic section > h2 + grid div >3 dish divs each h3+p. Description promises images/prices; markup has neither.",
+      "gap": "Static dish text is not commerce data; title and description alone do not justify product fields.",
+      "disposition": "Keep + Regroup + Fix",
+      "owner": "Actual section/native descendants own their properties. Section presets are not automatically shared component definitions.",
+      "home": "Content \u2192 Children \u2192 Menu title or Dish item; Style actual grid layout; optional image via Add.",
+      "controls": [
+        "Item row label derives heading; edit heading/description on selected native child. Price if user adds one is plain text unless explicitly bound via existing CMS; no currency/catalog claim.",
+        "Duplicate/reorder/remove whole dish wrappers; actual grid repeat/gap in Style. Missing image Add Image is explicit insert, not file slot that overwrites text."
+      ],
+      "workflow": "Menu grid \u2192 choose dish \u2192 edit text \u2192 return \u2192 reorder item \u2192 set mobile grid at actual inner owner. New image goes in chosen dish with Alt flow, not menu root.",
+      "preservation": "Preserve tree IDs, classes, custom attrs, binding/style layers and content. No duplicated root property bag mirroring descendants. Correct misleading preset description; preserve original static menu and no automatic ecommerce migration.",
+      "acceptance": [
+        "No price/image is claimed existing by panel.",
+        "Dish deletion preserves unrelated items, Undo restores exact children.",
+        "Grid breakpoint changes do not rewrite content."
+      ],
+      "evidence": "Builder and related consumers located in code. Registered insert, returned target and default Inspector observed in block-runtime-survey.json; proposed edits/output not runtime verified.",
+      "contracts": [
+        "BIC-C01",
+        "BIC-C02",
+        "BIC-C03",
+        "IC-01",
+        "IC-03",
+        "IC-04",
+        "IC-05",
+        "IC-13",
+        "II-01",
+        "II-02"
+      ]
+    },
+    {
+      "id": "B69-testimonials-section",
+      "block_id": "testimonials-section",
+      "source": "src/blocks/Sections/TestimonialsSection.tsx",
+      "type": "section",
+      "architecture": "Generic section > h2 + grid div >2 blockquote nodes; each p + cite. Native cite currently falls back to container.",
+      "gap": "Selecting cite must offer text/native attributes without generic layout mutation; quotes are not the testimonials component.",
+      "disposition": "Keep + Regroup",
+      "owner": "Actual section/native descendants own their properties. Section presets are not automatically shared component definitions.",
+      "home": "Content \u2192 Quotes; quote \u2192 text + attribution child; Style grid/root and typography at respective targets.",
+      "controls": [
+        "Quote and author are actual p/cite content, no root string copies. Preserve cite/blockquote semantics. Add/duplicate moves whole blockquote with author; source URL through existing cite attr in Advanced, not replacing author display.",
+        "Section and Testimonials component labels show their context/preset identity in catalog; no forced conversion between them."
+      ],
+      "workflow": "Select section \u2192 Quote2 \u2192 quote text \u2192 attribution \u2192 Back to Quotes \u2192 move/remove with paired content. Current item focus persists on return.",
+      "preservation": "Preserve tree IDs, classes, custom attrs, binding/style layers and content. No duplicated root property bag mirroring descendants. ",
+      "acceptance": [
+        "Editing attribution does not change quote; native cite preserved.",
+        "Reorder quote keeps p+cite as one item.",
+        "Existing custom quote descendants survive author edit."
+      ],
+      "evidence": "Builder and related consumers located in code. Registered insert, returned target and default Inspector observed in block-runtime-survey.json; proposed edits/output not runtime verified.",
+      "contracts": [
+        "BIC-C01",
+        "BIC-C02",
+        "BIC-C03",
+        "IC-01",
+        "IC-03",
+        "IC-04",
+        "IC-05",
+        "IC-13",
+        "II-01",
+        "II-02"
+      ]
+    },
+    {
+      "id": "B69-cta",
+      "block_id": "cta",
+      "source": "src/blocks/Sections/CTA.tsx",
+      "type": "cta",
+      "architecture": "section.cta >h2,p,button. Brand CSS vars on root/button; default button is not anchor.",
+      "gap": "Do not show button destination as known link; button action must be explicit.",
+      "disposition": "Keep + Regroup",
+      "owner": "Actual section/native descendants own their properties. Section presets are not automatically shared component definitions.",
+      "home": "Content child label/text; Style root Fill and typography; Behaviour selected Button/action.",
+      "controls": [
+        "Select actual button for label, type and existing link/action capabilities. A navigation conversion must follow shared button/link contract with preserved identity/attrs and explain tag semantics; never fabricate href-only navigation on native button.",
+        "Brand token shown as source; local override versus Edit source returns to exact selected child/root. No global Brand edits disguised as CTA colour."
+      ],
+      "workflow": "CTA root \u2192 button child \u2192 label/action \u2192 Preview; return restores selectedbutton. Edit root shared-token source through Brand exact resource only if permitted; cancel returns same context.",
+      "preservation": "Preserve tree IDs, classes, custom attrs, binding/style layers and content. No duplicated root property bag mirroring descendants. ",
+      "acceptance": [
+        "CTA label edit leaves heading and token references intact.",
+        "Button action behavior tested in preview/output; no success just because href exists.",
+        "Undo local colour restores token reference, not copied computed colour."
+      ],
+      "evidence": "Builder and related consumers located in code. Registered insert, returned target and default Inspector observed in block-runtime-survey.json; proposed edits/output not runtime verified.",
+      "contracts": [
+        "BIC-C01",
+        "BIC-C02",
+        "BIC-C03",
+        "IC-01",
+        "IC-03",
+        "IC-04",
+        "IC-05",
+        "IC-13",
+        "II-01",
+        "II-02"
+      ]
+    },
+    {
+      "id": "B69-contact",
+      "block_id": "contact",
+      "source": "src/blocks/Sections/Contact.tsx",
+      "type": "section",
+      "architecture": "Generic section > two-column div. First child contact headings/paragraphs; second child empty low-opacity bordered div. There is no form in this preset.",
+      "gap": "Catalog description says short message form but source creates placeholder only. A form field panel cannot be invented for it.",
+      "disposition": "Keep + Regroup + Fix",
+      "owner": "Actual section/native descendants own their properties. Section presets are not automatically shared component definitions.",
+      "home": "Content \u2192 Contact details and Form area; actual details children; empty container exposes proposed Add contact form action to the existing registered contact-form builder (not a currently verified static Add entry).",
+      "controls": [
+        "Form area shows \u201cEmpty container\u201d and \u201cAdd contact form\u201d proposed contextual insertion; this exposes the existing registered builder absent from the static Add catalog. Insert existing contact-form into validated target. Preserve placeholder styles until user changes them, but show that opacity/border apply to this wrapper and may affect contents.",
+        "Email is currently paragraph text; explicitly select/add Link to make mailto. Do not imply delivery/setup from text alone. After form insertion use B69-contact-form; built-in service setup separate."
+      ],
+      "workflow": "Select section \u2192 form area \u2192 Add contact form \u2192 select newly inserted form \u2192 Fields + Submission configuration \u2192 return to section. Cancel insertion leaves empty area; service failure retains form content with actionable setup notice.",
+      "preservation": "Preserve tree IDs, classes, custom attrs, binding/style layers and content. No duplicated root property bag mirroring descendants. Correct preset description to contact details + empty form area, or explicitly insert form in a later approved default update; no silent upgrade of saved placeholders.",
+      "acceptance": [
+        "Initial preset has no form fields; panel accurately says empty.",
+        "Adding form preserves contact-details column and root layout.",
+        "Existing form/config and reference links survive Undo/reopen."
+      ],
+      "evidence": "Builder and related consumers located in code. Registered insert, returned target and default Inspector observed in block-runtime-survey.json; proposed edits/output not runtime verified.",
+      "contracts": [
+        "BIC-C01",
+        "BIC-C02",
+        "BIC-C03",
+        "IC-01",
+        "IC-03",
+        "IC-04",
+        "IC-05",
+        "IC-13",
+        "II-01",
+        "II-02"
+      ]
+    },
+    {
+      "id": "B69-footer",
+      "block_id": "footer",
+      "source": "src/blocks/Sections/Footer.tsx",
+      "type": "footer",
+      "architecture": "footer root with copyright p only. Description says name/links, but preset has no links and fixed2024 text.",
+      "gap": "Do not expose navigation-list or automatic year behavior as implemented.",
+      "disposition": "Keep + Regroup + Fix",
+      "owner": "Actual section/native descendants own their properties. Section presets are not automatically shared component definitions.",
+      "home": "Content \u2192 Children/copyright; Style footer Fill/spacing; any actual links via child Behaviour.",
+      "controls": [
+        "Copyright is literal editable text; no automatic year substitution. Add links through existing Add Link into a validated group; no global footer synchronization inferred.",
+        "Save as component uses approved Add/Saved components workflow; existing local footers remain independent unless user creates/inserts shared component."
+      ],
+      "workflow": "Select footer \u2192 copyright paragraph \u2192 edit \u2192 Back. If reuse requested invoke existing component creation, disclose definition/instance scope then return; no hidden propagation to other pages.",
+      "preservation": "Preserve tree IDs, classes, custom attrs, binding/style layers and content. No duplicated root property bag mirroring descendants. Correct description to actual simple copyright footer; richer default optional, existing routes retained.",
+      "acceptance": [
+        "Text change affects this footer only unless genuine shared definition edit.",
+        "Saved2024/custom copyright never autochanges on open.",
+        "Added link IDs and component references preserved."
+      ],
+      "evidence": "Builder and related consumers located in code. Registered insert, returned target and default Inspector observed in block-runtime-survey.json; proposed edits/output not runtime verified.",
+      "contracts": [
+        "BIC-C01",
+        "BIC-C02",
+        "BIC-C03",
+        "IC-01",
+        "IC-03",
+        "IC-04",
+        "IC-05",
+        "IC-13",
+        "II-01",
+        "II-02"
+      ]
+    },
+    {
+      "id": "B69-navbar",
+      "block_id": "navbar",
+      "source": "src/blocks/Sections/Navbar.tsx",
+      "type": "navbar",
+      "architecture": "nav navbar root > logo text div + link group div with4 anchors. ElementManager.ts:258\u2013304 addPageToNavigation copies last link in first all-link descendant group, stores #page:id.",
+      "gap": "Logo text is not image; responsive hamburger/menu automation not traced. Page navigation dependency is real and must be preserved.",
+      "disposition": "Keep + Regroup",
+      "owner": "Actual section/native descendants own their properties. Section presets are not automatically shared component definitions.",
+      "home": "Content \u2192 Navigation links + Logo child; Behaviour per-link destination; Style actual nav/group responsive layout.",
+      "controls": [
+        "Links rows derived from actual group; label+destination edits hit same anchor as direct child selection. Supported destination types existing Link contract; current # means unset destination, not valid Home page mapping.",
+        "Move/duplicate/remove acts on link node with remapped internal IDs; Page \u2192 Add to site navigation uses same owner. Do not add duplicate #page:id; display affected nav count on page action. Existing hand-authored URLs stay unchanged.",
+        "No automatic mobile menu toggle promised. Preserve authored breakpoint visibility/layout; optional responsive menu authoring remains outside this coverage. Logo image requires explicit Add/Replace content decision."
+      ],
+      "workflow": "Select Navbar \u2192 Links \u2192 About \u2192 choose internal page \u2192 return to link list. Page creation Add to navigation returns to original page context and updates eligible group only; deleted page link shows missing reference, Choose page/Clear with Undo.",
+      "preservation": "Preserve tree IDs, classes, custom attrs, binding/style layers and content. No duplicated root property bag mirroring descendants. ",
+      "acceptance": [
+        "Link direct edit and row edit always read same ID/href.",
+        "Create page integration avoids duplicates and preserves existing groups.",
+        "Mobile layout edit does not delete links or pretend hamburger functionality."
+      ],
+      "evidence": "Builder and related consumers located in code. Registered insert, returned target and default Inspector observed in block-runtime-survey.json; proposed edits/output not runtime verified.",
+      "contracts": [
+        "BIC-C01",
+        "BIC-C02",
+        "BIC-C03",
+        "IC-01",
+        "IC-03",
+        "IC-04",
+        "IC-05",
+        "IC-13",
+        "II-01",
+        "II-02"
+      ]
+    }
+  ]
+}

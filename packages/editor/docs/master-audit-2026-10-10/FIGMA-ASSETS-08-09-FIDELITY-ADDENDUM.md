@@ -1,0 +1,16 @@
+# AS-IS Assets 08–09: targeted fidelity addendum
+
+Date: 2026-10-10. Only frames [08 Assets quick chooser](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8283-1998) and [09 Full Media](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC/Buildrick?node-id=8283-2325) were modified. Both retain their IDs and captured 1280×720 dimensions.
+
+Six gray thumbnail rectangles now contain the [actual uploaded image](evidence/assets-08-09-validation/actual-media-content.png). These six image fills are content only; all UI chrome remains native. Frame 08's three filenames now truncate within their measured 114.5px card widths instead of overlapping neighboring cards. Fifteen existing nodes changed; no new nodes were created.
+
+The source explicitly renders thumbnails with object-cover and filename ellipsis: [AssetCell.tsx](../../src/editor/sidebar/tabs/media/components/AssetCell.tsx#L144), [filename treatment](../../src/editor/sidebar/tabs/media/components/AssetCell.tsx#L228), and the [two-column grid](../../src/editor/sidebar/tabs/media/components/SlimLauncher.tsx#L625). The label's long text-run width in the legacy DOM extraction was not its actual clipping boundary.
+
+| State | Evidence | Verification scope |
+|---|---|---|
+| 08 Assets quick chooser | [Before](evidence/assets-08-09-validation/assets-08-before.png) · [Final native](evidence/assets-08-09-validation/assets-08-figma-final.png) · [Layout](evidence/assets-08-09-validation/assets-08-layout.json) | Final native image reviewed; image content, positions and text clipping checked against actual asset and source. Matching original browser PNG was not located. This is not a full paired runtime screenshot comparison. |
+| 09 Full Media | [Before](evidence/assets-08-09-validation/media-09-before.png) · [Browser](evidence/assets-08-09-validation/media-09-browser.png) · [Final native](evidence/assets-08-09-validation/media-09-figma-final.png) · [Layout](evidence/assets-08-09-validation/media-09-layout.json) | Final native visually compared with matching browser capture. All three actual thumbnails restored. |
+
+[Mutation and validation evidence](evidence/assets-08-09-validation/native-correction-and-validation.json) records the first nine node IDs, the content image hash, dimensions, image-fill nodes and text truncation widths.
+
+Frame 09 also restores its three overlaid menu buttons to their captured 92% white fill, the empty instruction to its captured two-line presentation, and SMART / MY FOLDERS to CSS uppercase with 0.88px tracking. See [LibraryManager.css](../../src/editor/media/LibraryManager.css#L228) and [additional mutations](evidence/assets-08-09-validation/additional-correction-and-validation.json). The instruction uses an explicit native line break to match the captured wrap; its underlying message is unchanged. The final corrected frame was visually inspected after these edits. The targeted patch does not establish pixel-perfect fidelity; font baselines and browser/Figma rendering still differ slightly. The browser's Next.js issue badge is omitted consistently with the existing capture policy; Agentation remains measured development chrome. No browser, app, upload, project data or other frame was modified.

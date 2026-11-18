@@ -1,0 +1,140 @@
+[
+  {
+    "label": "Build tools",
+    "goto": "8628:12592",
+    "wait": 7000,
+    "shot": "r34-build-tools.png"
+  },
+  {
+    "label": "Connections",
+    "x": 201,
+    "y": 872,
+    "shot": "r34-mcp-entry.png"
+  },
+  {
+    "label": "Set server URL",
+    "x": 720,
+    "y": 534
+  },
+  {
+    "label": "Review tools",
+    "x": 902,
+    "y": 619,
+    "shot": "r34-mcp-authorize.png"
+  },
+  {
+    "label": "Allow proposal scope",
+    "x": 720,
+    "y": 552
+  },
+  {
+    "label": "Authorize",
+    "x": 902,
+    "y": 637,
+    "shot": "r34-mcp-connected.png"
+  },
+  {
+    "label": "Font roles",
+    "goto": "8814:15869",
+    "wait": 3000
+  },
+  {
+    "label": "Change heading family",
+    "x": 720,
+    "y": 450
+  },
+  {
+    "label": "Review families",
+    "x": 902,
+    "y": 667,
+    "shot": "r34-font-impact.png"
+  },
+  {
+    "label": "Apply families",
+    "x": 902,
+    "y": 649,
+    "shot": "r34-font-library.png"
+  },
+  {
+    "label": "CMS Number",
+    "goto": "8771:13676",
+    "wait": 3000
+  },
+  {
+    "label": "Minimum picker",
+    "x": 538,
+    "y": 633
+  },
+  {
+    "label": "Minimum 80",
+    "x": 720,
+    "y": 565
+  },
+  {
+    "label": "Maximum picker",
+    "x": 902,
+    "y": 633
+  },
+  {
+    "label": "Maximum 2",
+    "x": 720,
+    "y": 517
+  },
+  {
+    "label": "Reject range",
+    "x": 902,
+    "y": 736,
+    "wait": 1000,
+    "shot": "r34-cms-range-error.png"
+  },
+  {
+    "label": "Correct minimum",
+    "x": 720,
+    "y": 517
+  },
+  {
+    "label": "Save corrected",
+    "x": 902,
+    "y": 736,
+    "wait": 1000,
+    "shot": "r34-cms-range-saved.png"
+  },
+  {
+    "label": "Media search",
+    "goto": "8819:14287",
+    "wait": 3000
+  },
+  {
+    "label": "Switch query to logo",
+    "x": 720,
+    "y": 534
+  },
+  {
+    "label": "Search empty",
+    "x": 902,
+    "y": 583,
+    "shot": "r34-media-no-results.png"
+  },
+  {
+    "label": "Clear search",
+    "x": 1190,
+    "y": 116,
+    "shot": "r34-media-search-recovered.png"
+  },
+  {
+    "label": "Client review request",
+    "goto": "8818:14422",
+    "wait": 3000
+  },
+  {
+    "label": "Set recipient",
+    "x": 720,
+    "y": 474
+  },
+  {
+    "label": "Send review",
+    "x": 902,
+    "y": 643,
+    "shot": "r34-review-pending.png"
+  }
+]

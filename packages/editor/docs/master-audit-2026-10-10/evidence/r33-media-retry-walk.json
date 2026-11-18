@@ -1,0 +1,32 @@
+[
+  {
+    "label": "Stable List entry",
+    "goto": "8773:13794",
+    "wait": 7000,
+    "shot": "r33-media-entry-retry.png"
+  },
+  {
+    "label": "Select asset two",
+    "x": 633,
+    "y": 419,
+    "shot": "r33-media-selected-retry.png"
+  },
+  {
+    "label": "Delete",
+    "x": 1225,
+    "y": 655,
+    "shot": "r33-media-confirm-retry.png"
+  },
+  {
+    "label": "Confirm",
+    "x": 720,
+    "y": 535,
+    "shot": "r33-media-deleted-retry.png"
+  },
+  {
+    "label": "Undo return",
+    "x": 720,
+    "y": 517,
+    "shot": "r33-media-return-retry.png"
+  }
+]

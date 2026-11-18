@@ -1,0 +1,49 @@
+[
+  {
+    "from": "302:19069",
+    "to": "302:19519"
+  },
+  {
+    "from": "302:19519",
+    "to": "302:19891"
+  },
+  {
+    "from": "302:19891",
+    "to": "302:20714",
+    "shot": "recovery-current-locked.png"
+  },
+  {
+    "from": "302:20714",
+    "to": "302:21088",
+    "shot": "recovery-current-choose.png"
+  },
+  {
+    "from": "302:21088",
+    "to": "311:23595",
+    "shot": "recovery-current-gallery-picker.png"
+  },
+  {
+    "from": "311:23595",
+    "to": "311:23145",
+    "shot": "recovery-current-gallery-return.png"
+  },
+  {
+    "from": "311:23145",
+    "to": "311:23595",
+    "shot": "recovery-current-gallery-picker.png"
+  },
+  {
+    "from": "311:23595",
+    "to": "311:23967",
+    "shot": "recovery-current-gallery-applied.png"
+  },
+  {
+    "from": "311:23967",
+    "to": "311:23145",
+    "shot": "recovery-current-gallery-return.png"
+  },
+  {
+    "from": "311:23145",
+    "to": "302:3370"
+  }
+]

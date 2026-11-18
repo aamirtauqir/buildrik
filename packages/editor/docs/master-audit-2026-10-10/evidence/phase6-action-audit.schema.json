@@ -1,0 +1,290 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Buildrick Phase6 native action audit",
+  "type": "object",
+  "required": [
+    "fileKey",
+    "pageId",
+    "snapshot",
+    "actions"
+  ],
+  "properties": {
+    "fileKey": {
+      "type": "string"
+    },
+    "pageId": {
+      "type": "string"
+    },
+    "snapshot": {
+      "type": "string"
+    },
+    "actions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/action"
+      }
+    }
+  },
+  "$defs": {
+    "action": {
+      "type": "object",
+      "required": [
+        "actionId",
+        "journeyIds",
+        "sourceFrameId",
+        "controlNodeId",
+        "controlLabel",
+        "owner",
+        "classification",
+        "intent",
+        "context",
+        "verification"
+      ],
+      "properties": {
+        "actionId": {
+          "type": "string"
+        },
+        "journeyIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^J-(0[1-9]|1[0-2])$"
+          }
+        },
+        "sourceFrameId": {
+          "type": "string"
+        },
+        "controlNodeId": {
+          "type": "string"
+        },
+        "controlLabel": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "classification": {
+          "enum": [
+            "wired",
+            "disabled_reason",
+            "simulation_limit",
+            "covered_inert",
+            "pending"
+          ]
+        },
+        "intent": {
+          "type": "string"
+        },
+        "context": {
+          "type": "object",
+          "properties": {
+            "site": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "page": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "selection": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "breakpoint": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "pseudoState": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "callerFrameId": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "targetProperty": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "role": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        },
+        "trigger": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "nativeActions": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "destinationIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "returnDestinationId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "cancelDestinationId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "disabledReason": {
+          "type": "string"
+        },
+        "coveredByNodeId": {
+          "type": "string"
+        },
+        "limitation": {
+          "type": "string"
+        },
+        "limitationVisibleAt": {
+          "type": "string"
+        },
+        "simulatedOutcome": {
+          "type": "string"
+        },
+        "externalEffectExecuted": {
+          "const": false
+        },
+        "verification": {
+          "type": "object",
+          "required": [
+            "level",
+            "result",
+            "evidence"
+          ],
+          "properties": {
+            "level": {
+              "enum": [
+                "unverified",
+                "native_readback",
+                "presentation_traversed",
+                "failed"
+              ]
+            },
+            "result": {
+              "enum": [
+                "pending",
+                "pass",
+                "fail",
+                "limited"
+              ]
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "contextRetained": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "returnChecked": {
+              "type": "boolean"
+            },
+            "cancelChecked": {
+              "type": "boolean"
+            },
+            "notes": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "classification": {
+                "const": "wired"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "trigger",
+              "nativeActions",
+              "destinationIds"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "classification": {
+                "const": "disabled_reason"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "disabledReason"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "classification": {
+                "const": "simulation_limit"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "limitation",
+              "limitationVisibleAt"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "classification": {
+                "const": "covered_inert"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "coveredByNodeId"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

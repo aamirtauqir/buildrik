@@ -1,0 +1,211 @@
+[
+  {
+    "id": "11:2",
+    "name": "R01 · 1024 × 768 / two-row toolbar",
+    "width": 1024,
+    "height": 768,
+    "counts": {
+      "FRAME": 74,
+      "INSTANCE": 73,
+      "TEXT": 47,
+      "VECTOR": 68,
+      "RECTANGLE": 6,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 47
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "11:311",
+    "name": "R02 · 1440 × 600 / short viewport",
+    "width": 1440,
+    "height": 600,
+    "counts": {
+      "FRAME": 128,
+      "INSTANCE": 108,
+      "TEXT": 85,
+      "VECTOR": 92,
+      "RECTANGLE": 13,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 79,
+      "Geist Mono": 6
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "11:870",
+    "name": "R03 · 1920 × 1080 / wide workspace",
+    "width": 1920,
+    "height": 1080,
+    "counts": {
+      "FRAME": 126,
+      "INSTANCE": 106,
+      "TEXT": 87,
+      "VECTOR": 88,
+      "RECTANGLE": 13,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 81,
+      "Geist Mono": 6
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "11:1297",
+    "name": "R04 · 1365 / overlay threshold below",
+    "width": 1365,
+    "height": 768,
+    "counts": {
+      "FRAME": 129,
+      "INSTANCE": 108,
+      "TEXT": 85,
+      "VECTOR": 91,
+      "RECTANGLE": 13,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 79,
+      "Geist Mono": 6
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "11:1866",
+    "name": "R05 · 1367 / docked threshold above",
+    "width": 1367,
+    "height": 768,
+    "counts": {
+      "FRAME": 128,
+      "INSTANCE": 108,
+      "TEXT": 85,
+      "VECTOR": 92,
+      "RECTANGLE": 13,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 79,
+      "Geist Mono": 6
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "11:2299",
+    "name": "R06 · 1280 / People and notifications",
+    "width": 1280,
+    "height": 720,
+    "counts": {
+      "FRAME": 77,
+      "INSTANCE": 82,
+      "TEXT": 51,
+      "VECTOR": 85,
+      "RECTANGLE": 6,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 51
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "15:2450",
+    "name": "T01 · 1440 / docked Review replaces Inspector",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 87,
+      "INSTANCE": 85,
+      "TEXT": 59,
+      "VECTOR": 77,
+      "RECTANGLE": 6,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 59
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "15:3054",
+    "name": "T02 · 1281 / Review overlay",
+    "width": 1281,
+    "height": 768,
+    "counts": {
+      "FRAME": 88,
+      "INSTANCE": 85,
+      "TEXT": 59,
+      "VECTOR": 77,
+      "RECTANGLE": 6,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 59
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "15:8208",
+    "name": "T03 · 1279 / Review sheet",
+    "width": 1279,
+    "height": 768,
+    "counts": {
+      "FRAME": 84,
+      "INSTANCE": 79,
+      "TEXT": 59,
+      "VECTOR": 70,
+      "RECTANGLE": 6,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 59
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "15:8645",
+    "name": "T04 · 1279 / Locate collapses to 48px peek",
+    "width": 1279,
+    "height": 768,
+    "counts": {
+      "FRAME": 75,
+      "INSTANCE": 73,
+      "TEXT": 48,
+      "VECTOR": 68,
+      "RECTANGLE": 6,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 48
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "17:2170",
+    "name": "B2 / geometry and keyboard handoff",
+    "width": 1120,
+    "height": 746,
+    "counts": {
+      "TEXT": 21,
+      "FRAME": 3
+    },
+    "fonts": {
+      "Inter": 21
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  }
+]

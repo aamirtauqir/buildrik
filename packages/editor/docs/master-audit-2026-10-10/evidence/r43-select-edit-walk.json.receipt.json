@@ -1,0 +1,36 @@
+[
+  {
+    "x": 575,
+    "y": 475,
+    "shot": "r43-select-renamed-keeps-value.png",
+    "url": "about:blank",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 865,
+    "y": 675,
+    "shot": "r43-select-renamed-canvas.png",
+    "url": "about:blank",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 475,
+    "y": 96,
+    "shot": "r43-select-renamed-mobile.png",
+    "url": "about:blank",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 1330,
+    "y": 294,
+    "url": "about:blank",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 575,
+    "y": 571,
+    "shot": "r43-select-added-strategy.png",
+    "url": "about:blank",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

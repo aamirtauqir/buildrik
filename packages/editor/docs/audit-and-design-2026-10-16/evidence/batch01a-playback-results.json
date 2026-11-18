@@ -1,0 +1,74 @@
+[
+  {
+    "case": "advanced-entry",
+    "expectedNode": "6-9089",
+    "url": "https://www.figma.com/proto/6yvgev9dRXrSLPluWkjDoz/Buildrick-%E2%80%94-Editor-Improvements-%C2%B7-Existing-Features?node-id=6-9089&starting-point-node-id=6%3A8134&hide-ui=1",
+    "pass": true,
+    "screenshot": "batch01a-playback-advanced-entry.png",
+    "input": "synthetic pointer events"
+  },
+  {
+    "case": "advanced-return",
+    "expectedNode": "6-8134",
+    "url": "https://www.figma.com/proto/6yvgev9dRXrSLPluWkjDoz/Buildrick-%E2%80%94-Editor-Improvements-%C2%B7-Existing-Features?node-id=6-8134&starting-point-node-id=6%3A8134&hide-ui=1",
+    "pass": true,
+    "screenshot": "batch01a-playback-advanced-return.png",
+    "input": "synthetic pointer events"
+  },
+  {
+    "case": "menu-entry",
+    "expectedNode": "6-11085",
+    "url": "https://www.figma.com/proto/6yvgev9dRXrSLPluWkjDoz/Buildrick-%E2%80%94-Editor-Improvements-%C2%B7-Existing-Features?node-id=6-11085&starting-point-node-id=6%3A8134&hide-ui=1",
+    "pass": true,
+    "screenshot": "batch01a-playback-menu-entry.png",
+    "input": "synthetic pointer events"
+  },
+  {
+    "case": "menu-escape",
+    "expectedNode": "6-8134",
+    "url": "https://www.figma.com/proto/6yvgev9dRXrSLPluWkjDoz/Buildrick-%E2%80%94-Editor-Improvements-%C2%B7-Existing-Features?node-id=6-8134&starting-point-node-id=6%3A8134&hide-ui=1",
+    "pass": true,
+    "screenshot": "batch01a-playback-menu-escape.png",
+    "input": "browser keyboard"
+  },
+  {
+    "case": "font-entry",
+    "expectedNode": "6-11581",
+    "url": "https://www.figma.com/proto/6yvgev9dRXrSLPluWkjDoz/Buildrick-%E2%80%94-Editor-Improvements-%C2%B7-Existing-Features?node-id=6-11581&starting-point-node-id=6%3A8134&hide-ui=1",
+    "pass": true,
+    "screenshot": "batch01a-playback-font-entry.png",
+    "input": "synthetic pointer events"
+  },
+  {
+    "case": "font-escape",
+    "expectedNode": "6-8134",
+    "url": "https://www.figma.com/proto/6yvgev9dRXrSLPluWkjDoz/Buildrick-%E2%80%94-Editor-Improvements-%C2%B7-Existing-Features?node-id=6-8134&starting-point-node-id=6%3A8134&hide-ui=1",
+    "pass": true,
+    "screenshot": "batch01a-playback-font-escape.png",
+    "input": "browser keyboard"
+  },
+  {
+    "case": "inline-entry",
+    "expectedNode": "6-10605",
+    "url": "https://www.figma.com/proto/6yvgev9dRXrSLPluWkjDoz/Buildrick-%E2%80%94-Editor-Improvements-%C2%B7-Existing-Features?node-id=6-10605&starting-point-node-id=6%3A8134&hide-ui=1",
+    "pass": true,
+    "screenshot": "batch01a-playback-inline-entry.png",
+    "input": "synthetic pointer events"
+  },
+  {
+    "case": "inline-inner-click",
+    "expectedNode": "6-10605",
+    "url": "https://www.figma.com/proto/6yvgev9dRXrSLPluWkjDoz/Buildrick-%E2%80%94-Editor-Improvements-%C2%B7-Existing-Features?node-id=6-10605&starting-point-node-id=6%3A8134&hide-ui=1",
+    "pass": true,
+    "screenshot": "batch01a-playback-inline-inner-click.png",
+    "input": "synthetic pointer events"
+  },
+  {
+    "case": "inline-escape",
+    "expectedNode": "6-8134",
+    "url": "https://www.figma.com/proto/6yvgev9dRXrSLPluWkjDoz/Buildrick-%E2%80%94-Editor-Improvements-%C2%B7-Existing-Features?node-id=6-8134&starting-point-node-id=6%3A8134&hide-ui=1",
+    "pass": true,
+    "screenshot": "batch01a-playback-inline-escape.png",
+    "input": "browser keyboard"
+  }
+]

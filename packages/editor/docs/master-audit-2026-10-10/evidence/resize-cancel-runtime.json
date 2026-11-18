@@ -1,0 +1,46 @@
+{
+  "method": "Separate preceding color transaction, then actual handle drag cancelled with Escape",
+  "before": {
+    "zoom": 100,
+    "model": {
+      "font-size": "var(--buildrick-design-font-size-4xl)",
+      "font-weight": "700",
+      "line-height": "1.2",
+      "margin-bottom": "var(--buildrick-design-space-5)",
+      "width": "400px",
+      "height": "80px",
+      "color": "rgb(180, 20, 20)"
+    },
+    "computed": {
+      "width": "400px",
+      "height": "80px"
+    },
+    "rect": {
+      "x": 384,
+      "y": 136,
+      "width": 400,
+      "height": 80
+    }
+  },
+  "after": {
+    "zoom": 100,
+    "model": {
+      "font-size": "var(--buildrick-design-font-size-4xl)",
+      "font-weight": "700",
+      "line-height": "1.2",
+      "margin-bottom": "var(--buildrick-design-space-5)",
+      "width": "400px",
+      "height": "80px"
+    },
+    "computed": {
+      "width": "400px",
+      "height": "80px"
+    },
+    "rect": {
+      "x": 384,
+      "y": 136,
+      "width": 400,
+      "height": 80
+    }
+  }
+}

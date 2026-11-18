@@ -1,0 +1,96 @@
+{
+  "date": "2026-10-11T21:27:40.050Z",
+  "scope": "Figma expansion navigation playback only; no external product actions",
+  "steps": [
+    {
+      "from": "I02",
+      "label": "Font size",
+      "to": "I19",
+      "source": "8468:171",
+      "x": 1265,
+      "y": 404,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8480-2729&starting-point-node-id=8465%3A3&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "I19",
+      "label": "Cancel",
+      "to": "I02",
+      "source": "8480:2893",
+      "x": 1265,
+      "y": 577,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-3&starting-point-node-id=8465%3A3&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "I02",
+      "label": "Font size",
+      "to": "I19",
+      "source": "8468:171",
+      "x": 1265,
+      "y": 404,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8480-2729&starting-point-node-id=8465%3A3&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "I19",
+      "label": "Review change",
+      "to": "I15",
+      "source": "8480:2890",
+      "x": 1265,
+      "y": 533,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-16&starting-point-node-id=8465%3A3&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "I15",
+      "label": "Apply class change",
+      "to": "I17",
+      "source": "8468:245600",
+      "x": 1265,
+      "y": 567,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-18&starting-point-node-id=8465%3A3&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "I04",
+      "label": "Columns",
+      "to": "I12",
+      "source": "8468:461",
+      "x": 1265,
+      "y": 316,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-13&starting-point-node-id=8465%3A5&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "I12",
+      "label": "Undo columns",
+      "to": "I04",
+      "source": "8468:245243",
+      "x": 1265,
+      "y": 423,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-5&starting-point-node-id=8465%3A5&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "A05",
+      "label": "Continue editing",
+      "to": "I18",
+      "source": "8468:246243",
+      "x": 1265,
+      "y": 460,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8472-2670&starting-point-node-id=8465%3A23&hide-ui=1",
+      "pass": true
+    },
+    {
+      "from": "I18",
+      "label": "Undo AI text change",
+      "to": "I02",
+      "source": "8472:2822",
+      "x": 1265,
+      "y": 685,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-3&starting-point-node-id=8465%3A23&hide-ui=1",
+      "pass": true
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+[
+  {
+    "name": "Initial focus Cancel",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "Backward Tab reaches code",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "Code Enter does not approve",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "Approval reachable",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "Forward Tab wraps",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "Backward Tab wraps",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "Escape restores opener and code",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "Receipt focuses Return",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "Receipt Escape retains approved state",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "incorrect no approval, code retained",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "incorrect in-dialog assertive message",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "Incorrect focuses invalid field",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "incorrect returns opener",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "expired no approval, code retained",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "expired in-dialog assertive message",
+    "pass": true,
+    "actual": "true"
+  },
+  {
+    "name": "Expired focuses resend",
+    "pass": false,
+    "actual": "false"
+  }
+]

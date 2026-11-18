@@ -1,0 +1,236 @@
+[
+  {
+    "id": "7:18654",
+    "name": "J-F1.01 · Open existing Home",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 92,
+      "INSTANCE": 92,
+      "TEXT": 62,
+      "VECTOR": 80,
+      "RECTANGLE": 4,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 62
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "7:18981",
+    "name": "J-F1.02 · Add / target Hero",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 86,
+      "INSTANCE": 91,
+      "TEXT": 70,
+      "VECTOR": 82,
+      "RECTANGLE": 4,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 70
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "7:19448",
+    "name": "J-F1.03 · Text inserted / receipt",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 93,
+      "INSTANCE": 91,
+      "TEXT": 74,
+      "VECTOR": 84,
+      "RECTANGLE": 8,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 74
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "7:19791",
+    "name": "J-F1.04 · Select Text in Layers",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 100,
+      "INSTANCE": 95,
+      "TEXT": 65,
+      "VECTOR": 86,
+      "RECTANGLE": 8,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 65
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "7:20283",
+    "name": "J-F1.05 · Edit content",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 100,
+      "INSTANCE": 95,
+      "TEXT": 65,
+      "VECTOR": 86,
+      "RECTANGLE": 8,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 65
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "7:20634",
+    "name": "J-F1.06 · Style / Desktop 24px",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 128,
+      "INSTANCE": 108,
+      "TEXT": 85,
+      "VECTOR": 92,
+      "RECTANGLE": 13,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 79,
+      "Geist Mono": 6
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "8:1282",
+    "name": "J-F1.07 · Tablet / inherited 24px",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 128,
+      "INSTANCE": 108,
+      "TEXT": 85,
+      "VECTOR": 92,
+      "RECTANGLE": 13,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 79,
+      "Geist Mono": 6
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "8:1705",
+    "name": "J-F1.08 · Tablet / override 20px",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 128,
+      "INSTANCE": 109,
+      "TEXT": 87,
+      "VECTOR": 92,
+      "RECTANGLE": 13,
+      "ELLIPSE": 2
+    },
+    "fonts": {
+      "Inter": 81,
+      "Geist Mono": 6
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "8:2272",
+    "name": "J-F1.09 · Remove override / fallback 24px",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 128,
+      "INSTANCE": 108,
+      "TEXT": 85,
+      "VECTOR": 92,
+      "RECTANGLE": 13,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 79,
+      "Geist Mono": 6
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "8:2695",
+    "name": "J-F1.10 · Undo removal / restored 20px",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 128,
+      "INSTANCE": 109,
+      "TEXT": 87,
+      "VECTOR": 92,
+      "RECTANGLE": 13,
+      "ELLIPSE": 2
+    },
+    "fonts": {
+      "Inter": 81,
+      "Geist Mono": 6
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "8:3262",
+    "name": "J-F1.11 · Preview / current Tablet",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 13,
+      "INSTANCE": 4,
+      "TEXT": 14,
+      "VECTOR": 3,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 13,
+      "Geist Mono": 1
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  },
+  {
+    "id": "8:3298",
+    "name": "J-F1.12 · Return / same context",
+    "width": 1440,
+    "height": 900,
+    "counts": {
+      "FRAME": 128,
+      "INSTANCE": 108,
+      "TEXT": 85,
+      "VECTOR": 92,
+      "RECTANGLE": 13,
+      "ELLIPSE": 1
+    },
+    "fonts": {
+      "Inter": 79,
+      "Geist Mono": 6
+    },
+    "imageFilledNodes": [],
+    "horizontalOverflow": []
+  }
+]

@@ -1,0 +1,10 @@
+{
+  "note": "Existing changes before master-prompt read-only phase; not new approval or baseline behavior. Do not revert unrelated work.",
+  "files": {
+    "packages/editor/src/editor/canvas/menus/ElementContextMenu.tsx": "574dc562adcb899bf6f12328687d74aa795bd3cbde9442707a7d0491132ec440",
+    "packages/editor/src/editor/canvas/menus/MenuItem.tsx": "a42d0993fa8b2780de3e59cceb20692d558e9affaa5fd33dd92237363fc4e0ba",
+    "packages/editor/src/editor/canvas/menus/SubmenuItem.tsx": "aa038b707613b3f167191f20d428b2cf1d3a74875d471367a498a4199bff3e48",
+    "packages/editor/src/editor/canvas/menus/SubmenuPanel.tsx": "59b593de4d5b772df7872fe0625ca1b49ab7cc8af22fcd6a0ad7488f07bd9163",
+    "packages/editor/src/editor/canvas/menus/__tests__/ElementContextMenu.overlay.test.tsx": "be3b18ca409d43d5cf4c61f36419a8a4632ae483d0ddc874c012cad1e70ac136"
+  }
+}

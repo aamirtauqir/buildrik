@@ -1,0 +1,1306 @@
+[
+  {
+    "n": 1,
+    "id": "7993:198599",
+    "name": "01 \u00b7 Heading \u00b7 S",
+    "w": 1440,
+    "h": 900,
+    "caption": "7993:198931",
+    "inspector": {
+      "id": "7993:198767",
+      "width": 300,
+      "height": 812,
+      "content": [
+        {
+          "name": "Header",
+          "y": 0,
+          "h": 80
+        },
+        {
+          "name": "Tabs",
+          "y": 80,
+          "h": 32
+        },
+        {
+          "name": "Style context",
+          "y": 112,
+          "h": 32
+        },
+        {
+          "name": "Scrollable sections",
+          "y": 144,
+          "h": 674
+        }
+      ]
+    },
+    "instances": 87
+  },
+  {
+    "n": 2,
+    "id": "7993:198958",
+    "name": "02 \u00b7 Heading \u00b7 B",
+    "w": 1440,
+    "h": 900,
+    "caption": "7993:199216",
+    "inspector": {
+      "id": "7993:199126",
+      "width": 300,
+      "height": 812,
+      "content": [
+        {
+          "name": "Header",
+          "y": 0,
+          "h": 80
+        },
+        {
+          "name": "Tabs",
+          "y": 80,
+          "h": 32
+        },
+        {
+          "name": "Scrollable sections",
+          "y": 112,
+          "h": 392
+        }
+      ]
+    },
+    "instances": 67
+  },
+  {
+    "n": 3,
+    "id": "7993:199242",
+    "name": "03 \u00b7 Heading \u00b7 E",
+    "w": 1440,
+    "h": 900,
+    "caption": "7993:199465",
+    "inspector": {
+      "id": "7993:199410",
+      "width": 300,
+      "height": 812,
+      "content": [
+        {
+          "name": "Header",
+          "y": 0,
+          "h": 80
+        },
+        {
+          "name": "Tabs",
+          "y": 80,
+          "h": 32
+        },
+        {
+          "name": "Style context",
+          "y": 112,
+          "h": 32
+        },
+        {
+          "name": "Scrollable sections",
+          "y": 144,
+          "h": 196
+        }
+      ]
+    },
+    "instances": 56
+  },
+  {
+    "n": 4,
+    "id": "7995:199188",
+    "name": "04 \u00b7 Text \u00b7 S",
+    "w": 1440,
+    "h": 900,
+    "caption": "7995:199496",
+    "inspector": {
+      "id": "7995:199356",
+      "width": 300,
+      "height": 812,
+      "content": [
+        {
+          "name": "Header",
+          "y": 0,
+          "h": 72
+        },
+        {
+          "name": "Tabs",
+          "y": 72,
+          "h": 32
+        },
+        {
+          "name": "Style context",
+          "y": 104,
+          "h": 36
+        },
+        {
+          "name": "Scrollable sections",
+          "y": 140,
+          "h": 588
+        }
+      ]
+    },
+    "instances": 88
+  },
+  {
+    "n": 5,
+    "id": "7995:199522",
+    "name": "05 \u00b7 Button \u00b7 S",
+    "w": 1440,
+    "h": 900,
+    "caption": "7995:199794",
+    "inspector": {
+      "id": "7995:199690",
+      "width": 300,
+      "height": 812,
+      "content": [
+        {
+          "name": "Header",
+          "y": 0,
+          "h": 72
+        },
+        {
+          "name": "Tabs",
+          "y": 72,
+          "h": 32
+        },
+        {
+          "name": "Style context",
+          "y": 104,
+          "h": 36
+        },
+        {
+          "name": "Scrollable sections",
+          "y": 140,
+          "h": 460
+        }
+      ]
+    },
+    "instances": 74
+  },
+  {
+    "n": 6,
+    "id": "7995:199820",
+    "name": "06 \u00b7 Button \u00b7 B",
+    "w": 1440,
+    "h": 900,
+    "caption": "7995:200111",
+    "inspector": {
+      "id": "7995:199988",
+      "width": 300,
+      "height": 812,
+      "content": [
+        {
+          "name": "Header",
+          "y": 0,
+          "h": 72
+        },
+        {
+          "name": "Tabs",
+          "y": 72,
+          "h": 32
+        },
+        {
+          "name": "Scrollable sections",
+          "y": 104,
+          "h": 560
+        }
+      ]
+    },
+    "instances": 83
+  },
+  {
+    "n": 7,
+    "id": "7995:200137",
+    "name": "07 \u00b7 Link \u00b7 B",
+    "w": 1440,
+    "h": 900,
+    "caption": "7995:200426",
+    "inspector": {
+      "id": "7995:200305",
+      "width": 300,
+      "height": 812,
+      "content": [
+        {
+          "name": "Header",
+          "y": 0,
+          "h": 72
+        },
+        {
+          "name": "Tabs",
+          "y": 72,
+          "h": 32
+        },
+        {
+          "name": "Scrollable sections",
+          "y": 104,
+          "h": 560
+        }
+      ]
+    },
+    "instances": 82
+  },
+  {
+    "n": 8,
+    "id": "7995:200452",
+    "name": "08 \u00b7 Image \u00b7 S",
+    "w": 1440,
+    "h": 900,
+    "caption": "7995:200741",
+    "inspector": {
+      "id": "7995:200620",
+      "width": 300,
+      "height": 812,
+      "content": [
+        {
+          "name": "Header",
+          "y": 0,
+          "h": 72
+        },
+        {
+          "name": "Tabs",
+          "y": 72,
+          "h": 32
+        },
+        {
+          "name": "Style context",
+          "y": 104,
+          "h": 36
+        },
+        {
+          "name": "Scrollable sections",
+          "y": 140,
+          "h": 596
+        }
+      ]
+    },
+    "instances": 78
+  },
+  {
+    "n": 9,
+    "id": "7995:200767",
+    "name": "09 \u00b7 Video embed \u00b7 S",
+    "w": 1440,
+    "h": 900,
+    "caption": "7995:201054",
+    "inspector": {
+      "id": "7995:200935",
+      "width": 300,
+      "height": 812,
+      "content": [
+        {
+          "name": "Header",
+          "y": 0,
+          "h": 72
+        },
+        {
+          "name": "Tabs",
+          "y": 72,
+          "h": 32
+        },
+        {
+          "name": "Style context",
+          "y": 104,
+          "h": 36
+        },
+        {
+          "name": "Scrollable sections",
+          "y": 140,
+          "h": 580
+        }
+      ]
+    },
+    "instances": 77
+  },
+  {
+    "n": 10,
+    "id": "7995:201080",
+    "name": "10 \u00b7 Audio \u00b7 S",
+    "w": 1440,
+    "h": 900,
+    "caption": "7995:201354",
+    "inspector": {
+      "id": "7995:201248",
+      "width": 300,
+      "height": 812,
+      "content": [
+        {
+          "name": "Header",
+          "y": 0,
+          "h": 72
+        },
+        {
+          "name": "Tabs",
+          "y": 72,
+          "h": 32
+        },
+        {
+          "name": "Style context",
+          "y": 104,
+          "h": 36
+        },
+        {
+          "name": "Scrollable sections",
+          "y": 140,
+          "h": 508
+        }
+      ]
+    },
+    "instances": 73
+  },
+  {
+    "n": 11,
+    "id": "7995:201380",
+    "name": "11 \u00b7 Countdown \u00b7 S",
+    "w": 1440,
+    "h": 900,
+    "caption": "7995:201652",
+    "inspector": {
+      "id": "7995:201548",
+      "width": 300,
+      "height": 812,
+      "content": [
+        {
+          "name": "Header",
+          "y": 0,
+          "h": 72
+        },
+        {
+          "name": "Tabs",
+          "y": 72,
+          "h": 32
+        },
+        {
+          "name": "Style context",
+          "y": 104,
+          "h": 36
+        },
+        {
+          "name": "Scrollable sections",
+          "y": 140,
+          "h": 460
+        }
+      ]
+    },
+    "instances": 76
+  },
+  {
+    "n": 12,
+    "id": "7995:201678",
+    "name": "12 \u00b7 Progress \u00b7 S",
+    "w": 1440,
+    "h": 900,
+    "caption": "7995:201945",
+    "inspector": {
+      "id": "7995:201846",
+      "width": 300,
+      "height": 812,
+      "content": [
+        {
+          "name": "Header",
+          "y": 0,
+          "h": 72
+        },
+        {
+          "name": "Tabs",
+          "y": 72,
+          "h": 32
+        },
+        {
+          "name": "Style context",
+          "y": 104,
+          "h": 36
+        },
+        {
+          "name": "Scrollable sections",
+          "y": 140,
+          "h": 396
+        }
+      ]
+    },
+    "instances": 73
+  },
+  {
+    "n": 13,
+    "id": "7995:201971",
+    "name": "13 \u00b7 Accordion \u00b7 S",
+    "w": 1440,
+    "h": 900,
+    "caption": "7995:202248",
+    "inspector": {
+      "id": "7995:202139",
+      "width": 300,
+      "height": 812,
+      "content": [
+        {
+          "name": "Header",
+          "y": 0,
+          "h": 72
+        },
+        {
+          "name": "Tabs",
+          "y": 72,
+          "h": 32
+        },
+        {
+          "name": "Style context",
+          "y": 104,
+          "h": 36
+        },
+        {
+          "name": "Scrollable sections",
+          "y": 140,
+          "h": 452
+        }
+      ]
+    },
+    "instances": 79
+  },
+  {
+    "n": 14,
+    "id": "7995:202274",
+    "name": "14 \u00b7 Input \u00b7 S",
+    "w": 1440,
+    "h": 900,
+    "caption": "7995:202557",
+    "inspector": {
+      "id": "7995:202442",
+      "width": 300,
+      "height": 812,
+      "content": [
+        {
+          "name": "Header",
+          "y": 0,
+          "h": 72
+        },
+        {
+          "name": "Tabs",
+          "y": 72,
+          "h": 32
+        },
+        {
+          "name": "Style context",
+          "y": 104,
+          "h": 36
+        },
+        {
+          "name": "Scrollable sections",
+          "y": 140,
+          "h": 504
+        }
+      ]
+    },
+    "instances": 80
+  },
+  {
+    "n": 15,
+    "id": "7995:202583",
+    "name": "15 \u00b7 Checkbox \u00b7 S",
+    "w": 1440,
+    "h": 900,
+    "caption": "7995:202851",
+    "inspector": {
+      "id": "7995:202751",
+      "width": 300,
+      "height": 812,
+      "content": [
+        {
+          "name": "Header",
+          "y": 0,
+          "h": 72
+        },
+        {
+          "name": "Tabs",
+          "y": 72,
+          "h": 32
+        },
+        {
+          "name": "Style context",
+          "y": 104,
+          "h": 36
+        },
+        {
+          "name": "Scrollable sections",
+          "y": 140,
+          "h": 456
+        }
+      ]
+    },
+    "instances": 74
+  },
+  {
+    "n": 16,
+    "id": "7995:202877",
+    "name": "16 \u00b7 Flex \u00b7 S",
+    "w": 1440,
+    "h": 900,
+    "caption": "7995:203182",
+    "inspector": {
+      "id": "7995:203045",
+      "width": 300,
+      "height": 812,
+      "content": [
+        {
+          "name": "Header",
+          "y": 0,
+          "h": 72
+        },
+        {
+          "name": "Tabs",
+          "y": 72,
+          "h": 32
+        },
+        {
+          "name": "Style context",
+          "y": 104,
+          "h": 36
+        },
+        {
+          "name": "Scrollable sections",
+          "y": 140,
+          "h": 552
+        }
+      ]
+    },
+    "instances": 83
+  },
+  {
+    "n": 17,
+    "id": "7995:203208",
+    "name": "17 \u00b7 Container (grid) \u00b7 S",
+    "w": 1440,
+    "h": 900,
+    "caption": "7995:203497",
+    "inspector": {
+      "id": "7995:203376",
+      "width": 300,
+      "height": 812,
+      "content": [
+        {
+          "name": "Header",
+          "y": 0,
+          "h": 72
+        },
+        {
+          "name": "Tabs",
+          "y": 72,
+          "h": 32
+        },
+        {
+          "name": "Style context",
+          "y": 104,
+          "h": 36
+        },
+        {
+          "name": "Scrollable sections",
+          "y": 140,
+          "h": 520
+        }
+      ]
+    },
+    "instances": 80
+  },
+  {
+    "n": 18,
+    "id": "7995:203523",
+    "name": "18 \u00b7 Section \u00b7 B",
+    "w": 1440,
+    "h": 900,
+    "caption": "7995:203803",
+    "inspector": {
+      "id": "7995:203691",
+      "width": 300,
+      "height": 812,
+      "content": [
+        {
+          "name": "Header",
+          "y": 0,
+          "h": 72
+        },
+        {
+          "name": "Tabs",
+          "y": 72,
+          "h": 32
+        },
+        {
+          "name": "Scrollable sections",
+          "y": 104,
+          "h": 492
+        }
+      ]
+    },
+    "instances": 80
+  },
+  {
+    "n": 19,
+    "id": "7995:203829",
+    "name": "19 \u00b7 Form \u00b7 B",
+    "w": 1440,
+    "h": 900,
+    "caption": "7995:204121",
+    "inspector": {
+      "id": "7995:203997",
+      "width": 300,
+      "height": 812,
+      "content": [
+        {
+          "name": "Header",
+          "y": 0,
+          "h": 72
+        },
+        {
+          "name": "Tabs",
+          "y": 72,
+          "h": 32
+        },
+        {
+          "name": "Scrollable sections",
+          "y": 104,
+          "h": 660
+        }
+      ]
+    },
+    "instances": 83
+  },
+  {
+    "n": 20,
+    "id": "7995:204147",
+    "name": "20 \u00b7 Collection list \u00b7 B",
+    "w": 1440,
+    "h": 900,
+    "caption": "7995:204421",
+    "inspector": {
+      "id": "7995:204315",
+      "width": 300,
+      "height": 812,
+      "content": [
+        {
+          "name": "Header",
+          "y": 0,
+          "h": 72
+        },
+        {
+          "name": "Tabs",
+          "y": 72,
+          "h": 32
+        },
+        {
+          "name": "Scrollable sections",
+          "y": 104,
+          "h": 480
+        }
+      ]
+    },
+    "instances": 78
+  },
+  {
+    "n": 21,
+    "id": "7995:204447",
+    "name": "21 \u00b7 Nothing selected \u2014 Page panel",
+    "w": 1440,
+    "h": 900,
+    "caption": "7995:204689",
+    "inspector": {
+      "id": "7995:204613",
+      "width": 300,
+      "height": 812,
+      "content": [
+        {
+          "name": "Header",
+          "y": 0,
+          "h": 72
+        },
+        {
+          "name": "Section / Fill / open",
+          "y": 72,
+          "h": 32
+        },
+        {
+          "name": "Field / Background",
+          "y": 104,
+          "h": 28
+        },
+        {
+          "name": "Section / Size / open",
+          "y": 132,
+          "h": 32
+        },
+        {
+          "name": "Field / Max width",
+          "y": 164,
+          "h": 28
+        },
+        {
+          "name": "Section / Typography / open",
+          "y": 192,
+          "h": 32
+        },
+        {
+          "name": "Field / Font",
+          "y": 224,
+          "h": 28
+        },
+        {
+          "name": "Field / Text colour",
+          "y": 252,
+          "h": 28
+        },
+        {
+          "name": "Section / Spacing / open",
+          "y": 280,
+          "h": 32
+        },
+        {
+          "name": "Spacing box diagram",
+          "y": 312,
+          "h": 128
+        },
+        {
+          "name": "Action row",
+          "y": 440,
+          "h": 36
+        },
+        {
+          "name": "Note / Your place here is kept",
+          "y": 476,
+          "h": 32
+        }
+      ]
+    },
+    "instances": 66
+  },
+  {
+    "n": 22,
+    "id": "7995:204715",
+    "name": "22 \u00b7 Multi-select (3 headings)",
+    "w": 1440,
+    "h": 900,
+    "caption": "7995:205082",
+    "inspector": {
+      "id": "7995:204885",
+      "width": 300,
+      "height": 812,
+      "content": [
+        {
+          "name": "Header",
+          "y": 0,
+          "h": 72
+        },
+        {
+          "name": "Segmented / Align",
+          "y": 72,
+          "h": 56
+        },
+        {
+          "name": "Segmented / Distribute",
+          "y": 128,
+          "h": 56
+        },
+        {
+          "name": "Action row",
+          "y": 184,
+          "h": 36
+        },
+        {
+          "name": "Note / Edits apply to all 3. One Undo r",
+          "y": 220,
+          "h": 32
+        },
+        {
+          "name": "Tabs",
+          "y": 252,
+          "h": 32
+        },
+        {
+          "name": "Style context",
+          "y": 284,
+          "h": 36
+        },
+        {
+          "name": "Scrollable sections",
+          "y": 320,
+          "h": 644
+        }
+      ]
+    },
+    "instances": 103
+  },
+  {
+    "n": 23,
+    "id": "7995:205108",
+    "name": "23 \u00b7 Locked element",
+    "w": 1440,
+    "h": 900,
+    "caption": "7995:205441",
+    "inspector": {
+      "id": "7995:205276",
+      "width": 300,
+      "height": 812,
+      "content": [
+        {
+          "name": "Header",
+          "y": 0,
+          "h": 72
+        },
+        {
+          "name": "Note / Locked",
+          "y": 72,
+          "h": 32
+        },
+        {
+          "name": "Note / Locked \u2014 unlock to edit \u00b7 Unlock",
+          "y": 104,
+          "h": 32
+        },
+        {
+          "name": "Tabs",
+          "y": 136,
+          "h": 32
+        },
+        {
+          "name": "Style context",
+          "y": 168,
+          "h": 36
+        },
+        {
+          "name": "Scrollable sections",
+          "y": 204,
+          "h": 644
+        }
+      ]
+    },
+    "instances": 94
+  },
+  {
+    "n": 24,
+    "id": "7995:205467",
+    "name": "24 \u00b7 CMS-bound heading \u00b7 B",
+    "w": 1440,
+    "h": 900,
+    "caption": "7995:205761",
+    "inspector": {
+      "id": "7995:205635",
+      "width": 300,
+      "height": 812,
+      "content": [
+        {
+          "name": "Header",
+          "y": 0,
+          "h": 72
+        },
+        {
+          "name": "Note / \u2301 Menu.name",
+          "y": 72,
+          "h": 32
+        },
+        {
+          "name": "Tabs",
+          "y": 104,
+          "h": 32
+        },
+        {
+          "name": "Scrollable sections",
+          "y": 136,
+          "h": 616
+        }
+      ]
+    },
+    "instances": 82
+  },
+  {
+    "n": 25,
+    "id": "7995:205787",
+    "name": "25 \u00b7 CMS source missing \u00b7 B",
+    "w": 1440,
+    "h": 900,
+    "caption": "7995:206061",
+    "inspector": {
+      "id": "7995:205955",
+      "width": 300,
+      "height": 812,
+      "content": [
+        {
+          "name": "Header",
+          "y": 0,
+          "h": 72
+        },
+        {
+          "name": "Note / \u2301 Specials.title \u00b7 missing",
+          "y": 72,
+          "h": 32
+        },
+        {
+          "name": "Tabs",
+          "y": 104,
+          "h": 32
+        },
+        {
+          "name": "Scrollable sections",
+          "y": 136,
+          "h": 524
+        }
+      ]
+    },
+    "instances": 75
+  },
+  {
+    "n": 26,
+    "id": "7995:206087",
+    "name": "26 \u00b7 Component instance \u00b7 S",
+    "w": 1440,
+    "h": 900,
+    "caption": "7995:206364",
+    "inspector": {
+      "id": "7995:206255",
+      "width": 300,
+      "height": 812,
+      "content": [
+        {
+          "name": "Header",
+          "y": 0,
+          "h": 72
+        },
+        {
+          "name": "Note / \u25c6 Component: Reservation banner",
+          "y": 72,
+          "h": 32
+        },
+        {
+          "name": "Tabs",
+          "y": 104,
+          "h": 32
+        },
+        {
+          "name": "Style context",
+          "y": 136,
+          "h": 36
+        },
+        {
+          "name": "Scrollable sections",
+          "y": 172,
+          "h": 500
+        }
+      ]
+    },
+    "instances": 76
+  },
+  {
+    "n": 27,
+    "id": "7995:206390",
+    "name": "27 \u00b7 Button :hover \u00b7 S",
+    "w": 1440,
+    "h": 900,
+    "caption": "7995:206672",
+    "inspector": {
+      "id": "7995:206558",
+      "width": 300,
+      "height": 812,
+      "content": [
+        {
+          "name": "Header",
+          "y": 0,
+          "h": 72
+        },
+        {
+          "name": "Tabs",
+          "y": 72,
+          "h": 32
+        },
+        {
+          "name": "Style context",
+          "y": 104,
+          "h": 36
+        },
+        {
+          "name": "Note / 1 :hover override \u00b7 Reset",
+          "y": 140,
+          "h": 32
+        },
+        {
+          "name": "Scrollable sections",
+          "y": 172,
+          "h": 520
+        }
+      ]
+    },
+    "instances": 76
+  },
+  {
+    "n": 28,
+    "id": "7995:207832",
+    "name": "28 \u00b7 Heading on Tablet \u00b7 S",
+    "w": 1440,
+    "h": 900,
+    "caption": "7995:208172",
+    "inspector": {
+      "id": "7995:208000",
+      "width": 300,
+      "height": 812,
+      "content": [
+        {
+          "name": "Header",
+          "y": 0,
+          "h": 72
+        },
+        {
+          "name": "Tabs",
+          "y": 72,
+          "h": 32
+        },
+        {
+          "name": "Style context",
+          "y": 104,
+          "h": 36
+        },
+        {
+          "name": "Note / Tablet \u00b7 Revert",
+          "y": 140,
+          "h": 32
+        },
+        {
+          "name": "Scrollable sections",
+          "y": 172,
+          "h": 676
+        }
+      ]
+    },
+    "instances": 96
+  },
+  {
+    "n": 29,
+    "id": "7995:208198",
+    "name": "29 \u00b7 Save conflict",
+    "w": 1440,
+    "h": 900,
+    "caption": "7995:208529",
+    "inspector": {
+      "id": "7995:208366",
+      "width": 300,
+      "height": 812,
+      "content": [
+        {
+          "name": "Header",
+          "y": 0,
+          "h": 72
+        },
+        {
+          "name": "Note / This site changed elsewhere \u2014 re",
+          "y": 72,
+          "h": 48
+        },
+        {
+          "name": "Tabs",
+          "y": 120,
+          "h": 32
+        },
+        {
+          "name": "Style context",
+          "y": 152,
+          "h": 36
+        },
+        {
+          "name": "Scrollable sections",
+          "y": 188,
+          "h": 644
+        }
+      ]
+    },
+    "instances": 94
+  },
+  {
+    "n": 30,
+    "id": "7995:208555",
+    "name": "30 \u00b7 \u22ef menu",
+    "w": 1440,
+    "h": 900,
+    "caption": "7995:209000",
+    "inspector": {
+      "id": "7995:208723",
+      "width": 300,
+      "height": 812,
+      "content": [
+        {
+          "name": "Header",
+          "y": 0,
+          "h": 72
+        },
+        {
+          "name": "Tabs",
+          "y": 72,
+          "h": 32
+        },
+        {
+          "name": "Style context",
+          "y": 104,
+          "h": 36
+        },
+        {
+          "name": "Scrollable sections",
+          "y": 140,
+          "h": 644
+        }
+      ]
+    },
+    "instances": 102
+  },
+  {
+    "n": 31,
+    "id": "7995:209026",
+    "name": "31 \u00b7 Apply-to-all dialog",
+    "w": 1440,
+    "h": 900,
+    "caption": "7995:209373",
+    "inspector": {
+      "id": "7995:209194",
+      "width": 300,
+      "height": 812,
+      "content": [
+        {
+          "name": "Header",
+          "y": 0,
+          "h": 72
+        },
+        {
+          "name": "Tabs",
+          "y": 72,
+          "h": 32
+        },
+        {
+          "name": "Style context",
+          "y": 104,
+          "h": 36
+        },
+        {
+          "name": "Scrollable sections",
+          "y": 140,
+          "h": 644
+        }
+      ]
+    },
+    "instances": 96
+  },
+  {
+    "n": 32,
+    "id": "7995:209399",
+    "name": "32 \u00b7 State menu",
+    "w": 1440,
+    "h": 900,
+    "caption": "7995:209745",
+    "inspector": {
+      "id": "7995:209567",
+      "width": 300,
+      "height": 812,
+      "content": [
+        {
+          "name": "Header",
+          "y": 0,
+          "h": 72
+        },
+        {
+          "name": "Tabs",
+          "y": 72,
+          "h": 32
+        },
+        {
+          "name": "Style context",
+          "y": 104,
+          "h": 36
+        },
+        {
+          "name": "Scrollable sections",
+          "y": 140,
+          "h": 644
+        }
+      ]
+    },
+    "instances": 99
+  },
+  {
+    "n": 33,
+    "id": "7995:209771",
+    "name": "33 \u00b7 Colour / token popover",
+    "w": 1440,
+    "h": 900,
+    "caption": "7995:210120",
+    "inspector": {
+      "id": "7995:209939",
+      "width": 300,
+      "height": 812,
+      "content": [
+        {
+          "name": "Header",
+          "y": 0,
+          "h": 72
+        },
+        {
+          "name": "Tabs",
+          "y": 72,
+          "h": 32
+        },
+        {
+          "name": "Style context",
+          "y": 104,
+          "h": 36
+        },
+        {
+          "name": "Scrollable sections",
+          "y": 140,
+          "h": 644
+        }
+      ]
+    },
+    "instances": 98
+  },
+  {
+    "n": 34,
+    "id": "7995:210146",
+    "name": "34 \u00b7 Field error",
+    "w": 1440,
+    "h": 900,
+    "caption": "7995:210477",
+    "inspector": {
+      "id": "7995:210314",
+      "width": 300,
+      "height": 812,
+      "content": [
+        {
+          "name": "Header",
+          "y": 0,
+          "h": 72
+        },
+        {
+          "name": "Tabs",
+          "y": 72,
+          "h": 32
+        },
+        {
+          "name": "Style context",
+          "y": 104,
+          "h": 36
+        },
+        {
+          "name": "Scrollable sections",
+          "y": 140,
+          "h": 676
+        }
+      ]
+    },
+    "instances": 94
+  },
+  {
+    "n": 35,
+    "id": "7995:210503",
+    "name": "35 \u00b7 AI column",
+    "w": 1440,
+    "h": 900,
+    "caption": "7995:210691",
+    "inspector": null,
+    "instances": 52
+  },
+  {
+    "n": 36,
+    "id": "7995:210717",
+    "name": "36 \u00b7 Inspector hidden",
+    "w": 1440,
+    "h": 900,
+    "caption": "7995:210891",
+    "inspector": null,
+    "instances": 49
+  }
+]

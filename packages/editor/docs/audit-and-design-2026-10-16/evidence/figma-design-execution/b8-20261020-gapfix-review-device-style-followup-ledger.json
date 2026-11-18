@@ -1,0 +1,2005 @@
+{
+  "master": "4:253",
+  "panelVariable": "VariableID:3:17",
+  "changed": [
+    {
+      "root": "280:70080",
+      "id": "280:70137",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:70169",
+      "id": "280:70223",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:70255",
+      "id": "280:70303",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:70335",
+      "id": "280:70375",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:70392",
+      "id": "280:70423",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:70440",
+      "id": "280:70494",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:70526",
+      "id": "280:70577",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:70609",
+      "id": "280:70656",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:70688",
+      "id": "280:70735",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:70767",
+      "id": "280:70817",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:70849",
+      "id": "280:70898",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:70930",
+      "id": "280:70977",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:71009",
+      "id": "280:71060",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:71092",
+      "id": "280:71142",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:71247",
+      "id": "280:71305",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:71336",
+      "id": "280:71391",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:71422",
+      "id": "280:71471",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:71502",
+      "id": "280:71543",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:71559",
+      "id": "280:71591",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:71607",
+      "id": "280:71662",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:71693",
+      "id": "280:71745",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:71776",
+      "id": "280:71824",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:71855",
+      "id": "280:71903",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:71934",
+      "id": "280:71985",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:72016",
+      "id": "280:72066",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:72097",
+      "id": "280:72145",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:72176",
+      "id": "280:72228",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:72259",
+      "id": "280:72310",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:72414",
+      "id": "280:72471",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:72505",
+      "id": "280:72559",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:72593",
+      "id": "280:72641",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:72675",
+      "id": "280:72715",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:72734",
+      "id": "280:72765",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:72784",
+      "id": "280:72838",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:72872",
+      "id": "280:72923",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:72957",
+      "id": "280:73004",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:73038",
+      "id": "280:73085",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:73119",
+      "id": "280:73169",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:73203",
+      "id": "280:73252",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:73286",
+      "id": "280:73333",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:73367",
+      "id": "280:73418",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:73452",
+      "id": "280:73502",
+      "name": "Tablet",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:74750",
+      "id": "280:74808",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:74839",
+      "id": "280:74894",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:74925",
+      "id": "280:74974",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:75005",
+      "id": "280:75046",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:75062",
+      "id": "280:75094",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:75110",
+      "id": "280:75165",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:75196",
+      "id": "280:75248",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:75279",
+      "id": "280:75327",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:75358",
+      "id": "280:75406",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:75437",
+      "id": "280:75488",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:75519",
+      "id": "280:75569",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:75600",
+      "id": "280:75648",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:75679",
+      "id": "280:75731",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "280:75762",
+      "id": "280:75813",
+      "name": "Mobile",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:3:17"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "selected": [
+    {
+      "root": "276:29206",
+      "id": "276:29215",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:29254",
+      "id": "276:29263",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:29300",
+      "id": "276:29309",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:29338",
+      "id": "276:29347",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:29371",
+      "id": "276:29380",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:29404",
+      "id": "276:29413",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:29453",
+      "id": "276:29462",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:29496",
+      "id": "276:29505",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:29533",
+      "id": "276:29542",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:29573",
+      "id": "276:29582",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:29616",
+      "id": "276:29625",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:29658",
+      "id": "276:29667",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:29698",
+      "id": "276:29707",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:29742",
+      "id": "276:29751",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:29801",
+      "id": "276:29810",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:29852",
+      "id": "276:29859",
+      "name": "Desktop"
+    },
+    {
+      "root": "276:29893",
+      "id": "276:29900",
+      "name": "Desktop"
+    },
+    {
+      "root": "276:29945",
+      "id": "276:29952",
+      "name": "Desktop"
+    },
+    {
+      "root": "276:29997",
+      "id": "276:30004",
+      "name": "Desktop"
+    },
+    {
+      "root": "276:30041",
+      "id": "276:30048",
+      "name": "Desktop"
+    },
+    {
+      "root": "276:30092",
+      "id": "276:30099",
+      "name": "Desktop"
+    },
+    {
+      "root": "276:30128",
+      "id": "276:30137",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:30572",
+      "id": "276:30581",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:30625",
+      "id": "276:30634",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:30670",
+      "id": "276:30679",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:30715",
+      "id": "276:30724",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:30766",
+      "id": "276:30775",
+      "name": "Mobile"
+    },
+    {
+      "root": "276:30803",
+      "id": "276:30812",
+      "name": "Mobile"
+    },
+    {
+      "root": "278:79269",
+      "id": "278:79278",
+      "name": "Mobile"
+    },
+    {
+      "root": "278:79319",
+      "id": "278:79328",
+      "name": "Mobile"
+    },
+    {
+      "root": "278:79355",
+      "id": "278:79364",
+      "name": "Mobile"
+    },
+    {
+      "root": "278:79409",
+      "id": "278:79417",
+      "name": "Tablet"
+    },
+    {
+      "root": "278:79447",
+      "id": "278:79455",
+      "name": "Tablet"
+    },
+    {
+      "root": "278:79482",
+      "id": "280:76065",
+      "name": "Tablet"
+    },
+    {
+      "root": "278:79538",
+      "id": "278:79547",
+      "name": "Mobile"
+    },
+    {
+      "root": "278:79588",
+      "id": "280:76105",
+      "name": "Tablet"
+    },
+    {
+      "root": "278:79632",
+      "id": "278:79640",
+      "name": "Tablet"
+    },
+    {
+      "root": "278:79671",
+      "id": "278:79680",
+      "name": "Mobile"
+    },
+    {
+      "root": "278:79787",
+      "id": "278:79796",
+      "name": "Mobile"
+    },
+    {
+      "root": "278:79826",
+      "id": "278:79835",
+      "name": "Mobile"
+    },
+    {
+      "root": "278:79879",
+      "id": "280:75992",
+      "name": "Mobile"
+    },
+    {
+      "root": "278:79931",
+      "id": "280:76029",
+      "name": "Mobile"
+    },
+    {
+      "root": "280:70080",
+      "id": "280:70136",
+      "name": "Desktop"
+    },
+    {
+      "root": "280:70169",
+      "id": "280:70222",
+      "name": "Desktop"
+    },
+    {
+      "root": "280:70255",
+      "id": "280:70302",
+      "name": "Desktop"
+    },
+    {
+      "root": "280:70335",
+      "id": "280:70374",
+      "name": "Desktop"
+    },
+    {
+      "root": "280:70392",
+      "id": "280:70422",
+      "name": "Desktop"
+    },
+    {
+      "root": "280:70440",
+      "id": "280:70493",
+      "name": "Desktop"
+    },
+    {
+      "root": "280:70526",
+      "id": "280:70576",
+      "name": "Desktop"
+    },
+    {
+      "root": "280:70609",
+      "id": "280:70655",
+      "name": "Desktop"
+    },
+    {
+      "root": "280:70688",
+      "id": "280:70734",
+      "name": "Desktop"
+    },
+    {
+      "root": "280:70767",
+      "id": "280:70816",
+      "name": "Desktop"
+    },
+    {
+      "root": "280:70849",
+      "id": "280:70897",
+      "name": "Desktop"
+    },
+    {
+      "root": "280:70930",
+      "id": "280:70976",
+      "name": "Desktop"
+    },
+    {
+      "root": "280:71009",
+      "id": "280:71059",
+      "name": "Desktop"
+    },
+    {
+      "root": "280:71092",
+      "id": "280:71141",
+      "name": "Desktop"
+    },
+    {
+      "root": "280:71195",
+      "id": "280:71204",
+      "name": "Mobile"
+    },
+    {
+      "root": "280:71247",
+      "id": "280:71304",
+      "name": "Tablet"
+    },
+    {
+      "root": "280:71336",
+      "id": "280:71390",
+      "name": "Tablet"
+    },
+    {
+      "root": "280:71422",
+      "id": "280:71470",
+      "name": "Tablet"
+    },
+    {
+      "root": "280:71502",
+      "id": "280:71542",
+      "name": "Tablet"
+    },
+    {
+      "root": "280:71559",
+      "id": "280:71590",
+      "name": "Tablet"
+    },
+    {
+      "root": "280:71607",
+      "id": "280:71661",
+      "name": "Tablet"
+    },
+    {
+      "root": "280:71693",
+      "id": "280:71744",
+      "name": "Tablet"
+    },
+    {
+      "root": "280:71776",
+      "id": "280:71823",
+      "name": "Tablet"
+    },
+    {
+      "root": "280:71855",
+      "id": "280:71902",
+      "name": "Tablet"
+    },
+    {
+      "root": "280:71934",
+      "id": "280:71984",
+      "name": "Tablet"
+    },
+    {
+      "root": "280:72016",
+      "id": "280:72065",
+      "name": "Tablet"
+    },
+    {
+      "root": "280:72097",
+      "id": "280:72144",
+      "name": "Tablet"
+    },
+    {
+      "root": "280:72176",
+      "id": "280:72227",
+      "name": "Tablet"
+    },
+    {
+      "root": "280:72259",
+      "id": "280:72309",
+      "name": "Tablet"
+    },
+    {
+      "root": "280:72362",
+      "id": "280:72371",
+      "name": "Mobile"
+    },
+    {
+      "root": "280:72414",
+      "id": "280:72470",
+      "name": "Desktop"
+    },
+    {
+      "root": "280:72505",
+      "id": "280:72558",
+      "name": "Desktop"
+    },
+    {
+      "root": "280:72593",
+      "id": "280:72640",
+      "name": "Desktop"
+    },
+    {
+      "root": "280:72675",
+      "id": "280:72714",
+      "name": "Desktop"
+    },
+    {
+      "root": "280:72734",
+      "id": "280:72764",
+      "name": "Desktop"
+    },
+    {
+      "root": "280:72784",
+      "id": "280:72837",
+      "name": "Desktop"
+    },
+    {
+      "root": "280:72872",
+      "id": "280:72922",
+      "name": "Desktop"
+    },
+    {
+      "root": "280:72957",
+      "id": "280:73003",
+      "name": "Desktop"
+    },
+    {
+      "root": "280:73038",
+      "id": "280:73084",
+      "name": "Desktop"
+    },
+    {
+      "root": "280:73119",
+      "id": "280:73168",
+      "name": "Desktop"
+    },
+    {
+      "root": "280:73203",
+      "id": "280:73251",
+      "name": "Desktop"
+    },
+    {
+      "root": "280:73286",
+      "id": "280:73332",
+      "name": "Desktop"
+    },
+    {
+      "root": "280:73367",
+      "id": "280:73417",
+      "name": "Desktop"
+    },
+    {
+      "root": "280:73452",
+      "id": "280:73501",
+      "name": "Desktop"
+    },
+    {
+      "root": "280:73557",
+      "id": "280:73566",
+      "name": "Mobile"
+    },
+    {
+      "root": "280:73611",
+      "id": "280:73669",
+      "name": "Mobile"
+    },
+    {
+      "root": "280:73698",
+      "id": "280:73753",
+      "name": "Mobile"
+    },
+    {
+      "root": "280:73782",
+      "id": "280:73831",
+      "name": "Mobile"
+    },
+    {
+      "root": "280:73860",
+      "id": "280:73901",
+      "name": "Mobile"
+    },
+    {
+      "root": "280:73914",
+      "id": "280:73946",
+      "name": "Mobile"
+    },
+    {
+      "root": "280:73959",
+      "id": "280:74014",
+      "name": "Mobile"
+    },
+    {
+      "root": "280:74043",
+      "id": "280:74095",
+      "name": "Mobile"
+    },
+    {
+      "root": "280:74124",
+      "id": "280:74172",
+      "name": "Mobile"
+    },
+    {
+      "root": "280:74201",
+      "id": "280:74249",
+      "name": "Mobile"
+    },
+    {
+      "root": "280:74278",
+      "id": "280:74329",
+      "name": "Mobile"
+    },
+    {
+      "root": "280:74358",
+      "id": "280:74408",
+      "name": "Mobile"
+    },
+    {
+      "root": "280:74437",
+      "id": "280:74485",
+      "name": "Mobile"
+    },
+    {
+      "root": "280:74514",
+      "id": "280:74566",
+      "name": "Mobile"
+    },
+    {
+      "root": "280:74595",
+      "id": "280:74646",
+      "name": "Mobile"
+    },
+    {
+      "root": "280:74696",
+      "id": "280:74705",
+      "name": "Mobile"
+    },
+    {
+      "root": "280:74750",
+      "id": "280:74807",
+      "name": "Tablet"
+    },
+    {
+      "root": "280:74839",
+      "id": "280:74893",
+      "name": "Tablet"
+    },
+    {
+      "root": "280:74925",
+      "id": "280:74973",
+      "name": "Tablet"
+    },
+    {
+      "root": "280:75005",
+      "id": "280:75045",
+      "name": "Tablet"
+    },
+    {
+      "root": "280:75062",
+      "id": "280:75093",
+      "name": "Tablet"
+    },
+    {
+      "root": "280:75110",
+      "id": "280:75164",
+      "name": "Tablet"
+    },
+    {
+      "root": "280:75196",
+      "id": "280:75247",
+      "name": "Tablet"
+    },
+    {
+      "root": "280:75279",
+      "id": "280:75326",
+      "name": "Tablet"
+    },
+    {
+      "root": "280:75358",
+      "id": "280:75405",
+      "name": "Tablet"
+    },
+    {
+      "root": "280:75437",
+      "id": "280:75487",
+      "name": "Tablet"
+    },
+    {
+      "root": "280:75519",
+      "id": "280:75568",
+      "name": "Tablet"
+    },
+    {
+      "root": "280:75600",
+      "id": "280:75647",
+      "name": "Tablet"
+    },
+    {
+      "root": "280:75679",
+      "id": "280:75730",
+      "name": "Tablet"
+    },
+    {
+      "root": "280:75762",
+      "id": "280:75812",
+      "name": "Tablet"
+    },
+    {
+      "root": "280:75865",
+      "id": "280:75874",
+      "name": "Mobile"
+    },
+    {
+      "root": "280:75919",
+      "id": "280:75928",
+      "name": "Mobile"
+    },
+    {
+      "root": "280:76137",
+      "id": "280:76146",
+      "name": "Mobile"
+    }
+  ],
+  "originalBlack": [
+    "280:70137",
+    "280:70223",
+    "280:70303",
+    "280:70375",
+    "280:70423",
+    "280:70494",
+    "280:70577",
+    "280:70656",
+    "280:70735",
+    "280:70817",
+    "280:70898",
+    "280:70977",
+    "280:71060",
+    "280:71142",
+    "280:71305",
+    "280:71391",
+    "280:71471",
+    "280:71543",
+    "280:71591",
+    "280:71662",
+    "280:71745",
+    "280:71824",
+    "280:71903",
+    "280:71985",
+    "280:72066",
+    "280:72145",
+    "280:72228",
+    "280:72310",
+    "280:72471",
+    "280:72559",
+    "280:72641",
+    "280:72715",
+    "280:72765",
+    "280:72838",
+    "280:72923",
+    "280:73004",
+    "280:73085",
+    "280:73169",
+    "280:73252",
+    "280:73333",
+    "280:73418",
+    "280:73502",
+    "280:74808",
+    "280:74894",
+    "280:74974",
+    "280:75046",
+    "280:75094",
+    "280:75165",
+    "280:75248",
+    "280:75327",
+    "280:75406",
+    "280:75488",
+    "280:75569",
+    "280:75648",
+    "280:75731",
+    "280:75813"
+  ]
+}

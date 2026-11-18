@@ -1,0 +1,78 @@
+[
+  {
+    "label": "Retry failed URL",
+    "x": 720,
+    "y": 535,
+    "wait": 2200,
+    "shot": "r28-url-retried.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8593%3A12598&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Select validated URL",
+    "x": 720,
+    "y": 513,
+    "shot": "r28-url-selected.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8593%3A12598&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Commit URL source",
+    "x": 545,
+    "y": 556,
+    "shot": "r28-url-committed.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8593%3A12598&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Open source to test cancel",
+    "x": 1241,
+    "y": 261,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8593%3A12598&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Select alternate draft only",
+    "x": 530,
+    "y": 422,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8593%3A12598&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Cancel keeps committed URL",
+    "x": 354,
+    "y": 556,
+    "shot": "r28-image-cancel-keeps-url.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-3011&starting-point-node-id=8593%3A12598&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Mobile independent padding fixture",
+    "goto": "8584:12241",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8584-12241&starting-point-node-id=8584%3A12241&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Unlink Mobile padding",
+    "x": 1239,
+    "y": 334,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8584-12241&starting-point-node-id=8584%3A12241&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Choose Mobile left side",
+    "x": 1149,
+    "y": 266,
+    "shot": "r28-mobile-left-picker.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8584-12241&starting-point-node-id=8584%3A12241&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Change Mobile left only",
+    "x": 720,
+    "y": 422,
+    "shot": "r28-mobile-left8.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8584-12241&starting-point-node-id=8584%3A12241&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

@@ -1,0 +1,214 @@
+[
+  {
+    "id": "376:25146",
+    "name": "PLAY · F3.13 · Cancel replacement · Work image stays locked",
+    "width": 1440,
+    "height": 996,
+    "counts": {
+      "FRAME": 74,
+      "INSTANCE": 80,
+      "TEXT": 53,
+      "VECTOR": 72,
+      "RECTANGLE": 3,
+      "ELLIPSE": 1
+    },
+    "fontFamilies": [
+      "Inter",
+      "Geist Mono"
+    ],
+    "images": [],
+    "outsideRoot": [],
+    "comments": []
+  },
+  {
+    "id": "376:25424",
+    "name": "PLAY · F3.14 · Work image unlocked · Undo",
+    "width": 1440,
+    "height": 996,
+    "counts": {
+      "FRAME": 71,
+      "INSTANCE": 80,
+      "TEXT": 54,
+      "VECTOR": 70,
+      "RECTANGLE": 3,
+      "ELLIPSE": 1
+    },
+    "fontFamilies": [
+      "Inter",
+      "Geist Mono"
+    ],
+    "images": [],
+    "outsideRoot": [],
+    "comments": []
+  },
+  {
+    "id": "377:25498",
+    "name": "PLAY · F5-SECOND-OPEN.1 · Second comment draft",
+    "width": 1440,
+    "height": 996,
+    "counts": {
+      "FRAME": 18,
+      "INSTANCE": 11,
+      "TEXT": 27
+    },
+    "fontFamilies": [
+      "Inter"
+    ],
+    "images": [],
+    "outsideRoot": [],
+    "comments": [
+      "Comments (1)",
+      "Home · Logo · Round 3 · Open"
+    ]
+  },
+  {
+    "id": "377:25549",
+    "name": "PLAY · F5-SECOND-OPEN.2 · Sending second comment",
+    "width": 1440,
+    "height": 996,
+    "counts": {
+      "FRAME": 20,
+      "INSTANCE": 13,
+      "TEXT": 31,
+      "RECTANGLE": 1
+    },
+    "fontFamilies": [
+      "Inter"
+    ],
+    "images": [],
+    "outsideRoot": [],
+    "comments": [
+      "Comments (1)",
+      "Home · Logo · Round 3 · Open"
+    ]
+  },
+  {
+    "id": "377:25609",
+    "name": "PLAY · F5-SECOND-OPEN.3 · Second comment failed · draft retained",
+    "width": 1440,
+    "height": 996,
+    "counts": {
+      "FRAME": 20,
+      "INSTANCE": 13,
+      "TEXT": 31,
+      "RECTANGLE": 1
+    },
+    "fontFamilies": [
+      "Inter"
+    ],
+    "images": [],
+    "outsideRoot": [],
+    "comments": [
+      "Comments (1)",
+      "Home · Logo · Round 3 · Open"
+    ]
+  },
+  {
+    "id": "377:25669",
+    "name": "PLAY · F5-SECOND-OPEN.4 · Second comment acknowledged · two threads",
+    "width": 1440,
+    "height": 996,
+    "counts": {
+      "FRAME": 15,
+      "INSTANCE": 8,
+      "TEXT": 24
+    },
+    "fontFamilies": [
+      "Inter"
+    ],
+    "images": [],
+    "outsideRoot": [],
+    "comments": [
+      "Comments (2)",
+      "Home · Logo · Round 3 · Open",
+      "Home · Logo · Round 3 · Open"
+    ]
+  },
+  {
+    "id": "377:25747",
+    "name": "PLAY · F5-SECOND-RESOLVED.1 · Second comment draft",
+    "width": 1440,
+    "height": 996,
+    "counts": {
+      "FRAME": 18,
+      "INSTANCE": 11,
+      "TEXT": 28
+    },
+    "fontFamilies": [
+      "Inter"
+    ],
+    "images": [],
+    "outsideRoot": [],
+    "comments": [
+      "Comments (1)",
+      "Home · Logo · Round 3 · Resolved",
+      "Studio: Logo enlarged to 28px in the draft."
+    ]
+  },
+  {
+    "id": "377:25798",
+    "name": "PLAY · F5-SECOND-RESOLVED.2 · Sending second comment",
+    "width": 1440,
+    "height": 996,
+    "counts": {
+      "FRAME": 20,
+      "INSTANCE": 13,
+      "TEXT": 32,
+      "RECTANGLE": 1
+    },
+    "fontFamilies": [
+      "Inter"
+    ],
+    "images": [],
+    "outsideRoot": [],
+    "comments": [
+      "Comments (1)",
+      "Home · Logo · Round 3 · Resolved",
+      "Studio: Logo enlarged to 28px in the draft."
+    ]
+  },
+  {
+    "id": "377:25858",
+    "name": "PLAY · F5-SECOND-RESOLVED.3 · Second comment failed · draft retained",
+    "width": 1440,
+    "height": 996,
+    "counts": {
+      "FRAME": 20,
+      "INSTANCE": 13,
+      "TEXT": 32,
+      "RECTANGLE": 1
+    },
+    "fontFamilies": [
+      "Inter"
+    ],
+    "images": [],
+    "outsideRoot": [],
+    "comments": [
+      "Comments (1)",
+      "Home · Logo · Round 3 · Resolved",
+      "Studio: Logo enlarged to 28px in the draft."
+    ]
+  },
+  {
+    "id": "377:25918",
+    "name": "PLAY · F5-SECOND-RESOLVED.4 · Second comment acknowledged · two threads",
+    "width": 1440,
+    "height": 996,
+    "counts": {
+      "FRAME": 15,
+      "INSTANCE": 8,
+      "TEXT": 25
+    },
+    "fontFamilies": [
+      "Inter"
+    ],
+    "images": [],
+    "outsideRoot": [],
+    "comments": [
+      "Comments (2)",
+      "Home · Logo · Round 3 · Resolved",
+      "Studio: Logo enlarged to 28px in the draft.",
+      "Home · Logo · Round 3 · Open"
+    ]
+  }
+]

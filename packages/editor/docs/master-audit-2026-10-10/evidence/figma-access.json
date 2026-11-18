@@ -1,0 +1,25 @@
+{
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "operation": "Read-only page enumeration via Figma connector",
+  "success": true,
+  "pages": [
+    {
+      "id": "0:1",
+      "name": "\ud83d\udcd5 Foundations"
+    },
+    {
+      "id": "1:2",
+      "name": "\ud83e\udde9 Components"
+    },
+    {
+      "id": "4418:45431",
+      "name": "Editor v3 \u00b7 IA"
+    },
+    {
+      "id": "7712:192948",
+      "name": "Page 4"
+    }
+  ],
+  "mutations": 0,
+  "note": "Read access confirmed; no reconstruction, redesign or write validation performed."
+}

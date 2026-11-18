@@ -1,0 +1,339 @@
+{
+  "createdNodeIds": [
+    "142:51838",
+    "142:52543",
+    "142:53229",
+    "142:53954",
+    "142:54521",
+    "142:55231",
+    "142:55781",
+    "142:56347",
+    "142:56910",
+    "142:57466",
+    "142:58015",
+    "142:58571",
+    "142:59267",
+    "142:59972",
+    "142:60682",
+    "142:61042",
+    "142:61405",
+    "142:61796",
+    "142:62396",
+    "142:63098",
+    "142:63798",
+    "142:64362",
+    "142:65068",
+    "142:65629",
+    "142:66187",
+    "142:66751",
+    "142:67309",
+    "142:68015",
+    "142:68730"
+  ],
+  "mutatedNodeIds": [
+    "142:53942",
+    "I142:55435;4:547",
+    "142:55435",
+    "142:57458",
+    "142:58563",
+    "142:62346",
+    "142:62348",
+    "142:53949",
+    "142:53951",
+    "142:54511",
+    "142:54513",
+    "142:56338",
+    "142:56344",
+    "142:56578",
+    "142:56579",
+    "142:57685",
+    "142:60680",
+    "142:55229",
+    "142:59265",
+    "142:60702",
+    "142:61062",
+    "142:61425",
+    "139:49140",
+    "139:49182",
+    "139:50612",
+    "139:53875",
+    "I139:50120;62:1585",
+    "I139:50123;80:14406",
+    "I139:50128;62:1585",
+    "I139:50129;62:1585",
+    "I139:50130;62:1585",
+    "I139:50134;62:1585",
+    "I139:50841;62:1585",
+    "I139:50842;62:1585",
+    "I139:50843;62:1585",
+    "I139:50844;80:14406",
+    "I139:51325;62:1585",
+    "I139:51344;62:1585",
+    "I139:51363;62:1585",
+    "I139:50849;62:1585",
+    "I139:50850;62:1585",
+    "I139:50851;62:1585",
+    "I139:50855;62:1585",
+    "142:62390",
+    "142:62393",
+    "142:62416",
+    "142:52049",
+    "142:63118",
+    "142:52753",
+    "142:63818",
+    "142:53916",
+    "142:64382",
+    "142:54732",
+    "142:65088",
+    "142:55441",
+    "142:65649",
+    "142:57120",
+    "142:66207",
+    "142:57676",
+    "142:66771",
+    "142:58225",
+    "142:67329",
+    "142:58782",
+    "142:68035",
+    "142:59478",
+    "142:68750",
+    "142:60183"
+  ],
+  "frames": [
+    {
+      "id": "142:51838",
+      "name": "B3-P146 · Pages / About deleted, Work kept",
+      "w": 1440,
+      "h": 900,
+      "nodes": 678,
+      "images": []
+    },
+    {
+      "id": "142:52543",
+      "name": "B3-P147 · Pages / successful retry undone",
+      "w": 1440,
+      "h": 900,
+      "nodes": 677,
+      "images": []
+    },
+    {
+      "id": "142:53229",
+      "name": "B3-P148 · Pages / recently deleted About",
+      "w": 1440,
+      "h": 900,
+      "nodes": 543,
+      "images": []
+    },
+    {
+      "id": "142:53954",
+      "name": "B3-P149 · Pages / restore slug already used",
+      "w": 1440,
+      "h": 900,
+      "nodes": 558,
+      "images": []
+    },
+    {
+      "id": "142:54521",
+      "name": "B3-P150 · Pages / About restored with new slug",
+      "w": 1440,
+      "h": 900,
+      "nodes": 682,
+      "images": []
+    },
+    {
+      "id": "142:55231",
+      "name": "B3-P151 · Pages / recovery offline",
+      "w": 1440,
+      "h": 900,
+      "nodes": 541,
+      "images": []
+    },
+    {
+      "id": "142:55781",
+      "name": "B3-P152 · Pages / permanent deletion typed confirm",
+      "w": 1440,
+      "h": 900,
+      "nodes": 557,
+      "images": []
+    },
+    {
+      "id": "142:56347",
+      "name": "B3-P153 · Pages / permanent deletion name matches",
+      "w": 1440,
+      "h": 900,
+      "nodes": 557,
+      "images": []
+    },
+    {
+      "id": "142:56910",
+      "name": "B3-P154 · Pages / no deleted pages after permanent delete",
+      "w": 1440,
+      "h": 900,
+      "nodes": 539,
+      "images": []
+    },
+    {
+      "id": "142:57466",
+      "name": "B3-P155 · Pages / restore failed, item retained",
+      "w": 1440,
+      "h": 900,
+      "nodes": 544,
+      "images": []
+    },
+    {
+      "id": "142:58015",
+      "name": "B3-P156 · Pages / loading deleted pages",
+      "w": 1440,
+      "h": 900,
+      "nodes": 539,
+      "images": []
+    },
+    {
+      "id": "142:58571",
+      "name": "B3-P157 · Pages / restored page above active-page limit",
+      "w": 1440,
+      "h": 900,
+      "nodes": 682,
+      "images": []
+    },
+    {
+      "id": "142:59267",
+      "name": "B3-P158 · Pages / cleared selection at 1440 × 600",
+      "w": 1440,
+      "h": 600,
+      "nodes": 691,
+      "images": []
+    },
+    {
+      "id": "142:59972",
+      "name": "B3-P159 · Pages / About restored, folder retained",
+      "w": 1440,
+      "h": 900,
+      "nodes": 696,
+      "images": []
+    },
+    {
+      "id": "142:60682",
+      "name": "B3-P160 · About / opened after restore",
+      "w": 1440,
+      "h": 900,
+      "nodes": 354,
+      "images": []
+    },
+    {
+      "id": "142:61042",
+      "name": "B3-P161 · About / restored new URL opened",
+      "w": 1440,
+      "h": 900,
+      "nodes": 357,
+      "images": []
+    },
+    {
+      "id": "142:61405",
+      "name": "B3-P162 · About / restored page view only",
+      "w": 1440,
+      "h": 900,
+      "nodes": 357,
+      "images": []
+    },
+    {
+      "id": "142:61796",
+      "name": "B3-P163 · Pages / Admin recovery actions",
+      "w": 1440,
+      "h": 900,
+      "nodes": 549,
+      "images": []
+    },
+    {
+      "id": "142:62396",
+      "name": "Return · Pages / About deleted, Work kept",
+      "w": 1440,
+      "h": 900,
+      "nodes": 519,
+      "images": []
+    },
+    {
+      "id": "142:63098",
+      "name": "Return · Pages / successful retry undone",
+      "w": 1440,
+      "h": 900,
+      "nodes": 519,
+      "images": []
+    },
+    {
+      "id": "142:63798",
+      "name": "Return · Pages / recently deleted About",
+      "w": 1440,
+      "h": 900,
+      "nodes": 519,
+      "images": []
+    },
+    {
+      "id": "142:64362",
+      "name": "Return · Pages / About restored with new slug",
+      "w": 1440,
+      "h": 900,
+      "nodes": 521,
+      "images": []
+    },
+    {
+      "id": "142:65068",
+      "name": "Return · Pages / recovery offline",
+      "w": 1440,
+      "h": 900,
+      "nodes": 516,
+      "images": []
+    },
+    {
+      "id": "142:65629",
+      "name": "Return · Pages / no deleted pages after permanent delete",
+      "w": 1440,
+      "h": 900,
+      "nodes": 519,
+      "images": []
+    },
+    {
+      "id": "142:66187",
+      "name": "Return · Pages / restore failed, item retained",
+      "w": 1440,
+      "h": 900,
+      "nodes": 519,
+      "images": []
+    },
+    {
+      "id": "142:66751",
+      "name": "Return · Pages / loading deleted pages",
+      "w": 1440,
+      "h": 900,
+      "nodes": 519,
+      "images": []
+    },
+    {
+      "id": "142:67309",
+      "name": "Return · Pages / restored page above active-page limit",
+      "w": 1440,
+      "h": 900,
+      "nodes": 521,
+      "images": []
+    },
+    {
+      "id": "142:68015",
+      "name": "Return · Pages / cleared selection at 1440 × 600",
+      "w": 1440,
+      "h": 600,
+      "nodes": 521,
+      "images": []
+    },
+    {
+      "id": "142:68730",
+      "name": "Return · Pages / About restored, folder retained",
+      "w": 1440,
+      "h": 900,
+      "nodes": 521,
+      "images": []
+    }
+  ],
+  "allAffectedNodeIds": "affected-nodes.json (includes inherited instance descendants)",
+  "createdNodeCount": 15844,
+  "createdNodeIdsScope": "Root IDs only; full descendant IDs in artifact"
+}

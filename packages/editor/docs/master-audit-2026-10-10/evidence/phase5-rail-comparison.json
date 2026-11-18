@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-10",
+  "frames": {
+    "E16": "8318:2045",
+    "E17": "8318:2204",
+    "E10": "8317:245216"
+  },
+  "method": "Compare RGB PNG pixels x0:60,y56:420 with PIL ImageChops.difference; inspect native text bounds and intersecting page siblings",
+  "E16vsE17DifferingPixels": 0,
+  "E16vsEarlierE10DifferenceBoundingBox": null,
+  "E17FullVsContentsOnlyDifferenceBoundingBox": null,
+  "E17IntersectingPageSiblings": [],
+  "nativeLabels": {
+    "width": 42,
+    "x": 2,
+    "parentWidth": 46,
+    "parentX": 7
+  },
+  "conclusion": "No differential rail clipping; apparent tool-display clipping is not supported by PNG/native evidence."
+}

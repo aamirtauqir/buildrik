@@ -1,0 +1,448 @@
+{
+  "heuristics": [
+    {
+      "id": "N1",
+      "name": "Visibility of system status",
+      "checkpoints": [
+        {
+          "check": "Loading states are visible for operations >1 second",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        },
+        {
+          "check": "Progress indicators shown for multi-step processes",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        },
+        {
+          "check": "Success/error feedback appears after user actions",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        },
+        {
+          "check": "Current location is clear in navigation",
+          "pass": true,
+          "severity": null,
+          "notes": "Five start specimens: selected object, page and task are named. Static inspection only.",
+          "status": "PASS"
+        }
+      ]
+    },
+    {
+      "id": "N2",
+      "name": "Match between system and real world",
+      "checkpoints": [
+        {
+          "check": "Labels use user language, not internal jargon",
+          "pass": true,
+          "severity": null,
+          "notes": "Expert judgment on sampled labels: Replace, Source, Preview and Send Round 3 to Lena name their tasks. User comprehension untested.",
+          "status": "PASS"
+        },
+        {
+          "check": "Icons follow established conventions",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        },
+        {
+          "check": "Information appears in natural and logical order",
+          "pass": true,
+          "severity": null,
+          "notes": "F4 places blocking issue before tips; F5 shows round/status before send action.",
+          "status": "PASS"
+        },
+        {
+          "check": "Metaphors match real-world expectations",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        }
+      ]
+    },
+    {
+      "id": "N3",
+      "name": "User control and freedom",
+      "checkpoints": [
+        {
+          "check": "Undo is available for destructive actions",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        },
+        {
+          "check": "Cancel/back options are clearly visible",
+          "pass": true,
+          "severity": null,
+          "notes": "All journeys is visible in sampled starts and has a native route to 302:3370. F4 close also has a route. Other exit behaviors untested.",
+          "status": "PASS"
+        },
+        {
+          "check": "Users can exit flows without losing progress",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        },
+        {
+          "check": "Confirmation dialogs for irreversible actions",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        }
+      ]
+    },
+    {
+      "id": "N4",
+      "name": "Consistency and standards",
+      "checkpoints": [
+        {
+          "check": "UI elements behave the same way throughout",
+          "pass": false,
+          "severity": 2,
+          "notes": "Prototype-only issue C02: in F4.01, identical Fix links differ in operability: 303:32421 has a route, 303:32429 has none. Scope is limited to the tested prototype, not application behavior.",
+          "status": "FAIL"
+        },
+        {
+          "check": "Terminology is consistent across all pages",
+          "pass": true,
+          "severity": null,
+          "notes": "Sampled text uses the same rail, Preview, Publish, Content/Style/Behavior/Effects labels. No claim about all pages.",
+          "status": "PASS"
+        },
+        {
+          "check": "Visual patterns (spacing, colors) are consistent",
+          "pass": true,
+          "severity": null,
+          "notes": "F1/F4/F5 screenshots share consistent rail, topbar, bottom navigation and right-task treatment; only these screenshots assessed.",
+          "status": "PASS"
+        },
+        {
+          "check": "Platform conventions are followed",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        }
+      ]
+    },
+    {
+      "id": "N5",
+      "name": "Error prevention",
+      "checkpoints": [
+        {
+          "check": "Form validation occurs before submission",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        },
+        {
+          "check": "Constraints prevent invalid inputs",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        },
+        {
+          "check": "Destructive actions require confirmation",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        },
+        {
+          "check": "Default values reduce user effort and errors",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        }
+      ]
+    },
+    {
+      "id": "N6",
+      "name": "Recognition rather than recall",
+      "checkpoints": [
+        {
+          "check": "Options are visible rather than requiring memorization",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        },
+        {
+          "check": "Help and instructions are easily accessible",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        },
+        {
+          "check": "Recently used items are easily accessible",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        },
+        {
+          "check": "Search and filter options are visible",
+          "pass": true,
+          "severity": null,
+          "notes": "Search layers is visible in sampled starts. Filtering/search execution untested.",
+          "status": "PASS"
+        }
+      ]
+    },
+    {
+      "id": "N7",
+      "name": "Flexibility and efficiency of use",
+      "checkpoints": [
+        {
+          "check": "Keyboard shortcuts available for frequent actions",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        },
+        {
+          "check": "Customizable interface elements",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        },
+        {
+          "check": "Shortcuts or recent items for repeat tasks",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        },
+        {
+          "check": "Batch operations for power users",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        }
+      ]
+    },
+    {
+      "id": "N8",
+      "name": "Aesthetic and minimalist design",
+      "checkpoints": [
+        {
+          "check": "Each screen focuses on one primary action",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        },
+        {
+          "check": "Visual hierarchy guides attention to important elements",
+          "pass": true,
+          "severity": null,
+          "notes": "F4 visually prioritizes the blocker; F5 emphasizes Send Round 3 in task footer. This is a bounded visual judgment.",
+          "status": "PASS"
+        },
+        {
+          "check": "Whitespace used effectively",
+          "pass": true,
+          "severity": null,
+          "notes": "Three 1440px screenshots separate rail, tree, canvas and Inspector/task; other sizes not assessed.",
+          "status": "PASS"
+        },
+        {
+          "check": "No unnecessary decorative elements that distract",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        }
+      ]
+    },
+    {
+      "id": "N9",
+      "name": "Help users recognize, diagnose, and recover from errors",
+      "checkpoints": [
+        {
+          "check": "Error messages are in plain language (no codes)",
+          "pass": true,
+          "severity": null,
+          "notes": "F4.01 explains missing collection source in words without an error code.",
+          "status": "PASS"
+        },
+        {
+          "check": "Error messages indicate what went wrong specifically",
+          "pass": true,
+          "severity": null,
+          "notes": "F4.01 names Latest posts and Home / Journal section.",
+          "status": "PASS"
+        },
+        {
+          "check": "Error messages suggest how to fix the issue",
+          "pass": true,
+          "severity": null,
+          "notes": "Blocking Fix route goes to 303:32650, which names the exact list and Choose collection action. Route structure, not playback.",
+          "status": "PASS"
+        },
+        {
+          "check": "Errors are visually prominent and close to the source",
+          "pass": true,
+          "severity": null,
+          "notes": "F4.01 displays blocker first with a selected-list canvas message; visual prominence assessed in screenshot.",
+          "status": "PASS"
+        }
+      ]
+    },
+    {
+      "id": "N10",
+      "name": "Help and documentation",
+      "checkpoints": [
+        {
+          "check": "Help is easily accessible from any screen",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        },
+        {
+          "check": "Contextual help is provided where needed",
+          "pass": false,
+          "severity": 2,
+          "notes": "Prototype-only issue C01: F1.01 guidance 302:3510 says select a child, but the only product reaction is Add (302:3422). No child-selection route is present in this specimen. Generic controller guidance does not explain the constrained task.",
+          "status": "FAIL"
+        },
+        {
+          "check": "Onboarding guides new users through key features",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        },
+        {
+          "check": "Documentation is searchable and task-focused",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        }
+      ]
+    }
+  ],
+  "accessibility": [
+    {
+      "id": "A1",
+      "name": "Color contrast",
+      "checkpoints": [
+        {
+          "check": "Text meets 4.5:1 contrast ratio (WCAG AA)",
+          "pass": true,
+          "severity": null,
+          "notes": "Only five sampled opaque text/background pairs measured; see contrast.json. Other text, modes, hover and disabled states unknown.",
+          "status": "PASS"
+        },
+        {
+          "check": "Large text meets 3:1 contrast ratio",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        },
+        {
+          "check": "Color is not the only way to convey information",
+          "pass": true,
+          "severity": null,
+          "notes": "Sampled F4 error and F5 resolved states have text as well as color.",
+          "status": "PASS"
+        },
+        {
+          "check": "Focus indicators have sufficient contrast",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        }
+      ]
+    },
+    {
+      "id": "A2",
+      "name": "Keyboard navigation",
+      "checkpoints": [
+        {
+          "check": "All interactive elements reachable via Tab key",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        },
+        {
+          "check": "Focus order follows logical reading order",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        },
+        {
+          "check": "Focus ring is visible on all interactive elements",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        },
+        {
+          "check": "No keyboard traps (user can always navigate away)",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        }
+      ]
+    },
+    {
+      "id": "A3",
+      "name": "Screen reader support",
+      "checkpoints": [
+        {
+          "check": "All images have meaningful alt text",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        },
+        {
+          "check": "Form inputs have associated labels",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        },
+        {
+          "check": "ARIA attributes used correctly for dynamic content",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        },
+        {
+          "check": "Headings follow logical hierarchy (h1 > h2 > h3)",
+          "pass": null,
+          "severity": null,
+          "notes": "NOT TESTED in this bounded static/route review. No pass/fail inferred from older handoffs.",
+          "status": "NOT_TESTED"
+        }
+      ]
+    }
+  ]
+}

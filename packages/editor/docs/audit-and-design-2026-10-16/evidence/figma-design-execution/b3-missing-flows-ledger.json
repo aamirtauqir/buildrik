@@ -1,0 +1,2101 @@
+{
+  "fileKey": "2L9OTGzBrL6kYmU18yA1c7",
+  "pageId": "3:4",
+  "frames": [
+    {
+      "num": 44,
+      "id": "101:22426",
+      "name": "B3-P44 · About settings / retained draft",
+      "w": 1440,
+      "h": 900,
+      "nodes": 581,
+      "instances": 146,
+      "fonts": [
+        "Inter",
+        "Geist Mono"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "101:22426",
+          "label": "B3-P44 · About settings / retained draft",
+          "r": [
+            {
+              "trigger": "ON_KEY_DOWN",
+              "to": [
+                "63:18758"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:22637",
+          "label": "Close About · Page settings",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "63:18758"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:22668",
+          "label": "Cancel",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "63:18758"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:22669",
+          "label": "Save",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "101:23017"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": []
+    },
+    {
+      "num": 45,
+      "id": "101:23017",
+      "name": "B3-P45 · About settings / saving before return",
+      "w": 1440,
+      "h": 900,
+      "nodes": 590,
+      "instances": 148,
+      "fonts": [
+        "Inter",
+        "Geist Mono"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "101:23017",
+          "label": "B3-P45 · About settings / saving before return",
+          "r": [
+            {
+              "trigger": "AFTER_TIMEOUT",
+              "to": [
+                "64:18356"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:23612",
+          "label": "Cancel navigation",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "101:28183"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": []
+    },
+    {
+      "num": 46,
+      "id": "101:23620",
+      "name": "B3-P46 · About settings / save rejected",
+      "w": 1440,
+      "h": 900,
+      "nodes": 592,
+      "instances": 149,
+      "fonts": [
+        "Inter",
+        "Geist Mono"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "101:23620",
+          "label": "B3-P46 · About settings / save rejected",
+          "r": [
+            {
+              "trigger": "ON_KEY_DOWN",
+              "to": [
+                "101:22426"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:23864",
+          "label": "Modal scrim / background inactive",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "101:22426"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:24215",
+          "label": "Keep editing",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "101:22426"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:24217",
+          "label": "Discard changes",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "63:6393"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:24219",
+          "label": "Retry save and leave",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "101:23017"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": []
+    },
+    {
+      "num": 47,
+      "id": "101:24231",
+      "name": "B3-P47 · About settings / offline close",
+      "w": 1440,
+      "h": 900,
+      "nodes": 592,
+      "instances": 148,
+      "fonts": [
+        "Inter",
+        "Geist Mono"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "101:24231",
+          "label": "B3-P47 · About settings / offline close",
+          "r": [
+            {
+              "trigger": "ON_KEY_DOWN",
+              "to": [
+                "101:27566"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:24475",
+          "label": "Modal scrim / background inactive",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "101:27566"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:24826",
+          "label": "Keep editing",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "101:27566"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:24828",
+          "label": "Discard changes",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "94:14750"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": []
+    },
+    {
+      "num": 48,
+      "id": "101:24836",
+      "name": "B3-P48 · About settings / invalid URL with return pending",
+      "w": 1440,
+      "h": 900,
+      "nodes": 583,
+      "instances": 146,
+      "fonts": [
+        "Inter",
+        "Geist Mono"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "101:25067",
+          "label": "Field / Page URL",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "101:25436"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:25432",
+          "label": "Cancel navigation",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "109:31658"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": []
+    },
+    {
+      "num": 49,
+      "id": "101:25436",
+      "name": "B3-P49 · About settings / corrected draft with return pending",
+      "w": 1440,
+      "h": 900,
+      "nodes": 582,
+      "instances": 146,
+      "fonts": [
+        "Inter",
+        "Geist Mono"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "101:26031",
+          "label": "Cancel navigation",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "101:22426"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:26033",
+          "label": "Save and leave",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "101:23017"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": []
+    },
+    {
+      "num": 50,
+      "id": "101:27566",
+      "name": "B3-P50 · About settings / offline draft retained",
+      "w": 1440,
+      "h": 900,
+      "nodes": 584,
+      "instances": 146,
+      "fonts": [
+        "Inter",
+        "Geist Mono"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "101:27566",
+          "label": "B3-P50 · About settings / offline draft retained",
+          "r": [
+            {
+              "trigger": "ON_KEY_DOWN",
+              "to": [
+                "101:24231"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:27777",
+          "label": "Close About · Page settings",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "101:24231"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:27808",
+          "label": "Cancel",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "101:24231"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": []
+    },
+    {
+      "num": 51,
+      "id": "101:28183",
+      "name": "B3-P51 · About settings / navigation cancelled, save continues",
+      "w": 1440,
+      "h": 900,
+      "nodes": 582,
+      "instances": 146,
+      "fonts": [
+        "Inter",
+        "Geist Mono"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "101:28183",
+          "label": "B3-P51 · About settings / navigation cancelled, save continues",
+          "r": [
+            {
+              "trigger": "AFTER_TIMEOUT",
+              "to": [
+                "101:28780"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": []
+    },
+    {
+      "num": 52,
+      "id": "101:28780",
+      "name": "B3-P52 · About settings / saved, remain in settings",
+      "w": 1440,
+      "h": 900,
+      "nodes": 581,
+      "instances": 146,
+      "fonts": [
+        "Inter",
+        "Geist Mono"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "101:28780",
+          "label": "B3-P52 · About settings / saved, remain in settings",
+          "r": [
+            {
+              "trigger": "ON_KEY_DOWN",
+              "to": [
+                "63:6393"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:28991",
+          "label": "Close About · Page settings",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "63:6393"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:29022",
+          "label": "Cancel",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "63:6393"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": []
+    },
+    {
+      "num": 53,
+      "id": "101:29372",
+      "name": "B3-P53 · Offline draft guard / 600px workspace",
+      "w": 1440,
+      "h": 600,
+      "nodes": 592,
+      "instances": 148,
+      "fonts": [
+        "Inter",
+        "Geist Mono"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "101:29372",
+          "label": "B3-P53 · Offline draft guard / 600px workspace",
+          "r": [
+            {
+              "trigger": "ON_KEY_DOWN",
+              "to": [
+                "109:44109"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:29616",
+          "label": "Modal scrim / background inactive",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "109:44109"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:29967",
+          "label": "Keep editing",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "109:44109"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:29969",
+          "label": "Discard changes",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "109:44764"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": []
+    },
+    {
+      "num": 54,
+      "id": "101:29978",
+      "name": "B3-P54 · New page / choose source",
+      "w": 1440,
+      "h": 900,
+      "nodes": 706,
+      "instances": 181,
+      "fonts": [
+        "Inter",
+        "Geist Mono"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "101:29978",
+          "label": "B3-P54 · New page / choose source",
+          "r": [
+            {
+              "trigger": "ON_KEY_DOWN",
+              "to": [
+                "63:6393"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:30656",
+          "label": "Modal scrim / background inactive",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "63:6393"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:30674",
+          "label": "Blank",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "101:36828"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:30688",
+          "label": "Cancel",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "63:6393"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:30690",
+          "label": "Choose template",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "104:28892"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": []
+    },
+    {
+      "num": 55,
+      "id": "101:36828",
+      "name": "B3-P55 · New page / blank",
+      "w": 1440,
+      "h": 900,
+      "nodes": 706,
+      "instances": 181,
+      "fonts": [
+        "Inter",
+        "Geist Mono"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "101:36828",
+          "label": "B3-P55 · New page / blank",
+          "r": [
+            {
+              "trigger": "ON_KEY_DOWN",
+              "to": [
+                "63:6393"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:37506",
+          "label": "Modal scrim / background inactive",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "63:6393"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:37526",
+          "label": "From template",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "101:29978"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:37538",
+          "label": "Cancel",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "63:6393"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:37540",
+          "label": "Create page",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "101:38980"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": []
+    },
+    {
+      "num": 56,
+      "id": "101:37542",
+      "name": "B3-P56 · New page / missing name",
+      "w": 1440,
+      "h": 900,
+      "nodes": 707,
+      "instances": 181,
+      "fonts": [
+        "Inter",
+        "Geist Mono"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "101:37542",
+          "label": "B3-P56 · New page / missing name",
+          "r": [
+            {
+              "trigger": "ON_KEY_DOWN",
+              "to": [
+                "63:6393"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:38220",
+          "label": "Modal scrim / background inactive",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "63:6393"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:38232",
+          "label": "Page name input",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "101:36828"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:38241",
+          "label": "From template",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "109:32916"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:38253",
+          "label": "Cancel",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "63:6393"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": []
+    },
+    {
+      "num": 57,
+      "id": "101:38257",
+      "name": "B3-P57 · New page / capacity reached",
+      "w": 1440,
+      "h": 900,
+      "nodes": 775,
+      "instances": 201,
+      "fonts": [
+        "Inter",
+        "Geist Mono"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "101:38257",
+          "label": "B3-P57 · New page / capacity reached",
+          "r": [
+            {
+              "trigger": "ON_KEY_DOWN",
+              "to": [
+                "109:30868"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:38935",
+          "label": "Modal scrim / background inactive",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "109:30868"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:38968",
+          "label": "Cancel",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "109:30868"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": []
+    },
+    {
+      "num": 58,
+      "id": "101:38980",
+      "name": "B3-P58 · New page / checking capacity",
+      "w": 1440,
+      "h": 900,
+      "nodes": 707,
+      "instances": 181,
+      "fonts": [
+        "Inter",
+        "Geist Mono"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "101:38980",
+          "label": "B3-P58 · New page / checking capacity",
+          "r": [
+            {
+              "trigger": "AFTER_TIMEOUT",
+              "to": [
+                "101:41858"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:39658",
+          "label": "Modal scrim / background inactive",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "63:6393"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:39691",
+          "label": "Cancel",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "63:6393"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": []
+    },
+    {
+      "num": 59,
+      "id": "101:39695",
+      "name": "B3-P59 · New page / capacity unavailable",
+      "w": 1440,
+      "h": 900,
+      "nodes": 709,
+      "instances": 182,
+      "fonts": [
+        "Inter",
+        "Geist Mono"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "101:39695",
+          "label": "B3-P59 · New page / capacity unavailable",
+          "r": [
+            {
+              "trigger": "ON_KEY_DOWN",
+              "to": [
+                "63:6393"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:40373",
+          "label": "Modal scrim / background inactive",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "63:6393"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:40406",
+          "label": "Cancel",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "63:6393"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:40410",
+          "label": "Retry check",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "101:38980"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": []
+    },
+    {
+      "num": 60,
+      "id": "101:40412",
+      "name": "B3-P60 · New page / creation rejected",
+      "w": 1440,
+      "h": 900,
+      "nodes": 707,
+      "instances": 181,
+      "fonts": [
+        "Inter",
+        "Geist Mono"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "101:40412",
+          "label": "B3-P60 · New page / creation rejected",
+          "r": [
+            {
+              "trigger": "ON_KEY_DOWN",
+              "to": [
+                "63:6393"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:41090",
+          "label": "Modal scrim / background inactive",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "63:6393"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:41123",
+          "label": "Cancel",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "63:6393"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:41125",
+          "label": "Try again",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "101:38980"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": []
+    },
+    {
+      "num": 61,
+      "id": "101:41127",
+      "name": "B3-P61 · New page / offline",
+      "w": 1440,
+      "h": 900,
+      "nodes": 707,
+      "instances": 181,
+      "fonts": [
+        "Inter",
+        "Geist Mono"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "101:41127",
+          "label": "B3-P61 · New page / offline",
+          "r": [
+            {
+              "trigger": "ON_KEY_DOWN",
+              "to": [
+                "94:14750"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:41805",
+          "label": "Modal scrim / background inactive",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "94:14750"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "101:41838",
+          "label": "Cancel",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "94:14750"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": []
+    },
+    {
+      "num": 62,
+      "id": "101:41858",
+      "name": "B3-P62 · New page / creating Services",
+      "w": 1440,
+      "h": 900,
+      "nodes": 707,
+      "instances": 181,
+      "fonts": [
+        "Inter",
+        "Geist Mono"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "101:41858",
+          "label": "B3-P62 · New page / creating Services",
+          "r": [
+            {
+              "trigger": "AFTER_TIMEOUT",
+              "to": [
+                "101:42581"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": []
+    },
+    {
+      "num": 63,
+      "id": "101:42581",
+      "name": "B3-P63 · Services created / blank page",
+      "w": 1440,
+      "h": 900,
+      "nodes": 300,
+      "instances": 85,
+      "fonts": [
+        "Inter",
+        "Geist Mono"
+      ],
+      "images": 0,
+      "routes": [],
+      "receipts": [
+        {
+          "id": "101:42941",
+          "x": 510,
+          "y": 792,
+          "w": 440,
+          "h": 44,
+          "absolute": true
+        }
+      ]
+    },
+    {
+      "num": 64,
+      "id": "104:28892",
+      "name": "B3-P64 · Templates / create Services",
+      "w": 1440,
+      "h": 900,
+      "nodes": 276,
+      "instances": 65,
+      "fonts": [
+        "Inter"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "104:29577",
+          "label": "‹ Back to New page",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "101:29978"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "104:29608",
+          "label": "Change",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "101:29978"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "I104:29612;103:30370",
+          "label": "Preview",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "105:29094"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": []
+    },
+    {
+      "num": 65,
+      "id": "105:29094",
+      "name": "B3-P65 · SaaS Landing preview / create Services",
+      "w": 1440,
+      "h": 900,
+      "nodes": 167,
+      "instances": 46,
+      "fonts": [
+        "Inter"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "105:29779",
+          "label": "‹ Back to templates",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "104:28892"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "105:29813",
+          "label": "Create page",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "106:29182"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "105:29810",
+          "label": "Change",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "101:29978"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": []
+    },
+    {
+      "num": 66,
+      "id": "106:29182",
+      "name": "B3-P66 · Create Services from SaaS Landing?",
+      "w": 1440,
+      "h": 900,
+      "nodes": 177,
+      "instances": 48,
+      "fonts": [
+        "Inter"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "106:29182",
+          "label": "B3-P66 · Create Services from SaaS Landing?",
+          "r": [
+            {
+              "trigger": "ON_KEY_DOWN",
+              "to": [
+                "105:29094"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "106:29349",
+          "label": "Modal scrim / background inactive",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "105:29094"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "106:29361",
+          "label": "Cancel",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "105:29094"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "106:29363",
+          "label": "Create page",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "107:31110"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": []
+    },
+    {
+      "num": 67,
+      "id": "106:37032",
+      "name": "B3-P67 · Creating Services…",
+      "w": 1440,
+      "h": 900,
+      "nodes": 182,
+      "instances": 48,
+      "fonts": [
+        "Inter"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "106:37032",
+          "label": "B3-P67 · Creating Services…",
+          "r": [
+            {
+              "trigger": "AFTER_TIMEOUT",
+              "to": [
+                "106:37579"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": []
+    },
+    {
+      "num": 68,
+      "id": "106:37213",
+      "name": "B3-P68 · Taking longer than usual…",
+      "w": 1440,
+      "h": 900,
+      "nodes": 175,
+      "instances": 47,
+      "fonts": [
+        "Inter"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "106:37392",
+          "label": "Keep waiting",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "106:37032"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": []
+    },
+    {
+      "num": 69,
+      "id": "106:37394",
+      "name": "B3-P69 · Services was created, but its layout wasn’t applied",
+      "w": 1440,
+      "h": 900,
+      "nodes": 181,
+      "instances": 50,
+      "fonts": [
+        "Inter"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "106:37573",
+          "label": "Open Services",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "107:30807"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "106:37575",
+          "label": "Delete empty page",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "107:30125"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "106:37577",
+          "label": "Try again into Services",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "107:31291"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": []
+    },
+    {
+      "num": 70,
+      "id": "106:37579",
+      "name": "B3-P70 · Services created from SaaS Landing",
+      "w": 1440,
+      "h": 900,
+      "nodes": 347,
+      "instances": 98,
+      "fonts": [
+        "Inter",
+        "Geist Mono"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "106:37666",
+          "label": "SEO & social",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "107:29742"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "106:37904",
+          "label": "Page settings",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "107:29742"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": [
+        {
+          "id": "106:37680",
+          "x": 390,
+          "y": 792,
+          "w": 580,
+          "h": 56,
+          "absolute": true
+        }
+      ]
+    },
+    {
+      "num": 71,
+      "id": "107:29742",
+      "name": "B3-P71 · Services page settings / exact return",
+      "w": 1440,
+      "h": 900,
+      "nodes": 402,
+      "instances": 111,
+      "fonts": [
+        "Inter",
+        "Geist Mono"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "107:30070",
+          "label": "Close Services · Page settings",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "106:37579"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "107:30101",
+          "label": "Cancel",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "106:37579"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": []
+    },
+    {
+      "num": 72,
+      "id": "107:30125",
+      "name": "B3-P72 · Services empty page deleted",
+      "w": 1440,
+      "h": 900,
+      "nodes": 682,
+      "instances": 175,
+      "fonts": [
+        "Inter",
+        "Geist Mono"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "I107:30347;62:1585",
+          "label": "Page actions",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "63:13820"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "107:30805",
+          "label": "Undo",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "109:42059"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": [
+        {
+          "id": "107:30803",
+          "x": 390,
+          "y": 792,
+          "w": 620,
+          "h": 56,
+          "absolute": true
+        }
+      ]
+    },
+    {
+      "num": 73,
+      "id": "107:30807",
+      "name": "B3-P73 · Services / empty page after template failure",
+      "w": 1440,
+      "h": 900,
+      "nodes": 302,
+      "instances": 86,
+      "fonts": [
+        "Inter",
+        "Geist Mono"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "107:31108",
+          "label": "Try template again",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "107:31291"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": [
+        {
+          "id": "107:30908",
+          "x": 390,
+          "y": 792,
+          "w": 620,
+          "h": 56,
+          "absolute": true
+        }
+      ]
+    },
+    {
+      "num": 74,
+      "id": "107:31110",
+      "name": "B3-P74 · Preparing SaaS Landing…",
+      "w": 1440,
+      "h": 900,
+      "nodes": 180,
+      "instances": 47,
+      "fonts": [
+        "Inter"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "107:31110",
+          "label": "B3-P74 · Preparing SaaS Landing…",
+          "r": [
+            {
+              "trigger": "AFTER_TIMEOUT",
+              "to": [
+                "106:37032"
+              ]
+            },
+            {
+              "trigger": "ON_KEY_DOWN",
+              "to": [
+                "105:29094"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "107:31289",
+          "label": "Cancel",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "105:29094"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": []
+    },
+    {
+      "num": 76,
+      "id": "107:31291",
+      "name": "B3-P76 · Applying SaaS Landing to Services…",
+      "w": 1440,
+      "h": 900,
+      "nodes": 182,
+      "instances": 48,
+      "fonts": [
+        "Inter"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "107:31291",
+          "label": "B3-P76 · Applying SaaS Landing to Services…",
+          "r": [
+            {
+              "trigger": "AFTER_TIMEOUT",
+              "to": [
+                "106:37579"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": []
+    },
+    {
+      "num": 75,
+      "id": "107:39139",
+      "name": "B3-P75 · We couldn’t confirm the result",
+      "w": 1440,
+      "h": 900,
+      "nodes": 177,
+      "instances": 48,
+      "fonts": [
+        "Inter"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "107:39318",
+          "label": "Keep waiting",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "106:37213"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "107:39320",
+          "label": "Check Services",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "107:30807"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": []
+    },
+    {
+      "num": 77,
+      "id": "109:30868",
+      "name": "B3-P77 · Pages / capacity inventory retained",
+      "w": 1440,
+      "h": 900,
+      "nodes": 746,
+      "instances": 194,
+      "fonts": [
+        "Inter",
+        "Geist Mono"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "109:31115",
+          "label": "+ Add page",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "101:38257"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "109:31117",
+          "label": "From template",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "101:38257"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": []
+    },
+    {
+      "num": 78,
+      "id": "109:31658",
+      "name": "B3-P78 · About settings / invalid URL draft retained",
+      "w": 1440,
+      "h": 900,
+      "nodes": 581,
+      "instances": 146,
+      "fonts": [
+        "Inter",
+        "Geist Mono"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "109:31658",
+          "label": "B3-P78 · About settings / invalid URL draft retained",
+          "r": [
+            {
+              "trigger": "ON_KEY_DOWN",
+              "to": [
+                "109:32246"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "109:31865",
+          "label": "Modal scrim / background inactive",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "109:32246"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "109:31870",
+          "label": "Close About · Page settings",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "109:32246"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "109:31890",
+          "label": "Field / Page URL",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "101:22426"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "109:32241",
+          "label": "Cancel",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "109:32246"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": []
+    },
+    {
+      "num": 79,
+      "id": "109:32246",
+      "name": "B3-P79 · About settings / close with invalid URL draft",
+      "w": 1440,
+      "h": 900,
+      "nodes": 592,
+      "instances": 149,
+      "fonts": [
+        "Inter",
+        "Geist Mono"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "109:32246",
+          "label": "B3-P79 · About settings / close with invalid URL draft",
+          "r": [
+            {
+              "trigger": "ON_KEY_DOWN",
+              "to": [
+                "109:31658"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "109:32490",
+          "label": "Modal scrim / background inactive",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "109:31658"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "109:32899",
+          "label": "Keep editing",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "109:31658"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "109:32901",
+          "label": "Discard changes",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "63:6393"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "109:32903",
+          "label": "Fix page URL",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "101:24836"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": []
+    },
+    {
+      "num": 80,
+      "id": "109:32916",
+      "name": "B3-P80 · New page / template source with name still empty",
+      "w": 1440,
+      "h": 900,
+      "nodes": 707,
+      "instances": 181,
+      "fonts": [
+        "Inter",
+        "Geist Mono"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "109:32916",
+          "label": "B3-P80 · New page / template source with name still empty",
+          "r": [
+            {
+              "trigger": "ON_KEY_DOWN",
+              "to": [
+                "63:6393"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "109:33159",
+          "label": "Modal scrim / background inactive",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "63:6393"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "109:33165",
+          "label": "Page name input",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "101:29978"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "109:33168",
+          "label": "Blank",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "101:37542"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "109:33174",
+          "label": "Cancel",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "63:6393"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": []
+    },
+    {
+      "num": 81,
+      "id": "109:42059",
+      "name": "B3-P81 · Services restored / Home stays open",
+      "w": 1440,
+      "h": 900,
+      "nodes": 699,
+      "instances": 180,
+      "fonts": [
+        "Inter",
+        "Geist Mono"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "109:42756",
+          "label": "Services",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "107:30807"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "109:42741",
+          "label": "Services / restored page",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "107:30807"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "109:42304",
+          "label": "Open Services",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "107:30807"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": [
+        {
+          "id": "109:42302",
+          "x": 390,
+          "y": 792,
+          "w": 620,
+          "h": 56,
+          "absolute": true
+        }
+      ]
+    },
+    {
+      "num": 82,
+      "id": "109:44109",
+      "name": "B3-P82 · Offline draft retained / 600px workspace",
+      "w": 1440,
+      "h": 600,
+      "nodes": 584,
+      "instances": 146,
+      "fonts": [
+        "Inter",
+        "Geist Mono"
+      ],
+      "images": 0,
+      "routes": [
+        {
+          "id": "109:44109",
+          "label": "B3-P82 · Offline draft retained / 600px workspace",
+          "r": [
+            {
+              "trigger": "ON_KEY_DOWN",
+              "to": [
+                "101:29372"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "109:44353",
+          "label": "Modal scrim / background inactive",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "101:29372"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "109:44705",
+          "label": "Close About · Page settings",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "101:29372"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "109:44737",
+          "label": "Cancel",
+          "r": [
+            {
+              "trigger": "ON_CLICK",
+              "to": [
+                "101:29372"
+              ]
+            }
+          ]
+        }
+      ],
+      "receipts": []
+    },
+    {
+      "num": 83,
+      "id": "109:44764",
+      "name": "B3-P83 · Offline Pages / 600px workspace",
+      "w": 1440,
+      "h": 600,
+      "nodes": 688,
+      "instances": 176,
+      "fonts": [
+        "Inter",
+        "Geist Mono"
+      ],
+      "images": 0,
+      "routes": [],
+      "receipts": []
+    }
+  ],
+  "frameCount": 40,
+  "auditDate": "2026-10-19",
+  "status": "PARTIALLY VERIFIED — native structure and selected visual/route review only",
+  "actionableRouteNodes": 114,
+  "prototypePlayback": "NOT RUN: Figma host WebGL initialization failed",
+  "applicationImplementation": false,
+  "independentReview": "B3-independent-QA-2026-10-19.md"
+}

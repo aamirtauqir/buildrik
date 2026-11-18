@@ -1,0 +1,15 @@
+[
+  {
+    "goto": "8843:25014",
+    "shot": "r40-columns-desktop3.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-25014&starting-point-node-id=8843%3A25014&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 475,
+    "y": 96,
+    "shot": "r40-columns-mobile3.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-25014&starting-point-node-id=8843%3A25014&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

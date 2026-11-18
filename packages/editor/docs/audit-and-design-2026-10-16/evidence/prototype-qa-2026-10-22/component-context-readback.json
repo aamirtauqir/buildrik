@@ -1,0 +1,508 @@
+[
+  {
+    "id": "415:55220",
+    "name": "CF16 · Component root / Push to master eligibility",
+    "w": 1440,
+    "h": 900,
+    "controls": [
+      {
+        "id": "415:55526",
+        "name": "Push to master",
+        "visible": true,
+        "x": 1279,
+        "y": 537,
+        "w": 276,
+        "h": 32,
+        "trigger": "ON_CLICK",
+        "actions": [
+          {
+            "type": "NODE",
+            "to": "415:55532"
+          }
+        ]
+      },
+      {
+        "id": "415:55528",
+        "name": "Reset local override",
+        "visible": true,
+        "x": 1279,
+        "y": 569,
+        "w": 276,
+        "h": 32,
+        "trigger": "ON_CLICK",
+        "actions": [
+          {
+            "type": "NODE",
+            "to": "421:52495"
+          }
+        ]
+      },
+      {
+        "id": "415:55530",
+        "name": "Inspect heading child",
+        "visible": true,
+        "x": 1279,
+        "y": 601,
+        "w": 276,
+        "h": 32,
+        "trigger": "ON_CLICK",
+        "actions": [
+          {
+            "type": "NODE",
+            "to": "415:54889"
+          }
+        ]
+      },
+      {
+        "id": "421:52368",
+        "name": "Open component",
+        "visible": true,
+        "x": 1279,
+        "y": 633,
+        "w": 276,
+        "h": 32,
+        "trigger": "ON_CLICK",
+        "actions": [
+          {
+            "type": "NODE",
+            "to": "462:51685"
+          }
+        ]
+      },
+      {
+        "id": "415:55323",
+        "name": "Prototype scenarios",
+        "visible": true,
+        "x": 1397,
+        "y": 883,
+        "w": 68,
+        "h": 28,
+        "trigger": "ON_CLICK",
+        "actions": [
+          {
+            "type": "NODE",
+            "to": "415:61494"
+          }
+        ]
+      }
+    ],
+    "counts": {
+      "FRAME": 66,
+      "INSTANCE": 83,
+      "TEXT": 60,
+      "VECTOR": 67,
+      "RECTANGLE": 2
+    },
+    "imageNodes": [],
+    "fonts": [
+      "Inter",
+      "Geist Mono"
+    ]
+  },
+  {
+    "id": "415:55850",
+    "name": "CF18 · Master updated / acknowledgement and recovery",
+    "w": 1440,
+    "h": 900,
+    "controls": [
+      {
+        "id": "415:56156",
+        "name": "View component versions",
+        "visible": true,
+        "x": 1279,
+        "y": 521,
+        "w": 276,
+        "h": 32,
+        "trigger": "ON_CLICK",
+        "actions": [
+          {
+            "type": "NODE",
+            "to": "419:56721"
+          }
+        ]
+      },
+      {
+        "id": "415:56158",
+        "name": "Back to instance",
+        "visible": true,
+        "x": 1279,
+        "y": 553,
+        "w": 276,
+        "h": 32,
+        "trigger": "ON_CLICK",
+        "actions": [
+          {
+            "type": "NODE",
+            "to": "462:51821"
+          }
+        ]
+      },
+      {
+        "id": "415:55953",
+        "name": "Prototype scenarios",
+        "visible": true,
+        "x": 1397,
+        "y": 883,
+        "w": 68,
+        "h": 28,
+        "trigger": "ON_CLICK",
+        "actions": [
+          {
+            "type": "NODE",
+            "to": "415:61494"
+          }
+        ]
+      }
+    ],
+    "counts": {
+      "FRAME": 65,
+      "INSTANCE": 80,
+      "TEXT": 58,
+      "VECTOR": 66,
+      "RECTANGLE": 2
+    },
+    "imageNodes": [],
+    "fonts": [
+      "Inter",
+      "Geist Mono"
+    ]
+  },
+  {
+    "id": "419:56721",
+    "name": "CF51 · Component detail / exact source and return",
+    "w": 1440,
+    "h": 900,
+    "controls": [
+      {
+        "id": "419:57033",
+        "name": "‹ Hero instance · Style / Tablet",
+        "visible": true,
+        "x": 510,
+        "y": 96,
+        "w": 380,
+        "h": 32,
+        "trigger": "ON_CLICK",
+        "actions": [
+          {
+            "type": "NODE",
+            "to": "462:51821"
+          }
+        ]
+      },
+      {
+        "id": "419:57044",
+        "name": "Return to Hero instance",
+        "visible": true,
+        "x": 460,
+        "y": 334,
+        "w": 280,
+        "h": 32,
+        "trigger": "ON_CLICK",
+        "actions": [
+          {
+            "type": "NODE",
+            "to": "462:51821"
+          }
+        ]
+      },
+      {
+        "id": "419:57049",
+        "name": "Review previous definition",
+        "visible": true,
+        "x": 460,
+        "y": 470,
+        "w": 280,
+        "h": 32,
+        "trigger": "ON_CLICK",
+        "actions": [
+          {
+            "type": "NODE",
+            "to": "421:50544"
+          }
+        ]
+      },
+      {
+        "id": "419:56823",
+        "name": "Prototype scenarios",
+        "visible": true,
+        "x": 1397,
+        "y": 883,
+        "w": 68,
+        "h": 28,
+        "trigger": "ON_CLICK",
+        "actions": [
+          {
+            "type": "NODE",
+            "to": "415:61494"
+          }
+        ]
+      }
+    ],
+    "counts": {
+      "FRAME": 26,
+      "INSTANCE": 41,
+      "TEXT": 33,
+      "VECTOR": 34,
+      "RECTANGLE": 2
+    },
+    "imageNodes": [],
+    "fonts": [
+      "Inter"
+    ]
+  },
+  {
+    "id": "462:51685",
+    "name": "CF78 · Component detail / before Push master36 local40",
+    "w": 1440,
+    "h": 900,
+    "controls": [
+      {
+        "id": "462:51717",
+        "name": "‹ Hero instance · Style / Tablet",
+        "visible": true,
+        "x": 510,
+        "y": 96,
+        "w": 380,
+        "h": 32,
+        "trigger": "ON_CLICK",
+        "actions": [
+          {
+            "type": "NODE",
+            "to": "415:55220"
+          }
+        ]
+      },
+      {
+        "id": "462:51724",
+        "name": "Return to Hero instance",
+        "visible": true,
+        "x": 460,
+        "y": 334,
+        "w": 280,
+        "h": 32,
+        "trigger": "ON_CLICK",
+        "actions": [
+          {
+            "type": "NODE",
+            "to": "415:55220"
+          }
+        ]
+      },
+      {
+        "id": "462:51737",
+        "name": "Prototype scenarios",
+        "visible": true,
+        "x": 1397,
+        "y": 883,
+        "w": 68,
+        "h": 28,
+        "trigger": "ON_CLICK",
+        "actions": [
+          {
+            "type": "NODE",
+            "to": "415:61494"
+          }
+        ]
+      }
+    ],
+    "counts": {
+      "FRAME": 26,
+      "INSTANCE": 41,
+      "TEXT": 33,
+      "VECTOR": 34,
+      "RECTANGLE": 2
+    },
+    "imageNodes": [],
+    "fonts": [
+      "Inter"
+    ]
+  },
+  {
+    "id": "462:51821",
+    "name": "CF79 · Component root / after Push master40 local40",
+    "w": 1440,
+    "h": 900,
+    "controls": [
+      {
+        "id": "462:51905",
+        "name": "Reset local override",
+        "visible": true,
+        "x": 1279,
+        "y": 585,
+        "w": 276,
+        "h": 32,
+        "trigger": "ON_CLICK",
+        "actions": [
+          {
+            "type": "NODE",
+            "to": "462:52099"
+          }
+        ]
+      },
+      {
+        "id": "462:51906",
+        "name": "Inspect heading child",
+        "visible": true,
+        "x": 1279,
+        "y": 617,
+        "w": 276,
+        "h": 32,
+        "trigger": "ON_CLICK",
+        "actions": [
+          {
+            "type": "NODE",
+            "to": "462:52381"
+          }
+        ]
+      },
+      {
+        "id": "462:51907",
+        "name": "Open component",
+        "visible": true,
+        "x": 1279,
+        "y": 649,
+        "w": 276,
+        "h": 32,
+        "trigger": "ON_CLICK",
+        "actions": [
+          {
+            "type": "NODE",
+            "to": "419:56721"
+          }
+        ]
+      },
+      {
+        "id": "462:51917",
+        "name": "Prototype scenarios",
+        "visible": true,
+        "x": 1397,
+        "y": 883,
+        "w": 68,
+        "h": 28,
+        "trigger": "ON_CLICK",
+        "actions": [
+          {
+            "type": "NODE",
+            "to": "415:61494"
+          }
+        ]
+      }
+    ],
+    "counts": {
+      "FRAME": 66,
+      "INSTANCE": 83,
+      "TEXT": 60,
+      "VECTOR": 67,
+      "RECTANGLE": 2
+    },
+    "imageNodes": [],
+    "fonts": [
+      "Inter",
+      "Geist Mono"
+    ]
+  },
+  {
+    "id": "462:52099",
+    "name": "CF80 · Post-Push Reset / no local override master40",
+    "w": 1440,
+    "h": 900,
+    "controls": [
+      {
+        "id": "462:52195",
+        "name": "Prototype scenarios",
+        "visible": true,
+        "x": 1397,
+        "y": 883,
+        "w": 68,
+        "h": 28,
+        "trigger": "ON_CLICK",
+        "actions": [
+          {
+            "type": "NODE",
+            "to": "415:61494"
+          }
+        ]
+      },
+      {
+        "id": "462:52198",
+        "name": "Undo",
+        "visible": true,
+        "x": 1358,
+        "y": 836,
+        "w": 100,
+        "h": 32,
+        "trigger": "ON_CLICK",
+        "actions": [
+          {
+            "type": "NODE",
+            "to": "462:51821"
+          }
+        ]
+      }
+    ],
+    "counts": {
+      "FRAME": 67,
+      "INSTANCE": 84,
+      "TEXT": 62,
+      "VECTOR": 67,
+      "RECTANGLE": 2
+    },
+    "imageNodes": [],
+    "fonts": [
+      "Inter",
+      "Geist Mono"
+    ]
+  },
+  {
+    "id": "462:52381",
+    "name": "CF81 · Component child / after Push exact root return",
+    "w": 1440,
+    "h": 900,
+    "controls": [
+      {
+        "id": "462:52477",
+        "name": "Select Hero instance root",
+        "visible": true,
+        "x": 1279,
+        "y": 753,
+        "w": 276,
+        "h": 32,
+        "trigger": "ON_CLICK",
+        "actions": [
+          {
+            "type": "NODE",
+            "to": "462:51821"
+          }
+        ]
+      },
+      {
+        "id": "462:52487",
+        "name": "Prototype scenarios",
+        "visible": true,
+        "x": 1397,
+        "y": 883,
+        "w": 68,
+        "h": 28,
+        "trigger": "ON_CLICK",
+        "actions": [
+          {
+            "type": "NODE",
+            "to": "415:61494"
+          }
+        ]
+      }
+    ],
+    "counts": {
+      "FRAME": 75,
+      "INSTANCE": 85,
+      "TEXT": 65,
+      "VECTOR": 68,
+      "RECTANGLE": 2
+    },
+    "imageNodes": [],
+    "fonts": [
+      "Inter",
+      "Geist Mono"
+    ]
+  }
+]

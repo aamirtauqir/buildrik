@@ -1,0 +1,194 @@
+{
+  "page": "3:6",
+  "scope": "cms native graph, not browser playback",
+  "rootCount": 4,
+  "controlReactions": 9,
+  "invalidDestinations": [],
+  "frames": [
+    {
+      "id": "424:337006",
+      "name": "RL01 · CMS / current-release navigation",
+      "w": 1440,
+      "h": 900,
+      "controls": [
+        {
+          "id": "424:337045",
+          "name": "Site variables",
+          "text": "Site variables",
+          "visible": true,
+          "x": 176,
+          "y": 328,
+          "w": 216,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "424:337452"
+            }
+          ]
+        },
+        {
+          "id": "424:337046",
+          "name": "Conditions",
+          "text": "Conditions",
+          "visible": true,
+          "x": 176,
+          "y": 368,
+          "w": 216,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "424:337627"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "424:337452",
+      "name": "RL02 · Site variables / Sources hidden",
+      "w": 1440,
+      "h": 900,
+      "controls": [
+        {
+          "id": "424:337485",
+          "name": "Blog   1,000",
+          "text": "Blog   1,000",
+          "visible": true,
+          "x": 176,
+          "y": 160,
+          "w": 216,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "424:337006"
+            }
+          ]
+        },
+        {
+          "id": "424:337492",
+          "name": "Conditions",
+          "text": "Conditions",
+          "visible": true,
+          "x": 176,
+          "y": 368,
+          "w": 216,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "424:337627"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "424:337627",
+      "name": "RL03 · Conditions / current-release index",
+      "w": 1440,
+      "h": 900,
+      "controls": [
+        {
+          "id": "424:337660",
+          "name": "Blog   1,000",
+          "text": "Blog   1,000",
+          "visible": true,
+          "x": 176,
+          "y": 160,
+          "w": 216,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "424:337006"
+            }
+          ]
+        },
+        {
+          "id": "424:337666",
+          "name": "Site variables",
+          "text": "Site variables",
+          "visible": true,
+          "x": 176,
+          "y": 328,
+          "w": 216,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "424:337452"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "424:337803",
+      "name": "RL00 · Current-release overrides / BD-39",
+      "w": 1440,
+      "h": 700,
+      "controls": [
+        {
+          "id": "424:337806",
+          "name": "RL01 · CMS / current-release navigation",
+          "text": "RL01 · CMS / current-release navigation",
+          "visible": true,
+          "x": 348,
+          "y": 162,
+          "w": 600,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "424:337006"
+            }
+          ]
+        },
+        {
+          "id": "424:337809",
+          "name": "RL02 · Site variables / Sources hidden",
+          "text": "RL02 · Site variables / Sources hidden",
+          "visible": true,
+          "x": 348,
+          "y": 218,
+          "w": 600,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "424:337452"
+            }
+          ]
+        },
+        {
+          "id": "424:337812",
+          "name": "RL03 · Conditions / current-release index",
+          "text": "RL03 · Conditions / current-release index",
+          "visible": true,
+          "x": 348,
+          "y": 274,
+          "w": 600,
+          "h": 32,
+          "trigger": "ON_CLICK",
+          "actions": [
+            {
+              "type": "NODE",
+              "to": "424:337627"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

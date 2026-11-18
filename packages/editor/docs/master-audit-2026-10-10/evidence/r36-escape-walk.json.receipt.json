@@ -1,0 +1,26 @@
+[
+  {
+    "goto": "8843:20467",
+    "wait": 5000,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-20467&starting-point-node-id=8843%3A20467&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 476,
+    "y": 96,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-20467&starting-point-node-id=8843%3A20467&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 1335,
+    "y": 292,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-20467&starting-point-node-id=8843%3A20467&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "key": "Escape",
+    "shot": "r36-picker-escape-return.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-20467&starting-point-node-id=8843%3A20467&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

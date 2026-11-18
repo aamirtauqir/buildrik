@@ -1,0 +1,7 @@
+[
+ {"x":720,"y":575,"shot":"r43-select-delete-cancel-keeps-default.png"},
+ {"x":865,"y":595},
+ {"x":720,"y":527,"shot":"r43-select-default-removed.png"},
+ {"x":575,"y":675,"shot":"r43-select-undo-restores-default-order.png"},
+ {"x":865,"y":699,"shot":"r43-select-restored-mobile-output.png"}
+]

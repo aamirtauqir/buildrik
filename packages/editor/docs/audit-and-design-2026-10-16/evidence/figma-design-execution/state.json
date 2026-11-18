@@ -1,0 +1,197 @@
+{
+  "runId": "buildrick-2026-10-18-b0-b2",
+  "fileKey": "2L9OTGzBrL6kYmU18yA1c7",
+  "url": "https://www.figma.com/design/2L9OTGzBrL6kYmU18yA1c7",
+  "scope": "First visual checkpoint B0-B2 initial pass; no app edits",
+  "status": "REPRESENTED; bounded independent corrections DESIGN REVIEW PASSED; full batch acceptance incomplete",
+  "completedSteps": [
+    "new-file",
+    "pages-and-readme",
+    "foundations",
+    "initial-components",
+    "12-journey-states",
+    "13-main-prototype-links",
+    "9-companion-frames",
+    "6-responsive-frames",
+    "4-task-geometry-frames",
+    "independent-three-frame-visual-review",
+    "final-horizontal-layout-and-font-readback",
+    "6229-app-files-unchanged"
+  ],
+  "pendingValidations": [
+    "complete-FID-and-owner-reconciliation",
+    "full-component-state-long-content-acceptance",
+    "full-editor-200-percent-text",
+    "prototype-playback",
+    "browser-keyboard-screenreader",
+    "runtime-and-persistence",
+    "user-composition-feedback"
+  ],
+  "entities": {
+    "pages": {
+      "00 · Read me": "0:1",
+      "01 · Foundations": "3:2",
+      "02 · Components": "3:3",
+      "03 · Editor": "3:4",
+      "04 · Inspector": "3:5",
+      "05 · Resources": "3:6",
+      "06 · Site delivery": "3:7",
+      "07 · Recovery and access": "3:8",
+      "08 · First run": "3:9",
+      "09 · Journey review": "3:10"
+    },
+    "foundations": "3:101",
+    "components": "4:656",
+    "readme": "14:2",
+    "journey": [
+      {
+        "id": "7:18654",
+        "name": "J-F1.01 · Open existing Home"
+      },
+      {
+        "id": "7:18981",
+        "name": "J-F1.02 · Add / target Hero"
+      },
+      {
+        "id": "7:19448",
+        "name": "J-F1.03 · Text inserted / receipt"
+      },
+      {
+        "id": "7:19791",
+        "name": "J-F1.04 · Select Text in Layers"
+      },
+      {
+        "id": "7:20283",
+        "name": "J-F1.05 · Edit content"
+      },
+      {
+        "id": "7:20634",
+        "name": "J-F1.06 · Style / Desktop 24px"
+      },
+      {
+        "id": "8:1282",
+        "name": "J-F1.07 · Tablet / inherited 24px"
+      },
+      {
+        "id": "8:1705",
+        "name": "J-F1.08 · Tablet / override 20px"
+      },
+      {
+        "id": "8:2272",
+        "name": "J-F1.09 · Remove override / fallback 24px"
+      },
+      {
+        "id": "8:2695",
+        "name": "J-F1.10 · Undo removal / restored 20px"
+      },
+      {
+        "id": "8:3262",
+        "name": "J-F1.11 · Preview / current Tablet"
+      },
+      {
+        "id": "8:3298",
+        "name": "J-F1.12 · Return / same context"
+      }
+    ],
+    "companions": [
+      {
+        "id": "10:2",
+        "name": "C01 · Locked insertion"
+      },
+      {
+        "id": "10:370",
+        "name": "C02 · Stale insertion target"
+      },
+      {
+        "id": "10:1190",
+        "name": "C03 · Mixed multi-selection"
+      },
+      {
+        "id": "10:1626",
+        "name": "C04 · Save pending"
+      },
+      {
+        "id": "10:2199",
+        "name": "C05 · Save failed / edits retained"
+      },
+      {
+        "id": "10:2647",
+        "name": "C06 · Focus mode / panels hidden"
+      },
+      {
+        "id": "10:2795",
+        "name": "C07 · Restored panel arrangement"
+      },
+      {
+        "id": "10:3228",
+        "name": "C08 · Narrow target / overlay"
+      },
+      {
+        "id": "10:3787",
+        "name": "C09 · Narrow insertion / Inspector stays closed"
+      }
+    ],
+    "responsive": [
+      {
+        "id": "11:2",
+        "name": "R01 · 1024 × 768 / two-row toolbar"
+      },
+      {
+        "id": "11:311",
+        "name": "R02 · 1440 × 600 / short viewport"
+      },
+      {
+        "id": "11:870",
+        "name": "R03 · 1920 × 1080 / wide workspace"
+      },
+      {
+        "id": "11:1297",
+        "name": "R04 · 1365 / overlay threshold below"
+      },
+      {
+        "id": "11:1866",
+        "name": "R05 · 1367 / docked threshold above"
+      },
+      {
+        "id": "11:2299",
+        "name": "R06 · 1280 / People and notifications"
+      }
+    ],
+    "tasks": [
+      {
+        "id": "15:2450",
+        "name": "T01 · 1440 / docked Review replaces Inspector"
+      },
+      {
+        "id": "15:3054",
+        "name": "T02 · 1281 / Review overlay"
+      },
+      {
+        "id": "15:8208",
+        "name": "T03 · 1279 / Review sheet"
+      },
+      {
+        "id": "15:8645",
+        "name": "T04 · 1279 / Locate collapses to 48px peek"
+      }
+    ],
+    "handoff": "17:2170"
+  },
+  "independentAudit": {
+    "agent": "figma_design_auditor",
+    "frames": [
+      "8:1705",
+      "10:1190",
+      "10:3228"
+    ],
+    "result": "No unresolved material P0/P1/P2 finding within three corrected frames; not full B2 or runtime acceptance"
+  },
+  "counts": {
+    "variables": 74,
+    "textStyles": 10,
+    "effectStyles": 4,
+    "components": 129,
+    "variantSets": 13,
+    "mainJourneyLinks": 13
+  }
+}

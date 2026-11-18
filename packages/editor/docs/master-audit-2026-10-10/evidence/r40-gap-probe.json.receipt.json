@@ -1,0 +1,17 @@
+[
+  {
+    "x": 1260,
+    "y": 390,
+    "wait": 1500,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-25014&starting-point-node-id=8843%3A25014&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 720,
+    "y": 613,
+    "wait": 2200,
+    "shot": "r40-mobile-gap32-probe.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-25014&starting-point-node-id=8843%3A25014&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

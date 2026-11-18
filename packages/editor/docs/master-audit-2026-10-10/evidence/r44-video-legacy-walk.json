@@ -1,0 +1,15 @@
+[
+  {"x":720,"y":372},
+  {"x":1330,"y":254,"shot":"r44-video-mobile-legacy-warning.png"},
+  {"x":1310,"y":226},
+  {"x":720,"y":523,"shot":"r44-video-mobile-legacy-migrated.png"},
+  {"x":1350,"y":323,"shot":"r44-video-mobile-legacy-restored.png"},
+  {"x":1390,"y":88},
+  {"x":210,"y":984},
+  {"x":720,"y":468,"shot":"r44-video-mobile-invalid-source.png"},
+  {"x":1330,"y":254},
+  {"x":1310,"y":226},
+  {"x":720,"y":563,"shot":"r44-video-invalid-source-square.png"},
+  {"x":1390,"y":88},
+  {"x":1330,"y":212,"shot":"r44-video-source-editor.png"}
+]

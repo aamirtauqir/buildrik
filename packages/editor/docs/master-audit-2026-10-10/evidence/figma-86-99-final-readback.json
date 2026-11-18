@@ -1,0 +1,300 @@
+{
+  "frames": [
+    {
+      "id": "8309:2",
+      "name": "AS-IS 86 · Components / Create dialog",
+      "parent": "8280:2",
+      "width": 1440,
+      "height": 900,
+      "images": [],
+      "remainingEllipsis": [
+        {
+          "id": "8309:15",
+          "text": "Audit persisted page"
+        },
+        {
+          "id": "8309:16",
+          "text": "Audit after checkpoint"
+        }
+      ]
+    },
+    {
+      "id": "8309:461",
+      "name": "AS-IS 87 · Components / Instance controls",
+      "parent": "8280:2",
+      "width": 1440,
+      "height": 900,
+      "images": [],
+      "remainingEllipsis": [
+        {
+          "id": "8309:474",
+          "text": "Audit persisted page"
+        },
+        {
+          "id": "8309:475",
+          "text": "Audit after checkpoint"
+        },
+        {
+          "id": "8309:832",
+          "text": "Audit As-Is heading 1010"
+        }
+      ]
+    },
+    {
+      "id": "8309:887",
+      "name": "AS-IS 88 · Components / Instance actions",
+      "parent": "8280:2",
+      "width": 1440,
+      "height": 900,
+      "images": [],
+      "remainingEllipsis": [
+        {
+          "id": "8309:900",
+          "text": "Audit persisted page"
+        },
+        {
+          "id": "8309:901",
+          "text": "Audit after checkpoint"
+        },
+        {
+          "id": "8309:1264",
+          "text": "Audit As-Is heading 1010"
+        }
+      ]
+    },
+    {
+      "id": "8309:242881",
+      "name": "AS-IS 89 · Components / Expanded manager",
+      "parent": "8280:2",
+      "width": 1440,
+      "height": 900,
+      "images": [],
+      "remainingEllipsis": [
+        {
+          "id": "8309:242894",
+          "text": "Audit persisted page"
+        },
+        {
+          "id": "8309:242895",
+          "text": "Audit after checkpoint"
+        },
+        {
+          "id": "8309:242945",
+          "text": "Component instance · Audit As-Is heading 1010 · 984 × 43"
+        }
+      ]
+    },
+    {
+      "id": "8309:243286",
+      "name": "AS-IS 90 · Components / Master detail",
+      "parent": "8280:2",
+      "width": 1440,
+      "height": 900,
+      "images": [
+        "8309:247980"
+      ],
+      "remainingEllipsis": [
+        {
+          "id": "8309:243299",
+          "text": "Audit persisted page"
+        },
+        {
+          "id": "8309:243300",
+          "text": "Audit after checkpoint"
+        },
+        {
+          "id": "8309:243350",
+          "text": "Component instance · Audit As-Is heading 1010 · 984 × 43"
+        }
+      ]
+    },
+    {
+      "id": "8309:243704",
+      "name": "AS-IS 91 · Components / Back to instance",
+      "parent": "8280:2",
+      "width": 1440,
+      "height": 900,
+      "images": [
+        "8309:247981"
+      ],
+      "remainingEllipsis": [
+        {
+          "id": "8309:243717",
+          "text": "Audit persisted page"
+        },
+        {
+          "id": "8309:243718",
+          "text": "Audit after checkpoint"
+        },
+        {
+          "id": "8309:243768",
+          "text": "Component instance · Audit As-Is heading 1010 · 984 × 43"
+        }
+      ]
+    },
+    {
+      "id": "8309:244123",
+      "name": "AS-IS 92 · Inspector / CMS binding chooser",
+      "parent": "8280:2",
+      "width": 1440,
+      "height": 900,
+      "images": [
+        "8309:247982"
+      ],
+      "remainingEllipsis": [
+        {
+          "id": "8309:244136",
+          "text": "Audit persisted page"
+        },
+        {
+          "id": "8309:244137",
+          "text": "Audit after checkpoint"
+        },
+        {
+          "id": "8309:244187",
+          "text": "Component instance · Audit As-Is heading 1010 · 984 × 43"
+        }
+      ]
+    },
+    {
+      "id": "8309:244434",
+      "name": "AS-IS 93 · Inspector / Add interaction",
+      "parent": "8280:2",
+      "width": 1440,
+      "height": 900,
+      "images": [
+        "8309:247983"
+      ],
+      "remainingEllipsis": [
+        {
+          "id": "8309:244447",
+          "text": "Audit persisted page"
+        },
+        {
+          "id": "8309:244448",
+          "text": "Audit after checkpoint"
+        },
+        {
+          "id": "8309:244498",
+          "text": "Component instance · Audit As-Is heading 1010 · 984 × 43"
+        }
+      ]
+    },
+    {
+      "id": "8309:244811",
+      "name": "AS-IS 94 · Inspector / Form behaviour",
+      "parent": "8280:2",
+      "width": 1440,
+      "height": 900,
+      "images": [],
+      "remainingEllipsis": [
+        {
+          "id": "8309:244825",
+          "text": "Audit persisted page"
+        },
+        {
+          "id": "8309:244826",
+          "text": "Audit after checkpoint"
+        }
+      ]
+    },
+    {
+      "id": "8309:245270",
+      "name": "AS-IS 95 · Inspector / Image chooser",
+      "parent": "8280:2",
+      "width": 1440,
+      "height": 900,
+      "images": [
+        "8309:245633",
+        "8309:245635",
+        "8309:245637"
+      ],
+      "remainingEllipsis": [
+        {
+          "id": "8309:245283",
+          "text": "Audit persisted page"
+        },
+        {
+          "id": "8309:245284",
+          "text": "Audit after checkpoint"
+        }
+      ]
+    },
+    {
+      "id": "8309:245692",
+      "name": "AS-IS 96 · Inspector / Spacing token picker",
+      "parent": "8280:2",
+      "width": 1440,
+      "height": 900,
+      "images": [
+        "8309:246073",
+        "8309:246075",
+        "8309:246077"
+      ],
+      "remainingEllipsis": [
+        {
+          "id": "8309:245705",
+          "text": "Audit persisted page"
+        },
+        {
+          "id": "8309:245706",
+          "text": "Audit after checkpoint"
+        }
+      ]
+    },
+    {
+      "id": "8309:246171",
+      "name": "AS-IS 97 · Inspector / Heading at Mobile",
+      "parent": "8280:2",
+      "width": 1440,
+      "height": 900,
+      "images": [],
+      "remainingEllipsis": [
+        {
+          "id": "8309:246184",
+          "text": "Audit persisted page"
+        },
+        {
+          "id": "8309:246185",
+          "text": "Audit after checkpoint"
+        },
+        {
+          "id": "8309:246253",
+          "text": "Heading · Heading · 335 × 43"
+        }
+      ]
+    },
+    {
+      "id": "8309:246610",
+      "name": "AS-IS 98 · Templates / Empty page replacement applied",
+      "parent": "8280:2",
+      "width": 1440,
+      "height": 900,
+      "images": [],
+      "remainingEllipsis": [
+        {
+          "id": "8309:246623",
+          "text": "Audit persisted page"
+        },
+        {
+          "id": "8309:246624",
+          "text": "Audit after checkpoint"
+        },
+        {
+          "id": "8309:246730",
+          "text": "Page / background"
+        }
+      ]
+    },
+    {
+      "id": "8309:247369",
+      "name": "AS-IS 99 · Templates / Replacement guard",
+      "parent": "8280:2",
+      "width": 1440,
+      "height": 900,
+      "images": [],
+      "remainingEllipsis": []
+    }
+  ],
+  "notes": []
+}

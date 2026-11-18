@@ -1,0 +1,9 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"roots\":[\"8842:14345\",\"8843:16808\",\"8843:17112\",\"8843:17410\",\"8844:264727\"],\"visibleLayoutChecks\":396,\"overflow\":[],\"sharedTextStylePersistedToTypes\":55,\"expectedStates\":[{\"id\":\"VariableID:8847:16439\",\"wired\":true},{\"id\":\"VariableID:8847:16516\",\"wired\":true},{\"id\":\"VariableID:8847:16593\",\"wired\":true},{\"id\":\"VariableID:8847:16670\",\"wired\":true}]}"
+    }
+  ],
+  "isError": false
+}

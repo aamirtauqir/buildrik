@@ -1,0 +1,433 @@
+[
+  {
+    "id": "350:25304",
+    "name": "PLAY · C01.1 · Select Eyebrow",
+    "size": [
+      1440,
+      996
+    ],
+    "descendants": 367,
+    "types": {
+      "FRAME": 102,
+      "INSTANCE": 102,
+      "TEXT": 71,
+      "VECTOR": 86,
+      "RECTANGLE": 5,
+      "ELLIPSE": 1
+    },
+    "fonts": [
+      "Inter",
+      "Geist Mono"
+    ],
+    "images": [],
+    "controls": [
+      {
+        "id": "350:25307",
+        "label": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "350:25764",
+        "label": "Back to Hero",
+        "x": 1080,
+        "y": 68,
+        "to": [
+          "302:3396"
+        ]
+      },
+      {
+        "id": "350:25350",
+        "label": "Hero",
+        "x": 199,
+        "y": 333,
+        "to": [
+          "302:3396"
+        ]
+      },
+      {
+        "id": "350:25352",
+        "label": "Headline",
+        "x": 199,
+        "y": 397,
+        "to": [
+          "350:25767"
+        ]
+      },
+      {
+        "id": "350:25353",
+        "label": "Explore our work",
+        "x": 199,
+        "y": 429,
+        "to": [
+          "350:26230"
+        ]
+      },
+      {
+        "id": "350:25385",
+        "label": "Thoughtful design.\nLasting impact.",
+        "x": 739.9996643066406,
+        "y": 393.1777648925781,
+        "to": [
+          "350:25767"
+        ]
+      },
+      {
+        "id": "350:25386",
+        "label": "Explore our work  ↗",
+        "x": 449.6440963745117,
+        "y": 466.3333206176758,
+        "to": [
+          "350:26230"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "350:25767",
+    "name": "PLAY · C01.2 · Select Headline",
+    "size": [
+      1440,
+      996
+    ],
+    "descendants": 367,
+    "types": {
+      "FRAME": 102,
+      "INSTANCE": 102,
+      "TEXT": 71,
+      "VECTOR": 86,
+      "RECTANGLE": 5,
+      "ELLIPSE": 1
+    },
+    "fonts": [
+      "Inter",
+      "Geist Mono"
+    ],
+    "images": [],
+    "controls": [
+      {
+        "id": "350:25770",
+        "label": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "350:26227",
+        "label": "Back to Hero",
+        "x": 1080,
+        "y": 68,
+        "to": [
+          "302:3396"
+        ]
+      },
+      {
+        "id": "350:25813",
+        "label": "Hero",
+        "x": 199,
+        "y": 333,
+        "to": [
+          "302:3396"
+        ]
+      },
+      {
+        "id": "350:25814",
+        "label": "Eyebrow",
+        "x": 199,
+        "y": 365,
+        "to": [
+          "350:25304"
+        ]
+      },
+      {
+        "id": "350:25816",
+        "label": "Explore our work",
+        "x": 199,
+        "y": 429,
+        "to": [
+          "350:26230"
+        ]
+      },
+      {
+        "id": "350:25847",
+        "label": "Independent design studio",
+        "x": 440.921875,
+        "y": 327.0555419921875,
+        "to": [
+          "350:25304"
+        ]
+      },
+      {
+        "id": "350:25849",
+        "label": "Explore our work  ↗",
+        "x": 449.6440963745117,
+        "y": 466.33325958251953,
+        "to": [
+          "350:26230"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "350:26230",
+    "name": "PLAY · C01.3 · Select Explore our work",
+    "size": [
+      1440,
+      996
+    ],
+    "descendants": 358,
+    "types": {
+      "FRAME": 102,
+      "INSTANCE": 98,
+      "TEXT": 70,
+      "VECTOR": 82,
+      "RECTANGLE": 5,
+      "ELLIPSE": 1
+    },
+    "fonts": [
+      "Inter",
+      "Geist Mono"
+    ],
+    "images": [],
+    "controls": [
+      {
+        "id": "350:26233",
+        "label": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "350:26691",
+        "label": "Back to Hero",
+        "x": 1080,
+        "y": 68,
+        "to": [
+          "302:3396"
+        ]
+      },
+      {
+        "id": "350:26276",
+        "label": "Hero",
+        "x": 199,
+        "y": 333,
+        "to": [
+          "302:3396"
+        ]
+      },
+      {
+        "id": "350:26277",
+        "label": "Eyebrow",
+        "x": 199,
+        "y": 365,
+        "to": [
+          "350:25304"
+        ]
+      },
+      {
+        "id": "350:26278",
+        "label": "Headline",
+        "x": 199,
+        "y": 397,
+        "to": [
+          "350:25767"
+        ]
+      },
+      {
+        "id": "350:26310",
+        "label": "Independent design studio",
+        "x": 440.921875,
+        "y": 327.055419921875,
+        "to": [
+          "350:25304"
+        ]
+      },
+      {
+        "id": "350:26311",
+        "label": "Thoughtful design.\nLasting impact.",
+        "x": 739.9996643066406,
+        "y": 393.177734375,
+        "to": [
+          "350:25767"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "353:24569",
+    "name": "PLAY · C02.1 · Images missing alt text",
+    "size": [
+      1440,
+      996
+    ],
+    "descendants": 362,
+    "types": {
+      "FRAME": 96,
+      "INSTANCE": 100,
+      "TEXT": 59,
+      "VECTOR": 105,
+      "RECTANGLE": 2
+    },
+    "fonts": [
+      "Inter",
+      "Geist Mono"
+    ],
+    "images": [],
+    "controls": [
+      {
+        "id": "353:24572",
+        "label": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "353:24672",
+        "label": "✕",
+        "x": 1389,
+        "y": 176.5,
+        "to": [
+          "303:32296"
+        ]
+      },
+      {
+        "id": "353:24945",
+        "label": "Open image ›",
+        "x": 1153,
+        "y": 301,
+        "to": [
+          "353:24957"
+        ]
+      },
+      {
+        "id": "353:24950",
+        "label": "Open image ›",
+        "x": 1153,
+        "y": 385,
+        "to": [
+          "353:25243"
+        ]
+      },
+      {
+        "id": "353:24952",
+        "label": "‹ Back to Issues",
+        "x": 1231,
+        "y": 425,
+        "to": [
+          "303:32296"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "353:24957",
+    "name": "PLAY · C02.2 · Home › Hero › Hero image",
+    "size": [
+      1440,
+      996
+    ],
+    "descendants": 270,
+    "types": {
+      "FRAME": 69,
+      "INSTANCE": 77,
+      "TEXT": 54,
+      "VECTOR": 66,
+      "RECTANGLE": 3,
+      "ELLIPSE": 1
+    },
+    "fonts": [
+      "Inter",
+      "Geist Mono"
+    ],
+    "images": [],
+    "controls": [
+      {
+        "id": "353:24960",
+        "label": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "353:25235",
+        "label": "‹ Back to Issues",
+        "x": 1291,
+        "y": 325,
+        "to": [
+          "303:32296"
+        ]
+      },
+      {
+        "id": "353:25237",
+        "label": "‹ Back to affected images",
+        "x": 1291,
+        "y": 365,
+        "to": [
+          "353:24569"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "353:25243",
+    "name": "PLAY · C02.3 · About › Team › Team image",
+    "size": [
+      1440,
+      996
+    ],
+    "descendants": 270,
+    "types": {
+      "FRAME": 69,
+      "INSTANCE": 77,
+      "TEXT": 54,
+      "VECTOR": 66,
+      "RECTANGLE": 3,
+      "ELLIPSE": 1
+    },
+    "fonts": [
+      "Inter",
+      "Geist Mono"
+    ],
+    "images": [],
+    "controls": [
+      {
+        "id": "353:25246",
+        "label": "All journeys",
+        "x": 68,
+        "y": 28,
+        "to": [
+          "302:3370"
+        ]
+      },
+      {
+        "id": "353:25521",
+        "label": "‹ Back to Issues",
+        "x": 1291,
+        "y": 325,
+        "to": [
+          "303:32296"
+        ]
+      },
+      {
+        "id": "353:25523",
+        "label": "‹ Back to affected images",
+        "x": 1291,
+        "y": 365,
+        "to": [
+          "353:24569"
+        ]
+      }
+    ]
+  }
+]

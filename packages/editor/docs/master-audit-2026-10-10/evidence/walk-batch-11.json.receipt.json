@@ -1,0 +1,66 @@
+[
+  {
+    "label": "Confirm detach",
+    "x": 1265,
+    "y": 146,
+    "expected": "8543:9508",
+    "shot": "walk-instance-detached.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8543-9508&starting-point-node-id=8507%3A247507&hide-ui=1",
+    "verification": "URL_MATCH"
+  },
+  {
+    "label": "CMS entry",
+    "x": 109,
+    "y": 237,
+    "shot": "walk-cms-records.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8543-9508&starting-point-node-id=8507%3A247507&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "CMS fields",
+    "x": 401,
+    "y": 179,
+    "shot": "walk-cms-fields.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8543-9508&starting-point-node-id=8507%3A247507&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Return CMS caller",
+    "x": 114,
+    "y": 931,
+    "shot": "walk-cms-return.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8543-9508&starting-point-node-id=8507%3A247507&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Pages entry",
+    "x": 109,
+    "y": 157,
+    "shot": "walk-pages.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8543-9508&starting-point-node-id=8507%3A247507&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Page SEO",
+    "x": 200,
+    "y": 488,
+    "shot": "walk-page-seo.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8543-9508&starting-point-node-id=8507%3A247507&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Return pages caller",
+    "x": 114,
+    "y": 931,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8543-9508&starting-point-node-id=8507%3A247507&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Review entry",
+    "x": 527,
+    "y": 28,
+    "shot": "walk-review.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8543-9508&starting-point-node-id=8507%3A247507&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

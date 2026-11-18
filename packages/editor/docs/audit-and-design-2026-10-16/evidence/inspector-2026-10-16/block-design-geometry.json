@@ -1,0 +1,76 @@
+{
+  "date": "2026-10-16",
+  "scope": "Read-only documentation viewer; no redesigned application geometry verification",
+  "measurements": [
+    {
+      "viewport": [
+        1440,
+        900
+      ],
+      "right": 300,
+      "panelHeight": 644,
+      "bodyScroll": false,
+      "docOverflow": false,
+      "panelOverflow": false,
+      "footerBottom": 900,
+      "tabColumns": "72.75px 72.75px 72.75px 72.75px",
+      "textEnlarged": false
+    },
+    {
+      "viewport": [
+        1280,
+        720
+      ],
+      "right": 300,
+      "panelHeight": 464,
+      "bodyScroll": false,
+      "docOverflow": false,
+      "panelOverflow": false,
+      "footerBottom": 720,
+      "tabColumns": "72.75px 72.75px 72.75px 72.75px",
+      "textEnlarged": false
+    },
+    {
+      "viewport": [
+        1024,
+        768
+      ],
+      "right": 300,
+      "panelHeight": 512,
+      "bodyScroll": false,
+      "docOverflow": false,
+      "panelOverflow": false,
+      "footerBottom": 768,
+      "tabColumns": "72.75px 72.75px 72.75px 72.75px",
+      "textEnlarged": false
+    },
+    {
+      "viewport": [
+        1440,
+        600
+      ],
+      "right": 300,
+      "panelHeight": 370,
+      "bodyScroll": true,
+      "docOverflow": false,
+      "panelOverflow": false,
+      "footerBottom": 600,
+      "tabColumns": "72.75px 72.75px 72.75px 72.75px",
+      "textEnlarged": false
+    },
+    {
+      "viewport": [
+        1280,
+        720
+      ],
+      "right": 300,
+      "panelHeight": 234,
+      "bodyScroll": true,
+      "docOverflow": false,
+      "panelOverflow": false,
+      "footerBottom": 720,
+      "tabColumns": "145.5px 145.5px",
+      "textEnlarged": true
+    }
+  ]
+}

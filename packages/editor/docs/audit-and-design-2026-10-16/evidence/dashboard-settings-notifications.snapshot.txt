@@ -1,0 +1,147 @@
+--- BEGIN UNTRUSTED EXTERNAL CONTENT (source: http://localhost:3000/dashboard/settings/notifications) ---
+--- BEGIN UNTRUSTED EXTERNAL C​ONTENT (source: http://localhost:3000/dashboard/settings/notifications) ---
+@e1 [link] "Skip to content"
+  @e2 [link] "B Buildrick"
+    @e3 [link] "Dashboard"
+    @e4 [link] "Marketplace"
+    @e5 [link] "Learn"
+    @e6 [link] "Resources"
+    @e7 [link] "Templates"
+  @e8 [button] "Search"
+  @e9 [button] "Notifications"
+  @e10 [button] "Account menu"
+  @e11 [button] "Switch workspace"
+        @e12 [link] "Home"
+        @e13 [link] "Getting started"
+        @e14 [link] "Sites 1"
+        @e15 [link] "Agency"
+        @e16 [link] "Media"
+        @e17 [link] "Settings"
+  @e18 [link] "Upgrade plan"
+  @e19 [link] "Settings"
+  @e20 [switch] "In-app notifications for Site Updates" [checked]
+  @e21 [combobox] "Email frequency for Site Updates"
+    @e22 [option] "Instant"
+    @e23 [option] "Daily digest" [selected]
+    @e24 [option] "Off"
+  @e25 [switch] "In-app notifications for Team" [checked]
+  @e26 [combobox] "Email frequency for Team"
+    @e27 [option] "Instant"
+    @e28 [option] "Daily digest" [selected]
+    @e29 [option] "Off"
+  @e30 [switch] "In-app notifications for Billing" [checked]
+  @e31 [combobox] "Email frequency for Billing"
+    @e32 [option] "Instant"
+    @e33 [option] "Daily digest" [selected]
+    @e34 [option] "Off"
+  @e35 [switch] "In-app notifications for Domains" [checked]
+  @e36 [combobox] "Email frequency for Domains"
+    @e37 [option] "Instant"
+    @e38 [option] "Daily digest" [selected]
+    @e39 [option] "Off"
+  @e40 [switch] "In-app notifications for Feedback" [checked]
+  @e41 [combobox] "Email frequency for Feedback"
+    @e42 [option] "Instant"
+    @e43 [option] "Daily digest" [selected]
+    @e44 [option] "Off"
+  @e45 [switch] "In-app notifications for AI" [checked]
+  @e46 [combobox] "Email frequency for AI"
+    @e47 [option] "Instant"
+    @e48 [option] "Daily digest" [selected]
+    @e49 [option] "Off"
+  @e50 [switch] "In-app notifications for Forms" [checked]
+  @e51 [combobox] "Email frequency for Forms"
+    @e52 [option] "Instant"
+    @e53 [option] "Daily digest" [selected]
+    @e54 [option] "Off"
+  @e55 [switch] "In-app notifications for Security" [checked] [disabled]
+  @e56 [combobox] "Email frequency for Security" [disabled]
+    @e57 [option] "Instant" [selected]
+    @e58 [option] "Daily digest"
+    @e59 [option] "Off"
+@e60 [button] "Accept All"
+@e61 [button] "Essential Only"
+@e62 [button] "Manage Preferences"
+@e63 [button] "v3.0.2 Output Detail Standard React Components Hide Until Restart Marker Color Clear on copy/send Block page interactions Manage MCP & Webhooks Manage MCP & Webhooks MCP Connection MCP connection allows agents to receive and act on annotations. Learn more Webhooks Auto-Send The webhook URL will receive live annotation changes and annotation data."
+  @e64 [button]
+  @e65 [button]
+  @e66 [button] [disabled]
+  @e67 [button] [disabled]
+  @e68 [button] [disabled]
+  @e69 [button] [disabled]
+  @e70 [button]
+  @e71 [button]
+  @e72 [link]
+  @e73 [button] "Switch to light mode"
+  @e74 [button] "Standard"
+  @e75 [checkbox] [checked]
+  @e76 [checkbox]
+  @e77 [button] "Indigo"
+  @e78 [button] "Blue"
+  @e79 [button] "Cyan"
+  @e80 [button] "Green"
+  @e81 [button] "Yellow"
+  @e82 [button] "Orange"
+  @e83 [button] "Red"
+  @e84 [checkbox] "Clear on copy/send"
+  @e85 [checkbox] "Block page interactions" [checked]
+  @e86 [button] "Manage MCP & Webhooks"
+  @e87 [button] "Manage MCP & Webhooks"
+    @e88 [link] "Learn more"
+  @e89 [checkbox] "Auto-Send" [checked] [disabled]
+  @e90 [textbox] "Webhook URL"
+
+── cursor-interactive (not in ARIA tree) ──
+@c1 [popover-child, cursor:pointer] "B"
+@c2 [popover-child, cursor:pointer] "Buildrick"
+@c3 [popover-child, cursor:pointer] "span"
+@c4 [popover-child, cursor:pointer] "1"
+@c5 [popover-child, cursor:pointer, tabindex=0, role=button] "v3.0.2
+
+Output Detail
+Standard
+React Components
+Hide Until Restart
+Marker Color
+"
+@c6 [popover-child, cursor:pointer] "div"
+@c7 [popover-child, cursor:pointer] "div"
+@c8 [popover-child, cursor:pointer] "div"
+@c9 [popover-child, cursor:pointer] "span"
+@c10 [popover-child, cursor:pointer] "span"
+@c11 [popover-child, cursor:pointer] "div"
+@c12 [popover-child, cursor:pointer] "span"
+@c13 [popover-child, cursor:pointer] "span"
+@c14 [popover-child, cursor:pointer] "div"
+@c15 [popover-child, cursor:pointer] "span"
+@c16 [popover-child, cursor:pointer] "span"
+@c17 [popover-child, cursor:pointer] "div"
+@c18 [popover-child, cursor:pointer] "span"
+@c19 [popover-child, cursor:pointer] "span"
+@c20 [popover-child, cursor:pointer] "div"
+@c21 [popover-child, cursor:pointer] "span"
+@c22 [popover-child, cursor:pointer] "span"
+@c23 [popover-child, cursor:pointer] "div"
+@c24 [popover-child, cursor:pointer] "span"
+@c25 [popover-child, cursor:pointer] "span"
+@c26 [popover-child, cursor:pointer] "div"
+@c27 [popover-child, cursor:pointer] "span"
+@c28 [popover-child, cursor:pointer] "div"
+@c29 [popover-child, cursor:pointer] "div"
+@c30 [popover-child, cursor:pointer] "span"
+@c31 [popover-child, cursor:pointer] "span"
+@c32 [popover-child, cursor:pointer] "span"
+@c33 [popover-child, cursor:pointer] "span"
+@c34 [popover-child, cursor:pointer] "Standard"
+@c35 [popover-child, cursor:pointer] "span"
+@c36 [popover-child, cursor:pointer] "span"
+@c37 [popover-child, cursor:pointer] "span"
+@c38 [popover-child, cursor:pointer] "span"
+@c39 [popover-child, cursor:pointer] "span"
+@c40 [popover-child, cursor:pointer] "Clear on copy/send"
+@c41 [popover-child, cursor:pointer] "Block page interactions"
+@c42 [popover-child, cursor:pointer] "Manage MCP & Webhooks"
+@c43 [popover-child, cursor:pointer] "span"
+@c44 [popover-child, cursor:pointer] "Manage MCP & Webhooks"
+--- END UNTRUSTED EXTERNAL C​ONTENT ---
+--- END UNTRUSTED EXTERNAL CONTENT ---

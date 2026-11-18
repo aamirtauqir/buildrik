@@ -1,0 +1,10 @@
+[
+ {"x":720,"y":693,"wait":0,"shot":"r42-form-retry-saving.png"},
+ {"x":1100,"y":800,"wait":0,"shot":"r42-form-saving-outside-click.png"},
+ {"wait":2600,"shot":"r42-form-retry-saved.png"},
+ {"x":720,"y":621,"shot":"r42-form-editor-recipient-denied.png"},
+ {"press":"Escape","shot":"r42-form-permission-escape.png"},
+ {"x":720,"y":537,"shot":"r42-form-url-before-dirty-exit.png"},
+ {"x":720,"y":493,"shot":"r42-form-invalid-before-dirty-exit.png"},
+ {"press":"Escape","shot":"r42-form-dirty-exit-guard.png"}
+]

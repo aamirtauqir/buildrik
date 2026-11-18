@@ -1,0 +1,7 @@
+[
+ {"label":"Leave uncommitted draft for Editor","x":319,"y":28,"shot":"r28-editor-before-apply.png","expected":"8465:3"},
+ {"label":"Resume pending draft","x":411,"y":28,"shot":"r28-build-resumed.png","expected":"8628:12749"},
+ {"label":"Review opens third column","x":201,"y":674,"shot":"r28-build-review.png","expected":"8628:12826"},
+ {"label":"Apply heading to shared project","x":1241,"y":528,"shot":"r28-build-applied.png","expected":"8628:12915"},
+ {"label":"Open native editable result","x":201,"y":634,"shot":"r28-editor-applied.png","expected":"8465:3"}
+]

@@ -1,0 +1,38 @@
+[
+  {
+    "label": "Reset at Editor",
+    "goto": "8465:3"
+  },
+  {
+    "label": "Pages",
+    "x": 109,
+    "y": 157
+  },
+  {
+    "label": "About options",
+    "x": 286,
+    "y": 231
+  },
+  {
+    "label": "Duplicate About",
+    "x": 720,
+    "y": 509
+  },
+  {
+    "label": "Manage duplicate",
+    "x": 720,
+    "y": 551
+  },
+  {
+    "label": "Back to Pages drawer",
+    "x": 720,
+    "y": 612,
+    "shot": "r31-drawer-copy-row-verified.png"
+  },
+  {
+    "label": "Copy direct options",
+    "x": 286,
+    "y": 327,
+    "shot": "r31-drawer-copy-options-verified.png"
+  }
+]

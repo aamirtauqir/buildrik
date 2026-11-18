@@ -1,0 +1,3193 @@
+{
+  "method": "TypeScript AST walk of imported appRouter declarations and nested router objects; guard names are direct syntactic calls only, not authorization verdicts. Aliases/spreads require manual follow-up.",
+  "routers": 34,
+  "procedures": 314,
+  "rows": [
+    {
+      "endpoint": "auth.login",
+      "file": "server/trpc/routers/auth.ts",
+      "line": 49,
+      "kind": "mutation",
+      "procedure": "publicProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "auth.signup",
+      "file": "server/trpc/routers/auth.ts",
+      "line": 84,
+      "kind": "mutation",
+      "procedure": "normalRateLimit",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "auth.verifyEmail",
+      "file": "server/trpc/routers/auth.ts",
+      "line": 107,
+      "kind": "mutation",
+      "procedure": "normalRateLimit",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "auth.resendVerification",
+      "file": "server/trpc/routers/auth.ts",
+      "line": 118,
+      "kind": "mutation",
+      "procedure": "normalRateLimit",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "auth.forgotPassword",
+      "file": "server/trpc/routers/auth.ts",
+      "line": 125,
+      "kind": "mutation",
+      "procedure": "normalRateLimit",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "auth.resetPassword",
+      "file": "server/trpc/routers/auth.ts",
+      "line": 132,
+      "kind": "mutation",
+      "procedure": "strictRateLimit",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "auth.magicLink",
+      "file": "server/trpc/routers/auth.ts",
+      "line": 143,
+      "kind": "mutation",
+      "procedure": "normalRateLimit",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "auth.verifyMagicLink",
+      "file": "server/trpc/routers/auth.ts",
+      "line": 150,
+      "kind": "mutation",
+      "procedure": "strictRateLimit",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "auth.verify2FA",
+      "file": "server/trpc/routers/auth.ts",
+      "line": 166,
+      "kind": "mutation",
+      "procedure": "strictRateLimit",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "auth.verifyBackupCode",
+      "file": "server/trpc/routers/auth.ts",
+      "line": 178,
+      "kind": "mutation",
+      "procedure": "strictRateLimit",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "auth.checkEmail",
+      "file": "server/trpc/routers/auth.ts",
+      "line": 199,
+      "kind": "mutation",
+      "procedure": "strictRateLimit",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "auth.logout",
+      "file": "server/trpc/routers/auth.ts",
+      "line": 221,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "auth.getInviteDetails",
+      "file": "server/trpc/routers/auth.ts",
+      "line": 229,
+      "kind": "query",
+      "procedure": "publicProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "auth.acceptInvite",
+      "file": "server/trpc/routers/auth.ts",
+      "line": 260,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "auth.declineInvite",
+      "file": "server/trpc/routers/auth.ts",
+      "line": 358,
+      "kind": "mutation",
+      "procedure": "publicProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "dashboard.stats",
+      "file": "server/trpc/routers/dashboard.ts",
+      "line": 45,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "dashboard.recentSites",
+      "file": "server/trpc/routers/dashboard.ts",
+      "line": 50,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "dashboard.attentionQueue",
+      "file": "server/trpc/routers/dashboard.ts",
+      "line": 55,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "dashboard.activity",
+      "file": "server/trpc/routers/dashboard.ts",
+      "line": 60,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "dashboard.health",
+      "file": "server/trpc/routers/dashboard.ts",
+      "line": 77,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "dashboard.usage",
+      "file": "server/trpc/routers/dashboard.ts",
+      "line": 82,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "dashboard.partner",
+      "file": "server/trpc/routers/dashboard.ts",
+      "line": 87,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireAgencyLayer"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "dashboard.quickActions",
+      "file": "server/trpc/routers/dashboard.ts",
+      "line": 98,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "sites.list",
+      "file": "server/trpc/routers/sites.ts",
+      "line": 70,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "sites.get",
+      "file": "server/trpc/routers/sites.ts",
+      "line": 77,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "assertSiteAccess"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "sites.create",
+      "file": "server/trpc/routers/sites.ts",
+      "line": 91,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkWorkspaceRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "sites.rename",
+      "file": "server/trpc/routers/sites.ts",
+      "line": 119,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "sites.duplicate",
+      "file": "server/trpc/routers/sites.ts",
+      "line": 131,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole",
+        "checkWorkspaceRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "sites.archive",
+      "file": "server/trpc/routers/sites.ts",
+      "line": 161,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "sites.unarchive",
+      "file": "server/trpc/routers/sites.ts",
+      "line": 173,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "sites.delete",
+      "file": "server/trpc/routers/sites.ts",
+      "line": 185,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "sites.listDeleted",
+      "file": "server/trpc/routers/sites.ts",
+      "line": 219,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "sites.restore",
+      "file": "server/trpc/routers/sites.ts",
+      "line": 227,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "sites.bulk",
+      "file": "server/trpc/routers/sites.ts",
+      "line": 261,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "sites.myRole",
+      "file": "server/trpc/routers/sites.ts",
+      "line": 305,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "sites.checkSlug",
+      "file": "server/trpc/routers/sites.ts",
+      "line": 331,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "sites.transfer",
+      "file": "server/trpc/routers/sites.ts",
+      "line": 340,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "sites.saveProject",
+      "file": "server/trpc/routers/sites.ts",
+      "line": 364,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "sites.prePublishChecks",
+      "file": "server/trpc/routers/sites.ts",
+      "line": 444,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "assertSiteAccess"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "sites.publish",
+      "file": "server/trpc/routers/sites.ts",
+      "line": 456,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "sites.publishStatus",
+      "file": "server/trpc/routers/sites.ts",
+      "line": 550,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "assertSiteAccess"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "sites.cancelPublish",
+      "file": "server/trpc/routers/sites.ts",
+      "line": 566,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "sites.schedulePublish",
+      "file": "server/trpc/routers/sites.ts",
+      "line": 599,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "sites.cancelScheduledPublish",
+      "file": "server/trpc/routers/sites.ts",
+      "line": 626,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "sites.getScheduledPublish",
+      "file": "server/trpc/routers/sites.ts",
+      "line": 645,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "assertSiteAccess"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "sites.unpublish",
+      "file": "server/trpc/routers/sites.ts",
+      "line": 662,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "sites.publishHistory",
+      "file": "server/trpc/routers/sites.ts",
+      "line": 685,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "sites.publishDiff",
+      "file": "server/trpc/routers/sites.ts",
+      "line": 700,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "sites.publishedSnapshot",
+      "file": "server/trpc/routers/sites.ts",
+      "line": 715,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "sites.rollback",
+      "file": "server/trpc/routers/sites.ts",
+      "line": 736,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "sites.getProjectData",
+      "file": "server/trpc/routers/sites.ts",
+      "line": 772,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "assertSiteAccess"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "sites.folders.list",
+      "file": "server/trpc/routers/sites.ts",
+      "line": 791,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "sites.folders.create",
+      "file": "server/trpc/routers/sites.ts",
+      "line": 796,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkWorkspaceRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "sites.folders.delete",
+      "file": "server/trpc/routers/sites.ts",
+      "line": 819,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "sites.folders.rename",
+      "file": "server/trpc/routers/sites.ts",
+      "line": 836,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "sites.folders.moveSite",
+      "file": "server/trpc/routers/sites.ts",
+      "line": 853,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteDetail.overview",
+      "file": "server/trpc/routers/site-detail.ts",
+      "line": 41,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "assertSiteAccess"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteDetail.settingsOverview",
+      "file": "server/trpc/routers/site-detail.ts",
+      "line": 55,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "assertSiteAccess"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteDetail.locales",
+      "file": "server/trpc/routers/site-detail.ts",
+      "line": 69,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "assertSiteAccess"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteDetail.settings.get",
+      "file": "server/trpc/routers/site-detail.ts",
+      "line": 88,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "assertSiteAccess"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteDetail.settings.update",
+      "file": "server/trpc/routers/site-detail.ts",
+      "line": 106,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteDetail.projectSettings.update",
+      "file": "server/trpc/routers/site-detail.ts",
+      "line": 157,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteDetail.redirects.list",
+      "file": "server/trpc/routers/site-detail.ts",
+      "line": 190,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "assertSiteAccess"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteDetail.redirects.suggestions",
+      "file": "server/trpc/routers/site-detail.ts",
+      "line": 205,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "assertSiteAccess"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteDetail.redirects.create",
+      "file": "server/trpc/routers/site-detail.ts",
+      "line": 217,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteDetail.redirects.update",
+      "file": "server/trpc/routers/site-detail.ts",
+      "line": 260,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteDetail.redirects.delete",
+      "file": "server/trpc/routers/site-detail.ts",
+      "line": 289,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteDetail.redirects.import_csv",
+      "file": "server/trpc/routers/site-detail.ts",
+      "line": 315,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteDetail.redirects.export_csv",
+      "file": "server/trpc/routers/site-detail.ts",
+      "line": 349,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "assertSiteAccess"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteDetail.domains.list",
+      "file": "server/trpc/routers/site-detail.ts",
+      "line": 363,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "assertSiteAccess"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteDetail.domains.usesVercel",
+      "file": "server/trpc/routers/site-detail.ts",
+      "line": 376,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "assertSiteAccess"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteDetail.domains.listForWorkspace",
+      "file": "server/trpc/routers/site-detail.ts",
+      "line": 389,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteDetail.domains.checkAvailability",
+      "file": "server/trpc/routers/site-detail.ts",
+      "line": 397,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteDetail.domains.check",
+      "file": "server/trpc/routers/site-detail.ts",
+      "line": 401,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteDetail.domains.connect",
+      "file": "server/trpc/routers/site-detail.ts",
+      "line": 416,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteDetail.domains.update",
+      "file": "server/trpc/routers/site-detail.ts",
+      "line": 458,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteDetail.domains.remove",
+      "file": "server/trpc/routers/site-detail.ts",
+      "line": 475,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteDetail.domains.setPrimary",
+      "file": "server/trpc/routers/site-detail.ts",
+      "line": 502,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteDetail.sharing.list",
+      "file": "server/trpc/routers/site-detail.ts",
+      "line": 524,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "assertSiteAccess",
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteDetail.sharing.create",
+      "file": "server/trpc/routers/site-detail.ts",
+      "line": 545,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteDetail.sharing.revoke",
+      "file": "server/trpc/routers/site-detail.ts",
+      "line": 595,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteDetail.analytics",
+      "file": "server/trpc/routers/site-detail.ts",
+      "line": 623,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "assertSiteAccess"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteDetail.analyticsStatus",
+      "file": "server/trpc/routers/site-detail.ts",
+      "line": 639,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "assertSiteAccess"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "templates.list",
+      "file": "server/trpc/routers/templates.ts",
+      "line": 13,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "templates.cloneFromSite",
+      "file": "server/trpc/routers/templates.ts",
+      "line": 18,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "templates.get",
+      "file": "server/trpc/routers/templates.ts",
+      "line": 38,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "templates.use",
+      "file": "server/trpc/routers/templates.ts",
+      "line": 47,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkWorkspaceRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "templates.applyToSite",
+      "file": "server/trpc/routers/templates.ts",
+      "line": 70,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "templates.generate.create",
+      "file": "server/trpc/routers/templates.ts",
+      "line": 95,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkWorkspaceRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "templates.generate.status",
+      "file": "server/trpc/routers/templates.ts",
+      "line": 118,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "templates.generate.cancel",
+      "file": "server/trpc/routers/templates.ts",
+      "line": 127,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "team.stats",
+      "file": "server/trpc/routers/team.ts",
+      "line": 53,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "team.list",
+      "file": "server/trpc/routers/team.ts",
+      "line": 57,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "team.auditLog",
+      "file": "server/trpc/routers/team.ts",
+      "line": 63,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "team.invite",
+      "file": "server/trpc/routers/team.ts",
+      "line": 76,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "team.changeRole",
+      "file": "server/trpc/routers/team.ts",
+      "line": 92,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "team.revoke",
+      "file": "server/trpc/routers/team.ts",
+      "line": 114,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "team.reactivate",
+      "file": "server/trpc/routers/team.ts",
+      "line": 131,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "team.delete",
+      "file": "server/trpc/routers/team.ts",
+      "line": 148,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "team.pendingInvites",
+      "file": "server/trpc/routers/team.ts",
+      "line": 164,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "team.revokeInvite",
+      "file": "server/trpc/routers/team.ts",
+      "line": 168,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "team.resendInvite",
+      "file": "server/trpc/routers/team.ts",
+      "line": 172,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "team.activity",
+      "file": "server/trpc/routers/team.ts",
+      "line": 183,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "billing.overview",
+      "file": "server/trpc/routers/billing.ts",
+      "line": 57,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "billing.plans",
+      "file": "server/trpc/routers/billing.ts",
+      "line": 61,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "billing.usage",
+      "file": "server/trpc/routers/billing.ts",
+      "line": 62,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "billing.invoices",
+      "file": "server/trpc/routers/billing.ts",
+      "line": 67,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "billing.createCheckoutSession",
+      "file": "server/trpc/routers/billing.ts",
+      "line": 73,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireOwner"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "billing.createPortalSession",
+      "file": "server/trpc/routers/billing.ts",
+      "line": 79,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireOwner"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "billing.cancel",
+      "file": "server/trpc/routers/billing.ts",
+      "line": 85,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireOwner"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "billing.reactivate",
+      "file": "server/trpc/routers/billing.ts",
+      "line": 96,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireOwner"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.profile.get",
+      "file": "server/trpc/routers/account.ts",
+      "line": 70,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.profile.update",
+      "file": "server/trpc/routers/account.ts",
+      "line": 71,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.changeEmail",
+      "file": "server/trpc/routers/account.ts",
+      "line": 73,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.changePassword",
+      "file": "server/trpc/routers/account.ts",
+      "line": 83,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.setPassword",
+      "file": "server/trpc/routers/account.ts",
+      "line": 93,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.disconnectProvider",
+      "file": "server/trpc/routers/account.ts",
+      "line": 102,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.twoFactor.enable",
+      "file": "server/trpc/routers/account.ts",
+      "line": 117,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.twoFactor.confirm",
+      "file": "server/trpc/routers/account.ts",
+      "line": 126,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.twoFactor.disable",
+      "file": "server/trpc/routers/account.ts",
+      "line": 138,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.sessions.list",
+      "file": "server/trpc/routers/account.ts",
+      "line": 154,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.sessions.revoke",
+      "file": "server/trpc/routers/account.ts",
+      "line": 160,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.sessions.revokeAll",
+      "file": "server/trpc/routers/account.ts",
+      "line": 161,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.loginHistory",
+      "file": "server/trpc/routers/account.ts",
+      "line": 163,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.notifications.list",
+      "file": "server/trpc/routers/account.ts",
+      "line": 165,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.notifications.update",
+      "file": "server/trpc/routers/account.ts",
+      "line": 166,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.preferences.get",
+      "file": "server/trpc/routers/account.ts",
+      "line": 169,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.preferences.update",
+      "file": "server/trpc/routers/account.ts",
+      "line": 170,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.workspace.get",
+      "file": "server/trpc/routers/account.ts",
+      "line": 175,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.workspace.listMine",
+      "file": "server/trpc/routers/account.ts",
+      "line": 180,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.workspace.create",
+      "file": "server/trpc/routers/account.ts",
+      "line": 184,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.workspace.update",
+      "file": "server/trpc/routers/account.ts",
+      "line": 199,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireWorkspaceAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.workspace.sharing",
+      "file": "server/trpc/routers/account.ts",
+      "line": 216,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireWorkspaceAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.workspace.delete",
+      "file": "server/trpc/routers/account.ts",
+      "line": 221,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.workspace.cancelDelete",
+      "file": "server/trpc/routers/account.ts",
+      "line": 230,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.workspace.transfer.pending",
+      "file": "server/trpc/routers/account.ts",
+      "line": 240,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.workspace.transfer.initiate",
+      "file": "server/trpc/routers/account.ts",
+      "line": 244,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.workspace.transfer.accept",
+      "file": "server/trpc/routers/account.ts",
+      "line": 256,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.workspace.transfer.cancel",
+      "file": "server/trpc/routers/account.ts",
+      "line": 269,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.integrations.list",
+      "file": "server/trpc/routers/account.ts",
+      "line": 281,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkWorkspaceRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.integrations.add",
+      "file": "server/trpc/routers/account.ts",
+      "line": 294,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireWorkspaceAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.integrations.remove",
+      "file": "server/trpc/routers/account.ts",
+      "line": 307,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.integrations.update",
+      "file": "server/trpc/routers/account.ts",
+      "line": 308,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.integrations.testEvent",
+      "file": "server/trpc/routers/account.ts",
+      "line": 318,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.aiCredits",
+      "file": "server/trpc/routers/account.ts",
+      "line": 331,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.dangerZone.pendingDeletion",
+      "file": "server/trpc/routers/account.ts",
+      "line": 336,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.dangerZone.deletionEligibility",
+      "file": "server/trpc/routers/account.ts",
+      "line": 342,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.dangerZone.exportData",
+      "file": "server/trpc/routers/account.ts",
+      "line": 345,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.dangerZone.deleteAccount",
+      "file": "server/trpc/routers/account.ts",
+      "line": 346,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "account.dangerZone.cancelAccountDeletion",
+      "file": "server/trpc/routers/account.ts",
+      "line": 361,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "help.categories",
+      "file": "server/trpc/routers/help.ts",
+      "line": 15,
+      "kind": "query",
+      "procedure": "publicProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "help.search",
+      "file": "server/trpc/routers/help.ts",
+      "line": 17,
+      "kind": "query",
+      "procedure": "publicProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "help.byCategory",
+      "file": "server/trpc/routers/help.ts",
+      "line": 21,
+      "kind": "query",
+      "procedure": "publicProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "help.article",
+      "file": "server/trpc/routers/help.ts",
+      "line": 25,
+      "kind": "query",
+      "procedure": "publicProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "help.feedback",
+      "file": "server/trpc/routers/help.ts",
+      "line": 33,
+      "kind": "mutation",
+      "procedure": "publicProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "help.createTicket",
+      "file": "server/trpc/routers/help.ts",
+      "line": 40,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "learn.list",
+      "file": "server/trpc/routers/learn.ts",
+      "line": 9,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "learn.complete",
+      "file": "server/trpc/routers/learn.ts",
+      "line": 11,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "notifications.list",
+      "file": "server/trpc/routers/notifications.ts",
+      "line": 11,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "notifications.unreadCount",
+      "file": "server/trpc/routers/notifications.ts",
+      "line": 17,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "notifications.markRead",
+      "file": "server/trpc/routers/notifications.ts",
+      "line": 20,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "notifications.markAllRead",
+      "file": "server/trpc/routers/notifications.ts",
+      "line": 25,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "notifications.delete",
+      "file": "server/trpc/routers/notifications.ts",
+      "line": 28,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "notifications.muteType",
+      "file": "server/trpc/routers/notifications.ts",
+      "line": 33,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "notifications.recent",
+      "file": "server/trpc/routers/notifications.ts",
+      "line": 44,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "notifications.listGrouped",
+      "file": "server/trpc/routers/notifications.ts",
+      "line": 47,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "onboarding.getState",
+      "file": "server/trpc/routers/onboarding.ts",
+      "line": 20,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "onboarding.completeStep",
+      "file": "server/trpc/routers/onboarding.ts",
+      "line": 28,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "onboarding.completeDashboardTask",
+      "file": "server/trpc/routers/onboarding.ts",
+      "line": 40,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "onboarding.completeEditorTask",
+      "file": "server/trpc/routers/onboarding.ts",
+      "line": 50,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "onboarding.saveWizard",
+      "file": "server/trpc/routers/onboarding.ts",
+      "line": 60,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "onboarding.completeWizard",
+      "file": "server/trpc/routers/onboarding.ts",
+      "line": 70,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "onboarding.dismiss",
+      "file": "server/trpc/routers/onboarding.ts",
+      "line": 78,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "pages.list",
+      "file": "server/trpc/routers/pages.ts",
+      "line": 49,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "guardSite"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "pages.get",
+      "file": "server/trpc/routers/pages.ts",
+      "line": 53,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "guardSite"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "pages.create",
+      "file": "server/trpc/routers/pages.ts",
+      "line": 59,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "guardSiteEditor"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "pages.update",
+      "file": "server/trpc/routers/pages.ts",
+      "line": 67,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "guardSiteEditor"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "pages.delete",
+      "file": "server/trpc/routers/pages.ts",
+      "line": 76,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "guardSiteEditor"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "pages.getTranslation",
+      "file": "server/trpc/routers/pages.ts",
+      "line": 85,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "guardSite"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "pages.setTranslation",
+      "file": "server/trpc/routers/pages.ts",
+      "line": 91,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "guardSiteEditor"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "pages.removeTranslation",
+      "file": "server/trpc/routers/pages.ts",
+      "line": 104,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "guardSiteEditor"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "pages.folders.list",
+      "file": "server/trpc/routers/pages.ts",
+      "line": 118,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "pages.folders.create",
+      "file": "server/trpc/routers/pages.ts",
+      "line": 121,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "pages.folders.update",
+      "file": "server/trpc/routers/pages.ts",
+      "line": 124,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "pages.folders.delete",
+      "file": "server/trpc/routers/pages.ts",
+      "line": 127,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "pages.folders.movePage",
+      "file": "server/trpc/routers/pages.ts",
+      "line": 130,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "forms.listBlocks",
+      "file": "server/trpc/routers/forms.ts",
+      "line": 22,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "guardSite"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "forms.listSubmissions",
+      "file": "server/trpc/routers/forms.ts",
+      "line": 29,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "guardSite"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "forms.updateSubmission",
+      "file": "server/trpc/routers/forms.ts",
+      "line": 36,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "guardSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "forms.deleteSubmission",
+      "file": "server/trpc/routers/forms.ts",
+      "line": 48,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "guardSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "forms.getBlock",
+      "file": "server/trpc/routers/forms.ts",
+      "line": 60,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "guardSite"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "forms.updateBlock",
+      "file": "server/trpc/routers/forms.ts",
+      "line": 67,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "guardSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "forms.exportSubmissions",
+      "file": "server/trpc/routers/forms.ts",
+      "line": 91,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "guardSite"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "upload.presign",
+      "file": "server/trpc/routers/upload.ts",
+      "line": 9,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "upload.confirm",
+      "file": "server/trpc/routers/upload.ts",
+      "line": 22,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "upload.limits",
+      "file": "server/trpc/routers/upload.ts",
+      "line": 31,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "ai.content",
+      "file": "server/trpc/routers/ai.ts",
+      "line": 200,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "ai.page",
+      "file": "server/trpc/routers/ai.ts",
+      "line": 226,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "ai.layout",
+      "file": "server/trpc/routers/ai.ts",
+      "line": 252,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "ai.summarize",
+      "file": "server/trpc/routers/ai.ts",
+      "line": 278,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "ai.milestoneSuggest",
+      "file": "server/trpc/routers/ai.ts",
+      "line": 303,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "ai.quota",
+      "file": "server/trpc/routers/ai.ts",
+      "line": 329,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "ai.streamPrompt",
+      "file": "server/trpc/routers/ai.ts",
+      "line": 334,
+      "kind": "subscription",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "assertProviderConfigured"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "ai.componentSchema",
+      "file": "server/trpc/routers/ai.ts",
+      "line": 444,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "ai.logAdoption",
+      "file": "server/trpc/routers/ai.ts",
+      "line": 484,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "media.listFolders",
+      "file": "server/trpc/routers/media.ts",
+      "line": 109,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "media.createFolder",
+      "file": "server/trpc/routers/media.ts",
+      "line": 115,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "media.renameFolder",
+      "file": "server/trpc/routers/media.ts",
+      "line": 128,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "media.moveFolder",
+      "file": "server/trpc/routers/media.ts",
+      "line": 141,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "media.deleteFolder",
+      "file": "server/trpc/routers/media.ts",
+      "line": 164,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "media.listAssets",
+      "file": "server/trpc/routers/media.ts",
+      "line": 179,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "media.createAsset",
+      "file": "server/trpc/routers/media.ts",
+      "line": 185,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "media.updateAsset",
+      "file": "server/trpc/routers/media.ts",
+      "line": 213,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "media.deleteAsset",
+      "file": "server/trpc/routers/media.ts",
+      "line": 229,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "media.moveAsset",
+      "file": "server/trpc/routers/media.ts",
+      "line": 242,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "media.listAssetVersions",
+      "file": "server/trpc/routers/media.ts",
+      "line": 260,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "media.createAssetVersion",
+      "file": "server/trpc/routers/media.ts",
+      "line": 273,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "media.restoreAssetVersion",
+      "file": "server/trpc/routers/media.ts",
+      "line": 294,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "media.generateAltText",
+      "file": "server/trpc/routers/media.ts",
+      "line": 324,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "media.checkStorageQuota",
+      "file": "server/trpc/routers/media.ts",
+      "line": 352,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "media.uploadPrefix",
+      "file": "server/trpc/routers/media.ts",
+      "line": 360,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "media.searchStockPhotos",
+      "file": "server/trpc/routers/media.ts",
+      "line": 368,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "media.searchStockVideos",
+      "file": "server/trpc/routers/media.ts",
+      "line": 385,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "apiTokens.list",
+      "file": "server/trpc/routers/api-tokens.ts",
+      "line": 50,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "assertWorkspaceMember"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "apiTokens.create",
+      "file": "server/trpc/routers/api-tokens.ts",
+      "line": 57,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "assertWorkspaceAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "apiTokens.revoke",
+      "file": "server/trpc/routers/api-tokens.ts",
+      "line": 79,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "assertWorkspaceAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "apiTokens.delete",
+      "file": "server/trpc/routers/api-tokens.ts",
+      "line": 104,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "assertWorkspaceAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "integrations.vercel.getConnection",
+      "file": "server/trpc/routers/integrations.ts",
+      "line": 23,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "integrations.vercel.finishConnect",
+      "file": "server/trpc/routers/integrations.ts",
+      "line": 50,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkWorkspaceRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "integrations.vercel.disconnect",
+      "file": "server/trpc/routers/integrations.ts",
+      "line": 121,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkWorkspaceRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "actions.propose",
+      "file": "server/trpc/routers/actions.ts",
+      "line": 35,
+      "kind": "mutation",
+      "procedure": "rateLimitedAction",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "actions.confirm",
+      "file": "server/trpc/routers/actions.ts",
+      "line": 69,
+      "kind": "mutation",
+      "procedure": "rateLimitedAction",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "features.list",
+      "file": "server/trpc/routers/features.ts",
+      "line": 14,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "features.set",
+      "file": "server/trpc/routers/features.ts",
+      "line": 20,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkWorkspaceRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "clients.list",
+      "file": "server/trpc/routers/clients.ts",
+      "line": 50,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "clients.get",
+      "file": "server/trpc/routers/clients.ts",
+      "line": 57,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireAgencyLayer"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "clients.create",
+      "file": "server/trpc/routers/clients.ts",
+      "line": 69,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireAgencyLayer",
+        "requireAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "clients.assignSite",
+      "file": "server/trpc/routers/clients.ts",
+      "line": 79,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireAgencyLayer",
+        "requireAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "clients.update",
+      "file": "server/trpc/routers/clients.ts",
+      "line": 93,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireAgencyLayer",
+        "requireAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "clients.delete",
+      "file": "server/trpc/routers/clients.ts",
+      "line": 106,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireAgencyLayer",
+        "requireAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "reviews.submit",
+      "file": "server/trpc/routers/reviews.ts",
+      "line": 65,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireAgencyLayer",
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "reviews.list",
+      "file": "server/trpc/routers/reviews.ts",
+      "line": 119,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "reviews.status",
+      "file": "server/trpc/routers/reviews.ts",
+      "line": 146,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "reviews.resolve",
+      "file": "server/trpc/routers/reviews.ts",
+      "line": 180,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireAgencyLayer",
+        "requireAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "reviews.currentRound",
+      "file": "server/trpc/routers/reviews.ts",
+      "line": 198,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "reviews.rounds",
+      "file": "server/trpc/routers/reviews.ts",
+      "line": 222,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "reviews.approvedSnapshot",
+      "file": "server/trpc/routers/reviews.ts",
+      "line": 243,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "reviews.revoke",
+      "file": "server/trpc/routers/reviews.ts",
+      "line": 263,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireAgencyLayer",
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "handover.rollup",
+      "file": "server/trpc/routers/handover.ts",
+      "line": 15,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkWorkspaceRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "clientReview.get",
+      "file": "server/trpc/routers/client-review.ts",
+      "line": 89,
+      "kind": "query",
+      "procedure": "publicProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "clientReview.identify",
+      "file": "server/trpc/routers/client-review.ts",
+      "line": 98,
+      "kind": "mutation",
+      "procedure": "strictClientLimit",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "clientReview.comments",
+      "file": "server/trpc/routers/client-review.ts",
+      "line": 106,
+      "kind": "query",
+      "procedure": "publicProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "clientReview.comment",
+      "file": "server/trpc/routers/client-review.ts",
+      "line": 114,
+      "kind": "mutation",
+      "procedure": "commentLimit",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "clientReview.requestNewLink",
+      "file": "server/trpc/routers/client-review.ts",
+      "line": 125,
+      "kind": "mutation",
+      "procedure": "strictClientLimit",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "clientReview.resolve",
+      "file": "server/trpc/routers/client-review.ts",
+      "line": 134,
+      "kind": "mutation",
+      "procedure": "strictClientLimit",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "comments.create",
+      "file": "server/trpc/routers/comments.ts",
+      "line": 40,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "assertSiteAccess"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "comments.list",
+      "file": "server/trpc/routers/comments.ts",
+      "line": 59,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "assertSiteAccess"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "comments.workspaceList",
+      "file": "server/trpc/routers/comments.ts",
+      "line": 71,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkWorkspaceRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "comments.reattach",
+      "file": "server/trpc/routers/comments.ts",
+      "line": 84,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "comments.resolve",
+      "file": "server/trpc/routers/comments.ts",
+      "line": 101,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "webhooks.status",
+      "file": "server/trpc/routers/webhooks.ts",
+      "line": 20,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkWorkspaceRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "webhooks.connect",
+      "file": "server/trpc/routers/webhooks.ts",
+      "line": 31,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkWorkspaceRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "webhooks.disconnect",
+      "file": "server/trpc/routers/webhooks.ts",
+      "line": 51,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkWorkspaceRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "webhooks.regenerateSecret",
+      "file": "server/trpc/routers/webhooks.ts",
+      "line": 63,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkWorkspaceRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "cms.collections.list",
+      "file": "server/trpc/routers/cms.ts",
+      "line": 57,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireRead"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "cms.collections.upsert",
+      "file": "server/trpc/routers/cms.ts",
+      "line": 61,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireWrite"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "cms.collections.delete",
+      "file": "server/trpc/routers/cms.ts",
+      "line": 69,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireWrite"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "cms.dynamicPages",
+      "file": "server/trpc/routers/cms.ts",
+      "line": 81,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireRead"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "cms.entries.list",
+      "file": "server/trpc/routers/cms.ts",
+      "line": 90,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireRead"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "cms.entries.upsert",
+      "file": "server/trpc/routers/cms.ts",
+      "line": 98,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireWrite"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "cms.entries.delete",
+      "file": "server/trpc/routers/cms.ts",
+      "line": 106,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireWrite"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "cms.entries.importCsvPreview",
+      "file": "server/trpc/routers/cms.ts",
+      "line": 118,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireWrite"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "cms.entries.importCsv",
+      "file": "server/trpc/routers/cms.ts",
+      "line": 126,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireWrite"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "cms.publishSnapshot",
+      "file": "server/trpc/routers/cms.ts",
+      "line": 138,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireWrite"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "theme.getShared",
+      "file": "server/trpc/routers/theme.ts",
+      "line": 70,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireAgencyLayer"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "theme.targets",
+      "file": "server/trpc/routers/theme.ts",
+      "line": 77,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireAgencyLayer"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "theme.capture",
+      "file": "server/trpc/routers/theme.ts",
+      "line": 84,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireAgencyLayer",
+        "requireAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "theme.setLock",
+      "file": "server/trpc/routers/theme.ts",
+      "line": 98,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireAgencyLayer",
+        "requireAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "theme.push",
+      "file": "server/trpc/routers/theme.ts",
+      "line": 114,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireAgencyLayer",
+        "requireAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "theme.previewPush",
+      "file": "server/trpc/routers/theme.ts",
+      "line": 128,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireAgencyLayer",
+        "requireAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "theme.rollback",
+      "file": "server/trpc/routers/theme.ts",
+      "line": 142,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireAgencyLayer",
+        "requireAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "theme.snapshots",
+      "file": "server/trpc/routers/theme.ts",
+      "line": 156,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireAgencyLayer"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "theme.brandRestorePoints",
+      "file": "server/trpc/routers/theme.ts",
+      "line": 169,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "theme.createBrandRestorePoint",
+      "file": "server/trpc/routers/theme.ts",
+      "line": 182,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "theme.brandRestorePoint",
+      "file": "server/trpc/routers/theme.ts",
+      "line": 199,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "theme.extractBrandFromUrl",
+      "file": "server/trpc/routers/theme.ts",
+      "line": 216,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "checkSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "theme.presets.list",
+      "file": "server/trpc/routers/theme.ts",
+      "line": 245,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireAgencyLayer"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "theme.presets.save",
+      "file": "server/trpc/routers/theme.ts",
+      "line": 250,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireAgencyLayer",
+        "requireAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "theme.presets.delete",
+      "file": "server/trpc/routers/theme.ts",
+      "line": 262,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireAgencyLayer",
+        "requireAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "theme.presets.applyPreset",
+      "file": "server/trpc/routers/theme.ts",
+      "line": 270,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireAgencyLayer",
+        "requireAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteVersions.create",
+      "file": "server/trpc/routers/site-version.ts",
+      "line": 26,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "guardSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteVersions.list",
+      "file": "server/trpc/routers/site-version.ts",
+      "line": 35,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "guardSite"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteVersions.get",
+      "file": "server/trpc/routers/site-version.ts",
+      "line": 42,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "guardSite"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteVersions.rename",
+      "file": "server/trpc/routers/site-version.ts",
+      "line": 49,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "guardSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteVersions.delete",
+      "file": "server/trpc/routers/site-version.ts",
+      "line": 56,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "guardSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteComponents.upsert",
+      "file": "server/trpc/routers/site-component.ts",
+      "line": 53,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "guardSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteComponents.list",
+      "file": "server/trpc/routers/site-component.ts",
+      "line": 67,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "guardSite"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteComponents.get",
+      "file": "server/trpc/routers/site-component.ts",
+      "line": 74,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "guardSite"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteComponents.delete",
+      "file": "server/trpc/routers/site-component.ts",
+      "line": 81,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "guardSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteComponents.library",
+      "file": "server/trpc/routers/site-component.ts",
+      "line": 91,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "guardSite"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteComponents.libraryGet",
+      "file": "server/trpc/routers/site-component.ts",
+      "line": 98,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "guardSite"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteComponents.workspaceList",
+      "file": "server/trpc/routers/site-component.ts",
+      "line": 107,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteComponents.usage",
+      "file": "server/trpc/routers/site-component.ts",
+      "line": 113,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteComponents.workspaceRename",
+      "file": "server/trpc/routers/site-component.ts",
+      "line": 121,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireWorkspaceAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "siteComponents.workspaceDelete",
+      "file": "server/trpc/routers/site-component.ts",
+      "line": 130,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireWorkspaceAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "userTemplates.upsert",
+      "file": "server/trpc/routers/user-template.ts",
+      "line": 22,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "guardSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "userTemplates.list",
+      "file": "server/trpc/routers/user-template.ts",
+      "line": 30,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "guardSite"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "userTemplates.delete",
+      "file": "server/trpc/routers/user-template.ts",
+      "line": 37,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "guardSiteRole"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "marketplace.listInstalled",
+      "file": "server/trpc/routers/marketplace.ts",
+      "line": 43,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireWorkspace"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "marketplace.install",
+      "file": "server/trpc/routers/marketplace.ts",
+      "line": 48,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireWorkspace",
+        "requireAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "marketplace.uninstall",
+      "file": "server/trpc/routers/marketplace.ts",
+      "line": 60,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireWorkspace",
+        "requireAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "marketplace.getConfig",
+      "file": "server/trpc/routers/marketplace.ts",
+      "line": 74,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireWorkspace"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "marketplace.configure",
+      "file": "server/trpc/routers/marketplace.ts",
+      "line": 81,
+      "kind": "mutation",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "requireWorkspace",
+        "requireAdmin"
+      ],
+      "runtime": "Pending; static registration only"
+    },
+    {
+      "endpoint": "activity.recent",
+      "file": "server/trpc/routers/activity.ts",
+      "line": 10,
+      "kind": "query",
+      "procedure": "protectedProcedure",
+      "guardCalls": [
+        "assertSiteAccess"
+      ],
+      "runtime": "Pending; static registration only"
+    }
+  ]
+}

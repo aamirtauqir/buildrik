@@ -1,0 +1,18 @@
+[
+  {
+    "label": "Updated Brand section entry",
+    "goto": "8539:11118",
+    "wait": 7000,
+    "shot": "r33-brand-sections-final.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8539-11118&starting-point-node-id=8539%3A11118&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "label": "Hero opens Blocks",
+    "x": 538,
+    "y": 223,
+    "shot": "r33-brand-blocks-handoff-final.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8539-11118&starting-point-node-id=8539%3A11118&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

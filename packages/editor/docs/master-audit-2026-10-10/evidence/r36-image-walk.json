@@ -1,0 +1,53 @@
+[
+  {
+    "goto": "8843:20467",
+    "wait": 5000
+  },
+  {
+    "x": 476,
+    "y": 96,
+    "shot": "r36-image-mobile.png"
+  },
+  {
+    "x": 1335,
+    "y": 334,
+    "shot": "r36-image-authored-alt.png"
+  },
+  {
+    "x": 1335,
+    "y": 292,
+    "shot": "r36-image-picker.png"
+  },
+  {
+    "x": 538,
+    "y": 422
+  },
+  {
+    "x": 546,
+    "y": 596,
+    "shot": "r36-image-applied.png"
+  },
+  {
+    "x": 1264,
+    "y": 537,
+    "shot": "r36-image-undo.png"
+  },
+  {
+    "x": 1335,
+    "y": 292
+  },
+  {
+    "x": 538,
+    "y": 498,
+    "shot": "r36-image-load-failed.png"
+  },
+  {
+    "key": "Escape",
+    "shot": "r36-image-failure-return.png"
+  },
+  {
+    "x": 1155,
+    "y": 117,
+    "shot": "r36-image-style.png"
+  }
+]

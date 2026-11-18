@@ -1,0 +1,92 @@
+[
+  {
+    "label": "Media repaired",
+    "goto": "8773:13794"
+  },
+  {
+    "label": "Select second asset",
+    "x": 633,
+    "y": 419,
+    "shot": "r33-media-isolation-final.png"
+  },
+  {
+    "label": "Delete second asset",
+    "x": 1225,
+    "y": 655
+  },
+  {
+    "label": "Confirm delete",
+    "x": 720,
+    "y": 535,
+    "shot": "r33-media-deleted-final.png"
+  },
+  {
+    "label": "Undo",
+    "x": 720,
+    "y": 517,
+    "shot": "r33-media-undo-final.png"
+  },
+  {
+    "label": "Brand section shortcuts",
+    "goto": "8539:11118",
+    "shot": "r33-brand-sections.png"
+  },
+  {
+    "label": "Blocks handoff",
+    "goto": "8798:13987",
+    "shot": "r33-blocks.png"
+  },
+  {
+    "label": "Insert Features sample",
+    "x": 108,
+    "y": 206,
+    "shot": "r33-blocks-features.png"
+  },
+  {
+    "label": "Undo insertion",
+    "x": 108,
+    "y": 594,
+    "shot": "r33-blocks-undo.png"
+  },
+  {
+    "label": "Site ownership",
+    "goto": "8777:14104"
+  },
+  {
+    "label": "Transfer",
+    "x": 720,
+    "y": 505
+  },
+  {
+    "label": "Select new owner",
+    "x": 720,
+    "y": 534
+  },
+  {
+    "label": "Review transfer",
+    "x": 902,
+    "y": 583
+  },
+  {
+    "label": "Confirm transfer",
+    "x": 852,
+    "y": 541,
+    "shot": "r33-site-transferred.png"
+  },
+  {
+    "label": "Delete permission denied",
+    "x": 720,
+    "y": 553,
+    "shot": "r33-site-owner-guard.png"
+  },
+  {
+    "label": "Revoke confirmation",
+    "goto": "8777:14083"
+  },
+  {
+    "label": "Revoke",
+    "x": 852,
+    "y": 551,
+    "shot": "r33-sharing-revoked.png"
+  }
+]

@@ -1,0 +1,6034 @@
+{
+  "contexts": {
+    "createdNodeIds": [
+      "8905:18143",
+      "I8905:18143;8314:8",
+      "8905:18146"
+    ],
+    "mutatedNodeIds": [
+      "8863:17171",
+      "8841:14865",
+      "8841:14880",
+      "8842:14381",
+      "8842:14561",
+      "8842:14409",
+      "8842:14380",
+      "8842:14379",
+      "8842:14553",
+      "8842:14557",
+      "8843:16844",
+      "8843:17024",
+      "8843:16872",
+      "8843:16843",
+      "8843:16842",
+      "8843:17016",
+      "8843:17020",
+      "8843:17148",
+      "8843:17328",
+      "8843:17176",
+      "8843:17147",
+      "8843:17146",
+      "8843:17320",
+      "8843:17324",
+      "8843:17446",
+      "8843:17626",
+      "8843:17474",
+      "8843:17445",
+      "8843:17444",
+      "8843:17618",
+      "8843:17622",
+      "8843:17721",
+      "8843:17901",
+      "8843:17749",
+      "8843:17720",
+      "8843:17719",
+      "8843:17893",
+      "8843:17897",
+      "8843:18059",
+      "8843:18239",
+      "8843:18087",
+      "8843:18058",
+      "8843:18057",
+      "8843:18231",
+      "8843:18235",
+      "8843:18416",
+      "8843:18596",
+      "8843:18444",
+      "8843:18415",
+      "8843:18414",
+      "8843:18588",
+      "8843:18592",
+      "8843:18733",
+      "8843:18913",
+      "8843:18761",
+      "8843:18732",
+      "8843:18731",
+      "8843:18905",
+      "8843:18909",
+      "8843:19056",
+      "8843:19236",
+      "8843:19084",
+      "8843:19055",
+      "8843:19054",
+      "8843:19228",
+      "8843:19232",
+      "8843:19355",
+      "8843:19535",
+      "8843:19383",
+      "8843:19354",
+      "8843:19353",
+      "8843:19527",
+      "8843:19531",
+      "8843:19642",
+      "8843:19822",
+      "8843:19670",
+      "8843:19641",
+      "8843:19640",
+      "8843:19814",
+      "8843:19818",
+      "8843:19929",
+      "8843:20109",
+      "8843:19957",
+      "8843:19928",
+      "8843:19927",
+      "8843:20101",
+      "8843:20105",
+      "8843:20216",
+      "8843:20396",
+      "8843:20244",
+      "8843:20215",
+      "8843:20214",
+      "8843:20388",
+      "8843:20392",
+      "8843:20503",
+      "8843:20683",
+      "8843:20531",
+      "8843:20502",
+      "8843:20501",
+      "8843:20675",
+      "8843:20679",
+      "8843:20819",
+      "8843:20999",
+      "8843:20847",
+      "8843:20818",
+      "8843:20817",
+      "8843:20991",
+      "8843:20995",
+      "8843:21137",
+      "8843:21317",
+      "8843:21165",
+      "8843:21136",
+      "8843:21135",
+      "8843:21309",
+      "8843:21313",
+      "8843:21430",
+      "8843:21610",
+      "8843:21458",
+      "8843:21429",
+      "8843:21428",
+      "8843:21602",
+      "8843:21606",
+      "8843:21705",
+      "8843:21885",
+      "8843:21733",
+      "8843:21704",
+      "8843:21703",
+      "8843:21877",
+      "8843:21881",
+      "8843:21992",
+      "8843:22172",
+      "8843:22020",
+      "8843:21991",
+      "8843:21990",
+      "8843:22164",
+      "8843:22168",
+      "8843:22273",
+      "8843:22453",
+      "8843:22301",
+      "8843:22272",
+      "8843:22271",
+      "8843:22445",
+      "8843:22449",
+      "8843:22573",
+      "8843:22753",
+      "8843:22601",
+      "8843:22572",
+      "8843:22571",
+      "8843:22745",
+      "8843:22749",
+      "8843:22848",
+      "8843:23028",
+      "8843:22876",
+      "8843:22847",
+      "8843:22846",
+      "8843:23020",
+      "8843:23024",
+      "8843:23116",
+      "8843:23296",
+      "8843:23144",
+      "8843:23115",
+      "8843:23114",
+      "8843:23288",
+      "8843:23292",
+      "8843:23384",
+      "8843:23564",
+      "8843:23412",
+      "8843:23383",
+      "8843:23382",
+      "8843:23556",
+      "8843:23560",
+      "8843:23672",
+      "8843:23852",
+      "8843:23700",
+      "8843:23671",
+      "8843:23670",
+      "8843:23844",
+      "8843:23848",
+      "8843:23959",
+      "8843:24139",
+      "8843:23987",
+      "8843:23958",
+      "8843:23957",
+      "8843:24131",
+      "8843:24135",
+      "8843:24246",
+      "8843:24426",
+      "8843:24274",
+      "8843:24245",
+      "8843:24244",
+      "8843:24418",
+      "8843:24422",
+      "8843:24514",
+      "8843:24694",
+      "8843:24542",
+      "8843:24513",
+      "8843:24512",
+      "8843:24686",
+      "8843:24690",
+      "8843:24782",
+      "8843:24962",
+      "8843:24810",
+      "8843:24781",
+      "8843:24780",
+      "8843:24954",
+      "8843:24958",
+      "8843:25050",
+      "8843:25230",
+      "8843:25078",
+      "8843:25049",
+      "8843:25048",
+      "8843:25222",
+      "8843:25226",
+      "8843:25318",
+      "8843:25498",
+      "8843:25346",
+      "8843:25317",
+      "8843:25316",
+      "8843:25490",
+      "8843:25494",
+      "8843:25639",
+      "8843:25819",
+      "8843:25667",
+      "8843:25638",
+      "8843:25637",
+      "8843:25811",
+      "8843:25815",
+      "8843:25960",
+      "8843:26140",
+      "8843:25988",
+      "8843:25959",
+      "8843:25958",
+      "8843:26132",
+      "8843:26136",
+      "8843:26281",
+      "8843:26461",
+      "8843:26309",
+      "8843:26280",
+      "8843:26279",
+      "8843:26453",
+      "8843:26457",
+      "8843:26602",
+      "8843:26782",
+      "8843:26630",
+      "8843:26601",
+      "8843:26600",
+      "8843:26774",
+      "8843:26778",
+      "8843:26870",
+      "8843:27050",
+      "8843:26898",
+      "8843:26869",
+      "8843:26868",
+      "8843:27042",
+      "8843:27046",
+      "8843:27138",
+      "8843:27318",
+      "8843:27166",
+      "8843:27137",
+      "8843:27136",
+      "8843:27310",
+      "8843:27314",
+      "8843:27406",
+      "8843:27586",
+      "8843:27434",
+      "8843:27405",
+      "8843:27404",
+      "8843:27578",
+      "8843:27582",
+      "8843:27674",
+      "8843:27854",
+      "8843:27702",
+      "8843:27673",
+      "8843:27672",
+      "8843:27846",
+      "8843:27850",
+      "8843:27942",
+      "8843:28122",
+      "8843:27970",
+      "8843:27941",
+      "8843:27940",
+      "8843:28114",
+      "8843:28118",
+      "8843:28210",
+      "8843:28390",
+      "8843:28238",
+      "8843:28209",
+      "8843:28208",
+      "8843:28382",
+      "8843:28386",
+      "8843:28478",
+      "8843:28658",
+      "8843:28506",
+      "8843:28477",
+      "8843:28476",
+      "8843:28650",
+      "8843:28654",
+      "8843:28746",
+      "8843:28926",
+      "8843:28774",
+      "8843:28745",
+      "8843:28744",
+      "8843:28918",
+      "8843:28922",
+      "8843:29014",
+      "8843:29194",
+      "8843:29042",
+      "8843:29013",
+      "8843:29012",
+      "8843:29186",
+      "8843:29190",
+      "8843:29282",
+      "8843:29462",
+      "8843:29310",
+      "8843:29281",
+      "8843:29280",
+      "8843:29454",
+      "8843:29458",
+      "8843:29550",
+      "8843:29730",
+      "8843:29578",
+      "8843:29549",
+      "8843:29548",
+      "8843:29722",
+      "8843:29726",
+      "8843:29818",
+      "8843:29998",
+      "8843:29846",
+      "8843:29817",
+      "8843:29816",
+      "8843:29990",
+      "8843:29994",
+      "8843:30086",
+      "8843:30266",
+      "8843:30114",
+      "8843:30085",
+      "8843:30084",
+      "8843:30258",
+      "8843:30262",
+      "8843:30354",
+      "8843:30534",
+      "8843:30382",
+      "8843:30353",
+      "8843:30352",
+      "8843:30526",
+      "8843:30530",
+      "8843:30625",
+      "8843:30805",
+      "8843:30653",
+      "8843:30624",
+      "8843:30623",
+      "8843:30797",
+      "8843:30801",
+      "8843:30959",
+      "8843:31139",
+      "8843:30987",
+      "8843:30958",
+      "8843:30957",
+      "8843:31131",
+      "8843:31135",
+      "8843:31264",
+      "8843:31444",
+      "8843:31292",
+      "8843:31263",
+      "8843:31262",
+      "8843:31436",
+      "8843:31440",
+      "8843:31557",
+      "8843:31737",
+      "8843:31585",
+      "8843:31556",
+      "8843:31555",
+      "8843:31729",
+      "8843:31733",
+      "8843:31828",
+      "8843:32008",
+      "8843:31856",
+      "8843:31827",
+      "8843:31826",
+      "8843:32000",
+      "8843:32004",
+      "8843:32099",
+      "8843:32279",
+      "8843:32127",
+      "8843:32098",
+      "8843:32097",
+      "8843:32271",
+      "8843:32275",
+      "8843:20532"
+    ],
+    "contextManifest": [
+      {
+        "type": "text",
+        "root": "8842:14345",
+        "variable": "VariableID:8905:17350"
+      },
+      {
+        "type": "heading",
+        "root": "8843:16808",
+        "variable": "VariableID:8905:17366"
+      },
+      {
+        "type": "paragraph",
+        "root": "8843:17112",
+        "variable": "VariableID:8905:17382"
+      },
+      {
+        "type": "label",
+        "root": "8843:17410",
+        "variable": "VariableID:8905:17398"
+      },
+      {
+        "type": "link",
+        "root": "8843:17685",
+        "variable": "VariableID:8905:17411"
+      },
+      {
+        "type": "button",
+        "root": "8843:18023",
+        "variable": "VariableID:8905:17434"
+      },
+      {
+        "type": "input",
+        "root": "8843:18380",
+        "variable": "VariableID:8905:17458"
+      },
+      {
+        "type": "textarea",
+        "root": "8843:18697",
+        "variable": "VariableID:8905:17473"
+      },
+      {
+        "type": "select",
+        "root": "8843:19020",
+        "variable": "VariableID:8905:17489"
+      },
+      {
+        "type": "checkbox",
+        "root": "8843:19319",
+        "variable": "VariableID:8905:17502"
+      },
+      {
+        "type": "radio",
+        "root": "8843:19606",
+        "variable": "VariableID:8905:17515"
+      },
+      {
+        "type": "switch",
+        "root": "8843:19893",
+        "variable": "VariableID:8905:17528"
+      },
+      {
+        "type": "upload",
+        "root": "8843:20180",
+        "variable": "VariableID:8905:17541"
+      },
+      {
+        "type": "image",
+        "root": "8843:20467",
+        "variable": "VariableID:8905:17554"
+      },
+      {
+        "type": "video",
+        "root": "8843:20783",
+        "variable": "VariableID:8905:17571"
+      },
+      {
+        "type": "audio",
+        "root": "8843:21101",
+        "variable": "VariableID:8905:17585"
+      },
+      {
+        "type": "svg",
+        "root": "8843:21394",
+        "variable": "VariableID:8905:17598"
+      },
+      {
+        "type": "icon",
+        "root": "8843:21669",
+        "variable": "VariableID:8905:17611"
+      },
+      {
+        "type": "lottie",
+        "root": "8843:21956",
+        "variable": "VariableID:8905:17624"
+      },
+      {
+        "type": "video-embed",
+        "root": "8843:22237",
+        "variable": "VariableID:8905:17637"
+      },
+      {
+        "type": "map-embed",
+        "root": "8843:22537",
+        "variable": "VariableID:8905:17650"
+      },
+      {
+        "type": "spacer",
+        "root": "8843:22812",
+        "variable": "VariableID:8905:17663"
+      },
+      {
+        "type": "divider",
+        "root": "8843:23080",
+        "variable": "VariableID:8905:17676"
+      },
+      {
+        "type": "countdown",
+        "root": "8843:23348",
+        "variable": "VariableID:8905:17689"
+      },
+      {
+        "type": "progress",
+        "root": "8843:23636",
+        "variable": "VariableID:8905:17702"
+      },
+      {
+        "type": "accordion",
+        "root": "8843:23923",
+        "variable": "VariableID:8905:17715"
+      },
+      {
+        "type": "flex",
+        "root": "8843:24210",
+        "variable": "VariableID:8905:17728"
+      },
+      {
+        "type": "stack",
+        "root": "8843:24478",
+        "variable": "VariableID:8905:17741"
+      },
+      {
+        "type": "grid",
+        "root": "8843:24746",
+        "variable": "VariableID:8905:17754"
+      },
+      {
+        "type": "columns",
+        "root": "8843:25014",
+        "variable": "VariableID:8905:17767"
+      },
+      {
+        "type": "container",
+        "root": "8843:25282",
+        "variable": "VariableID:8905:17780"
+      },
+      {
+        "type": "section",
+        "root": "8843:25603",
+        "variable": "VariableID:8905:17801"
+      },
+      {
+        "type": "card",
+        "root": "8843:25924",
+        "variable": "VariableID:8905:17822"
+      },
+      {
+        "type": "cta",
+        "root": "8843:26245",
+        "variable": "VariableID:8905:17843"
+      },
+      {
+        "type": "hero",
+        "root": "8843:26566",
+        "variable": "VariableID:8905:17864"
+      },
+      {
+        "type": "features",
+        "root": "8843:26834",
+        "variable": "VariableID:8905:17877"
+      },
+      {
+        "type": "header",
+        "root": "8843:27102",
+        "variable": "VariableID:8905:17890"
+      },
+      {
+        "type": "footer",
+        "root": "8843:27370",
+        "variable": "VariableID:8905:17903"
+      },
+      {
+        "type": "nav",
+        "root": "8843:27638",
+        "variable": "VariableID:8905:17916"
+      },
+      {
+        "type": "navbar",
+        "root": "8843:27906",
+        "variable": "VariableID:8905:17929"
+      },
+      {
+        "type": "pricing",
+        "root": "8843:28174",
+        "variable": "VariableID:8905:17942"
+      },
+      {
+        "type": "social",
+        "root": "8843:28442",
+        "variable": "VariableID:8905:17955"
+      },
+      {
+        "type": "testimonials",
+        "root": "8843:28710",
+        "variable": "VariableID:8905:17968"
+      },
+      {
+        "type": "tabs",
+        "root": "8843:28978",
+        "variable": "VariableID:8905:17981"
+      },
+      {
+        "type": "list",
+        "root": "8843:29246",
+        "variable": "VariableID:8905:17994"
+      },
+      {
+        "type": "table",
+        "root": "8843:29514",
+        "variable": "VariableID:8905:18007"
+      },
+      {
+        "type": "gallery",
+        "root": "8843:29782",
+        "variable": "VariableID:8905:18020"
+      },
+      {
+        "type": "custom",
+        "root": "8843:30050",
+        "variable": "VariableID:8905:18033"
+      },
+      {
+        "type": "list-item",
+        "root": "8843:30318",
+        "variable": "VariableID:8905:18046"
+      },
+      {
+        "type": "form",
+        "root": "8843:30589",
+        "variable": "VariableID:8905:18059"
+      },
+      {
+        "type": "slider",
+        "root": "8843:30923",
+        "variable": "VariableID:8905:18078"
+      },
+      {
+        "type": "collection-list",
+        "root": "8843:31228",
+        "variable": "VariableID:8905:18091"
+      },
+      {
+        "type": "product-card",
+        "root": "8843:31521",
+        "variable": "VariableID:8905:18104"
+      },
+      {
+        "type": "product-grid",
+        "root": "8843:31792",
+        "variable": "VariableID:8905:18117"
+      },
+      {
+        "type": "product-detail",
+        "root": "8843:32063",
+        "variable": "VariableID:8905:18130"
+      }
+    ],
+    "sharedContext": "VariableID:8905:17347",
+    "imageFitVisible": "VariableID:8905:17348",
+    "fitLink": "8905:18143",
+    "fitMovedTo": "8841:14865"
+  },
+  "picker": {
+    "createdNodeIds": [
+      "8907:17358",
+      "I8907:17358;8314:8",
+      "8907:17361",
+      "8907:17362",
+      "8907:17363",
+      "8907:17364",
+      "8907:17365",
+      "I8907:17365;8531:319",
+      "8907:17367",
+      "I8907:17367;8314:4",
+      "8907:17370",
+      "I8907:17370;8314:6",
+      "8907:17373",
+      "I8907:17373;8314:8",
+      "8907:17376",
+      "8907:17377",
+      "I8907:17377;8314:6"
+    ],
+    "mutatedNodeIds": [
+      "8843:20687",
+      "8539:12740",
+      "I8539:12747;8314:6",
+      "8539:12747",
+      "I8579:11905;8314:6",
+      "8579:11905",
+      "I8539:12746;8314:6",
+      "8539:12746",
+      "I8579:11902;8314:6",
+      "8579:11902",
+      "8539:12757",
+      "8539:9865",
+      "8539:12754",
+      "I8539:9789;8314:8",
+      "I8539:9977;8314:8",
+      "I8539:10067;8314:6",
+      "8539:9869",
+      "8539:9870",
+      "8907:17358",
+      "8843:20778",
+      "8843:20779",
+      "I8907:17365;8531:319",
+      "8907:17367",
+      "8907:17370",
+      "8907:17373",
+      "8907:17377",
+      "8907:17361"
+    ],
+    "beforeSrc": "VariableID:8907:17347",
+    "pickerContext": "VariableID:8907:17348",
+    "undo": "8907:17358",
+    "failure": "8907:17361",
+    "failedChoice": "8907:17377",
+    "source": "VariableID:8843:20689",
+    "alt": "VariableID:8843:20695",
+    "picker": "8539:12728",
+    "image": "8843:20467"
+  },
+  "fit": {
+    "createdNodeIds": [
+      "8908:17358",
+      "8908:17360",
+      "I8908:17360;8314:8"
+    ],
+    "mutatedNodeIds": [
+      "8908:17358",
+      "8908:17360",
+      "8843:20502",
+      "8843:20501",
+      "8863:17180",
+      "8863:17183",
+      "8863:17186",
+      "8863:17189",
+      "8863:17192",
+      "8842:14553",
+      "8843:17016",
+      "8843:17320",
+      "8843:17618",
+      "8843:17893",
+      "8843:18231",
+      "8843:18588",
+      "8843:18905",
+      "8843:19228",
+      "8843:19527",
+      "8843:19814",
+      "8843:20101",
+      "8843:20388",
+      "8843:20675",
+      "8843:20991",
+      "8843:21309",
+      "8843:21602",
+      "8843:21877",
+      "8843:22164",
+      "8843:22445",
+      "8843:22745",
+      "8843:23020",
+      "8843:23288",
+      "8843:23556",
+      "8843:23844",
+      "8843:24131",
+      "8843:24418",
+      "8843:24686",
+      "8843:24954",
+      "8843:25222",
+      "8843:25490",
+      "8843:25811",
+      "8843:26132",
+      "8843:26453",
+      "8843:26774",
+      "8843:27042",
+      "8843:27310",
+      "8843:27578",
+      "8843:27846",
+      "8843:28114",
+      "8843:28382",
+      "8843:28650",
+      "8843:28918",
+      "8843:29186",
+      "8843:29454",
+      "8843:29722",
+      "8843:29990",
+      "8843:30258",
+      "8843:30526",
+      "8843:30797",
+      "8843:31131",
+      "8843:31436",
+      "8843:31729",
+      "8843:32000",
+      "8843:32271",
+      "8905:18143",
+      "8539:12757",
+      "8843:20687",
+      "8539:12746",
+      "8539:12747",
+      "8579:11902",
+      "8579:11905",
+      "8539:9865",
+      "8907:17377"
+    ],
+    "variables": {
+      "baseFit": "VariableID:8908:17353",
+      "mobileFit": "VariableID:8908:17354",
+      "mobile": "VariableID:8908:17355",
+      "origin": "VariableID:8908:17356",
+      "resetVisible": "VariableID:8908:17357",
+      "valid": "VariableID:8908:17426"
+    },
+    "originText": "8908:17358",
+    "resetButton": "8908:17360"
+  },
+  "sourceAuditDate": "2026-10-13",
+  "types": [
+    {
+      "type": "text",
+      "root": "8842:14345",
+      "fields": [
+        {
+          "name": "Text style",
+          "var": "VariableID:8842:14567",
+          "node": "8842:14565",
+          "options": [
+            "Body text",
+            "Body large",
+            "Caption",
+            "Caption XS",
+            "Custom"
+          ]
+        },
+        {
+          "name": "Source",
+          "var": "VariableID:8842:14578",
+          "node": "8842:14576",
+          "options": [
+            "None",
+            "Articles"
+          ]
+        },
+        {
+          "name": "Field",
+          "var": "VariableID:8842:14584",
+          "node": "8842:14582",
+          "options": [
+            "Title",
+            "Summary"
+          ]
+        },
+        {
+          "name": "Fallback",
+          "var": "VariableID:8842:14590",
+          "node": "8842:14588",
+          "options": [
+            "Static content",
+            "No content"
+          ]
+        },
+        {
+          "name": "ID",
+          "var": "VariableID:8842:14601",
+          "node": "8842:14599",
+          "options": [
+            "text-01",
+            "text-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8842:14607",
+          "node": "8842:14605",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8842:14613",
+          "node": "8842:14611",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8842:14619",
+          "node": "8842:14617",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8842:14625",
+          "node": "8842:14623",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "root": "8843:16808",
+      "fields": [
+        {
+          "name": "Level",
+          "var": "VariableID:8843:17030",
+          "node": "8843:17028",
+          "options": [
+            "H1",
+            "H2",
+            "H3",
+            "H4",
+            "H5",
+            "H6"
+          ]
+        },
+        {
+          "name": "Text style",
+          "var": "VariableID:8843:17036",
+          "node": "8843:17034",
+          "options": [
+            "Heading 1",
+            "Heading 2",
+            "Heading 3",
+            "Sub-heading",
+            "Custom"
+          ]
+        },
+        {
+          "name": "Source",
+          "var": "VariableID:8843:17047",
+          "node": "8843:17045",
+          "options": [
+            "None",
+            "Articles"
+          ]
+        },
+        {
+          "name": "Field",
+          "var": "VariableID:8843:17053",
+          "node": "8843:17051",
+          "options": [
+            "Title",
+            "Summary"
+          ]
+        },
+        {
+          "name": "Fallback",
+          "var": "VariableID:8843:17059",
+          "node": "8843:17057",
+          "options": [
+            "Static content",
+            "No content"
+          ]
+        },
+        {
+          "name": "ID",
+          "var": "VariableID:8843:17070",
+          "node": "8843:17068",
+          "options": [
+            "heading-01",
+            "heading-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:17076",
+          "node": "8843:17074",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:17082",
+          "node": "8843:17080",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:17088",
+          "node": "8843:17086",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:17094",
+          "node": "8843:17092",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "root": "8843:17112",
+      "fields": [
+        {
+          "name": "Text style",
+          "var": "VariableID:8843:17334",
+          "node": "8843:17332",
+          "options": [
+            "Body text",
+            "Body large",
+            "Caption",
+            "Custom"
+          ]
+        },
+        {
+          "name": "Source",
+          "var": "VariableID:8843:17345",
+          "node": "8843:17343",
+          "options": [
+            "None",
+            "Articles"
+          ]
+        },
+        {
+          "name": "Field",
+          "var": "VariableID:8843:17351",
+          "node": "8843:17349",
+          "options": [
+            "Title",
+            "Summary"
+          ]
+        },
+        {
+          "name": "Fallback",
+          "var": "VariableID:8843:17357",
+          "node": "8843:17355",
+          "options": [
+            "Static content",
+            "No content"
+          ]
+        },
+        {
+          "name": "ID",
+          "var": "VariableID:8843:17368",
+          "node": "8843:17366",
+          "options": [
+            "paragraph-01",
+            "paragraph-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:17374",
+          "node": "8843:17372",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:17380",
+          "node": "8843:17378",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:17386",
+          "node": "8843:17384",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:17392",
+          "node": "8843:17390",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "label",
+      "root": "8843:17410",
+      "fields": [
+        {
+          "name": "Text style",
+          "var": "VariableID:8843:17632",
+          "node": "8843:17630",
+          "options": [
+            "Body text",
+            "Caption",
+            "Custom"
+          ]
+        },
+        {
+          "name": "ID",
+          "var": "VariableID:8843:17643",
+          "node": "8843:17641",
+          "options": [
+            "label-01",
+            "label-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:17649",
+          "node": "8843:17647",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:17655",
+          "node": "8843:17653",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:17661",
+          "node": "8843:17659",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:17667",
+          "node": "8843:17665",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "link",
+      "root": "8843:17685",
+      "fields": [
+        {
+          "name": "Link to",
+          "var": "VariableID:8843:17911",
+          "node": "8843:17909",
+          "options": [
+            "Page",
+            "URL",
+            "Email",
+            "Phone",
+            "Anchor"
+          ]
+        },
+        {
+          "name": "Destination",
+          "var": "VariableID:8843:17917",
+          "node": "8843:17915",
+          "options": [
+            "About",
+            "Contact"
+          ]
+        },
+        {
+          "name": "URL",
+          "var": "VariableID:8843:17923",
+          "node": "8843:17921",
+          "options": [
+            "https://example.com",
+            "https://studio.example"
+          ]
+        },
+        {
+          "name": "Email",
+          "var": "VariableID:8843:17929",
+          "node": "8843:17927",
+          "options": [
+            "hello@example.com",
+            "team@example.com"
+          ]
+        },
+        {
+          "name": "Phone",
+          "var": "VariableID:8843:17935",
+          "node": "8843:17933",
+          "options": [
+            "+1 555 0100",
+            "+1 555 0200"
+          ]
+        },
+        {
+          "name": "Anchor ID",
+          "var": "VariableID:8843:17941",
+          "node": "8843:17939",
+          "options": [
+            "services",
+            "contact"
+          ]
+        },
+        {
+          "name": "Open in new tab",
+          "var": "VariableID:8843:17947",
+          "node": "8843:17945",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "Rel",
+          "var": "VariableID:8843:17953",
+          "node": "8843:17951",
+          "options": [
+            "None",
+            "nofollow"
+          ]
+        },
+        {
+          "name": "Source",
+          "var": "VariableID:8843:17964",
+          "node": "8843:17962",
+          "options": [
+            "None",
+            "Articles"
+          ]
+        },
+        {
+          "name": "Field",
+          "var": "VariableID:8843:17970",
+          "node": "8843:17968",
+          "options": [
+            "Title",
+            "Summary"
+          ]
+        },
+        {
+          "name": "Fallback",
+          "var": "VariableID:8843:17976",
+          "node": "8843:17974",
+          "options": [
+            "Static content",
+            "No content"
+          ]
+        },
+        {
+          "name": "ID",
+          "var": "VariableID:8843:17987",
+          "node": "8843:17985",
+          "options": [
+            "link-01",
+            "link-primary"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:17993",
+          "node": "8843:17991",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:17999",
+          "node": "8843:17997",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:18005",
+          "node": "8843:18003",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "root": "8843:18023",
+      "fields": [
+        {
+          "name": "Type",
+          "var": "VariableID:8843:18245",
+          "node": "8843:18243",
+          "options": [
+            "Button",
+            "Submit",
+            "Reset"
+          ]
+        },
+        {
+          "name": "Disabled",
+          "var": "VariableID:8843:18251",
+          "node": "8843:18249",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "Link to",
+          "var": "VariableID:8843:18262",
+          "node": "8843:18260",
+          "options": [
+            "Page",
+            "URL",
+            "Email",
+            "Phone",
+            "Anchor"
+          ]
+        },
+        {
+          "name": "Destination",
+          "var": "VariableID:8843:18268",
+          "node": "8843:18266",
+          "options": [
+            "About",
+            "Contact"
+          ]
+        },
+        {
+          "name": "URL",
+          "var": "VariableID:8843:18274",
+          "node": "8843:18272",
+          "options": [
+            "https://example.com",
+            "https://studio.example"
+          ]
+        },
+        {
+          "name": "Email",
+          "var": "VariableID:8843:18280",
+          "node": "8843:18278",
+          "options": [
+            "hello@example.com",
+            "team@example.com"
+          ]
+        },
+        {
+          "name": "Phone",
+          "var": "VariableID:8843:18286",
+          "node": "8843:18284",
+          "options": [
+            "+1 555 0100",
+            "+1 555 0200"
+          ]
+        },
+        {
+          "name": "Anchor ID",
+          "var": "VariableID:8843:18292",
+          "node": "8843:18290",
+          "options": [
+            "services",
+            "contact"
+          ]
+        },
+        {
+          "name": "Open in new tab",
+          "var": "VariableID:8843:18298",
+          "node": "8843:18296",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "Rel",
+          "var": "VariableID:8843:18304",
+          "node": "8843:18302",
+          "options": [
+            "None",
+            "nofollow"
+          ]
+        },
+        {
+          "name": "Source",
+          "var": "VariableID:8843:18315",
+          "node": "8843:18313",
+          "options": [
+            "None",
+            "Articles"
+          ]
+        },
+        {
+          "name": "Field",
+          "var": "VariableID:8843:18321",
+          "node": "8843:18319",
+          "options": [
+            "Title",
+            "Summary"
+          ]
+        },
+        {
+          "name": "Fallback",
+          "var": "VariableID:8843:18327",
+          "node": "8843:18325",
+          "options": [
+            "Static content",
+            "No content"
+          ]
+        },
+        {
+          "name": "ID",
+          "var": "VariableID:8843:18338",
+          "node": "8843:18336",
+          "options": [
+            "button-01",
+            "button-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:18344",
+          "node": "8843:18342",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:18350",
+          "node": "8843:18348",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:18356",
+          "node": "8843:18354",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:18362",
+          "node": "8843:18360",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "input",
+      "root": "8843:18380",
+      "fields": [
+        {
+          "name": "Input type",
+          "var": "VariableID:8843:18602",
+          "node": "8843:18600",
+          "options": [
+            "Text",
+            "Email",
+            "Password",
+            "Number",
+            "Phone",
+            "URL",
+            "Date",
+            "Time",
+            "Date & Time",
+            "Search",
+            "File",
+            "Hidden",
+            "Range",
+            "Color"
+          ]
+        },
+        {
+          "name": "Name",
+          "var": "VariableID:8843:18608",
+          "node": "8843:18606",
+          "options": [
+            "email",
+            "email updated"
+          ]
+        },
+        {
+          "name": "Placeholder",
+          "var": "VariableID:8843:18614",
+          "node": "8843:18612",
+          "options": [
+            "Email address",
+            "Email address updated"
+          ]
+        },
+        {
+          "name": "Default",
+          "var": "VariableID:8843:18620",
+          "node": "8843:18618",
+          "options": [
+            "",
+            " updated"
+          ]
+        },
+        {
+          "name": "Required",
+          "var": "VariableID:8843:18626",
+          "node": "8843:18624",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "Disabled",
+          "var": "VariableID:8843:18632",
+          "node": "8843:18630",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "ID",
+          "var": "VariableID:8843:18643",
+          "node": "8843:18641",
+          "options": [
+            "input-01",
+            "input-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:18649",
+          "node": "8843:18647",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:18655",
+          "node": "8843:18653",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:18661",
+          "node": "8843:18659",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:18667",
+          "node": "8843:18665",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        },
+        {
+          "name": "Read only",
+          "var": "VariableID:8843:18673",
+          "node": "8843:18671",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "Autocomplete",
+          "var": "VariableID:8843:18679",
+          "node": "8843:18677",
+          "options": [
+            "On",
+            "Off",
+            "Name",
+            "Email",
+            "Phone"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "textarea",
+      "root": "8843:18697",
+      "fields": [
+        {
+          "name": "Name",
+          "var": "VariableID:8843:18919",
+          "node": "8843:18917",
+          "options": [
+            "message",
+            "message updated"
+          ]
+        },
+        {
+          "name": "Placeholder",
+          "var": "VariableID:8843:18925",
+          "node": "8843:18923",
+          "options": [
+            "Your message",
+            "Your message updated"
+          ]
+        },
+        {
+          "name": "Default",
+          "var": "VariableID:8843:18931",
+          "node": "8843:18929",
+          "options": [
+            "",
+            " updated"
+          ]
+        },
+        {
+          "name": "Rows",
+          "var": "VariableID:8843:18937",
+          "node": "8843:18935",
+          "options": [
+            "4",
+            "6"
+          ]
+        },
+        {
+          "name": "Required",
+          "var": "VariableID:8843:18943",
+          "node": "8843:18941",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "Disabled",
+          "var": "VariableID:8843:18949",
+          "node": "8843:18947",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "ID",
+          "var": "VariableID:8843:18960",
+          "node": "8843:18958",
+          "options": [
+            "textarea-01",
+            "textarea-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:18966",
+          "node": "8843:18964",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:18972",
+          "node": "8843:18970",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:18978",
+          "node": "8843:18976",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:18984",
+          "node": "8843:18982",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        },
+        {
+          "name": "Read only",
+          "var": "VariableID:8843:18990",
+          "node": "8843:18988",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "Max length",
+          "var": "VariableID:8843:18996",
+          "node": "8843:18994",
+          "options": [
+            "500",
+            "1000"
+          ]
+        },
+        {
+          "name": "Columns",
+          "var": "VariableID:8843:19002",
+          "node": "8843:19000",
+          "options": [
+            "50",
+            "60"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "root": "8843:19020",
+      "fields": [
+        {
+          "name": "Name",
+          "var": "VariableID:8843:19242",
+          "node": "8843:19240",
+          "options": [
+            "service",
+            "service updated"
+          ]
+        },
+        {
+          "name": "Options",
+          "var": "VariableID:8843:19248",
+          "node": "8843:19246",
+          "options": [
+            "Design; Development",
+            "Design; Development; Strategy"
+          ]
+        },
+        {
+          "name": "Required",
+          "var": "VariableID:8843:19254",
+          "node": "8843:19252",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "Disabled",
+          "var": "VariableID:8843:19260",
+          "node": "8843:19258",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "Multiple",
+          "var": "VariableID:8843:19266",
+          "node": "8843:19264",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "ID",
+          "var": "VariableID:8843:19277",
+          "node": "8843:19275",
+          "options": [
+            "select-01",
+            "select-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:19283",
+          "node": "8843:19281",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:19289",
+          "node": "8843:19287",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:19295",
+          "node": "8843:19293",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:19301",
+          "node": "8843:19299",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "root": "8843:19319",
+      "fields": [
+        {
+          "name": "Name",
+          "var": "VariableID:8843:19541",
+          "node": "8843:19539",
+          "options": [
+            "consent",
+            "consent updated"
+          ]
+        },
+        {
+          "name": "Checked by default",
+          "var": "VariableID:8843:19547",
+          "node": "8843:19545",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "Required",
+          "var": "VariableID:8843:19553",
+          "node": "8843:19551",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "ID",
+          "var": "VariableID:8843:19564",
+          "node": "8843:19562",
+          "options": [
+            "checkbox-01",
+            "checkbox-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:19570",
+          "node": "8843:19568",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:19576",
+          "node": "8843:19574",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:19582",
+          "node": "8843:19580",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:19588",
+          "node": "8843:19586",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "radio",
+      "root": "8843:19606",
+      "fields": [
+        {
+          "name": "Name",
+          "var": "VariableID:8843:19828",
+          "node": "8843:19826",
+          "options": [
+            "plan",
+            "plan updated"
+          ]
+        },
+        {
+          "name": "Checked by default",
+          "var": "VariableID:8843:19834",
+          "node": "8843:19832",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "Required",
+          "var": "VariableID:8843:19840",
+          "node": "8843:19838",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "ID",
+          "var": "VariableID:8843:19851",
+          "node": "8843:19849",
+          "options": [
+            "radio-01",
+            "radio-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:19857",
+          "node": "8843:19855",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:19863",
+          "node": "8843:19861",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:19869",
+          "node": "8843:19867",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:19875",
+          "node": "8843:19873",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "switch",
+      "root": "8843:19893",
+      "fields": [
+        {
+          "name": "Name",
+          "var": "VariableID:8843:20115",
+          "node": "8843:20113",
+          "options": [
+            "notifications",
+            "notifications updated"
+          ]
+        },
+        {
+          "name": "Checked by default",
+          "var": "VariableID:8843:20121",
+          "node": "8843:20119",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "Required",
+          "var": "VariableID:8843:20127",
+          "node": "8843:20125",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "ID",
+          "var": "VariableID:8843:20138",
+          "node": "8843:20136",
+          "options": [
+            "switch-01",
+            "switch-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:20144",
+          "node": "8843:20142",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:20150",
+          "node": "8843:20148",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:20156",
+          "node": "8843:20154",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:20162",
+          "node": "8843:20160",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "upload",
+      "root": "8843:20180",
+      "fields": [
+        {
+          "name": "Name",
+          "var": "VariableID:8843:20402",
+          "node": "8843:20400",
+          "options": [
+            "attachment",
+            "attachment updated"
+          ]
+        },
+        {
+          "name": "Required",
+          "var": "VariableID:8843:20408",
+          "node": "8843:20406",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "Disabled",
+          "var": "VariableID:8843:20414",
+          "node": "8843:20412",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "ID",
+          "var": "VariableID:8843:20425",
+          "node": "8843:20423",
+          "options": [
+            "upload-01",
+            "upload-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:20431",
+          "node": "8843:20429",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:20437",
+          "node": "8843:20435",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:20443",
+          "node": "8843:20441",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:20449",
+          "node": "8843:20447",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "root": "8843:20467",
+      "fields": [
+        {
+          "name": "Source",
+          "var": "VariableID:8843:20689",
+          "node": "8843:20687",
+          "options": [
+            "studio-gradient1.webp",
+            "studio-gradient2.webp"
+          ]
+        },
+        {
+          "name": "Alt text",
+          "var": "VariableID:8843:20695",
+          "node": "8843:20693",
+          "options": [
+            "Blue and violet study",
+            "A warm colour study"
+          ]
+        },
+        {
+          "name": "Loading",
+          "var": "VariableID:8843:20701",
+          "node": "8843:20699",
+          "options": [
+            "Lazy",
+            "Eager"
+          ]
+        },
+        {
+          "name": "Source",
+          "var": "VariableID:8843:20712",
+          "node": "8843:20710",
+          "options": [
+            "None",
+            "Articles"
+          ]
+        },
+        {
+          "name": "Field",
+          "var": "VariableID:8843:20718",
+          "node": "8843:20716",
+          "options": [
+            "Title",
+            "Summary"
+          ]
+        },
+        {
+          "name": "Fallback",
+          "var": "VariableID:8843:20724",
+          "node": "8843:20722",
+          "options": [
+            "Static content",
+            "No content"
+          ]
+        },
+        {
+          "name": "ID",
+          "var": "VariableID:8843:20735",
+          "node": "8843:20733",
+          "options": [
+            "image-01",
+            "image-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:20741",
+          "node": "8843:20739",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:20747",
+          "node": "8843:20745",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:20753",
+          "node": "8843:20751",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:20759",
+          "node": "8843:20757",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        },
+        {
+          "name": "Decoding",
+          "var": "VariableID:8843:20765",
+          "node": "8843:20763",
+          "options": [
+            "Auto",
+            "Sync",
+            "Async"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "video",
+      "root": "8843:20783",
+      "fields": [
+        {
+          "name": "Source",
+          "var": "VariableID:8843:21005",
+          "node": "8843:21003",
+          "options": [
+            "studio-tour.mp4",
+            "studio-work.mp4"
+          ]
+        },
+        {
+          "name": "Poster image",
+          "var": "VariableID:8843:21011",
+          "node": "8843:21009",
+          "options": [
+            "studio-gradient1.webp",
+            "studio-gradient2.webp"
+          ]
+        },
+        {
+          "name": "Autoplay",
+          "var": "VariableID:8843:21017",
+          "node": "8843:21015",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "Muted",
+          "var": "VariableID:8843:21023",
+          "node": "8843:21021",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "Loop",
+          "var": "VariableID:8843:21029",
+          "node": "8843:21027",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "Show controls",
+          "var": "VariableID:8843:21035",
+          "node": "8843:21033",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "Plays inline",
+          "var": "VariableID:8843:21041",
+          "node": "8843:21039",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "ID",
+          "var": "VariableID:8843:21053",
+          "node": "8843:21051",
+          "options": [
+            "video-01",
+            "video-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:21059",
+          "node": "8843:21057",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:21065",
+          "node": "8843:21063",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:21071",
+          "node": "8843:21069",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:21077",
+          "node": "8843:21075",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        },
+        {
+          "name": "Preload",
+          "var": "VariableID:8843:21083",
+          "node": "8843:21081",
+          "options": [
+            "Auto",
+            "Metadata",
+            "None"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "audio",
+      "root": "8843:21101",
+      "fields": [
+        {
+          "name": "Source",
+          "var": "VariableID:8843:21323",
+          "node": "8843:21321",
+          "options": [
+            "studio-intro.mp3",
+            "studio-story.mp3"
+          ]
+        },
+        {
+          "name": "Show controls",
+          "var": "VariableID:8843:21329",
+          "node": "8843:21327",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "Loop",
+          "var": "VariableID:8843:21335",
+          "node": "8843:21333",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "Autoplay",
+          "var": "VariableID:8843:21341",
+          "node": "8843:21339",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "ID",
+          "var": "VariableID:8843:21352",
+          "node": "8843:21350",
+          "options": [
+            "audio-01",
+            "audio-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:21358",
+          "node": "8843:21356",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:21364",
+          "node": "8843:21362",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:21370",
+          "node": "8843:21368",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:21376",
+          "node": "8843:21374",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "svg",
+      "root": "8843:21394",
+      "fields": [
+        {
+          "name": "Source",
+          "var": "VariableID:8843:21616",
+          "node": "8843:21614",
+          "options": [
+            "studio-mark.svg",
+            "studio-symbol.svg"
+          ]
+        },
+        {
+          "name": "ID",
+          "var": "VariableID:8843:21627",
+          "node": "8843:21625",
+          "options": [
+            "svg-01",
+            "svg-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:21633",
+          "node": "8843:21631",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:21639",
+          "node": "8843:21637",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:21645",
+          "node": "8843:21643",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:21651",
+          "node": "8843:21649",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "icon",
+      "root": "8843:21669",
+      "fields": [
+        {
+          "name": "Icon",
+          "var": "VariableID:8843:21891",
+          "node": "8843:21889",
+          "options": [
+            "Arrow right",
+            "Check"
+          ]
+        },
+        {
+          "name": "Icon size",
+          "var": "VariableID:8843:21897",
+          "node": "8843:21895",
+          "options": [
+            "16",
+            "20",
+            "24",
+            "32",
+            "48",
+            "64"
+          ]
+        },
+        {
+          "name": "Stroke width",
+          "var": "VariableID:8843:21903",
+          "node": "8843:21901",
+          "options": [
+            "1",
+            "1.5",
+            "2",
+            "2.5",
+            "3"
+          ]
+        },
+        {
+          "name": "ID",
+          "var": "VariableID:8843:21914",
+          "node": "8843:21912",
+          "options": [
+            "icon-01",
+            "icon-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:21920",
+          "node": "8843:21918",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:21926",
+          "node": "8843:21924",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:21932",
+          "node": "8843:21930",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:21938",
+          "node": "8843:21936",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "lottie",
+      "root": "8843:21956",
+      "fields": [
+        {
+          "name": "Animation URL",
+          "var": "VariableID:8843:22178",
+          "node": "8843:22176",
+          "options": [
+            "lottie.host/studio",
+            "Unsupported URL"
+          ]
+        },
+        {
+          "name": "Detected",
+          "var": "VariableID:8843:22184",
+          "node": "8843:22182",
+          "options": [
+            "LottieFiles",
+            "Unrecognized provider"
+          ]
+        },
+        {
+          "name": "ID",
+          "var": "VariableID:8843:22195",
+          "node": "8843:22193",
+          "options": [
+            "lottie-01",
+            "lottie-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:22201",
+          "node": "8843:22199",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:22207",
+          "node": "8843:22205",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:22213",
+          "node": "8843:22211",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:22219",
+          "node": "8843:22217",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "video-embed",
+      "root": "8843:22237",
+      "fields": [
+        {
+          "name": "Video URL",
+          "var": "VariableID:8843:22459",
+          "node": "8843:22457",
+          "options": [
+            "youtube.com/watch?v=studio",
+            "Unsupported URL"
+          ]
+        },
+        {
+          "name": "Ratio",
+          "var": "VariableID:8843:22465",
+          "node": "8843:22463",
+          "options": [
+            "16:9",
+            "4:3",
+            "1:1"
+          ]
+        },
+        {
+          "name": "Autoplay",
+          "var": "VariableID:8843:22471",
+          "node": "8843:22469",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "Muted",
+          "var": "VariableID:8843:22477",
+          "node": "8843:22475",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "Show controls",
+          "var": "VariableID:8843:22483",
+          "node": "8843:22481",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "ID",
+          "var": "VariableID:8843:22495",
+          "node": "8843:22493",
+          "options": [
+            "video-embed-01",
+            "video-embed-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:22501",
+          "node": "8843:22499",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:22507",
+          "node": "8843:22505",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:22513",
+          "node": "8843:22511",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:22519",
+          "node": "8843:22517",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "map-embed",
+      "root": "8843:22537",
+      "fields": [
+        {
+          "name": "Location",
+          "var": "VariableID:8843:22759",
+          "node": "8843:22757",
+          "options": [
+            "Google Maps · Studio North",
+            "Unsupported URL"
+          ]
+        },
+        {
+          "name": "ID",
+          "var": "VariableID:8843:22770",
+          "node": "8843:22768",
+          "options": [
+            "map-embed-01",
+            "map-embed-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:22776",
+          "node": "8843:22774",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:22782",
+          "node": "8843:22780",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:22788",
+          "node": "8843:22786",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:22794",
+          "node": "8843:22792",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "spacer",
+      "root": "8843:22812",
+      "fields": [
+        {
+          "name": "ID",
+          "var": "VariableID:8843:23038",
+          "node": "8843:23036",
+          "options": [
+            "spacer-01",
+            "spacer-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:23044",
+          "node": "8843:23042",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:23050",
+          "node": "8843:23048",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:23056",
+          "node": "8843:23054",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:23062",
+          "node": "8843:23060",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "divider",
+      "root": "8843:23080",
+      "fields": [
+        {
+          "name": "ID",
+          "var": "VariableID:8843:23306",
+          "node": "8843:23304",
+          "options": [
+            "divider-01",
+            "divider-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:23312",
+          "node": "8843:23310",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:23318",
+          "node": "8843:23316",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:23324",
+          "node": "8843:23322",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:23330",
+          "node": "8843:23328",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "countdown",
+      "root": "8843:23348",
+      "fields": [
+        {
+          "name": "Ends at",
+          "var": "VariableID:8843:23570",
+          "node": "8843:23568",
+          "options": [
+            "2026-12-31 23:59",
+            "2027-01-31 23:59"
+          ]
+        },
+        {
+          "name": "When done",
+          "var": "VariableID:8843:23576",
+          "node": "8843:23574",
+          "options": [
+            "Show message",
+            "Hide"
+          ]
+        },
+        {
+          "name": "Message",
+          "var": "VariableID:8843:23582",
+          "node": "8843:23580",
+          "options": [
+            "We are open!",
+            "Welcome to our studio"
+          ]
+        },
+        {
+          "name": "ID",
+          "var": "VariableID:8843:23594",
+          "node": "8843:23592",
+          "options": [
+            "countdown-01",
+            "countdown-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:23600",
+          "node": "8843:23598",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:23606",
+          "node": "8843:23604",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:23612",
+          "node": "8843:23610",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:23618",
+          "node": "8843:23616",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "progress",
+      "root": "8843:23636",
+      "fields": [
+        {
+          "name": "Value",
+          "var": "VariableID:8843:23858",
+          "node": "8843:23856",
+          "options": [
+            "60",
+            "80"
+          ]
+        },
+        {
+          "name": "Maximum",
+          "var": "VariableID:8843:23864",
+          "node": "8843:23862",
+          "options": [
+            "100",
+            "200"
+          ]
+        },
+        {
+          "name": "Show label",
+          "var": "VariableID:8843:23870",
+          "node": "8843:23868",
+          "options": [
+            "Yes",
+            "No"
+          ]
+        },
+        {
+          "name": "ID",
+          "var": "VariableID:8843:23881",
+          "node": "8843:23879",
+          "options": [
+            "progress-01",
+            "progress-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:23887",
+          "node": "8843:23885",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:23893",
+          "node": "8843:23891",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:23899",
+          "node": "8843:23897",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:23905",
+          "node": "8843:23903",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "accordion",
+      "root": "8843:23923",
+      "fields": [
+        {
+          "name": "1 · Reservations",
+          "var": "VariableID:8843:24145",
+          "node": "8843:24143",
+          "options": [
+            "Open",
+            "Closed"
+          ]
+        },
+        {
+          "name": "2 · Services",
+          "var": "VariableID:8843:24151",
+          "node": "8843:24149",
+          "options": [
+            "Closed",
+            "Open"
+          ]
+        },
+        {
+          "name": "Allow several open at once",
+          "var": "VariableID:8843:24157",
+          "node": "8843:24155",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "ID",
+          "var": "VariableID:8843:24168",
+          "node": "8843:24166",
+          "options": [
+            "accordion-01",
+            "accordion-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:24174",
+          "node": "8843:24172",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:24180",
+          "node": "8843:24178",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:24186",
+          "node": "8843:24184",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:24192",
+          "node": "8843:24190",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "flex",
+      "root": "8843:24210",
+      "fields": [
+        {
+          "name": "ID",
+          "var": "VariableID:8843:24436",
+          "node": "8843:24434",
+          "options": [
+            "flex-01",
+            "flex-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:24442",
+          "node": "8843:24440",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:24448",
+          "node": "8843:24446",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:24454",
+          "node": "8843:24452",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:24460",
+          "node": "8843:24458",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "stack",
+      "root": "8843:24478",
+      "fields": [
+        {
+          "name": "ID",
+          "var": "VariableID:8843:24704",
+          "node": "8843:24702",
+          "options": [
+            "stack-01",
+            "stack-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:24710",
+          "node": "8843:24708",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:24716",
+          "node": "8843:24714",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:24722",
+          "node": "8843:24720",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:24728",
+          "node": "8843:24726",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "grid",
+      "root": "8843:24746",
+      "fields": [
+        {
+          "name": "ID",
+          "var": "VariableID:8843:24972",
+          "node": "8843:24970",
+          "options": [
+            "grid-01",
+            "grid-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:24978",
+          "node": "8843:24976",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:24984",
+          "node": "8843:24982",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:24990",
+          "node": "8843:24988",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:24996",
+          "node": "8843:24994",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "columns",
+      "root": "8843:25014",
+      "fields": [
+        {
+          "name": "ID",
+          "var": "VariableID:8843:25240",
+          "node": "8843:25238",
+          "options": [
+            "columns-01",
+            "columns-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:25246",
+          "node": "8843:25244",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:25252",
+          "node": "8843:25250",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:25258",
+          "node": "8843:25256",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:25264",
+          "node": "8843:25262",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "container",
+      "root": "8843:25282",
+      "fields": [
+        {
+          "name": "Link to",
+          "var": "VariableID:8843:25508",
+          "node": "8843:25506",
+          "options": [
+            "Page",
+            "URL",
+            "Email",
+            "Phone",
+            "Anchor"
+          ]
+        },
+        {
+          "name": "Destination",
+          "var": "VariableID:8843:25514",
+          "node": "8843:25512",
+          "options": [
+            "About",
+            "Contact"
+          ]
+        },
+        {
+          "name": "URL",
+          "var": "VariableID:8843:25520",
+          "node": "8843:25518",
+          "options": [
+            "https://example.com",
+            "https://studio.example"
+          ]
+        },
+        {
+          "name": "Email",
+          "var": "VariableID:8843:25526",
+          "node": "8843:25524",
+          "options": [
+            "hello@example.com",
+            "team@example.com"
+          ]
+        },
+        {
+          "name": "Phone",
+          "var": "VariableID:8843:25532",
+          "node": "8843:25530",
+          "options": [
+            "+1 555 0100",
+            "+1 555 0200"
+          ]
+        },
+        {
+          "name": "Anchor ID",
+          "var": "VariableID:8843:25538",
+          "node": "8843:25536",
+          "options": [
+            "services",
+            "contact"
+          ]
+        },
+        {
+          "name": "Open in new tab",
+          "var": "VariableID:8843:25544",
+          "node": "8843:25542",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "Rel",
+          "var": "VariableID:8843:25550",
+          "node": "8843:25548",
+          "options": [
+            "None",
+            "nofollow"
+          ]
+        },
+        {
+          "name": "ID",
+          "var": "VariableID:8843:25561",
+          "node": "8843:25559",
+          "options": [
+            "container-01",
+            "container-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:25567",
+          "node": "8843:25565",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:25573",
+          "node": "8843:25571",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:25579",
+          "node": "8843:25577",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:25585",
+          "node": "8843:25583",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "root": "8843:25603",
+      "fields": [
+        {
+          "name": "Link to",
+          "var": "VariableID:8843:25829",
+          "node": "8843:25827",
+          "options": [
+            "Page",
+            "URL",
+            "Email",
+            "Phone",
+            "Anchor"
+          ]
+        },
+        {
+          "name": "Destination",
+          "var": "VariableID:8843:25835",
+          "node": "8843:25833",
+          "options": [
+            "About",
+            "Contact"
+          ]
+        },
+        {
+          "name": "URL",
+          "var": "VariableID:8843:25841",
+          "node": "8843:25839",
+          "options": [
+            "https://example.com",
+            "https://studio.example"
+          ]
+        },
+        {
+          "name": "Email",
+          "var": "VariableID:8843:25847",
+          "node": "8843:25845",
+          "options": [
+            "hello@example.com",
+            "team@example.com"
+          ]
+        },
+        {
+          "name": "Phone",
+          "var": "VariableID:8843:25853",
+          "node": "8843:25851",
+          "options": [
+            "+1 555 0100",
+            "+1 555 0200"
+          ]
+        },
+        {
+          "name": "Anchor ID",
+          "var": "VariableID:8843:25859",
+          "node": "8843:25857",
+          "options": [
+            "services",
+            "contact"
+          ]
+        },
+        {
+          "name": "Open in new tab",
+          "var": "VariableID:8843:25865",
+          "node": "8843:25863",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "Rel",
+          "var": "VariableID:8843:25871",
+          "node": "8843:25869",
+          "options": [
+            "None",
+            "nofollow"
+          ]
+        },
+        {
+          "name": "ID",
+          "var": "VariableID:8843:25882",
+          "node": "8843:25880",
+          "options": [
+            "section-01",
+            "section-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:25888",
+          "node": "8843:25886",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:25894",
+          "node": "8843:25892",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:25900",
+          "node": "8843:25898",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:25906",
+          "node": "8843:25904",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "card",
+      "root": "8843:25924",
+      "fields": [
+        {
+          "name": "Link to",
+          "var": "VariableID:8843:26150",
+          "node": "8843:26148",
+          "options": [
+            "Page",
+            "URL",
+            "Email",
+            "Phone",
+            "Anchor"
+          ]
+        },
+        {
+          "name": "Destination",
+          "var": "VariableID:8843:26156",
+          "node": "8843:26154",
+          "options": [
+            "About",
+            "Contact"
+          ]
+        },
+        {
+          "name": "URL",
+          "var": "VariableID:8843:26162",
+          "node": "8843:26160",
+          "options": [
+            "https://example.com",
+            "https://studio.example"
+          ]
+        },
+        {
+          "name": "Email",
+          "var": "VariableID:8843:26168",
+          "node": "8843:26166",
+          "options": [
+            "hello@example.com",
+            "team@example.com"
+          ]
+        },
+        {
+          "name": "Phone",
+          "var": "VariableID:8843:26174",
+          "node": "8843:26172",
+          "options": [
+            "+1 555 0100",
+            "+1 555 0200"
+          ]
+        },
+        {
+          "name": "Anchor ID",
+          "var": "VariableID:8843:26180",
+          "node": "8843:26178",
+          "options": [
+            "services",
+            "contact"
+          ]
+        },
+        {
+          "name": "Open in new tab",
+          "var": "VariableID:8843:26186",
+          "node": "8843:26184",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "Rel",
+          "var": "VariableID:8843:26192",
+          "node": "8843:26190",
+          "options": [
+            "None",
+            "nofollow"
+          ]
+        },
+        {
+          "name": "ID",
+          "var": "VariableID:8843:26203",
+          "node": "8843:26201",
+          "options": [
+            "card-01",
+            "card-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:26209",
+          "node": "8843:26207",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:26215",
+          "node": "8843:26213",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:26221",
+          "node": "8843:26219",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:26227",
+          "node": "8843:26225",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "cta",
+      "root": "8843:26245",
+      "fields": [
+        {
+          "name": "Link to",
+          "var": "VariableID:8843:26471",
+          "node": "8843:26469",
+          "options": [
+            "Page",
+            "URL",
+            "Email",
+            "Phone",
+            "Anchor"
+          ]
+        },
+        {
+          "name": "Destination",
+          "var": "VariableID:8843:26477",
+          "node": "8843:26475",
+          "options": [
+            "About",
+            "Contact"
+          ]
+        },
+        {
+          "name": "URL",
+          "var": "VariableID:8843:26483",
+          "node": "8843:26481",
+          "options": [
+            "https://example.com",
+            "https://studio.example"
+          ]
+        },
+        {
+          "name": "Email",
+          "var": "VariableID:8843:26489",
+          "node": "8843:26487",
+          "options": [
+            "hello@example.com",
+            "team@example.com"
+          ]
+        },
+        {
+          "name": "Phone",
+          "var": "VariableID:8843:26495",
+          "node": "8843:26493",
+          "options": [
+            "+1 555 0100",
+            "+1 555 0200"
+          ]
+        },
+        {
+          "name": "Anchor ID",
+          "var": "VariableID:8843:26501",
+          "node": "8843:26499",
+          "options": [
+            "services",
+            "contact"
+          ]
+        },
+        {
+          "name": "Open in new tab",
+          "var": "VariableID:8843:26507",
+          "node": "8843:26505",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "Rel",
+          "var": "VariableID:8843:26513",
+          "node": "8843:26511",
+          "options": [
+            "None",
+            "nofollow"
+          ]
+        },
+        {
+          "name": "ID",
+          "var": "VariableID:8843:26524",
+          "node": "8843:26522",
+          "options": [
+            "cta-01",
+            "cta-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:26530",
+          "node": "8843:26528",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:26536",
+          "node": "8843:26534",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:26542",
+          "node": "8843:26540",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:26548",
+          "node": "8843:26546",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hero",
+      "root": "8843:26566",
+      "fields": [
+        {
+          "name": "ID",
+          "var": "VariableID:8843:26792",
+          "node": "8843:26790",
+          "options": [
+            "hero-01",
+            "hero-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:26798",
+          "node": "8843:26796",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:26804",
+          "node": "8843:26802",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:26810",
+          "node": "8843:26808",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:26816",
+          "node": "8843:26814",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "features",
+      "root": "8843:26834",
+      "fields": [
+        {
+          "name": "ID",
+          "var": "VariableID:8843:27060",
+          "node": "8843:27058",
+          "options": [
+            "features-01",
+            "features-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:27066",
+          "node": "8843:27064",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:27072",
+          "node": "8843:27070",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:27078",
+          "node": "8843:27076",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:27084",
+          "node": "8843:27082",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "root": "8843:27102",
+      "fields": [
+        {
+          "name": "ID",
+          "var": "VariableID:8843:27328",
+          "node": "8843:27326",
+          "options": [
+            "header-01",
+            "header-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:27334",
+          "node": "8843:27332",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:27340",
+          "node": "8843:27338",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:27346",
+          "node": "8843:27344",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:27352",
+          "node": "8843:27350",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "footer",
+      "root": "8843:27370",
+      "fields": [
+        {
+          "name": "ID",
+          "var": "VariableID:8843:27596",
+          "node": "8843:27594",
+          "options": [
+            "footer-01",
+            "footer-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:27602",
+          "node": "8843:27600",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:27608",
+          "node": "8843:27606",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:27614",
+          "node": "8843:27612",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:27620",
+          "node": "8843:27618",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "nav",
+      "root": "8843:27638",
+      "fields": [
+        {
+          "name": "ID",
+          "var": "VariableID:8843:27864",
+          "node": "8843:27862",
+          "options": [
+            "nav-01",
+            "nav-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:27870",
+          "node": "8843:27868",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:27876",
+          "node": "8843:27874",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:27882",
+          "node": "8843:27880",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:27888",
+          "node": "8843:27886",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "navbar",
+      "root": "8843:27906",
+      "fields": [
+        {
+          "name": "ID",
+          "var": "VariableID:8843:28132",
+          "node": "8843:28130",
+          "options": [
+            "navbar-01",
+            "navbar-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:28138",
+          "node": "8843:28136",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:28144",
+          "node": "8843:28142",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:28150",
+          "node": "8843:28148",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:28156",
+          "node": "8843:28154",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "pricing",
+      "root": "8843:28174",
+      "fields": [
+        {
+          "name": "ID",
+          "var": "VariableID:8843:28400",
+          "node": "8843:28398",
+          "options": [
+            "pricing-01",
+            "pricing-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:28406",
+          "node": "8843:28404",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:28412",
+          "node": "8843:28410",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:28418",
+          "node": "8843:28416",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:28424",
+          "node": "8843:28422",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "social",
+      "root": "8843:28442",
+      "fields": [
+        {
+          "name": "ID",
+          "var": "VariableID:8843:28668",
+          "node": "8843:28666",
+          "options": [
+            "social-01",
+            "social-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:28674",
+          "node": "8843:28672",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:28680",
+          "node": "8843:28678",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:28686",
+          "node": "8843:28684",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:28692",
+          "node": "8843:28690",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "testimonials",
+      "root": "8843:28710",
+      "fields": [
+        {
+          "name": "ID",
+          "var": "VariableID:8843:28936",
+          "node": "8843:28934",
+          "options": [
+            "testimonials-01",
+            "testimonials-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:28942",
+          "node": "8843:28940",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:28948",
+          "node": "8843:28946",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:28954",
+          "node": "8843:28952",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:28960",
+          "node": "8843:28958",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "tabs",
+      "root": "8843:28978",
+      "fields": [
+        {
+          "name": "ID",
+          "var": "VariableID:8843:29204",
+          "node": "8843:29202",
+          "options": [
+            "tabs-01",
+            "tabs-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:29210",
+          "node": "8843:29208",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:29216",
+          "node": "8843:29214",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:29222",
+          "node": "8843:29220",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:29228",
+          "node": "8843:29226",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "list",
+      "root": "8843:29246",
+      "fields": [
+        {
+          "name": "ID",
+          "var": "VariableID:8843:29472",
+          "node": "8843:29470",
+          "options": [
+            "list-01",
+            "list-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:29478",
+          "node": "8843:29476",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:29484",
+          "node": "8843:29482",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:29490",
+          "node": "8843:29488",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:29496",
+          "node": "8843:29494",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "root": "8843:29514",
+      "fields": [
+        {
+          "name": "ID",
+          "var": "VariableID:8843:29740",
+          "node": "8843:29738",
+          "options": [
+            "table-01",
+            "table-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:29746",
+          "node": "8843:29744",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:29752",
+          "node": "8843:29750",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:29758",
+          "node": "8843:29756",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:29764",
+          "node": "8843:29762",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "gallery",
+      "root": "8843:29782",
+      "fields": [
+        {
+          "name": "ID",
+          "var": "VariableID:8843:30008",
+          "node": "8843:30006",
+          "options": [
+            "gallery-01",
+            "gallery-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:30014",
+          "node": "8843:30012",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:30020",
+          "node": "8843:30018",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:30026",
+          "node": "8843:30024",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:30032",
+          "node": "8843:30030",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "custom",
+      "root": "8843:30050",
+      "fields": [
+        {
+          "name": "ID",
+          "var": "VariableID:8843:30276",
+          "node": "8843:30274",
+          "options": [
+            "custom-01",
+            "custom-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:30282",
+          "node": "8843:30280",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:30288",
+          "node": "8843:30286",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:30294",
+          "node": "8843:30292",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:30300",
+          "node": "8843:30298",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "list-item",
+      "root": "8843:30318",
+      "fields": [
+        {
+          "name": "ID",
+          "var": "VariableID:8843:30547",
+          "node": "8843:30545",
+          "options": [
+            "list-item-01",
+            "list-item-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:30553",
+          "node": "8843:30551",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:30559",
+          "node": "8843:30557",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:30565",
+          "node": "8843:30563",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:30571",
+          "node": "8843:30569",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "form",
+      "root": "8843:30589",
+      "fields": [
+        {
+          "name": "Fields",
+          "var": "VariableID:8843:30811",
+          "node": "8843:30809",
+          "options": [
+            "Name; Email; Message",
+            "Name; Email; Phone; Message"
+          ]
+        },
+        {
+          "name": "After submit",
+          "var": "VariableID:8843:30817",
+          "node": "8843:30815",
+          "options": [
+            "Show message",
+            "Redirect"
+          ]
+        },
+        {
+          "name": "Success message",
+          "var": "VariableID:8843:30823",
+          "node": "8843:30821",
+          "options": [
+            "Thank you. We will be in touch.",
+            "Message received."
+          ]
+        },
+        {
+          "name": "Redirect URL",
+          "var": "VariableID:8843:30829",
+          "node": "8843:30827",
+          "options": [
+            "/thank-you",
+            ""
+          ]
+        },
+        {
+          "name": "Notification delivery",
+          "var": "VariableID:8843:30835",
+          "node": "8843:30833",
+          "options": [
+            "Owner managed",
+            "Owner managed"
+          ]
+        },
+        {
+          "name": "Spam protection",
+          "var": "VariableID:8843:30840",
+          "node": "8843:30838",
+          "options": [
+            "Enabled",
+            "Disabled"
+          ]
+        },
+        {
+          "name": "ID",
+          "var": "VariableID:8843:30851",
+          "node": "8843:30849",
+          "options": [
+            "form-01",
+            "form-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:30857",
+          "node": "8843:30855",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:30863",
+          "node": "8843:30861",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:30869",
+          "node": "8843:30867",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:30875",
+          "node": "8843:30873",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        },
+        {
+          "name": "Action URL",
+          "var": "VariableID:8843:30881",
+          "node": "8843:30879",
+          "options": [
+            "/submit",
+            "/contact"
+          ]
+        },
+        {
+          "name": "Method",
+          "var": "VariableID:8843:30887",
+          "node": "8843:30885",
+          "options": [
+            "POST",
+            "GET"
+          ]
+        },
+        {
+          "name": "Encoding",
+          "var": "VariableID:8843:30893",
+          "node": "8843:30891",
+          "options": [
+            "URL encoded",
+            "Multipart",
+            "Plain text"
+          ]
+        },
+        {
+          "name": "Disable validation",
+          "var": "VariableID:8843:30899",
+          "node": "8843:30897",
+          "options": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "Autocomplete",
+          "var": "VariableID:8843:30905",
+          "node": "8843:30903",
+          "options": [
+            "On",
+            "Off"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "slider",
+      "root": "8843:30923",
+      "fields": [
+        {
+          "name": "Slides",
+          "var": "VariableID:8843:31145",
+          "node": "8843:31143",
+          "options": [
+            "3 slides",
+            "4 slides"
+          ]
+        },
+        {
+          "name": "Autoplay",
+          "var": "VariableID:8843:31151",
+          "node": "8843:31149",
+          "options": [
+            "Off",
+            "On"
+          ]
+        },
+        {
+          "name": "Interval",
+          "var": "VariableID:8843:31157",
+          "node": "8843:31155",
+          "options": [
+            "5 seconds",
+            "8 seconds"
+          ]
+        },
+        {
+          "name": "Loop",
+          "var": "VariableID:8843:31163",
+          "node": "8843:31161",
+          "options": [
+            "On",
+            "Off"
+          ]
+        },
+        {
+          "name": "Pause on hover",
+          "var": "VariableID:8843:31169",
+          "node": "8843:31167",
+          "options": [
+            "On",
+            "Off"
+          ]
+        },
+        {
+          "name": "Navigation",
+          "var": "VariableID:8843:31175",
+          "node": "8843:31173",
+          "options": [
+            "Dots and arrows",
+            "Arrows"
+          ]
+        },
+        {
+          "name": "ID",
+          "var": "VariableID:8843:31186",
+          "node": "8843:31184",
+          "options": [
+            "slider-01",
+            "slider-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:31192",
+          "node": "8843:31190",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:31198",
+          "node": "8843:31196",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:31204",
+          "node": "8843:31202",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:31210",
+          "node": "8843:31208",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "collection-list",
+      "root": "8843:31228",
+      "fields": [
+        {
+          "name": "Collection",
+          "var": "VariableID:8843:31450",
+          "node": "8843:31448",
+          "options": [
+            "Articles",
+            "Team"
+          ]
+        },
+        {
+          "name": "Show items",
+          "var": "VariableID:8843:31456",
+          "node": "8843:31454",
+          "options": [
+            "3",
+            "2"
+          ]
+        },
+        {
+          "name": "Field mapping",
+          "var": "VariableID:8843:31462",
+          "node": "8843:31460",
+          "options": [
+            "Title → heading; Summary → text",
+            "Title → heading; Body → text"
+          ]
+        },
+        {
+          "name": "Empty message",
+          "var": "VariableID:8843:31468",
+          "node": "8843:31466",
+          "options": [
+            "No articles yet",
+            "Come back soon"
+          ]
+        },
+        {
+          "name": "ID",
+          "var": "VariableID:8843:31479",
+          "node": "8843:31477",
+          "options": [
+            "collection-list-01",
+            "collection-list-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:31485",
+          "node": "8843:31483",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:31491",
+          "node": "8843:31489",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:31497",
+          "node": "8843:31495",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:31503",
+          "node": "8843:31501",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "product-card",
+      "root": "8843:31521",
+      "fields": [
+        {
+          "name": "ID",
+          "var": "VariableID:8843:31750",
+          "node": "8843:31748",
+          "options": [
+            "product-card-01",
+            "product-card-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:31756",
+          "node": "8843:31754",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:31762",
+          "node": "8843:31760",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:31768",
+          "node": "8843:31766",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:31774",
+          "node": "8843:31772",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "product-grid",
+      "root": "8843:31792",
+      "fields": [
+        {
+          "name": "ID",
+          "var": "VariableID:8843:32021",
+          "node": "8843:32019",
+          "options": [
+            "product-grid-01",
+            "product-grid-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:32027",
+          "node": "8843:32025",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:32033",
+          "node": "8843:32031",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:32039",
+          "node": "8843:32037",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:32045",
+          "node": "8843:32043",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "product-detail",
+      "root": "8843:32063",
+      "fields": [
+        {
+          "name": "ID",
+          "var": "VariableID:8843:32292",
+          "node": "8843:32290",
+          "options": [
+            "product-detail-01",
+            "product-detail-primary"
+          ]
+        },
+        {
+          "name": "Title",
+          "var": "VariableID:8843:32298",
+          "node": "8843:32296",
+          "options": [
+            "",
+            "More information"
+          ]
+        },
+        {
+          "name": "Tab index",
+          "var": "VariableID:8843:32304",
+          "node": "8843:32302",
+          "options": [
+            "0",
+            "-1"
+          ]
+        },
+        {
+          "name": "CSS classes",
+          "var": "VariableID:8843:32310",
+          "node": "8843:32308",
+          "options": [
+            "None",
+            "studio-content"
+          ]
+        },
+        {
+          "name": "Data attribute",
+          "var": "VariableID:8843:32316",
+          "node": "8843:32314",
+          "options": [
+            "None",
+            "data-purpose=content"
+          ]
+        }
+      ]
+    }
+  ],
+  "shared": {
+    "style/layout": [
+      {
+        "name": "Display",
+        "var": "VariableID:8841:14887",
+        "node": "8841:14889",
+        "options": [
+          "Block",
+          "Flex",
+          "Grid",
+          "None"
+        ]
+      },
+      {
+        "name": "Direction",
+        "var": "VariableID:8841:14892",
+        "node": "8841:14894",
+        "options": [
+          "Row",
+          "Column"
+        ]
+      },
+      {
+        "name": "Align",
+        "var": "VariableID:8841:14897",
+        "node": "8841:14899",
+        "options": [
+          "Start",
+          "Center",
+          "End",
+          "Stretch"
+        ]
+      },
+      {
+        "name": "Wrap",
+        "var": "VariableID:8841:14902",
+        "node": "8841:14904",
+        "options": [
+          "No wrap",
+          "Wrap"
+        ]
+      },
+      {
+        "name": "Columns",
+        "var": "VariableID:8841:14907",
+        "node": "8841:14909",
+        "options": [
+          "3",
+          "2"
+        ]
+      },
+      {
+        "name": "Rows",
+        "var": "VariableID:8841:14912",
+        "node": "8841:14914",
+        "options": [
+          "Auto",
+          "2"
+        ]
+      },
+      {
+        "name": "Gap",
+        "var": "VariableID:8841:14917",
+        "node": "8841:14919",
+        "options": [
+          "24",
+          "32"
+        ]
+      },
+      {
+        "name": "Position",
+        "var": "VariableID:8841:14922",
+        "node": "8841:14924",
+        "options": [
+          "Relative",
+          "Absolute",
+          "Fixed",
+          "Sticky"
+        ]
+      },
+      {
+        "name": "Overflow",
+        "var": "VariableID:8841:14927",
+        "node": "8841:14929",
+        "options": [
+          "Visible",
+          "Hidden",
+          "Scroll"
+        ]
+      }
+    ],
+    "style/typography": [
+      {
+        "name": "Text style",
+        "var": "VariableID:8841:14937",
+        "node": "8841:14939",
+        "options": [
+          "Body text",
+          "Heading 2",
+          "Custom"
+        ]
+      },
+      {
+        "name": "Family",
+        "var": "VariableID:8841:14942",
+        "node": "8841:14944",
+        "options": [
+          "Inter",
+          "DM Sans"
+        ]
+      },
+      {
+        "name": "Weight",
+        "var": "VariableID:8841:14947",
+        "node": "8841:14949",
+        "options": [
+          "Regular",
+          "Medium",
+          "Semi Bold",
+          "Bold"
+        ]
+      },
+      {
+        "name": "Size",
+        "var": "VariableID:8841:14952",
+        "node": "8841:14954",
+        "options": [
+          "16",
+          "20"
+        ]
+      },
+      {
+        "name": "Line height",
+        "var": "VariableID:8841:14957",
+        "node": "8841:14959",
+        "options": [
+          "26",
+          "30"
+        ]
+      },
+      {
+        "name": "Tracking",
+        "var": "VariableID:8841:14962",
+        "node": "8841:14964",
+        "options": [
+          "0",
+          "0.02em"
+        ]
+      },
+      {
+        "name": "Align",
+        "var": "VariableID:8841:14967",
+        "node": "8841:14969",
+        "options": [
+          "Left",
+          "Center",
+          "Right",
+          "Justify"
+        ]
+      },
+      {
+        "name": "Decoration",
+        "var": "VariableID:8841:14972",
+        "node": "8841:14974",
+        "options": [
+          "None",
+          "Underline"
+        ]
+      },
+      {
+        "name": "Case",
+        "var": "VariableID:8841:14977",
+        "node": "8841:14979",
+        "options": [
+          "None",
+          "Uppercase"
+        ]
+      },
+      {
+        "name": "Color",
+        "var": "VariableID:8841:14982",
+        "node": "8841:14984",
+        "options": [
+          "Text primary",
+          "Text secondary"
+        ]
+      }
+    ],
+    "style/size": [
+      {
+        "name": "Width",
+        "var": "VariableID:8841:14992",
+        "node": "8841:14994",
+        "options": [
+          "Fill",
+          "Fixed",
+          "Fit content"
+        ]
+      },
+      {
+        "name": "Height",
+        "var": "VariableID:8841:14997",
+        "node": "8841:14999",
+        "options": [
+          "Fit content",
+          "Fixed",
+          "Fill"
+        ]
+      },
+      {
+        "name": "Min width",
+        "var": "VariableID:8841:15002",
+        "node": "8841:15004",
+        "options": [
+          "0",
+          "160"
+        ]
+      },
+      {
+        "name": "Max width",
+        "var": "VariableID:8841:15007",
+        "node": "8841:15009",
+        "options": [
+          "None",
+          "720"
+        ]
+      },
+      {
+        "name": "Min height",
+        "var": "VariableID:8841:15012",
+        "node": "8841:15014",
+        "options": [
+          "0",
+          "120"
+        ]
+      },
+      {
+        "name": "Max height",
+        "var": "VariableID:8841:15017",
+        "node": "8841:15019",
+        "options": [
+          "None",
+          "600"
+        ]
+      }
+    ],
+    "style/spacing": [
+      {
+        "name": "Padding top",
+        "var": "VariableID:8841:15027",
+        "node": "8841:15029",
+        "options": [
+          "24",
+          "32"
+        ]
+      },
+      {
+        "name": "Padding right",
+        "var": "VariableID:8841:15032",
+        "node": "8841:15034",
+        "options": [
+          "24",
+          "32"
+        ]
+      },
+      {
+        "name": "Padding bottom",
+        "var": "VariableID:8841:15037",
+        "node": "8841:15039",
+        "options": [
+          "24",
+          "32"
+        ]
+      },
+      {
+        "name": "Padding left",
+        "var": "VariableID:8841:15042",
+        "node": "8841:15044",
+        "options": [
+          "24",
+          "32"
+        ]
+      },
+      {
+        "name": "Margin top",
+        "var": "VariableID:8841:15047",
+        "node": "8841:15049",
+        "options": [
+          "0",
+          "16"
+        ]
+      },
+      {
+        "name": "Margin right",
+        "var": "VariableID:8841:15052",
+        "node": "8841:15054",
+        "options": [
+          "0",
+          "Auto"
+        ]
+      },
+      {
+        "name": "Margin bottom",
+        "var": "VariableID:8841:15057",
+        "node": "8841:15059",
+        "options": [
+          "0",
+          "16"
+        ]
+      },
+      {
+        "name": "Margin left",
+        "var": "VariableID:8841:15062",
+        "node": "8841:15064",
+        "options": [
+          "0",
+          "Auto"
+        ]
+      }
+    ],
+    "style/fill": [
+      {
+        "name": "Fill type",
+        "var": "VariableID:8841:15072",
+        "node": "8841:15074",
+        "options": [
+          "Solid",
+          "Gradient",
+          "Image",
+          "None"
+        ]
+      },
+      {
+        "name": "Color",
+        "var": "VariableID:8841:15077",
+        "node": "8841:15079",
+        "options": [
+          "Surface",
+          "Accent"
+        ]
+      },
+      {
+        "name": "Gradient start",
+        "var": "VariableID:8841:15082",
+        "node": "8841:15084",
+        "options": [
+          "Accent",
+          "Surface"
+        ]
+      },
+      {
+        "name": "Gradient end",
+        "var": "VariableID:8841:15087",
+        "node": "8841:15089",
+        "options": [
+          "Text secondary",
+          "Surface"
+        ]
+      },
+      {
+        "name": "Angle",
+        "var": "VariableID:8841:15092",
+        "node": "8841:15094",
+        "options": [
+          "90",
+          "180"
+        ]
+      },
+      {
+        "name": "Image",
+        "var": "VariableID:8841:15097",
+        "node": "8841:15099",
+        "options": [
+          "None",
+          "studio-gradient2.webp"
+        ]
+      },
+      {
+        "name": "Fit",
+        "var": "VariableID:8841:15102",
+        "node": "8841:15104",
+        "options": [
+          "Cover",
+          "Contain",
+          "Fill"
+        ]
+      },
+      {
+        "name": "Position",
+        "var": "VariableID:8841:15107",
+        "node": "8841:15109",
+        "options": [
+          "Center",
+          "Top"
+        ]
+      },
+      {
+        "name": "Repeat",
+        "var": "VariableID:8841:15112",
+        "node": "8841:15114",
+        "options": [
+          "No repeat",
+          "Repeat"
+        ]
+      },
+      {
+        "name": "Attachment",
+        "var": "VariableID:8841:15117",
+        "node": "8841:15119",
+        "options": [
+          "Scroll",
+          "Fixed"
+        ]
+      },
+      {
+        "name": "Blend mode",
+        "var": "VariableID:8841:15122",
+        "node": "8841:15124",
+        "options": [
+          "Normal",
+          "Multiply",
+          "Screen"
+        ]
+      }
+    ],
+    "style/border": [
+      {
+        "name": "Radius",
+        "var": "VariableID:8841:15132",
+        "node": "8841:15134",
+        "options": [
+          "8",
+          "16"
+        ]
+      },
+      {
+        "name": "Width",
+        "var": "VariableID:8841:15137",
+        "node": "8841:15139",
+        "options": [
+          "1",
+          "2"
+        ]
+      },
+      {
+        "name": "Style",
+        "var": "VariableID:8841:15142",
+        "node": "8841:15144",
+        "options": [
+          "Solid",
+          "Dashed",
+          "Dotted",
+          "Double",
+          "None"
+        ]
+      },
+      {
+        "name": "Color",
+        "var": "VariableID:8841:15147",
+        "node": "8841:15149",
+        "options": [
+          "Border",
+          "Accent"
+        ]
+      },
+      {
+        "name": "Sides",
+        "var": "VariableID:8841:15152",
+        "node": "8841:15154",
+        "options": [
+          "All",
+          "Top"
+        ]
+      },
+      {
+        "name": "Outline",
+        "var": "VariableID:8841:15157",
+        "node": "8841:15159",
+        "options": [
+          "None",
+          "2px accent"
+        ]
+      },
+      {
+        "name": "Outline offset",
+        "var": "VariableID:8841:15162",
+        "node": "8841:15164",
+        "options": [
+          "0",
+          "2"
+        ]
+      }
+    ],
+    "style/effects": [
+      {
+        "name": "Opacity",
+        "var": "VariableID:8841:15172",
+        "node": "8841:15174",
+        "options": [
+          "100%",
+          "80%"
+        ]
+      },
+      {
+        "name": "Shadow",
+        "var": "VariableID:8841:15177",
+        "node": "8841:15179",
+        "options": [
+          "None",
+          "Medium"
+        ]
+      },
+      {
+        "name": "Shadow X",
+        "var": "VariableID:8841:15182",
+        "node": "8841:15184",
+        "options": [
+          "0",
+          "4"
+        ]
+      },
+      {
+        "name": "Shadow Y",
+        "var": "VariableID:8841:15187",
+        "node": "8841:15189",
+        "options": [
+          "4",
+          "8"
+        ]
+      },
+      {
+        "name": "Blur",
+        "var": "VariableID:8841:15192",
+        "node": "8841:15194",
+        "options": [
+          "0",
+          "4"
+        ]
+      },
+      {
+        "name": "Spread",
+        "var": "VariableID:8841:15197",
+        "node": "8841:15199",
+        "options": [
+          "0",
+          "2"
+        ]
+      },
+      {
+        "name": "Brightness",
+        "var": "VariableID:8841:15202",
+        "node": "8841:15204",
+        "options": [
+          "100%",
+          "110%"
+        ]
+      },
+      {
+        "name": "Contrast",
+        "var": "VariableID:8841:15207",
+        "node": "8841:15209",
+        "options": [
+          "100%",
+          "120%"
+        ]
+      },
+      {
+        "name": "Saturation",
+        "var": "VariableID:8841:15212",
+        "node": "8841:15214",
+        "options": [
+          "100%",
+          "80%"
+        ]
+      },
+      {
+        "name": "Grayscale",
+        "var": "VariableID:8841:15217",
+        "node": "8841:15219",
+        "options": [
+          "0",
+          "100%"
+        ]
+      },
+      {
+        "name": "Hue rotate",
+        "var": "VariableID:8841:15222",
+        "node": "8841:15224",
+        "options": [
+          "0",
+          "45"
+        ]
+      },
+      {
+        "name": "Invert",
+        "var": "VariableID:8841:15227",
+        "node": "8841:15229",
+        "options": [
+          "0",
+          "100%"
+        ]
+      },
+      {
+        "name": "Sepia",
+        "var": "VariableID:8841:15232",
+        "node": "8841:15234",
+        "options": [
+          "0",
+          "100%"
+        ]
+      },
+      {
+        "name": "Translate X",
+        "var": "VariableID:8841:15237",
+        "node": "8841:15239",
+        "options": [
+          "0",
+          "8"
+        ]
+      },
+      {
+        "name": "Translate Y",
+        "var": "VariableID:8841:15242",
+        "node": "8841:15244",
+        "options": [
+          "0",
+          "8"
+        ]
+      },
+      {
+        "name": "Rotate",
+        "var": "VariableID:8841:15247",
+        "node": "8841:15249",
+        "options": [
+          "0",
+          "10"
+        ]
+      },
+      {
+        "name": "Scale",
+        "var": "VariableID:8841:15252",
+        "node": "8841:15254",
+        "options": [
+          "1",
+          "1.1"
+        ]
+      },
+      {
+        "name": "Skew",
+        "var": "VariableID:8841:15257",
+        "node": "8841:15259",
+        "options": [
+          "0",
+          "5"
+        ]
+      },
+      {
+        "name": "Transform origin",
+        "var": "VariableID:8841:15262",
+        "node": "8841:15264",
+        "options": [
+          "Center",
+          "Top left"
+        ]
+      },
+      {
+        "name": "Transition",
+        "var": "VariableID:8841:15267",
+        "node": "8841:15269",
+        "options": [
+          "None",
+          "200ms ease"
+        ]
+      },
+      {
+        "name": "Backdrop blur",
+        "var": "VariableID:8841:15272",
+        "node": "8841:15274",
+        "options": [
+          "0",
+          "8"
+        ]
+      },
+      {
+        "name": "Perspective",
+        "var": "VariableID:8841:15277",
+        "node": "8841:15279",
+        "options": [
+          "None",
+          "1000"
+        ]
+      }
+    ],
+    "style/visibility": [
+      {
+        "name": "Show on desktop",
+        "var": "VariableID:8841:15287",
+        "node": "8841:15289",
+        "options": [
+          "Yes",
+          "No"
+        ]
+      },
+      {
+        "name": "Show on tablet",
+        "var": "VariableID:8841:15292",
+        "node": "8841:15294",
+        "options": [
+          "Yes",
+          "No"
+        ]
+      },
+      {
+        "name": "Show on mobile",
+        "var": "VariableID:8841:15297",
+        "node": "8841:15299",
+        "options": [
+          "Yes",
+          "No"
+        ]
+      }
+    ],
+    "interaction/event": [
+      {
+        "name": "Trigger",
+        "var": "VariableID:8841:15307",
+        "node": "8841:15309",
+        "options": [
+          "On click",
+          "On hover",
+          "While pressed",
+          "On focus",
+          "On blur",
+          "On page load",
+          "On page scroll",
+          "On page leave",
+          "On scroll into view",
+          "While scrolling",
+          "On scroll out",
+          "On mouse over",
+          "On mouse move",
+          "On mouse out"
+        ]
+      },
+      {
+        "name": "Animation",
+        "var": "VariableID:8841:15312",
+        "node": "8841:15314",
+        "options": [
+          "Fade in",
+          "Slide up",
+          "Scale up",
+          "Rotate",
+          "Pulse",
+          "Blur"
+        ]
+      },
+      {
+        "name": "Target",
+        "var": "VariableID:8841:15317",
+        "node": "8841:15319",
+        "options": [
+          "This element",
+          "Children"
+        ]
+      },
+      {
+        "name": "Duration",
+        "var": "VariableID:8841:15322",
+        "node": "8841:15324",
+        "options": [
+          "300ms",
+          "600ms"
+        ]
+      },
+      {
+        "name": "Delay",
+        "var": "VariableID:8841:15327",
+        "node": "8841:15329",
+        "options": [
+          "0ms",
+          "100ms"
+        ]
+      },
+      {
+        "name": "Easing",
+        "var": "VariableID:8841:15332",
+        "node": "8841:15334",
+        "options": [
+          "Ease out",
+          "Linear"
+        ]
+      },
+      {
+        "name": "Loop",
+        "var": "VariableID:8841:15337",
+        "node": "8841:15339",
+        "options": [
+          "Off",
+          "On"
+        ]
+      },
+      {
+        "name": "Reverse",
+        "var": "VariableID:8841:15342",
+        "node": "8841:15344",
+        "options": [
+          "Off",
+          "On"
+        ]
+      },
+      {
+        "name": "Enabled",
+        "var": "VariableID:8841:15347",
+        "node": "8841:15349",
+        "options": [
+          "On",
+          "Off"
+        ]
+      }
+    ],
+    "interaction/css": [
+      {
+        "name": "Animation",
+        "var": "VariableID:8841:15357",
+        "node": "8841:15359",
+        "options": [
+          "None",
+          "Fade in"
+        ]
+      },
+      {
+        "name": "Direction",
+        "var": "VariableID:8841:15362",
+        "node": "8841:15364",
+        "options": [
+          "Normal",
+          "Alternate"
+        ]
+      },
+      {
+        "name": "Iterations",
+        "var": "VariableID:8841:15367",
+        "node": "8841:15369",
+        "options": [
+          "1",
+          "Infinite"
+        ]
+      },
+      {
+        "name": "Fill mode",
+        "var": "VariableID:8841:15372",
+        "node": "8841:15374",
+        "options": [
+          "Both",
+          "Forwards"
+        ]
+      }
+    ]
+  }
+}

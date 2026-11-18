@@ -1,0 +1,34 @@
+[
+  {
+    "fixtureLoad": "423:100464",
+    "actual": "423:100464"
+  },
+  {
+    "origin": "423:100464",
+    "label": "Class-first styling",
+    "expectedNode": "415-50289",
+    "openedTabs": [],
+    "pass": false
+  },
+  {
+    "origin": "423:100464",
+    "label": "All class states",
+    "expectedNode": "415-61494",
+    "openedTabs": [],
+    "pass": false
+  },
+  {
+    "origin": "423:100464",
+    "label": "Original journeys",
+    "expectedNode": "302-3370",
+    "openedTabs": [],
+    "pass": false
+  },
+  {
+    "origin": "423:100464",
+    "label": "Current-release CMS",
+    "expectedNode": "424-337803",
+    "openedTabs": [],
+    "pass": false
+  }
+]

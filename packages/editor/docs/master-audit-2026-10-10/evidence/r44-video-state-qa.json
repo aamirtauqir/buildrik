@@ -1,0 +1,365 @@
+{
+  "scope": "Read-only interpreter of native authored actions. Synthetic states only; no native variable/node mutations. Covers finite Ratio raw-state/legacy-pair recovery, source isolation and modeled geometry. Not actual CSS/iframe/provider playback, arbitrary legacy migration, application history, durable persistence or complete mixed/permission proof.",
+  "sourceManifest": [
+    "r44-video-mutation.json",
+    "r44-video-source-mutation.json",
+    "r44-video-undo-ownership-correction.json"
+  ],
+  "checks": 1258,
+  "passed": 1258,
+  "failed": [],
+  "categories": {
+    "fixtures_choices_reset_undo": {
+      "checks": 822,
+      "passed": 822
+    },
+    "useful_history_origin_and_scope": {
+      "checks": 36,
+      "passed": 36
+    },
+    "undo_external_style_ownership": {
+      "checks": 128,
+      "passed": 128
+    },
+    "eligibility_staleness_recovery": {
+      "checks": 74,
+      "passed": 74
+    },
+    "invalid_source_and_snapshot_isolation": {
+      "checks": 19,
+      "passed": 19
+    },
+    "source_draft_validation_cancel_guards": {
+      "checks": 54,
+      "passed": 54
+    },
+    "review_fixture_reset": {
+      "checks": 14,
+      "passed": 14
+    },
+    "shared_style_routing_and_bindings": {
+      "checks": 111,
+      "passed": 111
+    }
+  },
+  "nonVideoEntryEvidence": [
+    {
+      "id": "8842:14553",
+      "caller": "text"
+    },
+    {
+      "id": "8843:17016",
+      "caller": "heading"
+    },
+    {
+      "id": "8843:17320",
+      "caller": "paragraph"
+    },
+    {
+      "id": "8843:17618",
+      "caller": "label"
+    },
+    {
+      "id": "8843:17893",
+      "caller": "link"
+    },
+    {
+      "id": "8843:18231",
+      "caller": "button"
+    },
+    {
+      "id": "8843:18588",
+      "caller": "input"
+    },
+    {
+      "id": "8843:18905",
+      "caller": "textarea"
+    },
+    {
+      "id": "8843:19228",
+      "caller": "select"
+    },
+    {
+      "id": "8843:19527",
+      "caller": "checkbox"
+    },
+    {
+      "id": "8843:19814",
+      "caller": "radio"
+    },
+    {
+      "id": "8843:20101",
+      "caller": "switch"
+    },
+    {
+      "id": "8843:20388",
+      "caller": "upload"
+    },
+    {
+      "id": "8843:20675",
+      "caller": "image"
+    },
+    {
+      "id": "8843:20991",
+      "caller": "video"
+    },
+    {
+      "id": "8843:21309",
+      "caller": "audio"
+    },
+    {
+      "id": "8843:21602",
+      "caller": "svg"
+    },
+    {
+      "id": "8843:21877",
+      "caller": "icon"
+    },
+    {
+      "id": "8843:22164",
+      "caller": "lottie"
+    },
+    {
+      "id": "8843:22745",
+      "caller": "map-embed"
+    },
+    {
+      "id": "8843:23020",
+      "caller": "spacer"
+    },
+    {
+      "id": "8843:23288",
+      "caller": "divider"
+    },
+    {
+      "id": "8843:23556",
+      "caller": "countdown"
+    },
+    {
+      "id": "8843:23844",
+      "caller": "progress"
+    },
+    {
+      "id": "8843:24131",
+      "caller": "accordion"
+    },
+    {
+      "id": "8843:24418",
+      "caller": "flex"
+    },
+    {
+      "id": "8843:24686",
+      "caller": "stack"
+    },
+    {
+      "id": "8843:24954",
+      "caller": "grid"
+    },
+    {
+      "id": "8843:25222",
+      "caller": "columns"
+    },
+    {
+      "id": "8843:25490",
+      "caller": "container"
+    },
+    {
+      "id": "8843:25811",
+      "caller": "section"
+    },
+    {
+      "id": "8843:26132",
+      "caller": "card"
+    },
+    {
+      "id": "8843:26453",
+      "caller": "cta"
+    },
+    {
+      "id": "8843:26774",
+      "caller": "hero"
+    },
+    {
+      "id": "8843:27042",
+      "caller": "features"
+    },
+    {
+      "id": "8843:27310",
+      "caller": "header"
+    },
+    {
+      "id": "8843:27578",
+      "caller": "footer"
+    },
+    {
+      "id": "8843:27846",
+      "caller": "nav"
+    },
+    {
+      "id": "8843:28114",
+      "caller": "navbar"
+    },
+    {
+      "id": "8843:28382",
+      "caller": "pricing"
+    },
+    {
+      "id": "8843:28650",
+      "caller": "social"
+    },
+    {
+      "id": "8843:28918",
+      "caller": "testimonials"
+    },
+    {
+      "id": "8843:29186",
+      "caller": "tabs"
+    },
+    {
+      "id": "8843:29454",
+      "caller": "list"
+    },
+    {
+      "id": "8843:29722",
+      "caller": "table"
+    },
+    {
+      "id": "8843:29990",
+      "caller": "gallery"
+    },
+    {
+      "id": "8843:30258",
+      "caller": "custom"
+    },
+    {
+      "id": "8843:30526",
+      "caller": "list-item"
+    },
+    {
+      "id": "8843:30797",
+      "caller": "form"
+    },
+    {
+      "id": "8843:31131",
+      "caller": "slider"
+    },
+    {
+      "id": "8843:31436",
+      "caller": "collection-list"
+    },
+    {
+      "id": "8843:31729",
+      "caller": "product-card"
+    },
+    {
+      "id": "8843:32000",
+      "caller": "product-grid"
+    },
+    {
+      "id": "8843:32271",
+      "caller": "product-detail"
+    }
+  ],
+  "inspectedNodeIds": [
+    "9051:17532",
+    "9051:17534",
+    "9051:17523",
+    "9051:17526",
+    "9051:17524",
+    "8843:22237",
+    "8841:14864",
+    "8844:265290",
+    "9051:17536",
+    "9051:17547",
+    "9051:19953",
+    "9051:19954",
+    "9051:19957",
+    "9051:19964",
+    "8843:22463",
+    "8843:22457",
+    "8843:22522",
+    "9051:19976",
+    "9051:19979",
+    "9051:19982",
+    "9051:19985",
+    "9051:19988",
+    "9051:19991",
+    "9051:19994",
+    "9051:19997",
+    "9051:20000",
+    "9051:20003",
+    "9055:17502",
+    "9055:17510",
+    "9055:17512",
+    "9055:17513",
+    "9055:17515",
+    "9055:17522",
+    "8843:22445",
+    "8844:265293",
+    "8844:265296",
+    "8844:265299",
+    "8844:265302",
+    "8843:22271",
+    "8843:22272",
+    "8841:14868",
+    "8841:15383",
+    "8843:22329",
+    "8842:14553",
+    "8843:17016",
+    "8843:17320",
+    "8843:17618",
+    "8843:17893",
+    "8843:18231",
+    "8843:18588",
+    "8843:18905",
+    "8843:19228",
+    "8843:19527",
+    "8843:19814",
+    "8843:20101",
+    "8843:20388",
+    "8843:20675",
+    "8843:20991",
+    "8843:21309",
+    "8843:21602",
+    "8843:21877",
+    "8843:22164",
+    "8843:22745",
+    "8843:23020",
+    "8843:23288",
+    "8843:23556",
+    "8843:23844",
+    "8843:24131",
+    "8843:24418",
+    "8843:24686",
+    "8843:24954",
+    "8843:25222",
+    "8843:25490",
+    "8843:25811",
+    "8843:26132",
+    "8843:26453",
+    "8843:26774",
+    "8843:27042",
+    "8843:27310",
+    "8843:27578",
+    "8843:27846",
+    "8843:28114",
+    "8843:28382",
+    "8843:28650",
+    "8843:28918",
+    "8843:29186",
+    "8843:29454",
+    "8843:29722",
+    "8843:29990",
+    "8843:30258",
+    "8843:30526",
+    "8843:30797",
+    "8843:31131",
+    "8843:31436",
+    "8843:31729",
+    "8843:32000",
+    "8843:32271"
+  ],
+  "mutatedNodeIds": [],
+  "mutatedVariableIds": [],
+  "checkpoint": "Read-only live-action rerun after Undo ownership correction; preserves intervening unrelated style edits and refuses changed migration-owned pair."
+}

@@ -1,0 +1,1963 @@
+[
+  {
+    "id": "8662:12993",
+    "name": "R30 / Publish · Checking",
+    "w": 1440,
+    "h": 1000,
+    "controls": [
+      {
+        "id": "8662:12997",
+        "label": "Close",
+        "x": 1391,
+        "y": 89
+      }
+    ]
+  },
+  {
+    "id": "8662:13005",
+    "name": "R30 / Publish · Checks unavailable",
+    "w": 1440,
+    "h": 1000,
+    "controls": [
+      {
+        "id": "8662:13009",
+        "label": "Close",
+        "x": 1391,
+        "y": 89
+      },
+      {
+        "id": "8662:13016",
+        "label": "Retry checks",
+        "x": 1264,
+        "y": 257
+      }
+    ]
+  },
+  {
+    "id": "8662:13019",
+    "name": "R30 / Publish · Blocked",
+    "w": 1440,
+    "h": 1000,
+    "controls": [
+      {
+        "id": "8662:13023",
+        "label": "Close",
+        "x": 1391,
+        "y": 89
+      },
+      {
+        "id": "8662:13031",
+        "label": "Open Integrations",
+        "x": 1264,
+        "y": 311
+      },
+      {
+        "id": "8662:13034",
+        "label": "Open SEO defaults",
+        "x": 1264,
+        "y": 429
+      },
+      {
+        "id": "8662:13038",
+        "label": "Recheck readiness",
+        "x": 1264,
+        "y": 525
+      }
+    ]
+  },
+  {
+    "id": "8662:13041",
+    "name": "R30 / Publish · Ready",
+    "w": 1440,
+    "h": 1000,
+    "controls": [
+      {
+        "id": "8662:13045",
+        "label": "Close",
+        "x": 1391,
+        "y": 89
+      },
+      {
+        "id": "8662:13053",
+        "label": "Review SEO advisory",
+        "x": 1264,
+        "y": 399
+      },
+      {
+        "id": "8662:13055",
+        "label": "Review publication",
+        "x": 1264,
+        "y": 447
+      }
+    ]
+  },
+  {
+    "id": "8662:13058",
+    "name": "R30 / Publish · Confirm",
+    "w": 560,
+    "h": 368,
+    "controls": [
+      {
+        "id": "8662:13064",
+        "label": "Publish now",
+        "x": 720,
+        "y": 564
+      },
+      {
+        "id": "8662:13066",
+        "label": "Cancel",
+        "x": 720,
+        "y": 612
+      }
+    ]
+  },
+  {
+    "id": "8662:13069",
+    "name": "R30 / Publish · Deploying",
+    "w": 1440,
+    "h": 1000,
+    "controls": [
+      {
+        "id": "8662:13073",
+        "label": "Close",
+        "x": 1391,
+        "y": 89
+      }
+    ]
+  },
+  {
+    "id": "8662:13082",
+    "name": "R30 / Publish · Published",
+    "w": 1440,
+    "h": 1000,
+    "controls": [
+      {
+        "id": "8662:13086",
+        "label": "Close",
+        "x": 1391,
+        "y": 89
+      },
+      {
+        "id": "8662:13094",
+        "label": "View published history",
+        "x": 1264,
+        "y": 313
+      }
+    ]
+  },
+  {
+    "id": "8662:13097",
+    "name": "R30 / Publish · Deployment failed",
+    "w": 1440,
+    "h": 1000,
+    "controls": [
+      {
+        "id": "8662:13101",
+        "label": "Close",
+        "x": 1391,
+        "y": 89
+      },
+      {
+        "id": "8662:13108",
+        "label": "Retry publication",
+        "x": 1264,
+        "y": 275
+      },
+      {
+        "id": "8662:13110",
+        "label": "View build error",
+        "x": 1264,
+        "y": 323
+      }
+    ]
+  },
+  {
+    "id": "8662:13113",
+    "name": "R30 / Publish · Build error",
+    "w": 560,
+    "h": 214,
+    "controls": [
+      {
+        "id": "8662:13116",
+        "label": "Back to failed release",
+        "x": 720,
+        "y": 535
+      }
+    ]
+  },
+  {
+    "id": "8662:13151",
+    "name": "R30 / Review fixtures",
+    "w": 680,
+    "h": 566,
+    "controls": [
+      {
+        "id": "8662:13154",
+        "label": "Publish: disconnected workspace",
+        "x": 720,
+        "y": 359
+      },
+      {
+        "id": "8662:13157",
+        "label": "Publish: readiness request fails",
+        "x": 720,
+        "y": 407
+      },
+      {
+        "id": "8662:13160",
+        "label": "Publish: ready with advisories",
+        "x": 720,
+        "y": 455
+      },
+      {
+        "id": "8662:13163",
+        "label": "Publish: deployment fails",
+        "x": 720,
+        "y": 503
+      },
+      {
+        "id": "8663:13582",
+        "label": "Pages: new page",
+        "x": 720,
+        "y": 551
+      },
+      {
+        "id": "8663:13585",
+        "label": "Pages: creation fails",
+        "x": 720,
+        "y": 599
+      },
+      {
+        "id": "8665:13019",
+        "label": "SEO: save error and retry",
+        "x": 720,
+        "y": 647
+      },
+      {
+        "id": "8666:13094",
+        "label": "History: restore / undo sample change",
+        "x": 720,
+        "y": 695
+      },
+      {
+        "id": "8666:13097",
+        "label": "History: restore failure",
+        "x": 720,
+        "y": 743
+      }
+    ]
+  },
+  {
+    "id": "8663:12890",
+    "name": "R30 / Pages · new-template",
+    "w": 640,
+    "h": 456,
+    "controls": [
+      {
+        "id": "8663:12894",
+        "label": "Page name",
+        "x": 720,
+        "y": 429
+      },
+      {
+        "id": "8663:12897",
+        "label": "Blank · Empty canvas",
+        "x": 568,
+        "y": 478
+      },
+      {
+        "id": "8663:12901",
+        "label": "Add to site navigation · On",
+        "x": 720,
+        "y": 526
+      },
+      {
+        "id": "8663:12904",
+        "label": "Choose template",
+        "x": 720,
+        "y": 608
+      },
+      {
+        "id": "8663:12906",
+        "label": "Cancel",
+        "x": 720,
+        "y": 656
+      }
+    ]
+  },
+  {
+    "id": "8663:12911",
+    "name": "R30 / Pages · new-blank",
+    "w": 640,
+    "h": 456,
+    "controls": [
+      {
+        "id": "8663:12915",
+        "label": "Page name",
+        "x": 720,
+        "y": 429
+      },
+      {
+        "id": "8663:12920",
+        "label": "From template",
+        "x": 872,
+        "y": 478
+      },
+      {
+        "id": "8663:12922",
+        "label": "Add to site navigation · On",
+        "x": 720,
+        "y": 526
+      },
+      {
+        "id": "8663:12925",
+        "label": "Create page",
+        "x": 720,
+        "y": 608
+      },
+      {
+        "id": "8663:12927",
+        "label": "Cancel",
+        "x": 720,
+        "y": 656
+      }
+    ]
+  },
+  {
+    "id": "8663:12935",
+    "name": "R30 / Pages · Required name",
+    "w": 640,
+    "h": 374,
+    "controls": [
+      {
+        "id": "8663:12939",
+        "label": "Page name",
+        "x": 720,
+        "y": 470
+      },
+      {
+        "id": "8663:12941",
+        "label": "Use sample name: Contact",
+        "x": 720,
+        "y": 519
+      },
+      {
+        "id": "8663:12945",
+        "label": "Cancel",
+        "x": 720,
+        "y": 615
+      }
+    ]
+  },
+  {
+    "id": "8663:12954",
+    "name": "R30 / Pages · Creation failed",
+    "w": 560,
+    "h": 242,
+    "controls": [
+      {
+        "id": "8663:12957",
+        "label": "Retry",
+        "x": 720,
+        "y": 501
+      },
+      {
+        "id": "8663:12959",
+        "label": "Back to Pages",
+        "x": 720,
+        "y": 549
+      }
+    ]
+  },
+  {
+    "id": "8663:12963",
+    "name": "R30 / Pages · Template preview",
+    "w": 760,
+    "h": 346,
+    "controls": [
+      {
+        "id": "8663:12969",
+        "label": "Use template · Create Contact",
+        "x": 720,
+        "y": 553
+      },
+      {
+        "id": "8663:12971",
+        "label": "Back to templates",
+        "x": 720,
+        "y": 601
+      }
+    ]
+  },
+  {
+    "id": "8663:12975",
+    "name": "R30 / Editor / Contact blank",
+    "w": 1440,
+    "h": 1000,
+    "controls": [
+      {
+        "id": "I8663:12978;8627:624",
+        "label": "Build",
+        "x": 411,
+        "y": 28
+      },
+      {
+        "id": "8663:12982",
+        "label": "Review",
+        "x": 507,
+        "y": 28
+      },
+      {
+        "id": "8663:12984",
+        "label": "History",
+        "x": 601,
+        "y": 28
+      },
+      {
+        "id": "8663:12985",
+        "label": "Share preview link",
+        "x": 703,
+        "y": 28
+      },
+      {
+        "id": "8663:12986",
+        "label": "Preview",
+        "x": 805,
+        "y": 28
+      },
+      {
+        "id": "8663:12987",
+        "label": "Publish",
+        "x": 897,
+        "y": 28
+      },
+      {
+        "id": "8663:12992",
+        "label": "Pages",
+        "x": 109,
+        "y": 157
+      },
+      {
+        "id": "8663:12993",
+        "label": "Assets",
+        "x": 109,
+        "y": 197
+      },
+      {
+        "id": "8663:12994",
+        "label": "CMS",
+        "x": 109,
+        "y": 237
+      },
+      {
+        "id": "8663:12995",
+        "label": "Brand variables",
+        "x": 109,
+        "y": 277
+      },
+      {
+        "id": "8663:12996",
+        "label": "Classes",
+        "x": 109,
+        "y": 317
+      },
+      {
+        "id": "8663:13008",
+        "label": "Home",
+        "x": 284,
+        "y": 96
+      },
+      {
+        "id": "8663:13010",
+        "label": "Mobile",
+        "x": 476,
+        "y": 96
+      },
+      {
+        "id": "8663:13158",
+        "label": "Browse templates",
+        "x": 407,
+        "y": 318
+      },
+      {
+        "id": "8663:13164",
+        "label": "Manage pages",
+        "x": 1264,
+        "y": 189
+      },
+      {
+        "id": "8663:13167",
+        "label": "Return to Home",
+        "x": 1264,
+        "y": 229
+      }
+    ]
+  },
+  {
+    "id": "8663:13173",
+    "name": "R30 / Editor / Contact from template",
+    "w": 1440,
+    "h": 1000,
+    "controls": [
+      {
+        "id": "I8663:13176;8627:624",
+        "label": "Build",
+        "x": 411,
+        "y": 28
+      },
+      {
+        "id": "8663:13180",
+        "label": "Review",
+        "x": 507,
+        "y": 28
+      },
+      {
+        "id": "8663:13182",
+        "label": "History",
+        "x": 601,
+        "y": 28
+      },
+      {
+        "id": "8663:13183",
+        "label": "Share preview link",
+        "x": 703,
+        "y": 28
+      },
+      {
+        "id": "8663:13184",
+        "label": "Preview",
+        "x": 805,
+        "y": 28
+      },
+      {
+        "id": "8663:13185",
+        "label": "Publish",
+        "x": 897,
+        "y": 28
+      },
+      {
+        "id": "8663:13190",
+        "label": "Pages",
+        "x": 109,
+        "y": 157
+      },
+      {
+        "id": "8663:13191",
+        "label": "Assets",
+        "x": 109,
+        "y": 197
+      },
+      {
+        "id": "8663:13192",
+        "label": "CMS",
+        "x": 109,
+        "y": 237
+      },
+      {
+        "id": "8663:13193",
+        "label": "Brand variables",
+        "x": 109,
+        "y": 277
+      },
+      {
+        "id": "8663:13194",
+        "label": "Classes",
+        "x": 109,
+        "y": 317
+      },
+      {
+        "id": "8663:13206",
+        "label": "Home",
+        "x": 284,
+        "y": 96
+      },
+      {
+        "id": "8663:13208",
+        "label": "Mobile",
+        "x": 476,
+        "y": 96
+      },
+      {
+        "id": "8663:13359",
+        "label": "Manage pages",
+        "x": 1264,
+        "y": 189
+      },
+      {
+        "id": "8663:13362",
+        "label": "Return to Home",
+        "x": 1264,
+        "y": 229
+      }
+    ]
+  },
+  {
+    "id": "8663:13368",
+    "name": "R30 / Editor / About",
+    "w": 1440,
+    "h": 1000,
+    "controls": [
+      {
+        "id": "I8663:13371;8627:624",
+        "label": "Build",
+        "x": 411,
+        "y": 28
+      },
+      {
+        "id": "8663:13375",
+        "label": "Review",
+        "x": 507,
+        "y": 28
+      },
+      {
+        "id": "8663:13377",
+        "label": "History",
+        "x": 601,
+        "y": 28
+      },
+      {
+        "id": "8663:13378",
+        "label": "Share preview link",
+        "x": 703,
+        "y": 28
+      },
+      {
+        "id": "8663:13379",
+        "label": "Preview",
+        "x": 805,
+        "y": 28
+      },
+      {
+        "id": "8663:13380",
+        "label": "Publish",
+        "x": 897,
+        "y": 28
+      },
+      {
+        "id": "8663:13385",
+        "label": "Pages",
+        "x": 109,
+        "y": 157
+      },
+      {
+        "id": "8663:13386",
+        "label": "Assets",
+        "x": 109,
+        "y": 197
+      },
+      {
+        "id": "8663:13387",
+        "label": "CMS",
+        "x": 109,
+        "y": 237
+      },
+      {
+        "id": "8663:13388",
+        "label": "Brand variables",
+        "x": 109,
+        "y": 277
+      },
+      {
+        "id": "8663:13389",
+        "label": "Classes",
+        "x": 109,
+        "y": 317
+      },
+      {
+        "id": "8663:13401",
+        "label": "Home",
+        "x": 284,
+        "y": 96
+      },
+      {
+        "id": "8663:13403",
+        "label": "Mobile",
+        "x": 476,
+        "y": 96
+      },
+      {
+        "id": "8663:13554",
+        "label": "Manage pages",
+        "x": 1264,
+        "y": 189
+      },
+      {
+        "id": "8663:13557",
+        "label": "Return to Home",
+        "x": 1264,
+        "y": 229
+      }
+    ]
+  },
+  {
+    "id": "8665:12914",
+    "name": "R30 / SEO · Edit sample values",
+    "w": 680,
+    "h": 402,
+    "controls": [
+      {
+        "id": "8665:12917",
+        "label": "Title: Studio North — Thoughtful spaces",
+        "x": 720,
+        "y": 421
+      },
+      {
+        "id": "8665:12919",
+        "label": "Description: Architecture and interior design by Studio North.",
+        "x": 720,
+        "y": 469
+      },
+      {
+        "id": "8665:12921",
+        "label": "URL: journal · already used",
+        "x": 720,
+        "y": 517
+      },
+      {
+        "id": "8665:12923",
+        "label": "URL: home · valid",
+        "x": 720,
+        "y": 565
+      },
+      {
+        "id": "8665:12925",
+        "label": "Clear title · inherit site default",
+        "x": 720,
+        "y": 613
+      },
+      {
+        "id": "8665:12927",
+        "label": "Back to page settings",
+        "x": 720,
+        "y": 661
+      }
+    ]
+  },
+  {
+    "id": "8665:12943",
+    "name": "R30 / SEO · Saved",
+    "w": 560,
+    "h": 242,
+    "controls": [
+      {
+        "id": "8665:12946",
+        "label": "Manage pages",
+        "x": 720,
+        "y": 501
+      },
+      {
+        "id": "8665:12948",
+        "label": "Back to Home settings",
+        "x": 720,
+        "y": 549
+      }
+    ]
+  },
+  {
+    "id": "8665:12953",
+    "name": "R30 / SEO · Save failed",
+    "w": 560,
+    "h": 242,
+    "controls": [
+      {
+        "id": "8665:12956",
+        "label": "Retry save",
+        "x": 720,
+        "y": 501
+      },
+      {
+        "id": "8665:12958",
+        "label": "Keep editing",
+        "x": 720,
+        "y": 549
+      }
+    ]
+  },
+  {
+    "id": "8665:12961",
+    "name": "R30 / SEO · Invalid URL",
+    "w": 560,
+    "h": 242,
+    "controls": [
+      {
+        "id": "8665:12964",
+        "label": "Use home and return to settings",
+        "x": 720,
+        "y": 501
+      },
+      {
+        "id": "8665:12966",
+        "label": "Keep editing",
+        "x": 720,
+        "y": 549
+      }
+    ]
+  },
+  {
+    "id": "8665:12971",
+    "name": "R30 / SEO · Saving",
+    "w": 560,
+    "h": 146,
+    "controls": []
+  },
+  {
+    "id": "8665:12978",
+    "name": "R30 / SEO · Discard changes",
+    "w": 560,
+    "h": 230,
+    "controls": [
+      {
+        "id": "8665:12981",
+        "label": "Discard changes",
+        "x": 720,
+        "y": 527
+      },
+      {
+        "id": "8665:12983",
+        "label": "Keep editing",
+        "x": 720,
+        "y": 575
+      }
+    ]
+  },
+  {
+    "id": "8665:13005",
+    "name": "R30 / SEO · AI suggestion",
+    "w": 560,
+    "h": 328,
+    "controls": [
+      {
+        "id": "8665:13011",
+        "label": "Use suggestion in draft",
+        "x": 720,
+        "y": 544
+      },
+      {
+        "id": "8665:13013",
+        "label": "Cancel",
+        "x": 720,
+        "y": 592
+      }
+    ]
+  },
+  {
+    "id": "8666:12930",
+    "name": "R30 / History · Version details",
+    "w": 560,
+    "h": 434,
+    "controls": [
+      {
+        "id": "8666:12937",
+        "label": "Compare with current",
+        "x": 720,
+        "y": 549
+      },
+      {
+        "id": "8666:12939",
+        "label": "Restore to draft",
+        "x": 720,
+        "y": 597
+      },
+      {
+        "id": "8666:12941",
+        "label": "Back to Saves",
+        "x": 720,
+        "y": 645
+      }
+    ]
+  },
+  {
+    "id": "8666:12945",
+    "name": "R30 / History · Semantic comparison",
+    "w": 1040,
+    "h": 420,
+    "controls": [
+      {
+        "id": "8666:12955",
+        "label": "Visual comparison",
+        "x": 720,
+        "y": 542
+      },
+      {
+        "id": "8666:12957",
+        "label": "Review restore",
+        "x": 720,
+        "y": 590
+      },
+      {
+        "id": "8666:12959",
+        "label": "Back to version details",
+        "x": 720,
+        "y": 638
+      }
+    ]
+  },
+  {
+    "id": "8666:12963",
+    "name": "R30 / History · Visual comparison",
+    "w": 1040,
+    "h": 444,
+    "controls": [
+      {
+        "id": "8666:12973",
+        "label": "Semantic comparison",
+        "x": 720,
+        "y": 554
+      },
+      {
+        "id": "8666:12975",
+        "label": "Review restore",
+        "x": 720,
+        "y": 602
+      },
+      {
+        "id": "8666:12977",
+        "label": "Back to version details",
+        "x": 720,
+        "y": 650
+      }
+    ]
+  },
+  {
+    "id": "8666:12984",
+    "name": "R30 / History · Restore confirmation",
+    "w": 560,
+    "h": 386,
+    "controls": [
+      {
+        "id": "8666:12991",
+        "label": "Create safety copy and restore",
+        "x": 720,
+        "y": 573
+      },
+      {
+        "id": "8666:12993",
+        "label": "Cancel",
+        "x": 720,
+        "y": 621
+      }
+    ]
+  },
+  {
+    "id": "8666:13000",
+    "name": "R30 / History · Restored",
+    "w": 560,
+    "h": 242,
+    "controls": [
+      {
+        "id": "8666:13003",
+        "label": "Undo restore",
+        "x": 720,
+        "y": 501
+      },
+      {
+        "id": "8666:13005",
+        "label": "Return to Editor",
+        "x": 720,
+        "y": 549
+      }
+    ]
+  },
+  {
+    "id": "8666:13009",
+    "name": "R30 / History · Undo restored",
+    "w": 560,
+    "h": 194,
+    "controls": [
+      {
+        "id": "8666:13012",
+        "label": "Return to Editor",
+        "x": 720,
+        "y": 525
+      }
+    ]
+  },
+  {
+    "id": "8666:13016",
+    "name": "R30 / History · Restore failed",
+    "w": 560,
+    "h": 242,
+    "controls": [
+      {
+        "id": "8666:13019",
+        "label": "Retry restore",
+        "x": 720,
+        "y": 501
+      },
+      {
+        "id": "8666:13021",
+        "label": "Back to version",
+        "x": 720,
+        "y": 549
+      }
+    ]
+  },
+  {
+    "id": "8666:13028",
+    "name": "R30 / History · Save version",
+    "w": 560,
+    "h": 326,
+    "controls": [
+      {
+        "id": "8666:13032",
+        "label": "Version name",
+        "x": 720,
+        "y": 494
+      },
+      {
+        "id": "8666:13034",
+        "label": "Save version",
+        "x": 720,
+        "y": 543
+      },
+      {
+        "id": "8666:13036",
+        "label": "Cancel",
+        "x": 720,
+        "y": 591
+      }
+    ]
+  },
+  {
+    "id": "8666:13040",
+    "name": "R30 / History · Version saved",
+    "w": 560,
+    "h": 194,
+    "controls": [
+      {
+        "id": "8666:13043",
+        "label": "Open Saves",
+        "x": 720,
+        "y": 525
+      }
+    ]
+  },
+  {
+    "id": "8666:13048",
+    "name": "R30 / History · Rename version",
+    "w": 560,
+    "h": 326,
+    "controls": [
+      {
+        "id": "8666:13052",
+        "label": "Version name",
+        "x": 720,
+        "y": 494
+      },
+      {
+        "id": "8666:13054",
+        "label": "Save name",
+        "x": 720,
+        "y": 543
+      },
+      {
+        "id": "8666:13056",
+        "label": "Cancel",
+        "x": 720,
+        "y": 591
+      }
+    ]
+  },
+  {
+    "id": "8666:13063",
+    "name": "R30 / History · Delete version",
+    "w": 560,
+    "h": 262,
+    "controls": [
+      {
+        "id": "8666:13066",
+        "label": "Delete saved version",
+        "x": 720,
+        "y": 511
+      },
+      {
+        "id": "8666:13068",
+        "label": "Cancel",
+        "x": 720,
+        "y": 559
+      }
+    ]
+  },
+  {
+    "id": "8666:13083",
+    "name": "R30 / History · AI summary unavailable",
+    "w": 560,
+    "h": 262,
+    "controls": [
+      {
+        "id": "8666:13086",
+        "label": "Open semantic comparison",
+        "x": 720,
+        "y": 511
+      },
+      {
+        "id": "8666:13088",
+        "label": "Back to version",
+        "x": 720,
+        "y": 559
+      }
+    ]
+  },
+  {
+    "id": "8668:12955",
+    "name": "R30 / Preview / blank",
+    "w": 1440,
+    "h": 1000,
+    "controls": [
+      {
+        "id": "8668:13044",
+        "label": "Button / TO-BE",
+        "x": 82,
+        "y": 28
+      }
+    ]
+  },
+  {
+    "id": "8668:13053",
+    "name": "R30 / Preview / template",
+    "w": 1440,
+    "h": 1000,
+    "controls": [
+      {
+        "id": "8668:13142",
+        "label": "Button / TO-BE",
+        "x": 82,
+        "y": 28
+      }
+    ]
+  },
+  {
+    "id": "8668:13154",
+    "name": "R30 / Preview / about",
+    "w": 1440,
+    "h": 1000,
+    "controls": [
+      {
+        "id": "8668:13243",
+        "label": "Button / TO-BE",
+        "x": 82,
+        "y": 28
+      }
+    ]
+  },
+  {
+    "id": "8465:3",
+    "name": "I02 / Design / Typography",
+    "w": 1440,
+    "h": 1000,
+    "controls": [
+      {
+        "id": "I8628:13077;8627:624",
+        "label": "Build",
+        "x": 411,
+        "y": 28
+      },
+      {
+        "id": "8468:72",
+        "label": "Review",
+        "x": 507,
+        "y": 28
+      },
+      {
+        "id": "8468:75",
+        "label": "History",
+        "x": 601,
+        "y": 28
+      },
+      {
+        "id": "8468:77",
+        "label": "Share preview link",
+        "x": 703,
+        "y": 28
+      },
+      {
+        "id": "8468:79",
+        "label": "Preview",
+        "x": 805,
+        "y": 28
+      },
+      {
+        "id": "8468:81",
+        "label": "Publish",
+        "x": 897,
+        "y": 28
+      },
+      {
+        "id": "8468:86",
+        "label": "Layers",
+        "x": 109,
+        "y": 117
+      },
+      {
+        "id": "8468:88",
+        "label": "Pages",
+        "x": 109,
+        "y": 157
+      },
+      {
+        "id": "8468:90",
+        "label": "Assets",
+        "x": 109,
+        "y": 197
+      },
+      {
+        "id": "8468:92",
+        "label": "CMS",
+        "x": 109,
+        "y": 237
+      },
+      {
+        "id": "8468:94",
+        "label": "Brand variables",
+        "x": 109,
+        "y": 277
+      },
+      {
+        "id": "8468:96",
+        "label": "Classes",
+        "x": 109,
+        "y": 317
+      },
+      {
+        "id": "8468:99",
+        "label": "Body",
+        "x": 109,
+        "y": 381
+      },
+      {
+        "id": "8468:101",
+        "label": "  Main section",
+        "x": 109,
+        "y": 421
+      },
+      {
+        "id": "8468:105",
+        "label": "    Paragraph",
+        "x": 109,
+        "y": 501
+      },
+      {
+        "id": "8468:107",
+        "label": "    Primary button",
+        "x": 109,
+        "y": 541
+      },
+      {
+        "id": "8468:109",
+        "label": "  Project grid",
+        "x": 109,
+        "y": 581
+      },
+      {
+        "id": "8468:111",
+        "label": "  3 selected elements",
+        "x": 109,
+        "y": 621
+      },
+      {
+        "id": "8468:117",
+        "label": "Home",
+        "x": 284,
+        "y": 96
+      },
+      {
+        "id": "8468:121",
+        "label": "Mobile",
+        "x": 476,
+        "y": 96
+      },
+      {
+        "id": "8468:149",
+        "label": "Settings",
+        "x": 1253,
+        "y": 117
+      },
+      {
+        "id": "8468:151",
+        "label": "Interactions",
+        "x": 1360,
+        "y": 117
+      },
+      {
+        "id": "8468:157",
+        "label": "Property / Class",
+        "x": 1241,
+        "y": 229
+      },
+      {
+        "id": "8574:11692",
+        "label": "Property / Text style",
+        "x": 1241,
+        "y": 315
+      },
+      {
+        "id": "8468:171",
+        "label": "Property / Font size",
+        "x": 1241,
+        "y": 441
+      },
+      {
+        "id": "8468:196",
+        "label": "Mobile override",
+        "x": 1265,
+        "y": 685
+      },
+      {
+        "id": "8468:198",
+        "label": "Class manager",
+        "x": 1265,
+        "y": 725
+      },
+      {
+        "id": "8468:200",
+        "label": "Layout",
+        "x": 1265,
+        "y": 765
+      }
+    ]
+  },
+  {
+    "id": "8539:9579",
+    "name": "R29 / Editor overlay / Pages",
+    "w": 1440,
+    "h": 1000,
+    "controls": [
+      {
+        "id": "8655:12896",
+        "label": "Button / TO-BE",
+        "x": 303,
+        "y": 88
+      },
+      {
+        "id": "8539:9655",
+        "label": "SEO & social settings",
+        "x": 176,
+        "y": 501
+      },
+      {
+        "id": "8539:9657",
+        "label": "+ New page",
+        "x": 176,
+        "y": 944
+      }
+    ]
+  },
+  {
+    "id": "8539:10798",
+    "name": "R26 overlay / page-seo",
+    "w": 1440,
+    "h": 1000,
+    "controls": [
+      {
+        "id": "8539:10800",
+        "label": "Back to canvas",
+        "x": 104,
+        "y": 28
+      },
+      {
+        "id": "8539:10807",
+        "label": "Navigate / Social",
+        "x": 116,
+        "y": 177
+      },
+      {
+        "id": "8539:10808",
+        "label": "Navigate / Advanced",
+        "x": 116,
+        "y": 225
+      },
+      {
+        "id": "8539:10809",
+        "label": "Navigate / Page actions",
+        "x": 116,
+        "y": 273
+      },
+      {
+        "id": "8539:10816",
+        "label": "URL slug",
+        "x": 538,
+        "y": 251
+      },
+      {
+        "id": "8539:10817",
+        "label": "Meta title",
+        "x": 538,
+        "y": 343
+      },
+      {
+        "id": "8539:10818",
+        "label": "Meta description",
+        "x": 538,
+        "y": 435
+      },
+      {
+        "id": "8539:10819",
+        "label": "Write with AI",
+        "x": 538,
+        "y": 500
+      },
+      {
+        "id": "8539:10822",
+        "label": "Search indexing",
+        "x": 1110,
+        "y": 239
+      },
+      {
+        "id": "8539:10823",
+        "label": "Title guidance",
+        "x": 1110,
+        "y": 319
+      },
+      {
+        "id": "8539:10824",
+        "label": "Description guidance",
+        "x": 1110,
+        "y": 411
+      },
+      {
+        "id": "8539:10825",
+        "label": "Site SEO defaults",
+        "x": 1110,
+        "y": 476
+      },
+      {
+        "id": "8539:10828",
+        "label": "Cancel",
+        "x": 354,
+        "y": 596
+      },
+      {
+        "id": "8539:10829",
+        "label": "Done",
+        "x": 546,
+        "y": 596
+      },
+      {
+        "id": "8545:15468",
+        "label": "Return to caller",
+        "x": 114,
+        "y": 931
+      }
+    ]
+  },
+  {
+    "id": "8539:10865",
+    "name": "R26 overlay / page-social",
+    "w": 1440,
+    "h": 1000,
+    "controls": [
+      {
+        "id": "8539:10867",
+        "label": "Back to canvas",
+        "x": 104,
+        "y": 28
+      },
+      {
+        "id": "8539:10873",
+        "label": "Navigate / SEO",
+        "x": 116,
+        "y": 129
+      },
+      {
+        "id": "8539:10875",
+        "label": "Navigate / Advanced",
+        "x": 116,
+        "y": 225
+      },
+      {
+        "id": "8539:10876",
+        "label": "Navigate / Page actions",
+        "x": 116,
+        "y": 273
+      },
+      {
+        "id": "8539:10883",
+        "label": "Image",
+        "x": 538,
+        "y": 251
+      },
+      {
+        "id": "8539:10884",
+        "label": "OG title",
+        "x": 538,
+        "y": 343
+      },
+      {
+        "id": "8539:10885",
+        "label": "Title length",
+        "x": 538,
+        "y": 435
+      },
+      {
+        "id": "8539:10886",
+        "label": "Choose social image",
+        "x": 538,
+        "y": 500
+      },
+      {
+        "id": "8539:10891",
+        "label": "Cancel",
+        "x": 354,
+        "y": 596
+      },
+      {
+        "id": "8539:10892",
+        "label": "Done",
+        "x": 546,
+        "y": 596
+      },
+      {
+        "id": "8545:15473",
+        "label": "Return to caller",
+        "x": 114,
+        "y": 931
+      }
+    ]
+  },
+  {
+    "id": "8539:10914",
+    "name": "R26 overlay / page-advanced",
+    "w": 1440,
+    "h": 1000,
+    "controls": [
+      {
+        "id": "8539:10916",
+        "label": "Back to canvas",
+        "x": 104,
+        "y": 28
+      },
+      {
+        "id": "8539:10922",
+        "label": "Navigate / SEO",
+        "x": 116,
+        "y": 129
+      },
+      {
+        "id": "8539:10923",
+        "label": "Navigate / Social",
+        "x": 116,
+        "y": 177
+      },
+      {
+        "id": "8539:10925",
+        "label": "Navigate / Page actions",
+        "x": 116,
+        "y": 273
+      },
+      {
+        "id": "8539:10932",
+        "label": "Page status",
+        "x": 538,
+        "y": 239
+      },
+      {
+        "id": "8539:10933",
+        "label": "Allow indexing",
+        "x": 538,
+        "y": 307
+      },
+      {
+        "id": "8539:10934",
+        "label": "Follow links",
+        "x": 538,
+        "y": 375
+      },
+      {
+        "id": "8539:10935",
+        "label": "Live",
+        "x": 538,
+        "y": 428
+      },
+      {
+        "id": "8539:10936",
+        "label": "Hidden",
+        "x": 538,
+        "y": 466
+      },
+      {
+        "id": "8539:10939",
+        "label": "Page Head code",
+        "x": 1110,
+        "y": 251
+      },
+      {
+        "id": "8539:10942",
+        "label": "Cancel",
+        "x": 354,
+        "y": 562
+      },
+      {
+        "id": "8539:10943",
+        "label": "Done",
+        "x": 546,
+        "y": 562
+      },
+      {
+        "id": "8545:15478",
+        "label": "Return to caller",
+        "x": 114,
+        "y": 931
+      }
+    ]
+  },
+  {
+    "id": "8539:12186",
+    "name": "R26 overlay / templates",
+    "w": 1440,
+    "h": 1000,
+    "controls": [
+      {
+        "id": "8539:12188",
+        "label": "Back to canvas",
+        "x": 104,
+        "y": 28
+      },
+      {
+        "id": "8539:12194",
+        "label": "Navigate / Overview",
+        "x": 116,
+        "y": 129
+      },
+      {
+        "id": "8539:12203",
+        "label": "Portfolio",
+        "x": 538,
+        "y": 262
+      },
+      {
+        "id": "8539:12218",
+        "label": "Back to canvas",
+        "x": 354,
+        "y": 510
+      },
+      {
+        "id": "8545:15598",
+        "label": "Return to caller",
+        "x": 114,
+        "y": 931
+      }
+    ]
+  },
+  {
+    "id": "8465:7",
+    "name": "I06 / Design / Mobile override",
+    "w": 1440,
+    "h": 1000,
+    "controls": [
+      {
+        "id": "I8628:13101;8627:624",
+        "label": "Build",
+        "x": 411,
+        "y": 28
+      },
+      {
+        "id": "8468:244296",
+        "label": "Review",
+        "x": 507,
+        "y": 28
+      },
+      {
+        "id": "8468:244299",
+        "label": "History",
+        "x": 601,
+        "y": 28
+      },
+      {
+        "id": "8468:244301",
+        "label": "Share preview link",
+        "x": 703,
+        "y": 28
+      },
+      {
+        "id": "8468:244303",
+        "label": "Preview",
+        "x": 805,
+        "y": 28
+      },
+      {
+        "id": "8468:244305",
+        "label": "Publish",
+        "x": 897,
+        "y": 28
+      },
+      {
+        "id": "8468:244310",
+        "label": "Layers",
+        "x": 109,
+        "y": 117
+      },
+      {
+        "id": "8468:244312",
+        "label": "Pages",
+        "x": 109,
+        "y": 157
+      },
+      {
+        "id": "8468:244314",
+        "label": "Assets",
+        "x": 109,
+        "y": 197
+      },
+      {
+        "id": "8468:244316",
+        "label": "CMS",
+        "x": 109,
+        "y": 237
+      },
+      {
+        "id": "8468:244318",
+        "label": "Brand variables",
+        "x": 109,
+        "y": 277
+      },
+      {
+        "id": "8468:244320",
+        "label": "Classes",
+        "x": 109,
+        "y": 317
+      },
+      {
+        "id": "8468:244323",
+        "label": "Body",
+        "x": 109,
+        "y": 381
+      },
+      {
+        "id": "8468:244325",
+        "label": "  Main section",
+        "x": 109,
+        "y": 421
+      },
+      {
+        "id": "8468:244327",
+        "label": "    Heading",
+        "x": 109,
+        "y": 461
+      },
+      {
+        "id": "8468:244329",
+        "label": "    Paragraph",
+        "x": 109,
+        "y": 501
+      },
+      {
+        "id": "8468:244331",
+        "label": "    Primary button",
+        "x": 109,
+        "y": 541
+      },
+      {
+        "id": "8468:244333",
+        "label": "  Project grid",
+        "x": 109,
+        "y": 581
+      },
+      {
+        "id": "8468:244335",
+        "label": "  3 selected elements",
+        "x": 109,
+        "y": 621
+      },
+      {
+        "id": "8468:244341",
+        "label": "Home",
+        "x": 284,
+        "y": 96
+      },
+      {
+        "id": "8468:244343",
+        "label": "Desktop",
+        "x": 380,
+        "y": 96
+      },
+      {
+        "id": "8468:244381",
+        "label": "Settings",
+        "x": 1253,
+        "y": 117
+      },
+      {
+        "id": "8468:244383",
+        "label": "Interactions",
+        "x": 1360,
+        "y": 117
+      },
+      {
+        "id": "8468:244426",
+        "label": "Reset font size",
+        "x": 1265,
+        "y": 683
+      },
+      {
+        "id": "8468:244428",
+        "label": "Desktop",
+        "x": 1265,
+        "y": 723
+      },
+      {
+        "id": "8468:244430",
+        "label": "Ask AI",
+        "x": 1265,
+        "y": 763
+      }
+    ]
+  },
+  {
+    "id": "8465:15",
+    "name": "I14 / Design / Mobile · override removed",
+    "w": 1440,
+    "h": 1000,
+    "controls": [
+      {
+        "id": "I8628:13149;8627:624",
+        "label": "Build",
+        "x": 411,
+        "y": 28
+      },
+      {
+        "id": "8468:245370",
+        "label": "Review",
+        "x": 507,
+        "y": 28
+      },
+      {
+        "id": "8468:245373",
+        "label": "History",
+        "x": 601,
+        "y": 28
+      },
+      {
+        "id": "8468:245375",
+        "label": "Share preview link",
+        "x": 703,
+        "y": 28
+      },
+      {
+        "id": "8468:245377",
+        "label": "Preview",
+        "x": 805,
+        "y": 28
+      },
+      {
+        "id": "8468:245379",
+        "label": "Publish",
+        "x": 897,
+        "y": 28
+      },
+      {
+        "id": "8468:245384",
+        "label": "Layers",
+        "x": 109,
+        "y": 117
+      },
+      {
+        "id": "8468:245386",
+        "label": "Pages",
+        "x": 109,
+        "y": 157
+      },
+      {
+        "id": "8468:245388",
+        "label": "Assets",
+        "x": 109,
+        "y": 197
+      },
+      {
+        "id": "8468:245390",
+        "label": "CMS",
+        "x": 109,
+        "y": 237
+      },
+      {
+        "id": "8468:245392",
+        "label": "Brand variables",
+        "x": 109,
+        "y": 277
+      },
+      {
+        "id": "8468:245394",
+        "label": "Classes",
+        "x": 109,
+        "y": 317
+      },
+      {
+        "id": "8468:245397",
+        "label": "Body",
+        "x": 109,
+        "y": 381
+      },
+      {
+        "id": "8468:245399",
+        "label": "  Main section",
+        "x": 109,
+        "y": 421
+      },
+      {
+        "id": "8468:245401",
+        "label": "    Heading",
+        "x": 109,
+        "y": 461
+      },
+      {
+        "id": "8468:245403",
+        "label": "    Paragraph",
+        "x": 109,
+        "y": 501
+      },
+      {
+        "id": "8468:245405",
+        "label": "    Primary button",
+        "x": 109,
+        "y": 541
+      },
+      {
+        "id": "8468:245407",
+        "label": "  Project grid",
+        "x": 109,
+        "y": 581
+      },
+      {
+        "id": "8468:245409",
+        "label": "  3 selected elements",
+        "x": 109,
+        "y": 621
+      },
+      {
+        "id": "8468:245415",
+        "label": "Home",
+        "x": 284,
+        "y": 96
+      },
+      {
+        "id": "8468:245417",
+        "label": "Desktop",
+        "x": 380,
+        "y": 96
+      },
+      {
+        "id": "8468:245455",
+        "label": "Settings",
+        "x": 1253,
+        "y": 117
+      },
+      {
+        "id": "8468:245457",
+        "label": "Interactions",
+        "x": 1360,
+        "y": 117
+      },
+      {
+        "id": "8468:245476",
+        "label": "Undo reset",
+        "x": 1265,
+        "y": 395
+      },
+      {
+        "id": "8468:245478",
+        "label": "Desktop typography",
+        "x": 1265,
+        "y": 435
+      }
+    ]
+  }
+]

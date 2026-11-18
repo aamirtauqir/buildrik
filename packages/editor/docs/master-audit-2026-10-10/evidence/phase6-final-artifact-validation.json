@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "ledgerRecords": 4725,
+  "nativeReactionSources": 607,
+  "newBrowserChecks": 43,
+  "retainedNewTypeBindings": 4286,
+  "missingDestinations": 0,
+  "geometryDifferences": 0,
+  "scope": "Artifact consistency and prior tool/browser readback, not production tests"
+}

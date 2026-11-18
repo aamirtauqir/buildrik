@@ -1,0 +1,106 @@
+{
+  "createdNodeIds": [
+    "139:47668",
+    "139:48427",
+    "139:49184",
+    "139:49899",
+    "139:50620",
+    "139:51389",
+    "139:52176",
+    "139:52895",
+    "139:53653"
+  ],
+  "mutatedNodeIds": [
+    "139:48376",
+    "139:48383",
+    "139:49180",
+    "139:49147",
+    "139:50612",
+    "139:51385",
+    "139:48379",
+    "139:52889",
+    "139:48381",
+    "139:52166",
+    "139:52168",
+    "139:53603",
+    "139:53875",
+    "131:42510"
+  ],
+  "frames": [
+    {
+      "id": "139:47668",
+      "name": "B3-P137 · Pages / three selected, grouped bulk actions",
+      "w": 1440,
+      "h": 900,
+      "nodes": 737,
+      "images": []
+    },
+    {
+      "id": "139:48427",
+      "name": "B3-P138 · Pages / bulk delete partial result",
+      "w": 1440,
+      "h": 900,
+      "nodes": 721,
+      "images": []
+    },
+    {
+      "id": "139:49184",
+      "name": "B3-P139 · Pages / undo only successful bulk deletions",
+      "w": 1440,
+      "h": 900,
+      "nodes": 701,
+      "images": []
+    },
+    {
+      "id": "139:49899",
+      "name": "B3-P140 · Pages / retry only failed deletion",
+      "w": 1440,
+      "h": 900,
+      "nodes": 669,
+      "images": []
+    },
+    {
+      "id": "139:50620",
+      "name": "B3-P141 · Pages / three pages duplicated",
+      "w": 1440,
+      "h": 900,
+      "nodes": 747,
+      "images": []
+    },
+    {
+      "id": "139:51389",
+      "name": "B3-P142 · Pages / move three selected pages",
+      "w": 1440,
+      "h": 900,
+      "nodes": 752,
+      "images": []
+    },
+    {
+      "id": "139:52176",
+      "name": "B3-P143 · Pages / three pages moved to private folder",
+      "w": 1440,
+      "h": 900,
+      "nodes": 696,
+      "images": []
+    },
+    {
+      "id": "139:52895",
+      "name": "B3-P144 · Pages / homepage selected, deletion unavailable",
+      "w": 1440,
+      "h": 900,
+      "nodes": 734,
+      "images": []
+    },
+    {
+      "id": "139:53653",
+      "name": "B3-P145 · Pages / bulk selection at 1440 × 600",
+      "w": 1440,
+      "h": 600,
+      "nodes": 737,
+      "images": []
+    }
+  ],
+  "allAffectedNodeIds": "affected-nodes.json (includes inherited instance descendants)",
+  "createdNodeCount": 6503,
+  "createdNodeIdsScope": "Root IDs only; full descendant IDs in artifact"
+}

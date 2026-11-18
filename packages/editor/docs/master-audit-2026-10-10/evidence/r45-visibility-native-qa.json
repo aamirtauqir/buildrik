@@ -1,0 +1,1257 @@
+{
+  "scope": "Bounded R45 native audit of Heading, Image, Shared Style, Display chooser, refusal and two review dialogs. Current authored default visibility/geometry only; no variable changes, prototype-state traversal or browser playback.",
+  "scopeInventoryNote": "R45 IDs from r45-visibility-mutation.json plus targeted native IDs; older alternate routes inspected only to determine fixture ownership.",
+  "roots": [
+    {
+      "name": "Heading",
+      "id": "8843:16808",
+      "width": 1440,
+      "height": 1000,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    },
+    {
+      "name": "Image",
+      "id": "8843:20467",
+      "width": 1440,
+      "height": 1000,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    },
+    {
+      "name": "Shared Style",
+      "id": "8841:14864",
+      "width": 1440,
+      "height": 1000,
+      "layoutMode": "NONE",
+      "clipsContent": true,
+      "scroll": "NONE"
+    },
+    {
+      "name": "Display chooser",
+      "id": "8844:264650",
+      "width": 400,
+      "height": 306,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    },
+    {
+      "name": "Refusal",
+      "id": "9064:17601",
+      "width": 540,
+      "height": 152,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    },
+    {
+      "name": "Heading review",
+      "id": "9064:20058",
+      "width": 560,
+      "height": 508,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    },
+    {
+      "name": "Image review",
+      "id": "9064:20114",
+      "width": 560,
+      "height": 508,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    }
+  ],
+  "missingRoots": [],
+  "nodes": 714,
+  "visibleNodes": 294,
+  "instances": 227,
+  "componentIds": [
+    "8627:621",
+    "8314:3",
+    "8314:7",
+    "8314:5",
+    "8531:318"
+  ],
+  "missingComponents": [],
+  "componentErrors": [],
+  "reactionDestinations": [
+    "8581:11856",
+    "8628:12749",
+    "8628:12592",
+    "8581:11797",
+    "8465:31",
+    "8581:11815",
+    "8465:46",
+    "8539:9190",
+    "8581:11846",
+    "8539:9339",
+    "8539:9433",
+    "8841:14864",
+    "8539:9579",
+    "8539:9786",
+    "8539:9881",
+    "8539:9974",
+    "8465:8",
+    "8465:2",
+    "8465:10",
+    "8465:9",
+    "8465:5",
+    "8844:16149",
+    "8841:14872",
+    "8844:264993",
+    "8465:3",
+    "9064:20058",
+    "8539:12728",
+    "8844:265209",
+    "9064:20114",
+    "8844:264650",
+    "9064:17601",
+    "8844:265290",
+    "9051:17536",
+    "8844:265268",
+    "8863:17177",
+    "8863:17140",
+    "8990:17560",
+    "8844:264670",
+    "8844:264690",
+    "8844:264710",
+    "8844:264727",
+    "8844:264744",
+    "8844:264764",
+    "8844:265243",
+    "8844:264784",
+    "8844:264801",
+    "8844:264818",
+    "8844:264838",
+    "8844:264855",
+    "8844:264872",
+    "8843:20467",
+    "8843:16808"
+  ],
+  "missingDestinations": [],
+  "destinationErrors": [],
+  "geometryChecks": 287,
+  "expectedScrolling": [],
+  "clippingCandidates": [],
+  "unclippedOverflow": [],
+  "geometrySkipped": [],
+  "selectorRow": null,
+  "captions": [],
+  "deviceWidthBindings": [],
+  "mutatedNodeIds": [],
+  "mutatedVariableIds": [],
+  "scrollContainers": [
+    {
+      "id": "8843:16873",
+      "name": "Inspector",
+      "visible": true,
+      "scroll": "VERTICAL",
+      "clipsContent": true,
+      "width": 352,
+      "height": 920
+    },
+    {
+      "id": "8843:20532",
+      "name": "Inspector",
+      "visible": true,
+      "scroll": "VERTICAL",
+      "clipsContent": true,
+      "width": 352,
+      "height": 920
+    },
+    {
+      "id": "8841:14865",
+      "name": "Task panel / Style",
+      "visible": true,
+      "scroll": "VERTICAL",
+      "clipsContent": true,
+      "width": 352,
+      "height": 920
+    }
+  ],
+  "missingVariables": [],
+  "variableErrors": [],
+  "boundVariableReferences": 4902,
+  "selectedBindings": [
+    {
+      "id": "8843:17107",
+      "name": "Selected / Heading",
+      "type": "FRAME",
+      "parentId": "8843:17103",
+      "width": 656,
+      "height": 77,
+      "visible": true,
+      "horizontal": "FILL",
+      "vertical": "HUG",
+      "layoutMode": "VERTICAL",
+      "boundVariables": {
+        "visible": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:9064:17517"
+        }
+      },
+      "expectedVisibilityVariable": "VariableID:9064:17517",
+      "matches": true
+    },
+    {
+      "id": "8843:20778",
+      "name": "Selected / Image",
+      "type": "FRAME",
+      "parentId": "8843:20774",
+      "width": 656,
+      "height": 200,
+      "visible": true,
+      "horizontal": "FILL",
+      "vertical": "FIXED",
+      "layoutMode": "VERTICAL",
+      "boundVariables": {
+        "visible": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:9064:17554"
+        }
+      },
+      "expectedVisibilityVariable": "VariableID:9064:17554",
+      "matches": true
+    }
+  ],
+  "tabletGates": [
+    {
+      "id": "8843:17018",
+      "name": "Action / Settings",
+      "binding": {
+        "type": "VARIABLE_ALIAS",
+        "id": "VariableID:9064:17519"
+      },
+      "expected": "VariableID:9064:17519",
+      "matches": true
+    },
+    {
+      "id": "8843:17020",
+      "name": "Action / Interactions",
+      "binding": {
+        "type": "VARIABLE_ALIAS",
+        "id": "VariableID:9064:17519"
+      },
+      "expected": "VariableID:9064:17519",
+      "matches": true
+    },
+    {
+      "id": "8843:20677",
+      "name": "Action / Settings",
+      "binding": {
+        "type": "VARIABLE_ALIAS",
+        "id": "VariableID:9064:17556"
+      },
+      "expected": "VariableID:9064:17556",
+      "matches": true
+    },
+    {
+      "id": "8843:20679",
+      "name": "Action / Interactions",
+      "binding": {
+        "type": "VARIABLE_ALIAS",
+        "id": "VariableID:9064:17556"
+      },
+      "expected": "VariableID:9064:17556",
+      "matches": true
+    }
+  ],
+  "tabletColors": [
+    {
+      "target": "heading",
+      "device": "Desktop",
+      "id": "8843:16842",
+      "name": "Action / Desktop",
+      "fillBindings": [
+        {
+          "color": {
+            "type": "VARIABLE_ALIAS",
+            "id": "VariableID:8914:17382"
+          }
+        }
+      ],
+      "textFillBindings": [
+        {
+          "id": "I8843:16842;8314:6",
+          "bindings": [
+            {
+              "color": {
+                "type": "VARIABLE_ALIAS",
+                "id": "VariableID:8914:17384"
+              }
+            }
+          ]
+        }
+      ],
+      "colorWrites": [
+        [
+          "VariableID:8914:17382",
+          "VariableID:8322:790"
+        ],
+        [
+          "VariableID:8914:17383",
+          "VariableID:8322:789"
+        ],
+        [
+          "VariableID:8914:17384",
+          "VariableID:8322:789"
+        ],
+        [
+          "VariableID:8914:17385",
+          "VariableID:8322:778"
+        ],
+        [
+          "VariableID:9065:19911",
+          "VariableID:8322:789"
+        ],
+        [
+          "VariableID:9065:19912",
+          "VariableID:8322:778"
+        ]
+      ]
+    },
+    {
+      "target": "heading",
+      "device": "Tablet",
+      "id": "9064:20045",
+      "name": "Action / Tablet",
+      "fillBindings": [
+        {
+          "color": {
+            "type": "VARIABLE_ALIAS",
+            "id": "VariableID:9065:19911"
+          }
+        }
+      ],
+      "textFillBindings": [
+        {
+          "id": "I9064:20045;8314:6",
+          "bindings": [
+            {
+              "color": {
+                "type": "VARIABLE_ALIAS",
+                "id": "VariableID:9065:19912"
+              }
+            }
+          ]
+        }
+      ],
+      "colorWrites": [
+        [
+          "VariableID:8914:17382",
+          "VariableID:8322:789"
+        ],
+        [
+          "VariableID:8914:17383",
+          "VariableID:8322:789"
+        ],
+        [
+          "VariableID:8914:17384",
+          "VariableID:8322:778"
+        ],
+        [
+          "VariableID:8914:17385",
+          "VariableID:8322:778"
+        ],
+        [
+          "VariableID:9065:19911",
+          "VariableID:8322:790"
+        ],
+        [
+          "VariableID:9065:19912",
+          "VariableID:8322:789"
+        ]
+      ]
+    },
+    {
+      "target": "heading",
+      "device": "Mobile",
+      "id": "8843:16843",
+      "name": "Action / Mobile",
+      "fillBindings": [
+        {
+          "color": {
+            "type": "VARIABLE_ALIAS",
+            "id": "VariableID:8914:17383"
+          }
+        }
+      ],
+      "textFillBindings": [
+        {
+          "id": "I8843:16843;8314:8",
+          "bindings": [
+            {
+              "color": {
+                "type": "VARIABLE_ALIAS",
+                "id": "VariableID:8914:17385"
+              }
+            }
+          ]
+        }
+      ],
+      "colorWrites": [
+        [
+          "VariableID:8914:17382",
+          "VariableID:8322:789"
+        ],
+        [
+          "VariableID:8914:17383",
+          "VariableID:8322:790"
+        ],
+        [
+          "VariableID:8914:17384",
+          "VariableID:8322:778"
+        ],
+        [
+          "VariableID:8914:17385",
+          "VariableID:8322:789"
+        ],
+        [
+          "VariableID:9065:19911",
+          "VariableID:8322:789"
+        ],
+        [
+          "VariableID:9065:19912",
+          "VariableID:8322:778"
+        ]
+      ]
+    },
+    {
+      "target": "image",
+      "device": "Desktop",
+      "id": "8843:20501",
+      "name": "Action / Desktop",
+      "fillBindings": [
+        {
+          "color": {
+            "type": "VARIABLE_ALIAS",
+            "id": "VariableID:8914:17583"
+          }
+        }
+      ],
+      "textFillBindings": [
+        {
+          "id": "I8843:20501;8314:6",
+          "bindings": [
+            {
+              "color": {
+                "type": "VARIABLE_ALIAS",
+                "id": "VariableID:8914:17585"
+              }
+            }
+          ]
+        }
+      ],
+      "colorWrites": [
+        [
+          "VariableID:8914:17583",
+          "VariableID:8322:790"
+        ],
+        [
+          "VariableID:8914:17584",
+          "VariableID:8322:789"
+        ],
+        [
+          "VariableID:8914:17585",
+          "VariableID:8322:789"
+        ],
+        [
+          "VariableID:8914:17586",
+          "VariableID:8322:778"
+        ],
+        [
+          "VariableID:9065:19916",
+          "VariableID:8322:789"
+        ],
+        [
+          "VariableID:9065:19917",
+          "VariableID:8322:778"
+        ]
+      ]
+    },
+    {
+      "target": "image",
+      "device": "Tablet",
+      "id": "9064:20101",
+      "name": "Action / Tablet",
+      "fillBindings": [
+        {
+          "color": {
+            "type": "VARIABLE_ALIAS",
+            "id": "VariableID:9065:19916"
+          }
+        }
+      ],
+      "textFillBindings": [
+        {
+          "id": "I9064:20101;8314:6",
+          "bindings": [
+            {
+              "color": {
+                "type": "VARIABLE_ALIAS",
+                "id": "VariableID:9065:19917"
+              }
+            }
+          ]
+        }
+      ],
+      "colorWrites": [
+        [
+          "VariableID:8914:17583",
+          "VariableID:8322:789"
+        ],
+        [
+          "VariableID:8914:17584",
+          "VariableID:8322:789"
+        ],
+        [
+          "VariableID:8914:17585",
+          "VariableID:8322:778"
+        ],
+        [
+          "VariableID:8914:17586",
+          "VariableID:8322:778"
+        ],
+        [
+          "VariableID:9065:19916",
+          "VariableID:8322:790"
+        ],
+        [
+          "VariableID:9065:19917",
+          "VariableID:8322:789"
+        ]
+      ]
+    },
+    {
+      "target": "image",
+      "device": "Mobile",
+      "id": "8843:20502",
+      "name": "Action / Mobile",
+      "fillBindings": [
+        {
+          "color": {
+            "type": "VARIABLE_ALIAS",
+            "id": "VariableID:8914:17584"
+          }
+        }
+      ],
+      "textFillBindings": [
+        {
+          "id": "I8843:20502;8314:8",
+          "bindings": [
+            {
+              "color": {
+                "type": "VARIABLE_ALIAS",
+                "id": "VariableID:8914:17586"
+              }
+            }
+          ]
+        }
+      ],
+      "colorWrites": [
+        [
+          "VariableID:8914:17583",
+          "VariableID:8322:789"
+        ],
+        [
+          "VariableID:8914:17584",
+          "VariableID:8322:790"
+        ],
+        [
+          "VariableID:8914:17585",
+          "VariableID:8322:778"
+        ],
+        [
+          "VariableID:8914:17586",
+          "VariableID:8322:789"
+        ],
+        [
+          "VariableID:9065:19916",
+          "VariableID:8322:789"
+        ],
+        [
+          "VariableID:9065:19917",
+          "VariableID:8322:778"
+        ]
+      ]
+    }
+  ],
+  "controlStructure": [
+    {
+      "id": "9064:17586",
+      "name": "R45 / Display and origin",
+      "type": "FRAME",
+      "parentId": "8841:14865",
+      "width": 318,
+      "height": 32,
+      "visible": false,
+      "horizontal": "FIXED",
+      "vertical": "HUG",
+      "layoutMode": "VERTICAL",
+      "boundVariables": {
+        "visible": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:9064:17500"
+        }
+      }
+    },
+    {
+      "id": "8841:14889",
+      "name": "Field / Display",
+      "type": "INSTANCE",
+      "parentId": "9064:17586",
+      "width": 318,
+      "height": 34,
+      "visible": true,
+      "horizontal": "FIXED",
+      "vertical": "FIXED",
+      "layoutMode": "HORIZONTAL",
+      "boundVariables": {}
+    },
+    {
+      "id": "9064:17593",
+      "name": "Style families / existing Desktop and Mobile previews",
+      "type": "FRAME",
+      "parentId": "8841:14865",
+      "width": 318,
+      "height": 232,
+      "visible": true,
+      "horizontal": "FILL",
+      "vertical": "HUG",
+      "layoutMode": "VERTICAL",
+      "boundVariables": {
+        "visible": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:9064:17501"
+        }
+      }
+    },
+    {
+      "id": "8841:14882",
+      "name": "Action / Layout",
+      "type": "INSTANCE",
+      "parentId": "9064:17593",
+      "width": 318,
+      "height": 32,
+      "visible": false,
+      "horizontal": "FIXED",
+      "vertical": "FIXED",
+      "layoutMode": "HORIZONTAL",
+      "boundVariables": {
+        "visible": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:8841:14862"
+        }
+      }
+    },
+    {
+      "id": "8841:14884",
+      "name": "Controls / Layout",
+      "type": "FRAME",
+      "parentId": "9064:17593",
+      "width": 318,
+      "height": 740,
+      "visible": false,
+      "horizontal": "FIXED",
+      "vertical": "HUG",
+      "layoutMode": "VERTICAL",
+      "boundVariables": {
+        "visible": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:8886:17434"
+        }
+      }
+    },
+    {
+      "id": "8841:15282",
+      "name": "Action / Visibility",
+      "type": "INSTANCE",
+      "parentId": "8841:14865",
+      "width": 318,
+      "height": 32,
+      "visible": true,
+      "horizontal": "FIXED",
+      "vertical": "FIXED",
+      "layoutMode": "HORIZONTAL",
+      "boundVariables": {}
+    },
+    {
+      "id": "8841:15284",
+      "name": "Controls / Visibility",
+      "type": "FRAME",
+      "parentId": "8841:14865",
+      "width": 318,
+      "height": 10,
+      "visible": false,
+      "horizontal": "FIXED",
+      "vertical": "HUG",
+      "layoutMode": "VERTICAL",
+      "boundVariables": {
+        "visible": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:8841:15285"
+        }
+      }
+    },
+    {
+      "id": "9064:20049",
+      "name": "Tablet preview scope",
+      "type": "FRAME",
+      "parentId": "8843:16873",
+      "width": 318,
+      "height": 32,
+      "visible": false,
+      "horizontal": "FIXED",
+      "vertical": "HUG",
+      "layoutMode": "VERTICAL",
+      "boundVariables": {
+        "visible": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:9064:17520"
+        }
+      }
+    },
+    {
+      "id": "9064:20105",
+      "name": "Tablet preview scope",
+      "type": "FRAME",
+      "parentId": "8843:20532",
+      "width": 318,
+      "height": 32,
+      "visible": false,
+      "horizontal": "FIXED",
+      "vertical": "HUG",
+      "layoutMode": "VERTICAL",
+      "boundVariables": {
+        "visible": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:9064:17557"
+        }
+      }
+    }
+  ],
+  "flexGridEligibility": [
+    {
+      "id": "8844:264656",
+      "name": "Action / Flex",
+      "layoutWrites": [
+        {
+          "id": "VariableID:8886:17424",
+          "name": "style/condition/layout/Direction",
+          "value": true,
+          "guardedByInactiveFixture": true
+        },
+        {
+          "id": "VariableID:8886:17426",
+          "name": "style/condition/layout/Wrap",
+          "value": true,
+          "guardedByInactiveFixture": true
+        },
+        {
+          "id": "VariableID:8886:17428",
+          "name": "style/condition/layout/Columns",
+          "value": false,
+          "guardedByInactiveFixture": true
+        },
+        {
+          "id": "VariableID:8886:17430",
+          "name": "style/condition/layout/Rows",
+          "value": false,
+          "guardedByInactiveFixture": true
+        },
+        {
+          "id": "VariableID:8886:17432",
+          "name": "style/condition/layout/Align",
+          "value": true,
+          "guardedByInactiveFixture": true
+        },
+        {
+          "id": "VariableID:8886:17434",
+          "name": "style/condition/layout/Gap",
+          "value": true,
+          "guardedByInactiveFixture": true
+        }
+      ]
+    },
+    {
+      "id": "8844:264659",
+      "name": "Action / Grid",
+      "layoutWrites": [
+        {
+          "id": "VariableID:8886:17424",
+          "name": "style/condition/layout/Direction",
+          "value": false,
+          "guardedByInactiveFixture": true
+        },
+        {
+          "id": "VariableID:8886:17426",
+          "name": "style/condition/layout/Wrap",
+          "value": false,
+          "guardedByInactiveFixture": true
+        },
+        {
+          "id": "VariableID:8886:17428",
+          "name": "style/condition/layout/Columns",
+          "value": true,
+          "guardedByInactiveFixture": true
+        },
+        {
+          "id": "VariableID:8886:17430",
+          "name": "style/condition/layout/Rows",
+          "value": true,
+          "guardedByInactiveFixture": true
+        },
+        {
+          "id": "VariableID:8886:17432",
+          "name": "style/condition/layout/Align",
+          "value": true,
+          "guardedByInactiveFixture": true
+        },
+        {
+          "id": "VariableID:8886:17434",
+          "name": "style/condition/layout/Gap",
+          "value": true,
+          "guardedByInactiveFixture": true
+        }
+      ]
+    }
+  ],
+  "alternateRoutes": [
+    {
+      "id": "8843:17034",
+      "name": "Action / Text style → Style",
+      "root": {
+        "id": "8843:16808",
+        "name": "R35 / Inspector / Heading"
+      },
+      "ancestors": [
+        {
+          "id": "8843:17032",
+          "name": "Property / Text style"
+        },
+        {
+          "id": "9064:20048",
+          "name": "Existing property previews / Desktop and Mobile"
+        },
+        {
+          "id": "8843:16873",
+          "name": "Inspector"
+        },
+        {
+          "id": "8843:16821",
+          "name": "Workspace"
+        },
+        {
+          "id": "8843:16808",
+          "name": "R35 / Inspector / Heading"
+        }
+      ],
+      "callerWrites": [
+        "heading"
+      ],
+      "r45WriteNames": [
+        "r45/visibility/active",
+        "r45/visibility/display-eligible",
+        "r45/visibility/extras",
+        "r45/visibility/heading/effective",
+        "r45/visibility/heading/origin",
+        "r45/visibility/heading/visible",
+        "r45/visibility/heading/hidden",
+        "r45/visibility/heading/result"
+      ],
+      "r45WriteCount": 66,
+      "selectedContext": [
+        {
+          "id": "I8843:16813;8314:8",
+          "text": "Selected AI"
+        },
+        {
+          "id": "I8843:16833;8314:8",
+          "text": "Heading"
+        },
+        {
+          "id": "I8843:16837;8314:8",
+          "text": "1 selected element"
+        },
+        {
+          "id": "9064:20040",
+          "text": "Visible on Desktop"
+        },
+        {
+          "id": "I8843:16842;8314:6",
+          "text": "Desktop"
+        },
+        {
+          "id": "I9064:20045;8314:6",
+          "text": "Tablet"
+        }
+      ],
+      "selectedNodes": [
+        {
+          "id": "8843:16837",
+          "name": "Action / 1 selected element"
+        },
+        {
+          "id": "8843:17107",
+          "name": "Selected / Heading",
+          "visibilityBinding": {
+            "type": "VARIABLE_ALIAS",
+            "id": "VariableID:9064:17517"
+          }
+        },
+        {
+          "id": "8843:17096",
+          "name": "Selection actions"
+        }
+      ]
+    },
+    {
+      "id": "8905:18143",
+      "name": "Action / Image fit → Style",
+      "root": {
+        "id": "8843:20467",
+        "name": "R35 / Inspector / Image"
+      },
+      "ancestors": [
+        {
+          "id": "9064:20104",
+          "name": "Existing property previews / Desktop and Mobile"
+        },
+        {
+          "id": "8843:20532",
+          "name": "Inspector"
+        },
+        {
+          "id": "8843:20480",
+          "name": "Workspace"
+        },
+        {
+          "id": "8843:20467",
+          "name": "R35 / Inspector / Image"
+        }
+      ],
+      "callerWrites": [
+        "image"
+      ],
+      "r45WriteNames": [
+        "r45/visibility/active",
+        "r45/visibility/display-eligible",
+        "r45/visibility/extras",
+        "r45/visibility/heading/effective",
+        "r45/visibility/heading/origin",
+        "r45/visibility/heading/visible",
+        "r45/visibility/heading/hidden",
+        "r45/visibility/heading/result"
+      ],
+      "r45WriteCount": 66,
+      "selectedContext": [
+        {
+          "id": "I8843:20472;8314:8",
+          "text": "Selected AI"
+        },
+        {
+          "id": "I8843:20492;8314:8",
+          "text": "Image"
+        },
+        {
+          "id": "I8912:17353;8314:4",
+          "text": "      Image"
+        },
+        {
+          "id": "I8843:20496;8314:8",
+          "text": "1 selected element"
+        },
+        {
+          "id": "9064:20096",
+          "text": "Visible on Desktop"
+        },
+        {
+          "id": "I8843:20501;8314:6",
+          "text": "Desktop"
+        }
+      ],
+      "selectedNodes": [
+        {
+          "id": "8912:17353",
+          "name": "Current selection / Image"
+        },
+        {
+          "id": "8843:20496",
+          "name": "Action / 1 selected element"
+        },
+        {
+          "id": "8843:20778",
+          "name": "Selected / Image",
+          "visibilityBinding": {
+            "type": "VARIABLE_ALIAS",
+            "id": "VariableID:9064:17554"
+          }
+        },
+        {
+          "id": "8843:20767",
+          "name": "Selection actions"
+        }
+      ]
+    },
+    {
+      "id": "8468:244789",
+      "name": "Action / Style",
+      "root": {
+        "id": "8465:10",
+        "name": "I09 / Design / Element settings"
+      },
+      "ancestors": [
+        {
+          "id": "8468:244788",
+          "name": "Inspector tabs"
+        },
+        {
+          "id": "8468:244757",
+          "name": "Inspector"
+        },
+        {
+          "id": "8468:244725",
+          "name": "Workspace"
+        },
+        {
+          "id": "8465:10",
+          "name": "I09 / Design / Element settings"
+        }
+      ],
+      "callerWrites": [
+        "heading"
+      ],
+      "r45WriteNames": [
+        "r45/visibility/active",
+        "r45/visibility/display-eligible",
+        "r45/visibility/extras"
+      ],
+      "r45WriteCount": 3,
+      "selectedContext": [
+        {
+          "id": "I8468:244710;8314:8",
+          "text": "Selected AI"
+        },
+        {
+          "id": "I8468:244745;8314:8",
+          "text": "    Heading"
+        },
+        {
+          "id": "I8468:244753;8314:8",
+          "text": "  3 selected elements"
+        },
+        {
+          "id": "I8468:244761;8314:6",
+          "text": "Desktop"
+        },
+        {
+          "id": "I8468:244763;8314:8",
+          "text": "Mobile"
+        },
+        {
+          "id": "8468:244765",
+          "text": "61% · 1200px · Desktop · Base"
+        }
+      ],
+      "selectedNodes": [
+        {
+          "id": "8468:244753",
+          "name": "Action /   3 selected elements"
+        }
+      ]
+    },
+    {
+      "id": "8468:244842",
+      "name": "Action / Style",
+      "root": {
+        "id": "8465:10",
+        "name": "I09 / Design / Element settings"
+      },
+      "ancestors": [
+        {
+          "id": "8468:244841",
+          "name": "Primary actions"
+        },
+        {
+          "id": "8468:244757",
+          "name": "Inspector"
+        },
+        {
+          "id": "8468:244725",
+          "name": "Workspace"
+        },
+        {
+          "id": "8465:10",
+          "name": "I09 / Design / Element settings"
+        }
+      ],
+      "callerWrites": [
+        "heading"
+      ],
+      "r45WriteNames": [
+        "r45/visibility/active",
+        "r45/visibility/display-eligible",
+        "r45/visibility/extras"
+      ],
+      "r45WriteCount": 3,
+      "selectedContext": [
+        {
+          "id": "I8468:244710;8314:8",
+          "text": "Selected AI"
+        },
+        {
+          "id": "I8468:244745;8314:8",
+          "text": "    Heading"
+        },
+        {
+          "id": "I8468:244753;8314:8",
+          "text": "  3 selected elements"
+        },
+        {
+          "id": "I8468:244761;8314:6",
+          "text": "Desktop"
+        },
+        {
+          "id": "I8468:244763;8314:8",
+          "text": "Mobile"
+        },
+        {
+          "id": "8468:244765",
+          "text": "61% · 1200px · Desktop · Base"
+        }
+      ],
+      "selectedNodes": [
+        {
+          "id": "8468:244753",
+          "name": "Action /   3 selected elements"
+        }
+      ]
+    },
+    {
+      "id": "8507:2858",
+      "name": "Action / Style",
+      "root": {
+        "id": "8507:2799",
+        "name": "T01 / Integrated inspector / Image settings"
+      },
+      "ancestors": [
+        {
+          "id": "8507:2857",
+          "name": "Inspector tabs"
+        },
+        {
+          "id": "8507:2855",
+          "name": "Inspector"
+        },
+        {
+          "id": "8507:2811",
+          "name": "Workspace"
+        },
+        {
+          "id": "8507:2799",
+          "name": "T01 / Integrated inspector / Image settings"
+        }
+      ],
+      "callerWrites": [
+        "image"
+      ],
+      "r45WriteNames": [
+        "r45/visibility/active",
+        "r45/visibility/display-eligible",
+        "r45/visibility/extras"
+      ],
+      "r45WriteCount": 3,
+      "selectedContext": [
+        {
+          "id": "I8507:2803;8314:8",
+          "text": "Selected AI"
+        },
+        {
+          "id": "I8507:2822;8328:195",
+          "text": "Project image"
+        },
+        {
+          "id": "I8507:2827;8328:195",
+          "text": "  3 selected elements"
+        },
+        {
+          "id": "I8507:2832;8314:6",
+          "text": "Desktop"
+        },
+        {
+          "id": "I8507:2833;8314:8",
+          "text": "Mobile"
+        },
+        {
+          "id": "8507:2834",
+          "text": "61% · 1200px · Desktop · Base"
+        }
+      ],
+      "selectedNodes": [
+        {
+          "id": "8507:2827",
+          "name": "Action /   3 selected elements"
+        }
+      ]
+    }
+  ],
+  "referenceSummary": {
+    "roots": 7,
+    "nodes": 714,
+    "visibleNodes": 294,
+    "instances": 227,
+    "uniqueComponents": 5,
+    "uniqueDestinations": 52,
+    "referencedVariables": 4902,
+    "missing": 0,
+    "errors": 0
+  },
+  "layoutSummary": {
+    "geometryChecks": 287,
+    "expectedScrolling": 0,
+    "clippingCandidates": 0,
+    "unclippedOverflow": 0,
+    "skippedRotated": 0
+  },
+  "caveats": [
+    "Current authored default geometry only; no native variable mutation, browser state traversal or provider/source runtime testing.",
+    "Tablet tab/color gates are inspected bindings/actions, not newly browser-played interactions.",
+    "Older alternate routes are not assigned finite Heading/Image ownership by caller string alone.",
+    "Flex/Grid value changes do not establish actual Flex/Grid layout or dependent-control eligibility in this bounded visibility task."
+  ],
+  "reviewFindings": [
+    {
+      "priority": "P0",
+      "status": "ROOT_CORRECTION_PENDING_AT_AUDIT",
+      "topic": "Older caller strings do not identify the finite instance",
+      "entries": [
+        "8468:244789",
+        "8468:244842",
+        "8507:2858"
+      ],
+      "roots": [
+        "8465:10",
+        "8507:2799"
+      ],
+      "evidence": "Separate legacy contexts show three selected elements and 1200px Desktop context, with no inspected finite selected.visible binding. Current routes write caller heading/image and activate R45 solely from that name.",
+      "recommendation": "Preserve legacy caller/persistence and add explicit fixture ownership to shared-value sync, active/Display/Tablet gates and finite guards. Canonical Heading/Image entries establish ownership; legacy entries clear it. A one-time active=false assignment is insufficient because sync recomputes it from caller."
+    },
+    {
+      "priority": "P1",
+      "status": "BOUNDED_SCOPE_LIMITATION_OPEN",
+      "topic": "Flex/Grid dependent layout controls",
+      "entries": [
+        "8844:264656",
+        "8844:264659"
+      ],
+      "evidence": "Direction/Wrap/Columns/Rows/Align/Gap writes occur only inside the inactive-fixture fallback. The Layout header remains caller-layout-gated and its body remains Gap-gated, while Display has been moved to an independent container.",
+      "recommendation": "No automatic mutation from this audit. Keep actual Flex/Grid layout/dependent-control acceptance OPEN; either add an explicitly reviewed scoped eligibility contract or visibly bound this task to hide/recover behavior. Preserve legacy fallback for other families."
+    }
+  ],
+  "checkpoint": "After Tablet origin/color/tab corrections and canonical alternate-entry sync; before older-route fixture-ownership correction."
+}

@@ -1,0 +1,5 @@
+[
+  {"goto":"8843:22237","wait":6500,"shot":"r44-video-desktop-default.png"},
+  {"x":475,"y":96,"shot":"r44-video-mobile-default.png"},
+  {"x":1330,"y":254,"shot":"r44-video-mobile-canonical-style.png"}
+]

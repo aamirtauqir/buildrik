@@ -1,0 +1,159 @@
+{
+  "date": "2026-10-10",
+  "status": "Offline proposal; root executes and supplies actual target IDs after readback",
+  "script": "/tmp/buildrick-phase6-root-destinations.js",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "pageId": "8312:2",
+  "stableTargets": {
+    "RD01": "TO-BE P6-RD01 \u00b7 Publish confirmation / simulated",
+    "RD02": "TO-BE P6-RD02 \u00b7 Publish simulation boundary",
+    "RD03": "TO-BE P6-RD03 \u00b7 About page selected",
+    "RD04": "TO-BE P6-RD04 \u00b7 About us blank page created",
+    "RD05": "TO-BE P6-RD05 \u00b7 Home Mobile editing",
+    "RD06": "TO-BE P6-RD06 \u00b7 Home Desktop visual preview"
+  },
+  "routes": [
+    {
+      "sourceFrameId": "8317:245051",
+      "sourceControlId": "8317:245208",
+      "sourceControlLabel": "Save and run checks",
+      "targetStableName": "TO-BE P6-RD01 \u00b7 Publish confirmation / simulated",
+      "targetId": null,
+      "limitation": "Explicit switch to assumed ready prototype scenario; no actual save/check executed. Keep label explaining simulation visible."
+    },
+    {
+      "sourceFrameId": "8317:243948",
+      "sourceControlId": "8317:244137",
+      "sourceControlLabel": "Pages / About row",
+      "targetStableName": "TO-BE P6-RD03 \u00b7 About page selected",
+      "targetId": null,
+      "limitation": "Existing About page example, distinct from newly created About us."
+    },
+    {
+      "sourceFrameId": "8317:297",
+      "sourceControlId": "8317:380",
+      "sourceControlLabel": "About page tab",
+      "targetStableName": "TO-BE P6-RD03 \u00b7 About page selected",
+      "targetId": null,
+      "limitation": "Switches to About Pages-context specimen; no service operation."
+    },
+    {
+      "sourceFrameId": "8318:244368",
+      "sourceControlId": "8318:244586",
+      "sourceControlLabel": "Create blank page",
+      "targetStableName": "TO-BE P6-RD04 \u00b7 About us blank page created",
+      "targetId": null,
+      "limitation": "Creates only finite named About us design state, not a persisted page."
+    },
+    {
+      "sourceFrameId": "8317:297",
+      "sourceControlId": "8317:383",
+      "sourceControlLabel": "Desktop device label",
+      "targetStableName": "TO-BE P6-RD05 \u00b7 Home Mobile editing",
+      "targetId": null,
+      "limitation": "Finite device-choice demonstration; a final menu can route to this state."
+    },
+    {
+      "sourceFrameId": "8317:245216",
+      "sourceControlId": "8317:245300",
+      "sourceControlLabel": "Back to editor",
+      "targetStableName": "TO-BE P6-RD05 \u00b7 Home Mobile editing",
+      "targetId": null,
+      "limitation": "Mobile Home returns to same Mobile Home at100% with Heading selected."
+    },
+    {
+      "sourceFrameId": "8317:297",
+      "sourceControlId": "8317:314",
+      "sourceControlLabel": "Preview",
+      "targetStableName": "TO-BE P6-RD06 \u00b7 Home Desktop visual preview",
+      "targetId": null,
+      "limitation": "Desktop Home must not navigate directly to Mobile Preview."
+    },
+    {
+      "sourceStableName": "TO-BE P6-RD01 \u00b7 Publish confirmation / simulated",
+      "sourceAnchorName": "RD01 / simulate confirmation",
+      "targetStableName": "TO-BE P6-RD02 \u00b7 Publish simulation boundary",
+      "targetId": null,
+      "limitation": "No deployment sent; target/revision/checks are example assumptions."
+    },
+    {
+      "sourceStableName": "TO-BE P6-RD01 \u00b7 Publish confirmation / simulated",
+      "sourceAnchorName": "RD01 / cancel to checks",
+      "targetStableName": null,
+      "targetId": "8317:245051",
+      "limitation": "Return to original blocked prototype scenario; does not change real checks."
+    },
+    {
+      "sourceStableName": "TO-BE P6-RD02 \u00b7 Publish simulation boundary",
+      "sourceAnchorName": "RD02 / back to editor",
+      "targetStableName": null,
+      "targetId": "8317:297",
+      "limitation": "Finite design transition only"
+    },
+    {
+      "sourceStableName": "TO-BE P6-RD02 \u00b7 Publish simulation boundary",
+      "sourceAnchorName": "RD02 / back to checks",
+      "targetStableName": null,
+      "targetId": "8317:245051",
+      "limitation": "Finite design transition only"
+    },
+    {
+      "sourceStableName": "TO-BE P6-RD03 \u00b7 About page selected",
+      "sourceAnchorName": "RD03 / switch Home",
+      "targetStableName": null,
+      "targetId": "8317:243948",
+      "limitation": "Finite design transition only"
+    },
+    {
+      "sourceStableName": "TO-BE P6-RD04 \u00b7 About us blank page created",
+      "sourceAnchorName": "RD04 / return Home",
+      "targetStableName": null,
+      "targetId": "8317:297",
+      "limitation": "Finite design transition only"
+    },
+    {
+      "sourceStableName": "TO-BE P6-RD05 \u00b7 Home Mobile editing",
+      "sourceAnchorName": "RD05 / Preview same Home Mobile",
+      "targetStableName": null,
+      "targetId": "8317:245216",
+      "limitation": "Finite design transition only"
+    },
+    {
+      "sourceStableName": "TO-BE P6-RD05 \u00b7 Home Mobile editing",
+      "sourceAnchorName": "RD05 / choose Desktop",
+      "targetStableName": null,
+      "targetId": "8317:297",
+      "limitation": "Finite device-choice demonstration, same Home page and selected Heading."
+    },
+    {
+      "sourceStableName": "TO-BE P6-RD06 \u00b7 Home Desktop visual preview",
+      "sourceAnchorName": "RD06 / return Home Desktop",
+      "targetStableName": null,
+      "targetId": "8317:297",
+      "limitation": "Finite design transition only"
+    },
+    {
+      "sourceStableName": "TO-BE P6-RD04 \u00b7 About us blank page created",
+      "sourceAnchorName": "RD04 / Pages Home",
+      "targetId": "8317:243948",
+      "limitation": "Finite Home page return; new About us remains a prototype example."
+    },
+    {
+      "sourceStableName": "TO-BE P6-RD04 \u00b7 About us blank page created",
+      "sourceAnchorName": "RD04 / Pages About",
+      "targetStableName": "TO-BE P6-RD03 \u00b7 About page selected",
+      "targetId": null,
+      "limitation": "Finite existing About page, distinct from About us."
+    }
+  ],
+  "writeScope": "Only6 deterministic-name new/cloned destinations at x24000/25600; no source mutations; no reactions written",
+  "retryRule": "Reuse complete exact-name frames. BUILDING partial throws for inspection; never silently duplicates/deletes partial nodes.",
+  "buttonMasterIds": [
+    "8314:3",
+    "8314:5",
+    "8314:7",
+    "8314:9",
+    "8314:11"
+  ],
+  "preflightEvidence": "Read exact source frames/controls on2026-10-10; node --check passed; not yet executed in Figma."
+}

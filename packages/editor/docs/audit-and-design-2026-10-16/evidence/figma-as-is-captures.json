@@ -1,0 +1,977 @@
+{
+  "date": "2026-10-16",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "page": "8280:2",
+  "captures": [
+    {
+      "number": 1,
+      "id": "8281:2",
+      "name": "AS-IS 01 \u00b7 Review / empty \u00b7 1280",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/01.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "8ccb315b84fad5ab6c65d880ee9c7f287250a91518f3429aff81ba602d7eff43"
+    },
+    {
+      "number": 2,
+      "id": "8283:2",
+      "name": "AS-IS 02 \u00b7 Heading / Style",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/02.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "5b1315155d686772e93a58a33457af48dcbd534928d7517a38cf5a404f2da84d"
+    },
+    {
+      "number": 3,
+      "id": "8283:299",
+      "name": "AS-IS 03 \u00b7 Selected element actions",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/03.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "ccf0cbfaf42840caafefaee4861d9a9eb9e9a97e4c5e899bc57ec63a255ddcf6"
+    },
+    {
+      "number": 4,
+      "id": "8283:610",
+      "name": "AS-IS 04 \u00b7 Layers",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/04.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "36d288cd68f0c5beda9c9ee075ce2dfd7fbb3d1e495fb97b07d93262e85094c8"
+    },
+    {
+      "number": 5,
+      "id": "8283:935",
+      "name": "AS-IS 05 \u00b7 Pages",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/05.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "90678c36b5e433bb4360930041b0648123b048970fc41fb0c510472587b3127a"
+    },
+    {
+      "number": 6,
+      "id": "8283:1249",
+      "name": "AS-IS 06 \u00b7 Add catalog",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/06.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "bdc1c505cdbaaa5e5959342ae5c1f0066e6870f6805b4269e742f67c352a13e9"
+    },
+    {
+      "number": 7,
+      "id": "8283:1654",
+      "name": "AS-IS 07 \u00b7 Saved components",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/07.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "a107caa170e83d5b0d2b0cd4109cb75930d2a456ead9725580d20be9dcc4f660"
+    },
+    {
+      "number": 8,
+      "id": "8283:1998",
+      "name": "AS-IS 08 \u00b7 Assets quick chooser",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/08.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "da86af2f2f007012b8783ee2565cc61c56917f81460d78582999a5ed1deef303"
+    },
+    {
+      "number": 9,
+      "id": "8283:2325",
+      "name": "AS-IS 09 \u00b7 Full Media",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/09.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "5a14d76c44ccc2ba5f70f22d495c947884cb440795b93479496e70be3ce1c7d4"
+    },
+    {
+      "number": 10,
+      "id": "8283:2523",
+      "name": "AS-IS 10 \u00b7 CMS records",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/10.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "cf223d9e394ef92a2d853ecc2282b8dd95aa10a2f2cebbd79c7d9ba9d60dd94b"
+    },
+    {
+      "number": 11,
+      "id": "8286:2",
+      "name": "AS-IS 11 \u00b7 CMS record / draft",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/11.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "c70dba83cb800a025ebf626e71086a658470220fc2a83d549a843142122a2791"
+    },
+    {
+      "number": 12,
+      "id": "8286:272",
+      "name": "AS-IS 12 \u00b7 CMS fields",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/12.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "80af6347388d8f660f2f85403eb08caa37c658c68edec454802abd53f8d4243a"
+    },
+    {
+      "number": 13,
+      "id": "8286:511",
+      "name": "AS-IS 13 \u00b7 Brand / colors",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/13.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "1816f547fc3d16ae9874504d829c615c5eccd09d7e83beaa11a9422e1410288c"
+    },
+    {
+      "number": 14,
+      "id": "8286:733",
+      "name": "AS-IS 14 \u00b7 Brand color picker",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/14.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "6f8e996adea59a51a8ee767ab52cc9ad77f1cc52ac096ce78b37d96e34d46a4e"
+    },
+    {
+      "number": 15,
+      "id": "8286:985",
+      "name": "AS-IS 15 \u00b7 Brand typography",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/15.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "f37091e472ed1fcc158244e2a9c6a16f2b8d3e1e5a4bb20c9270f564c2f71f54"
+    },
+    {
+      "number": 16,
+      "id": "8286:1160",
+      "name": "AS-IS 16 \u00b7 Brand spacing",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/16.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "69922fd4be41bae20eaf8834d84609c0889d24578cf79d1750ff88c8834cd430"
+    },
+    {
+      "number": 17,
+      "id": "8286:1357",
+      "name": "AS-IS 17 \u00b7 Site menu",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/17.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "b829450eda404ac5b29ed7fa048a3a0d63c26e3fb40b9a981a16ef27e85d2008"
+    },
+    {
+      "number": 18,
+      "id": "8286:1613",
+      "name": "AS-IS 18 \u00b7 Settings / General",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/18.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "7ce41cbbf0b64d9c4bbf90659f7dab49f888aaa9b4e151d9c51c643e3089a90b"
+    },
+    {
+      "number": 19,
+      "id": "8290:2",
+      "name": "AS-IS 19 \u00b7 History / Session",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/19.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "84c9617ea5be14442f5fa651f8aaca343a86c6b0dfdec17d0c0660bfe7368a14"
+    },
+    {
+      "number": 20,
+      "id": "8290:178",
+      "name": "AS-IS 20 \u00b7 History / Saves",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/20.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "11a7780b2c83b32e4efb652107d70f2ab73f620b21c6619aeca42af63e019712"
+    },
+    {
+      "number": 21,
+      "id": "8290:364",
+      "name": "AS-IS 21 \u00b7 Notifications / empty",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/21.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "135b5157852850e17d6d2703a03a86374bd931027cb1df97312fc6e0a86515d7"
+    },
+    {
+      "number": 22,
+      "id": "8290:660",
+      "name": "AS-IS 22 \u00b7 Issues / six warnings",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/22.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "105f6d45176dd37210b76341a8698a1c270bc47eceaa7329a5c506b169be1340"
+    },
+    {
+      "number": 23,
+      "id": "8290:862",
+      "name": "AS-IS 23 \u00b7 Activity / event",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/23.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "f6e7a527951ea365273056958c8070a03d0b81ae29afdbcb504d02780f189afe"
+    },
+    {
+      "number": 24,
+      "id": "8290:1033",
+      "name": "AS-IS 24 \u00b7 Command palette",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/24.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "fe531246f75f3cb1298e4d1549203da7a47047d63834bc97051c68f452ede0ee"
+    },
+    {
+      "number": 25,
+      "id": "8290:1233",
+      "name": "AS-IS 25 \u00b7 Publish / checks and targets",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/25.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "0a6f14785312dcfe4ff30c467c2571ef4545ab96c236700bb55e37e6e9f22bef"
+    },
+    {
+      "number": 26,
+      "id": "8290:1463",
+      "name": "AS-IS 26 \u00b7 AI / selected heading",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/26.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "592ccb6851a023c8105073b220284bd39d8c4452e42034614c3e51546c97552b"
+    },
+    {
+      "number": 27,
+      "id": "8290:1629",
+      "name": "AS-IS 27 \u00b7 Templates / gallery",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/27.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "45d1db66ffc2b4e6e2cd280eacc97c7b8cc0917e1d8c43e3c013c0caab433b51"
+    },
+    {
+      "number": 28,
+      "id": "8290:1811",
+      "name": "AS-IS 28 \u00b7 Template preview",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/28.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "f472a65b17272736b82558f9f2d79e1fc69b68467144de81a6847cf675d4dee7"
+    },
+    {
+      "number": 29,
+      "id": "8290:1952",
+      "name": "AS-IS 29 \u00b7 Components / manager empty",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/29.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "a2ab2bf77f92b01a52ff921585646c622bec3da66bbecc02da21ba2e680d681d"
+    },
+    {
+      "number": 30,
+      "id": "8290:2250",
+      "name": "AS-IS 30 \u00b7 Preview / Desktop",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/30.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "6f53e3414aa68bcd7ab6d1c3ad0df880ad3b2132e5f1b63ec1e8b5b15eee6ad7"
+    },
+    {
+      "number": 31,
+      "id": "8290:2518",
+      "name": "AS-IS 31 \u00b7 Preview / Mobile 375",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/31.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "1d7f5ab779a68ae5ebaa380f28c6f950df1adf74431dedc1b11a071bd1844f47"
+    },
+    {
+      "number": 32,
+      "id": "8290:2797",
+      "name": "AS-IS 32 \u00b7 Pages / page Inspector",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/32.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "d6ff33932f29801158c61e5cb15d15906dd82325adfe3c811601806c84087dd6"
+    },
+    {
+      "number": 33,
+      "id": "8290:3051",
+      "name": "AS-IS 33 \u00b7 New page dialog",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/33.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "487d6ee7f85659a4e435c749830a974c35188493782cbad1a470d86e07950a2b"
+    },
+    {
+      "number": 34,
+      "id": "8290:3332",
+      "name": "AS-IS 34 \u00b7 Export dialog",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/34.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "c6e04450eff9cc93b46bd8f446315add92a0f0a3d2a48d08f6458fb419ebe66f"
+    },
+    {
+      "number": 35,
+      "id": "8290:3619",
+      "name": "AS-IS 35 \u00b7 Keyboard shortcuts",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/35.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "f8b3cecb8007761d6da1a9c1348f3fc247aaced22883e292aa2ed0a7563aaa9c"
+    },
+    {
+      "number": 36,
+      "id": "8293:2",
+      "name": "AS-IS 36 \u00b7 Heading Style \u2014 1440px",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/36.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "780e8f52830e28d3cb0b56acdf6878283054123ecfe2650ddd34e954f1e47c6b"
+    },
+    {
+      "number": 37,
+      "id": "8293:373",
+      "name": "AS-IS 37 \u00b7 Image Style \u2014 1440px",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/37.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "4f871b623727fb8d8ef5a16598e5fb3ca46c30a1ce12659a8a1f6368c7f6f422"
+    },
+    {
+      "number": 38,
+      "id": "8293:734",
+      "name": "AS-IS 38 \u00b7 Image Behaviour \u2014 current controls",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/38.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "2e1e31ab6d552af19aa8dfc86e43c28fe5a11c89e9e3af5c3926c329e49d3436"
+    },
+    {
+      "number": 39,
+      "id": "8293:994",
+      "name": "AS-IS 39 \u00b7 Image Effects \u2014 current controls",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/39.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "70c4485f74552c373f602e6b456085923251ce50eb6aae50e6fad297b11057eb"
+    },
+    {
+      "number": 40,
+      "id": "8293:1239",
+      "name": "AS-IS 40 \u00b7 Page Inspector \u2014 selected root",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/40.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "5cdce3f7c0a152eb10190729dd37522c91c8c84c832caf1357e556af729b1add"
+    },
+    {
+      "number": 41,
+      "id": "8293:1528",
+      "name": "AS-IS 41 \u00b7 Page settings \u2014 SEO",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/41.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "4f81adf924ad38858d329a3558f6faecc24fe52f3ab201d342433f10c0d6864e"
+    },
+    {
+      "number": 42,
+      "id": "8293:1858",
+      "name": "AS-IS 42 \u00b7 Page settings \u2014 Social",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/42.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "08f217b1391d8477daecb54db4adf913dc7faef196ca7830256f73278844681b"
+    },
+    {
+      "number": 43,
+      "id": "8293:2168",
+      "name": "AS-IS 43 \u00b7 Page settings \u2014 Advanced",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/43.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "fdb5cf9eb604b8dc3bda0afbc33ca7d0f31121600967e6bd178d62346930b4da"
+    },
+    {
+      "number": 44,
+      "id": "8302:2",
+      "name": "AS-IS 44 \u00b7 Settings / Overview",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/44.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "c54a3d7a7e8a74de36b70fac61441664fb0e58990e642c93b644747c93edd50a"
+    },
+    {
+      "number": 45,
+      "id": "8302:234",
+      "name": "AS-IS 45 \u00b7 Settings / SEO",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/45.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "e32aa84937581ba0734f2ac346c022bafc170e13385ff318621f3fa9b12fe98b"
+    },
+    {
+      "number": 46,
+      "id": "8302:473",
+      "name": "AS-IS 46 \u00b7 Settings / Redirects",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/46.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "9c103e65706f719ae9b1e28a7ef020b07ac6afa9712b8d3fc385f33c45487750"
+    },
+    {
+      "number": 47,
+      "id": "8302:682",
+      "name": "AS-IS 47 \u00b7 Settings / Domains \u2014 no custom domain",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/47.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "72b7a1d8b3aad06d8359ab4f278e9f140349f457910ca507b3915d9773501421"
+    },
+    {
+      "number": 48,
+      "id": "8302:883",
+      "name": "AS-IS 48 \u00b7 Settings / Access",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/48.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "17ee7992746d0cd25dd531821b59d28b4bfbd9ed22ece36c1a8145ee13cb9359"
+    },
+    {
+      "number": 49,
+      "id": "8302:1095",
+      "name": "AS-IS 49 \u00b7 Settings / Analytics",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/49.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "9575e28ff30eba738072dcb9199a5e91f078d9d2e9dbc5174fd5d4a8d7f0da7a"
+    },
+    {
+      "number": 50,
+      "id": "8302:1327",
+      "name": "AS-IS 50 \u00b7 Settings / Form submissions \u2014 empty",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/50.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "94380260273b1c71f972549bfa8883bdc5289de6b3ec8f94a25b23fd9398787f"
+    },
+    {
+      "number": 51,
+      "id": "8302:1527",
+      "name": "AS-IS 51 \u00b7 Settings / Languages",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/51.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "bd4285904f499ac58fa5137c2dedf5ec8ba8bf169fe4808c204cc06cdf537f11"
+    },
+    {
+      "number": 52,
+      "id": "8302:1748",
+      "name": "AS-IS 52 \u00b7 Settings / Custom code",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/52.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "82b70781f80c3f91852d2a8325c721c31afd759e2ba3272344cd800888567403"
+    },
+    {
+      "number": 53,
+      "id": "8302:1966",
+      "name": "AS-IS 53 \u00b7 Settings / Security headers",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/53.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "a3cb606561e6d202ed9e5f8558e894b658904decf29b1186bdcdaa29c43c63f7"
+    },
+    {
+      "number": 54,
+      "id": "8302:2194",
+      "name": "AS-IS 54 \u00b7 Settings / Danger zone",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/54.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "deaa8795bf42ece8b2968493e156264fb6b842da74587e41f52172a8f35f46c6"
+    },
+    {
+      "number": 55,
+      "id": "8302:2404",
+      "name": "AS-IS 55 \u00b7 Settings / Members \u2014 workspace door",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/55.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "251640ade00203b071aa25d0dbdc9091108d7faa52b1f1ab2ee7590671754a88"
+    },
+    {
+      "number": 56,
+      "id": "8302:2608",
+      "name": "AS-IS 56 \u00b7 Settings / Billing \u2014 workspace door",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/56.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "18c047c329652bc8d917397139177b1f75ae4796c63f44e3bb9b3c8244d39cc8"
+    },
+    {
+      "number": 57,
+      "id": "8302:2812",
+      "name": "AS-IS 57 \u00b7 Settings / Integrations \u2014 workspace door",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/57.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "58657974606367703d59ac412822490a96a6d5cff19f544721823f208865a3fd"
+    },
+    {
+      "number": 58,
+      "id": "8304:74",
+      "name": "AS-IS 58 \u00b7 Brand / Colour mode",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/58.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "3d2df6dd21d938ce3c07201bc82276445c598fc02bbaff113b1d1d4b0188df09"
+    },
+    {
+      "number": 59,
+      "id": "8304:308",
+      "name": "AS-IS 59 \u00b7 Brand / Styles",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/59.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "0f436e2a176fd3a1fec16ad0d28ae8a436f49ead33de5125816993094af6a1ae"
+    },
+    {
+      "number": 60,
+      "id": "8304:505",
+      "name": "AS-IS 60 \u00b7 Brand / Component styles",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/60.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "dc88b80f9137f03aa6bdd11b44be1aeef47645dfd38192e617f626493587dae0"
+    },
+    {
+      "number": 61,
+      "id": "8304:690",
+      "name": "AS-IS 61 \u00b7 Brand / Classes \u2014 empty",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/61.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "1b941c04fe3d4fb86aac961946f685fc52087b8484d91fec5da816b77ac9a252"
+    },
+    {
+      "number": 62,
+      "id": "8304:836",
+      "name": "AS-IS 62 \u00b7 Brand / Presets",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/62.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "87f2e17b6e2c59949823dc966a20f0ecf24fd480a3106a5556d0204860ff1cfd"
+    },
+    {
+      "number": 63,
+      "id": "8304:1034",
+      "name": "AS-IS 63 \u00b7 Brand / Brand checks",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/63.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "0f6f77ac268e915ba2f43206f0a859eb524a03be60b8df5bdc0e616f5e07a731"
+    },
+    {
+      "number": 64,
+      "id": "8304:1184",
+      "name": "AS-IS 64 \u00b7 Brand / Starters",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/64.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "a0fe049e4635254ba5843fcd7080bd3ccd93cdd0b56af92aafad0c573aa1971c"
+    },
+    {
+      "number": 65,
+      "id": "8304:1357",
+      "name": "AS-IS 65 \u00b7 Brand / Import / export",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/65.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "e17efcf1167be8c4d10218c020e82923155e065ffd66c6af67c1e8445596a16d"
+    },
+    {
+      "number": 66,
+      "id": "8306:241560",
+      "name": "AS-IS 66 \u00b7 CMS / No collection selected",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/66.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "998685ec2b602ce1873dfebd9a76805d7e7d2471d25d6d53610ec8a01dd8ef93"
+    },
+    {
+      "number": 67,
+      "id": "8307:241530",
+      "name": "AS-IS 67 \u00b7 CMS / Title field settings",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/67.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "63e55850a09e6540f9db9dc5d8e6e4a1ed6ea8849e6ba902f6852eb77901e04f"
+    },
+    {
+      "number": 68,
+      "id": "8307:241775",
+      "name": "AS-IS 68 \u00b7 CMS / Dynamic pages",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/68.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "fe02a302492cb47b69a14da289b0b1a11a6af136bceb082da8273a36ec6c7232"
+    },
+    {
+      "number": 69,
+      "id": "8307:241979",
+      "name": "AS-IS 69 \u00b7 CMS / Collection settings",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/69.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "a34278b05e7e13834ca0f0a584b9ece355d1dd5f8513f4e23a689d7f5419e055"
+    },
+    {
+      "number": 70,
+      "id": "8307:242190",
+      "name": "AS-IS 70 \u00b7 Media / Selected asset",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/70.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "ea02dba6570e1fed683f6bb0dd906342aa26be8e517b789deead393034013171"
+    },
+    {
+      "number": 71,
+      "id": "8308:2",
+      "name": "AS-IS 71 \u00b7 Media / Asset properties",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/71.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "5b51495c2c68b755e241d52545e33bd58f0ebcfb836ffd8efadfffb8b84b2528"
+    },
+    {
+      "number": 72,
+      "id": "8308:228",
+      "name": "AS-IS 72 \u00b7 Media / Crop editor",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/72.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "e51cdbf330975dada99f64cf4d66523f8a1eb71a77f00c712ba5497b40fd34df"
+    },
+    {
+      "number": 73,
+      "id": "8308:505",
+      "name": "AS-IS 73 \u00b7 Media / Asset actions",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/73.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "c852fc6a484e74901dfaec9fb4a9b63cc86e0d48b5ce948b61469c4b88abb079"
+    },
+    {
+      "number": 74,
+      "id": "8308:737",
+      "name": "AS-IS 74 \u00b7 History / Published empty state",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/74.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "5d0cbf2e854c0fd79c16c80e548b923b554ee1fb72c28e0730e78a41a7cd3fe9"
+    },
+    {
+      "number": 75,
+      "id": "8308:879",
+      "name": "AS-IS 75 \u00b7 History / Version actions",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/75.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "5322f3092693a1fb2657cf546eb64c0cfdb1c4142461cf2701cf7cc0635864f7"
+    },
+    {
+      "number": 76,
+      "id": "8308:1048",
+      "name": "AS-IS 76 \u00b7 History / Compare with current",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/76.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "a69df44c0c136aec027890ec7fa24a74da2aa4c3af2891f8a2e4cadbeccb05d5"
+    },
+    {
+      "number": 77,
+      "id": "8308:1227",
+      "name": "AS-IS 77 \u00b7 Canvas / View menu",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/77.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "08d86073fef8930bd7dd3ca6afa2efb0efdef6859315fabce39f2761d81bc383"
+    },
+    {
+      "number": 78,
+      "id": "8308:1472",
+      "name": "AS-IS 78 \u00b7 Canvas / Breakpoint menu",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/78.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "74b8fe3f22626c295fb000f3212e1111d0b8e12cbf50563706a8189ea28588ef"
+    },
+    {
+      "number": 79,
+      "id": "8308:1701",
+      "name": "AS-IS 79 \u00b7 Canvas / Mobile viewport",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/79.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "55812fc0f8373432baef9b24a2a8b1e1bb5bc083a3ba27ed3cffede2517da3cc"
+    },
+    {
+      "number": 80,
+      "id": "8308:1927",
+      "name": "AS-IS 80 \u00b7 Inspector / Multiple selected",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/80.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "3fcd6064b7a21cfed337a707f1ed456fd077c69e57a25f0ad1a0a83fd2c32d12"
+    },
+    {
+      "number": 81,
+      "id": "8308:2246",
+      "name": "AS-IS 81 \u00b7 Inspector / Locked element",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/81.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "a9b86b633359706dff8983f86692e3f3e55a57bb7eb83f444692b9b4f93387f9"
+    },
+    {
+      "number": 82,
+      "id": "8308:2638",
+      "name": "AS-IS 82 \u00b7 Inspector / Container",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/82.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "7c03818fd5047a9c2f76ea6adbccd8de63cabeaecb6dc81847393e946fde664c"
+    },
+    {
+      "number": 83,
+      "id": "8308:3082",
+      "name": "AS-IS 83 \u00b7 Inspector / Form",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/83.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "c1702f8e91453bf76b587a2598529d1e14d436594f68a6a2b35a42fa310a79e5"
+    },
+    {
+      "number": 84,
+      "id": "8308:3572",
+      "name": "AS-IS 84 \u00b7 Pages / Empty page",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/84.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "6f5c09b978ef3b2168c8799ec2085ff8dc7456703f01951054731cda137aa810"
+    },
+    {
+      "number": 85,
+      "id": "8308:3973",
+      "name": "AS-IS 85 \u00b7 Pages / Page actions",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/85.png",
+      "width": 1280,
+      "height": 720,
+      "downloadExit": 0,
+      "sha256": "357708e1b8a2c8d3a226a786cbc4d34f49cc180e0a9387d8efb93ebf878211e5"
+    },
+    {
+      "number": 86,
+      "id": "8309:2",
+      "name": "AS-IS 86 \u00b7 Components / Create dialog",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/86.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "71c8e63caf61b66b55563fe4b3ab8b7cc8659e60d4d9930ad3b8f53dfcee5ff7"
+    },
+    {
+      "number": 87,
+      "id": "8309:461",
+      "name": "AS-IS 87 \u00b7 Components / Instance controls",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/87.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "d52949df10c7319fc10190b79beff73e27ad196d282ce9dd8a30d6166a406935"
+    },
+    {
+      "number": 88,
+      "id": "8309:887",
+      "name": "AS-IS 88 \u00b7 Components / Instance actions",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/88.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "9ca471efd00641310a23380c4cd45bdf7fb01ff263319cce034c3875f4cc1810"
+    },
+    {
+      "number": 89,
+      "id": "8309:242881",
+      "name": "AS-IS 89 \u00b7 Components / Expanded manager",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/89.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "ccb37a44266476ad59b513556701a81def8481d4490e93e983c72ed4cc555f1e"
+    },
+    {
+      "number": 90,
+      "id": "8309:243286",
+      "name": "AS-IS 90 \u00b7 Components / Master detail",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/90.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "926ab4743e3afbc75cdd827da6cb75b2c9aeca9518f303e72c4a6a828a5a18f7"
+    },
+    {
+      "number": 91,
+      "id": "8309:243704",
+      "name": "AS-IS 91 \u00b7 Components / Back to instance",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/91.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "cb4ae3b90d5760cb924077492af7b8ac71ba4155999f9bfffd91f3e067a93c1a"
+    },
+    {
+      "number": 92,
+      "id": "8309:244123",
+      "name": "AS-IS 92 \u00b7 Inspector / CMS binding chooser",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/92.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "46ea0d00efa9ac040e8c8567b2da3c09593c9b34058f63d2059f6c03eef58e55"
+    },
+    {
+      "number": 93,
+      "id": "8309:244434",
+      "name": "AS-IS 93 \u00b7 Inspector / Add interaction",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/93.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "5eda53de411212aad8cb952ac58c2a73390d9fca042d9e4f4c90481b0fbe9b43"
+    },
+    {
+      "number": 94,
+      "id": "8309:244811",
+      "name": "AS-IS 94 \u00b7 Inspector / Form behaviour",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/94.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "8f3aaf1301a1a36d896a5f2770eae6afdd4b964357fb020ad6c7df6ee390d883"
+    },
+    {
+      "number": 95,
+      "id": "8309:245270",
+      "error": "Error: {\"content\":[{\"type\":\"text\",\"text\":\"You've reached the Figma MCP tool call limit for your Full seat on the Professional plan. Upgrade your seat or plan for more tool calls. Learn more: https://developers.figma.com/docs/figma-mcp-server/rate-limits-access/\"},{\"type\":\"resource_link\",\"uri\":\"file://figma"
+    },
+    {
+      "number": 96,
+      "id": "8309:245692",
+      "error": "Error: {\"content\":[{\"type\":\"text\",\"text\":\"You've reached the Figma MCP tool call limit for your Full seat on the Professional plan. Upgrade your seat or plan for more tool calls. Learn more: https://developers.figma.com/docs/figma-mcp-server/rate-limits-access/\"},{\"type\":\"resource_link\",\"uri\":\"file://figma"
+    },
+    {
+      "number": 97,
+      "id": "8309:246171",
+      "name": "AS-IS 97 \u00b7 Inspector / Heading at Mobile",
+      "path": "docs/audit-and-design-2026-10-16/evidence/figma-as-is-screens/97.png",
+      "width": 1440,
+      "height": 900,
+      "downloadExit": 0,
+      "sha256": "d41b24e3b1a5ca3fa7ca5f5986b847ecf2cb360694a4e03d8c9a9bc79af6416b"
+    },
+    {
+      "number": 98,
+      "id": "8309:246610",
+      "error": "Error: {\"content\":[{\"type\":\"text\",\"text\":\"You've reached the Figma MCP tool call limit for your Full seat on the Professional plan. Upgrade your seat or plan for more tool calls. Learn more: https://developers.figma.com/docs/figma-mcp-server/rate-limits-access/\"},{\"type\":\"resource_link\",\"uri\":\"file://figma"
+    },
+    {
+      "number": 99,
+      "id": "8309:247369",
+      "error": "Error: {\"content\":[{\"type\":\"text\",\"text\":\"You've reached the Figma MCP tool call limit for your Full seat on the Professional plan. Upgrade your seat or plan for more tool calls. Learn more: https://developers.figma.com/docs/figma-mcp-server/rate-limits-access/\"},{\"type\":\"resource_link\",\"uri\":\"file://figma"
+    }
+  ]
+}

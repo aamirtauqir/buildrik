@@ -1,0 +1,6790 @@
+[
+  {
+    "id": "8317:242981",
+    "code": "IN-01",
+    "nodes": [
+      {
+        "id": "8317:242992",
+        "name": "⌘ K",
+        "parent": "Application header",
+        "r": [
+          1034,
+          13,
+          52,
+          30
+        ]
+      },
+      {
+        "id": "8317:242994",
+        "name": "History",
+        "parent": "Application header",
+        "r": [
+          1094,
+          13,
+          70,
+          30
+        ]
+      },
+      {
+        "id": "8317:242996",
+        "name": "Review",
+        "parent": "Application header",
+        "r": [
+          1170,
+          13,
+          70,
+          30
+        ]
+      },
+      {
+        "id": "8317:242998",
+        "name": "Preview",
+        "parent": "Application header",
+        "r": [
+          1248,
+          13,
+          80,
+          30
+        ]
+      },
+      {
+        "id": "8317:243000",
+        "name": "Publish",
+        "parent": "Application header",
+        "r": [
+          1336,
+          13,
+          88,
+          30
+        ]
+      },
+      {
+        "id": "8317:243027",
+        "name": "Action / help",
+        "parent": "Primary navigation",
+        "r": [
+          16,
+          852,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:243138",
+        "name": "Action / close",
+        "parent": "Left drawer / Layers",
+        "r": [
+          304,
+          66,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:243141",
+        "name": "Search / Search layers",
+        "parent": "Left drawer / Layers",
+        "r": [
+          72,
+          109,
+          256,
+          32
+        ]
+      },
+      {
+        "id": "8317:243145",
+        "name": "Row / Body",
+        "parent": "Left drawer / Layers",
+        "r": [
+          72,
+          155,
+          256,
+          32
+        ]
+      },
+      {
+        "id": "8317:243149",
+        "name": "Row / Main section",
+        "parent": "Left drawer / Layers",
+        "r": [
+          84,
+          191,
+          244,
+          32
+        ]
+      },
+      {
+        "id": "8317:243153",
+        "name": "Row / Heading",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          227,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8317:243157",
+        "name": "Row / Paragraph",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          263,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8317:243161",
+        "name": "Row / Project image",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          299,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8317:243067",
+        "name": "Desktop",
+        "parent": "Page and breakpoint context",
+        "r": [
+          1032,
+          67,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:245433",
+        "name": "Explore our work",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          394,
+          632,
+          132,
+          30
+        ]
+      },
+      {
+        "id": "8317:245435",
+        "name": "Selection / Project image",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          392,
+          379,
+          696,
+          229
+        ]
+      },
+      {
+        "id": "8317:245438",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          389,
+          376,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8317:245439",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          1085,
+          376,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8317:245440",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          389,
+          605,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8317:245441",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          1085,
+          605,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8317:243093",
+        "name": "Action / undo",
+        "parent": "Canvas toolbar",
+        "r": [
+          348,
+          868,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:243096",
+        "name": "Action / redo",
+        "parent": "Canvas toolbar",
+        "r": [
+          380,
+          868,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:243099",
+        "name": "63% ⌄",
+        "parent": "Canvas toolbar",
+        "r": [
+          419,
+          867,
+          74,
+          30
+        ]
+      },
+      {
+        "id": "8317:243104",
+        "name": "Action / more",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1373,
+          64,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:243107",
+        "name": "Action / close",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1406,
+          64,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:243111",
+        "name": "Style",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1154,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:243112",
+        "name": "Content",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1248,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:243114",
+        "name": "Effects",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1342,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:243116",
+        "name": "Desktop",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1154,
+          173,
+          91,
+          22
+        ]
+      },
+      {
+        "id": "8317:243117",
+        "name": "Desktop",
+        "parent": "Desktop",
+        "r": [
+          1161,
+          176,
+          77,
+          16
+        ]
+      },
+      {
+        "id": "8317:243118",
+        "name": "Base state",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1253,
+          173,
+          88,
+          22
+        ]
+      },
+      {
+        "id": "8317:243119",
+        "name": "Base state",
+        "parent": "Base state",
+        "r": [
+          1260,
+          176,
+          74,
+          16
+        ]
+      },
+      {
+        "id": "8318:565",
+        "name": "Property group / Image",
+        "parent": "Inspector properties / IN-01",
+        "r": [
+          1140,
+          251,
+          300,
+          118
+        ]
+      },
+      {
+        "id": "8318:567",
+        "name": "Property / Source / default",
+        "parent": "Property group / Image",
+        "r": [
+          1154,
+          286,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8318:571",
+        "name": "Property / Alt text / default",
+        "parent": "Property group / Image",
+        "r": [
+          1154,
+          323,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8318:575",
+        "name": "Replace image",
+        "parent": "Inspector properties / IN-01",
+        "r": [
+          1154,
+          373,
+          272,
+          30
+        ]
+      },
+      {
+        "id": "8318:577",
+        "name": "Property group / Display",
+        "parent": "Inspector properties / IN-01",
+        "r": [
+          1140,
+          417,
+          300,
+          118
+        ]
+      },
+      {
+        "id": "8318:579",
+        "name": "Property / Fit / default",
+        "parent": "Property group / Display",
+        "r": [
+          1154,
+          452,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8318:583",
+        "name": "Property / Loading / default",
+        "parent": "Property group / Display",
+        "r": [
+          1154,
+          489,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8318:587",
+        "name": "Property group / CMS binding",
+        "parent": "Inspector properties / IN-01",
+        "r": [
+          1140,
+          539,
+          300,
+          81
+        ]
+      },
+      {
+        "id": "8318:589",
+        "name": "Property / Source / default",
+        "parent": "Property group / CMS binding",
+        "r": [
+          1154,
+          574,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8318:593",
+        "name": "Property group / Accessibility",
+        "parent": "Inspector properties / IN-01",
+        "r": [
+          1140,
+          624,
+          300,
+          79
+        ]
+      },
+      {
+        "id": "8318:596",
+        "name": "Property group / Attributes",
+        "parent": "Inspector properties / IN-01",
+        "r": [
+          1140,
+          707,
+          300,
+          63
+        ]
+      },
+      {
+        "id": "8318:561",
+        "name": "Open selected-element AI",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1331,
+          64,
+          35,
+          30
+        ]
+      }
+    ]
+  },
+  {
+    "id": "8317:243209",
+    "code": "IN-02",
+    "nodes": [
+      {
+        "id": "8317:243220",
+        "name": "⌘ K",
+        "parent": "Application header",
+        "r": [
+          1034,
+          13,
+          52,
+          30
+        ]
+      },
+      {
+        "id": "8317:243222",
+        "name": "History",
+        "parent": "Application header",
+        "r": [
+          1094,
+          13,
+          70,
+          30
+        ]
+      },
+      {
+        "id": "8317:243224",
+        "name": "Review",
+        "parent": "Application header",
+        "r": [
+          1170,
+          13,
+          70,
+          30
+        ]
+      },
+      {
+        "id": "8317:243226",
+        "name": "Preview",
+        "parent": "Application header",
+        "r": [
+          1248,
+          13,
+          80,
+          30
+        ]
+      },
+      {
+        "id": "8317:243228",
+        "name": "Publish",
+        "parent": "Application header",
+        "r": [
+          1336,
+          13,
+          88,
+          30
+        ]
+      },
+      {
+        "id": "8317:243255",
+        "name": "Action / help",
+        "parent": "Primary navigation",
+        "r": [
+          16,
+          852,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:243372",
+        "name": "Action / close",
+        "parent": "Left drawer / Layers",
+        "r": [
+          304,
+          66,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:243375",
+        "name": "Search / Search layers",
+        "parent": "Left drawer / Layers",
+        "r": [
+          72,
+          109,
+          256,
+          32
+        ]
+      },
+      {
+        "id": "8317:243379",
+        "name": "Row / Body",
+        "parent": "Left drawer / Layers",
+        "r": [
+          72,
+          155,
+          256,
+          32
+        ]
+      },
+      {
+        "id": "8317:243383",
+        "name": "Row / Main section",
+        "parent": "Left drawer / Layers",
+        "r": [
+          84,
+          191,
+          244,
+          32
+        ]
+      },
+      {
+        "id": "8317:243387",
+        "name": "Row / Heading",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          227,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8317:243391",
+        "name": "Row / Paragraph",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          263,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8317:243395",
+        "name": "Row / Project grid",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          299,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8317:243399",
+        "name": "Row / Quiet spaces",
+        "parent": "Left drawer / Layers",
+        "r": [
+          108,
+          335,
+          220,
+          32
+        ]
+      },
+      {
+        "id": "8317:243403",
+        "name": "Row / Natural light",
+        "parent": "Left drawer / Layers",
+        "r": [
+          108,
+          369,
+          220,
+          32
+        ]
+      },
+      {
+        "id": "8317:243407",
+        "name": "Row / Simple living",
+        "parent": "Left drawer / Layers",
+        "r": [
+          108,
+          403,
+          220,
+          32
+        ]
+      },
+      {
+        "id": "8317:243295",
+        "name": "Desktop",
+        "parent": "Page and breakpoint context",
+        "r": [
+          1032,
+          67,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:245504",
+        "name": "Selection / Project grid",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          379,
+          375,
+          722,
+          232
+        ]
+      },
+      {
+        "id": "8317:245507",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          376,
+          372,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8317:245508",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          1098,
+          372,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8317:245509",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          376,
+          604,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8317:245510",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          1098,
+          604,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8317:243321",
+        "name": "Action / undo",
+        "parent": "Canvas toolbar",
+        "r": [
+          348,
+          868,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:243324",
+        "name": "Action / redo",
+        "parent": "Canvas toolbar",
+        "r": [
+          380,
+          868,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:243327",
+        "name": "63% ⌄",
+        "parent": "Canvas toolbar",
+        "r": [
+          419,
+          867,
+          74,
+          30
+        ]
+      },
+      {
+        "id": "8317:243332",
+        "name": "Action / more",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1373,
+          64,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:243335",
+        "name": "Action / close",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1406,
+          64,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:243339",
+        "name": "Style",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1154,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:243341",
+        "name": "Content",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1248,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:243342",
+        "name": "Effects",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1342,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:243344",
+        "name": "Desktop",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1154,
+          173,
+          91,
+          22
+        ]
+      },
+      {
+        "id": "8317:243345",
+        "name": "Desktop",
+        "parent": "Desktop",
+        "r": [
+          1161,
+          176,
+          77,
+          16
+        ]
+      },
+      {
+        "id": "8317:243346",
+        "name": "Base state",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1253,
+          173,
+          88,
+          22
+        ]
+      },
+      {
+        "id": "8317:243347",
+        "name": "Base state",
+        "parent": "Base state",
+        "r": [
+          1260,
+          176,
+          74,
+          16
+        ]
+      },
+      {
+        "id": "8317:245444",
+        "name": "Property group / Layout",
+        "parent": "Inspector properties / IN-02",
+        "r": [
+          1140,
+          251,
+          300,
+          229
+        ]
+      },
+      {
+        "id": "8317:245446",
+        "name": "Property / Display / default",
+        "parent": "Property group / Layout",
+        "r": [
+          1154,
+          286,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:245450",
+        "name": "Property / Direction / default",
+        "parent": "Property group / Layout",
+        "r": [
+          1154,
+          323,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:245454",
+        "name": "Property / Align / default",
+        "parent": "Property group / Layout",
+        "r": [
+          1154,
+          360,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:245458",
+        "name": "Property / Wrap / default",
+        "parent": "Property group / Layout",
+        "r": [
+          1154,
+          397,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:245462",
+        "name": "Property / Gap / default",
+        "parent": "Property group / Layout",
+        "r": [
+          1154,
+          434,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:245466",
+        "name": "Property group / Size",
+        "parent": "Inspector properties / IN-02",
+        "r": [
+          1140,
+          484,
+          300,
+          118
+        ]
+      },
+      {
+        "id": "8317:245468",
+        "name": "Property / Width / default",
+        "parent": "Property group / Size",
+        "r": [
+          1154,
+          519,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:245472",
+        "name": "Property / Height / default",
+        "parent": "Property group / Size",
+        "r": [
+          1154,
+          556,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:245476",
+        "name": "Property group / Spacing",
+        "parent": "Inspector properties / IN-02",
+        "r": [
+          1140,
+          606,
+          300,
+          118
+        ]
+      },
+      {
+        "id": "8317:245478",
+        "name": "Property / Padding / default",
+        "parent": "Property group / Spacing",
+        "r": [
+          1154,
+          641,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:245482",
+        "name": "Property / Margin / default",
+        "parent": "Property group / Spacing",
+        "r": [
+          1154,
+          678,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:245486",
+        "name": "Property group / Text inside",
+        "parent": "Inspector properties / IN-02",
+        "r": [
+          1140,
+          728,
+          300,
+          63
+        ]
+      },
+      {
+        "id": "8318:599",
+        "name": "Open selected-element AI",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1331,
+          64,
+          35,
+          30
+        ]
+      }
+    ]
+  },
+  {
+    "id": "8317:243462",
+    "code": "IN-03",
+    "nodes": [
+      {
+        "id": "8317:243473",
+        "name": "⌘ K",
+        "parent": "Application header",
+        "r": [
+          1034,
+          13,
+          52,
+          30
+        ]
+      },
+      {
+        "id": "8317:243475",
+        "name": "History",
+        "parent": "Application header",
+        "r": [
+          1094,
+          13,
+          70,
+          30
+        ]
+      },
+      {
+        "id": "8317:243477",
+        "name": "Review",
+        "parent": "Application header",
+        "r": [
+          1170,
+          13,
+          70,
+          30
+        ]
+      },
+      {
+        "id": "8317:243479",
+        "name": "Preview",
+        "parent": "Application header",
+        "r": [
+          1248,
+          13,
+          80,
+          30
+        ]
+      },
+      {
+        "id": "8317:243481",
+        "name": "Publish",
+        "parent": "Application header",
+        "r": [
+          1336,
+          13,
+          88,
+          30
+        ]
+      },
+      {
+        "id": "8317:243508",
+        "name": "Action / help",
+        "parent": "Primary navigation",
+        "r": [
+          16,
+          852,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:243625",
+        "name": "Action / close",
+        "parent": "Left drawer / Layers",
+        "r": [
+          304,
+          66,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:243628",
+        "name": "Search / Search layers",
+        "parent": "Left drawer / Layers",
+        "r": [
+          72,
+          109,
+          256,
+          32
+        ]
+      },
+      {
+        "id": "8317:243632",
+        "name": "Row / Body",
+        "parent": "Left drawer / Layers",
+        "r": [
+          72,
+          155,
+          256,
+          32
+        ]
+      },
+      {
+        "id": "8317:243636",
+        "name": "Row / Main section",
+        "parent": "Left drawer / Layers",
+        "r": [
+          84,
+          191,
+          244,
+          32
+        ]
+      },
+      {
+        "id": "8317:243640",
+        "name": "Row / Heading",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          227,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8317:243644",
+        "name": "Row / Paragraph",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          263,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8317:243648",
+        "name": "Row / Project grid",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          299,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8317:243652",
+        "name": "Row / Quiet spaces",
+        "parent": "Left drawer / Layers",
+        "r": [
+          108,
+          335,
+          220,
+          32
+        ]
+      },
+      {
+        "id": "8317:243656",
+        "name": "Row / Natural light",
+        "parent": "Left drawer / Layers",
+        "r": [
+          108,
+          369,
+          220,
+          32
+        ]
+      },
+      {
+        "id": "8317:243660",
+        "name": "Row / Simple living",
+        "parent": "Left drawer / Layers",
+        "r": [
+          108,
+          403,
+          220,
+          32
+        ]
+      },
+      {
+        "id": "8317:243548",
+        "name": "Desktop",
+        "parent": "Page and breakpoint context",
+        "r": [
+          1032,
+          67,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:245574",
+        "name": "Selection / Project grid",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          379,
+          375,
+          722,
+          232
+        ]
+      },
+      {
+        "id": "8317:245577",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          376,
+          372,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8317:245578",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          1098,
+          372,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8317:245579",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          376,
+          604,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8317:245580",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          1098,
+          604,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8317:243574",
+        "name": "Action / undo",
+        "parent": "Canvas toolbar",
+        "r": [
+          348,
+          868,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:243577",
+        "name": "Action / redo",
+        "parent": "Canvas toolbar",
+        "r": [
+          380,
+          868,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:243580",
+        "name": "63% ⌄",
+        "parent": "Canvas toolbar",
+        "r": [
+          419,
+          867,
+          74,
+          30
+        ]
+      },
+      {
+        "id": "8317:243585",
+        "name": "Action / more",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1373,
+          64,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:243588",
+        "name": "Action / close",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1406,
+          64,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:243592",
+        "name": "Style",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1154,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:243594",
+        "name": "Content",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1248,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:243595",
+        "name": "Effects",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1342,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:243597",
+        "name": "Desktop",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1154,
+          173,
+          91,
+          22
+        ]
+      },
+      {
+        "id": "8317:243598",
+        "name": "Desktop",
+        "parent": "Desktop",
+        "r": [
+          1161,
+          176,
+          77,
+          16
+        ]
+      },
+      {
+        "id": "8317:243599",
+        "name": "Base state",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1253,
+          173,
+          88,
+          22
+        ]
+      },
+      {
+        "id": "8317:243600",
+        "name": "Base state",
+        "parent": "Base state",
+        "r": [
+          1260,
+          176,
+          74,
+          16
+        ]
+      },
+      {
+        "id": "8317:245513",
+        "name": "Property group / Layout",
+        "parent": "Inspector properties / IN-03",
+        "r": [
+          1140,
+          251,
+          300,
+          155
+        ]
+      },
+      {
+        "id": "8317:245515",
+        "name": "Property / Display / default",
+        "parent": "Property group / Layout",
+        "r": [
+          1154,
+          286,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:245519",
+        "name": "Property / Columns / default",
+        "parent": "Property group / Layout",
+        "r": [
+          1154,
+          323,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:245523",
+        "name": "Property / Gap / default",
+        "parent": "Property group / Layout",
+        "r": [
+          1154,
+          360,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:245527",
+        "name": "Property group / Grid settings",
+        "parent": "Inspector properties / IN-03",
+        "r": [
+          1140,
+          410,
+          300,
+          229
+        ]
+      },
+      {
+        "id": "8317:245529",
+        "name": "Property / Column tracks / default",
+        "parent": "Property group / Grid settings",
+        "r": [
+          1154,
+          445,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:245533",
+        "name": "Property / Rows / default",
+        "parent": "Property group / Grid settings",
+        "r": [
+          1154,
+          482,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:245537",
+        "name": "Property / Flow / default",
+        "parent": "Property group / Grid settings",
+        "r": [
+          1154,
+          519,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:245541",
+        "name": "Property / Items / default",
+        "parent": "Property group / Grid settings",
+        "r": [
+          1154,
+          556,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:245545",
+        "name": "Property / Justify / default",
+        "parent": "Property group / Grid settings",
+        "r": [
+          1154,
+          593,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:245549",
+        "name": "Property group / Size",
+        "parent": "Inspector properties / IN-03",
+        "r": [
+          1140,
+          643,
+          300,
+          118
+        ]
+      },
+      {
+        "id": "8317:245551",
+        "name": "Property / Width / default",
+        "parent": "Property group / Size",
+        "r": [
+          1154,
+          678,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:245555",
+        "name": "Property / Height / default",
+        "parent": "Property group / Size",
+        "r": [
+          1154,
+          715,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8318:601",
+        "name": "Open selected-element AI",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1331,
+          64,
+          35,
+          30
+        ]
+      }
+    ]
+  },
+  {
+    "id": "8317:246429",
+    "code": "IN-04",
+    "nodes": [
+      {
+        "id": "8317:246440",
+        "name": "⌘ K",
+        "parent": "Application header",
+        "r": [
+          1034,
+          13,
+          52,
+          30
+        ]
+      },
+      {
+        "id": "8317:246442",
+        "name": "History",
+        "parent": "Application header",
+        "r": [
+          1094,
+          13,
+          70,
+          30
+        ]
+      },
+      {
+        "id": "8317:246444",
+        "name": "Review",
+        "parent": "Application header",
+        "r": [
+          1170,
+          13,
+          70,
+          30
+        ]
+      },
+      {
+        "id": "8317:246446",
+        "name": "Preview",
+        "parent": "Application header",
+        "r": [
+          1248,
+          13,
+          80,
+          30
+        ]
+      },
+      {
+        "id": "8317:246448",
+        "name": "Publish",
+        "parent": "Application header",
+        "r": [
+          1336,
+          13,
+          88,
+          30
+        ]
+      },
+      {
+        "id": "8317:246475",
+        "name": "Action / help",
+        "parent": "Primary navigation",
+        "r": [
+          16,
+          852,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:246589",
+        "name": "Action / close",
+        "parent": "Left drawer / Layers",
+        "r": [
+          304,
+          66,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:246592",
+        "name": "Search / Search layers",
+        "parent": "Left drawer / Layers",
+        "r": [
+          72,
+          109,
+          256,
+          32
+        ]
+      },
+      {
+        "id": "8317:246596",
+        "name": "Row / Body",
+        "parent": "Left drawer / Layers",
+        "r": [
+          72,
+          155,
+          256,
+          32
+        ]
+      },
+      {
+        "id": "8317:246600",
+        "name": "Row / Main section",
+        "parent": "Left drawer / Layers",
+        "r": [
+          84,
+          191,
+          244,
+          32
+        ]
+      },
+      {
+        "id": "8317:246604",
+        "name": "Row / Heading",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          227,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8317:246608",
+        "name": "Row / Paragraph",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          263,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8317:246612",
+        "name": "Row / Contact form",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          299,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8317:246515",
+        "name": "Desktop",
+        "parent": "Page and breakpoint context",
+        "r": [
+          1032,
+          67,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:246579",
+        "name": "Send enquiry",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          409,
+          546,
+          113,
+          30
+        ]
+      },
+      {
+        "id": "8317:246581",
+        "name": "Selection / Contact form",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          394,
+          380,
+          692,
+          207
+        ]
+      },
+      {
+        "id": "8317:246584",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          391,
+          377,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8317:246585",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          1083,
+          377,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8317:246586",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          391,
+          583,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8317:246587",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          1083,
+          583,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8317:246541",
+        "name": "Action / undo",
+        "parent": "Canvas toolbar",
+        "r": [
+          348,
+          868,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:246544",
+        "name": "Action / redo",
+        "parent": "Canvas toolbar",
+        "r": [
+          380,
+          868,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:246547",
+        "name": "63% ⌄",
+        "parent": "Canvas toolbar",
+        "r": [
+          419,
+          867,
+          74,
+          30
+        ]
+      },
+      {
+        "id": "8317:246552",
+        "name": "Action / more",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1373,
+          64,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:246555",
+        "name": "Action / close",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1406,
+          64,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:246559",
+        "name": "Style",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1154,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:246560",
+        "name": "Content",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1248,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:246562",
+        "name": "Effects",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1342,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:246564",
+        "name": "Desktop",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1154,
+          173,
+          91,
+          22
+        ]
+      },
+      {
+        "id": "8317:246565",
+        "name": "Desktop",
+        "parent": "Desktop",
+        "r": [
+          1161,
+          176,
+          77,
+          16
+        ]
+      },
+      {
+        "id": "8317:246566",
+        "name": "Base state",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1253,
+          173,
+          88,
+          22
+        ]
+      },
+      {
+        "id": "8317:246567",
+        "name": "Base state",
+        "parent": "Base state",
+        "r": [
+          1260,
+          176,
+          74,
+          16
+        ]
+      },
+      {
+        "id": "8317:246619",
+        "name": "Property group / Fields",
+        "parent": "Inspector properties / IN-04",
+        "r": [
+          1140,
+          251,
+          300,
+          118
+        ]
+      },
+      {
+        "id": "8317:246621",
+        "name": "Property / Name / default",
+        "parent": "Property group / Fields",
+        "r": [
+          1154,
+          286,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:246625",
+        "name": "Property / Email / default",
+        "parent": "Property group / Fields",
+        "r": [
+          1154,
+          323,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:246629",
+        "name": "+ Add field",
+        "parent": "Inspector properties / IN-04",
+        "r": [
+          1154,
+          373,
+          272,
+          30
+        ]
+      },
+      {
+        "id": "8317:246631",
+        "name": "Property group / After submit",
+        "parent": "Inspector properties / IN-04",
+        "r": [
+          1140,
+          417,
+          300,
+          155
+        ]
+      },
+      {
+        "id": "8317:246633",
+        "name": "Property / Then / default",
+        "parent": "Property group / After submit",
+        "r": [
+          1154,
+          452,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:246637",
+        "name": "Property / Message / default",
+        "parent": "Property group / After submit",
+        "r": [
+          1154,
+          489,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:246641",
+        "name": "Property / Send to / default",
+        "parent": "Property group / After submit",
+        "r": [
+          1154,
+          526,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:246647",
+        "name": "Checkbox / Spam protection",
+        "parent": "Frame",
+        "r": [
+          1154,
+          582,
+          16,
+          16
+        ]
+      },
+      {
+        "id": "8317:246652",
+        "name": "Property group / Permissions",
+        "parent": "Inspector properties / IN-04",
+        "r": [
+          1140,
+          681,
+          300,
+          63
+        ]
+      },
+      {
+        "id": "8318:603",
+        "name": "Open selected-element AI",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1331,
+          64,
+          35,
+          30
+        ]
+      }
+    ]
+  },
+  {
+    "id": "8317:246658",
+    "code": "IN-05",
+    "nodes": [
+      {
+        "id": "8317:246669",
+        "name": "⌘ K",
+        "parent": "Application header",
+        "r": [
+          1034,
+          13,
+          52,
+          30
+        ]
+      },
+      {
+        "id": "8317:246671",
+        "name": "History",
+        "parent": "Application header",
+        "r": [
+          1094,
+          13,
+          70,
+          30
+        ]
+      },
+      {
+        "id": "8317:246673",
+        "name": "Review",
+        "parent": "Application header",
+        "r": [
+          1170,
+          13,
+          70,
+          30
+        ]
+      },
+      {
+        "id": "8317:246675",
+        "name": "Preview",
+        "parent": "Application header",
+        "r": [
+          1248,
+          13,
+          80,
+          30
+        ]
+      },
+      {
+        "id": "8317:246677",
+        "name": "Publish",
+        "parent": "Application header",
+        "r": [
+          1336,
+          13,
+          88,
+          30
+        ]
+      },
+      {
+        "id": "8317:246704",
+        "name": "Action / help",
+        "parent": "Primary navigation",
+        "r": [
+          16,
+          852,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:246815",
+        "name": "Action / close",
+        "parent": "Left drawer / Layers",
+        "r": [
+          304,
+          66,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:246818",
+        "name": "Search / Search layers",
+        "parent": "Left drawer / Layers",
+        "r": [
+          72,
+          109,
+          256,
+          32
+        ]
+      },
+      {
+        "id": "8317:246822",
+        "name": "Row / Body",
+        "parent": "Left drawer / Layers",
+        "r": [
+          72,
+          155,
+          256,
+          32
+        ]
+      },
+      {
+        "id": "8317:246826",
+        "name": "Row / Main section",
+        "parent": "Left drawer / Layers",
+        "r": [
+          84,
+          191,
+          244,
+          32
+        ]
+      },
+      {
+        "id": "8317:246830",
+        "name": "Row / Heading",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          227,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8317:246834",
+        "name": "Row / Paragraph",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          263,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8317:246838",
+        "name": "Row / Project grid",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          299,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8317:246744",
+        "name": "Desktop",
+        "parent": "Page and breakpoint context",
+        "r": [
+          1032,
+          67,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:246805",
+        "name": "Explore our work",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          394,
+          632,
+          132,
+          30
+        ]
+      },
+      {
+        "id": "8317:246807",
+        "name": "Selection / Heading · CMS",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          391,
+          209,
+          698,
+          110
+        ]
+      },
+      {
+        "id": "8317:246810",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          388,
+          206,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8317:246811",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          1086,
+          206,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8317:246812",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          388,
+          315,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8317:246813",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          1086,
+          315,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8317:246770",
+        "name": "Action / undo",
+        "parent": "Canvas toolbar",
+        "r": [
+          348,
+          868,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:246773",
+        "name": "Action / redo",
+        "parent": "Canvas toolbar",
+        "r": [
+          380,
+          868,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:246776",
+        "name": "63% ⌄",
+        "parent": "Canvas toolbar",
+        "r": [
+          419,
+          867,
+          74,
+          30
+        ]
+      },
+      {
+        "id": "8317:246781",
+        "name": "Action / more",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1373,
+          64,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:246784",
+        "name": "Action / close",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1406,
+          64,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:246788",
+        "name": "Style",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1154,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:246789",
+        "name": "Content",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1248,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:246791",
+        "name": "Effects",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1342,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:246793",
+        "name": "Desktop",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1154,
+          173,
+          91,
+          22
+        ]
+      },
+      {
+        "id": "8317:246794",
+        "name": "Desktop",
+        "parent": "Desktop",
+        "r": [
+          1161,
+          176,
+          77,
+          16
+        ]
+      },
+      {
+        "id": "8317:246795",
+        "name": "Base state",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1253,
+          173,
+          88,
+          22
+        ]
+      },
+      {
+        "id": "8317:246796",
+        "name": "Base state",
+        "parent": "Base state",
+        "r": [
+          1260,
+          176,
+          74,
+          16
+        ]
+      },
+      {
+        "id": "8317:246845",
+        "name": "Property group / CMS binding",
+        "parent": "Inspector properties / IN-05",
+        "r": [
+          1140,
+          251,
+          300,
+          192
+        ]
+      },
+      {
+        "id": "8317:246847",
+        "name": "Property / Source / default",
+        "parent": "Property group / CMS binding",
+        "r": [
+          1154,
+          286,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:246851",
+        "name": "Property / Collection / default",
+        "parent": "Property group / CMS binding",
+        "r": [
+          1154,
+          323,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:246855",
+        "name": "Property / Field / default",
+        "parent": "Property group / CMS binding",
+        "r": [
+          1154,
+          360,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:246859",
+        "name": "Property / Record / default",
+        "parent": "Property group / CMS binding",
+        "r": [
+          1154,
+          397,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:246863",
+        "name": "Property group / Content preview",
+        "parent": "Inspector properties / IN-05",
+        "r": [
+          1140,
+          447,
+          300,
+          63
+        ]
+      },
+      {
+        "id": "8317:246866",
+        "name": "Open record",
+        "parent": "Inspector properties / IN-05",
+        "r": [
+          1154,
+          514,
+          130,
+          30
+        ]
+      },
+      {
+        "id": "8317:246868",
+        "name": "Unbind",
+        "parent": "Inspector properties / IN-05",
+        "r": [
+          1296,
+          514,
+          130,
+          30
+        ]
+      },
+      {
+        "id": "8317:246871",
+        "name": "Property group / Accessibility",
+        "parent": "Inspector properties / IN-05",
+        "r": [
+          1140,
+          604,
+          300,
+          81
+        ]
+      },
+      {
+        "id": "8317:246873",
+        "name": "Property / Visibility / default",
+        "parent": "Property group / Accessibility",
+        "r": [
+          1154,
+          639,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:246877",
+        "name": "Property group / Attributes",
+        "parent": "Inspector properties / IN-05",
+        "r": [
+          1140,
+          689,
+          300,
+          63
+        ]
+      },
+      {
+        "id": "8318:605",
+        "name": "Open selected-element AI",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1331,
+          64,
+          35,
+          30
+        ]
+      }
+    ]
+  },
+  {
+    "id": "8317:246897",
+    "code": "IN-06",
+    "nodes": [
+      {
+        "id": "8317:246908",
+        "name": "⌘ K",
+        "parent": "Application header",
+        "r": [
+          1034,
+          13,
+          52,
+          30
+        ]
+      },
+      {
+        "id": "8317:246910",
+        "name": "History",
+        "parent": "Application header",
+        "r": [
+          1094,
+          13,
+          70,
+          30
+        ]
+      },
+      {
+        "id": "8317:246912",
+        "name": "Review",
+        "parent": "Application header",
+        "r": [
+          1170,
+          13,
+          70,
+          30
+        ]
+      },
+      {
+        "id": "8317:246914",
+        "name": "Preview",
+        "parent": "Application header",
+        "r": [
+          1248,
+          13,
+          80,
+          30
+        ]
+      },
+      {
+        "id": "8317:246916",
+        "name": "Publish",
+        "parent": "Application header",
+        "r": [
+          1336,
+          13,
+          88,
+          30
+        ]
+      },
+      {
+        "id": "8317:246943",
+        "name": "Action / help",
+        "parent": "Primary navigation",
+        "r": [
+          16,
+          852,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:247060",
+        "name": "Action / close",
+        "parent": "Left drawer / Layers",
+        "r": [
+          304,
+          66,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:247063",
+        "name": "Search / Search layers",
+        "parent": "Left drawer / Layers",
+        "r": [
+          72,
+          109,
+          256,
+          32
+        ]
+      },
+      {
+        "id": "8317:247067",
+        "name": "Row / Body",
+        "parent": "Left drawer / Layers",
+        "r": [
+          72,
+          155,
+          256,
+          32
+        ]
+      },
+      {
+        "id": "8317:247071",
+        "name": "Row / Main section",
+        "parent": "Left drawer / Layers",
+        "r": [
+          84,
+          191,
+          244,
+          32
+        ]
+      },
+      {
+        "id": "8317:247075",
+        "name": "Row / Heading",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          227,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8317:247079",
+        "name": "Row / Paragraph",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          263,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8317:247083",
+        "name": "Row / Project grid",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          299,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8317:247087",
+        "name": "Row / Quiet spaces",
+        "parent": "Left drawer / Layers",
+        "r": [
+          108,
+          335,
+          220,
+          32
+        ]
+      },
+      {
+        "id": "8317:247091",
+        "name": "Row / Natural light",
+        "parent": "Left drawer / Layers",
+        "r": [
+          108,
+          369,
+          220,
+          32
+        ]
+      },
+      {
+        "id": "8317:247095",
+        "name": "Row / Simple living",
+        "parent": "Left drawer / Layers",
+        "r": [
+          108,
+          403,
+          220,
+          32
+        ]
+      },
+      {
+        "id": "8317:246983",
+        "name": "Desktop",
+        "parent": "Page and breakpoint context",
+        "r": [
+          1032,
+          67,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8318:624",
+        "name": "Selection / Project grid · Instance",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          379,
+          375,
+          722,
+          232
+        ]
+      },
+      {
+        "id": "8318:627",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          376,
+          372,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8318:628",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          1098,
+          372,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8318:629",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          376,
+          604,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8318:630",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          1098,
+          604,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8317:247009",
+        "name": "Action / undo",
+        "parent": "Canvas toolbar",
+        "r": [
+          348,
+          868,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:247012",
+        "name": "Action / redo",
+        "parent": "Canvas toolbar",
+        "r": [
+          380,
+          868,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:247015",
+        "name": "63% ⌄",
+        "parent": "Canvas toolbar",
+        "r": [
+          419,
+          867,
+          74,
+          30
+        ]
+      },
+      {
+        "id": "8317:247020",
+        "name": "Action / more",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1373,
+          64,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:247023",
+        "name": "Action / close",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1406,
+          64,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:247027",
+        "name": "Style",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1154,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:247029",
+        "name": "Content",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1248,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:247030",
+        "name": "Effects",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1342,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:247032",
+        "name": "Desktop",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1154,
+          173,
+          91,
+          22
+        ]
+      },
+      {
+        "id": "8317:247033",
+        "name": "Desktop",
+        "parent": "Desktop",
+        "r": [
+          1161,
+          176,
+          77,
+          16
+        ]
+      },
+      {
+        "id": "8317:247034",
+        "name": "Base state",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1253,
+          173,
+          88,
+          22
+        ]
+      },
+      {
+        "id": "8317:247035",
+        "name": "Base state",
+        "parent": "Base state",
+        "r": [
+          1260,
+          176,
+          74,
+          16
+        ]
+      },
+      {
+        "id": "8317:247102",
+        "name": "Property group / Component",
+        "parent": "Inspector properties / IN-06",
+        "r": [
+          1140,
+          251,
+          300,
+          81
+        ]
+      },
+      {
+        "id": "8317:247104",
+        "name": "Property / Variant / default",
+        "parent": "Property group / Component",
+        "r": [
+          1154,
+          286,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:247108",
+        "name": "Edit master",
+        "parent": "Inspector properties / IN-06",
+        "r": [
+          1154,
+          336,
+          178,
+          30
+        ]
+      },
+      {
+        "id": "8317:247110",
+        "name": "Actions ⌄",
+        "parent": "Inspector properties / IN-06",
+        "r": [
+          1342,
+          336,
+          84,
+          30
+        ]
+      },
+      {
+        "id": "8317:247112",
+        "name": "Property group / Overrides",
+        "parent": "Inspector properties / IN-06",
+        "r": [
+          1140,
+          381,
+          300,
+          100
+        ]
+      },
+      {
+        "id": "8317:247114",
+        "name": "Property / Padding / default",
+        "parent": "Property group / Overrides",
+        "r": [
+          1154,
+          416,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:247119",
+        "name": "Reset to master…",
+        "parent": "Inspector properties / IN-06",
+        "r": [
+          1154,
+          485,
+          272,
+          30
+        ]
+      },
+      {
+        "id": "8317:247121",
+        "name": "Property group / Size",
+        "parent": "Inspector properties / IN-06",
+        "r": [
+          1140,
+          529,
+          300,
+          118
+        ]
+      },
+      {
+        "id": "8317:247123",
+        "name": "Property / Width / inherited",
+        "parent": "Property group / Size",
+        "r": [
+          1154,
+          564,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:247127",
+        "name": "Property / Height / inherited",
+        "parent": "Property group / Size",
+        "r": [
+          1154,
+          601,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:247131",
+        "name": "Property group / Spacing",
+        "parent": "Inspector properties / IN-06",
+        "r": [
+          1140,
+          651,
+          300,
+          118
+        ]
+      },
+      {
+        "id": "8317:247133",
+        "name": "Property / Padding / default",
+        "parent": "Property group / Spacing",
+        "r": [
+          1154,
+          686,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:247137",
+        "name": "Property / Margin / inherited",
+        "parent": "Property group / Spacing",
+        "r": [
+          1154,
+          723,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8318:607",
+        "name": "Open selected-element AI",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1331,
+          64,
+          35,
+          30
+        ]
+      }
+    ]
+  },
+  {
+    "id": "8317:247144",
+    "code": "IN-07",
+    "nodes": [
+      {
+        "id": "8317:247155",
+        "name": "⌘ K",
+        "parent": "Application header",
+        "r": [
+          1034,
+          13,
+          52,
+          30
+        ]
+      },
+      {
+        "id": "8317:247157",
+        "name": "History",
+        "parent": "Application header",
+        "r": [
+          1094,
+          13,
+          70,
+          30
+        ]
+      },
+      {
+        "id": "8317:247159",
+        "name": "Review",
+        "parent": "Application header",
+        "r": [
+          1170,
+          13,
+          70,
+          30
+        ]
+      },
+      {
+        "id": "8317:247161",
+        "name": "Preview",
+        "parent": "Application header",
+        "r": [
+          1248,
+          13,
+          80,
+          30
+        ]
+      },
+      {
+        "id": "8317:247163",
+        "name": "Publish",
+        "parent": "Application header",
+        "r": [
+          1336,
+          13,
+          88,
+          30
+        ]
+      },
+      {
+        "id": "8317:247190",
+        "name": "Action / help",
+        "parent": "Primary navigation",
+        "r": [
+          16,
+          852,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8318:646",
+        "name": "Action / close",
+        "parent": "Left drawer / Layers",
+        "r": [
+          304,
+          66,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8318:649",
+        "name": "Search / Search layers",
+        "parent": "Left drawer / Layers",
+        "r": [
+          72,
+          109,
+          256,
+          32
+        ]
+      },
+      {
+        "id": "8318:653",
+        "name": "Row / Body",
+        "parent": "Left drawer / Layers",
+        "r": [
+          72,
+          155,
+          256,
+          32
+        ]
+      },
+      {
+        "id": "8318:657",
+        "name": "Row / Main section",
+        "parent": "Left drawer / Layers",
+        "r": [
+          84,
+          191,
+          244,
+          32
+        ]
+      },
+      {
+        "id": "8318:661",
+        "name": "Row / Heading",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          227,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8318:665",
+        "name": "Row / Paragraph",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          263,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8318:669",
+        "name": "Row / Project grid",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          299,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8317:247230",
+        "name": "Desktop",
+        "parent": "Page and breakpoint context",
+        "r": [
+          1032,
+          67,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8318:640",
+        "name": "Explore our work",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          394,
+          632,
+          132,
+          30
+        ]
+      },
+      {
+        "id": "8318:642",
+        "name": "Selection / Heading · Locked",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          391,
+          209,
+          698,
+          110
+        ]
+      },
+      {
+        "id": "8317:247256",
+        "name": "Action / undo",
+        "parent": "Canvas toolbar",
+        "r": [
+          348,
+          868,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:247259",
+        "name": "Action / redo",
+        "parent": "Canvas toolbar",
+        "r": [
+          380,
+          868,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:247262",
+        "name": "63% ⌄",
+        "parent": "Canvas toolbar",
+        "r": [
+          419,
+          867,
+          74,
+          30
+        ]
+      },
+      {
+        "id": "8317:247267",
+        "name": "Action / more",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1373,
+          64,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:247270",
+        "name": "Action / close",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1406,
+          64,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:247274",
+        "name": "Style",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1154,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:247276",
+        "name": "Content",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1248,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:247277",
+        "name": "Effects",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1342,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:247279",
+        "name": "Desktop",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1154,
+          173,
+          91,
+          22
+        ]
+      },
+      {
+        "id": "8317:247280",
+        "name": "Desktop",
+        "parent": "Desktop",
+        "r": [
+          1161,
+          176,
+          77,
+          16
+        ]
+      },
+      {
+        "id": "8317:247281",
+        "name": "Base state",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1253,
+          173,
+          88,
+          22
+        ]
+      },
+      {
+        "id": "8317:247282",
+        "name": "Base state",
+        "parent": "Base state",
+        "r": [
+          1260,
+          176,
+          74,
+          16
+        ]
+      },
+      {
+        "id": "8317:247330",
+        "name": "Unlock",
+        "parent": "Locked status",
+        "r": [
+          1166,
+          259,
+          90,
+          30
+        ]
+      },
+      {
+        "id": "8317:247332",
+        "name": "Property group / Typography",
+        "parent": "Inspector properties / IN-07",
+        "r": [
+          1140,
+          317,
+          300,
+          192
+        ]
+      },
+      {
+        "id": "8317:247334",
+        "name": "Property / Font / disabled",
+        "parent": "Property group / Typography",
+        "r": [
+          1154,
+          352,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:247338",
+        "name": "Property / Size / disabled",
+        "parent": "Property group / Typography",
+        "r": [
+          1154,
+          389,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:247342",
+        "name": "Property / Weight / disabled",
+        "parent": "Property group / Typography",
+        "r": [
+          1154,
+          426,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:247346",
+        "name": "Property / Line height / disabled",
+        "parent": "Property group / Typography",
+        "r": [
+          1154,
+          463,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:247350",
+        "name": "Property group / Size",
+        "parent": "Inspector properties / IN-07",
+        "r": [
+          1140,
+          513,
+          300,
+          118
+        ]
+      },
+      {
+        "id": "8317:247352",
+        "name": "Property / Width / disabled",
+        "parent": "Property group / Size",
+        "r": [
+          1154,
+          548,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:247356",
+        "name": "Property / Height / disabled",
+        "parent": "Property group / Size",
+        "r": [
+          1154,
+          585,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:247360",
+        "name": "Property group / Colour",
+        "parent": "Inspector properties / IN-07",
+        "r": [
+          1140,
+          635,
+          300,
+          100
+        ]
+      },
+      {
+        "id": "8317:247362",
+        "name": "Property / Text / disabled",
+        "parent": "Property group / Colour",
+        "r": [
+          1154,
+          670,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8318:631",
+        "name": "Open selected-element AI",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1331,
+          64,
+          35,
+          30
+        ]
+      }
+    ]
+  },
+  {
+    "id": "8317:247370",
+    "code": "IN-08",
+    "nodes": [
+      {
+        "id": "8317:247381",
+        "name": "⌘ K",
+        "parent": "Application header",
+        "r": [
+          1034,
+          13,
+          52,
+          30
+        ]
+      },
+      {
+        "id": "8317:247383",
+        "name": "History",
+        "parent": "Application header",
+        "r": [
+          1094,
+          13,
+          70,
+          30
+        ]
+      },
+      {
+        "id": "8317:247385",
+        "name": "Review",
+        "parent": "Application header",
+        "r": [
+          1170,
+          13,
+          70,
+          30
+        ]
+      },
+      {
+        "id": "8317:247387",
+        "name": "Preview",
+        "parent": "Application header",
+        "r": [
+          1248,
+          13,
+          80,
+          30
+        ]
+      },
+      {
+        "id": "8317:247389",
+        "name": "Publish",
+        "parent": "Application header",
+        "r": [
+          1336,
+          13,
+          88,
+          30
+        ]
+      },
+      {
+        "id": "8317:247416",
+        "name": "Action / help",
+        "parent": "Primary navigation",
+        "r": [
+          16,
+          852,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8318:709",
+        "name": "Action / close",
+        "parent": "Left drawer / Layers",
+        "r": [
+          304,
+          66,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8318:712",
+        "name": "Search / Search layers",
+        "parent": "Left drawer / Layers",
+        "r": [
+          72,
+          109,
+          256,
+          32
+        ]
+      },
+      {
+        "id": "8318:716",
+        "name": "Row / Body",
+        "parent": "Left drawer / Layers",
+        "r": [
+          72,
+          155,
+          256,
+          32
+        ]
+      },
+      {
+        "id": "8318:720",
+        "name": "Row / Main section",
+        "parent": "Left drawer / Layers",
+        "r": [
+          84,
+          191,
+          244,
+          32
+        ]
+      },
+      {
+        "id": "8318:724",
+        "name": "Row / Heading",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          227,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8318:728",
+        "name": "Row / Paragraph",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          263,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8318:732",
+        "name": "Row / Image",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          299,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8318:736",
+        "name": "Row / CTA container",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          335,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8317:247456",
+        "name": "Desktop",
+        "parent": "Page and breakpoint context",
+        "r": [
+          1032,
+          67,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8318:685",
+        "name": "Explore our work",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          394,
+          632,
+          132,
+          30
+        ]
+      },
+      {
+        "id": "8318:687",
+        "name": "Selection / 3 selected",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          392,
+          209,
+          696,
+          110
+        ]
+      },
+      {
+        "id": "8318:690",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          389,
+          206,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8318:691",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          1085,
+          206,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8318:692",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          389,
+          315,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8318:693",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          1085,
+          315,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8318:694",
+        "name": "Selection / Image",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          392,
+          379,
+          696,
+          229
+        ]
+      },
+      {
+        "id": "8318:697",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          389,
+          376,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8318:698",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          1085,
+          376,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8318:699",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          389,
+          605,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8318:700",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          1085,
+          605,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8318:701",
+        "name": "Selection / Container",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          392,
+          630,
+          135,
+          34
+        ]
+      },
+      {
+        "id": "8318:704",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          389,
+          627,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8318:705",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          525,
+          627,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8318:706",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          389,
+          661,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8318:707",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          525,
+          661,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8317:247482",
+        "name": "Action / undo",
+        "parent": "Canvas toolbar",
+        "r": [
+          348,
+          868,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:247485",
+        "name": "Action / redo",
+        "parent": "Canvas toolbar",
+        "r": [
+          380,
+          868,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:247488",
+        "name": "63% ⌄",
+        "parent": "Canvas toolbar",
+        "r": [
+          419,
+          867,
+          74,
+          30
+        ]
+      },
+      {
+        "id": "8317:247493",
+        "name": "Action / more",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1373,
+          64,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:247496",
+        "name": "Action / close",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1406,
+          64,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:247500",
+        "name": "Style",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1154,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:247502",
+        "name": "Content",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1248,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:247503",
+        "name": "Effects",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1342,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:247505",
+        "name": "Desktop",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1154,
+          173,
+          91,
+          22
+        ]
+      },
+      {
+        "id": "8317:247506",
+        "name": "Desktop",
+        "parent": "Desktop",
+        "r": [
+          1161,
+          176,
+          77,
+          16
+        ]
+      },
+      {
+        "id": "8317:247507",
+        "name": "Base state",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1253,
+          173,
+          88,
+          22
+        ]
+      },
+      {
+        "id": "8317:247508",
+        "name": "Base state",
+        "parent": "Base state",
+        "r": [
+          1260,
+          176,
+          74,
+          16
+        ]
+      },
+      {
+        "id": "8317:247571",
+        "name": "Property group / Arrange",
+        "parent": "Inspector properties / IN-08",
+        "r": [
+          1140,
+          251,
+          300,
+          63
+        ]
+      },
+      {
+        "id": "8317:247574",
+        "name": "Align ⌄",
+        "parent": "Inspector properties / IN-08",
+        "r": [
+          1154,
+          318,
+          130,
+          30
+        ]
+      },
+      {
+        "id": "8317:247576",
+        "name": "Distribute ⌄",
+        "parent": "Inspector properties / IN-08",
+        "r": [
+          1296,
+          318,
+          130,
+          30
+        ]
+      },
+      {
+        "id": "8317:247578",
+        "name": "Group selected elements",
+        "parent": "Inspector properties / IN-08",
+        "r": [
+          1154,
+          358,
+          272,
+          30
+        ]
+      },
+      {
+        "id": "8317:247580",
+        "name": "Property group / Size",
+        "parent": "Inspector properties / IN-08",
+        "r": [
+          1140,
+          405,
+          300,
+          118
+        ]
+      },
+      {
+        "id": "8317:247582",
+        "name": "Property / Width / mixed",
+        "parent": "Property group / Size",
+        "r": [
+          1154,
+          440,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:247586",
+        "name": "Property / Height / mixed",
+        "parent": "Property group / Size",
+        "r": [
+          1154,
+          477,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:247590",
+        "name": "Property group / Spacing",
+        "parent": "Inspector properties / IN-08",
+        "r": [
+          1140,
+          527,
+          300,
+          118
+        ]
+      },
+      {
+        "id": "8317:247592",
+        "name": "Property / Padding / mixed",
+        "parent": "Property group / Spacing",
+        "r": [
+          1154,
+          562,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:247596",
+        "name": "Property / Margin / default",
+        "parent": "Property group / Spacing",
+        "r": [
+          1154,
+          599,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:247600",
+        "name": "Property group / Fill",
+        "parent": "Inspector properties / IN-08",
+        "r": [
+          1140,
+          649,
+          300,
+          81
+        ]
+      },
+      {
+        "id": "8317:247602",
+        "name": "Property / Colour / mixed",
+        "parent": "Property group / Fill",
+        "r": [
+          1154,
+          684,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:247606",
+        "name": "Property group / Border",
+        "parent": "Inspector properties / IN-08",
+        "r": [
+          1140,
+          734,
+          300,
+          81
+        ]
+      },
+      {
+        "id": "8317:247608",
+        "name": "Property / Width / default",
+        "parent": "Property group / Border",
+        "r": [
+          1154,
+          769,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8318:676",
+        "name": "Open selected-element AI",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1331,
+          64,
+          35,
+          30
+        ]
+      }
+    ]
+  },
+  {
+    "id": "8317:247616",
+    "code": "IN-09",
+    "nodes": [
+      {
+        "id": "8317:247627",
+        "name": "⌘ K",
+        "parent": "Application header",
+        "r": [
+          1034,
+          13,
+          52,
+          30
+        ]
+      },
+      {
+        "id": "8317:247629",
+        "name": "History",
+        "parent": "Application header",
+        "r": [
+          1094,
+          13,
+          70,
+          30
+        ]
+      },
+      {
+        "id": "8317:247631",
+        "name": "Review",
+        "parent": "Application header",
+        "r": [
+          1170,
+          13,
+          70,
+          30
+        ]
+      },
+      {
+        "id": "8317:247633",
+        "name": "Preview",
+        "parent": "Application header",
+        "r": [
+          1248,
+          13,
+          80,
+          30
+        ]
+      },
+      {
+        "id": "8317:247635",
+        "name": "Publish",
+        "parent": "Application header",
+        "r": [
+          1336,
+          13,
+          88,
+          30
+        ]
+      },
+      {
+        "id": "8317:247662",
+        "name": "Action / help",
+        "parent": "Primary navigation",
+        "r": [
+          16,
+          852,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:247779",
+        "name": "Action / close",
+        "parent": "Left drawer / Layers",
+        "r": [
+          304,
+          66,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:247782",
+        "name": "Search / Search layers",
+        "parent": "Left drawer / Layers",
+        "r": [
+          72,
+          109,
+          256,
+          32
+        ]
+      },
+      {
+        "id": "8317:247786",
+        "name": "Row / Body",
+        "parent": "Left drawer / Layers",
+        "r": [
+          72,
+          155,
+          256,
+          32
+        ]
+      },
+      {
+        "id": "8317:247790",
+        "name": "Row / Main section",
+        "parent": "Left drawer / Layers",
+        "r": [
+          84,
+          191,
+          244,
+          32
+        ]
+      },
+      {
+        "id": "8317:247794",
+        "name": "Row / Heading",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          227,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8317:247798",
+        "name": "Row / Paragraph",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          263,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8317:247802",
+        "name": "Row / Project grid",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          299,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8317:247702",
+        "name": "Desktop",
+        "parent": "Page and breakpoint context",
+        "r": [
+          1032,
+          67,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:247771",
+        "name": "Selection / Project grid",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          379,
+          375,
+          722,
+          232
+        ]
+      },
+      {
+        "id": "8317:247774",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          376,
+          372,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8317:247775",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          1098,
+          372,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8317:247776",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          376,
+          604,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8317:247777",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          1098,
+          604,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8317:247728",
+        "name": "Action / undo",
+        "parent": "Canvas toolbar",
+        "r": [
+          348,
+          868,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:247731",
+        "name": "Action / redo",
+        "parent": "Canvas toolbar",
+        "r": [
+          380,
+          868,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:247734",
+        "name": "63% ⌄",
+        "parent": "Canvas toolbar",
+        "r": [
+          419,
+          867,
+          74,
+          30
+        ]
+      },
+      {
+        "id": "8317:247739",
+        "name": "Action / more",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1373,
+          64,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:247742",
+        "name": "Action / close",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1406,
+          64,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:247746",
+        "name": "Style",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1154,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:247748",
+        "name": "Content",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1248,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:247749",
+        "name": "Effects",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1342,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:247751",
+        "name": "Desktop",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1154,
+          173,
+          91,
+          22
+        ]
+      },
+      {
+        "id": "8317:247752",
+        "name": "Desktop",
+        "parent": "Desktop",
+        "r": [
+          1161,
+          176,
+          77,
+          16
+        ]
+      },
+      {
+        "id": "8317:247753",
+        "name": "Base state",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1253,
+          173,
+          88,
+          22
+        ]
+      },
+      {
+        "id": "8317:247754",
+        "name": "Base state",
+        "parent": "Base state",
+        "r": [
+          1260,
+          176,
+          74,
+          16
+        ]
+      },
+      {
+        "id": "8317:247809",
+        "name": "Property group / Layout",
+        "parent": "Inspector properties / IN-09",
+        "r": [
+          1140,
+          251,
+          300,
+          155
+        ]
+      },
+      {
+        "id": "8317:247811",
+        "name": "Property / Display / default",
+        "parent": "Property group / Layout",
+        "r": [
+          1154,
+          286,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:247815",
+        "name": "Property / Columns / default",
+        "parent": "Property group / Layout",
+        "r": [
+          1154,
+          323,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:247819",
+        "name": "Property / Gap / default",
+        "parent": "Property group / Layout",
+        "r": [
+          1154,
+          360,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:247823",
+        "name": "Property group / Size",
+        "parent": "Inspector properties / IN-09",
+        "r": [
+          1140,
+          410,
+          300,
+          118
+        ]
+      },
+      {
+        "id": "8317:247825",
+        "name": "Property / Width / default",
+        "parent": "Property group / Size",
+        "r": [
+          1154,
+          445,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:247829",
+        "name": "Property / Height / default",
+        "parent": "Property group / Size",
+        "r": [
+          1154,
+          482,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:247833",
+        "name": "Property group / Spacing",
+        "parent": "Inspector properties / IN-09",
+        "r": [
+          1140,
+          532,
+          300,
+          81
+        ]
+      },
+      {
+        "id": "8317:247835",
+        "name": "Property / Padding / default",
+        "parent": "Property group / Spacing",
+        "r": [
+          1154,
+          567,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8318:741",
+        "name": "Open selected-element AI",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1331,
+          64,
+          35,
+          30
+        ]
+      },
+      {
+        "id": "8317:247839",
+        "name": "Context menu / Project grid",
+        "parent": "TO-BE IN-09 · Context menu · viewport edge",
+        "r": [
+          1168,
+          470,
+          256,
+          398
+        ]
+      },
+      {
+        "id": "8317:247842",
+        "name": "Menu action / Copy",
+        "parent": "Context menu / Project grid",
+        "r": [
+          1176,
+          518,
+          240,
+          34
+        ]
+      },
+      {
+        "id": "8317:247845",
+        "name": "Menu action / Duplicate",
+        "parent": "Context menu / Project grid",
+        "r": [
+          1176,
+          561,
+          240,
+          34
+        ]
+      },
+      {
+        "id": "8317:247848",
+        "name": "Menu action / Paste style",
+        "parent": "Context menu / Project grid",
+        "r": [
+          1176,
+          604,
+          240,
+          42
+        ]
+      },
+      {
+        "id": "8317:247851",
+        "name": "Menu action / Arrange in parent",
+        "parent": "Context menu / Project grid",
+        "r": [
+          1176,
+          647,
+          240,
+          34
+        ]
+      },
+      {
+        "id": "8317:247854",
+        "name": "Menu action / Save as component…",
+        "parent": "Context menu / Project grid",
+        "r": [
+          1176,
+          690,
+          240,
+          34
+        ]
+      },
+      {
+        "id": "8317:247856",
+        "name": "Menu action / Lock",
+        "parent": "Context menu / Project grid",
+        "r": [
+          1176,
+          733,
+          240,
+          34
+        ]
+      },
+      {
+        "id": "8317:247859",
+        "name": "Menu action / Delete",
+        "parent": "Context menu / Project grid",
+        "r": [
+          1176,
+          776,
+          240,
+          34
+        ]
+      },
+      {
+        "id": "8317:247862",
+        "name": "Arrange submenu / opens left",
+        "parent": "TO-BE IN-09 · Context menu · viewport edge",
+        "r": [
+          918,
+          639,
+          242,
+          130
+        ]
+      },
+      {
+        "id": "8317:247864",
+        "name": "Move forward",
+        "parent": "Arrange submenu / opens left",
+        "r": [
+          930,
+          678,
+          212,
+          17
+        ]
+      },
+      {
+        "id": "8317:247865",
+        "name": "Move backward",
+        "parent": "Arrange submenu / opens left",
+        "r": [
+          930,
+          708,
+          212,
+          17
+        ]
+      },
+      {
+        "id": "8317:247866",
+        "name": "Move to start",
+        "parent": "Arrange submenu / opens left",
+        "r": [
+          930,
+          738,
+          212,
+          17
+        ]
+      }
+    ]
+  },
+  {
+    "id": "8317:247870",
+    "code": "IN-10",
+    "nodes": [
+      {
+        "id": "8317:247881",
+        "name": "⌘ K",
+        "parent": "Application header",
+        "r": [
+          1034,
+          13,
+          52,
+          30
+        ]
+      },
+      {
+        "id": "8317:247883",
+        "name": "History",
+        "parent": "Application header",
+        "r": [
+          1094,
+          13,
+          70,
+          30
+        ]
+      },
+      {
+        "id": "8317:247885",
+        "name": "Review",
+        "parent": "Application header",
+        "r": [
+          1170,
+          13,
+          70,
+          30
+        ]
+      },
+      {
+        "id": "8317:247887",
+        "name": "Preview",
+        "parent": "Application header",
+        "r": [
+          1248,
+          13,
+          80,
+          30
+        ]
+      },
+      {
+        "id": "8317:247889",
+        "name": "Publish",
+        "parent": "Application header",
+        "r": [
+          1336,
+          13,
+          88,
+          30
+        ]
+      },
+      {
+        "id": "8317:247916",
+        "name": "Action / help",
+        "parent": "Primary navigation",
+        "r": [
+          16,
+          852,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:248018",
+        "name": "Action / close",
+        "parent": "Left drawer / Add",
+        "r": [
+          304,
+          66,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:248021",
+        "name": "Search / Search elements",
+        "parent": "Left drawer / Add",
+        "r": [
+          72,
+          109,
+          256,
+          32
+        ]
+      },
+      {
+        "id": "8317:248025",
+        "name": "Row / Heading",
+        "parent": "Left drawer / Add",
+        "r": [
+          72,
+          157,
+          256,
+          32
+        ]
+      },
+      {
+        "id": "8317:248029",
+        "name": "Row / Text",
+        "parent": "Left drawer / Add",
+        "r": [
+          72,
+          195,
+          256,
+          32
+        ]
+      },
+      {
+        "id": "8317:248033",
+        "name": "Row / Button",
+        "parent": "Left drawer / Add",
+        "r": [
+          72,
+          233,
+          256,
+          32
+        ]
+      },
+      {
+        "id": "8317:248037",
+        "name": "Row / Image",
+        "parent": "Left drawer / Add",
+        "r": [
+          72,
+          271,
+          256,
+          32
+        ]
+      },
+      {
+        "id": "8317:248041",
+        "name": "Row / Container",
+        "parent": "Left drawer / Add",
+        "r": [
+          72,
+          309,
+          256,
+          32
+        ]
+      },
+      {
+        "id": "8317:248045",
+        "name": "Row / Form",
+        "parent": "Left drawer / Add",
+        "r": [
+          72,
+          347,
+          256,
+          32
+        ]
+      },
+      {
+        "id": "8317:247935",
+        "name": "Desktop",
+        "parent": "Page and breakpoint context",
+        "r": [
+          1032,
+          67,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:248004",
+        "name": "Selection / Main section",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          379,
+          375,
+          722,
+          232
+        ]
+      },
+      {
+        "id": "8317:248007",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          376,
+          372,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8317:248008",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          1098,
+          372,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8317:248009",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          376,
+          604,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8317:248010",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          1098,
+          604,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8317:248014",
+        "name": "Button",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          941,
+          580,
+          113,
+          30
+        ]
+      },
+      {
+        "id": "8317:247961",
+        "name": "Action / undo",
+        "parent": "Canvas toolbar",
+        "r": [
+          348,
+          868,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:247964",
+        "name": "Action / redo",
+        "parent": "Canvas toolbar",
+        "r": [
+          380,
+          868,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:247967",
+        "name": "63% ⌄",
+        "parent": "Canvas toolbar",
+        "r": [
+          419,
+          867,
+          74,
+          30
+        ]
+      },
+      {
+        "id": "8317:247972",
+        "name": "Action / more",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1373,
+          64,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:247975",
+        "name": "Action / close",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1406,
+          64,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:247979",
+        "name": "Style",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1154,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:247981",
+        "name": "Content",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1248,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:247982",
+        "name": "Effects",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1342,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:247984",
+        "name": "Desktop",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1154,
+          173,
+          91,
+          22
+        ]
+      },
+      {
+        "id": "8317:247985",
+        "name": "Desktop",
+        "parent": "Desktop",
+        "r": [
+          1161,
+          176,
+          77,
+          16
+        ]
+      },
+      {
+        "id": "8317:247986",
+        "name": "Base state",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1253,
+          173,
+          88,
+          22
+        ]
+      },
+      {
+        "id": "8317:247987",
+        "name": "Base state",
+        "parent": "Base state",
+        "r": [
+          1260,
+          176,
+          74,
+          16
+        ]
+      },
+      {
+        "id": "8317:248052",
+        "name": "Property group / Layout",
+        "parent": "Inspector properties / IN-10",
+        "r": [
+          1140,
+          251,
+          300,
+          155
+        ]
+      },
+      {
+        "id": "8317:248054",
+        "name": "Property / Display / default",
+        "parent": "Property group / Layout",
+        "r": [
+          1154,
+          286,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:248058",
+        "name": "Property / Direction / default",
+        "parent": "Property group / Layout",
+        "r": [
+          1154,
+          323,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:248062",
+        "name": "Property / Gap / default",
+        "parent": "Property group / Layout",
+        "r": [
+          1154,
+          360,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:248066",
+        "name": "Property group / Size",
+        "parent": "Inspector properties / IN-10",
+        "r": [
+          1140,
+          410,
+          300,
+          118
+        ]
+      },
+      {
+        "id": "8317:248068",
+        "name": "Property / Width / default",
+        "parent": "Property group / Size",
+        "r": [
+          1154,
+          445,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:248072",
+        "name": "Property / Height / default",
+        "parent": "Property group / Size",
+        "r": [
+          1154,
+          482,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:248076",
+        "name": "Property group / Spacing",
+        "parent": "Inspector properties / IN-10",
+        "r": [
+          1140,
+          532,
+          300,
+          81
+        ]
+      },
+      {
+        "id": "8317:248078",
+        "name": "Property / Padding / default",
+        "parent": "Property group / Spacing",
+        "r": [
+          1154,
+          567,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8318:743",
+        "name": "Open selected-element AI",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1331,
+          64,
+          35,
+          30
+        ]
+      }
+    ]
+  },
+  {
+    "id": "8317:248085",
+    "code": "IN-11",
+    "nodes": [
+      {
+        "id": "8317:248096",
+        "name": "⌘ K",
+        "parent": "Application header",
+        "r": [
+          1034,
+          13,
+          52,
+          30
+        ]
+      },
+      {
+        "id": "8317:248098",
+        "name": "History",
+        "parent": "Application header",
+        "r": [
+          1094,
+          13,
+          70,
+          30
+        ]
+      },
+      {
+        "id": "8317:248100",
+        "name": "Review",
+        "parent": "Application header",
+        "r": [
+          1170,
+          13,
+          70,
+          30
+        ]
+      },
+      {
+        "id": "8317:248102",
+        "name": "Preview",
+        "parent": "Application header",
+        "r": [
+          1248,
+          13,
+          80,
+          30
+        ]
+      },
+      {
+        "id": "8317:248104",
+        "name": "Publish",
+        "parent": "Application header",
+        "r": [
+          1336,
+          13,
+          88,
+          30
+        ]
+      },
+      {
+        "id": "8317:248131",
+        "name": "Action / help",
+        "parent": "Primary navigation",
+        "r": [
+          16,
+          852,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:248251",
+        "name": "Action / close",
+        "parent": "Left drawer / Layers",
+        "r": [
+          304,
+          66,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:248254",
+        "name": "Search / Search layers",
+        "parent": "Left drawer / Layers",
+        "r": [
+          72,
+          109,
+          256,
+          32
+        ]
+      },
+      {
+        "id": "8317:248258",
+        "name": "Row / Body",
+        "parent": "Left drawer / Layers",
+        "r": [
+          72,
+          155,
+          256,
+          32
+        ]
+      },
+      {
+        "id": "8317:248262",
+        "name": "Row / Main section",
+        "parent": "Left drawer / Layers",
+        "r": [
+          84,
+          191,
+          244,
+          32
+        ]
+      },
+      {
+        "id": "8317:248266",
+        "name": "Row / Heading",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          227,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8317:248270",
+        "name": "Row / Paragraph",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          263,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8317:248274",
+        "name": "Row / Project grid",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          299,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8317:248278",
+        "name": "Row / Quiet spaces",
+        "parent": "Left drawer / Layers",
+        "r": [
+          108,
+          335,
+          220,
+          32
+        ]
+      },
+      {
+        "id": "8317:248282",
+        "name": "Row / Natural light",
+        "parent": "Left drawer / Layers",
+        "r": [
+          108,
+          369,
+          220,
+          32
+        ]
+      },
+      {
+        "id": "8317:248286",
+        "name": "Row / Simple living",
+        "parent": "Left drawer / Layers",
+        "r": [
+          108,
+          403,
+          220,
+          32
+        ]
+      },
+      {
+        "id": "8317:248171",
+        "name": "Desktop",
+        "parent": "Page and breakpoint context",
+        "r": [
+          1032,
+          67,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:248240",
+        "name": "Selection / Project grid · 560 × 280",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          379,
+          375,
+          351,
+          175
+        ]
+      },
+      {
+        "id": "8317:248243",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          376,
+          372,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8317:248244",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          727,
+          372,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8317:248245",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          376,
+          547,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8317:248246",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          727,
+          547,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8317:248197",
+        "name": "Action / undo",
+        "parent": "Canvas toolbar",
+        "r": [
+          348,
+          868,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:248200",
+        "name": "Action / redo",
+        "parent": "Canvas toolbar",
+        "r": [
+          380,
+          868,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:248203",
+        "name": "63% ⌄",
+        "parent": "Canvas toolbar",
+        "r": [
+          419,
+          867,
+          74,
+          30
+        ]
+      },
+      {
+        "id": "8317:248208",
+        "name": "Action / more",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1373,
+          64,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:248211",
+        "name": "Action / close",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1406,
+          64,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8317:248215",
+        "name": "Style",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1154,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:248217",
+        "name": "Content",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1248,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:248218",
+        "name": "Effects",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1342,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8317:248220",
+        "name": "Desktop",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1154,
+          173,
+          91,
+          22
+        ]
+      },
+      {
+        "id": "8317:248221",
+        "name": "Desktop",
+        "parent": "Desktop",
+        "r": [
+          1161,
+          176,
+          77,
+          16
+        ]
+      },
+      {
+        "id": "8317:248222",
+        "name": "Base state",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1253,
+          173,
+          88,
+          22
+        ]
+      },
+      {
+        "id": "8317:248223",
+        "name": "Base state",
+        "parent": "Base state",
+        "r": [
+          1260,
+          176,
+          74,
+          16
+        ]
+      },
+      {
+        "id": "8317:248293",
+        "name": "Property group / Size",
+        "parent": "Inspector properties / IN-11",
+        "r": [
+          1140,
+          251,
+          300,
+          192
+        ]
+      },
+      {
+        "id": "8317:248295",
+        "name": "Property / Width / default",
+        "parent": "Property group / Size",
+        "r": [
+          1154,
+          286,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:248299",
+        "name": "Property / Height / default",
+        "parent": "Property group / Size",
+        "r": [
+          1154,
+          323,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:248303",
+        "name": "Property / Min width / default",
+        "parent": "Property group / Size",
+        "r": [
+          1154,
+          360,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:248307",
+        "name": "Property / Max width / default",
+        "parent": "Property group / Size",
+        "r": [
+          1154,
+          397,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:248311",
+        "name": "Property group / Layout",
+        "parent": "Inspector properties / IN-11",
+        "r": [
+          1140,
+          447,
+          300,
+          155
+        ]
+      },
+      {
+        "id": "8317:248313",
+        "name": "Property / Display / default",
+        "parent": "Property group / Layout",
+        "r": [
+          1154,
+          482,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:248317",
+        "name": "Property / Columns / default",
+        "parent": "Property group / Layout",
+        "r": [
+          1154,
+          519,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:248321",
+        "name": "Property / Gap / default",
+        "parent": "Property group / Layout",
+        "r": [
+          1154,
+          556,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8317:248325",
+        "name": "Property group / Spacing",
+        "parent": "Inspector properties / IN-11",
+        "r": [
+          1140,
+          606,
+          300,
+          81
+        ]
+      },
+      {
+        "id": "8317:248327",
+        "name": "Property / Padding / default",
+        "parent": "Property group / Spacing",
+        "r": [
+          1154,
+          641,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8318:745",
+        "name": "Open selected-element AI",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1331,
+          64,
+          35,
+          30
+        ]
+      }
+    ]
+  },
+  {
+    "id": "8318:1573",
+    "code": "IN-12",
+    "nodes": [
+      {
+        "id": "8318:1584",
+        "name": "⌘ K",
+        "parent": "Application header",
+        "r": [
+          1034,
+          13,
+          52,
+          30
+        ]
+      },
+      {
+        "id": "8318:1586",
+        "name": "History",
+        "parent": "Application header",
+        "r": [
+          1094,
+          13,
+          70,
+          30
+        ]
+      },
+      {
+        "id": "8318:1588",
+        "name": "Review",
+        "parent": "Application header",
+        "r": [
+          1170,
+          13,
+          70,
+          30
+        ]
+      },
+      {
+        "id": "8318:1590",
+        "name": "Preview",
+        "parent": "Application header",
+        "r": [
+          1248,
+          13,
+          80,
+          30
+        ]
+      },
+      {
+        "id": "8318:1592",
+        "name": "Publish",
+        "parent": "Application header",
+        "r": [
+          1336,
+          13,
+          88,
+          30
+        ]
+      },
+      {
+        "id": "8318:1619",
+        "name": "Action / help",
+        "parent": "Primary navigation",
+        "r": [
+          16,
+          852,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8318:1732",
+        "name": "Action / close",
+        "parent": "Left drawer / Layers",
+        "r": [
+          304,
+          66,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8318:1735",
+        "name": "Search / Search layers",
+        "parent": "Left drawer / Layers",
+        "r": [
+          72,
+          109,
+          256,
+          32
+        ]
+      },
+      {
+        "id": "8318:1739",
+        "name": "Row / Body",
+        "parent": "Left drawer / Layers",
+        "r": [
+          72,
+          155,
+          256,
+          32
+        ]
+      },
+      {
+        "id": "8318:1743",
+        "name": "Row / Main section",
+        "parent": "Left drawer / Layers",
+        "r": [
+          84,
+          191,
+          244,
+          32
+        ]
+      },
+      {
+        "id": "8318:1747",
+        "name": "Row / Heading",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          227,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8318:1751",
+        "name": "Row / Paragraph",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          263,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8318:1755",
+        "name": "Row / Project grid",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          299,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8318:1659",
+        "name": "Desktop",
+        "parent": "Page and breakpoint context",
+        "r": [
+          1032,
+          67,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8318:1722",
+        "name": "Explore our work",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          394,
+          632,
+          132,
+          30
+        ]
+      },
+      {
+        "id": "8318:1724",
+        "name": "Selection / Heading",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          391,
+          209,
+          698,
+          110
+        ]
+      },
+      {
+        "id": "8318:1727",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          388,
+          206,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8318:1728",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          1086,
+          206,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8318:1729",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          388,
+          315,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8318:1730",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          1086,
+          315,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8318:1685",
+        "name": "Action / undo",
+        "parent": "Canvas toolbar",
+        "r": [
+          348,
+          868,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8318:1688",
+        "name": "Action / redo",
+        "parent": "Canvas toolbar",
+        "r": [
+          380,
+          868,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8318:1691",
+        "name": "63% ⌄",
+        "parent": "Canvas toolbar",
+        "r": [
+          419,
+          867,
+          74,
+          30
+        ]
+      },
+      {
+        "id": "8318:1696",
+        "name": "Open selected-element AI",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1331,
+          64,
+          35,
+          30
+        ]
+      },
+      {
+        "id": "8318:1698",
+        "name": "Action / more",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1373,
+          64,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8318:1701",
+        "name": "Action / close",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1406,
+          64,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8318:1705",
+        "name": "Style",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1154,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8318:1706",
+        "name": "Content",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1248,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8318:1707",
+        "name": "Effects",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1342,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8318:1710",
+        "name": "Desktop",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1154,
+          173,
+          91,
+          22
+        ]
+      },
+      {
+        "id": "8318:1711",
+        "name": "Desktop",
+        "parent": "Desktop",
+        "r": [
+          1161,
+          176,
+          77,
+          16
+        ]
+      },
+      {
+        "id": "8318:1712",
+        "name": "Base state",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1253,
+          173,
+          88,
+          22
+        ]
+      },
+      {
+        "id": "8318:1713",
+        "name": "Base state",
+        "parent": "Base state",
+        "r": [
+          1260,
+          176,
+          74,
+          16
+        ]
+      },
+      {
+        "id": "8318:1762",
+        "name": "Property group / Opacity",
+        "parent": "Inspector properties / IN-12",
+        "r": [
+          1140,
+          251,
+          300,
+          81
+        ]
+      },
+      {
+        "id": "8318:1764",
+        "name": "Property / Opacity / default",
+        "parent": "Property group / Opacity",
+        "r": [
+          1154,
+          286,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8318:1768",
+        "name": "Property group / Shadow",
+        "parent": "Inspector properties / IN-12",
+        "r": [
+          1140,
+          336,
+          300,
+          63
+        ]
+      },
+      {
+        "id": "8318:1771",
+        "name": "Property group / Filters",
+        "parent": "Inspector properties / IN-12",
+        "r": [
+          1140,
+          403,
+          300,
+          63
+        ]
+      },
+      {
+        "id": "8318:1774",
+        "name": "Property group / Transform & motion",
+        "parent": "Inspector properties / IN-12",
+        "r": [
+          1140,
+          470,
+          300,
+          63
+        ]
+      },
+      {
+        "id": "8318:1777",
+        "name": "Property group / Interactions",
+        "parent": "Inspector properties / IN-12",
+        "r": [
+          1140,
+          537,
+          300,
+          192
+        ]
+      },
+      {
+        "id": "8318:1779",
+        "name": "Property / On click / default",
+        "parent": "Property group / Interactions",
+        "r": [
+          1154,
+          572,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8318:1783",
+        "name": "Property / Duration / default",
+        "parent": "Property group / Interactions",
+        "r": [
+          1154,
+          609,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8318:1787",
+        "name": "Property / Delay / default",
+        "parent": "Property group / Interactions",
+        "r": [
+          1154,
+          646,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8318:1791",
+        "name": "Property / Easing / default",
+        "parent": "Property group / Interactions",
+        "r": [
+          1154,
+          683,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8318:1795",
+        "name": "Preview",
+        "parent": "Inspector properties / IN-12",
+        "r": [
+          1154,
+          733,
+          130,
+          30
+        ]
+      },
+      {
+        "id": "8318:1797",
+        "name": "Disable",
+        "parent": "Inspector properties / IN-12",
+        "r": [
+          1296,
+          733,
+          130,
+          30
+        ]
+      },
+      {
+        "id": "8318:1799",
+        "name": "+ Add interaction",
+        "parent": "Inspector properties / IN-12",
+        "r": [
+          1154,
+          773,
+          228,
+          30
+        ]
+      },
+      {
+        "id": "8318:1801",
+        "name": "Remove interaction",
+        "parent": "Inspector properties / IN-12",
+        "r": [
+          1392,
+          773,
+          34,
+          30
+        ]
+      }
+    ]
+  },
+  {
+    "id": "8318:1807",
+    "code": "IN-13",
+    "nodes": [
+      {
+        "id": "8318:1818",
+        "name": "⌘ K",
+        "parent": "Application header",
+        "r": [
+          1034,
+          13,
+          52,
+          30
+        ]
+      },
+      {
+        "id": "8318:1820",
+        "name": "History",
+        "parent": "Application header",
+        "r": [
+          1094,
+          13,
+          70,
+          30
+        ]
+      },
+      {
+        "id": "8318:1822",
+        "name": "Review",
+        "parent": "Application header",
+        "r": [
+          1170,
+          13,
+          70,
+          30
+        ]
+      },
+      {
+        "id": "8318:1824",
+        "name": "Preview",
+        "parent": "Application header",
+        "r": [
+          1248,
+          13,
+          80,
+          30
+        ]
+      },
+      {
+        "id": "8318:1826",
+        "name": "Publish",
+        "parent": "Application header",
+        "r": [
+          1336,
+          13,
+          88,
+          30
+        ]
+      },
+      {
+        "id": "8318:1853",
+        "name": "Action / help",
+        "parent": "Primary navigation",
+        "r": [
+          16,
+          852,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8318:1966",
+        "name": "Action / close",
+        "parent": "Left drawer / Layers",
+        "r": [
+          304,
+          66,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8318:1969",
+        "name": "Search / Search layers",
+        "parent": "Left drawer / Layers",
+        "r": [
+          72,
+          109,
+          256,
+          32
+        ]
+      },
+      {
+        "id": "8318:1973",
+        "name": "Row / Body",
+        "parent": "Left drawer / Layers",
+        "r": [
+          72,
+          155,
+          256,
+          32
+        ]
+      },
+      {
+        "id": "8318:1977",
+        "name": "Row / Main section",
+        "parent": "Left drawer / Layers",
+        "r": [
+          84,
+          191,
+          244,
+          32
+        ]
+      },
+      {
+        "id": "8318:1981",
+        "name": "Row / Heading",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          227,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8318:1985",
+        "name": "Row / Paragraph",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          263,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8318:1989",
+        "name": "Row / Project image",
+        "parent": "Left drawer / Layers",
+        "r": [
+          96,
+          299,
+          232,
+          32
+        ]
+      },
+      {
+        "id": "8318:1893",
+        "name": "Desktop",
+        "parent": "Page and breakpoint context",
+        "r": [
+          1032,
+          67,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8318:1956",
+        "name": "Explore our work",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          394,
+          632,
+          132,
+          30
+        ]
+      },
+      {
+        "id": "8318:1958",
+        "name": "Selection / Project image",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          392,
+          379,
+          696,
+          229
+        ]
+      },
+      {
+        "id": "8318:1961",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          389,
+          376,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8318:1962",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          1085,
+          376,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8318:1963",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          389,
+          605,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8318:1964",
+        "name": "Resize handle",
+        "parent": "Website document / 1200 authored px",
+        "r": [
+          1085,
+          605,
+          6,
+          6
+        ]
+      },
+      {
+        "id": "8318:1919",
+        "name": "Action / undo",
+        "parent": "Canvas toolbar",
+        "r": [
+          348,
+          868,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8318:1922",
+        "name": "Action / redo",
+        "parent": "Canvas toolbar",
+        "r": [
+          380,
+          868,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8318:1925",
+        "name": "63% ⌄",
+        "parent": "Canvas toolbar",
+        "r": [
+          419,
+          867,
+          74,
+          30
+        ]
+      },
+      {
+        "id": "8318:1930",
+        "name": "Open selected-element AI",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1331,
+          64,
+          35,
+          30
+        ]
+      },
+      {
+        "id": "8318:1932",
+        "name": "Action / more",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1373,
+          64,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8318:1935",
+        "name": "Action / close",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1406,
+          64,
+          28,
+          28
+        ]
+      },
+      {
+        "id": "8318:1939",
+        "name": "Style",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1154,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8318:1940",
+        "name": "Content",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1248,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8318:1942",
+        "name": "Effects",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1342,
+          133,
+          80,
+          17
+        ]
+      },
+      {
+        "id": "8318:1944",
+        "name": "Desktop",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1154,
+          173,
+          91,
+          22
+        ]
+      },
+      {
+        "id": "8318:1945",
+        "name": "Desktop",
+        "parent": "Desktop",
+        "r": [
+          1161,
+          176,
+          77,
+          16
+        ]
+      },
+      {
+        "id": "8318:1946",
+        "name": "Base state",
+        "parent": "Right workspace / Inspector",
+        "r": [
+          1253,
+          173,
+          88,
+          22
+        ]
+      },
+      {
+        "id": "8318:1947",
+        "name": "Base state",
+        "parent": "Base state",
+        "r": [
+          1260,
+          176,
+          74,
+          16
+        ]
+      },
+      {
+        "id": "8318:1996",
+        "name": "Property group / Accessibility",
+        "parent": "Inspector properties / IN-13",
+        "r": [
+          1140,
+          251,
+          300,
+          153
+        ]
+      },
+      {
+        "id": "8318:1998",
+        "name": "Property / Alt text / default",
+        "parent": "Property group / Accessibility",
+        "r": [
+          1154,
+          286,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8318:2002",
+        "name": "Property / Tab index / default",
+        "parent": "Property group / Accessibility",
+        "r": [
+          1154,
+          323,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8318:2007",
+        "name": "Property group / Attributes",
+        "parent": "Inspector properties / IN-13",
+        "r": [
+          1140,
+          408,
+          300,
+          155
+        ]
+      },
+      {
+        "id": "8318:2009",
+        "name": "Property / ID / default",
+        "parent": "Property group / Attributes",
+        "r": [
+          1154,
+          443,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8318:2013",
+        "name": "Property / Title / default",
+        "parent": "Property group / Attributes",
+        "r": [
+          1154,
+          480,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8318:2017",
+        "name": "Property / Decoding / default",
+        "parent": "Property group / Attributes",
+        "r": [
+          1154,
+          517,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8318:2021",
+        "name": "Property group / CSS classes",
+        "parent": "Inspector properties / IN-13",
+        "r": [
+          1140,
+          567,
+          300,
+          44
+        ]
+      },
+      {
+        "id": "8318:2023",
+        "name": "project-image ⌄",
+        "parent": "Inspector properties / IN-13",
+        "r": [
+          1154,
+          600,
+          154,
+          22
+        ]
+      },
+      {
+        "id": "8318:2024",
+        "name": "project-image ⌄",
+        "parent": "project-image ⌄",
+        "r": [
+          1161,
+          603,
+          140,
+          16
+        ]
+      },
+      {
+        "id": "8318:2025",
+        "name": "Property group / Add class",
+        "parent": "Inspector properties / IN-13",
+        "r": [
+          1140,
+          635,
+          300,
+          81
+        ]
+      },
+      {
+        "id": "8318:2027",
+        "name": "Property / Class / default",
+        "parent": "Property group / Add class",
+        "r": [
+          1154,
+          670,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8318:2031",
+        "name": "Property group / Custom attributes",
+        "parent": "Inspector properties / IN-13",
+        "r": [
+          1140,
+          720,
+          300,
+          81
+        ]
+      },
+      {
+        "id": "8318:2033",
+        "name": "Property / data-project / default",
+        "parent": "Property group / Custom attributes",
+        "r": [
+          1154,
+          755,
+          272,
+          34
+        ]
+      },
+      {
+        "id": "8318:2037",
+        "name": "+ Add attribute",
+        "parent": "Inspector properties / IN-13",
+        "r": [
+          1154,
+          805,
+          272,
+          30
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,165 @@
+{
+  "_status": "SUPERSEDED 2026-10-18 — historical checkpoint; see panels/ and design-audit-2026-10-18/",
+  "date": "2026-10-16",
+  "mode": "FIGMA_DESIGN_ONLY",
+  "fileKey": "6yvgev9dRXrSLPluWkjDoz",
+  "fileUrl": "https://www.figma.com/design/6yvgev9dRXrSLPluWkjDoz?node-id=28-1520",
+  "pageId": "0:1",
+  "baselineFileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "baselinePageId": "8280:2",
+  "sourceCommit": "19f964d5e7efda2c276a4c185782bb963da605ec",
+  "batch00": "PLANNING_ARTIFACTS_VERIFIED",
+  "boards": [
+    {
+      "nodeId": "2:2",
+      "name": "scope",
+      "screenshot": "evidence/improvement-plan-scope.png",
+      "structuralCheck": "PASS",
+      "visualInspection": "PASS: readable, no clipping or overlap observed"
+    },
+    {
+      "nodeId": "2:23",
+      "name": "core-sequence",
+      "screenshot": "evidence/improvement-plan-core-sequence.png",
+      "structuralCheck": "PASS",
+      "visualInspection": "PASS: readable, no clipping or overlap observed"
+    },
+    {
+      "nodeId": "2:47",
+      "name": "shared-sequence",
+      "screenshot": "evidence/improvement-plan-shared-sequence.png",
+      "structuralCheck": "PASS",
+      "visualInspection": "PASS: readable, no clipping or overlap observed"
+    },
+    {
+      "nodeId": "2:71",
+      "name": "comparative-qa",
+      "screenshot": "evidence/improvement-plan-comparative-qa.png",
+      "structuralCheck": "PASS",
+      "visualInspection": "PASS: readable, no clipping or overlap observed"
+    }
+  ],
+  "batch01a": "REFERENCE STUDY / NOT ACCEPTED as redesign; historical QA retained",
+  "laterBatches": "PLANNED",
+  "originalFigmaWrites": 0,
+  "applicationCodeChanges": 0,
+  "deploymentActions": 0,
+  "savedProjectMutations": 0,
+  "runtimeQAThisCheckpoint": "Observed Canvas/Layers selection of same ID and opening Advanced/font/menu; no value writes or save/reopen/Undo tests",
+  "missingFreshBaselineFrames": [
+    95,
+    96,
+    98,
+    99
+  ],
+  "independentReview": {
+    "reviewer": "audit_spec_review",
+    "verdict": "PASS: staged plan only; no blocking corrections",
+    "requiredBookkeeping": "Completed: actual board IDs and four visual-check results recorded",
+    "doesNotApprove": "Product screens, implementation or runtime QA"
+  },
+  "nextTask": "Finish architecture gate review, then detailed module workflows and responsive/error/recovery states; no application code.",
+  "batch01aPageId": "6:8080",
+  "batch01aFrames": [
+    {
+      "name": "normal",
+      "nodeId": "6:8134",
+      "screenshot": "evidence/batch01a-proposed-normal.png"
+    },
+    {
+      "name": "wide",
+      "nodeId": "6:8611",
+      "screenshot": "evidence/batch01a-proposed-wide.png"
+    },
+    {
+      "name": "advanced",
+      "nodeId": "6:9089",
+      "screenshot": "evidence/batch01a-proposed-advanced.png"
+    },
+    {
+      "name": "short",
+      "nodeId": "6:9649",
+      "screenshot": "evidence/batch01a-proposed-short.png"
+    },
+    {
+      "name": "error",
+      "nodeId": "6:10127",
+      "screenshot": "evidence/batch01a-proposed-error.png"
+    },
+    {
+      "name": "inline",
+      "nodeId": "6:10605",
+      "screenshot": "evidence/batch01a-proposed-inline.png"
+    },
+    {
+      "name": "menu",
+      "nodeId": "6:11085",
+      "screenshot": "evidence/batch01a-proposed-menu.png"
+    },
+    {
+      "name": "font",
+      "nodeId": "6:11581",
+      "screenshot": "evidence/batch01a-proposed-font.png"
+    }
+  ],
+  "batch01aIndependentReview": {
+    "reviewer": "audit_spec_review",
+    "verdict": "Core Heading/Typography sound; visual corrections requested and applied; no unsupported expansion",
+    "corrections": [
+      "swatch value",
+      "decoration cues",
+      "font excerpt scope",
+      "menu stacking",
+      "canvas actions",
+      "current documentation"
+    ],
+    "remaining": "Prototype playback, long-content stress and unchanged-surface completeness; see BATCH-01A.md"
+  },
+  "activeMode": "STATIC WIREFRAMING \u2192 module design \u2192 comparative QA",
+  "userSteering": "Explicitly confirmed: no code implementation; Figma product design only. Complete wireframes, detailed design, preservation review and design QA autonomously without repeated confirmation.",
+  "wireframes": {
+    "pageId": "25:1520",
+    "status": "REFERENCE STUDY / NOT ACCEPTED",
+    "frames": [
+      {
+        "id": "25:1521",
+        "name": "WF01 Heading/core"
+      },
+      {
+        "id": "25:2028",
+        "name": "WF02 Advanced"
+      },
+      {
+        "id": "25:2618",
+        "name": "WF03 Short workspace"
+      }
+    ],
+    "prototypeReactions": 0
+  },
+  "batch01aPlayback": {
+    "passed": 9,
+    "evidence": "evidence/batch01a-playback-results.json",
+    "scope": "Navigation destinations and three Escape returns; synthetic pointer input and browser keyboard",
+    "unverified": "Full focus, data edits, short-height scroll playback, Enter/error paths"
+  },
+  "architecture": {
+    "pageId": "28:1520",
+    "status": "STATIC CANDIDATE \u2014 independent review permits further design; not detailed acceptance",
+    "frames": [
+      "28:1521",
+      "28:1674",
+      "28:1804",
+      "28:1954",
+      "28:2062",
+      "28:2220"
+    ],
+    "recommendedCandidate": "A \u2014 persistent Structure and object editor",
+    "prototypeReactions": 0,
+    "spec": "ARCHITECTURE-DECISION.md",
+    "review": {
+      "reviewer": "audit_spec_review",
+      "corrections": "Heading Layout hidden; CSS animation canonical owner clarified",
+      "remaining": "Element conditions target/no-selection/deleted-target states specified but not drawn; detailed module and responsive QA outstanding"
+    }
+  }
+}

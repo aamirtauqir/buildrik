@@ -1,0 +1,21 @@
+[
+  {
+    "goto": "8884:17236",
+    "wait": 5000
+  },
+  {
+    "x": 1260,
+    "y": 393,
+    "shot": "r35-layers-reordered.png"
+  },
+  {
+    "x": 1260,
+    "y": 433,
+    "shot": "r35-layers-nested.png"
+  },
+  {
+    "x": 1260,
+    "y": 473,
+    "shot": "r35-layers-undo.png"
+  }
+]

@@ -1,0 +1,14 @@
+[
+  {
+    "label": "Updated Brand section entry",
+    "goto": "8539:11118",
+    "wait": 7000,
+    "shot": "r33-brand-sections-final.png"
+  },
+  {
+    "label": "Hero opens Blocks",
+    "x": 538,
+    "y": 223,
+    "shot": "r33-brand-blocks-handoff-final.png"
+  }
+]

@@ -1,0 +1,302 @@
+{
+  "screens": [
+    {
+      "key": "T01",
+      "id": "8507:2799",
+      "name": "T01 / Integrated inspector / Image settings",
+      "inspector": "8507:2855",
+      "actions": [
+        {
+          "id": "8507:3004",
+          "label": "Use descriptive alt"
+        },
+        {
+          "id": "8507:3006",
+          "label": "View email field"
+        }
+      ],
+      "bounds": {
+        "w": 1440,
+        "h": 1000
+      },
+      "instanceCount": 38
+    },
+    {
+      "key": "T02",
+      "id": "8507:3011",
+      "name": "T02 / Integrated inspector / Image alt text updated",
+      "inspector": "8507:3067",
+      "actions": [
+        {
+          "id": "8507:3216",
+          "label": "Undo alt text"
+        },
+        {
+          "id": "8507:3218",
+          "label": "View email field"
+        }
+      ],
+      "bounds": {
+        "w": 1440,
+        "h": 1000
+      },
+      "instanceCount": 38
+    },
+    {
+      "key": "T03",
+      "id": "8507:246872",
+      "name": "T03 / Integrated inspector / Email field settings",
+      "inspector": "8507:246928",
+      "actions": [
+        {
+          "id": "8507:247077",
+          "label": "Make field required"
+        },
+        {
+          "id": "8507:247079",
+          "label": "Form submission settings"
+        }
+      ],
+      "bounds": {
+        "w": 1440,
+        "h": 1000
+      },
+      "instanceCount": 38
+    },
+    {
+      "key": "T04",
+      "id": "8507:247087",
+      "name": "T04 / Integrated inspector / Required email field",
+      "inspector": "8507:247143",
+      "actions": [
+        {
+          "id": "8507:247292",
+          "label": "Undo required"
+        },
+        {
+          "id": "8507:247294",
+          "label": "Form submission settings"
+        }
+      ],
+      "bounds": {
+        "w": 1440,
+        "h": 1000
+      },
+      "instanceCount": 38
+    },
+    {
+      "key": "T05",
+      "id": "8507:247302",
+      "name": "T05 / Integrated inspector / Form submission settings",
+      "inspector": "8507:247358",
+      "actions": [
+        {
+          "id": "8507:247497",
+          "label": "Review redirect"
+        },
+        {
+          "id": "8507:247499",
+          "label": "Select email field"
+        }
+      ],
+      "bounds": {
+        "w": 1440,
+        "h": 1000
+      },
+      "instanceCount": 36
+    },
+    {
+      "key": "T06",
+      "id": "8507:247507",
+      "name": "T06 / Integrated inspector / Form redirect needs URL",
+      "inspector": "8507:247563",
+      "actions": [
+        {
+          "id": "8507:247702",
+          "label": "Cancel redirect"
+        },
+        {
+          "id": "8507:247704",
+          "label": "Select email field"
+        }
+      ],
+      "bounds": {
+        "w": 1440,
+        "h": 1000
+      },
+      "instanceCount": 36
+    },
+    {
+      "key": "T07",
+      "id": "8507:247712",
+      "name": "T07 / Integrated inspector / Collection list settings",
+      "inspector": "8507:247768",
+      "actions": [
+        {
+          "id": "8507:247890",
+          "label": "Show 2 items"
+        },
+        {
+          "id": "8507:247892",
+          "label": "View component instance"
+        }
+      ],
+      "bounds": {
+        "w": 1440,
+        "h": 1000
+      },
+      "instanceCount": 36
+    },
+    {
+      "key": "T08",
+      "id": "8507:247900",
+      "name": "T08 / Integrated inspector / Collection limit updated",
+      "inspector": "8507:247956",
+      "actions": [
+        {
+          "id": "8507:248078",
+          "label": "Undo limit"
+        },
+        {
+          "id": "8507:248080",
+          "label": "View component instance"
+        }
+      ],
+      "bounds": {
+        "w": 1440,
+        "h": 1000
+      },
+      "instanceCount": 36
+    },
+    {
+      "key": "T09",
+      "id": "8507:248087",
+      "name": "T09 / Integrated inspector / Component instance settings",
+      "inspector": "8507:248143",
+      "actions": [
+        {
+          "id": "8507:248287",
+          "label": "Review reset"
+        },
+        {
+          "id": "8507:248289",
+          "label": "View project image"
+        }
+      ],
+      "bounds": {
+        "w": 1440,
+        "h": 1000
+      },
+      "instanceCount": 37
+    },
+    {
+      "key": "T10",
+      "id": "8507:248294",
+      "name": "T10 / Integrated inspector / Reset instance review",
+      "inspector": "8507:248350",
+      "actions": [
+        {
+          "id": "8507:248462",
+          "label": "Reset this instance"
+        },
+        {
+          "id": "8507:248464",
+          "label": "Cancel reset"
+        }
+      ],
+      "bounds": {
+        "w": 1440,
+        "h": 1000
+      },
+      "instanceCount": 34
+    },
+    {
+      "key": "T11",
+      "id": "8507:248469",
+      "name": "T11 / Integrated inspector / Instance reset result",
+      "inspector": "8507:248525",
+      "actions": [
+        {
+          "id": "8507:248669",
+          "label": "Undo reset"
+        },
+        {
+          "id": "8507:248671",
+          "label": "View project image"
+        }
+      ],
+      "bounds": {
+        "w": 1440,
+        "h": 1000
+      },
+      "instanceCount": 37
+    }
+  ],
+  "directEdges": [
+    {
+      "id": "8507:2934",
+      "label": "Alt text",
+      "from": "8507:2799",
+      "to": "8507:3011",
+      "x": 1265,
+      "y": 306
+    },
+    {
+      "id": "8507:3146",
+      "label": "Alt text",
+      "from": "8507:3011",
+      "to": "8507:2799",
+      "x": 1265,
+      "y": 306
+    },
+    {
+      "id": "8507:247039",
+      "label": "Required",
+      "from": "8507:246872",
+      "to": "8507:247087",
+      "x": 1265,
+      "y": 436
+    },
+    {
+      "id": "8507:247254",
+      "label": "Required",
+      "from": "8507:247087",
+      "to": "8507:246872",
+      "x": 1265,
+      "y": 436
+    },
+    {
+      "id": "8507:247432",
+      "label": "Then",
+      "from": "8507:247302",
+      "to": "8507:247507",
+      "x": 1265,
+      "y": 262
+    },
+    {
+      "id": "8507:247847",
+      "label": "Show items",
+      "from": "8507:247712",
+      "to": "8507:247900",
+      "x": 1265,
+      "y": 306
+    },
+    {
+      "id": "8507:248035",
+      "label": "Show items",
+      "from": "8507:247900",
+      "to": "8507:247712",
+      "x": 1265,
+      "y": 306
+    }
+  ],
+  "readback": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"mutatedNodeIds\":[\"8507:2885\",\"8507:3097\",\"8507:246958\",\"8507:247173\",\"8507:247388\",\"8507:247593\",\"8507:247798\",\"8507:247986\",\"8507:248173\",\"8507:248380\",\"8507:248555\"],\"summary\":[{\"id\":\"8507:2799\",\"name\":\"T01 / Integrated inspector / Image settings\",\"nodeCount\":144,\"instanceCount\":38,\"connectedSources\":12,\"inspectorOverflow\":[]},{\"id\":\"8507:3011\",\"name\":\"T02 / Integrated inspector / Image alt text updated\",\"nodeCount\":144,\"instanceCount\":38,\"connectedSources\":13,\"inspectorOverflow\":[]},{\"id\":\"8507:246872\",\"name\":\"T03 / Integrated inspector / Email field settings\",\"nodeCount\":144,\"instanceCount\":38,\"connectedSources\":12,\"inspectorOverflow\":[]},{\"id\":\"8507:247087\",\"name\":\"T04 / Integrated inspector / Required email field\",\"nodeCount\":144,\"instanceCount\":38,\"connectedSources\":13,\"inspectorOverflow\":[]},{\"id\":\"8507:247302\",\"name\":\"T05 / Integrated inspector / Form submission settings\",\"nodeCount\":134,\"instanceCount\":36,\"connectedSources\":12,\"inspectorOverflow\":[]},{\"id\":\"8507:247507\",\"name\":\"T06 / Integrated inspector / Form redirect needs URL\",\"nodeCount\":134,\"instanceCount\":36,\"connectedSources\":12,\"inspectorOverflow\":[]},{\"id\":\"8507:247712\",\"name\":\"T07 / Integrated inspector / Collection list settings\",\"nodeCount\":132,\"instanceCount\":36,\"connectedSources\":12,\"inspectorOverflow\":[]},{\"id\":\"8507:247900\",\"name\":\"T08 / Integrated inspector / Collection limit updated\",\"nodeCount\":131,\"instanceCount\":36,\"connectedSources\":13,\"inspectorOverflow\":[]},{\"id\":\"8507:248087\",\"name\":\"T09 / Integrated inspector / Component instance settings\",\"nodeCount\":139,\"instanceCount\":37,\"connectedSources\":11,\"inspectorOverflow\":[]},{\"id\":\"8507:248294\",\"name\":\"T10 / Integrated inspector / Reset instance review\",\"nodeCount\":122,\"instanceCount\":34,\"connectedSources\":12,\"inspectorOverflow\":[]},{\"id\":\"8507:248469\",\"name\":\"T11 / Integrated inspector / Instance reset result\",\"nodeCount\":139,\"instanceCount\":37,\"connectedSources\":12,\"inspectorOverflow\":[]}]}"
+      }
+    ],
+    "isError": false
+  }
+}

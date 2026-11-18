@@ -1,0 +1,161 @@
+Screen,Control node,Control label,Playback status,Evidence,Coverage scope
+I01,8467:142,Typography,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+I01,8467:144,Appearance,not played,,Primary-action subset only; not full product denominator
+I01,8467:146,Edit grid,not played,,Primary-action subset only; not full product denominator
+I01,8467:148,Box spacing,not played,,Primary-action subset only; not full product denominator
+I02,8468:196,Mobile override,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+I02,8468:198,Class manager,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+I02,8468:200,Layout,not played,,Primary-action subset only; not full product denominator
+I02,8468:202,Ask AI,not played,,Primary-action subset only; not full product denominator
+I03,8468:344,Hover state,not played,,Primary-action subset only; not full product denominator
+I03,8468:346,Layout,not played,,Primary-action subset only; not full product denominator
+I03,8468:348,Interactions,not played,,Primary-action subset only; not full product denominator
+I04,8468:496,Two columns,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+I04,8468:498,Layout,not played,,Primary-action subset only; not full product denominator
+I04,8468:500,Ask AI,not played,,Primary-action subset only; not full product denominator
+I05,8468:633,Apply 32px padding,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+I05,8468:635,Layout,not played,,Primary-action subset only; not full product denominator
+I06,8468:244426,Reset font size,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+I06,8468:244428,Desktop,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+I06,8468:244430,Ask AI,not played,,Primary-action subset only; not full product denominator
+I07,8468:244564,Preview shared change,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+I07,8468:244566,Back to typography,not played,,Primary-action subset only; not full product denominator
+I08,8468:244700,Base appearance,not played,,Primary-action subset only; not full product denominator
+I08,8468:244702,Interactions,not played,,Primary-action subset only; not full product denominator
+I09,8468:244842,Style,not played,,Primary-action subset only; not full product denominator
+I09,8468:244844,AI copy edit,not played,,Primary-action subset only; not full product denominator
+I09,8468:244846,Interaction settings,not played,,Primary-action subset only; not full product denominator
+I10,8468:244984,Preview animation,not played,,Primary-action subset only; not full product denominator
+I10,8468:244986,Style,not played,,Primary-action subset only; not full product denominator
+I11,8468:245120,Inspect Heading,not played,,Primary-action subset only; not full product denominator
+I11,8468:245122,Team presence,not played,,Primary-action subset only; not full product denominator
+I12,8468:245243,Undo columns,destination checked,phase6-expansion-field-playback.json,Primary-action subset only; not full product denominator
+I12,8468:245245,Mobile,not played,,Primary-action subset only; not full product denominator
+I13,8468:245356,Undo spacing,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+I13,8468:245358,Layout,not played,,Primary-action subset only; not full product denominator
+I14,8468:245476,Undo reset,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+I14,8468:245478,Desktop typography,not played,,Primary-action subset only; not full product denominator
+I15,8468:245600,Apply class change,destination checked,phase6-expansion-field-playback.json,Primary-action subset only; not full product denominator
+I15,8468:245602,Cancel,not played,,Primary-action subset only; not full product denominator
+I16,8468:245716,Replay setup,not played,,Primary-action subset only; not full product denominator
+I16,8468:245718,Back to Style,not played,,Primary-action subset only; not full product denominator
+I17,8468:245828,Undo shared change,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+I17,8468:245830,Back to Style,not played,,Primary-action subset only; not full product denominator
+A01,8468:245909,Generate proposal,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+A01,8468:245911,Change scope,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+A01,8468:245913,History,not played,,Primary-action subset only; not full product denominator
+A02,8468:245993,Use page scope,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+A02,8468:245995,Use element scope,not played,,Primary-action subset only; not full product denominator
+A02,8468:245997,Use site scope,not played,,Primary-action subset only; not full product denominator
+A03,8468:246077,View proposal,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+A03,8468:246079,Cancel generation,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+A03,8468:246081,Error scenario,not played,,Primary-action subset only; not full product denominator
+A04,8468:246161,Apply change,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+A04,8468:246163,Discard,not played,,Primary-action subset only; not full product denominator
+A04,8468:246165,Stale scenario,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+A05,8468:246241,Undo AI change,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+A05,8468:246243,Continue editing,destination checked,phase6-expansion-field-playback.json,Primary-action subset only; not full product denominator
+A05,8468:246245,New request,not played,,Primary-action subset only; not full product denominator
+A06,8468:246325,Regenerate,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+A06,8468:246327,Discard proposal,not played,,Primary-action subset only; not full product denominator
+A07,8468:246407,Retry request,not played,,Primary-action subset only; not full product denominator
+A07,8468:246409,AI settings,not played,,Primary-action subset only; not full product denominator
+A07,8468:246411,Back,not played,,Primary-action subset only; not full product denominator
+A08,8468:246491,Open heading result,not played,,Primary-action subset only; not full product denominator
+A08,8468:246493,New conversation,not played,,Primary-action subset only; not full product denominator
+A08,8468:246495,Open site review,not played,,Primary-action subset only; not full product denominator
+A09,8468:246574,Plan as agent task,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+A09,8468:246576,Change scope,not played,,Primary-action subset only; not full product denominator
+A10,8468:246655,Create site audit task,not played,,Primary-action subset only; not full product denominator
+A10,8468:246657,Change scope,not played,,Primary-action subset only; not full product denominator
+A10,8468:246659,Usage & limits,not played,,Primary-action subset only; not full product denominator
+A11,8468:246739,Back to assistant,not played,,Primary-action subset only; not full product denominator
+A11,8468:246741,Quota exhausted,not played,,Primary-action subset only; not full product denominator
+A12,8468:246817,Review existing proposal,not played,,Primary-action subset only; not full product denominator
+A12,8468:246819,Usage settings,not played,,Primary-action subset only; not full product denominator
+A12,8468:246821,Return to editor,not played,,Primary-action subset only; not full product denominator
+G01,8468:246901,New task,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+G01,8468:246903,View active run,not played,,Primary-action subset only; not full product denominator
+G01,8468:246905,Review ready result,not played,,Primary-action subset only; not full product denominator
+G02,8468:246984,Generate plan,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+G02,8468:246986,Cancel task,not played,,Primary-action subset only; not full product denominator
+G02,8468:246988,Site audit preset,not played,,Primary-action subset only; not full product denominator
+G03,8468:247068,Approve & run,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+G03,8468:247070,Edit task,not played,,Primary-action subset only; not full product denominator
+G03,8468:247072,Cancel,not played,,Primary-action subset only; not full product denominator
+G04,8468:247152,Review result,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+G04,8468:247154,Cancel run,not played,,Primary-action subset only; not full product denominator
+G04,8468:247156,Failure scenario,not played,,Primary-action subset only; not full product denominator
+G05,8468:247236,Apply 4 changes,not played,,Primary-action subset only; not full product denominator
+G05,8468:247238,Review 2 changes,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+G05,8468:247240,Reject all,not played,,Primary-action subset only; not full product denominator
+G05,8468:247242,Stale baseline,not played,,Primary-action subset only; not full product denominator
+G06,8468:247322,Undo change set,not played,,Primary-action subset only; not full product denominator
+G06,8468:247324,Open editor,not played,,Primary-action subset only; not full product denominator
+G06,8468:247326,All agent runs,not played,,Primary-action subset only; not full product denominator
+G07,8468:247406,Open run 014,not played,,Primary-action subset only; not full product denominator
+G07,8468:247408,Start new task,not played,,Primary-action subset only; not full product denominator
+G08,8468:247484,Edit & restart,not played,,Primary-action subset only; not full product denominator
+G08,8468:247486,View runs,not played,,Primary-action subset only; not full product denominator
+G09,8468:247566,Retry validation,not played,,Primary-action subset only; not full product denominator
+G09,8468:247568,Edit task,not played,,Primary-action subset only; not full product denominator
+G09,8468:247570,Cancel,not played,,Primary-action subset only; not full product denominator
+G10,8468:247650,Apply selected 2,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+G10,8468:247652,Select all,not played,,Primary-action subset only; not full product denominator
+G10,8468:247654,Discard,not played,,Primary-action subset only; not full product denominator
+G11,8468:247730,Review audit plan,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+G11,8468:247732,Back,not played,,Primary-action subset only; not full product denominator
+G12,8468:247808,Refresh task,not played,,Primary-action subset only; not full product denominator
+G12,8468:247810,Discard result,not played,,Primary-action subset only; not full product denominator
+G12,8468:247812,View team changes,not played,,Primary-action subset only; not full product denominator
+G13,8468:247888,Undo selected edits,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+G13,8468:247890,Open Mobile editor,not played,,Primary-action subset only; not full product denominator
+G13,8468:247892,Run history,not played,,Primary-action subset only; not full product denominator
+G14,8468:247972,Run audit,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+G14,8468:247974,Edit scope,not played,,Primary-action subset only; not full product denominator
+G14,8468:247976,Cancel,not played,,Primary-action subset only; not full product denominator
+G15,8468:248056,Inspect element settings,not played,,Primary-action subset only; not full product denominator
+G15,8468:248058,View agent runs,not played,,Primary-action subset only; not full product denominator
+C01,8468:248136,Share & permissions,not played,,Primary-action subset only; not full product denominator
+C01,8468:248138,Open comments,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+C01,8468:248140,Activity,not played,,Primary-action subset only; not full product denominator
+C01,8468:248142,Connection lost,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+C02,8468:248220,Review invitation,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+C02,8468:248222,Client review,not played,,Primary-action subset only; not full product denominator
+C02,8468:248224,Back to team,not played,,Primary-action subset only; not full product denominator
+C03,8468:248302,Open thread,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+C03,8468:248304,Ask AI about heading,not played,,Primary-action subset only; not full product denominator
+C03,8468:248306,Team,not played,,Primary-action subset only; not full product denominator
+C04,8468:248384,Resolve thread,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+C04,8468:248386,Back to comments,not played,,Primary-action subset only; not full product denominator
+C04,8468:248388,Inspect heading,not played,,Primary-action subset only; not full product denominator
+C05,8468:248466,Review conflicting edit,not played,,Primary-action subset only; not full product denominator
+C05,8468:248468,Agent run,not played,,Primary-action subset only; not full product denominator
+C05,8468:248470,Team,not played,,Primary-action subset only; not full product denominator
+C06,8468:248548,Preview reviewer view,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+C06,8468:248550,Back to permissions,not played,,Primary-action subset only; not full product denominator
+C07,8468:248628,Reconnect · conflict,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+C07,8468:248630,Return to team,not played,,Primary-action subset only; not full product denominator
+C08,8468:248708,Use server 32px,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+C08,8468:248710,Reapply my 24px,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+C08,8468:248712,Decide later,not played,,Primary-action subset only; not full product denominator
+C09,8468:248790,Send invitation,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+C09,8468:248792,Edit invitation,not played,,Primary-action subset only; not full product denominator
+C10,8468:248866,Reopen thread,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+C10,8468:248868,Back to comments,not played,,Primary-action subset only; not full product denominator
+C11,8468:248946,Approve version,destination checked,phase6-expansion-playback.json,Primary-action subset only; not full product denominator
+C11,8468:248948,Request changes,not played,,Primary-action subset only; not full product denominator
+C12,8468:249024,Return to team,not played,,Primary-action subset only; not full product denominator
+C12,8468:249026,Activity,not played,,Primary-action subset only; not full product denominator
+C13,8468:249100,Return to team,not played,,Primary-action subset only; not full product denominator
+C13,8468:249102,Activity,not played,,Primary-action subset only; not full product denominator
+C14,8468:249176,Back to permissions,not played,,Primary-action subset only; not full product denominator
+C14,8468:249178,Team,not played,,Primary-action subset only; not full product denominator
+C15,8472:2664,Back to review,not played,,Primary-action subset only; not full product denominator
+C16,8472:2667,Back to review,not played,,Primary-action subset only; not full product denominator
+I18,8472:2822,Undo AI text change,destination checked,phase6-expansion-field-playback.json,Primary-action subset only; not full product denominator
+I02,8468:171,Font size,destination checked,phase6-expansion-field-playback.json,Primary-action subset only; not full product denominator
+I02,8468:157,Class,not played,,Primary-action subset only; not full product denominator
+I04,8468:461,Columns,destination checked,phase6-expansion-field-playback.json,Primary-action subset only; not full product denominator
+I19,8480:2890,Review change,destination checked,phase6-expansion-field-playback.json,Primary-action subset only; not full product denominator
+I19,8480:2893,Cancel,destination checked,phase6-expansion-field-playback.json,Primary-action subset only; not full product denominator

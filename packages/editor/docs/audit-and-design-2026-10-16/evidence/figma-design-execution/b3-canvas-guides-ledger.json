@@ -1,0 +1,398 @@
+{
+  "createdNodeIds": [
+    "145:64586",
+    "145:65011",
+    "145:65448",
+    "145:65889",
+    "145:66698",
+    "145:67134",
+    "145:67569",
+    "145:67997",
+    "145:68426",
+    "145:68858",
+    "145:69294",
+    "145:69735",
+    "145:70156",
+    "145:70590",
+    "145:71013",
+    "145:71444",
+    "145:71878",
+    "145:72343",
+    "145:72772",
+    "145:73215",
+    "145:73657",
+    "145:74465",
+    "145:74905",
+    "145:75344",
+    "145:75774",
+    "145:76210",
+    "145:76644",
+    "145:77080",
+    "145:77521",
+    "145:77943",
+    "145:78378",
+    "145:78804",
+    "145:79239",
+    "145:79674",
+    "145:80116"
+  ],
+  "mutatedNodeIds": [
+    "I145:69021;4:547",
+    "145:69021",
+    "I145:69457;4:547",
+    "145:69457",
+    "I145:69896;4:547",
+    "145:69896",
+    "145:65000",
+    "145:65002",
+    "145:65426",
+    "145:65432",
+    "145:65446",
+    "145:65444",
+    "145:65625",
+    "145:65618",
+    "145:66057",
+    "145:67123",
+    "145:67132",
+    "145:67991",
+    "145:67995",
+    "145:68413",
+    "145:68422",
+    "145:68424",
+    "145:68417",
+    "145:68419",
+    "145:70152",
+    "145:68601",
+    "145:68600",
+    "145:67565",
+    "145:67567",
+    "145:71011",
+    "145:71428",
+    "145:71433",
+    "145:71505",
+    "145:64998",
+    "145:72408",
+    "145:65423",
+    "145:72837",
+    "145:65614",
+    "145:73280",
+    "145:66055",
+    "145:73722",
+    "145:67112",
+    "145:74530",
+    "145:67546",
+    "145:74970",
+    "145:67982",
+    "145:75409",
+    "145:68410",
+    "145:75839",
+    "145:68593",
+    "145:76275",
+    "145:69026",
+    "145:76709",
+    "145:69462",
+    "145:77145",
+    "145:70148",
+    "145:77586",
+    "145:70323",
+    "145:78008",
+    "145:71002",
+    "145:78443",
+    "145:71425",
+    "145:78869",
+    "145:71610",
+    "145:79304",
+    "145:72046",
+    "145:79739",
+    "13:2695",
+    "13:2688",
+    "144:65378",
+    "145:80377",
+    "144:66411"
+  ],
+  "frames": [
+    {
+      "id": "145:64586",
+      "name": "B3-C01 · Canvas / View menu",
+      "w": 1440,
+      "h": 900,
+      "nodes": 422,
+      "images": []
+    },
+    {
+      "id": "145:65011",
+      "name": "B3-C02 · Canvas / grid size and snap off",
+      "w": 1440,
+      "h": 900,
+      "nodes": 434,
+      "images": []
+    },
+    {
+      "id": "145:65448",
+      "name": "B3-C03 · Canvas / invalid fractional grid draft",
+      "w": 1440,
+      "h": 900,
+      "nodes": 435,
+      "images": []
+    },
+    {
+      "id": "145:65889",
+      "name": "B3-C04 · Canvas / grid and snapping on at 7px",
+      "w": 1440,
+      "h": 900,
+      "nodes": 802,
+      "images": []
+    },
+    {
+      "id": "145:66698",
+      "name": "B3-C05 · Canvas / ruler guides shared across site",
+      "w": 1440,
+      "h": 900,
+      "nodes": 433,
+      "images": []
+    },
+    {
+      "id": "145:67134",
+      "name": "B3-C06 · Canvas / add guide without dragging",
+      "w": 1440,
+      "h": 900,
+      "nodes": 432,
+      "images": []
+    },
+    {
+      "id": "145:67569",
+      "name": "B3-C07 · Canvas / locked guide detail",
+      "w": 1440,
+      "h": 900,
+      "nodes": 423,
+      "images": []
+    },
+    {
+      "id": "145:67997",
+      "name": "B3-C08 · Canvas / edit guide position",
+      "w": 1440,
+      "h": 900,
+      "nodes": 426,
+      "images": []
+    },
+    {
+      "id": "145:68426",
+      "name": "B3-C09 · Canvas / guide position draft retained",
+      "w": 1440,
+      "h": 900,
+      "nodes": 427,
+      "images": []
+    },
+    {
+      "id": "145:68858",
+      "name": "B3-C10 · Canvas / guide moved, selection preserved",
+      "w": 1440,
+      "h": 900,
+      "nodes": 430,
+      "images": []
+    },
+    {
+      "id": "145:69294",
+      "name": "B3-C11 · Canvas / guide added with stable existing guides",
+      "w": 1440,
+      "h": 900,
+      "nodes": 435,
+      "images": []
+    },
+    {
+      "id": "145:69735",
+      "name": "B3-C12 · Canvas / guide removed with Undo",
+      "w": 1440,
+      "h": 900,
+      "nodes": 415,
+      "images": []
+    },
+    {
+      "id": "145:70156",
+      "name": "B3-C13 · Canvas / guide changed while editing",
+      "w": 1440,
+      "h": 900,
+      "nodes": 430,
+      "images": []
+    },
+    {
+      "id": "145:70590",
+      "name": "B3-C14 · Canvas / no ruler guides",
+      "w": 1440,
+      "h": 900,
+      "nodes": 420,
+      "images": []
+    },
+    {
+      "id": "145:71013",
+      "name": "B3-C15 · Canvas / authoring width presets",
+      "w": 1440,
+      "h": 900,
+      "nodes": 428,
+      "images": []
+    },
+    {
+      "id": "145:71444",
+      "name": "B3-C16 · Canvas / invalid custom width remains draft",
+      "w": 1440,
+      "h": 900,
+      "nodes": 429,
+      "images": []
+    },
+    {
+      "id": "145:71878",
+      "name": "B3-C17 · Canvas / Viewer inspects shared guides",
+      "w": 1440,
+      "h": 900,
+      "nodes": 434,
+      "images": []
+    },
+    {
+      "id": "145:72343",
+      "name": "Return · Canvas / View menu",
+      "w": 1440,
+      "h": 900,
+      "nodes": 406,
+      "images": []
+    },
+    {
+      "id": "145:72772",
+      "name": "Return · Canvas / grid size and snap off",
+      "w": 1440,
+      "h": 900,
+      "nodes": 406,
+      "images": []
+    },
+    {
+      "id": "145:73215",
+      "name": "Return · Canvas / invalid fractional grid draft",
+      "w": 1440,
+      "h": 900,
+      "nodes": 406,
+      "images": []
+    },
+    {
+      "id": "145:73657",
+      "name": "Return · Canvas / grid and snapping on at 7px",
+      "w": 1440,
+      "h": 900,
+      "nodes": 774,
+      "images": []
+    },
+    {
+      "id": "145:74465",
+      "name": "Return · Canvas / ruler guides shared across site",
+      "w": 1440,
+      "h": 900,
+      "nodes": 408,
+      "images": []
+    },
+    {
+      "id": "145:74905",
+      "name": "Return · Canvas / add guide without dragging",
+      "w": 1440,
+      "h": 900,
+      "nodes": 406,
+      "images": []
+    },
+    {
+      "id": "145:75344",
+      "name": "Return · Canvas / locked guide detail",
+      "w": 1440,
+      "h": 900,
+      "nodes": 407,
+      "images": []
+    },
+    {
+      "id": "145:75774",
+      "name": "Return · Canvas / edit guide position",
+      "w": 1440,
+      "h": 900,
+      "nodes": 407,
+      "images": []
+    },
+    {
+      "id": "145:76210",
+      "name": "Return · Canvas / guide position draft retained",
+      "w": 1440,
+      "h": 900,
+      "nodes": 407,
+      "images": []
+    },
+    {
+      "id": "145:76644",
+      "name": "Return · Canvas / guide moved, selection preserved",
+      "w": 1440,
+      "h": 900,
+      "nodes": 405,
+      "images": []
+    },
+    {
+      "id": "145:77080",
+      "name": "Return · Canvas / guide added with stable existing guides",
+      "w": 1440,
+      "h": 900,
+      "nodes": 406,
+      "images": []
+    },
+    {
+      "id": "145:77521",
+      "name": "Return · Canvas / guide removed with Undo",
+      "w": 1440,
+      "h": 900,
+      "nodes": 404,
+      "images": []
+    },
+    {
+      "id": "145:77943",
+      "name": "Return · Canvas / guide changed while editing",
+      "w": 1440,
+      "h": 900,
+      "nodes": 407,
+      "images": []
+    },
+    {
+      "id": "145:78378",
+      "name": "Return · Canvas / no ruler guides",
+      "w": 1440,
+      "h": 900,
+      "nodes": 406,
+      "images": []
+    },
+    {
+      "id": "145:78804",
+      "name": "Return · Canvas / authoring width presets",
+      "w": 1440,
+      "h": 900,
+      "nodes": 406,
+      "images": []
+    },
+    {
+      "id": "145:79239",
+      "name": "Return · Canvas / invalid custom width remains draft",
+      "w": 1440,
+      "h": 900,
+      "nodes": 406,
+      "images": []
+    },
+    {
+      "id": "145:79674",
+      "name": "Return · Canvas / Viewer inspects shared guides",
+      "w": 1440,
+      "h": 900,
+      "nodes": 408,
+      "images": []
+    },
+    {
+      "id": "145:80116",
+      "name": "B3-P167 · About / plan options with exact return",
+      "w": 1440,
+      "h": 900,
+      "nodes": 772,
+      "images": []
+    }
+  ],
+  "allAffectedNodeIds": "affected-nodes.json (includes inherited instance descendants)",
+  "createdNodeCount": 15737,
+  "createdNodeIdsScope": "Root IDs only; full descendant IDs in artifact"
+}

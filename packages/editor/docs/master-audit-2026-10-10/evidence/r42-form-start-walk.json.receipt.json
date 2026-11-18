@@ -1,0 +1,22 @@
+[
+  {
+    "goto": "8843:30589",
+    "wait": 6500,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-30589&starting-point-node-id=8843%3A30589&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 475,
+    "y": 96,
+    "shot": "r42-form-mobile-initial.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-30589&starting-point-node-id=8843%3A30589&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 1320,
+    "y": 212,
+    "shot": "r42-form-fields-manager.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-30589&starting-point-node-id=8843%3A30589&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

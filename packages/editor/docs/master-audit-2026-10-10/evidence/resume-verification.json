@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-10",
+  "baseCommit": "df60cf9ec727b11ec100eaab6081a7eb052950da",
+  "baseline": "All five prior modified source/test SHA-256 hashes matched prior-working-tree.json. No new production edits.",
+  "cms": {
+    "host": "http://127.0.0.1:5050/",
+    "method": "Created collection and record with browser UI. Reloaded page. Read matching collection and records via the existing dev-only Composer probe; no model injection.",
+    "collection": "Audit collection 1010",
+    "recordsAfterReload": [{"data":{"title":"Audit record alpha","slug":"audit-record-alpha"},"status":"draft"}],
+    "saveFeedback": "Record saved · Audit collection 1010. Changes to this record are live in the CMS. Published pages using this record will refresh on next build.",
+    "scope": "Local IndexedDB only. Not evidence of remote persistence or CMS binding/rendering. Post-reload UI navigation was interrupted by automation daemon timeouts; model round trip succeeded."
+  },
+  "tests": {
+    "command": "npx vitest run src/editor/cms/__tests__/RecordSheet.test.tsx src/editor/cms/__tests__/CmsWorkspace.recordSave.test.tsx src/engine/components/__tests__/ComponentManager.test.ts src/engine/components/__tests__/ComponentInstance.overrides.test.ts src/engine/components/__tests__/override-sync.test.ts",
+    "filesPassed": 5,
+    "testsPassed": 63,
+    "durationSeconds": 98.31,
+    "scope": "Existing tests, unchanged. Does not certify complete browser workflows."
+  },
+  "authenticatedAccess": {
+    "method": "Reused repository-provided Playwright storageState without exporting credentials.",
+    "requested": "http://localhost:3000/dashboard",
+    "actual": "http://localhost:3000/auth",
+    "evidence": "resume-dashboard.json",
+    "status": "Blocked pending usable test-account session"
+  },
+  "tooling": "Sandbox Chromium launch crashed; approved outside-sandbox retry succeeded. Repeated browse daemon health/action timeouts excluded from product findings."
+}

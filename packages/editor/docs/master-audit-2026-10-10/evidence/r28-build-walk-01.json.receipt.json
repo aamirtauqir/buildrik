@@ -1,0 +1,31 @@
+[
+  {
+    "label": "Editor baseline",
+    "goto": "8465:3",
+    "wait": 1200,
+    "shot": "r28-editor-baseline.png",
+    "expected": "8465:3",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8465-3&starting-point-node-id=8465%3A3&hide-ui=1",
+    "verification": "URL_MATCH"
+  },
+  {
+    "label": "Open separate Build",
+    "x": 411,
+    "y": 28,
+    "wait": 800,
+    "shot": "r28-build-start.png",
+    "expected": "8628:12592",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8628-12592&starting-point-node-id=8465%3A3&hide-ui=1",
+    "verification": "URL_MATCH"
+  },
+  {
+    "label": "Create scoped heading draft",
+    "x": 202,
+    "y": 574,
+    "wait": 4000,
+    "shot": "r28-build-draft.png",
+    "expected": "8628:12749",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8628-12749&starting-point-node-id=8465%3A3&hide-ui=1",
+    "verification": "URL_MATCH"
+  }
+]

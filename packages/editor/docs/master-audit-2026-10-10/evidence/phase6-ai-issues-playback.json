@@ -1,0 +1,98 @@
+{
+  "date": "2026-10-11",
+  "ai": [
+    {
+      "action": "disabled stale Apply",
+      "expected": "8317-244162",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8317-244162&starting-point-node-id=8317%3A244162&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "regenerate simulation",
+      "expected": "8391-1664",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8391-1664&starting-point-node-id=8317%3A244162&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "review request",
+      "expected": "8317-244162",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8317-244162&starting-point-node-id=8317%3A244162&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "regenerate simulation",
+      "expected": "8391-1664",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8391-1664&starting-point-node-id=8317%3A244162&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "continue editing",
+      "expected": "8317-297",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8317-297&starting-point-node-id=8317%3A244162&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "open selected AI",
+      "expected": "8317-244162",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8317-244162&starting-point-node-id=8317%3A244162&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "regenerate simulation",
+      "expected": "8391-1664",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8391-1664&starting-point-node-id=8317%3A244162&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "close AI",
+      "expected": "8317-297",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8317-297&starting-point-node-id=8317%3A244162&hide-ui=1",
+      "pass": true
+    }
+  ],
+  "issues": [
+    {
+      "action": "select issue Image",
+      "expected": "8391-1815",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8391-1815&starting-point-node-id=8317%3A244722&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "Back to Issues",
+      "expected": "8391-2071",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8391-2071&starting-point-node-id=8317%3A244722&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "close Issues",
+      "expected": "8391-1815",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8391-1815&starting-point-node-id=8317%3A244722&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "Inspector close",
+      "expected": "8391-2071",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8391-2071&starting-point-node-id=8317%3A244722&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "select Image again",
+      "expected": "8391-1815",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8391-1815&starting-point-node-id=8317%3A244722&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "Back to Issues",
+      "expected": "8391-2071",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8391-2071&starting-point-node-id=8317%3A244722&hide-ui=1",
+      "pass": true
+    },
+    {
+      "action": "Issues Escape",
+      "expected": "8391-1815",
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8391-1815&starting-point-node-id=8317%3A244722&hide-ui=1",
+      "pass": true
+    }
+  ],
+  "method": "Synthetic pointer/mouse events on visible Figma presentation canvas, URL readback and screenshots. No provider or editor-state engine calls."
+}

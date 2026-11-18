@@ -1,0 +1,6 @@
+{
+  "url": "http://localhost:3000/auth",
+  "title": "Buildrick",
+  "body": "Log in to\nBuildrick\nContinue with Google\nContinue with GitHub\nor\nEmail\nPassword\nRemember me\nLog in\nForgot password?\n\nDon't have an account? Sign up",
+  "followup": "Repository-provided Playwright auth state successfully opened /dashboard; no credentials or session tokens exported."
+}

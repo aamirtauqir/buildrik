@@ -1,0 +1,54 @@
+[
+  {
+    "x": 720,
+    "y": 545,
+    "wait": 1500,
+    "shot": "r41-polish-one-slide.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-30923&starting-point-node-id=8843%3A30923&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 850,
+    "y": 445,
+    "wait": 1500,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-30923&starting-point-node-id=8843%3A30923&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 720,
+    "y": 545,
+    "wait": 1500,
+    "shot": "r41-polish-empty-manager-confirmed.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-30923&starting-point-node-id=8843%3A30923&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "press": "Escape",
+    "wait": 1500,
+    "shot": "r41-polish-empty-confirmed.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-30923&starting-point-node-id=8843%3A30923&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 1320,
+    "y": 212,
+    "wait": 1500,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-30923&starting-point-node-id=8843%3A30923&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 720,
+    "y": 517,
+    "wait": 1500,
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-30923&starting-point-node-id=8843%3A30923&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  },
+  {
+    "x": 850,
+    "y": 625,
+    "wait": 1500,
+    "shot": "r41-polish-new-confirmed.png",
+    "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8843-30923&starting-point-node-id=8843%3A30923&hide-ui=1",
+    "verification": "VISUAL_REVIEW_REQUIRED"
+  }
+]

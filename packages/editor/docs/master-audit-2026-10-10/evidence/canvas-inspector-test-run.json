@@ -1,0 +1,273 @@
+{
+  "date": "2026-10-10",
+  "runner": "Vitest 4.1.2",
+  "node": "v24.13.0",
+  "cwd": "/Users/shahg/Desktop/pencil/buildrik/packages/editor",
+  "command": [
+    "node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "src/engine/__tests__/Composer.previewInteractions.test.ts",
+    "src/engine/__tests__/group-elements.test.ts",
+    "src/editor/canvas/__tests__/insertDrag.test.tsx",
+    "src/editor/inspector/__tests__/discreteUndo.test.tsx",
+    "src/editor/inspector/__tests__/lockGuard.writePaths.test.tsx",
+    "src/editor/shell/__tests__/PreviewOverlay.test.tsx",
+    "src/editor/shell/__tests__/renderPreviewHtml.test.ts",
+    "src/engine/canvas/__tests__/AlignmentHandler.test.ts",
+    "src/engine/commands/__tests__/CommandCenter.textfield.test.ts",
+    "src/engine/commands/__tests__/reorderElement.order.test.ts",
+    "src/engine/interactions/__tests__/InteractionRuntime.test.ts",
+    "src/engine/export/__tests__/ExportEngine.hideBreakpoints.test.ts",
+    "src/editor/canvas/hooks/__tests__/useCanvasDragDrop.test.ts",
+    "src/editor/canvas/hooks/__tests__/useCanvasElementDrag.test.tsx",
+    "src/editor/canvas/hooks/__tests__/useCanvasKeyboard.arrows.test.ts",
+    "src/editor/canvas/hooks/__tests__/useCanvasMarquee.test.ts",
+    "src/editor/canvas/hooks/__tests__/useCanvasSnapping.test.ts",
+    "src/editor/canvas/hooks/__tests__/useSectionReorder.test.tsx",
+    "src/editor/inspector/config/__tests__/cssContext.effectiveStyles.test.ts",
+    "src/editor/inspector/config/__tests__/pseudoOverrides.test.ts",
+    "src/editor/inspector/hooks/__tests__/useStyleHandlers.locked.test.ts",
+    "src/editor/inspector/hooks/__tests__/useStyleHandlers.multiTarget.test.ts",
+    "src/editor/inspector/hooks/__tests__/useStyleHandlers.pendingFlush.test.ts",
+    "src/editor/inspector/hooks/__tests__/useStyleHandlers.responsive.test.ts",
+    "src/editor/inspector/sections/__tests__/registry.slice.test.ts",
+    "src/editor/canvas/hooks/keyboard/__tests__/keyboardHelpers.breakpointLock.test.tsx",
+    "src/editor/canvas/hooks/drag/__tests__/dropOperations.test.ts",
+    "src/editor/inspector/sections/interactions/__tests__/InteractionEditor.test.tsx",
+    "src/editor/inspector/sections/interactions/__tests__/InteractionsSection.test.tsx",
+    "src/editor/inspector/sections/registry/__tests__/shouldRender.test.ts",
+    "--maxWorkers=1",
+    "--reporter=default",
+    "--reporter=json",
+    "--outputFile.json=docs/master-audit-2026-10-10/evidence/canvas-inspector-tests.json"
+  ],
+  "exitCode": 0,
+  "success": true,
+  "fileCount": 30,
+  "passed": 373,
+  "failed": 0,
+  "todo": 3,
+  "durationSeconds": 1060.95,
+  "timingMeaning": "Busy local development machine; not production performance evidence",
+  "abortedAttempt": "Initial npx invocation produced no runner output or JSON and was interrupted with exit 130; not counted as verification",
+  "warnings": [
+    "React act() warnings in lockGuard.writePaths CmsBindingSection Unbind and useSectionReorder content-change fixture",
+    "Nonfatal media auto-save fetch DNS failures for cdn.example/example.com in useCanvasDragDrop fixture cases; no live media provider success established"
+  ],
+  "rawSha256": "1ff6c95d7ca8cb31122635622fac6395bee8c3f0953a7b39d6728a1a35c8ac69",
+  "files": [
+    {
+      "path": "src/engine/__tests__/Composer.previewInteractions.test.ts",
+      "status": "passed",
+      "counts": {
+        "passed": 3
+      }
+    },
+    {
+      "path": "src/engine/__tests__/group-elements.test.ts",
+      "status": "passed",
+      "counts": {
+        "passed": 3
+      }
+    },
+    {
+      "path": "src/editor/canvas/__tests__/insertDrag.test.tsx",
+      "status": "passed",
+      "counts": {
+        "passed": 4
+      }
+    },
+    {
+      "path": "src/editor/inspector/__tests__/discreteUndo.test.tsx",
+      "status": "passed",
+      "counts": {
+        "passed": 3
+      }
+    },
+    {
+      "path": "src/editor/inspector/__tests__/lockGuard.writePaths.test.tsx",
+      "status": "passed",
+      "counts": {
+        "passed": 14
+      }
+    },
+    {
+      "path": "src/editor/shell/__tests__/PreviewOverlay.test.tsx",
+      "status": "passed",
+      "counts": {
+        "passed": 11
+      }
+    },
+    {
+      "path": "src/editor/shell/__tests__/renderPreviewHtml.test.ts",
+      "status": "passed",
+      "counts": {
+        "passed": 1
+      }
+    },
+    {
+      "path": "src/engine/canvas/__tests__/AlignmentHandler.test.ts",
+      "status": "passed",
+      "counts": {
+        "passed": 27,
+        "todo": 1
+      }
+    },
+    {
+      "path": "src/engine/commands/__tests__/CommandCenter.textfield.test.ts",
+      "status": "passed",
+      "counts": {
+        "passed": 9
+      }
+    },
+    {
+      "path": "src/engine/commands/__tests__/reorderElement.order.test.ts",
+      "status": "passed",
+      "counts": {
+        "passed": 6
+      }
+    },
+    {
+      "path": "src/engine/interactions/__tests__/InteractionRuntime.test.ts",
+      "status": "passed",
+      "counts": {
+        "passed": 47,
+        "todo": 2
+      }
+    },
+    {
+      "path": "src/engine/export/__tests__/ExportEngine.hideBreakpoints.test.ts",
+      "status": "passed",
+      "counts": {
+        "passed": 4
+      }
+    },
+    {
+      "path": "src/editor/canvas/hooks/__tests__/useCanvasDragDrop.test.ts",
+      "status": "passed",
+      "counts": {
+        "passed": 31
+      }
+    },
+    {
+      "path": "src/editor/canvas/hooks/__tests__/useCanvasElementDrag.test.tsx",
+      "status": "passed",
+      "counts": {
+        "passed": 22
+      }
+    },
+    {
+      "path": "src/editor/canvas/hooks/__tests__/useCanvasKeyboard.arrows.test.ts",
+      "status": "passed",
+      "counts": {
+        "passed": 12
+      }
+    },
+    {
+      "path": "src/editor/canvas/hooks/__tests__/useCanvasMarquee.test.ts",
+      "status": "passed",
+      "counts": {
+        "passed": 8
+      }
+    },
+    {
+      "path": "src/editor/canvas/hooks/__tests__/useCanvasSnapping.test.ts",
+      "status": "passed",
+      "counts": {
+        "passed": 21
+      }
+    },
+    {
+      "path": "src/editor/canvas/hooks/__tests__/useSectionReorder.test.tsx",
+      "status": "passed",
+      "counts": {
+        "passed": 18
+      }
+    },
+    {
+      "path": "src/editor/inspector/config/__tests__/cssContext.effectiveStyles.test.ts",
+      "status": "passed",
+      "counts": {
+        "passed": 4
+      }
+    },
+    {
+      "path": "src/editor/inspector/config/__tests__/pseudoOverrides.test.ts",
+      "status": "passed",
+      "counts": {
+        "passed": 6
+      }
+    },
+    {
+      "path": "src/editor/inspector/hooks/__tests__/useStyleHandlers.locked.test.ts",
+      "status": "passed",
+      "counts": {
+        "passed": 7
+      }
+    },
+    {
+      "path": "src/editor/inspector/hooks/__tests__/useStyleHandlers.multiTarget.test.ts",
+      "status": "passed",
+      "counts": {
+        "passed": 9
+      }
+    },
+    {
+      "path": "src/editor/inspector/hooks/__tests__/useStyleHandlers.pendingFlush.test.ts",
+      "status": "passed",
+      "counts": {
+        "passed": 3
+      }
+    },
+    {
+      "path": "src/editor/inspector/hooks/__tests__/useStyleHandlers.responsive.test.ts",
+      "status": "passed",
+      "counts": {
+        "passed": 2
+      }
+    },
+    {
+      "path": "src/editor/inspector/sections/__tests__/registry.slice.test.ts",
+      "status": "passed",
+      "counts": {
+        "passed": 4
+      }
+    },
+    {
+      "path": "src/editor/canvas/hooks/keyboard/__tests__/keyboardHelpers.breakpointLock.test.tsx",
+      "status": "passed",
+      "counts": {
+        "passed": 5
+      }
+    },
+    {
+      "path": "src/editor/canvas/hooks/drag/__tests__/dropOperations.test.ts",
+      "status": "passed",
+      "counts": {
+        "passed": 53
+      }
+    },
+    {
+      "path": "src/editor/inspector/sections/interactions/__tests__/InteractionEditor.test.tsx",
+      "status": "passed",
+      "counts": {
+        "passed": 12
+      }
+    },
+    {
+      "path": "src/editor/inspector/sections/interactions/__tests__/InteractionsSection.test.tsx",
+      "status": "passed",
+      "counts": {
+        "passed": 16
+      }
+    },
+    {
+      "path": "src/editor/inspector/sections/registry/__tests__/shouldRender.test.ts",
+      "status": "passed",
+      "counts": {
+        "passed": 8
+      }
+    }
+  ]
+}

@@ -1,0 +1,1087 @@
+{
+  "date": "2026-10-16",
+  "count": 120,
+  "status": "Source support classification and selected design; not full native functionality verification",
+  "rows": [
+    {
+      "tag": "a",
+      "contract": "N12",
+      "family": "Links",
+      "route": "B69-link; Content label/text, Behaviour destination/target/rel, actual safe URL/page/section reference and same source writer. Nested interactive content is guarded; native link stays distinct from button action.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "abbr",
+      "contract": "N01",
+      "family": "Text and phrasing",
+      "route": "Content \u2192 actual text/inline editor, semantic tag/allowed attributes; Style \u2192 applicable typography. Preserve inline markup and language/direction/time/cite values. Complex ruby editing is preserved native content, not a new phonetic authoring tool.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "address",
+      "contract": "N03",
+      "family": "Structural landmarks",
+      "route": "B69-container/section/navbar/footer as actual native semantics warrant; Content \u2192 children/attributes. Figure and quote associations remain real child structure. Specialized landmark/publishing behavior is not inferred from generic container type.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "article",
+      "contract": "N03",
+      "family": "Structural landmarks",
+      "route": "B69-container/section/navbar/footer as actual native semantics warrant; Content \u2192 children/attributes. Figure and quote associations remain real child structure. Specialized landmark/publishing behavior is not inferred from generic container type.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "aside",
+      "contract": "N03",
+      "family": "Structural landmarks",
+      "route": "B69-container/section/navbar/footer as actual native semantics warrant; Content \u2192 children/attributes. Figure and quote associations remain real child structure. Specialized landmark/publishing behavior is not inferred from generic container type.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "audio",
+      "contract": "N06",
+      "family": "Media and sources",
+      "route": "B69-image/video/audio; source/track attributes belong to exact node in enclosing media/picture, not arbitrary layout children. Picture source selection and srcset preserved; responsive picture visual source authoring deferred, native editing remains.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "b",
+      "contract": "N01",
+      "family": "Text and phrasing",
+      "route": "Content \u2192 actual text/inline editor, semantic tag/allowed attributes; Style \u2192 applicable typography. Preserve inline markup and language/direction/time/cite values. Complex ruby editing is preserved native content, not a new phonetic authoring tool.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "bdi",
+      "contract": "N01",
+      "family": "Text and phrasing",
+      "route": "Content \u2192 actual text/inline editor, semantic tag/allowed attributes; Style \u2192 applicable typography. Preserve inline markup and language/direction/time/cite values. Complex ruby editing is preserved native content, not a new phonetic authoring tool.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "bdo",
+      "contract": "N01",
+      "family": "Text and phrasing",
+      "route": "Content \u2192 actual text/inline editor, semantic tag/allowed attributes; Style \u2192 applicable typography. Preserve inline markup and language/direction/time/cite values. Complex ruby editing is preserved native content, not a new phonetic authoring tool.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "blockquote",
+      "contract": "N03",
+      "family": "Structural landmarks",
+      "route": "B69-container/section/navbar/footer as actual native semantics warrant; Content \u2192 children/attributes. Figure and quote associations remain real child structure. Specialized landmark/publishing behavior is not inferred from generic container type.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "br",
+      "contract": "N10",
+      "family": "Void separators",
+      "route": "B69-divider for hr; br/wbr semantic break, no content/children controls. Preserve break location in parent inline content; no padding/drop UI pretending a container.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "button",
+      "contract": "N05",
+      "family": "Native forms",
+      "route": "B69 form/native field resolver; options target select/optgroup; fieldset/legend retain group identity. Datalist and output preserve native attrs/children; bespoke calculation/suggestions builder deferred. No fictitious output calculation API.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "caption",
+      "contract": "N07",
+      "family": "Tables",
+      "route": "B69-table; row/cell/header/column semantics qualify generic container family. Preserve spans/headers/scope/caption and valid native structure; complex imported spans use specified guard, not flattening.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "cite",
+      "contract": "N01",
+      "family": "Text and phrasing",
+      "route": "Content \u2192 actual text/inline editor, semantic tag/allowed attributes; Style \u2192 applicable typography. Preserve inline markup and language/direction/time/cite values. Complex ruby editing is preserved native content, not a new phonetic authoring tool.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "code",
+      "contract": "N01",
+      "family": "Text and phrasing",
+      "route": "Content \u2192 actual text/inline editor, semantic tag/allowed attributes; Style \u2192 applicable typography. Preserve inline markup and language/direction/time/cite values. Complex ruby editing is preserved native content, not a new phonetic authoring tool.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "col",
+      "contract": "N07",
+      "family": "Tables",
+      "route": "B69-table; row/cell/header/column semantics qualify generic container family. Preserve spans/headers/scope/caption and valid native structure; complex imported spans use specified guard, not flattening.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "colgroup",
+      "contract": "N07",
+      "family": "Tables",
+      "route": "B69-table; row/cell/header/column semantics qualify generic container family. Preserve spans/headers/scope/caption and valid native structure; complex imported spans use specified guard, not flattening.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "data",
+      "contract": "N01",
+      "family": "Text and phrasing",
+      "route": "Content \u2192 actual text/inline editor, semantic tag/allowed attributes; Style \u2192 applicable typography. Preserve inline markup and language/direction/time/cite values. Complex ruby editing is preserved native content, not a new phonetic authoring tool.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "datalist",
+      "contract": "N05",
+      "family": "Native forms",
+      "route": "B69 form/native field resolver; options target select/optgroup; fieldset/legend retain group identity. Datalist and output preserve native attrs/children; bespoke calculation/suggestions builder deferred. No fictitious output calculation API.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "dd",
+      "contract": "N04",
+      "family": "Lists",
+      "route": "B69-list for ordered/unordered items; dt/dd association preserved as semantic pair and generic native tree edit. No auto-conversion of description lists into li; native list style/number attrs where applicable.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "del",
+      "contract": "N01",
+      "family": "Text and phrasing",
+      "route": "Content \u2192 actual text/inline editor, semantic tag/allowed attributes; Style \u2192 applicable typography. Preserve inline markup and language/direction/time/cite values. Complex ruby editing is preserved native content, not a new phonetic authoring tool.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "details",
+      "contract": "N08",
+      "family": "Native disclosure and dialog",
+      "route": "Content native attrs/text and actual children; details open is authored initial state, preview toggle is temporary. Summary stays associated first summary; no free invalid reorder. Native dialog is not assumed to be Buildrick Modal; B69-modal linkage only on proof. Authoring open/close targets beyond preserved native attrs requires that contract, no automatic runtime wiring.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "dfn",
+      "contract": "N01",
+      "family": "Text and phrasing",
+      "route": "Content \u2192 actual text/inline editor, semantic tag/allowed attributes; Style \u2192 applicable typography. Preserve inline markup and language/direction/time/cite values. Complex ruby editing is preserved native content, not a new phonetic authoring tool.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "dialog",
+      "contract": "N08",
+      "family": "Native disclosure and dialog",
+      "route": "Content native attrs/text and actual children; details open is authored initial state, preview toggle is temporary. Summary stays associated first summary; no free invalid reorder. Native dialog is not assumed to be Buildrick Modal; B69-modal linkage only on proof. Authoring open/close targets beyond preserved native attrs requires that contract, no automatic runtime wiring.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "div",
+      "contract": "N03",
+      "family": "Structural landmarks",
+      "route": "B69-container/section/navbar/footer as actual native semantics warrant; Content \u2192 children/attributes. Figure and quote associations remain real child structure. Specialized landmark/publishing behavior is not inferred from generic container type.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "dl",
+      "contract": "N04",
+      "family": "Lists",
+      "route": "B69-list for ordered/unordered items; dt/dd association preserved as semantic pair and generic native tree edit. No auto-conversion of description lists into li; native list style/number attrs where applicable.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "dt",
+      "contract": "N04",
+      "family": "Lists",
+      "route": "B69-list for ordered/unordered items; dt/dd association preserved as semantic pair and generic native tree edit. No auto-conversion of description lists into li; native list style/number attrs where applicable.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "em",
+      "contract": "N01",
+      "family": "Text and phrasing",
+      "route": "Content \u2192 actual text/inline editor, semantic tag/allowed attributes; Style \u2192 applicable typography. Preserve inline markup and language/direction/time/cite values. Complex ruby editing is preserved native content, not a new phonetic authoring tool.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "fieldset",
+      "contract": "N05",
+      "family": "Native forms",
+      "route": "B69 form/native field resolver; options target select/optgroup; fieldset/legend retain group identity. Datalist and output preserve native attrs/children; bespoke calculation/suggestions builder deferred. No fictitious output calculation API.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "figcaption",
+      "contract": "N03",
+      "family": "Structural landmarks",
+      "route": "B69-container/section/navbar/footer as actual native semantics warrant; Content \u2192 children/attributes. Figure and quote associations remain real child structure. Specialized landmark/publishing behavior is not inferred from generic container type.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "figure",
+      "contract": "N03",
+      "family": "Structural landmarks",
+      "route": "B69-container/section/navbar/footer as actual native semantics warrant; Content \u2192 children/attributes. Figure and quote associations remain real child structure. Specialized landmark/publishing behavior is not inferred from generic container type.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "footer",
+      "contract": "N03",
+      "family": "Structural landmarks",
+      "route": "B69-container/section/navbar/footer as actual native semantics warrant; Content \u2192 children/attributes. Figure and quote associations remain real child structure. Specialized landmark/publishing behavior is not inferred from generic container type.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "form",
+      "contract": "N05",
+      "family": "Native forms",
+      "route": "B69 form/native field resolver; options target select/optgroup; fieldset/legend retain group identity. Datalist and output preserve native attrs/children; bespoke calculation/suggestions builder deferred. No fictitious output calculation API.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "h1",
+      "contract": "N02",
+      "family": "Headings",
+      "route": "B69-heading; heading level is native tag, same content/ID retained; no responsive heading-level setting.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "h2",
+      "contract": "N02",
+      "family": "Headings",
+      "route": "B69-heading; heading level is native tag, same content/ID retained; no responsive heading-level setting.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "h3",
+      "contract": "N02",
+      "family": "Headings",
+      "route": "B69-heading; heading level is native tag, same content/ID retained; no responsive heading-level setting.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "h4",
+      "contract": "N02",
+      "family": "Headings",
+      "route": "B69-heading; heading level is native tag, same content/ID retained; no responsive heading-level setting.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "h5",
+      "contract": "N02",
+      "family": "Headings",
+      "route": "B69-heading; heading level is native tag, same content/ID retained; no responsive heading-level setting.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "h6",
+      "contract": "N02",
+      "family": "Headings",
+      "route": "B69-heading; heading level is native tag, same content/ID retained; no responsive heading-level setting.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "header",
+      "contract": "N03",
+      "family": "Structural landmarks",
+      "route": "B69-container/section/navbar/footer as actual native semantics warrant; Content \u2192 children/attributes. Figure and quote associations remain real child structure. Specialized landmark/publishing behavior is not inferred from generic container type.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "hgroup",
+      "contract": "N03",
+      "family": "Structural landmarks",
+      "route": "B69-container/section/navbar/footer as actual native semantics warrant; Content \u2192 children/attributes. Figure and quote associations remain real child structure. Specialized landmark/publishing behavior is not inferred from generic container type.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "hr",
+      "contract": "N10",
+      "family": "Void separators",
+      "route": "B69-divider for hr; br/wbr semantic break, no content/children controls. Preserve break location in parent inline content; no padding/drop UI pretending a container.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "i",
+      "contract": "N01",
+      "family": "Text and phrasing",
+      "route": "Content \u2192 actual text/inline editor, semantic tag/allowed attributes; Style \u2192 applicable typography. Preserve inline markup and language/direction/time/cite values. Complex ruby editing is preserved native content, not a new phonetic authoring tool.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "img",
+      "contract": "N06",
+      "family": "Media and sources",
+      "route": "B69-image/video/audio; source/track attributes belong to exact node in enclosing media/picture, not arbitrary layout children. Picture source selection and srcset preserved; responsive picture visual source authoring deferred, native editing remains.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "input",
+      "contract": "N05",
+      "family": "Native forms",
+      "route": "B69 form/native field resolver; options target select/optgroup; fieldset/legend retain group identity. Datalist and output preserve native attrs/children; bespoke calculation/suggestions builder deferred. No fictitious output calculation API.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "ins",
+      "contract": "N01",
+      "family": "Text and phrasing",
+      "route": "Content \u2192 actual text/inline editor, semantic tag/allowed attributes; Style \u2192 applicable typography. Preserve inline markup and language/direction/time/cite values. Complex ruby editing is preserved native content, not a new phonetic authoring tool.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "kbd",
+      "contract": "N01",
+      "family": "Text and phrasing",
+      "route": "Content \u2192 actual text/inline editor, semantic tag/allowed attributes; Style \u2192 applicable typography. Preserve inline markup and language/direction/time/cite values. Complex ruby editing is preserved native content, not a new phonetic authoring tool.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "label",
+      "contract": "N05",
+      "family": "Native forms",
+      "route": "B69 form/native field resolver; options target select/optgroup; fieldset/legend retain group identity. Datalist and output preserve native attrs/children; bespoke calculation/suggestions builder deferred. No fictitious output calculation API.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "legend",
+      "contract": "N05",
+      "family": "Native forms",
+      "route": "B69 form/native field resolver; options target select/optgroup; fieldset/legend retain group identity. Datalist and output preserve native attrs/children; bespoke calculation/suggestions builder deferred. No fictitious output calculation API.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "li",
+      "contract": "N04",
+      "family": "Lists",
+      "route": "B69-list for ordered/unordered items; dt/dd association preserved as semantic pair and generic native tree edit. No auto-conversion of description lists into li; native list style/number attrs where applicable.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "main",
+      "contract": "N03",
+      "family": "Structural landmarks",
+      "route": "B69-container/section/navbar/footer as actual native semantics warrant; Content \u2192 children/attributes. Figure and quote associations remain real child structure. Specialized landmark/publishing behavior is not inferred from generic container type.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "mark",
+      "contract": "N01",
+      "family": "Text and phrasing",
+      "route": "Content \u2192 actual text/inline editor, semantic tag/allowed attributes; Style \u2192 applicable typography. Preserve inline markup and language/direction/time/cite values. Complex ruby editing is preserved native content, not a new phonetic authoring tool.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "menu",
+      "contract": "N04",
+      "family": "Lists",
+      "route": "B69-list for ordered/unordered items; dt/dd association preserved as semantic pair and generic native tree edit. No auto-conversion of description lists into li; native list style/number attrs where applicable.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "meter",
+      "contract": "N09",
+      "family": "Native metrics",
+      "route": "Content value/min/max and supporting native attrs on actual node; meter low/high/optimum kept. Native progress uses max/value; omitting value is indeterminate. B69-progress compound only where structure proved. No percent wrapper mutation for generic native element.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "nav",
+      "contract": "N03",
+      "family": "Structural landmarks",
+      "route": "B69-container/section/navbar/footer as actual native semantics warrant; Content \u2192 children/attributes. Figure and quote associations remain real child structure. Specialized landmark/publishing behavior is not inferred from generic container type.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "ol",
+      "contract": "N04",
+      "family": "Lists",
+      "route": "B69-list for ordered/unordered items; dt/dd association preserved as semantic pair and generic native tree edit. No auto-conversion of description lists into li; native list style/number attrs where applicable.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "optgroup",
+      "contract": "N05",
+      "family": "Native forms",
+      "route": "B69 form/native field resolver; options target select/optgroup; fieldset/legend retain group identity. Datalist and output preserve native attrs/children; bespoke calculation/suggestions builder deferred. No fictitious output calculation API.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "option",
+      "contract": "N05",
+      "family": "Native forms",
+      "route": "B69 form/native field resolver; options target select/optgroup; fieldset/legend retain group identity. Datalist and output preserve native attrs/children; bespoke calculation/suggestions builder deferred. No fictitious output calculation API.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "output",
+      "contract": "N05",
+      "family": "Native forms",
+      "route": "B69 form/native field resolver; options target select/optgroup; fieldset/legend retain group identity. Datalist and output preserve native attrs/children; bespoke calculation/suggestions builder deferred. No fictitious output calculation API.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "p",
+      "contract": "N01",
+      "family": "Text and phrasing",
+      "route": "Content \u2192 actual text/inline editor, semantic tag/allowed attributes; Style \u2192 applicable typography. Preserve inline markup and language/direction/time/cite values. Complex ruby editing is preserved native content, not a new phonetic authoring tool.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "picture",
+      "contract": "N06",
+      "family": "Media and sources",
+      "route": "B69-image/video/audio; source/track attributes belong to exact node in enclosing media/picture, not arbitrary layout children. Picture source selection and srcset preserved; responsive picture visual source authoring deferred, native editing remains.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "pre",
+      "contract": "N01",
+      "family": "Text and phrasing",
+      "route": "Content \u2192 actual text/inline editor, semantic tag/allowed attributes; Style \u2192 applicable typography. Preserve inline markup and language/direction/time/cite values. Complex ruby editing is preserved native content, not a new phonetic authoring tool.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "progress",
+      "contract": "N09",
+      "family": "Native metrics",
+      "route": "Content value/min/max and supporting native attrs on actual node; meter low/high/optimum kept. Native progress uses max/value; omitting value is indeterminate. B69-progress compound only where structure proved. No percent wrapper mutation for generic native element.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "q",
+      "contract": "N01",
+      "family": "Text and phrasing",
+      "route": "Content \u2192 actual text/inline editor, semantic tag/allowed attributes; Style \u2192 applicable typography. Preserve inline markup and language/direction/time/cite values. Complex ruby editing is preserved native content, not a new phonetic authoring tool.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "rp",
+      "contract": "N01",
+      "family": "Text and phrasing",
+      "route": "Content \u2192 actual text/inline editor, semantic tag/allowed attributes; Style \u2192 applicable typography. Preserve inline markup and language/direction/time/cite values. Complex ruby editing is preserved native content, not a new phonetic authoring tool.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "rt",
+      "contract": "N01",
+      "family": "Text and phrasing",
+      "route": "Content \u2192 actual text/inline editor, semantic tag/allowed attributes; Style \u2192 applicable typography. Preserve inline markup and language/direction/time/cite values. Complex ruby editing is preserved native content, not a new phonetic authoring tool.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "ruby",
+      "contract": "N01",
+      "family": "Text and phrasing",
+      "route": "Content \u2192 actual text/inline editor, semantic tag/allowed attributes; Style \u2192 applicable typography. Preserve inline markup and language/direction/time/cite values. Complex ruby editing is preserved native content, not a new phonetic authoring tool.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "s",
+      "contract": "N01",
+      "family": "Text and phrasing",
+      "route": "Content \u2192 actual text/inline editor, semantic tag/allowed attributes; Style \u2192 applicable typography. Preserve inline markup and language/direction/time/cite values. Complex ruby editing is preserved native content, not a new phonetic authoring tool.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "samp",
+      "contract": "N01",
+      "family": "Text and phrasing",
+      "route": "Content \u2192 actual text/inline editor, semantic tag/allowed attributes; Style \u2192 applicable typography. Preserve inline markup and language/direction/time/cite values. Complex ruby editing is preserved native content, not a new phonetic authoring tool.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "search",
+      "contract": "N03",
+      "family": "Structural landmarks",
+      "route": "B69-container/section/navbar/footer as actual native semantics warrant; Content \u2192 children/attributes. Figure and quote associations remain real child structure. Specialized landmark/publishing behavior is not inferred from generic container type.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "section",
+      "contract": "N03",
+      "family": "Structural landmarks",
+      "route": "B69-container/section/navbar/footer as actual native semantics warrant; Content \u2192 children/attributes. Figure and quote associations remain real child structure. Specialized landmark/publishing behavior is not inferred from generic container type.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "select",
+      "contract": "N05",
+      "family": "Native forms",
+      "route": "B69 form/native field resolver; options target select/optgroup; fieldset/legend retain group identity. Datalist and output preserve native attrs/children; bespoke calculation/suggestions builder deferred. No fictitious output calculation API.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "small",
+      "contract": "N01",
+      "family": "Text and phrasing",
+      "route": "Content \u2192 actual text/inline editor, semantic tag/allowed attributes; Style \u2192 applicable typography. Preserve inline markup and language/direction/time/cite values. Complex ruby editing is preserved native content, not a new phonetic authoring tool.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "source",
+      "contract": "N06",
+      "family": "Media and sources",
+      "route": "B69-image/video/audio; source/track attributes belong to exact node in enclosing media/picture, not arbitrary layout children. Picture source selection and srcset preserved; responsive picture visual source authoring deferred, native editing remains.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "span",
+      "contract": "N01",
+      "family": "Text and phrasing",
+      "route": "Content \u2192 actual text/inline editor, semantic tag/allowed attributes; Style \u2192 applicable typography. Preserve inline markup and language/direction/time/cite values. Complex ruby editing is preserved native content, not a new phonetic authoring tool.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "strong",
+      "contract": "N01",
+      "family": "Text and phrasing",
+      "route": "Content \u2192 actual text/inline editor, semantic tag/allowed attributes; Style \u2192 applicable typography. Preserve inline markup and language/direction/time/cite values. Complex ruby editing is preserved native content, not a new phonetic authoring tool.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "sub",
+      "contract": "N01",
+      "family": "Text and phrasing",
+      "route": "Content \u2192 actual text/inline editor, semantic tag/allowed attributes; Style \u2192 applicable typography. Preserve inline markup and language/direction/time/cite values. Complex ruby editing is preserved native content, not a new phonetic authoring tool.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "summary",
+      "contract": "N08",
+      "family": "Native disclosure and dialog",
+      "route": "Content native attrs/text and actual children; details open is authored initial state, preview toggle is temporary. Summary stays associated first summary; no free invalid reorder. Native dialog is not assumed to be Buildrick Modal; B69-modal linkage only on proof. Authoring open/close targets beyond preserved native attrs requires that contract, no automatic runtime wiring.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "sup",
+      "contract": "N01",
+      "family": "Text and phrasing",
+      "route": "Content \u2192 actual text/inline editor, semantic tag/allowed attributes; Style \u2192 applicable typography. Preserve inline markup and language/direction/time/cite values. Complex ruby editing is preserved native content, not a new phonetic authoring tool.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "table",
+      "contract": "N07",
+      "family": "Tables",
+      "route": "B69-table; row/cell/header/column semantics qualify generic container family. Preserve spans/headers/scope/caption and valid native structure; complex imported spans use specified guard, not flattening.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "tbody",
+      "contract": "N07",
+      "family": "Tables",
+      "route": "B69-table; row/cell/header/column semantics qualify generic container family. Preserve spans/headers/scope/caption and valid native structure; complex imported spans use specified guard, not flattening.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "td",
+      "contract": "N07",
+      "family": "Tables",
+      "route": "B69-table; row/cell/header/column semantics qualify generic container family. Preserve spans/headers/scope/caption and valid native structure; complex imported spans use specified guard, not flattening.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "textarea",
+      "contract": "N05",
+      "family": "Native forms",
+      "route": "B69 form/native field resolver; options target select/optgroup; fieldset/legend retain group identity. Datalist and output preserve native attrs/children; bespoke calculation/suggestions builder deferred. No fictitious output calculation API.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "tfoot",
+      "contract": "N07",
+      "family": "Tables",
+      "route": "B69-table; row/cell/header/column semantics qualify generic container family. Preserve spans/headers/scope/caption and valid native structure; complex imported spans use specified guard, not flattening.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "th",
+      "contract": "N07",
+      "family": "Tables",
+      "route": "B69-table; row/cell/header/column semantics qualify generic container family. Preserve spans/headers/scope/caption and valid native structure; complex imported spans use specified guard, not flattening.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "thead",
+      "contract": "N07",
+      "family": "Tables",
+      "route": "B69-table; row/cell/header/column semantics qualify generic container family. Preserve spans/headers/scope/caption and valid native structure; complex imported spans use specified guard, not flattening.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "time",
+      "contract": "N01",
+      "family": "Text and phrasing",
+      "route": "Content \u2192 actual text/inline editor, semantic tag/allowed attributes; Style \u2192 applicable typography. Preserve inline markup and language/direction/time/cite values. Complex ruby editing is preserved native content, not a new phonetic authoring tool.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "tr",
+      "contract": "N07",
+      "family": "Tables",
+      "route": "B69-table; row/cell/header/column semantics qualify generic container family. Preserve spans/headers/scope/caption and valid native structure; complex imported spans use specified guard, not flattening.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "track",
+      "contract": "N06",
+      "family": "Media and sources",
+      "route": "B69-image/video/audio; source/track attributes belong to exact node in enclosing media/picture, not arbitrary layout children. Picture source selection and srcset preserved; responsive picture visual source authoring deferred, native editing remains.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "u",
+      "contract": "N01",
+      "family": "Text and phrasing",
+      "route": "Content \u2192 actual text/inline editor, semantic tag/allowed attributes; Style \u2192 applicable typography. Preserve inline markup and language/direction/time/cite values. Complex ruby editing is preserved native content, not a new phonetic authoring tool.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "ul",
+      "contract": "N04",
+      "family": "Lists",
+      "route": "B69-list for ordered/unordered items; dt/dd association preserved as semantic pair and generic native tree edit. No auto-conversion of description lists into li; native list style/number attrs where applicable.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "var",
+      "contract": "N01",
+      "family": "Text and phrasing",
+      "route": "Content \u2192 actual text/inline editor, semantic tag/allowed attributes; Style \u2192 applicable typography. Preserve inline markup and language/direction/time/cite values. Complex ruby editing is preserved native content, not a new phonetic authoring tool.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "video",
+      "contract": "N06",
+      "family": "Media and sources",
+      "route": "B69-image/video/audio; source/track attributes belong to exact node in enclosing media/picture, not arbitrary layout children. Picture source selection and srcset preserved; responsive picture visual source authoring deferred, native editing remains.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "wbr",
+      "contract": "N10",
+      "family": "Void separators",
+      "route": "B69-divider for hr; br/wbr semantic break, no content/children controls. Preserve break location in parent inline content; no padding/drop UI pretending a container.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "svg",
+      "contract": "N11",
+      "family": "SVG subtree",
+      "route": "B69-svg/icon representation resolver. SVG namespace qualifies text/title. Content \u2192 native attributes; Preserve viewBox, geometry/paint paths, fragment references and content. Dedicated vector/gradient/filter graph editor deferred; generic HTML layout/nesting controls suppressed. SVG resources are local native nodes, not automatically Brand tokens.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "circle",
+      "contract": "N11",
+      "family": "SVG subtree",
+      "route": "B69-svg/icon representation resolver. SVG namespace qualifies text/title. Content \u2192 native attributes; Preserve viewBox, geometry/paint paths, fragment references and content. Dedicated vector/gradient/filter graph editor deferred; generic HTML layout/nesting controls suppressed. SVG resources are local native nodes, not automatically Brand tokens.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "ellipse",
+      "contract": "N11",
+      "family": "SVG subtree",
+      "route": "B69-svg/icon representation resolver. SVG namespace qualifies text/title. Content \u2192 native attributes; Preserve viewBox, geometry/paint paths, fragment references and content. Dedicated vector/gradient/filter graph editor deferred; generic HTML layout/nesting controls suppressed. SVG resources are local native nodes, not automatically Brand tokens.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "line",
+      "contract": "N11",
+      "family": "SVG subtree",
+      "route": "B69-svg/icon representation resolver. SVG namespace qualifies text/title. Content \u2192 native attributes; Preserve viewBox, geometry/paint paths, fragment references and content. Dedicated vector/gradient/filter graph editor deferred; generic HTML layout/nesting controls suppressed. SVG resources are local native nodes, not automatically Brand tokens.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "path",
+      "contract": "N11",
+      "family": "SVG subtree",
+      "route": "B69-svg/icon representation resolver. SVG namespace qualifies text/title. Content \u2192 native attributes; Preserve viewBox, geometry/paint paths, fragment references and content. Dedicated vector/gradient/filter graph editor deferred; generic HTML layout/nesting controls suppressed. SVG resources are local native nodes, not automatically Brand tokens.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Observed in registered fixture model",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "polygon",
+      "contract": "N11",
+      "family": "SVG subtree",
+      "route": "B69-svg/icon representation resolver. SVG namespace qualifies text/title. Content \u2192 native attributes; Preserve viewBox, geometry/paint paths, fragment references and content. Dedicated vector/gradient/filter graph editor deferred; generic HTML layout/nesting controls suppressed. SVG resources are local native nodes, not automatically Brand tokens.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "polyline",
+      "contract": "N11",
+      "family": "SVG subtree",
+      "route": "B69-svg/icon representation resolver. SVG namespace qualifies text/title. Content \u2192 native attributes; Preserve viewBox, geometry/paint paths, fragment references and content. Dedicated vector/gradient/filter graph editor deferred; generic HTML layout/nesting controls suppressed. SVG resources are local native nodes, not automatically Brand tokens.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "rect",
+      "contract": "N11",
+      "family": "SVG subtree",
+      "route": "B69-svg/icon representation resolver. SVG namespace qualifies text/title. Content \u2192 native attributes; Preserve viewBox, geometry/paint paths, fragment references and content. Dedicated vector/gradient/filter graph editor deferred; generic HTML layout/nesting controls suppressed. SVG resources are local native nodes, not automatically Brand tokens.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "g",
+      "contract": "N11",
+      "family": "SVG subtree",
+      "route": "B69-svg/icon representation resolver. SVG namespace qualifies text/title. Content \u2192 native attributes; Preserve viewBox, geometry/paint paths, fragment references and content. Dedicated vector/gradient/filter graph editor deferred; generic HTML layout/nesting controls suppressed. SVG resources are local native nodes, not automatically Brand tokens.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "defs",
+      "contract": "N11",
+      "family": "SVG subtree",
+      "route": "B69-svg/icon representation resolver. SVG namespace qualifies text/title. Content \u2192 native attributes; Preserve viewBox, geometry/paint paths, fragment references and content. Dedicated vector/gradient/filter graph editor deferred; generic HTML layout/nesting controls suppressed. SVG resources are local native nodes, not automatically Brand tokens.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "use",
+      "contract": "N11",
+      "family": "SVG subtree",
+      "route": "B69-svg/icon representation resolver. SVG namespace qualifies text/title. Content \u2192 native attributes; Preserve viewBox, geometry/paint paths, fragment references and content. Dedicated vector/gradient/filter graph editor deferred; generic HTML layout/nesting controls suppressed. SVG resources are local native nodes, not automatically Brand tokens.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "symbol",
+      "contract": "N11",
+      "family": "SVG subtree",
+      "route": "B69-svg/icon representation resolver. SVG namespace qualifies text/title. Content \u2192 native attributes; Preserve viewBox, geometry/paint paths, fragment references and content. Dedicated vector/gradient/filter graph editor deferred; generic HTML layout/nesting controls suppressed. SVG resources are local native nodes, not automatically Brand tokens.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "text",
+      "contract": "N11",
+      "family": "SVG subtree",
+      "route": "B69-svg/icon representation resolver. SVG namespace qualifies text/title. Content \u2192 native attributes; Preserve viewBox, geometry/paint paths, fragment references and content. Dedicated vector/gradient/filter graph editor deferred; generic HTML layout/nesting controls suppressed. SVG resources are local native nodes, not automatically Brand tokens.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "tspan",
+      "contract": "N11",
+      "family": "SVG subtree",
+      "route": "B69-svg/icon representation resolver. SVG namespace qualifies text/title. Content \u2192 native attributes; Preserve viewBox, geometry/paint paths, fragment references and content. Dedicated vector/gradient/filter graph editor deferred; generic HTML layout/nesting controls suppressed. SVG resources are local native nodes, not automatically Brand tokens.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "title",
+      "contract": "N11",
+      "family": "SVG subtree",
+      "route": "B69-svg/icon representation resolver. SVG namespace qualifies text/title. Content \u2192 native attributes; Preserve viewBox, geometry/paint paths, fragment references and content. Dedicated vector/gradient/filter graph editor deferred; generic HTML layout/nesting controls suppressed. SVG resources are local native nodes, not automatically Brand tokens.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "desc",
+      "contract": "N11",
+      "family": "SVG subtree",
+      "route": "B69-svg/icon representation resolver. SVG namespace qualifies text/title. Content \u2192 native attributes; Preserve viewBox, geometry/paint paths, fragment references and content. Dedicated vector/gradient/filter graph editor deferred; generic HTML layout/nesting controls suppressed. SVG resources are local native nodes, not automatically Brand tokens.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "lineargradient",
+      "contract": "N11",
+      "family": "SVG subtree",
+      "route": "B69-svg/icon representation resolver. SVG namespace qualifies text/title. Content \u2192 native attributes; Preserve viewBox, geometry/paint paths, fragment references and content. Dedicated vector/gradient/filter graph editor deferred; generic HTML layout/nesting controls suppressed. SVG resources are local native nodes, not automatically Brand tokens.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "radialgradient",
+      "contract": "N11",
+      "family": "SVG subtree",
+      "route": "B69-svg/icon representation resolver. SVG namespace qualifies text/title. Content \u2192 native attributes; Preserve viewBox, geometry/paint paths, fragment references and content. Dedicated vector/gradient/filter graph editor deferred; generic HTML layout/nesting controls suppressed. SVG resources are local native nodes, not automatically Brand tokens.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "stop",
+      "contract": "N11",
+      "family": "SVG subtree",
+      "route": "B69-svg/icon representation resolver. SVG namespace qualifies text/title. Content \u2192 native attributes; Preserve viewBox, geometry/paint paths, fragment references and content. Dedicated vector/gradient/filter graph editor deferred; generic HTML layout/nesting controls suppressed. SVG resources are local native nodes, not automatically Brand tokens.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "mask",
+      "contract": "N11",
+      "family": "SVG subtree",
+      "route": "B69-svg/icon representation resolver. SVG namespace qualifies text/title. Content \u2192 native attributes; Preserve viewBox, geometry/paint paths, fragment references and content. Dedicated vector/gradient/filter graph editor deferred; generic HTML layout/nesting controls suppressed. SVG resources are local native nodes, not automatically Brand tokens.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "clippath",
+      "contract": "N11",
+      "family": "SVG subtree",
+      "route": "B69-svg/icon representation resolver. SVG namespace qualifies text/title. Content \u2192 native attributes; Preserve viewBox, geometry/paint paths, fragment references and content. Dedicated vector/gradient/filter graph editor deferred; generic HTML layout/nesting controls suppressed. SVG resources are local native nodes, not automatically Brand tokens.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "filter",
+      "contract": "N11",
+      "family": "SVG subtree",
+      "route": "B69-svg/icon representation resolver. SVG namespace qualifies text/title. Content \u2192 native attributes; Preserve viewBox, geometry/paint paths, fragment references and content. Dedicated vector/gradient/filter graph editor deferred; generic HTML layout/nesting controls suppressed. SVG resources are local native nodes, not automatically Brand tokens.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "fegaussianblur",
+      "contract": "N11",
+      "family": "SVG subtree",
+      "route": "B69-svg/icon representation resolver. SVG namespace qualifies text/title. Content \u2192 native attributes; Preserve viewBox, geometry/paint paths, fragment references and content. Dedicated vector/gradient/filter graph editor deferred; generic HTML layout/nesting controls suppressed. SVG resources are local native nodes, not automatically Brand tokens.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "feoffset",
+      "contract": "N11",
+      "family": "SVG subtree",
+      "route": "B69-svg/icon representation resolver. SVG namespace qualifies text/title. Content \u2192 native attributes; Preserve viewBox, geometry/paint paths, fragment references and content. Dedicated vector/gradient/filter graph editor deferred; generic HTML layout/nesting controls suppressed. SVG resources are local native nodes, not automatically Brand tokens.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "femerge",
+      "contract": "N11",
+      "family": "SVG subtree",
+      "route": "B69-svg/icon representation resolver. SVG namespace qualifies text/title. Content \u2192 native attributes; Preserve viewBox, geometry/paint paths, fragment references and content. Dedicated vector/gradient/filter graph editor deferred; generic HTML layout/nesting controls suppressed. SVG resources are local native nodes, not automatically Brand tokens.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    },
+    {
+      "tag": "femergenode",
+      "contract": "N11",
+      "family": "SVG subtree",
+      "route": "B69-svg/icon representation resolver. SVG namespace qualifies text/title. Content \u2192 native attributes; Preserve viewBox, geometry/paint paths, fragment references and content. Dedicated vector/gradient/filter graph editor deferred; generic HTML layout/nesting controls suppressed. SVG resources are local native nodes, not automatically Brand tokens.",
+      "source": "packages/shared/schemas/element-markup.ts:21",
+      "runtime": "Not exercised by registry survey; source allowlisted only",
+      "design": "Safe semantic/attribute route specified; specialized authoring only as stated"
+    }
+  ]
+}

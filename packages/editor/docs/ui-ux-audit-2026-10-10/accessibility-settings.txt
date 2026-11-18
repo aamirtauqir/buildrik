@@ -1,0 +1,147 @@
+- banner "Editor toolbar":
+  - status: Saved
+  - banner:
+    - button "‹ Exit"
+    - button "Untitled Project"
+    - button "SaaS Landing"
+    - button "History ›"
+    - button "Notifications"
+    - button "Preview"
+    - button "Publish" [disabled]
+    - button "Site menu"
+- link "Skip to Canvas":
+  - /url: "#layout-canvas"
+- navigation "Editor sidebar":
+  - tablist "Editor navigation":
+    - tab "Add elements, blocks and components to your page": Add
+    - tab "View and reorder page structure": Layers
+    - tab "Manage all pages in your site": Pages
+    - tab "Upload and manage images, videos, and fonts": Assets
+    - tab "Collections, records and data sources for dynamic content": CMS
+    - tab "Brand — global colors, fonts, spacing tokens": Brand
+    - button "Help — keyboard shortcuts": Help
+- region "Full-page view"
+- button "Get started — 2 of 7 complete. Click to expand.": 2/7
+- status
+- complementary:
+  - link "Back to canvas":
+    - /url: /
+  - heading "Settings" [level=2]
+  - text: Untitled Project
+  - button "Search settings": Search
+  - navigation "Settings sections":
+    - button "Overview"
+    - text: Site
+    - button "General"
+    - button "Languages"
+    - button "Brand ↗"
+    - text: Search & sharing
+    - button "SEO"
+    - text: Publishing
+    - button "Domains"
+    - button "Redirects"
+    - button "Access Pro"
+    - text: Visitors
+    - button "Analytics"
+    - button "Form submissions"
+    - text: Advanced
+    - button "Custom code Pro"
+    - button "Security headers"
+    - text: Danger zone
+    - button "Danger zone"
+    - text: Managed in workspace settings ↗
+    - button "Members"
+    - button "Billing Free"
+    - button "Integrations & webhooks"
+- banner:
+  - heading "General" [level=2]
+  - paragraph: Untitled Project · all pages · applies on next publish
+- heading "Site identity" [level=3]
+- text: Site name
+- textbox "Site name" [invalid]
+- alert: Give the site a name — it is what the browser tab and search results show.
+- text: Author
+- textbox "Author":
+  - /placeholder: Who this site belongs to
+- paragraph: Favicon
+- button "Upload favicon"
+- text: ICO, PNG or SVG
+- paragraph: Touch icon
+- button "Upload touch icon"
+- text: PNG · 180×180 recommended Favicon URL
+- textbox "Favicon URL":
+  - /placeholder: https://example.com/favicon.ico
+- link "English (en) · Manage in Languages ›":
+  - /url: "#localization"
+- heading "Advanced" [level=3]:
+  - button "Advanced"
+- contentinfo:
+  - status: All changes saved
+  - button "Discard" [disabled]
+  - button "Save" [disabled]
+- button "v3.0.2 Output Detail Standard React Components Hide Until Restart Marker Color Clear on copy/send Block page interactions Manage MCP & Webhooks Manage MCP & Webhooks MCP Connection MCP connection allows agents to receive and act on annotations. Learn more Webhooks Auto-Send The webhook URL will receive live annotation changes and annotation data.":
+  - img
+  - button:
+    - img
+  - button:
+    - img
+  - button [disabled]:
+    - img
+  - button [disabled]:
+    - img
+  - button [disabled]:
+    - img
+  - button [disabled]:
+    - img
+  - button:
+    - img
+  - button:
+    - img
+  - link:
+    - /url: https://agentation.com
+    - img
+  - paragraph: v3.0.2
+  - button "Switch to light mode":
+    - img
+  - text: Output Detail
+  - img
+  - button "Standard"
+  - text: React Components
+  - img
+  - checkbox [checked]
+  - text: Hide Until Restart
+  - img
+  - checkbox
+  - text: Marker Color
+  - button "Indigo"
+  - button "Blue"
+  - button "Cyan"
+  - button "Green"
+  - button "Yellow"
+  - button "Orange"
+  - button "Red"
+  - checkbox "Clear on copy/send"
+  - img
+  - text: Clear on copy/send
+  - img
+  - checkbox "Block page interactions" [checked]
+  - img
+  - text: Block page interactions
+  - button "Manage MCP & Webhooks":
+    - text: Manage MCP & Webhooks
+    - img
+  - button "Manage MCP & Webhooks":
+    - img
+    - text: Manage MCP & Webhooks
+  - text: MCP Connection
+  - img
+  - paragraph:
+    - text: MCP connection allows agents to receive and act on annotations.
+    - link "Learn more":
+      - /url: https://agentation.dev/mcp
+  - text: Webhooks
+  - img
+  - text: Auto-Send
+  - checkbox "Auto-Send" [checked] [disabled]
+  - paragraph: The webhook URL will receive live annotation changes and annotation data.
+  - textbox "Webhook URL"

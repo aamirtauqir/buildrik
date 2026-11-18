@@ -1,0 +1,15 @@
+{
+  "date": "2026-10-12T09:14:07.595Z",
+  "scope": "Authored Figma transitions, no backend operations",
+  "steps": [
+    {
+      "from": "T01",
+      "label": "Use descriptive alt",
+      "to": "T02",
+      "x": 1265,
+      "y": 759,
+      "pass": false,
+      "url": "https://www.figma.com/proto/g4GzQFqzNYz5sosz1QtZXC/Buildrick-%E2%80%94-Product?node-id=8507-2799&starting-point-node-id=8507%3A2799&hide-ui=1"
+    }
+  ]
+}

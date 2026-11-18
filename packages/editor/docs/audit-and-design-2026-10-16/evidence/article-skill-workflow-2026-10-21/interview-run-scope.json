@@ -1,0 +1,20 @@
+{
+  "source_url": "https://raw.githubusercontent.com/borghei/Claude-Skills/main/project-management/discovery/interview-synthesis/scripts/interview_synthesizer.py",
+  "sha256": "96d2ecfdb7e369cc7a57b76eec23a46f580db4b3c6852c247d5a830c0ebfa563",
+  "input": "interview-input.json",
+  "output": "interview-synthesis-empty.json",
+  "mode": "empty real-evidence audit",
+  "min_strength": 2,
+  "result": {
+    "interview_count": 0,
+    "snippet_count": 0,
+    "theme_count": 0,
+    "opportunity_count": 0
+  },
+  "limitations": [
+    "No completed research study",
+    "No synthetic interviews supplied",
+    "Upstream empty-theme Markdown claim intentionally avoided",
+    "Finance-specific automated classification needs manual review for Buildrick"
+  ]
+}

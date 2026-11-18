@@ -1,0 +1,12 @@
+[
+ {"label":"Retry failed URL","x":720,"y":535,"wait":2200,"shot":"r28-url-retried.png"},
+ {"label":"Select validated URL","x":720,"y":513,"shot":"r28-url-selected.png"},
+ {"label":"Commit URL source","x":545,"y":556,"shot":"r28-url-committed.png"},
+ {"label":"Open source to test cancel","x":1241,"y":261},
+ {"label":"Select alternate draft only","x":530,"y":422},
+ {"label":"Cancel keeps committed URL","x":354,"y":556,"shot":"r28-image-cancel-keeps-url.png"},
+ {"label":"Mobile independent padding fixture","goto":"8584:12241"},
+ {"label":"Unlink Mobile padding","x":1239,"y":334},
+ {"label":"Choose Mobile left side","x":1149,"y":266,"shot":"r28-mobile-left-picker.png"},
+ {"label":"Change Mobile left only","x":720,"y":422,"shot":"r28-mobile-left8.png"}
+]

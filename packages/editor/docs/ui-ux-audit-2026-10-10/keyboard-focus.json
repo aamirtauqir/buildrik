@@ -1,0 +1,50 @@
+[
+  {
+    "tag": "A",
+    "label": "Skip to Canvas"
+  },
+  {
+    "tag": "BUTTON",
+    "label": "Help — keyboard shortcuts"
+  },
+  {
+    "tag": "DIV",
+    "label": "Get started — 2 of 7 complete. Click to expand."
+  },
+  {
+    "tag": "A",
+    "label": "Back to canvas"
+  },
+  {
+    "tag": "BUTTON",
+    "label": "Search settings"
+  },
+  {
+    "tag": "BUTTON",
+    "label": "Overview"
+  },
+  {
+    "tag": "BUTTON",
+    "label": "General"
+  },
+  {
+    "tag": "BUTTON",
+    "label": "Languages"
+  },
+  {
+    "tag": "BUTTON",
+    "label": "Brand ↗"
+  },
+  {
+    "tag": "BUTTON",
+    "label": "SEO"
+  },
+  {
+    "tag": "BUTTON",
+    "label": "Domains"
+  },
+  {
+    "tag": "BUTTON",
+    "label": "Redirects"
+  }
+]

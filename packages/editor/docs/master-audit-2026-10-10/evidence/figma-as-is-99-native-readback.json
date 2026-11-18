@@ -1,0 +1,930 @@
+{
+  "page": "8280:2",
+  "count": 99,
+  "frames": [
+    {
+      "id": "8281:2",
+      "name": "AS-IS 01 · Review / empty · 1280",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 137,
+      "texts": 34,
+      "imageFills": 0
+    },
+    {
+      "id": "8283:2",
+      "name": "AS-IS 02 · Heading / Style",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 298,
+      "texts": 79,
+      "imageFills": 0
+    },
+    {
+      "id": "8283:299",
+      "name": "AS-IS 03 · Selected element actions",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 312,
+      "texts": 92,
+      "imageFills": 0
+    },
+    {
+      "id": "8283:610",
+      "name": "AS-IS 04 · Layers",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 326,
+      "texts": 90,
+      "imageFills": 0
+    },
+    {
+      "id": "8283:935",
+      "name": "AS-IS 05 · Pages",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 315,
+      "texts": 90,
+      "imageFills": 0
+    },
+    {
+      "id": "8283:1249",
+      "name": "AS-IS 06 · Add catalog",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 406,
+      "texts": 113,
+      "imageFills": 0
+    },
+    {
+      "id": "8283:1654",
+      "name": "AS-IS 07 · Saved components",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 345,
+      "texts": 111,
+      "imageFills": 0
+    },
+    {
+      "id": "8283:1998",
+      "name": "AS-IS 08 · Assets quick chooser",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 328,
+      "texts": 91,
+      "imageFills": 3
+    },
+    {
+      "id": "8283:2325",
+      "name": "AS-IS 09 · Full Media",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 195,
+      "texts": 51,
+      "imageFills": 3
+    },
+    {
+      "id": "8283:2523",
+      "name": "AS-IS 10 · CMS records",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 232,
+      "texts": 61,
+      "imageFills": 0
+    },
+    {
+      "id": "8286:2",
+      "name": "AS-IS 11 · CMS record / draft",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 272,
+      "texts": 78,
+      "imageFills": 0
+    },
+    {
+      "id": "8286:272",
+      "name": "AS-IS 12 · CMS fields",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 240,
+      "texts": 69,
+      "imageFills": 0
+    },
+    {
+      "id": "8286:511",
+      "name": "AS-IS 13 · Brand / colors",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 224,
+      "texts": 111,
+      "imageFills": 0
+    },
+    {
+      "id": "8286:733",
+      "name": "AS-IS 14 · Brand color picker",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 348,
+      "texts": 122,
+      "imageFills": 0
+    },
+    {
+      "id": "8286:985",
+      "name": "AS-IS 15 · Brand typography",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 177,
+      "texts": 92,
+      "imageFills": 0
+    },
+    {
+      "id": "8286:1160",
+      "name": "AS-IS 16 · Brand spacing",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 199,
+      "texts": 91,
+      "imageFills": 0
+    },
+    {
+      "id": "8286:1357",
+      "name": "AS-IS 17 · Site menu",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 257,
+      "texts": 90,
+      "imageFills": 0
+    },
+    {
+      "id": "8286:1613",
+      "name": "AS-IS 18 · Settings / General",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 202,
+      "texts": 65,
+      "imageFills": 0
+    },
+    {
+      "id": "8290:2",
+      "name": "AS-IS 19 · History / Session",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 177,
+      "texts": 41,
+      "imageFills": 0
+    },
+    {
+      "id": "8290:178",
+      "name": "AS-IS 20 · History / Saves",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 187,
+      "texts": 48,
+      "imageFills": 0
+    },
+    {
+      "id": "8290:364",
+      "name": "AS-IS 21 · Notifications / empty",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 297,
+      "texts": 80,
+      "imageFills": 0
+    },
+    {
+      "id": "8290:660",
+      "name": "AS-IS 22 · Issues / six warnings",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 203,
+      "texts": 56,
+      "imageFills": 0
+    },
+    {
+      "id": "8290:862",
+      "name": "AS-IS 23 · Activity / event",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 172,
+      "texts": 41,
+      "imageFills": 0
+    },
+    {
+      "id": "8290:1033",
+      "name": "AS-IS 24 · Command palette",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 201,
+      "texts": 64,
+      "imageFills": 0
+    },
+    {
+      "id": "8290:1233",
+      "name": "AS-IS 25 · Publish / checks and targets",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 231,
+      "texts": 75,
+      "imageFills": 0
+    },
+    {
+      "id": "8290:1463",
+      "name": "AS-IS 26 · AI / selected heading",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 167,
+      "texts": 38,
+      "imageFills": 0
+    },
+    {
+      "id": "8290:1629",
+      "name": "AS-IS 27 · Templates / gallery",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 187,
+      "texts": 77,
+      "imageFills": 8
+    },
+    {
+      "id": "8290:1811",
+      "name": "AS-IS 28 · Template preview",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 141,
+      "texts": 54,
+      "imageFills": 0
+    },
+    {
+      "id": "8290:1952",
+      "name": "AS-IS 29 · Components / manager empty",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 299,
+      "texts": 84,
+      "imageFills": 0
+    },
+    {
+      "id": "8290:2250",
+      "name": "AS-IS 30 · Preview / Desktop",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 269,
+      "texts": 78,
+      "imageFills": 0
+    },
+    {
+      "id": "8290:2518",
+      "name": "AS-IS 31 · Preview / Mobile 375",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 280,
+      "texts": 78,
+      "imageFills": 0
+    },
+    {
+      "id": "8290:2797",
+      "name": "AS-IS 32 · Pages / page Inspector",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 255,
+      "texts": 68,
+      "imageFills": 0
+    },
+    {
+      "id": "8290:3051",
+      "name": "AS-IS 33 · New page dialog",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 283,
+      "texts": 78,
+      "imageFills": 0
+    },
+    {
+      "id": "8290:3332",
+      "name": "AS-IS 34 · Export dialog",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 293,
+      "texts": 87,
+      "imageFills": 0
+    },
+    {
+      "id": "8290:3619",
+      "name": "AS-IS 35 · Keyboard shortcuts",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 300,
+      "texts": 93,
+      "imageFills": 0
+    },
+    {
+      "id": "8293:2",
+      "name": "AS-IS 36 · Heading Style — 1440px",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 372,
+      "texts": 102,
+      "imageFills": 0
+    },
+    {
+      "id": "8293:373",
+      "name": "AS-IS 37 · Image Style — 1440px",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 362,
+      "texts": 93,
+      "imageFills": 0
+    },
+    {
+      "id": "8293:734",
+      "name": "AS-IS 38 · Image Behaviour — current controls",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 267,
+      "texts": 62,
+      "imageFills": 0
+    },
+    {
+      "id": "8293:994",
+      "name": "AS-IS 39 · Image Effects — current controls",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 246,
+      "texts": 56,
+      "imageFills": 0
+    },
+    {
+      "id": "8293:1239",
+      "name": "AS-IS 40 · Page Inspector — selected root",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 290,
+      "texts": 71,
+      "imageFills": 0
+    },
+    {
+      "id": "8293:1528",
+      "name": "AS-IS 41 · Page settings — SEO",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 331,
+      "texts": 100,
+      "imageFills": 0
+    },
+    {
+      "id": "8293:1858",
+      "name": "AS-IS 42 · Page settings — Social",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 311,
+      "texts": 86,
+      "imageFills": 0
+    },
+    {
+      "id": "8293:2168",
+      "name": "AS-IS 43 · Page settings — Advanced",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 317,
+      "texts": 89,
+      "imageFills": 0
+    },
+    {
+      "id": "8302:2",
+      "name": "AS-IS 44 · Settings / Overview",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 229,
+      "texts": 80,
+      "imageFills": 0
+    },
+    {
+      "id": "8302:234",
+      "name": "AS-IS 45 · Settings / SEO",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 236,
+      "texts": 77,
+      "imageFills": 0
+    },
+    {
+      "id": "8302:473",
+      "name": "AS-IS 46 · Settings / Redirects",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 207,
+      "texts": 58,
+      "imageFills": 0
+    },
+    {
+      "id": "8302:682",
+      "name": "AS-IS 47 · Settings / Domains — no custom domain",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 198,
+      "texts": 54,
+      "imageFills": 0
+    },
+    {
+      "id": "8302:883",
+      "name": "AS-IS 48 · Settings / Access",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 210,
+      "texts": 60,
+      "imageFills": 0
+    },
+    {
+      "id": "8302:1095",
+      "name": "AS-IS 49 · Settings / Analytics",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 232,
+      "texts": 70,
+      "imageFills": 0
+    },
+    {
+      "id": "8302:1327",
+      "name": "AS-IS 50 · Settings / Form submissions — empty",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 197,
+      "texts": 53,
+      "imageFills": 0
+    },
+    {
+      "id": "8302:1527",
+      "name": "AS-IS 51 · Settings / Languages",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 218,
+      "texts": 68,
+      "imageFills": 0
+    },
+    {
+      "id": "8302:1748",
+      "name": "AS-IS 52 · Settings / Custom code",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 221,
+      "texts": 63,
+      "imageFills": 0
+    },
+    {
+      "id": "8302:1966",
+      "name": "AS-IS 53 · Settings / Security headers",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 232,
+      "texts": 67,
+      "imageFills": 0
+    },
+    {
+      "id": "8302:2194",
+      "name": "AS-IS 54 · Settings / Danger zone",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 207,
+      "texts": 59,
+      "imageFills": 0
+    },
+    {
+      "id": "8302:2404",
+      "name": "AS-IS 55 · Settings / Members — workspace door",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 201,
+      "texts": 56,
+      "imageFills": 0
+    },
+    {
+      "id": "8302:2608",
+      "name": "AS-IS 56 · Settings / Billing — workspace door",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 201,
+      "texts": 56,
+      "imageFills": 0
+    },
+    {
+      "id": "8302:2812",
+      "name": "AS-IS 57 · Settings / Integrations — workspace door",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 201,
+      "texts": 56,
+      "imageFills": 0
+    },
+    {
+      "id": "8304:74",
+      "name": "AS-IS 58 · Brand / Colour mode",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 231,
+      "texts": 98,
+      "imageFills": 0
+    },
+    {
+      "id": "8304:308",
+      "name": "AS-IS 59 · Brand / Styles",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 194,
+      "texts": 98,
+      "imageFills": 0
+    },
+    {
+      "id": "8304:505",
+      "name": "AS-IS 60 · Brand / Component styles",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 182,
+      "texts": 71,
+      "imageFills": 0
+    },
+    {
+      "id": "8304:690",
+      "name": "AS-IS 61 · Brand / Classes — empty",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 143,
+      "texts": 48,
+      "imageFills": 0
+    },
+    {
+      "id": "8304:836",
+      "name": "AS-IS 62 · Brand / Presets",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 195,
+      "texts": 79,
+      "imageFills": 0
+    },
+    {
+      "id": "8304:1034",
+      "name": "AS-IS 63 · Brand / Brand checks",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 147,
+      "texts": 52,
+      "imageFills": 0
+    },
+    {
+      "id": "8304:1184",
+      "name": "AS-IS 64 · Brand / Starters",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 170,
+      "texts": 64,
+      "imageFills": 0
+    },
+    {
+      "id": "8304:1357",
+      "name": "AS-IS 65 · Brand / Import / export",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 163,
+      "texts": 57,
+      "imageFills": 0
+    },
+    {
+      "id": "8306:241560",
+      "name": "AS-IS 66 · CMS / No collection selected",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 179,
+      "texts": 58,
+      "imageFills": 0
+    },
+    {
+      "id": "8307:241530",
+      "name": "AS-IS 67 · CMS / Title field settings",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 244,
+      "texts": 89,
+      "imageFills": 0
+    },
+    {
+      "id": "8307:241775",
+      "name": "AS-IS 68 · CMS / Dynamic pages",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 203,
+      "texts": 65,
+      "imageFills": 0
+    },
+    {
+      "id": "8307:241979",
+      "name": "AS-IS 69 · CMS / Collection settings",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 208,
+      "texts": 68,
+      "imageFills": 0
+    },
+    {
+      "id": "8307:242190",
+      "name": "AS-IS 70 · Media / Selected asset",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 218,
+      "texts": 63,
+      "imageFills": 4
+    },
+    {
+      "id": "8308:2",
+      "name": "AS-IS 71 · Media / Asset properties",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 223,
+      "texts": 67,
+      "imageFills": 4
+    },
+    {
+      "id": "8308:228",
+      "name": "AS-IS 72 · Media / Crop editor",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 281,
+      "texts": 97,
+      "imageFills": 5
+    },
+    {
+      "id": "8308:505",
+      "name": "AS-IS 73 · Media / Asset actions",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 229,
+      "texts": 71,
+      "imageFills": 4
+    },
+    {
+      "id": "8308:737",
+      "name": "AS-IS 74 · History / Published empty state",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 143,
+      "texts": 36,
+      "imageFills": 0
+    },
+    {
+      "id": "8308:879",
+      "name": "AS-IS 75 · History / Version actions",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 170,
+      "texts": 52,
+      "imageFills": 0
+    },
+    {
+      "id": "8308:1048",
+      "name": "AS-IS 76 · History / Compare with current",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 180,
+      "texts": 58,
+      "imageFills": 0
+    },
+    {
+      "id": "8308:1227",
+      "name": "AS-IS 77 · Canvas / View menu",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 246,
+      "texts": 75,
+      "imageFills": 0
+    },
+    {
+      "id": "8308:1472",
+      "name": "AS-IS 78 · Canvas / Breakpoint menu",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 230,
+      "texts": 65,
+      "imageFills": 0
+    },
+    {
+      "id": "8308:1701",
+      "name": "AS-IS 79 · Canvas / Mobile viewport",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 250,
+      "texts": 59,
+      "imageFills": 0
+    },
+    {
+      "id": "8308:1927",
+      "name": "AS-IS 80 · Inspector / Multiple selected",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 320,
+      "texts": 86,
+      "imageFills": 0
+    },
+    {
+      "id": "8308:2246",
+      "name": "AS-IS 81 · Inspector / Locked element",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 393,
+      "texts": 103,
+      "imageFills": 0
+    },
+    {
+      "id": "8308:2638",
+      "name": "AS-IS 82 · Inspector / Container",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 446,
+      "texts": 114,
+      "imageFills": 0
+    },
+    {
+      "id": "8308:3082",
+      "name": "AS-IS 83 · Inspector / Form",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 491,
+      "texts": 120,
+      "imageFills": 0
+    },
+    {
+      "id": "8308:3572",
+      "name": "AS-IS 84 · Pages / Empty page",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 418,
+      "texts": 102,
+      "imageFills": 0
+    },
+    {
+      "id": "8308:3973",
+      "name": "AS-IS 85 · Pages / Page actions",
+      "width": 1280,
+      "height": 720,
+      "nativeNodes": 287,
+      "texts": 78,
+      "imageFills": 0
+    },
+    {
+      "id": "8309:2",
+      "name": "AS-IS 86 · Components / Create dialog",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 458,
+      "texts": 122,
+      "imageFills": 0
+    },
+    {
+      "id": "8309:461",
+      "name": "AS-IS 87 · Components / Instance controls",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 423,
+      "texts": 103,
+      "imageFills": 0
+    },
+    {
+      "id": "8309:887",
+      "name": "AS-IS 88 · Components / Instance actions",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 429,
+      "texts": 105,
+      "imageFills": 0
+    },
+    {
+      "id": "8309:242881",
+      "name": "AS-IS 89 · Components / Expanded manager",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 402,
+      "texts": 103,
+      "imageFills": 0
+    },
+    {
+      "id": "8309:243286",
+      "name": "AS-IS 90 · Components / Master detail",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 416,
+      "texts": 120,
+      "imageFills": 1
+    },
+    {
+      "id": "8309:243704",
+      "name": "AS-IS 91 · Components / Back to instance",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 417,
+      "texts": 120,
+      "imageFills": 1
+    },
+    {
+      "id": "8309:244123",
+      "name": "AS-IS 92 · Inspector / CMS binding chooser",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 309,
+      "texts": 89,
+      "imageFills": 1
+    },
+    {
+      "id": "8309:244434",
+      "name": "AS-IS 93 · Inspector / Add interaction",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 375,
+      "texts": 96,
+      "imageFills": 1
+    },
+    {
+      "id": "8309:244811",
+      "name": "AS-IS 94 · Inspector / Form behaviour",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 456,
+      "texts": 98,
+      "imageFills": 0
+    },
+    {
+      "id": "8309:245270",
+      "name": "AS-IS 95 · Inspector / Image chooser",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 419,
+      "texts": 94,
+      "imageFills": 3
+    },
+    {
+      "id": "8309:245692",
+      "name": "AS-IS 96 · Inspector / Spacing token picker",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 471,
+      "texts": 109,
+      "imageFills": 3
+    },
+    {
+      "id": "8309:246171",
+      "name": "AS-IS 97 · Inspector / Heading at Mobile",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 436,
+      "texts": 105,
+      "imageFills": 0
+    },
+    {
+      "id": "8309:246610",
+      "name": "AS-IS 98 · Templates / Empty page replacement applied",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 412,
+      "texts": 98,
+      "imageFills": 0
+    },
+    {
+      "id": "8309:247369",
+      "name": "AS-IS 99 · Templates / Replacement guard",
+      "width": 1440,
+      "height": 900,
+      "nativeNodes": 178,
+      "texts": 68,
+      "imageFills": 0
+    }
+  ],
+  "library": {
+    "page": "8286:1818",
+    "components": 29,
+    "sets": 11,
+    "instances": 6,
+    "autoLayout": 62
+  },
+  "pages": [
+    {
+      "id": "0:1",
+      "name": "📕 Foundations"
+    },
+    {
+      "id": "1:2",
+      "name": "🧩 Components"
+    },
+    {
+      "id": "4418:45431",
+      "name": "Editor v3 · IA"
+    },
+    {
+      "id": "7712:192948",
+      "name": "Page 4"
+    },
+    {
+      "id": "8280:2",
+      "name": "01 — EXISTING APPLICATION / AS-IS"
+    },
+    {
+      "id": "8286:1818",
+      "name": "01A — AS-IS / REUSABLE CONTROLS"
+    }
+  ]
+}

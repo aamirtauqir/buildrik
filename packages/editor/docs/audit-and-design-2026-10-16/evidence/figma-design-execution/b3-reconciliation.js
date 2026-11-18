@@ -1,0 +1,9 @@
+// P15 §5.4 / T-2. Outcomes are separate fixtures, never a product-side result selector.
+const cases=[
+ {name:'B3-P84 · Reconciliation / Services has content',title:'Services is ready to inspect',body:'Services exists and contains content. Open it to check the result before making any further changes.',note:'No new page will be created, and existing content will not be replaced.',status:'Template · Result needs review',actions:[{label:'Keep waiting',to:'106:37213'},{label:'Open Services',kind:'primary',to:'106:37579'}]},
+ {name:'B3-P85 · Reconciliation / operation still running',title:'Services is still being created',body:'The same creation is still running. Starting it again could create a duplicate page.',note:'Keep waiting for this operation. Closing this message does not cancel an import that has already started.',status:'Template · Creating Services…',actions:[{label:'Keep waiting',kind:'primary',to:'106:37213'}]},
+ {name:'B3-P86 · Reconciliation / access unavailable',title:'We can’t check Services yet',body:'Your access could not be confirmed. The creation result is still unknown, so creating another page is unavailable.',note:'Your original request is retained. Check again after your access is restored.',status:'Template · Result unknown',actions:[{label:'Keep waiting',to:'106:37213'},{label:'Check again',kind:'primary',to:'107:39139'}]},
+ {name:'B3-P87 · Reconciliation / confirmed not created',title:'Services wasn’t created',body:'The operation has finished and no page was created. Your page name and template choice are retained.',note:'Return to the preview to review Services and SaaS Landing before trying again.',status:'Template · Nothing changed',actions:[{label:'Review and retry',kind:'primary',to:'105:29094'}]}
+];
+for(const c of cases){const r=await clone('107:39139',c.name);status(r,c.status);modal(r,c.title,c.body,{note:c.note,actions:c.actions,width:560});}
+return await finish();

@@ -1,0 +1,1267 @@
+{
+  "time": "2026-10-10T14:01:48.814Z",
+  "url": "http://127.0.0.1:5050/",
+  "text": "Saved\n‹ Exit\nUntitled Project\n›\nHome\nHistory ›\nPreview\nPublish\nSkip to Canvas\nAdd\nLayers\nPages\nAssets\nCMS\nBrand\nHelp\nAdd\n⋯\n✕\n⌘F\n▾\nELEMENTS\n53\nH\nHeading\n☆\nText\n☆\nLink\n☆\nCollection list\n☆\nList\n☆\nButton\n☆\nIcon\n☆\nDivider\n☆\nSpacer\n☆\nLabel\n☆\nProgress\n☆\nCountdown\n☆\nContainer\n☆\nSection\n☆\nGrid\n☆\nColumns\n☆\nFlex\n☆\nStack\n☆\nCard\n☆\nTable\n☆\nInput\n☆\nTextarea\n☆\nSelect\n☆\nCheckbox\n☆\nRadio\n☆\nSwitch\n☆\nSlider\n☆\nSubmit\n☆\nEmail\n☆\nPassword\n☆\nNumber\n☆\nDate\n☆\nTime\n☆\nColor\n☆\nForm\n☆\nImage\n☆\nVideo\n☆\nAudio\n☆\nGallery\n☆\nSVG\n☆\nLottie\n☆\nEmbed\n☆\nMap\n☆\nNavbar\n☆\nFooter\n☆\nCTA\n☆\nAccordion\n☆\nTabs\n☆\nModal\n☆\nTestimonials\n☆\nPricing\n☆\nSocial Icons\n☆\nCarousel\n☆\n✦  Generate a block with AI…\n▸\nBLOCKS\n8\n▸\nBUILT-IN COMPONENTS\n14\n▸\nSAVED COMPONENTS\n0\nPage templates ›\nHome\n\nThis page is empty\n\nStart with a template, drop a block, or describe your site.\n\nSaaS Landing\nPortfolio\nAgency\nBrowse all templates\nAdd a block\n✦ Describe your site\nStart blank\nView · 1 ▾\n61% ▾\nNothing selected\nHome\nHome · Page\n✦ AI\nFill\nBackground\nPage / background\nSize\nMax width\npx\n%\nrem\nvw\nTypography\nFont\nInter\nText colour\nText\nSpacing\nMargin\nPadding\nLink sides\nSEO & social\n\nYour place here is kept\n\n0/7\n\nEverything you build lives behind these six.\n\nInsert sections, manage layers and pages, add media and content, and set your brand — all from this rail.\n\nGot it\n💡\nTip 1/4\nDrag ⠿ to place an element exactly\nGot it\n\nv3.0.2\n\nOutput Detail\nStandard\nReact Components\nHide Until Restart\nMarker Color\nClear on copy/send\nBlock page interactions\nManage MCP & Webhooks\nManage MCP & Webhooks\nMCP Connection\n\nMCP connection allows agents to receive and act on annotations. Learn more\n\nWebhooks\nAuto-Send\n\nThe webhook URL will receive live annotation changes and annotation data.",
+  "nodes": [
+    {
+      "id": "root-mv2gpg81-qjntl9n36y",
+      "type": "container",
+      "parent": null,
+      "text": "",
+      "style": "background-color: var(--buildrick-design-color-page-background)"
+    }
+  ],
+  "controls": [
+    {
+      "tag": "BUTTON",
+      "text": "‹ Exit",
+      "label": null,
+      "test": "topbar-exit",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Untitled Project",
+      "label": null,
+      "test": "topbar-crumb-site",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Home",
+      "label": null,
+      "test": "topbar-crumb-page",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "History ›",
+      "label": null,
+      "test": "save-status-saved",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "",
+      "label": "Notifications",
+      "test": null,
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Preview",
+      "label": null,
+      "test": "topbar-preview",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Publish",
+      "label": null,
+      "test": null,
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "",
+      "label": "Site menu",
+      "test": "site-menu-trigger",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Add",
+      "label": "Add elements, blocks and components to your page",
+      "test": "rail-tab-add",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Layers",
+      "label": "View and reorder page structure",
+      "test": "rail-tab-layers",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Pages",
+      "label": "Manage all pages in your site",
+      "test": "rail-tab-pages",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Assets",
+      "label": "Upload and manage images, videos, and fonts",
+      "test": "rail-tab-assets",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "CMS",
+      "label": "Collections, records and data sources for dynamic content",
+      "test": "rail-tab-content",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Brand",
+      "label": "Brand — global colors, fonts, spacing tokens",
+      "test": "rail-tab-design",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Help",
+      "label": "Help — keyboard shortcuts",
+      "test": "rail-help",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "⋯",
+      "label": "Add options",
+      "test": "add-panel-menu",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "✕",
+      "label": "Close Add",
+      "test": null,
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "INPUT",
+      "text": "",
+      "label": "Search elements…",
+      "test": "add-search-input",
+      "placeholder": "Search elements…",
+      "type": "text",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "▾\nELEMENTS\n53",
+      "label": null,
+      "test": "insert-group-elements",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "DIV",
+      "text": "H\nHeading\n☆",
+      "label": null,
+      "test": "insert-el-Heading",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Text\n☆",
+      "label": null,
+      "test": "insert-el-Text",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Link\n☆",
+      "label": null,
+      "test": "insert-el-Link",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Collection list\n☆",
+      "label": null,
+      "test": "insert-el-Collection list",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "List\n☆",
+      "label": null,
+      "test": "insert-el-List",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Button\n☆",
+      "label": null,
+      "test": "insert-el-Button",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Icon\n☆",
+      "label": null,
+      "test": "insert-el-Icon",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Divider\n☆",
+      "label": null,
+      "test": "insert-el-Divider",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Spacer\n☆",
+      "label": null,
+      "test": "insert-el-Spacer",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Label\n☆",
+      "label": null,
+      "test": "insert-el-Label",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Progress\n☆",
+      "label": null,
+      "test": "insert-el-Progress",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Countdown\n☆",
+      "label": null,
+      "test": "insert-el-Countdown",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Container\n☆",
+      "label": null,
+      "test": "insert-el-Container",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Section\n☆",
+      "label": null,
+      "test": "insert-el-Section",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Grid\n☆",
+      "label": null,
+      "test": "insert-el-Grid",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Columns\n☆",
+      "label": null,
+      "test": "insert-el-Columns",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Flex\n☆",
+      "label": null,
+      "test": "insert-el-Flex",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Stack\n☆",
+      "label": null,
+      "test": "insert-el-Stack",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Card\n☆",
+      "label": null,
+      "test": "insert-el-Card",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Table\n☆",
+      "label": null,
+      "test": "insert-el-Table",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Input\n☆",
+      "label": null,
+      "test": "insert-el-Input",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Textarea\n☆",
+      "label": null,
+      "test": "insert-el-Textarea",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Select\n☆",
+      "label": null,
+      "test": "insert-el-Select",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Checkbox\n☆",
+      "label": null,
+      "test": "insert-el-Checkbox",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Radio\n☆",
+      "label": null,
+      "test": "insert-el-Radio",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Switch\n☆",
+      "label": null,
+      "test": "insert-el-Switch",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Slider\n☆",
+      "label": null,
+      "test": "insert-el-Slider",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Submit\n☆",
+      "label": null,
+      "test": "insert-el-Submit",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Email\n☆",
+      "label": null,
+      "test": "insert-el-Email",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Password\n☆",
+      "label": null,
+      "test": "insert-el-Password",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Number\n☆",
+      "label": null,
+      "test": "insert-el-Number",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Date\n☆",
+      "label": null,
+      "test": "insert-el-Date",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Time\n☆",
+      "label": null,
+      "test": "insert-el-Time",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Color\n☆",
+      "label": null,
+      "test": "insert-el-Color",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Form\n☆",
+      "label": null,
+      "test": "insert-el-Form",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Image\n☆",
+      "label": null,
+      "test": "insert-el-Image",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Video\n☆",
+      "label": null,
+      "test": "insert-el-Video",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Audio\n☆",
+      "label": null,
+      "test": "insert-el-Audio",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Gallery\n☆",
+      "label": null,
+      "test": "insert-el-Gallery",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "SVG\n☆",
+      "label": null,
+      "test": "insert-el-SVG",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Lottie\n☆",
+      "label": null,
+      "test": "insert-el-Lottie",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Embed\n☆",
+      "label": null,
+      "test": "insert-el-Embed",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Map\n☆",
+      "label": null,
+      "test": "insert-el-Map",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Navbar\n☆",
+      "label": null,
+      "test": "insert-el-Navbar",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Footer\n☆",
+      "label": null,
+      "test": "insert-el-Footer",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "CTA\n☆",
+      "label": null,
+      "test": "insert-el-CTA",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Accordion\n☆",
+      "label": null,
+      "test": "insert-el-Accordion",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Tabs\n☆",
+      "label": null,
+      "test": "insert-el-Tabs",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Modal\n☆",
+      "label": null,
+      "test": "insert-el-Modal",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Testimonials\n☆",
+      "label": null,
+      "test": "insert-el-Testimonials",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Pricing\n☆",
+      "label": null,
+      "test": "insert-el-Pricing",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Social Icons\n☆",
+      "label": null,
+      "test": "insert-el-Social Icons",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "DIV",
+      "text": "Carousel\n☆",
+      "label": null,
+      "test": "insert-el-Carousel",
+      "placeholder": null,
+      "type": null,
+      "draggable": true
+    },
+    {
+      "tag": "BUTTON",
+      "text": "▸\nBLOCKS\n8",
+      "label": null,
+      "test": "insert-group-blocks",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "▸\nBUILT-IN COMPONENTS\n14",
+      "label": null,
+      "test": "insert-group-components",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "▸\nSAVED COMPONENTS\n0",
+      "label": null,
+      "test": "insert-group-mine",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Page templates ›",
+      "label": null,
+      "test": "insert-page-templates",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "DIV",
+      "text": "Home",
+      "label": "Home",
+      "test": "page-tab-page-mv2gpg80-r4osty1cb8",
+      "placeholder": null,
+      "type": null,
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "",
+      "label": "Add page",
+      "test": "page-tab-add",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "SaaS Landing",
+      "label": "Start from the SaaS Landing template",
+      "test": "canvas-empty-template-site-saas-landing",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Portfolio",
+      "label": "Start from the Portfolio template",
+      "test": "canvas-empty-template-site-portfolio",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Agency",
+      "label": "Start from the Agency template",
+      "test": "canvas-empty-template-site-agency",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Browse all templates",
+      "label": null,
+      "test": "canvas-empty-browse",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Add a block",
+      "label": null,
+      "test": "canvas-empty-add-block",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "✦ Describe your site",
+      "label": null,
+      "test": "canvas-empty-describe",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Start blank",
+      "label": null,
+      "test": "canvas-empty-start-blank",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "",
+      "label": "Undo",
+      "test": null,
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "",
+      "label": "Redo",
+      "test": null,
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "View · 1 ▾",
+      "label": "View",
+      "test": "canvas-view-menu-trigger",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "61% ▾",
+      "label": "Zoom 61%",
+      "test": "canvas-zoom-trigger",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "✦ AI",
+      "label": "Ask AI about this page",
+      "test": "inspector-ai-chip",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "",
+      "label": "Page actions",
+      "test": "inspector-page-menu",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "",
+      "label": "Hide inspector (⌘\\)",
+      "test": "inspector-hide",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "",
+      "label": "Choose Background color",
+      "test": null,
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Page / background",
+      "label": "Jump to token color-page-background in Brand",
+      "test": "inspector-token-name",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "INPUT",
+      "text": "",
+      "label": null,
+      "test": null,
+      "placeholder": "",
+      "type": "text",
+      "draggable": false
+    },
+    {
+      "tag": "SELECT",
+      "text": "px\n%\nrem\nvw",
+      "label": "Max width unit",
+      "test": null,
+      "placeholder": null,
+      "type": null,
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Inter",
+      "label": "Font family",
+      "test": "inspector-field-font",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "",
+      "label": "Choose Text colour color",
+      "test": null,
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Text",
+      "label": "Jump to token color-text in Brand",
+      "test": "inspector-token-name",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "INPUT",
+      "text": "",
+      "label": null,
+      "test": null,
+      "placeholder": "0",
+      "type": "text",
+      "draggable": false
+    },
+    {
+      "tag": "INPUT",
+      "text": "",
+      "label": null,
+      "test": null,
+      "placeholder": "0",
+      "type": "text",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "",
+      "label": "Jump to token space-5 in Brand",
+      "test": "inspector-spacing-token-padding-top",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "INPUT",
+      "text": "",
+      "label": null,
+      "test": null,
+      "placeholder": "0",
+      "type": "text",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "",
+      "label": "Jump to token space-5 in Brand",
+      "test": "inspector-spacing-token-padding-left",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "INPUT",
+      "text": "",
+      "label": null,
+      "test": null,
+      "placeholder": "0",
+      "type": "text",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "",
+      "label": "Jump to token space-5 in Brand",
+      "test": "inspector-spacing-token-padding-right",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "INPUT",
+      "text": "",
+      "label": null,
+      "test": null,
+      "placeholder": "0",
+      "type": "text",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "",
+      "label": "Jump to token space-5 in Brand",
+      "test": "inspector-spacing-token-padding-bottom",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "INPUT",
+      "text": "",
+      "label": null,
+      "test": null,
+      "placeholder": "0",
+      "type": "text",
+      "draggable": false
+    },
+    {
+      "tag": "INPUT",
+      "text": "",
+      "label": null,
+      "test": null,
+      "placeholder": "0",
+      "type": "text",
+      "draggable": false
+    },
+    {
+      "tag": "INPUT",
+      "text": "",
+      "label": null,
+      "test": null,
+      "placeholder": "0",
+      "type": "text",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Link sides",
+      "label": null,
+      "test": "inspector-spacing-link",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "SEO & social",
+      "label": null,
+      "test": "inspector-page-seo",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Got it",
+      "label": null,
+      "test": "rail-coach-got-it",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Got it",
+      "label": null,
+      "test": "insert-first-use-tip-ok",
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "",
+      "label": null,
+      "test": null,
+      "placeholder": null,
+      "type": null,
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "",
+      "label": null,
+      "test": null,
+      "placeholder": null,
+      "type": null,
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "",
+      "label": null,
+      "test": null,
+      "placeholder": null,
+      "type": null,
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "",
+      "label": null,
+      "test": null,
+      "placeholder": null,
+      "type": null,
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "",
+      "label": null,
+      "test": null,
+      "placeholder": null,
+      "type": null,
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "",
+      "label": null,
+      "test": null,
+      "placeholder": null,
+      "type": null,
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "",
+      "label": null,
+      "test": null,
+      "placeholder": null,
+      "type": null,
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "",
+      "label": null,
+      "test": null,
+      "placeholder": null,
+      "type": null,
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "",
+      "label": null,
+      "test": null,
+      "placeholder": null,
+      "type": null,
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Standard",
+      "label": null,
+      "test": null,
+      "placeholder": null,
+      "type": null,
+      "draggable": false
+    },
+    {
+      "tag": "INPUT",
+      "text": "",
+      "label": null,
+      "test": null,
+      "placeholder": null,
+      "type": "checkbox",
+      "draggable": false
+    },
+    {
+      "tag": "INPUT",
+      "text": "",
+      "label": null,
+      "test": null,
+      "placeholder": null,
+      "type": "checkbox",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "",
+      "label": null,
+      "test": null,
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "",
+      "label": null,
+      "test": null,
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "",
+      "label": null,
+      "test": null,
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "",
+      "label": null,
+      "test": null,
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "",
+      "label": null,
+      "test": null,
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "",
+      "label": null,
+      "test": null,
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "",
+      "label": null,
+      "test": null,
+      "placeholder": null,
+      "type": "button",
+      "draggable": false
+    },
+    {
+      "tag": "INPUT",
+      "text": "",
+      "label": null,
+      "test": null,
+      "placeholder": null,
+      "type": "checkbox",
+      "draggable": false
+    },
+    {
+      "tag": "INPUT",
+      "text": "",
+      "label": null,
+      "test": null,
+      "placeholder": null,
+      "type": "checkbox",
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Manage MCP & Webhooks",
+      "label": null,
+      "test": null,
+      "placeholder": null,
+      "type": null,
+      "draggable": false
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Manage MCP & Webhooks",
+      "label": null,
+      "test": null,
+      "placeholder": null,
+      "type": null,
+      "draggable": false
+    },
+    {
+      "tag": "INPUT",
+      "text": "",
+      "label": null,
+      "test": null,
+      "placeholder": null,
+      "type": "checkbox",
+      "draggable": false
+    }
+  ]
+}

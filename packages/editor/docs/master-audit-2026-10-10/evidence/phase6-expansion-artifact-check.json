@@ -1,0 +1,10 @@
+{
+  "status": "PASS for stated checks; Phase 6 remains open",
+  "screens": 62,
+  "browser_checks": 53,
+  "browser_failed_checks_in_final_runs": 0,
+  "missing_native_destinations": 0,
+  "detected_container_overflows": 0,
+  "reviewer_editor_links": 0,
+  "full_product_complete": false
+}

@@ -1,0 +1,13 @@
+[
+  {
+    "label": "Start authored-alt image fixture",
+    "goto": "8507:3011",
+    "shot": "walk-image-start.png"
+  },
+  {
+    "label": "Open source chooser",
+    "x": 1241,
+    "y": 261,
+    "shot": "walk-image-chooser.png"
+  }
+]

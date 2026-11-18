@@ -1,0 +1,189 @@
+[
+  {
+    "id": "8317:297",
+    "paper": "8317:388",
+    "body": "8317:436",
+    "hero": "8317:392",
+    "scale": 0.6266666666666667,
+    "viewportWidth": 1200,
+    "key": "E01",
+    "title": "Editor / Heading Style",
+    "noteId": "8315:199"
+  },
+  {
+    "key": "E02",
+    "id": "8317:243717",
+    "noteId": "8317:243945",
+    "title": "TO-BE E02 \u00b7 Add / searchable catalog",
+    "width": 1440,
+    "height": 900
+  },
+  {
+    "key": "E03",
+    "id": "8317:243948",
+    "noteId": "8317:244159",
+    "title": "TO-BE E03 \u00b7 Pages / structure and page settings",
+    "width": 1440,
+    "height": 900
+  },
+  {
+    "key": "E04",
+    "id": "8317:244162",
+    "noteId": "8317:244324",
+    "title": "TO-BE E04 \u00b7 Selected AI / stale proposal",
+    "width": 1440,
+    "height": 900
+  },
+  {
+    "key": "E05",
+    "id": "8317:244386",
+    "noteId": "8317:244551",
+    "title": "TO-BE E05 \u00b7 Review / readable comments with limited approval",
+    "width": 1440,
+    "height": 900
+  },
+  {
+    "key": "E06",
+    "id": "8317:244554",
+    "noteId": "8317:244719",
+    "title": "TO-BE E06 \u00b7 History / metadata-aware comparison",
+    "width": 1440,
+    "height": 900
+  },
+  {
+    "key": "E07",
+    "id": "8317:244722",
+    "noteId": "8317:244884",
+    "title": "TO-BE E07 \u00b7 Issues / unavailable server check",
+    "width": 1440,
+    "height": 900
+  },
+  {
+    "key": "E08",
+    "id": "8317:244887",
+    "noteId": "8317:245048",
+    "title": "TO-BE E08 \u00b7 Activity / exclusive right workspace",
+    "width": 1440,
+    "height": 900
+  },
+  {
+    "key": "E09",
+    "id": "8317:245051",
+    "noteId": "8317:245213",
+    "title": "TO-BE E09 \u00b7 Publish / blocked release checks",
+    "width": 1440,
+    "height": 900
+  },
+  {
+    "key": "E10",
+    "id": "8317:245216",
+    "noteId": "8317:245307",
+    "title": "TO-BE E10 \u00b7 Preview / Mobile visual checks",
+    "width": 1440,
+    "height": 900
+  },
+  {
+    "key": "E11",
+    "id": "8317:245583",
+    "noteId": "8317:245812",
+    "title": "TO-BE E11 \u00b7 Command palette / direct destinations",
+    "width": 1440,
+    "height": 900
+  },
+  {
+    "key": "E12",
+    "id": "8317:245815",
+    "noteId": "8317:246012",
+    "title": "TO-BE E12 \u00b7 Editor / 1280 \u00d7 720",
+    "width": 1280,
+    "height": 720
+  },
+  {
+    "key": "E13",
+    "id": "8317:246015",
+    "noteId": "8317:246179",
+    "title": "TO-BE E13 \u00b7 Editor / 1024 \u00d7 768",
+    "width": 1024,
+    "height": 768
+  },
+  {
+    "key": "E14",
+    "id": "8317:246182",
+    "noteId": "8317:246221",
+    "title": "TO-BE E14 \u00b7 Focused properties / 200% zoom scenario",
+    "width": 720,
+    "height": 450
+  },
+  {
+    "key": "E15",
+    "id": "8317:246224",
+    "noteId": "8317:246426",
+    "title": "TO-BE E15 \u00b7 Save recovery / local changes retained",
+    "width": 1440,
+    "height": 900
+  },
+  {
+    "key": "E16",
+    "id": "8318:2045",
+    "noteId": "8318:2201",
+    "title": "Empty page / first action",
+    "width": 1440,
+    "height": 900
+  },
+  {
+    "key": "E17",
+    "id": "8318:2204",
+    "noteId": "8318:2303",
+    "title": "Mobile preview / navigation expanded",
+    "width": 1440,
+    "height": 900
+  },
+  {
+    "key": "E18",
+    "id": "8318:244145",
+    "noteId": "8318:244365",
+    "title": "TO-BE E18 \u00b7 New page / template",
+    "width": 1440,
+    "height": 900
+  },
+  {
+    "key": "E19",
+    "id": "8318:244368",
+    "noteId": "8318:244588",
+    "title": "TO-BE E19 \u00b7 New page / blank",
+    "width": 1440,
+    "height": 900
+  },
+  {
+    "key": "E20",
+    "id": "8318:244591",
+    "noteId": "8318:244747",
+    "title": "TO-BE E20 \u00b7 Layers / expanded long names",
+    "width": 1440,
+    "height": 900
+  },
+  {
+    "key": "E21",
+    "id": "8318:244750",
+    "noteId": "8318:244935",
+    "title": "TO-BE E21 \u00b7 1024 temporary Layers chooser",
+    "width": 1024,
+    "height": 768
+  },
+  {
+    "key": "E22",
+    "id": "8320:759",
+    "noteId": "8320:915",
+    "title": "TO-BE E22 \u00b7 Empty page / 1280",
+    "width": 1280,
+    "height": 720
+  },
+  {
+    "key": "E23",
+    "id": "8320:918",
+    "noteId": "8320:1033",
+    "title": "TO-BE E23 \u00b7 Empty page / 1024",
+    "width": 1024,
+    "height": 768
+  }
+]

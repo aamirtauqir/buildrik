@@ -1,0 +1,125 @@
+[
+  {
+    "label": "History reviewer fixtures",
+    "goto": "8662:13151"
+  },
+  {
+    "label": "R30 / Review fixtures → History: restore / undo sample change",
+    "x": 720,
+    "y": 695
+  },
+  {
+    "label": "R30 / History · Version details → Compare with current",
+    "x": 720,
+    "y": 549,
+    "shot": "r30-history-semantic.png"
+  },
+  {
+    "label": "R30 / History · Semantic comparison → Visual comparison",
+    "x": 720,
+    "y": 542,
+    "shot": "r30-history-visual.png"
+  },
+  {
+    "label": "R30 / History · Visual comparison → Review restore",
+    "x": 720,
+    "y": 602,
+    "shot": "r30-restore-confirm.png"
+  },
+  {
+    "label": "R30 / History · Restore confirmation → Create safety copy and restore",
+    "x": 720,
+    "y": 573,
+    "shot": "r30-restored.png"
+  },
+  {
+    "label": "R30 / History · Restored → Undo restore",
+    "x": 720,
+    "y": 501,
+    "shot": "r30-restore-undone.png"
+  },
+  {
+    "label": "R30 / History · Undo restored → Return to Editor",
+    "x": 720,
+    "y": 525
+  },
+  {
+    "label": "R30 / Review fixtures → History: restore failure",
+    "x": 720,
+    "y": 743
+  },
+  {
+    "label": "R30 / History · Restore confirmation → Create safety copy and restore",
+    "x": 720,
+    "y": 573,
+    "shot": "r30-restore-failed.png"
+  },
+  {
+    "label": "R30 / History · Restore failed → Retry restore",
+    "x": 720,
+    "y": 501
+  },
+  {
+    "label": "R30 / History · Restore confirmation → Create safety copy and restore",
+    "x": 720,
+    "y": 573,
+    "shot": "r30-restore-retried.png"
+  },
+  {
+    "label": "R30 / History · Restored → Return to Editor",
+    "x": 720,
+    "y": 549
+  },
+  {
+    "label": "R30 / Review fixtures → Pages: creation fails",
+    "x": 720,
+    "y": 599
+  },
+  {
+    "label": "R30 / Pages · new-blank → Create page",
+    "x": 720,
+    "y": 608,
+    "shot": "r30-page-failed.png"
+  },
+  {
+    "label": "R30 / Pages · Creation failed → Retry",
+    "x": 720,
+    "y": 501
+  },
+  {
+    "label": "R30 / Pages · new-blank → Create page",
+    "x": 720,
+    "y": 608,
+    "shot": "r30-page-retried.png",
+    "expected": "8663:12975"
+  },
+  {
+    "label": "Contact switches to Mobile",
+    "x": 476,
+    "y": 96,
+    "expected": "8676:12958",
+    "shot": "r30-mobile-blank.png"
+  },
+  {
+    "label": "Return Desktop Contact",
+    "x": 380,
+    "y": 96,
+    "expected": "8663:12975"
+  },
+  {
+    "label": "Responsive reviewer fixture",
+    "goto": "8662:13151"
+  },
+  {
+    "label": "Desktop96 fixture",
+    "x": 720,
+    "y": 791
+  },
+  {
+    "label": "Reset Mobile font size",
+    "x": 1265,
+    "y": 683,
+    "shot": "r30-mobile-reset96.png",
+    "expected": "8465:15"
+  }
+]

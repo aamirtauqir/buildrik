@@ -1,0 +1,15 @@
+[
+  {"press":"Escape"},
+  {"x":1390,"y":88},
+  {"x":210,"y":984},
+  {"x":720,"y":756},
+  {"x":720,"y":523,"shot":"r44-video-stale-refusal.png"},
+  {"press":"Escape"},
+  {"x":1390,"y":88},
+  {"x":1180,"y":505,"shot":"r44-video-reset-sample-coherent.png"},
+  {"x":380,"y":96},
+  {"x":1330,"y":254},
+  {"x":1310,"y":226},
+  {"x":720,"y":563},
+  {"x":1390,"y":88,"shot":"r44-video-square-scroll-start.png"}
+]

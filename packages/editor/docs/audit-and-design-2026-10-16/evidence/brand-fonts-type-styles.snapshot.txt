@@ -1,0 +1,261 @@
+--- BEGIN UNTRUSTED EXTERNAL CONTENT (source: http://localhost:3000/edit/cmv8uviql000bucorbmjjol97) ---
+--- BEGIN UNTRUSTED EXTERNAL C​ONTENT (source: http://localhost:3000/edit/cmv8uviql000bucorbmjjol97) ---
+    @e1 [button] "‹ Exit"
+    @e2 [button] "s0-qa site"
+    @e3 [button] "Home"
+    @e4 [button] "History ›"
+    @e5 [button] "Review"
+    @e6 [button] "Comments"
+    @e7 [button] "Notifications, 2 unread"
+    @e8 [button] "Preview"
+    @e9 [button] "Site menu"
+@e10 [link] "Skip to Canvas"
+    @e11 [tab] "Add elements, blocks and components to your page": Add
+    @e12 [tab] "View and reorder page structure": Layers
+    @e13 [tab] "Manage all pages in your site": Pages
+    @e14 [tab] "Upload and manage images, videos, and fonts": Assets
+    @e15 [tab] "Collections, records and data sources for dynamic content": CMS
+    @e16 [tab] "Brand — global colors, fonts, spacing tokens": Brand
+    @e17 [button] "Help — keyboard shortcuts": Help
+@e18 [button] "Get started — 3 of 7 complete. Click to expand.": 3/7
+@e19 [button] "v3.0.2 Output Detail Standard React Components Hide Until Restart Marker Color Clear on copy/send Block page interactions Manage MCP & Webhooks Manage MCP & Webhooks MCP Connection MCP connection allows agents to receive and act on annotations. Learn more Webhooks Auto-Send The webhook URL will receive live annotation changes and annotation data."
+  @e20 [button]
+  @e21 [button]
+  @e22 [button] [disabled]
+  @e23 [button] [disabled]
+  @e24 [button] [disabled]
+  @e25 [button] [disabled]
+  @e26 [button]
+  @e27 [button]
+  @e28 [link]
+  @e29 [button] "Switch to light mode"
+  @e30 [button] "Standard"
+  @e31 [checkbox] [checked]
+  @e32 [checkbox]
+  @e33 [button] "Indigo"
+  @e34 [button] "Blue"
+  @e35 [button] "Cyan"
+  @e36 [button] "Green"
+  @e37 [button] "Yellow"
+  @e38 [button] "Orange"
+  @e39 [button] "Red"
+  @e40 [checkbox] "Clear on copy/send"
+  @e41 [checkbox] "Block page interactions" [checked]
+  @e42 [button] "Manage MCP & Webhooks"
+  @e43 [button] "Manage MCP & Webhooks"
+    @e44 [link] "Learn more"
+  @e45 [checkbox] "Auto-Send" [checked] [disabled]
+  @e46 [textbox] "Webhook URL"
+  @e47 [button] "Back to canvas"
+    @e48 [button] "Colours 58"
+    @e49 [button] "Colour mode"
+    @e50 [button] "Fonts & type styles"
+    @e51 [button] "Styles"
+    @e52 [button] "Component styles"
+    @e53 [button] "Classes"
+    @e54 [button] "Presets"
+    @e55 [button] "Brand checks"
+    @e56 [button] "Starters"
+    @e57 [button] "Spacing"
+    @e58 [button] "Import / export"
+  @e59 [button] "Review changes · 0"
+  @e60 [button] "Restore points"
+    @e61 [button] "+ Add a font"
+      @e62 [button] "Heading Inter · Display · 1 weight"
+      @e63 [button] "Body Inter · Body · 1 weight"
+      @e64 [button] "Mono Geist Mono · Mono · not used yet"
+      @e65 [button] "Heading 1 Inter Bold 36/40"
+      @e66 [button] "Heading 2 Inter Bold 30/36"
+      @e67 [button] "Heading 3 Inter Semi Bold 24/30"
+      @e68 [button] "Sub-heading Inter Medium 20/28"
+      @e69 [button] "Body large Inter Regular 18/29"
+      @e70 [button] "Body text Inter Regular 16/26"
+      @e71 [button] "Caption Inter Regular 14/21"
+      @e72 [button] "Caption XS Inter Regular 12/18"
+      @e73 [tab] "Light" [selected]
+      @e74 [tab] "Dark" [disabled]
+    @e75 [combobox] "Preview zoom"
+      @e76 [option] "25%"
+      @e77 [option] "50%" [selected]
+      @e78 [option] "100%"
+
+── cursor-interactive (not in ARIA tree) ──
+@c1 [cursor:pointer] "Review"
+@c2 [cursor:pointer] "›"
+@c3 [cursor:pointer] "Add"
+@c4 [cursor:pointer] "Layers"
+@c5 [cursor:pointer] "Pages"
+@c6 [cursor:pointer] "Assets"
+@c7 [cursor:pointer] "CMS"
+@c8 [cursor:pointer] "Brand"
+@c9 [cursor:pointer] "Help"
+@c10 [cursor:pointer] "span"
+@c11 [cursor:pointer] "span"
+@c12 [tabindex=0] "div"
+@c13 [popover-child, cursor:pointer] "div"
+@c14 [popover-child, cursor:pointer, tabindex=0, role=button] "span"
+@c15 [popover-child, cursor:pointer] "span"
+@c16 [popover-child, cursor:pointer] "span"
+@c17 [popover-child, cursor:pointer] "span"
+@c18 [popover-child, cursor:pointer] "div"
+@c19 [popover-child, cursor:pointer, tabindex=0, role=button] "span"
+@c20 [popover-child, cursor:pointer] "span"
+@c21 [popover-child, cursor:pointer] "span"
+@c22 [popover-child, cursor:pointer] "span"
+@c23 [popover-child, cursor:pointer] "div"
+@c24 [popover-child, cursor:pointer, tabindex=0, role=button] "span"
+@c25 [popover-child, cursor:pointer] "span"
+@c26 [popover-child, cursor:pointer] "span"
+@c27 [popover-child, cursor:pointer] "span"
+@c28 [popover-child, cursor:pointer] "span"
+@c29 [popover-child, cursor:pointer] "div"
+@c30 [popover-child, cursor:pointer, tabindex=0, role=button] "span"
+@c31 [popover-child, cursor:pointer] "span"
+@c32 [popover-child, cursor:pointer] "span"
+@c33 [popover-child, cursor:pointer] "3/7"
+@c34 [popover-child, cursor:pointer, tabindex=0, role=button] "v3.0.2
+
+Output Detail
+Standard
+React Components
+Hide Until Restart
+Marker Color
+"
+@c35 [popover-child, cursor:pointer] "div"
+@c36 [popover-child, cursor:pointer] "div"
+@c37 [popover-child, cursor:pointer] "div"
+@c38 [popover-child, cursor:pointer] "span"
+@c39 [popover-child, cursor:pointer] "span"
+@c40 [popover-child, cursor:pointer] "div"
+@c41 [popover-child, cursor:pointer] "span"
+@c42 [popover-child, cursor:pointer] "span"
+@c43 [popover-child, cursor:pointer] "div"
+@c44 [popover-child, cursor:pointer] "span"
+@c45 [popover-child, cursor:pointer] "span"
+@c46 [popover-child, cursor:pointer] "div"
+@c47 [popover-child, cursor:pointer] "span"
+@c48 [popover-child, cursor:pointer] "span"
+@c49 [popover-child, cursor:pointer] "div"
+@c50 [popover-child, cursor:pointer] "span"
+@c51 [popover-child, cursor:pointer] "span"
+@c52 [popover-child, cursor:pointer] "div"
+@c53 [popover-child, cursor:pointer] "span"
+@c54 [popover-child, cursor:pointer] "span"
+@c55 [popover-child, cursor:pointer] "div"
+@c56 [popover-child, cursor:pointer] "span"
+@c57 [popover-child, cursor:pointer] "div"
+@c58 [popover-child, cursor:pointer] "div"
+@c59 [popover-child, cursor:pointer] "span"
+@c60 [popover-child, cursor:pointer] "span"
+@c61 [popover-child, cursor:pointer] "span"
+@c62 [popover-child, cursor:pointer] "span"
+@c63 [popover-child, cursor:pointer] "Standard"
+@c64 [popover-child, cursor:pointer] "span"
+@c65 [popover-child, cursor:pointer] "span"
+@c66 [popover-child, cursor:pointer] "span"
+@c67 [popover-child, cursor:pointer] "span"
+@c68 [popover-child, cursor:pointer] "span"
+@c69 [popover-child, cursor:pointer] "Clear on copy/send"
+@c70 [popover-child, cursor:pointer] "Block page interactions"
+@c71 [popover-child, cursor:pointer] "Manage MCP & Webhooks"
+@c72 [popover-child, cursor:pointer] "span"
+@c73 [popover-child, cursor:pointer] "Manage MCP & Webhooks"
+@c74 [popover-child, cursor:pointer, tabindex=0, role=button] "Heading
+Inter · Display · 1 weight
+›"
+@c75 [popover-child, cursor:pointer] "Heading
+Inter · Display · 1 weight"
+@c76 [popover-child, cursor:pointer] "Heading"
+@c77 [popover-child, cursor:pointer] "Inter · Display · 1 weight"
+@c78 [popover-child, cursor:pointer] "Inter"
+@c79 [popover-child, cursor:pointer] "Display"
+@c80 [popover-child, cursor:pointer] "1 weight"
+@c81 [popover-child, cursor:pointer] "›"
+@c82 [popover-child, cursor:pointer, tabindex=0, role=button] "Body
+Inter · Body · 1 weight
+›"
+@c83 [popover-child, cursor:pointer] "Body
+Inter · Body · 1 weight"
+@c84 [popover-child, cursor:pointer] "Body"
+@c85 [popover-child, cursor:pointer] "Inter · Body · 1 weight"
+@c86 [popover-child, cursor:pointer] "Inter"
+@c87 [popover-child, cursor:pointer] "Body"
+@c88 [popover-child, cursor:pointer] "1 weight"
+@c89 [popover-child, cursor:pointer] "›"
+@c90 [popover-child, cursor:pointer, tabindex=0, role=button] "Mono
+Geist Mono · Mono · not used yet
+›"
+@c91 [popover-child, cursor:pointer] "Mono
+Geist Mono · Mono · not used yet"
+@c92 [popover-child, cursor:pointer] "Mono"
+@c93 [popover-child, cursor:pointer] "Geist Mono · Mono · not used yet"
+@c94 [popover-child, cursor:pointer] "Geist Mono"
+@c95 [popover-child, cursor:pointer] "Mono"
+@c96 [popover-child, cursor:pointer] "not used yet"
+@c97 [popover-child, cursor:pointer] "›"
+@c98 [popover-child, cursor:pointer, tabindex=0, role=button] "Heading 1
+Inter Bold 36/40
+›"
+@c99 [popover-child, cursor:pointer] "Heading 1
+Inter Bold 36/40"
+@c100 [popover-child, cursor:pointer] "Heading 1"
+@c101 [popover-child, cursor:pointer] "Inter Bold 36/40"
+@c102 [popover-child, cursor:pointer] "›"
+@c103 [popover-child, cursor:pointer, tabindex=0, role=button] "Heading 2
+Inter Bold 30/36
+›"
+@c104 [popover-child, cursor:pointer] "Heading 2
+Inter Bold 30/36"
+@c105 [popover-child, cursor:pointer] "Heading 2"
+@c106 [popover-child, cursor:pointer] "Inter Bold 30/36"
+@c107 [popover-child, cursor:pointer] "›"
+@c108 [popover-child, cursor:pointer, tabindex=0, role=button] "Heading 3
+Inter Semi Bold 24/30
+›"
+@c109 [popover-child, cursor:pointer] "Heading 3
+Inter Semi Bold 24/30"
+@c110 [popover-child, cursor:pointer] "Heading 3"
+@c111 [popover-child, cursor:pointer] "Inter Semi Bold 24/30"
+@c112 [popover-child, cursor:pointer] "›"
+@c113 [popover-child, cursor:pointer, tabindex=0, role=button] "Sub-heading
+Inter Medium 20/28
+›"
+@c114 [popover-child, cursor:pointer] "Sub-heading
+Inter Medium 20/28"
+@c115 [popover-child, cursor:pointer] "Sub-heading"
+@c116 [popover-child, cursor:pointer] "Inter Medium 20/28"
+@c117 [popover-child, cursor:pointer] "›"
+@c118 [popover-child, cursor:pointer, tabindex=0, role=button] "Body large
+Inter Regular 18/29
+›"
+@c119 [popover-child, cursor:pointer] "Body large
+Inter Regular 18/29"
+@c120 [popover-child, cursor:pointer] "Body large"
+@c121 [popover-child, cursor:pointer] "Inter Regular 18/29"
+@c122 [popover-child, cursor:pointer] "›"
+@c123 [popover-child, cursor:pointer, tabindex=0, role=button] "Body text
+Inter Regular 16/26
+›"
+@c124 [popover-child, cursor:pointer] "Body text
+Inter Regular 16/26"
+@c125 [popover-child, cursor:pointer] "Body text"
+@c126 [popover-child, cursor:pointer] "Inter Regular 16/26"
+@c127 [popover-child, cursor:pointer] "›"
+@c128 [popover-child, cursor:pointer, tabindex=0, role=button] "Caption
+Inter Regular 14/21
+›"
+@c129 [popover-child, cursor:pointer] "Caption
+Inter Regular 14/21"
+@c130 [popover-child, cursor:pointer] "Caption"
+@c131 [popover-child, cursor:pointer] "Inter Regular 14/21"
+@c132 [popover-child, cursor:pointer] "›"
+@c133 [popover-child, cursor:pointer, tabindex=0, role=button] "Caption XS
+Inter Regular 12/18
+›"
+@c134 [popover-child, cursor:pointer] "Caption XS
+Inter Regular 12/18"
+@c135 [popover-child, cursor:pointer] "Caption XS"
+@c136 [popover-child, cursor:pointer] "Inter Regular 12/18"
+@c137 [popover-child, cursor:pointer] "›"
+--- END UNTRUSTED EXTERNAL C​ONTENT ---
+--- END UNTRUSTED EXTERNAL CONTENT ---

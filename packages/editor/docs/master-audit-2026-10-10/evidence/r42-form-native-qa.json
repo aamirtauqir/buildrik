@@ -1,0 +1,421 @@
+{
+  "scope": "Bounded native audit of two Form roots, five field dialogs present in the field manifest, and eight remote dialogs. Current authored visibility/geometry only, not all prototype states or browser playback.",
+  "scopeInventoryNote": "Requested six field dialogs; manifest contains five distinct field dialog frames. No missing sixth node was inferred or invented.",
+  "roots": [
+    {
+      "name": "Form",
+      "id": "8843:30589",
+      "width": 1440,
+      "height": 1000,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    },
+    {
+      "name": "Form Admin",
+      "id": "9026:17615",
+      "width": 1440,
+      "height": 1000,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    },
+    {
+      "name": "Fields manager",
+      "id": "9024:17458",
+      "width": 560,
+      "height": 606,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    },
+    {
+      "name": "Field refusal",
+      "id": "9024:17500",
+      "width": 560,
+      "height": 162,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    },
+    {
+      "name": "Field type chooser",
+      "id": "9024:17514",
+      "width": 480,
+      "height": 414,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    },
+    {
+      "name": "Field defaults",
+      "id": "9024:17539",
+      "width": 480,
+      "height": 258,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    },
+    {
+      "name": "Field conversion review",
+      "id": "9024:17557",
+      "width": 560,
+      "height": 374,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    },
+    {
+      "name": "Remote manager",
+      "id": "9026:17446",
+      "width": 620,
+      "height": 626,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    },
+    {
+      "name": "Remote loading",
+      "id": "9026:17476",
+      "width": 560,
+      "height": 114,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    },
+    {
+      "name": "Remote saving",
+      "id": "9026:17487",
+      "width": 560,
+      "height": 114,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    },
+    {
+      "name": "Remote URL",
+      "id": "9026:17498",
+      "width": 500,
+      "height": 354,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    },
+    {
+      "name": "Remote message",
+      "id": "9026:17520",
+      "width": 500,
+      "height": 222,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    },
+    {
+      "name": "Remote recipient",
+      "id": "9026:17537",
+      "width": 500,
+      "height": 270,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    },
+    {
+      "name": "Remote refusal",
+      "id": "9026:17556",
+      "width": 560,
+      "height": 162,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    },
+    {
+      "name": "Remote exit",
+      "id": "9026:17570",
+      "width": 560,
+      "height": 230,
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "scroll": "NONE"
+    }
+  ],
+  "missingRoots": [],
+  "nodes": 489,
+  "visibleNodes": 396,
+  "instances": 149,
+  "componentIds": [
+    "8627:621",
+    "8314:3",
+    "8314:7",
+    "8314:5",
+    "8531:318"
+  ],
+  "missingComponents": [],
+  "componentErrors": [],
+  "reactionDestinations": [
+    {
+      "id": "8581:11856",
+      "type": "FRAME",
+      "name": "R27 / Captured workspace / Site menu"
+    },
+    {
+      "id": "8628:12749",
+      "type": "FRAME",
+      "name": "B03 / Build / Draft ready"
+    },
+    {
+      "id": "8628:12592",
+      "type": "FRAME",
+      "name": "B01 / Build / Start a scoped task"
+    },
+    {
+      "id": "8581:11797",
+      "type": "FRAME",
+      "name": "R27 / Captured workspace / Selected AI"
+    },
+    {
+      "id": "8465:31",
+      "type": "FRAME",
+      "name": "PROPOSED / scope unverified / G01 / Agents / Agents"
+    },
+    {
+      "id": "8581:11815",
+      "type": "FRAME",
+      "name": "R27 / Captured workspace / Review"
+    },
+    {
+      "id": "8465:46",
+      "type": "FRAME",
+      "name": "PROPOSED / scope unverified / C01 / Team / Team collaboration"
+    },
+    {
+      "id": "8539:9190",
+      "type": "FRAME",
+      "name": "R29 / Editor overlay / History"
+    },
+    {
+      "id": "8581:11846",
+      "type": "FRAME",
+      "name": "R27 / Captured workspace / Share preview link"
+    },
+    {
+      "id": "8539:9339",
+      "type": "FRAME",
+      "name": "R29 / Editor / Desktop visual preview"
+    },
+    {
+      "id": "8539:9433",
+      "type": "FRAME",
+      "name": "R29 / Editor overlay / Publish"
+    },
+    {
+      "id": "8465:2",
+      "type": "FRAME",
+      "name": "I01 / Design / Layout & spacing"
+    },
+    {
+      "id": "8539:9579",
+      "type": "FRAME",
+      "name": "R29 / Editor overlay / Pages"
+    },
+    {
+      "id": "8539:9786",
+      "type": "FRAME",
+      "name": "R33 / Media / Grid"
+    },
+    {
+      "id": "8539:9881",
+      "type": "FRAME",
+      "name": "R26 overlay / cms"
+    },
+    {
+      "id": "8539:9974",
+      "type": "FRAME",
+      "name": "R26 overlay / brand"
+    },
+    {
+      "id": "8465:8",
+      "type": "FRAME",
+      "name": "I07 / Design / Class & cascade manager"
+    },
+    {
+      "id": "9024:17458",
+      "type": "FRAME",
+      "name": "R42 / Form / Fields"
+    },
+    {
+      "id": "8844:16149",
+      "type": "FRAME",
+      "name": "R35 / Inspector / Element library"
+    },
+    {
+      "id": "8841:14864",
+      "type": "FRAME",
+      "name": "R35 / Inspector / Shared Style"
+    },
+    {
+      "id": "8841:14872",
+      "type": "FRAME",
+      "name": "R35 / Inspector / Shared Interactions"
+    },
+    {
+      "id": "9026:17446",
+      "type": "FRAME",
+      "name": "R42 / Form / After submit"
+    },
+    {
+      "id": "9026:17476",
+      "type": "FRAME",
+      "name": "R42 / Form / Loading settings"
+    },
+    {
+      "id": "8844:265398",
+      "type": "FRAME",
+      "name": "R35 / Choice / Encoding"
+    },
+    {
+      "id": "8465:3",
+      "type": "FRAME",
+      "name": "I02 / Design / Typography"
+    },
+    {
+      "id": "9024:17514",
+      "type": "FRAME",
+      "name": "R42 / Form / Choose field type"
+    },
+    {
+      "id": "9024:17500",
+      "type": "FRAME",
+      "name": "R42 / Form / Field change unavailable"
+    },
+    {
+      "id": "9024:17539",
+      "type": "FRAME",
+      "name": "R42 / Form / Default value"
+    },
+    {
+      "id": "9024:17557",
+      "type": "FRAME",
+      "name": "R42 / Form / Review conversion"
+    },
+    {
+      "id": "9026:17570",
+      "type": "FRAME",
+      "name": "R42 / Form / Unsaved settings"
+    },
+    {
+      "id": "9026:17487",
+      "type": "FRAME",
+      "name": "R42 / Form / Saving settings"
+    },
+    {
+      "id": "9026:17498",
+      "type": "FRAME",
+      "name": "R42 / Form / Redirect URL"
+    },
+    {
+      "id": "9026:17520",
+      "type": "FRAME",
+      "name": "R42 / Form / Success message"
+    },
+    {
+      "id": "9026:17537",
+      "type": "FRAME",
+      "name": "R42 / Form / Notification email"
+    },
+    {
+      "id": "9026:17556",
+      "type": "FRAME",
+      "name": "R42 / Form / Permission required"
+    }
+  ],
+  "missingDestinations": [],
+  "destinationErrors": [],
+  "geometryChecks": 381,
+  "expectedScrolling": [],
+  "clippingCandidates": [],
+  "unclippedOverflow": [],
+  "geometrySkipped": [],
+  "newSavedValueTexts": [
+    {
+      "id": "9028:17506",
+      "type": "TEXT",
+      "parent": "9026:17446",
+      "visible": true,
+      "width": 572,
+      "height": 20,
+      "characters": "Saved redirect URL: Not configured",
+      "boundVariable": {
+        "type": "VARIABLE_ALIAS",
+        "id": "VariableID:9028:17469"
+      }
+    },
+    {
+      "id": "9028:17508",
+      "type": "TEXT",
+      "parent": "9026:17446",
+      "visible": true,
+      "width": 572,
+      "height": 20,
+      "characters": "Saved notification email: Not configured",
+      "boundVariable": {
+        "type": "VARIABLE_ALIAS",
+        "id": "VariableID:9028:17470"
+      }
+    }
+  ],
+  "mutatedNodeIds": [],
+  "mutatedVariableIds": [],
+  "scrollContainers": [
+    {
+      "id": "8843:30626",
+      "name": "Canvas viewport",
+      "visible": true,
+      "scroll": "VERTICAL",
+      "clipsContent": true,
+      "width": 824,
+      "height": 762
+    },
+    {
+      "id": "8843:30654",
+      "name": "Inspector",
+      "visible": true,
+      "scroll": "VERTICAL",
+      "clipsContent": true,
+      "width": 352,
+      "height": 920
+    },
+    {
+      "id": "9026:17653",
+      "name": "Canvas viewport",
+      "visible": true,
+      "scroll": "VERTICAL",
+      "clipsContent": true,
+      "width": 824,
+      "height": 762
+    },
+    {
+      "id": "9026:17685",
+      "name": "Inspector",
+      "visible": true,
+      "scroll": "VERTICAL",
+      "clipsContent": true,
+      "width": 352,
+      "height": 920
+    }
+  ],
+  "referenceSummary": {
+    "roots": 15,
+    "instances": 149,
+    "uniqueComponents": 5,
+    "uniqueDestinations": 35,
+    "missing": 0,
+    "errors": 0
+  },
+  "layoutSummary": {
+    "geometryChecks": 381,
+    "expectedScrolling": 0,
+    "clippingCandidates": 0,
+    "unclippedOverflow": 0,
+    "skippedRotated": 0
+  }
+}

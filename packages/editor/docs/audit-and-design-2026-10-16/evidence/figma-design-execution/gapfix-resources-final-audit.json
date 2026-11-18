@@ -1,0 +1,361 @@
+{
+  "pageId": "3:6",
+  "roots": [
+    {
+      "id": "271:256007",
+      "name": "GAP-CM01 · Recovered copy / new ID acknowledged",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:256179",
+      "name": "GAP-CM02 · Original retained after creating a copy",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:256343",
+      "name": "GAP-CM03 · Recovered copy / request failed, original kept",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:256513",
+      "name": "GAP-CM04 · Recovered copy / connection lost, check before retry",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:256683",
+      "name": "GAP-CM05 · Delete source permanently / name confirmation",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:256859",
+      "name": "GAP-CM06 · Delete source permanently / name matched",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:257033",
+      "name": "GAP-CM07 · Deleting opening_hours / waiting for acknowledgement",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:257200",
+      "name": "GAP-CM08 · Source permanently removed / acknowledged",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:257366",
+      "name": "GAP-CM09 · Source delete failed / source still recoverable",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:257539",
+      "name": "GAP-CM10 · Source delete / result unknown",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:257709",
+      "name": "GAP-CM11 · Source delete / Admin access required",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:257887",
+      "name": "GAP-CM · Recovery outcome review — fixtures, no data mutations",
+      "w": 1440,
+      "h": 550
+    },
+    {
+      "id": "271:257949",
+      "name": "GAP-PB-CMS-ready · Saved changes / checks passed",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:258152",
+      "name": "GAP-PB-CMS-confirm · Review whole-site release",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:258375",
+      "name": "GAP-PB-CMS-pending · Publishing / same job remains active",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:258569",
+      "name": "GAP-PB-CMS-success · Published / acknowledged release",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:258766",
+      "name": "GAP-PB-CMS-failed · Publish failed / live v12 unchanged",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:258960",
+      "name": "GAP-PB-CMS-unknown · Publish status unknown / do not start another",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:259154",
+      "name": "GAP-PB-CMS-working · Publish continues while working",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:259339",
+      "name": "GAP-PB-Assets-ready · Saved changes / checks passed",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:259654",
+      "name": "GAP-PB-Assets-confirm · Review whole-site release",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:259990",
+      "name": "GAP-PB-Assets-pending · Publishing / same job remains active",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:260296",
+      "name": "GAP-PB-Assets-success · Published / acknowledged release",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:260605",
+      "name": "GAP-PB-Assets-failed · Publish failed / live v12 unchanged",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:260911",
+      "name": "GAP-PB-Assets-unknown · Publish status unknown / do not start another",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:261217",
+      "name": "GAP-PB-Assets-working · Publish continues while working",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:261514",
+      "name": "GAP-PB-Brand-ready · Saved changes / checks passed",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:261771",
+      "name": "GAP-PB-Brand-confirm · Review whole-site release",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:262055",
+      "name": "GAP-PB-Brand-pending · Publishing / same job remains active",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:262303",
+      "name": "GAP-PB-Brand-success · Published / acknowledged release",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:262554",
+      "name": "GAP-PB-Brand-failed · Publish failed / live v12 unchanged",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:262802",
+      "name": "GAP-PB-Brand-unknown · Publish status unknown / do not start another",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:263050",
+      "name": "GAP-PB-Brand-working · Publish continues while working",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:263289",
+      "name": "GAP-PB-Components-ready · Saved changes / checks passed",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:263478",
+      "name": "GAP-PB-Components-confirm · Review whole-site release",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:263681",
+      "name": "GAP-PB-Components-pending · Publishing / same job remains active",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:263861",
+      "name": "GAP-PB-Components-success · Published / acknowledged release",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:264044",
+      "name": "GAP-PB-Components-failed · Publish failed / live v12 unchanged",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:264224",
+      "name": "GAP-PB-Components-unknown · Publish status unknown / do not start another",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:264404",
+      "name": "GAP-PB-Components-working · Publish continues while working",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:264575",
+      "name": "GAP-PB-Templates-ready · Saved changes / checks passed",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:264861",
+      "name": "GAP-PB-Templates-confirm · Review whole-site release",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:265164",
+      "name": "GAP-PB-Templates-pending · Publishing / same job remains active",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:265441",
+      "name": "GAP-PB-Templates-success · Published / acknowledged release",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:265721",
+      "name": "GAP-PB-Templates-failed · Publish failed / live v12 unchanged",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:265998",
+      "name": "GAP-PB-Templates-unknown · Publish status unknown / do not start another",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:266275",
+      "name": "GAP-PB-Templates-working · Publish continues while working",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "271:266543",
+      "name": "GAP-PB · Resource Publish review / simulated outcomes",
+      "w": 1440,
+      "h": 390
+    },
+    {
+      "id": "279:66718",
+      "name": "GAP-PB-CMS-unknown-return · Retained publish state",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "279:66897",
+      "name": "GAP-PB-CMS-published-return · Retained publish state",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "279:67077",
+      "name": "GAP-PB-Assets-unknown-return · Retained publish state",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "279:67368",
+      "name": "GAP-PB-Assets-published-return · Retained publish state",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "279:67660",
+      "name": "GAP-PB-Brand-unknown-return · Retained publish state",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "279:67893",
+      "name": "GAP-PB-Brand-published-return · Retained publish state",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "279:68127",
+      "name": "GAP-PB-Components-unknown-return · Retained publish state",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "279:68292",
+      "name": "GAP-PB-Components-published-return · Retained publish state",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "279:68458",
+      "name": "GAP-PB-Templates-unknown-return · Retained publish state",
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "id": "279:68720",
+      "name": "GAP-PB-Templates-published-return · Retained publish state",
+      "w": 1440,
+      "h": 900
+    }
+  ],
+  "rootCount": 58,
+  "nodes": 12171,
+  "links": 127,
+  "images": 0,
+  "missing": [],
+  "self": [],
+  "timers": [],
+  "surfaceOverflow": []
+}

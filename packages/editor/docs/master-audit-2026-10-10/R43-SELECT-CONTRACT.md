@@ -1,0 +1,67 @@
+# R43 — Select/options source contract and finite design plan
+
+14 October 2026. Read-only source/register audit; proposed design contract, not implementation or acceptance evidence. No Figma inventory or playback was performed for this report. All 14 module gates remain OPEN. R42's six-type field conversion fixture does not establish Select/options acceptance.
+
+## Existing entry and evidence boundary
+
+The control register records Select root `8843:19020`, Name `8843:19240`, Options `8843:19246`, Required `8843:19252`, Disabled `8843:19258`, Multiple `8843:19264`, ID `8843:19275`, Title `8843:19281`, Tab index `8843:19287`, CSS classes `8843:19293`, and Data attribute `8843:19299`. These are existing documented IDs, **not live-verified in R43**. The Options sample switches “Design; Development” to “Design; Development; Strategy”; a changed label alone is not proof that choices, submission values or default selection changed correctly.
+
+Integrate with the documented Form root `8843:30589` → Fields `8843:30809` → field manager `9024:17458`: identify the field as **Service · Select**, then open the same Select settings/options task. Return must retain the Form, selected Service field, device and scroll context. Direct canvas/Inspector Select selection and Form Fields must address one field state, not independent copies. The exact native integration IDs must be recorded by the author.
+
+## Source findings
+
+| Source reference | Observed behavior and implication |
+|---|---|
+| `src/blocks/Forms/Select.tsx:12` | Catalog definition is HTML: Select named `choice` with Option 1 and Option 2, no explicit option values/default-selection attributes. It has no bespoke `build` function. The historical Design/Development sample is not a universal default. |
+| `src/blocks/BlockRegistry.ts:363` and `:367`; `src/engine/elements/manager/HTMLParser.ts:157`, `:261` | HTML insertion builds element children. Select options are represented in the parsed tree. This needs to be reconciled with the content-only Inspector route. |
+| `src/editor/inspector/sections/typeBlock/bodies/formBodies.tsx:55`, `:62` | Select has Name, Options (one per line), Required, Disabled and Multiple. It has no dedicated label/value/default-option controls. `elementCapabilities.ts:126` routes Select through the input body while retaining its Select type. |
+| `src/editor/inspector/sections/typeBlock/PropertyField.tsx:143` | Options reads only `getContent()` with an option-inner-HTML regex. It ignores child option nodes, option attributes, group structure and effective selection; entity decoding is not performed here. |
+| Same file `:164` | Every write trims lines, removes blank lines, escapes each remaining line and replaces content with bare `<option>label</option>` entries. On content-backed options this drops explicit values, selected/disabled/label attributes, optgroups and other option metadata. This is replacement, not a metadata-preserving label edit. |
+| `src/engine/elements/Element.ts:130`, `:146`; `ElementSerialization.ts:71` | `getContent()` does not serialize children; `setContent()` does not remove them; HTML serialization concatenates content and child HTML. Together with parsed insertion, this exposes a source-level risk of an empty Options read followed by new content alongside stale/duplicate option children. No runtime reproduction was performed here. |
+| `PropertyField.tsx:191`; `attributeWriter.ts` via `runTxn`/`writeAttribute` | Routed edits use writable-target filtering and a transaction. That does not prove preservation, atomic rollback, descendant eligibility, history no-op behavior or correct multi-selection handling. |
+| `src/editor/inspector/sections/FormFieldsSection.tsx:42`, `:50`, `:107` | Fields includes Select descendants but infers every non-textarea from the `type` attribute, normally calling Select Text. Choosing an input subtype writes `type` onto Select; choosing Long text replaces the Select. Neither is a safe supported Select conversion. |
+| Same file `:66` | Replacement retains only name, placeholder, aria-label, required and HTML ID. It omits options, defaults, disabled/multiple flags, styles/classes and unrelated metadata. |
+| Same file `:116` | “Label” edits placeholder, not a visible field label. Do not reuse this as a Select option label or claim accessible field-label editing. |
+| `src/shared/utils/html/sanitizationConfig.ts:85` | Source allowlists Select name/required/disabled/multiple/size/autocomplete; option value/selected/disabled/label; optgroup label/disabled. These richer data are intentional source inputs, not disposable unknown fields. |
+| `src/editor/inspector/sections/typeBlock/__tests__/formBodies.test.tsx:78` | Existing test checks the bare HTML write for Red/Blue only. It does not cover imported children, values/default preservation, groups, Undo or actual submission. No tests were run or changed for this audit. |
+
+## Proposed safe contract
+
+**Ownership:** Name, options, option order, submitted values, authored defaults, Required, Disabled and Multiple are document semantics in Settings and apply across devices. They do not create Mobile overrides. Appearance remains Style-owned. None of these edits writes Form remote after-submit/message/recipient/spam settings.
+
+**One representation:** model options as stable rows with logical identity, label, explicit submitted value, default-selection flag and disabled flag; preserve group/unknown metadata when present. Read child-backed, content-backed and imported data without silently merging duplicate representations. A conflicting or unsupported representation is a no-write state with an explanation. The finite prototype may represent logical IDs; that must not be described as proven engine identity or serialized subtree recovery.
+
+**Supported finite specimen:** Service options are Design (`design`), Development (`development`, selected by default), and a user-added Strategy (`strategy`). This deliberately separates display labels from submitted values. Begin with the first two. Show the authored default label and submitted value in details and render the matching choice on canvas. Prototype visitor selection, if offered, must be separate from the authored default and must not create an edit-history entry.
+
+| Action | Intended outcome, guard and recovery |
+|---|---|
+| Edit option label | Change Development to Product development while keeping value `development`, option identity, default flag and order. Never derive a new value from a changed label. |
+| Edit submitted value | Explicit independent control; rename `development` only when the user edits Value. Keep selection by option identity, so the selected label stays stable. Blank/duplicate values require an explicit product policy; the finite fixture should reject its invalid blank/duplicate examples without rewriting other values. This is a bounded design choice, not a claimed HTML restriction. |
+| Add and reorder | Add Strategy with its own identity/value; reorder adjacent options without recreating existing identities or changing defaults. A duplicate-option action, if offered, must choose/require a distinct value before commit. Do not expose an unimplemented Duplicate action. |
+| Remove | Preview the named option and its value. Cancel/Escape preserves document/history. Removing a non-default keeps the default. Removing the default requires an explicit replacement choice (or an explicitly supported no-default state) before commit; do not silently choose a fallback. The bounded fixture can refuse removing the last option with a recovery explanation; that is not a production minimum claim. |
+| Change default | Choose an existing enabled option; show label and value. Same default is a no-op and preserves useful Undo. Do not synthesize a default from a label or use a Select-level `value` string as sole persistence evidence. |
+| Required / Disabled | Change the semantic flag independently of options/value/default. Show the specimen's relevant state; do not confuse a disabled visitor control with a locked authoring target. Submission/validation behavior needs runtime proof. |
+| Multiple | Enabling retains the selected option and permits an explicit selected-set model. Disabling with more than one authored default requires choosing the retained option or canceling. If that set/reduction task is not authored, explain Multiple as unsupported in the finite fixture and preserve its state; a cosmetic toggle is insufficient. |
+| Cancel, reset and Undo | Draft editing remains separate until Apply. Cancel/Escape discards only that edit draft; no-op does not replace useful history. One-step Undo restores complete represented option order/identities/labels/values/default set and edited flags. Do not offer “Reset options” without a defined origin; there is no source-wide default list. |
+| Eligibility / stale target | Before Apply, deletion confirm and Undo, recheck Form/Select identity, parent membership, captured revision and applicable target/descendant/component permissions. Refuse stale or protected edits without writing the next field at an old index. Mixed selections require their own contract; otherwise explain single-field-only editing. |
+
+**Unsupported Select conversion is intentional and complete:** show actual Type “Select” in Form Fields, with “Edit options” as the useful action. If the six-type route is invoked, explain: “This field uses options and a selected value. Changing it to a text field here would remove those settings. Keep this Select, or add a new field separately.” Return to Service without changing type, options, value/default, flags, order, revision or useful Undo. Do not expose Select as a target in the text/textarea chooser until a separate conversion contract exists. The refusal fixes the design's eligibility story; it is not evidence that the source defect was implemented away.
+
+Imported optgroups, disabled options, conflicting content/child data and nontrivial metadata must either be represented/preserved by the editor or receive an explicit read-only explanation. They must not be flattened by the plain-lines editor. This is the safe boundary for unsupported complexity, not permission to lose hidden fields.
+
+## Finite acceptance queue
+
+| Priority | Meaningful task and required evidence |
+|---|---|
+| 1 — Entry and truthful type | Form Fields → Service · Select → Options. Show Design/Development and default Development/value `development`, with the same state through direct Select selection. Capture native IDs and browser entry/return. Attempt Text/Long text conversion; verify explained refusal and no mutation/history loss. |
+| 2 — Label/value preservation | Rename Development to Product development, Apply, inspect changed canvas label and unchanged submitted value/default. Reopen on Mobile, then Desktop; both reflect one global edit. Cancel a second label edit, then Undo the first; recover label, values, order, identities/default and target context. |
+| 3 — Add/order/default | Add Strategy, move it before Design, select Strategy as the authored default. After each commit, verify list, canvas/default details and a one-step recovery against that operation's exact preceding snapshot. Reopen and return through Form Fields. |
+| 4 — Destructive recovery | Remove non-default Design with cancel/confirm/Undo. Attempt removal of default Strategy: preview loss, cancel; then explicitly choose Development as replacement and confirm. Undo restores Strategy's option identity, position and default. Test the finite last-option refusal. |
+| 5 — Validation and eligibility | Blank/duplicate value examples, no-op Apply/default, stale revision/target, Form/Select protection, unsupported imported/group fixture. Each refusal preserves data and the preceding useful snapshot and returns to the identified field. Interpreter assertions plus at least one browser refusal/return; all unplayed cases remain marked interpreter-only. |
+| 6 — Flag and state boundaries | Required and Disabled preserve option/value/default. Exercise Multiple enable/reduction if authored; otherwise its explicit no-write explanation. Keep authored default separate from transient visitor choice. Verify remote settings remain unchanged through Select edits/Undo, and a remote save does not consume the Select snapshot. |
+
+Minimum browser story: **Form → Service Select → rename Development while preserving `development` → add/reorder Strategy → set Strategy default → cancel selected-option deletion → confirm deletion with named replacement → Undo → attempt unsupported type conversion → return/reopen on the other device.** Show real option/default output, not only labels or toasts. Separate short checks can cover flags, imported complexity and protection.
+
+## Closure boundary
+
+Record authoring/native structure, live-reaction logic and browser observations separately. Acceptance applies only to the represented task after entry/output/recovery/return are demonstrated. The source implementation still needs canonical representation reconciliation, safe metadata-preserving operations, actual option/field identity and subtree history, effective eligibility, keyboard/focus behavior, native default/multiple/required/disabled semantics, export/read-back and submission verification. No real submission or publishing is needed for this design pass. Do not close Form, Inspector or any module gate from this contract alone.
