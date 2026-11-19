@@ -10,7 +10,7 @@ interface SeoInputs {
 }
 
 /** One line of the score, design-2l9 board 65:17860 ("Title length: 20/20"). */
-export interface SeoScoreRow {
+interface SeoScoreRow {
   label: string;
   earned: number;
   max: number;
@@ -21,7 +21,7 @@ export interface SeoScoreRow {
  * numbers, so the score is their sum. Indexing off is not a part: it zeroes
  * the whole score (the SEO tab says so instead of listing rows).
  */
-export function seoScoreBreakdown({ title, desc, slug }: Omit<SeoInputs, "allowIndex">): SeoScoreRow[] {
+function seoScoreBreakdown({ title, desc, slug }: Omit<SeoInputs, "allowIndex">): SeoScoreRow[] {
   return [
     { label: "Title length", earned: title.length >= 10 && title.length <= 60 ? 20 : title.length > 0 ? 10 : 0, max: 20 },
     { label: "URL format", earned: slug && /^[a-z0-9-/]+$/.test(slug) ? 20 : 0, max: 20 },

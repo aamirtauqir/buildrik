@@ -29,8 +29,12 @@ import { SocialTab } from "./SocialTab";
 import { AdvancedTab } from "./AdvancedTab";
 import { UnsavedWarningModal, type LeaveGuardMode } from "./UnsavedWarningModal";
 import { Button, Portal, useFocusTrap } from "@/editor/chrome-ui";
+import { ReadabilityTab, readabilityLabel } from "./ReadabilityTab";
+import { useSeoFindings } from "./useSeoFindings";
 const TABS: { id: DrawerTab; label: string }[] = [
   { id: "seo", label: "SEO" },
+  /* FG-007 (owner 2026-11-19: inside the 2L9 modal, not a drawer). */
+  { id: "readability", label: "Readability" },
   { id: "social", label: "Social" },
   { id: "advanced", label: "Advanced" },
 ];
@@ -61,6 +65,15 @@ export const PageSettingsDrawer: React.FC<Props> = (props) => (
 
 const PageSettingsCard: React.FC<Props> = ({ page, allPages, composer, onClose, initialTab, previousSlug, redirectSaved }) => {
   const s = usePageSettings(composer, page, allPages);
+  /* FG-007 / FG-008: the page as drafted here, analysed — the SEO tab's
+     checklist and the Readability tab both read it. */
+  const seo = useSeoFindings(composer, page.id, {
+    seoTitle: s.seoTitle,
+    seoDesc: s.seoDesc,
+    slug: s.slug,
+    keyphrase: s.keyphrase,
+    noIndex: !s.allowIndex,
+  });
   /* The page open on the canvas, when it is another one. */
   const active = allPages.find((pg) => pg.isActive);
   const stays = active && active.id !== page.id ? active.name : null;
@@ -199,6 +212,7 @@ const PageSettingsCard: React.FC<Props> = ({ page, allPages, composer, onClose, 
               onClick={() => s.setActiveTab(tab.id)}
             >
               {tab.label}
+              {tab.id === "readability" ? <span className="bd-sr-only">{`: ${readabilityLabel(seo.readability)}`}</span> : null}
             </Button>
           ))}
         </div>
@@ -223,7 +237,12 @@ const PageSettingsCard: React.FC<Props> = ({ page, allPages, composer, onClose, 
           <fieldset disabled={saving} className="tw:m-0 tw:min-w-0 tw:border-0 tw:p-0">
           {s.activeTab === "seo" && (
             <div id="pg-drawer-tab-seo" role="tabpanel" aria-label="SEO settings">
-              <SeoTab s={s} page={page} composer={composer} previousSlug={previousSlug} redirectSaved={redirectSaved} onOpenSiteDefaults={openSiteDefaults} />
+              <SeoTab s={s} page={page} composer={composer} previousSlug={previousSlug} redirectSaved={redirectSaved} onOpenSiteDefaults={openSiteDefaults} seo={seo} />
+            </div>
+          )}
+          {s.activeTab === "readability" && (
+            <div id="pg-drawer-tab-readability" role="tabpanel" aria-label="Readability">
+              <ReadabilityTab readability={seo.readability} locale={composer?.getProjectSettings?.()?.seo?.language ?? "en"} />
             </div>
           )}
           {s.activeTab === "social" && (

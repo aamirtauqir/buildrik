@@ -82,6 +82,7 @@ export function createMockComposer(opts: CreateMockComposerOpts = {}): MockCompo
   const elements = {
     getAllPages: vi.fn(() => pages),
     getElement: vi.fn(() => null),
+    exportPages: vi.fn(() => pages),
     getActivePage: vi.fn(() => pages.find((p) => p.id === activePageId) ?? null),
     setActivePage: vi.fn((id: string) => {
       activePageId = id;

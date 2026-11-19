@@ -21,7 +21,7 @@ const home: PageItem = { id: "h", name: "Home", slug: "home", isHome: true, isAc
 function mount() {
   const pending: Array<{ resolve: () => void; reject: (e: Error) => void }> = [];
   const updatePage = vi.fn(() => new Promise<void>((resolve, reject) => pending.push({ resolve, reject })));
-  const composer = { elements: { updatePage }, emit: vi.fn(), getProjectMetadata: () => ({}) } as never;
+  const composer = { elements: { exportPages: () => [], updatePage }, on: () => undefined, off: () => undefined, emit: vi.fn(), getProjectMetadata: () => ({}) } as never;
   const onClose = vi.fn();
   render(
     <ToastProvider>

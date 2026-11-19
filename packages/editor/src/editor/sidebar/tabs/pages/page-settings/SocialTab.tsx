@@ -5,11 +5,15 @@
  * with its rule. (The full share-card mock that sat on top is gone — the
  * board draws the image alone.)
  *
+ * FG-011 (owner 2026-11-19, inside the 2L9 modal): X shares these values
+ * unless "Customize for X" is on; then it has its own title, description and
+ * image, each labelled customized or inherited.
+ *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { BK_HELPER_CLASS, BK_LABEL_CLASS, HelperText, Label, Textarea, TextInput } from "@/editor/chrome-ui";
+import { BK_HELPER_CLASS, BK_LABEL_CLASS, HelperText, Label, Textarea, TextInput, ToggleSwitch } from "@/editor/chrome-ui";
 import type { UsePageSettingsReturn } from "./usePageSettings";
 
 interface Props {
@@ -75,6 +79,41 @@ export const SocialTab: React.FC<Props> = ({ s }) => (
       />
       <HelperText className={BK_HELPER_CLASS}>Recommended: 1200 × 630. Clear the URL to remove the image.</HelperText>
     </div>
+    <div className={FIELD} data-testid="social-x">
+      <ToggleSwitch
+        checked={s.xCustomized}
+        onChange={s.setXCustomized}
+        label="Customize for X"
+        data-testid="social-x-toggle"
+      />
+      <span className={COUNT} data-testid="social-x-state">
+        {s.xCustomized ? "X uses its own title, description and image." : "X uses the social title, description and image above."}
+      </span>
+    </div>
+    {s.xCustomized ? (
+      <>
+        <div className={FIELD} data-testid="social-field-x-title">
+          <Label htmlFor="x-title" className={BK_LABEL_CLASS}>{`X title · ${s.xTitle.length} / 70`}</Label>
+          <TextInput id="x-title" data-testid="social-input-x-title" value={s.xTitle} onChange={(e) => s.setXTitle(e.target.value)} placeholder={s.ogTitle || s.effectiveTitle} />
+        </div>
+        <div className={FIELD} data-testid="social-field-x-desc">
+          <Label htmlFor="x-desc" className={BK_LABEL_CLASS}>X description</Label>
+          <Textarea id="x-desc" rows={2} data-testid="social-input-x-desc" value={s.xDesc} onChange={(e) => s.setXDesc(e.target.value)} placeholder={s.ogDesc || s.seoDesc} />
+          <span className={COUNT}>{`${s.xDesc.length} / 200`}</span>
+        </div>
+        <div className={FIELD} data-testid="social-field-x-image">
+          <Label htmlFor="x-image" className={BK_LABEL_CLASS}>X image URL</Label>
+          <TextInput
+            id="x-image"
+            type="url"
+            data-testid="social-input-x-image"
+            value={s.xImageUrl ?? ""}
+            onChange={(e) => s.setXImageUrl(e.target.value || null)}
+            placeholder={s.ogImageUrl ?? s.siteOgImage ?? "https://…"}
+          />
+        </div>
+      </>
+    ) : null}
   </div>
 );
 

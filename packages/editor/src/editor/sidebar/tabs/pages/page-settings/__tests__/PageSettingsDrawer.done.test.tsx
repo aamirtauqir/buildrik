@@ -21,7 +21,7 @@ const page: PageItem = { id: "p1", name: "Menu", slug: "menu", isHome: false };
 function mount(updatePage = vi.fn().mockResolvedValue(undefined)) {
   const onClose = vi.fn();
   const emit = vi.fn();
-  const composer = { elements: { updatePage }, emit, getProjectMetadata: () => ({ name: "Bella Cucina" }) } as never;
+  const composer = { elements: { exportPages: () => [], updatePage }, on: () => undefined, off: () => undefined, emit, getProjectMetadata: () => ({ name: "Bella Cucina" }) } as never;
   render(
     <ToastProvider>
       <PageSettingsDrawer page={page} allPages={[page]} composer={composer} onClose={onClose} />
@@ -38,7 +38,7 @@ afterEach(() => vi.useRealTimers());
 describe("PageSettingsDrawer — subtitle", () => {
   // re-baseline: page settings subtitle — 94:29621 for the page on the canvas, 63:15939 for another.
   it("says page appearance stays in the Inspector for the page on the canvas, and names the canvas page otherwise", () => {
-    const composer = { elements: { updatePage: vi.fn() }, emit: vi.fn(), getProjectMetadata: () => ({}) } as never;
+    const composer = { elements: { exportPages: () => [], updatePage: vi.fn() }, on: () => undefined, off: () => undefined, emit: vi.fn(), getProjectMetadata: () => ({}) } as never;
     const home: PageItem = { id: "h", name: "Home", slug: "home", isHome: true, isActive: true };
     const { rerender } = render(
       <ToastProvider>

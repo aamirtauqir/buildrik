@@ -14,8 +14,7 @@ import { useToast } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants/events";
 import type { Composer } from "@/engine";
 import type { PageItem, DrawerTab } from "../types";
-import { calculateSeoScore, seoScoreBreakdown, type SeoScoreRow } from "../utils/seoScore";
-import { isPlaceholderSlug } from "@buildrik/shared/seo/analysis";
+import { pageSeoSchema } from "@buildrik/shared/schemas/sites";
 import { resolvePageTitle } from "@/engine/export/SEOInjector";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { useSiteOrigin } from "@/editor/shared/useSiteOrigin";
@@ -43,10 +42,6 @@ export interface UsePageSettingsReturn {
   slug: string;
   setSlug: (v: string) => void;
   slugError: string | null;
-  seoScore: number;
-  /** design-2l9 65:17860: the score's six parts, which it is the sum of. */
-  seoBreakdown: SeoScoreRow[];
-  seoChecks: { titleSet: boolean; slugClean: boolean; indexingOn: boolean; descSet: boolean };
 
   ogTitle: string;
   setOgTitle: (v: string) => void;
@@ -54,6 +49,39 @@ export interface UsePageSettingsReturn {
   setOgDesc: (v: string) => void;
   ogImageUrl: string | null;
   setOgImageUrl: (url: string | null) => void;
+  /** The site's default social image (Settings › SEO), used when the page has none. */
+  siteOgImage: string | null;
+
+  /** FG-007: optional focus keyphrase — with none, keyphrase checks are not run. */
+  keyphrase: string;
+  setKeyphrase: (v: string) => void;
+
+  /** FG-011: X uses the shared social values unless this is on. */
+  xCustomized: boolean;
+  /** Turning it on starts the X fields from the shared values when they are
+   *  empty; turning it off keeps them (they are only ignored on export). */
+  setXCustomized: (on: boolean) => void;
+  xTitle: string;
+  setXTitle: (v: string) => void;
+  xDesc: string;
+  setXDesc: (v: string) => void;
+  xImageUrl: string | null;
+  setXImageUrl: (url: string | null) => void;
+
+  /** "" = this page's own address; else a full http(s) URL (FG-007). */
+  canonicalUrl: string;
+  setCanonicalUrl: (v: string) => void;
+  /** The shared schema's refusal, or null. Save stays off while it is set. */
+  canonicalError: string | null;
+  schemaType: "WebPage" | "Article";
+  setSchemaType: (v: "WebPage" | "Article") => void;
+  articleAuthor: string;
+  setArticleAuthor: (v: string) => void;
+  /** YYYY-MM-DD, or "". */
+  articleDate: string;
+  setArticleDate: (v: string) => void;
+  /** The site's author (General), the Article author placeholder. */
+  siteAuthor: string;
 
   /** Decision #21: Live · Hidden. Password is gone until the published-site
    *  middleware exists to enforce it. */
@@ -113,6 +141,15 @@ interface PersistedState {
   ogTitle: string;
   ogDesc: string;
   ogImageUrl: string | null;
+  keyphrase: string;
+  xCustomized: boolean;
+  xTitle: string;
+  xDesc: string;
+  xImageUrl: string | null;
+  canonicalUrl: string;
+  schemaType: "WebPage" | "Article";
+  articleAuthor: string;
+  articleDate: string;
   visibility: "live" | "hidden";
   allowIndex: boolean;
   allowFollow: boolean;
@@ -133,6 +170,15 @@ function getPersistedState(page: PageItem): PersistedState {
     ogTitle: page.seo?.ogTitle ?? "",
     ogDesc: page.seo?.ogDescription ?? "",
     ogImageUrl: page.seo?.ogImage ?? null,
+    keyphrase: page.seo?.focusKeyphrase ?? "",
+    xCustomized: page.seo?.xCustomized === true,
+    xTitle: page.seo?.twitterTitle ?? "",
+    xDesc: page.seo?.twitterDescription ?? "",
+    xImageUrl: page.seo?.twitterImage ?? null,
+    canonicalUrl: page.seo?.canonicalUrl ?? "",
+    schemaType: page.seo?.schemaType === "Article" ? "Article" : "WebPage",
+    articleAuthor: page.seo?.article?.authorName ?? "",
+    articleDate: (page.seo?.article?.datePublished ?? "").slice(0, 10),
     visibility,
     allowIndex: !seoFlags?.noIndex,
     allowFollow: !seoFlags?.noFollow,
@@ -158,6 +204,15 @@ export function usePageSettings(
   const [ogTitle, setOgTitle] = React.useState("");
   const [ogDesc, setOgDesc] = React.useState("");
   const [ogImageUrl, setOgImageUrl] = React.useState<string | null>(null);
+  const [keyphrase, setKeyphrase] = React.useState("");
+  const [xCustomized, setXCustomizedRaw] = React.useState(false);
+  const [xTitle, setXTitle] = React.useState("");
+  const [xDesc, setXDesc] = React.useState("");
+  const [xImageUrl, setXImageUrl] = React.useState<string | null>(null);
+  const [canonicalUrl, setCanonicalUrl] = React.useState("");
+  const [schemaType, setSchemaType] = React.useState<"WebPage" | "Article">("WebPage");
+  const [articleAuthor, setArticleAuthor] = React.useState("");
+  const [articleDate, setArticleDate] = React.useState("");
   const [visibility, setVisibility] = React.useState<"live" | "hidden">("live");
   const [allowIndex, setAllowIndex] = React.useState(true);
   const [allowFollow, setAllowFollow] = React.useState(true);
@@ -183,6 +238,15 @@ export function usePageSettings(
     setOgTitle(state.ogTitle);
     setOgDesc(state.ogDesc);
     setOgImageUrl(state.ogImageUrl);
+    setKeyphrase(state.keyphrase);
+    setXCustomizedRaw(state.xCustomized);
+    setXTitle(state.xTitle);
+    setXDesc(state.xDesc);
+    setXImageUrl(state.xImageUrl);
+    setCanonicalUrl(state.canonicalUrl);
+    setSchemaType(state.schemaType);
+    setArticleAuthor(state.articleAuthor);
+    setArticleDate(state.articleDate);
     setVisibility(state.visibility);
     setAllowIndex(state.allowIndex);
     setAllowFollow(state.allowFollow);
@@ -207,6 +271,15 @@ export function usePageSettings(
       ogTitle,
       ogDesc,
       ogImageUrl,
+      keyphrase,
+      xCustomized,
+      xTitle,
+      xDesc,
+      xImageUrl,
+      canonicalUrl,
+      schemaType,
+      articleAuthor,
+      articleDate,
       visibility,
       allowIndex,
       allowFollow,
@@ -222,6 +295,15 @@ export function usePageSettings(
     ogTitle,
     ogDesc,
     ogImageUrl,
+    keyphrase,
+    xCustomized,
+    xTitle,
+    xDesc,
+    xImageUrl,
+    canonicalUrl,
+    schemaType,
+    articleAuthor,
+    articleDate,
     visibility,
     allowIndex,
     allowFollow,
@@ -245,8 +327,15 @@ export function usePageSettings(
     [page?.id, allPages]
   );
 
+  /* FG-007: validated by the shared page schema — what the server accepts. */
+  const canonicalError = React.useMemo(() => {
+    const parsed = pageSeoSchema.shape.canonicalUrl.safeParse(canonicalUrl.trim());
+    return parsed.success ? null : (parsed.error.issues[0]?.message ?? "Enter a full URL beginning with https:// or http://.");
+  }, [canonicalUrl]);
+
   const save = React.useCallback(async (): Promise<boolean> => {
     if (!composer || !page) return false;
+    if (canonicalError) return false;
     if (slugError) {
       addToast({ description: "Fix slug error before saving", tone: "warning" });
       return false;
@@ -278,6 +367,17 @@ export function usePageSettings(
             ogTitle: ogTitle || undefined,
             ogDescription: ogDesc || undefined,
             ogImage: ogImageUrl || undefined,
+            focusKeyphrase: keyphrase.trim() || undefined,
+            xCustomized: xCustomized || undefined,
+            twitterTitle: xTitle || undefined,
+            twitterDescription: xDesc || undefined,
+            twitterImage: xImageUrl || undefined,
+            canonicalUrl: canonicalUrl.trim() || undefined,
+            schemaType: schemaType === "Article" ? "Article" : undefined,
+            article:
+              schemaType === "Article"
+                ? { authorName: articleAuthor.trim() || undefined, datePublished: articleDate ? `${articleDate}T00:00:00.000Z` : undefined }
+                : undefined,
             noIndex: !allowIndex,
             noFollow: !allowFollow,
           },
@@ -291,6 +391,15 @@ export function usePageSettings(
         ogTitle,
         ogDesc,
         ogImageUrl,
+        keyphrase,
+        xCustomized,
+        xTitle,
+        xDesc,
+        xImageUrl,
+        canonicalUrl,
+        schemaType,
+        articleAuthor,
+        articleDate,
         visibility,
         allowIndex,
         allowFollow,
@@ -318,11 +427,21 @@ export function usePageSettings(
     ogTitle,
     ogDesc,
     ogImageUrl,
+    keyphrase,
+    xCustomized,
+    xTitle,
+    xDesc,
+    xImageUrl,
+    canonicalUrl,
+    schemaType,
+    articleAuthor,
+    articleDate,
     visibility,
     allowIndex,
     allowFollow,
     customHead,
     slugError,
+    canonicalError,
     addToast,
   ]);
 
@@ -334,30 +453,23 @@ export function usePageSettings(
   /* What ships, by the exporter's own rule (`resolvePageTitle`): the stored
      page settings carry a legacy `title` the exporter still honours. */
   const siteSeo = composer?.getProjectSettings?.()?.seo;
+  const siteOgImage = siteSeo?.defaultOgImage?.trim() || null;
   const storedSettings = page ? composer?.elements?.getPage?.(page.id)?.settings : undefined;
   const inheritedTitle = page ? resolvePageTitle(page, undefined, storedSettings, siteSeo) : "";
   const effectiveTitle = page ? resolvePageTitle(page, { metaTitle: seoTitle }, storedSettings, siteSeo) : "";
-  /* An empty field is not a missing title: the page ships the inherited one,
-     so that is what the score grades. */
-  const gradedTitle = seoTitle || inheritedTitle;
-
-  const seoScore = React.useMemo(
-    () => calculateSeoScore({ title: gradedTitle, desc: seoDesc, slug, allowIndex }),
-    [gradedTitle, seoDesc, slug, allowIndex]
+  /* FG-011: on starts from the shared values — the OG fields, else what they
+     fall back to — but only into empty X fields, so values kept from an
+     earlier customisation come back as they were. */
+  const setXCustomized = React.useCallback(
+    (on: boolean) => {
+      setXCustomizedRaw(on);
+      if (!on) return;
+      if (!xTitle) setXTitle(ogTitle || effectiveTitle);
+      if (!xDesc) setXDesc(ogDesc || seoDesc);
+      if (!xImageUrl) setXImageUrl(ogImageUrl);
+    },
+    [xTitle, xDesc, xImageUrl, ogTitle, ogDesc, ogImageUrl, effectiveTitle, seoDesc],
   );
-  const seoBreakdown = React.useMemo(
-    () => seoScoreBreakdown({ title: gradedTitle, desc: seoDesc, slug }),
-    [gradedTitle, seoDesc, slug]
-  );
-  const seoChecks = {
-    titleSet: gradedTitle.length >= 10,
-    /* Green means the full "+30 pts" the panel advertises is actually earned.
-       It used to mean "valid and non-empty", which is only 20 of them on a
-       placeholder slug — the tick said yes while the score said no. */
-    slugClean: !slugError && slug.length > 0 && !isPlaceholderSlug(slug),
-    indexingOn: allowIndex,
-    descSet: seoDesc.length >= 50,
-  };
 
   /* Whether this site is reachable by anyone. The slug warning is about
      "existing links", so the honest question is whether links can exist —
@@ -382,15 +494,33 @@ export function usePageSettings(
     slug,
     setSlug,
     slugError,
-    seoScore,
-    seoChecks,
-    seoBreakdown,
     ogTitle,
     setOgTitle,
     ogDesc,
     setOgDesc,
     ogImageUrl,
     setOgImageUrl,
+    siteOgImage,
+    keyphrase,
+    setKeyphrase,
+    xCustomized,
+    setXCustomized,
+    xTitle,
+    setXTitle,
+    xDesc,
+    setXDesc,
+    xImageUrl,
+    setXImageUrl,
+    canonicalUrl,
+    setCanonicalUrl,
+    canonicalError,
+    schemaType,
+    setSchemaType,
+    articleAuthor,
+    setArticleAuthor,
+    articleDate,
+    setArticleDate,
+    siteAuthor: siteSeo?.author ?? "",
     visibility,
     setVisibility,
     allowIndex,

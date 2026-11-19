@@ -2,8 +2,12 @@
  * SeoTab — Pure form renderer. No state. No logic.
  * All state via UsePageSettingsReturn (s prop).
  *
- * Order: Google Preview → SEO Score → Title → Description → Slug → the
- * redirect offer for a saved slug change (Clone 3519:19920's door).
+ * Order: Google Preview → Title → Description → Slug → the redirect offer
+ * for a saved slug change (Clone 3519:19920's door) → SEO checks.
+ *
+ * FG-007 / FG-008 (owner 2026-11-19, inside the 2L9 modal): the preview names
+ * the page's SEO status, not a score, and "SEO checks" holds the optional
+ * focus keyphrase and the findings checklist (shared/seo/analysis).
  *
  * @license BSD-3-Clause
  */
@@ -13,7 +17,11 @@ import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
 import type { PageItem } from "../types";
 import type { UsePageSettingsReturn } from "./usePageSettings";
-import { BK_HELPER_CLASS, BK_HELPER_ERROR_CLASS, BK_LABEL_CLASS, Button, HelperText, Label, Modal, Select, Textarea, TextInput } from "@/editor/chrome-ui";
+import { BK_HELPER_CLASS, BK_HELPER_ERROR_CLASS, BK_LABEL_CLASS, Button, HelperText, Label, Select, Textarea, TextInput } from "@/editor/chrome-ui";
+import { SEO_STATUS_LABEL } from "@buildrik/shared/seo/status";
+import type { Finding } from "@buildrik/shared/seo/analysis";
+import { FindingsList } from "./FindingsList";
+import type { SeoFindingsState } from "./useSeoFindings";
 import { isPlaceholderSlug } from "@buildrik/shared/seo/analysis";
 import { resolvePageDescription } from "@/engine/export/SEOInjector";
 import { pageFileNames } from "@/engine/export/pageFiles";
@@ -31,7 +39,12 @@ interface Props {
   /** 6887:73809 "Site SEO defaults ›" → Settings › SEO defaults (the drawer
    *  guards unsaved edits first). */
   onOpenSiteDefaults?: () => void;
+  /** FG-007 / FG-008: the drafted page, analysed (the modal runs the analysis). */
+  seo?: SeoFindingsState;
 }
+
+/** A finding whose fix is a field here focuses that field. */
+const FIELD_IDS = { title: "seo-title", description: "seo-desc", slug: "seo-slug", keyphrase: "seo-keyphrase" } as const;
 
 /** The public path a page answers on. The home page is `/` whatever its slug
  *  says (the exporter), so a home-page slug edit moves no URL. */
@@ -51,8 +64,13 @@ const BTN_32 = "tw:rounded-[var(--bk-radius-md)] tw:text-[length:var(--bk-text-1
 const BTN_SECONDARY = `${BTN_32} tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]`;
 
 
-export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, redirectSaved, onOpenSiteDefaults }) => {
-  const [detailsOpen, setDetailsOpen] = React.useState(false);
+export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, redirectSaved, onOpenSiteDefaults, seo }) => {
+  /* Element fixes leave the modal for the canvas; only field fixes are
+     reachable from here, so only they carry a Fix. */
+  const findings: Finding[] = (seo?.findings ?? []).map((f) => (f.fix?.kind === "field" ? f : { ...f, fix: undefined }));
+  const fix = (f: Finding) => {
+    if (f.fix?.kind === "field") document.getElementById(FIELD_IDS[f.fix.field])?.focus();
+  };
   const domain = s.domain ?? "yoursite.com";
   /* An empty field ships the inherited title, so the counter measures that. */
   const countedTitle = s.seoTitle || s.inheritedTitle;
@@ -113,7 +131,7 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, redir
     <div className="tw:flex tw:flex-col tw:gap-2.5">
       {/* ── 1. GOOGLE PREVIEW — TOP ────────────────────────────────────── */}
       <div className={`${LABEL_TEXT} ${UI}`} data-testid="seo-preview-label">
-        {`Search preview · SEO score ${s.allowIndex ? s.seoScore : 0}`}
+        {`Search preview · ${SEO_STATUS_LABEL[seo?.status ?? "not-checked"]}`}
       </div>
       {/* Google preview — prototype .gpreview */}
       <div className="tw:flex tw:flex-col tw:gap-1 tw:rounded-md tw:bg-[var(--bk-gray-100)] tw:px-3 tw:py-3">
@@ -237,7 +255,7 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, redir
           <HelperText color="red" className={BK_HELPER_ERROR_CLASS}>{s.slugError}</HelperText>
         ) : isPlaceholderSlug(s.slug) ? (
           <HelperText className={BK_HELPER_CLASS}>
-            “{s.slug}” is a numbered URL — a descriptive slug ranks better (+10 pts)
+            “{s.slug}” is a numbered URL — a descriptive slug ranks better
           </HelperText>
         ) : null}
       </div>
@@ -315,41 +333,26 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, redir
           Couldn’t save page settings. Your changes are still here.
         </p>
       )}
-      <Button
-        variant="link"
-        data-testid="seo-score-details"
-        aria-haspopup="dialog"
-        className={`${LINK} ${UI}`}
-        onClick={() => setDetailsOpen(true)}
-      >
-        SEO score details
-      </Button>
-      {/* design-2l9 board 65:17860: the score's six parts in their own small
-          dialog over Page settings, one "Part: n/max" line each, and "Back to
-          SEO" to return. */}
-      <Modal
-        open={detailsOpen}
-        onClose={() => setDetailsOpen(false)}
-        width="sm"
-        title={`SEO score · ${page.name} · ${s.seoScore}/100`}
-        testId="seo-score-breakdown"
-      >
-        <div className="tw:flex tw:flex-col tw:items-start">
-          {s.seoBreakdown.map((row) => (
-            <span key={row.label} className={`tw:text-[13px] tw:leading-5 tw:tabular-nums tw:text-[var(--bk-ink-soft)] ${UI}`}>
-              {`${row.label}: ${row.earned}/${row.max}`}
-            </span>
-          ))}
-          <Button
-            variant="link"
-            data-testid="seo-score-back"
-            className={`${LINK} ${UI} tw:mt-3`}
-            onClick={() => setDetailsOpen(false)}
-          >
-            Back to SEO
-          </Button>
-        </div>
-      </Modal>
+      {/* FG-007 / FG-008: the optional focus keyphrase, then the checklist. */}
+      <div className={FIELD} data-testid="seo-field-keyphrase">
+        <Label htmlFor="seo-keyphrase" className={BK_LABEL_CLASS}>Focus keyphrase · optional</Label>
+        <TextInput
+          id="seo-keyphrase"
+          sizing="sm"
+          data-testid="seo-input-keyphrase"
+          value={s.keyphrase}
+          onChange={(e) => s.setKeyphrase(e.target.value)}
+          placeholder="The phrase this page should be found for"
+        />
+      </div>
+      <div className={FIELD} data-testid="seo-checks">
+        <div className={`${LABEL_TEXT} ${UI}`}>SEO checks</div>
+        {seo?.findings ? (
+          <FindingsList findings={findings} onFix={fix} dimmed={!s.allowIndex} />
+        ) : (
+          <p className={`tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)] ${UI}`}>Not checked yet.</p>
+        )}
+      </div>
       <p className={`tw:m-0 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-soft)] ${UI}`} data-testid="seo-override-note">
         These overrides affect this page only. Clear the title to use site defaults.
       </p>

@@ -36,9 +36,27 @@ function makeSettings(over: Partial<UsePageSettingsReturn> = {}): UsePageSetting
     slug: "home",
     setSlug: vi.fn(),
     slugError: null,
-    seoScore: 100,
-    seoChecks: { titleSet: true, slugClean: true, indexingOn: true, descSet: true },
-    seoBreakdown: [],
+    siteOgImage: null,
+    keyphrase: "",
+    setKeyphrase: vi.fn(),
+    xCustomized: false,
+    setXCustomized: vi.fn(),
+    xTitle: "",
+    setXTitle: vi.fn(),
+    xDesc: "",
+    setXDesc: vi.fn(),
+    xImageUrl: null,
+    setXImageUrl: vi.fn(),
+    canonicalUrl: "",
+    setCanonicalUrl: vi.fn(),
+    canonicalError: null,
+    schemaType: "WebPage",
+    setSchemaType: vi.fn(),
+    articleAuthor: "",
+    setArticleAuthor: vi.fn(),
+    articleDate: "",
+    setArticleDate: vi.fn(),
+    siteAuthor: "",
     ogTitle: "",
     setOgTitle: vi.fn(),
     ogDesc: "",
@@ -140,45 +158,45 @@ describe("SeoTab meta description field", () => {
   });
 });
 
-// ── SEO score card ───────────────────────────────────────────────────────────
+// ── FG-007 / FG-008: status and checklist ───────────────────────────────────
 
-describe("SeoTab score card", () => {
-  /* design-2l9 board 63:15939: the score is part of the preview's label,
-     first in the form. Re-baseline: the score card and its banners. */
-  it("names the score in the preview label, above the title field", () => {
-    render(<SeoTab s={makeSettings({ seoScore: 85 })} page={makePage()} composer={null} />);
+describe("SeoTab — status and SEO checks (FG-007 / FG-008)", () => {
+  const seo = (over: Record<string, unknown> = {}) =>
+    ({ findings: [], readability: null, status: "no-issues", stale: false, recompute: () => [], ...over }) as never;
+
+  /* FG-008: the preview names the page's status, never an unexplained score. */
+  it("names the status in the preview label, above the title field", () => {
+    render(<SeoTab s={makeSettings()} page={makePage()} composer={null} seo={seo({ status: "needs-attention" })} />);
     const label = screen.getByTestId("seo-preview-label");
-    expect(label).toHaveTextContent("Search preview · SEO score 85");
+    expect(label).toHaveTextContent("Search preview · Needs attention");
+    expect(label).not.toHaveTextContent(/score/i);
     expect(label.compareDocumentPosition(screen.getByTestId("seo-label-title")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
-  /* design-2l9 board 65:17860 replaces the four-check grid with the score's
-     own six parts. Re-baseline: SEO score display. */
-  it("SEO score details opens the score's six parts; Back to SEO closes them", () => {
-    const seoBreakdown = [
-      { label: "Title length", earned: 20, max: 20 },
-      { label: "URL format", earned: 20, max: 20 },
-      { label: "Description length", earned: 30, max: 30 },
-      { label: "Descriptive URL", earned: 10, max: 10 },
-      { label: "Title ≥30 characters", earned: 0, max: 10 },
-      { label: "Description ≥100 characters", earned: 0, max: 10 },
-    ];
-    render(<SeoTab s={makeSettings({ seoScore: 80, seoBreakdown })} page={makePage()} composer={null} />);
-    expect(screen.queryByTestId("seo-score-breakdown")).toBeNull();
-    fireEvent.click(screen.getByTestId("seo-score-details"));
-    const box = screen.getByTestId("seo-score-breakdown");
-    expect(box).toHaveTextContent(/SEO score · .+ · 80\/100/);
-    // re-baseline: SEO score details — a small dialog with "Part: n/max" lines (65:17860).
-    expect(box).toHaveTextContent("Title length: 20/20");
-    expect(box).toHaveTextContent("Description ≥100 characters: 0/10");
-    fireEvent.click(screen.getByTestId("seo-score-back"));
-    expect(screen.queryByTestId("seo-score-breakdown")).toBeNull();
+  it("reads Not checked before the analysis has run", () => {
+    render(<SeoTab s={makeSettings()} page={makePage()} composer={null} />);
+    expect(screen.getByTestId("seo-preview-label")).toHaveTextContent("Search preview · Not checked");
+    expect(screen.getByTestId("seo-checks")).toHaveTextContent("Not checked yet.");
   });
 
-  it("with indexing off the preview reads score 0 and the select says Hidden", () => {
-    render(<SeoTab s={makeSettings({ allowIndex: false, seoScore: 0 })} page={makePage()} composer={null} />);
-    expect(screen.getByTestId("seo-preview-label")).toHaveTextContent("SEO score 0");
-    expect((screen.getByTestId("seo-input-indexing") as HTMLSelectElement).value).toBe("noindex");
+  it("lists the findings; a field finding's Fix focuses that field", () => {
+    const findings = [
+      { id: "title-length", rating: "problem", text: "The title is too short.", fix: { kind: "field", field: "title" } },
+      { id: "img-alt", rating: "improvement", text: "An image has no alt text.", fix: { kind: "element", elementId: "e1", section: "content" } },
+    ];
+    render(<SeoTab s={makeSettings()} page={makePage()} composer={null} seo={seo({ findings, status: "needs-attention" })} />);
+    expect(screen.getByTestId("seo-finding-title-length")).toHaveTextContent("The title is too short.");
+    /* Element fixes leave the modal, so they carry no Fix here. */
+    expect(screen.getAllByRole("button", { name: /^Fix:/ })).toHaveLength(1);
+    fireEvent.click(screen.getByRole("button", { name: "Fix: The title is too short." }));
+    expect(document.activeElement?.id).toBe("seo-title");
+  });
+
+  it("the focus keyphrase is optional and writes through setKeyphrase", () => {
+    const s = makeSettings();
+    render(<SeoTab s={s} page={makePage()} composer={null} seo={seo()} />);
+    fireEvent.change(screen.getByTestId("seo-input-keyphrase"), { target: { value: "handmade pasta" } });
+    expect(s.setKeyphrase).toHaveBeenCalledWith("handmade pasta");
   });
 });
 
@@ -233,20 +251,19 @@ describe("SeoTab slug field", () => {
    only 20 of the 30 the panel advertises. The banner has to say so. */
 describe("SeoTab — a placeholder slug is explained where it is fixed", () => {
   const settings = (over: Record<string, unknown>) =>
-    ({ ...makeSettings(), seoScore: 30, seoChecks: { titleSet: false, slugClean: false, indexingOn: true, descSet: false }, ...over }) as never;
+    ({ ...makeSettings(), ...over }) as never;
 
-  it("says so under the slug field, naming the slug and what fixing it is worth", () => {
+  it("says so under the slug field, naming the slug", () => {
     render(<SeoTab s={settings({ slug: "page-4" })} page={makePage()} composer={null} />);
     const hint = document.getElementById("seo-slug")?.getAttribute("aria-describedby");
     expect(hint).toBe("seo-slug-hint");
     expect(screen.getByText(/is a numbered URL/).textContent).toMatch(/page-4/);
-    expect(screen.getByText(/is a numbered URL/).textContent).toMatch(/\+10 pts/);
   });
 
   /* 6887:73809 draws the slug field bare: a good slug prints no rule under
      it (the field auto-formats as you type either way). */
   it("prints nothing under a real slug", () => {
-    render(<SeoTab s={settings({ slug: "pricing", seoChecks: { titleSet: false, slugClean: true, indexingOn: true, descSet: false } })} page={makePage()} composer={null} />);
+    render(<SeoTab s={settings({ slug: "pricing" })} page={makePage()} composer={null} />);
     expect(screen.queryByText(/is a numbered URL/)).toBeNull();
     expect(screen.queryByText(/Lowercase letters/)).toBeNull();
   });
@@ -254,7 +271,7 @@ describe("SeoTab — a placeholder slug is explained where it is fixed", () => {
   /* An empty or rejected slug also greys the tick, and calling THAT a
      numbered URL would be a second wrong explanation. */
   it("does not call an empty slug a numbered URL", () => {
-    render(<SeoTab s={settings({ slug: "", seoScore: 20 })} page={makePage()} composer={null} />);
+    render(<SeoTab s={settings({ slug: "" })} page={makePage()} composer={null} />);
     expect(screen.queryByText(/is a numbered URL/)).toBeNull();
   });
 });

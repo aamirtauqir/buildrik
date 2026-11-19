@@ -12,7 +12,7 @@ import type { PageSEO } from "@/shared/types";
 export type PageStatus = "live" | "draft" | "hidden" | "scheduled" | "error";
 
 /** Settings drawer tab identifier */
-export type DrawerTab = "seo" | "social" | "advanced";
+export type DrawerTab = "seo" | "readability" | "social" | "advanced";
 
 /** `ui:pages-open-settings` from outside the panel — Settings' saved repair
  *  card (`Back to <Page> SEO`, Clone 3519:20096) and the Templates success

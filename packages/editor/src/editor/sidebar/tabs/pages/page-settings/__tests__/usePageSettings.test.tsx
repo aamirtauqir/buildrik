@@ -370,54 +370,64 @@ describe("usePageSettings save", () => {
   });
 });
 
-// ── seoScore + the "score-label lies" corroboration ──────────────────────────
+// ── FG-007 / FG-011: keyphrase, X, canonical and structured data ────────────
 
-describe("usePageSettings seoScore", () => {
-  it("computes a numeric score from title/desc/slug when indexing is on", () => {
+describe("usePageSettings — FG-007 / FG-011 fields", () => {
+  const savedSeo = async (result: { current: ReturnType<typeof usePageSettings> }, composer: MockComposer) => {
+    await act(async () => {
+      await result.current.save();
+    });
+    const [, patch] = (composer.elements.updatePage as unknown as Mock).mock.calls.at(-1)!;
+    return (patch as { settings: { seo: Record<string, unknown> } }).settings.seo;
+  };
+
+  it("seeds from the page and saves the focus keyphrase", async () => {
     const composer = createMockComposer({});
-    const { result } = setup(
-      composer,
-      page({
-        slug: "about-us",
-        seo: {
-          metaTitle: "A Great SEO Title For Testing Pages", // 35 chars
-          metaDescription: "x".repeat(120), // 100-160
-        },
-      })
-    );
-    // title 30(+20/+10) + slug 30(+20/+10) + desc 40(+30/+10) = 100
-    expect(result.current.seoScore).toBe(100);
+    const { result } = setup(composer, page({ seo: { focusKeyphrase: "pasta" } }));
+    expect(result.current.keyphrase).toBe("pasta");
+    act(() => result.current.setKeyphrase("handmade pasta"));
+    expect(result.current.isDirty).toBe(true);
+    expect((await savedSeo(result, composer)).focusKeyphrase).toBe("handmade pasta");
   });
 
-  /* D1: an empty field is not a missing title — the page ships the inherited
-     one, so the score and the "Page title" check grade that. */
-  it("grades the inherited title when the field is empty", () => {
-    const composer = createMockComposer({ projectSettings: { seo: { metaTitle: "Bella Cucina — handmade pasta daily" } } });
-    const { result } = setup(composer, page({ slug: "about-us", isHome: true, seo: undefined }));
-    expect(result.current.seoTitle).toBe("");
-    expect(result.current.seoChecks.titleSet).toBe(true);
-    // title 30 (35 chars) + slug 30 + desc 0 = 60
-    expect(result.current.seoScore).toBe(60);
+  it("Customize for X starts from the shared values and saves its own", async () => {
+    const composer = createMockComposer({});
+    const { result } = setup(composer, page({ seo: { ogTitle: "Share me", ogDescription: "Shared words" } }));
+    act(() => result.current.setXCustomized(true));
+    expect(result.current.xTitle).toBe("Share me");
+    expect(result.current.xDesc).toBe("Shared words");
+    act(() => result.current.setXTitle("For X"));
+    const seo = await savedSeo(result, composer);
+    expect(seo).toMatchObject({ xCustomized: true, twitterTitle: "For X", twitterDescription: "Shared words" });
   });
 
-  // Indexing is an all-or-nothing GATE in calculateSeoScore: turning it off
-  // zeroes the ENTIRE score (a 100 → 0 drop, not 100 → 60). SeoTab now honestly
-  // labels this row "Required" (a gate) instead of the former fictional "+40 pts".
-  it("toggling indexing off zeroes the whole score (gate, not +40)", () => {
+  it("a canonical URL the shared schema refuses blocks the save", async () => {
     const composer = createMockComposer({});
-    const { result } = setup(
-      composer,
-      page({
-        slug: "about-us",
-        seo: {
-          metaTitle: "A Great SEO Title For Testing Pages",
-          metaDescription: "x".repeat(120),
-        },
-      })
-    );
-    expect(result.current.seoScore).toBe(100);
+    const { result } = setup(composer, page());
+    act(() => result.current.setCanonicalUrl("not a url"));
+    expect(result.current.canonicalError).not.toBeNull();
+    let ok: boolean | undefined;
+    await act(async () => {
+      ok = await result.current.save();
+    });
+    expect(ok).toBe(false);
+    expect(composer.elements.updatePage).not.toHaveBeenCalled();
+    act(() => result.current.setCanonicalUrl("https://example.com/original"));
+    expect(result.current.canonicalError).toBeNull();
+    expect((await savedSeo(result, composer)).canonicalUrl).toBe("https://example.com/original");
+  });
 
-    act(() => result.current.setAllowIndex(false));
-    expect(result.current.seoScore).toBe(0); // not 60 (100 - the advertised 40)
+  it("an Article saves its author and date", async () => {
+    const composer = createMockComposer({});
+    const { result } = setup(composer, page());
+    act(() => {
+      result.current.setSchemaType("Article");
+      result.current.setArticleAuthor("Ana");
+      result.current.setArticleDate("2026-11-19");
+    });
+    expect(await savedSeo(result, composer)).toMatchObject({
+      schemaType: "Article",
+      article: { authorName: "Ana", datePublished: "2026-11-19T00:00:00.000Z" },
+    });
   });
 });

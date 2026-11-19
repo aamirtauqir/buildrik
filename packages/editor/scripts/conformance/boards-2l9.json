@@ -187,9 +187,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "founder:p4-seo-tabs-in-2l9-modal",
    "verified": "drift-fixed",
-   "verifiedNote": "probe-compared 2026-10-27 (case pages-settings-seo, 1440×900, board shots/63-15939.png): dialog 720×700 at 360,100 (getBoundingClientRect); title row + ✕ over a hairline; SEO · Social · Advanced segmented with tinted active; body order subtitle → 'Search preview · SEO score n' + gray preview card → 'SEO title · n / 60 · Page override' → Description + 'n / 160' → Page URL '/slug' → Search indexing row (select 240×28 at x560) → Site SEO defaults → SEO score details → scope note; Cancel · Save. Filled gray borderless fields 28 tall. blocked:owner-page-settings-container resolved by the owner (board wins). Remaining: 'Write with AI'/'Regenerate' link waits on PR #33.",
+   "verifiedNote": "owner 2026-11-19 kept code-ahead feature: FG-007 / FG-008 inside the 2L9 Page settings modal — the preview label names the SEO status (Not checked / Needs attention / No issues detected / Hidden from search) instead of a score, and \"SEO checks\" adds the optional focus keyphrase and the findings checklist (shared/seo/analysis); a Readability tab sits after SEO. The board's other fields stay. Tests: SeoTab \"status and SEO checks\", ReadabilityTab. | probe-compared 2026-10-27 (case pages-settings-seo, 1440×900, board shots/63-15939.png): dialog 720×700 at 360,100 (getBoundingClientRect); title row + ✕ over a hairline; SEO · Social · Advanced segmented with tinted active; body order subtitle → 'Search preview · SEO score n' + gray preview card → 'SEO title · n / 60 · Page override' → Description + 'n / 160' → Page URL '/slug' → Search indexing row (select 240×28 at x560) → Site SEO defaults → SEO score details → scope note; Cancel · Save. Filled gray borderless fields 28 tall. blocked:owner-page-settings-container resolved by the owner (board wins). Remaining: 'Write with AI'/'Regenerate' link waits on PR #33.",
    "tier": "P1"
   },
   {
@@ -198,9 +198,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "founder:p4-seo-tabs-in-2l9-modal",
    "verified": "drift-fixed",
-   "verifiedNote": "probe-compared 2026-10-27 (page-settings dialog, Social tab, board shots/63-16507.png): explainer line; 'Social title · n / 60' + input; Social description textarea with n / 160 under it; 'Social image' 240×124 gray preview (1200 × 630); 'Social image URL' + rule. OG share-card mock removed.",
+   "verifiedNote": "owner 2026-11-19 kept code-ahead feature: FG-011 inside the 2L9 Page settings modal — \"Customize for X\" under the board's social fields; on, X has its own title, description and image, seeded from the shared values. Tests: usePageSettings \"FG-007 / FG-011 fields\". | probe-compared 2026-10-27 (page-settings dialog, Social tab, board shots/63-16507.png): explainer line; 'Social title · n / 60' + input; Social description textarea with n / 160 under it; 'Social image' 240×124 gray preview (1200 × 630); 'Social image URL' + rule. OG share-card mock removed.",
    "tier": "P1"
   },
   {
@@ -209,9 +209,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "founder:p4-seo-tabs-in-2l9-modal",
    "verified": "drift-fixed",
-   "verifiedNote": "probe-compared 2026-10-27 (Advanced tab, board shots/63-17061.png): Publish visibility select Live/Hidden + helper; 'Search indexing: Indexed' + 'Change in SEO' link (switches to SEO tab); Follow links select; Head code textarea + two rules. Board's '· Pro' on Head code not drawn: code:head-code-not-gated.",
+   "verifiedNote": "owner 2026-11-19 kept code-ahead feature: FG-007 inside the 2L9 Page settings modal — Canonical URL (shared pageSeoSchema, Save off while refused) and Structured data type (Web page / Article with author and date) between Follow links and Head code. Tests: usePageSettings \"FG-007 / FG-011 fields\". | probe-compared 2026-10-27 (Advanced tab, board shots/63-17061.png): Publish visibility select Live/Hidden + helper; 'Search indexing: Indexed' + 'Change in SEO' link (switches to SEO tab); Follow links select; Head code textarea + two rules. Board's '· Pro' on Head code not drawn: code:head-code-not-gated.",
    "tier": "P1"
   },
   {
@@ -364,9 +364,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "founder:p4-seo-tabs-in-2l9-modal",
    "verified": "drift-fixed",
-   "verifiedNote": "probe-compared 2026-10-27 (case pages-settings-score, board shots/65-17860.png): SEO score details opens a 480 dialog over Page settings (was an inline gray box): 'SEO score · {page} · n/100' title, six 'Part: n/max' lines 13px soft ink, 'Back to SEO' link closes it. Dialog 480×240 (board 480×256).",
+   "verifiedNote": "owner 2026-11-19 kept code-ahead feature: FG-008 — the SEO score breakdown dialog is replaced by the findings checklist in the SEO tab; the Listings \"SEO score\" column (63:21262) keeps the score. | probe-compared 2026-10-27 (case pages-settings-score, board shots/65-17860.png): SEO score details opens a 480 dialog over Page settings (was an inline gray box): 'SEO score · {page} · n/100' title, six 'Part: n/max' lines 13px soft ink, 'Back to SEO' link closes it. Dialog 480×240 (board 480×256).",
    "tier": "P1"
   },
   {

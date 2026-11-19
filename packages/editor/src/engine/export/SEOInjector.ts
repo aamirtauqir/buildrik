@@ -110,6 +110,12 @@ export class SEOInjector {
     const ogTitle = pageSEO?.ogTitle || title;
     const ogDescription = pageSEO?.ogDescription || description;
     const twitterCard = pageSEO?.twitterCard || "summary_large_image";
+    /* FG-011: X uses the shared (Open Graph) values unless the page turned on
+       "Customize for X". Custom values kept while it is off are ignored. */
+    const xOwn = pageSEO?.xCustomized === true;
+    const xTitle = (xOwn && pageSEO?.twitterTitle) || ogTitle;
+    const xDescription = (xOwn && pageSEO?.twitterDescription) || ogDescription;
+    const xImage = (xOwn && pageSEO?.twitterImage) || ogImage;
     /* Only the page's own override is emitted here. The default canonical is
        built on the server from the URL the deploy serves (`pageCanonicalUrl`,
        packages/shared/seo/urls.ts) — the editor does not know the domain. A
@@ -157,14 +163,14 @@ export class SEOInjector {
 
     // Twitter Card tags
     tags.push(`<meta name="twitter:card" content="${twitterCard}">`);
-    tags.push(`<meta name="twitter:title" content="${this.escape(ogTitle)}">`);
+    tags.push(`<meta name="twitter:title" content="${this.escape(xTitle)}">`);
 
-    if (ogDescription) {
-      tags.push(`<meta name="twitter:description" content="${this.escape(ogDescription)}">`);
+    if (xDescription) {
+      tags.push(`<meta name="twitter:description" content="${this.escape(xDescription)}">`);
     }
 
-    if (ogImage) {
-      tags.push(`<meta name="twitter:image" content="${this.escape(ogImage)}">`);
+    if (xImage) {
+      tags.push(`<meta name="twitter:image" content="${this.escape(xImage)}">`);
     }
 
     if (siteSEO?.twitterHandle) {

@@ -16,7 +16,7 @@ import type { PageItem } from "@/editor/sidebar/tabs/pages/types";
 describe("page settings — a Home with an empty slug", () => {
   it("opens clean: Editing, not Unsaved, and Save disabled", () => {
     const home: PageItem = { id: "h", name: "Home", slug: "", isHome: true, isActive: true };
-    const composer = { elements: { updatePage: vi.fn() }, emit: vi.fn(), getProjectMetadata: () => ({}) } as never;
+    const composer = { elements: { exportPages: () => [], updatePage: vi.fn() }, on: () => undefined, off: () => undefined, emit: vi.fn(), getProjectMetadata: () => ({}) } as never;
     render(
       <ToastProvider>
         <PageSettingsDrawer page={home} allPages={[home]} composer={composer} onClose={vi.fn()} />

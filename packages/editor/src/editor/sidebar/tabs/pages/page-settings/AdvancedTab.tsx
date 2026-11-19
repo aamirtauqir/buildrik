@@ -7,14 +7,18 @@
  * (`authority: code:head-code-not-gated`).
  *
  * Decision #21: Password is removed until the published-site middleware
- * exists to enforce it; canonical URL comes later.
+ * exists to enforce it.
+ *
+ * FG-007 (owner 2026-11-19, inside the 2L9 modal): a canonical URL checked by
+ * the shared page schema (Save stays off while it is refused) and the JSON-LD
+ * type this page describes — WebPage, or Article with its author and date.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 import type { UsePageSettingsReturn } from "./usePageSettings";
-import { BK_HELPER_CLASS, BK_HELPER_ERROR_CLASS, BK_LABEL_CLASS, Button, HelperText, Label, Select, Textarea } from "@/editor/chrome-ui";
+import { BK_HELPER_CLASS, BK_HELPER_ERROR_CLASS, BK_LABEL_CLASS, Button, HelperText, Label, Select, Textarea, TextInput } from "@/editor/chrome-ui";
 
 interface Props {
   s: UsePageSettingsReturn;
@@ -70,6 +74,59 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => (
         <option value="follow">Follow</option>
         <option value="nofollow">No follow</option>
       </Select>
+    </div>
+    <div className={FIELD} data-testid="adv-field-canonical">
+      <Label htmlFor="adv-canonical" className={BK_LABEL_CLASS}>Canonical URL</Label>
+      <TextInput
+        id="adv-canonical"
+        sizing="sm"
+        type="url"
+        data-testid="adv-input-canonical"
+        value={s.canonicalUrl}
+        onChange={(e) => s.setCanonicalUrl(e.target.value)}
+        placeholder="This page’s own address"
+        color={s.canonicalError ? "failure" : undefined}
+        aria-invalid={s.canonicalError ? true : undefined}
+      />
+      {s.canonicalError ? (
+        <HelperText color="red" className={BK_HELPER_ERROR_CLASS} data-testid="adv-canonical-error">{s.canonicalError}</HelperText>
+      ) : (
+        <HelperText className={BK_HELPER_CLASS}>Leave empty unless another address is the original of this page.</HelperText>
+      )}
+    </div>
+    <div className={FIELD} data-testid="adv-field-schema">
+      <Label htmlFor="adv-schema" className={BK_LABEL_CLASS}>Structured data type</Label>
+      <Select
+        id="adv-schema"
+        sizing="sm"
+        data-testid="adv-input-schema"
+        value={s.schemaType}
+        onChange={(e) => s.setSchemaType(e.target.value === "Article" ? "Article" : "WebPage")}
+      >
+        <option value="WebPage">Web page</option>
+        <option value="Article">Article</option>
+      </Select>
+      {s.schemaType === "Article" ? (
+        <div className="tw:flex tw:gap-2">
+          <TextInput
+            sizing="sm"
+            aria-label="Article author"
+            data-testid="adv-input-article-author"
+            value={s.articleAuthor}
+            onChange={(e) => s.setArticleAuthor(e.target.value)}
+            placeholder={s.siteAuthor || "Author"}
+            className="tw:flex-1"
+          />
+          <TextInput
+            sizing="sm"
+            type="date"
+            aria-label="Date published"
+            data-testid="adv-input-article-date"
+            value={s.articleDate}
+            onChange={(e) => s.setArticleDate(e.target.value)}
+          />
+        </div>
+      ) : null}
     </div>
     <div className={FIELD}>
       <Label htmlFor="adv-head" className={BK_LABEL_CLASS}>Head code</Label>
