@@ -9,6 +9,7 @@
 import type { CmsBindingsInput } from "@buildrik/shared/schemas/sites";
 import type { DarkMode, DesignToken } from "@buildrik/shared/schemas/design-tokens";
 import type { StyleModel } from "@buildrik/shared/schemas/class-styles";
+import type { SeoSiteSchema } from "@buildrik/shared/schemas/seo-schema";
 import type { AssetData } from "./asset";
 import type { CanvasGuide } from "./canvas";
 import type { ElementData } from "./element";
@@ -289,6 +290,14 @@ export interface PageSEO {
   canonicalUrl?: string;
   /** JSON-LD structured data */
   structuredData?: Record<string, unknown>;
+  /** Optional focus keyphrase (FG-007) — with none, keyphrase checks are not run */
+  focusKeyphrase?: string;
+  /** JSON-LD type this page describes; WebPage when unset */
+  schemaType?: "WebPage" | "Article";
+  /** Article details, used when schemaType is "Article" */
+  article?: { authorName?: string; datePublished?: string };
+  /** FG-011: X uses the shared social values unless this is true; custom X values are kept either way */
+  xCustomized?: boolean;
 }
 
 // ============================================
@@ -409,6 +418,10 @@ export interface SiteSEO {
   allowIndexing?: boolean;
   /** [Site column] Custom robots.txt, shipped verbatim when set; the editor only previews it */
   robotsTxt?: string;
+  /** Settings › SEO › Structured data (FG-009). Project JSON only, merged like author. */
+  schema?: SeoSiteSchema | null;
+  /** Settings › SEO › Sitemap "Generate a sitemap"; unset means on. Project JSON only. */
+  sitemapEnabled?: boolean;
   /** [Site column] Social media profile links (server: socialLinks JSON) */
   socialLinks?: {
     twitter?: string;

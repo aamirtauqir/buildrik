@@ -9,33 +9,32 @@
 import type { PageSEO, SiteSEO, PageData } from "@/shared/types";
 import { sanitizeHeadCode } from "./sanitizeHeadCode";
 import { SOCIAL_NETWORKS } from "@buildrik/shared/schemas/site-detail";
+import { resolveEmittedTitle } from "@buildrik/shared/seo/titles";
 
 // ============================================================================
 // SEO INJECTOR
 // ============================================================================
 
 /**
- * The title a page ships with, in the order the exporter has always resolved
- * it. Exported because the single-file export path had no access to it: the
- * download modal seeded `pageTitle` from a constant, so every customer's
- * exported HTML was titled "Buildrick Export" until they noticed the field and
- * typed over it. One precedence, both paths.
+ * The title a page ships with — `resolveEmittedTitle` (packages/shared/seo/
+ * titles.ts), the one resolver the drawer and the pre-publish check use too.
+ * Owner order L3-036: own SEO title verbatim → site template over the page
+ * name → page name; the site default title is the home page's fallback.
+ * Exported because the single-file export path and the drawer need it.
  */
 export function resolvePageTitle(
-  page: Pick<PageData, "name">,
+  page: Pick<PageData, "name" | "isHome">,
   pageSEO?: PageSEO,
   pageSettings?: { title?: string },
   siteSEO?: SiteSEO
 ): string {
-  const own = pageSEO?.metaTitle || pageSettings?.title;
-  if (own) return applyTitleTemplate(own, siteSEO);
-  /* A page with no title of its own inherits the site's default title
-     (Settings › SEO › Defaults — owner decision Q4, 2026-10-04). That value is
-     already a whole title, so the template does not wrap it a second time.
-     Without one, the page name stands in, as before. */
-  const siteDefault = siteSEO?.metaTitle?.trim();
-  if (siteDefault) return siteDefault;
-  return applyTitleTemplate(page.name || "Untitled", siteSEO);
+  return resolveEmittedTitle({
+    pageName: page.name,
+    isHome: page.isHome === true,
+    seoTitle: pageSEO?.metaTitle,
+    settingsTitle: pageSettings?.title,
+    site: siteSEO ?? {},
+  }).title;
 }
 
 /**
@@ -49,25 +48,6 @@ export function resolvePageDescription(
   siteSEO?: SiteSEO
 ): string {
   return pageSEO?.metaDescription || pageSettings?.description || siteSEO?.metaDescription?.trim() || "";
-}
-
-/**
- * Wrap a page's own title in the site's title template.
- *
- * The template is stored (`sites.metaTitleTemplate`), shown on the dashboard's
- * SEO tab, and graded by the pre-publish "SEO configured" check — and until
- * now it was applied by nothing, so a site that set "Acme — {page_title}"
- * published pages titled just "Home". A template with no `{page_title}` in it
- * would replace every page title with the same string, which is never what the
- * field is for, so it is ignored.
- */
-function applyTitleTemplate(title: string, siteSEO?: SiteSEO): string {
-  const template = siteSEO?.metaTitleTemplate?.trim();
-  if (!template || !template.includes("{page_title}")) return title;
-  return template
-    .replace(/\{page_title\}/g, title)
-    .replace(/\{site_name\}/g, siteSEO?.siteName ?? "")
-    .trim();
 }
 
 /**

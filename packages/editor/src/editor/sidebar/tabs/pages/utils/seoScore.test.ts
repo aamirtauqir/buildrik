@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { calculateSeoScore, isPlaceholderSlug } from "./seoScore";
+import { calculateSeoScore } from "./seoScore";
+import { isPlaceholderSlug } from "@buildrik/shared/seo/analysis";
 
 describe("calculateSeoScore", () => {
   it("returns 0 when allowIndex is false, regardless of other fields", () => {

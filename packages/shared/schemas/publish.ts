@@ -46,6 +46,10 @@ export function publishPathError(path: string): string | null {
 
 /** Payload sent by editor when publishing — one entry per page. */
 export const publishPageSchema = z.object({
+  /** The editor page this file renders — lets the worker read that page's
+   *  stored settings (noindex → left out of the sitemap). Optional: an editor
+   *  tab from before it existed omits it. */
+  pageId: z.string().min(1).max(64).optional(),
   /** Path inside deployment, e.g. "index.html", "about/index.html". */
   path: z
     .string()

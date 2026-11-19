@@ -140,11 +140,12 @@ describe("Publish Service", () => {
       vi.mocked(prisma.page.findMany).mockResolvedValue([
         { id: "p1", name: "Home", blocks: [{}], settings: null },
         { id: "p2", name: "About", blocks: [{}], settings: { visibility: "live" } },
-        { id: "p3", name: "Work", blocks: [{}], settings: {} },
+        { id: "p3", name: "About", blocks: [{}], settings: {} },
       ] as any);
 
       const result = await runPrePublishChecks("s1");
       expect(result.ready).toBe(true);
+      // Two pages emit the same title (L3-036 inspects each emitted title).
       const seoCheck = result.checks.find((c) => c.label === "SEO configured");
       expect(seoCheck?.status).toBe("warning");
     });

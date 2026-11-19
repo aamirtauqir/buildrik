@@ -90,12 +90,18 @@ describe("usePageSettings seed", () => {
      page's own title — every page the drawer saved opted out of the site's
      default title. The field now holds only the page's OWN title; what the
      page inherits is offered as the placeholder. */
-  it("starts the title field EMPTY when the page has no own title, and offers the inherited site default", () => {
+  it("starts the title field EMPTY when the page has no own title; the home page inherits the site default", () => {
     const composer = createMockComposer({ projectSettings: { seo: { metaTitle: "Bella Default Title" } } });
-    const { result } = setup(composer, page({ name: "About Us", seo: undefined }));
+    const { result } = setup(composer, page({ name: "Home", isHome: true, seo: undefined }));
     expect(result.current.seoTitle).toBe("");
     expect(result.current.inheritedTitle).toBe("Bella Default Title");
     expect(result.current.effectiveTitle).toBe("Bella Default Title");
+  });
+
+  it("a page other than home inherits its own name, not the site default (L3-036, Q3)", () => {
+    const composer = createMockComposer({ projectSettings: { seo: { metaTitle: "Bella Default Title" } } });
+    const { result } = setup(composer, page({ name: "About Us", seo: undefined }));
+    expect(result.current.inheritedTitle).toBe("About Us");
   });
 
   it("without a site default, the inherited title is the page name through the site template — as exported", () => {
@@ -105,12 +111,12 @@ describe("usePageSettings seed", () => {
     expect(result.current.inheritedTitle).toBe("Blog Post | Acme");
   });
 
-  it("a typed title is the effective one (through the template, as exported)", () => {
+  it("a typed title is the effective one, verbatim — the template only wraps the page name (L3-036)", () => {
     const composer = createMockComposer({ projectSettings: { seo: { metaTitle: "Bella Default Title", metaTitleTemplate: "{page_title} | Acme" } } });
     const { result } = setup(composer, page({ name: "About", seo: undefined }));
     act(() => result.current.setSeoTitle("Our story"));
-    expect(result.current.effectiveTitle).toBe("Our story | Acme");
-    expect(result.current.inheritedTitle).toBe("Bella Default Title");
+    expect(result.current.effectiveTitle).toBe("Our story");
+    expect(result.current.inheritedTitle).toBe("About | Acme");
   });
 
   /* #21 / #26: a legacy password page arrives as "hidden" (usePages maps it —
@@ -387,7 +393,7 @@ describe("usePageSettings seoScore", () => {
      one, so the score and the "Page title" check grade that. */
   it("grades the inherited title when the field is empty", () => {
     const composer = createMockComposer({ projectSettings: { seo: { metaTitle: "Bella Cucina — handmade pasta daily" } } });
-    const { result } = setup(composer, page({ slug: "about-us", seo: undefined }));
+    const { result } = setup(composer, page({ slug: "about-us", isHome: true, seo: undefined }));
     expect(result.current.seoTitle).toBe("");
     expect(result.current.seoChecks.titleSet).toBe(true);
     // title 30 (35 chars) + slug 30 + desc 0 = 60

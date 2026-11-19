@@ -14,7 +14,7 @@ import { EVENTS } from "@/shared/constants/events";
 import type { PageItem } from "../types";
 import type { UsePageSettingsReturn } from "./usePageSettings";
 import { BK_HELPER_CLASS, BK_HELPER_ERROR_CLASS, BK_LABEL_CLASS, Button, HelperText, Label, Modal, Select, Textarea, TextInput } from "@/editor/chrome-ui";
-import { isPlaceholderSlug } from "../utils/seoScore";
+import { isPlaceholderSlug } from "@buildrik/shared/seo/analysis";
 import { resolvePageDescription } from "@/engine/export/SEOInjector";
 import { pageFileNames } from "@/engine/export/pageFiles";
 import { pageLinkUrl } from "@buildrik/shared/seo/urls";

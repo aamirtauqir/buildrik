@@ -5,6 +5,7 @@ import {
   ANALYTICS_ID_SAFE,
   type AnalyticsProvider,
 } from "./analytics-ids";
+import { seoSiteSchemaSchema } from "./seo-schema";
 
 /**
  * The JSON-only site settings (Settings Phase B, BE-1): the values in
@@ -61,7 +62,9 @@ export const redirectsSettingsSchema = z.object({
 export const SITE_AUTHOR_MAX_LENGTH = 100;
 
 /**
- * The JSON-only members of `seo` — today only General's Author. The rest of
+ * The JSON-only members of `seo` — General's Author, the site's structured
+ * data and the sitemap switch (P4 SEO, 2026-10-10: kept out of Site columns so
+ * reading them needs no migration). The rest of
  * `seo` is Site columns (or the retired Twitter handle), so this block is
  * MERGED into the stored `seo`, never a replacement, and it is not one of the
  * `PROJECT_SETTINGS_KEY_SCHEMAS`: the autosave boundary must not run the whole
@@ -69,7 +72,11 @@ export const SITE_AUTHOR_MAX_LENGTH = 100;
  */
 export const seoSettingsSchema = z
   .object({
-    author: z.string().trim().max(SITE_AUTHOR_MAX_LENGTH, { message: `Keep it under ${SITE_AUTHOR_MAX_LENGTH} characters.` }),
+    author: z.string().trim().max(SITE_AUTHOR_MAX_LENGTH, { message: `Keep it under ${SITE_AUTHOR_MAX_LENGTH} characters.` }).optional(),
+    /** Settings › SEO › Structured data (FG-009); null clears it. */
+    schema: seoSiteSchemaSchema.nullable().optional(),
+    /** Settings › SEO › Sitemap "Generate a sitemap"; unset means on. */
+    sitemapEnabled: z.boolean().optional(),
   })
   .strict();
 

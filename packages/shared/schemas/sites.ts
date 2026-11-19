@@ -132,8 +132,23 @@ export const pageSeoSchema = z
     twitterImage: z.string().optional(),
     noIndex: z.boolean().optional(),
     noFollow: z.boolean().optional(),
-    canonicalUrl: z.string().optional(),
+    /** "" means "this page's own address"; anything else is a full http(s) URL. */
+    canonicalUrl: z
+      .union([
+        z.literal(""),
+        z.string().url("Use a full https:// address").max(2048).refine((u) => /^https?:\/\//i.test(u), "Use a full https:// address"),
+      ])
+      .optional(),
     structuredData: z.record(z.unknown()).optional(),
+    /** Optional (owner FG-007): with none, the keyphrase checks are not run. */
+    focusKeyphrase: z.string().trim().max(100).optional(),
+    /** JSON-LD type this page describes; WebPage when unset. */
+    schemaType: z.enum(["WebPage", "Article"]).optional(),
+    article: z
+      .object({ authorName: z.string().trim().max(100).optional(), datePublished: z.string().datetime().optional() })
+      .optional(),
+    /** FG-011: X uses the shared social values unless customised; custom values are kept when toggled off. */
+    xCustomized: z.boolean().optional(),
   })
   .passthrough();
 

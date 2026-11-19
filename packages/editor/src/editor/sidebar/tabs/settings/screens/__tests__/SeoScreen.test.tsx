@@ -233,6 +233,28 @@ describe("SEO — what Save sends", () => {
     expect(last(props.registerSaveHandler)).toBeUndefined();
   });
 
+  /* L3-036: the title template is a Site column; it rides the same flush. */
+  it("loads the title template, previews it, and flushes it as seo.metaTitleTemplate", async () => {
+    getMock.mockResolvedValue({ ...serverRow(), metaTitleTemplate: "{page_title} · Acme" });
+    const { props } = setup();
+    await loaded();
+    expect(input("seo-title-template").value).toBe("{page_title} · Acme");
+    fireEvent.change(input("seo-title-template"), { target: { value: "{page_title} | {site_name}" } });
+    expect(props.onDirtyChange).toHaveBeenLastCalledWith(true);
+    expect(screen.getByTestId("set-seo-title-template-preview")).toHaveTextContent("| Acme");
+    const next = last<() => SettingsFlush>(props.registerFlushHandler)!().settings;
+    expect(next.seo?.metaTitleTemplate).toBe("{page_title} | {site_name}");
+  });
+
+  it("a template without {page_title} is refused inline and keeps Save off", async () => {
+    const { props } = setup();
+    await loaded();
+    fireEvent.change(input("seo-title-template"), { target: { value: "Acme" } });
+    expect(last<Record<string, string>>(props.registerFieldErrors)).toMatchObject({
+      "seo.metaTitleTemplate": "Include {page_title} so each page keeps its own title.",
+    });
+  });
+
   it("a changed canonical URL rides in the one flush as an extra column — no second save", async () => {
     const { composer, props } = setup();
     await loaded();

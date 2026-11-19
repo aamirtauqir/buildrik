@@ -68,6 +68,20 @@ describe("updateProjectSettings (BE-2)", () => {
     expect(result.saved).toEqual({ seo: { twitterHandle: "@bella", author: "Elena Rossi" } });
   });
 
+  it("merges structured data and the sitemap switch into seo, keeping the author (P4 SEO)", async () => {
+    tx.site.findUnique.mockResolvedValue({
+      projectSettings: { ...stored, seo: { author: "Elena Rossi" } },
+      deletedAt: null,
+      workspace: { plan: "FREE" },
+    });
+    await updateProjectSettings("s1", { seo: { schema: { entity: "Person", name: "Sofia Rossi" }, sitemapEnabled: false } });
+    expect((written().projectSettings as Record<string, unknown>).seo).toEqual({
+      author: "Elena Rossi",
+      schema: { entity: "Person", name: "Sofia Rossi" },
+      sitemapEnabled: false,
+    });
+  });
+
   it("refuses non-empty global CSS on FREE, and lets FREE clear it", async () => {
     tx.site.findUnique.mockResolvedValue({ projectSettings: stored, deletedAt: null, workspace: { plan: "FREE" } });
     await expect(updateProjectSettings("s1", { customCode: { globalCss: "h1{}" } })).rejects.toThrow("CUSTOM_CODE_NOT_AVAILABLE");

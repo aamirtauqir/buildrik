@@ -36,6 +36,7 @@ import { Field, Input, LoadCard, SCREEN_FIELD_ERROR, SaveErrorBanner, Screen, Si
 import { useServerLoad } from "../hooks/useServerLoad";
 import type { ScreenProps, SettingsFlushResult } from "../types";
 import { SettingsCard } from "../components/SettingsCard";
+import { TitleTemplateField, TITLE_TEMPLATE_TOKEN_ERROR } from "../components/TitleTemplateField";
 import {
   SocialProfilesCard,
   emptySocialProfiles,
@@ -45,7 +46,9 @@ import {
 
 /** What this screen reads off `siteDetail.settings.get`. */
 interface SeoRow {
+  name?: string | null;
   metaTitle?: string | null;
+  metaTitleTemplate?: string | null;
   metaDescription?: string | null;
   ogImage?: string | null;
   canonicalUrl?: string | null;
@@ -113,6 +116,7 @@ export const SeoScreen: React.FC<ScreenProps> = ({
   const seo = composer?.getProjectSettings().seo;
   const legacyHandle = seo?.twitterHandle ?? "";
   const [metaTitle, setMetaTitle] = React.useState(seo?.metaTitle ?? "");
+  const [titleTemplate, setTitleTemplate] = React.useState(seo?.metaTitleTemplate ?? "");
   const [metaDescription, setMetaDescription] = React.useState(seo?.metaDescription ?? "");
   const [ogImage, setOgImage] = React.useState(seo?.defaultOgImage ?? "");
   const [social, setSocial] = React.useState<SocialProfiles>(() => socialProfilesOf(seo?.socialLinks, legacyHandle));
@@ -126,11 +130,12 @@ export const SeoScreen: React.FC<ScreenProps> = ({
   /* The values the server holds — dirty is a difference from them, so typing
      a field back to its saved value is clean again. (Canonical has its own
      `savedCanonical`.) */
-  const snapshot = (v: { metaTitle: string; metaDescription: string; ogImage: string; social: SocialProfiles; allowIndexing: boolean; robotsTxt: string }) =>
-    JSON.stringify([v.metaTitle, v.metaDescription, v.ogImage, v.social, v.allowIndexing, v.robotsTxt]);
+  const snapshot = (v: { metaTitle: string; titleTemplate: string; metaDescription: string; ogImage: string; social: SocialProfiles; allowIndexing: boolean; robotsTxt: string }) =>
+    JSON.stringify([v.metaTitle, v.titleTemplate, v.metaDescription, v.ogImage, v.social, v.allowIndexing, v.robotsTxt]);
   const [saved, setSaved] = React.useState(() =>
     snapshot({
       metaTitle: seo?.metaTitle ?? "",
+      titleTemplate: seo?.metaTitleTemplate ?? "",
       metaDescription: seo?.metaDescription ?? "",
       ogImage: seo?.defaultOgImage ?? "",
       social: socialProfilesOf(seo?.socialLinks, legacyHandle),
@@ -154,6 +159,7 @@ export const SeoScreen: React.FC<ScreenProps> = ({
     ({ row, domains, missing }) => {
       setPagesWithoutDescription(missing);
       setMetaTitle(row.metaTitle ?? "");
+      setTitleTemplate(row.metaTitleTemplate ?? "");
       setMetaDescription(row.metaDescription ?? "");
       setOgImage(row.ogImage ?? "");
       setSocial(socialProfilesOf(row.socialLinks, legacyHandle));
@@ -164,6 +170,7 @@ export const SeoScreen: React.FC<ScreenProps> = ({
       setSaved(
         snapshot({
           metaTitle: row.metaTitle ?? "",
+          titleTemplate: row.metaTitleTemplate ?? "",
           metaDescription: row.metaDescription ?? "",
           ogImage: row.ogImage ?? "",
           social: socialProfilesOf(row.socialLinks, legacyHandle),
@@ -176,7 +183,7 @@ export const SeoScreen: React.FC<ScreenProps> = ({
     { onLoadStateChange, registerRetryLoad },
   );
 
-  const current = snapshot({ metaTitle, metaDescription, ogImage, social, allowIndexing, robotsTxt });
+  const current = snapshot({ metaTitle, titleTemplate, metaDescription, ogImage, social, allowIndexing, robotsTxt });
   const dirty = current !== saved || canonical.trim() !== savedCanonical.trim();
   React.useEffect(() => {
     onDirtyChange?.(dirty);
@@ -186,6 +193,7 @@ export const SeoScreen: React.FC<ScreenProps> = ({
 
   const errors = {
     metaTitle: columnError("metaTitle", metaTitle),
+    titleTemplate: titleTemplate.trim() && !titleTemplate.includes("{page_title}") ? TITLE_TEMPLATE_TOKEN_ERROR : null,
     metaDescription: columnError("metaDescription", metaDescription),
     ogImage: columnError("ogImage", ogImage),
     canonical: columnError("canonicalUrl", canonical),
@@ -200,6 +208,7 @@ export const SeoScreen: React.FC<ScreenProps> = ({
     if (!registerFieldErrors) return;
     const out: Record<string, string> = {};
     if (errors.metaTitle) out["seo.metaTitle"] = errors.metaTitle;
+    if (errors.titleTemplate) out["seo.metaTitleTemplate"] = errors.titleTemplate;
     if (errors.metaDescription) out["seo.metaDescription"] = errors.metaDescription;
     if (errors.ogImage) out["seo.defaultOgImage"] = errors.ogImage;
     if (errors.canonical) out.canonicalUrl = errors.canonical;
@@ -219,8 +228,8 @@ export const SeoScreen: React.FC<ScreenProps> = ({
     }));
   }, [fieldErrors]);
 
-  const stateRef = React.useRef({ metaTitle, metaDescription, ogImage, social, allowIndexing, robotsTxt, canonical, savedCanonical });
-  stateRef.current = { metaTitle, metaDescription, ogImage, social, allowIndexing, robotsTxt, canonical, savedCanonical };
+  const stateRef = React.useRef({ metaTitle, titleTemplate, metaDescription, ogImage, social, allowIndexing, robotsTxt, canonical, savedCanonical });
+  stateRef.current = { metaTitle, titleTemplate, metaDescription, ogImage, social, allowIndexing, robotsTxt, canonical, savedCanonical };
 
   const flush = React.useCallback((): SettingsFlushResult => {
     if (!composer) return;
@@ -231,6 +240,7 @@ export const SeoScreen: React.FC<ScreenProps> = ({
       seo: {
         ...current.seo,
         metaTitle: s.metaTitle,
+        metaTitleTemplate: s.titleTemplate,
         metaDescription: s.metaDescription,
         defaultOgImage: s.ogImage,
         socialLinks: { ...s.social },
@@ -282,6 +292,10 @@ export const SeoScreen: React.FC<ScreenProps> = ({
     SOCIAL_NETWORKS.map((n) => [n, fieldErrors?.[`seo.socialLinks.${n}`]]).filter((e) => e[1]),
   ) as Partial<Record<SocialNetwork, string>>;
   const toggle = (key: keyof typeof open) => (next: boolean) => setOpen((o) => ({ ...o, [key]: next }));
+  const siteName = composer?.getProjectMetadata().name ?? seo?.siteName ?? "";
+  /* The preview names a real page that would use the template: the first one
+     that is not home (home falls back to the site default title first). */
+  const samplePageTitle = composer?.elements?.getAllPages?.().find((p) => !p.isHome)?.name ?? "About";
 
   return (
     <Screen>
@@ -337,6 +351,13 @@ export const SeoScreen: React.FC<ScreenProps> = ({
               </p>
             ) : null}
           </Field>
+          <TitleTemplateField
+            value={titleTemplate}
+            onChange={setTitleTemplate}
+            siteName={siteName}
+            samplePageTitle={samplePageTitle}
+            serverError={fieldErrors?.["seo.metaTitleTemplate"] ?? null}
+          />
           <Field label="Open Graph image URL" htmlFor="seo-og" siteColumn="seo.defaultOgImage" span="full">
             <Input
               id="seo-og"

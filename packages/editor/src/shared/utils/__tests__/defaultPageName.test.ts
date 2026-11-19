@@ -21,7 +21,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { getDefaultPageName } from "../pageUtils";
 import { slugify } from "../helpers";
-import { isPlaceholderSlug } from "@/editor/sidebar/tabs/pages/utils/seoScore";
+import { isPlaceholderSlug } from "@buildrik/shared/seo/analysis";
 
 describe("getDefaultPageName", () => {
   it("names an empty project's first page Home", () => {

@@ -10,6 +10,7 @@ import {
 } from "@buildrik/shared/schemas/publish";
 import { getPlanLimit, type PlanName } from "@/lib/constants/plan-limits";
 import { asContentRoot, CONTENT_CHECK_LABELS, detectContentIssues } from "@buildrik/shared/content/contentIssues";
+import { resolveEmittedTitle, titleFindings } from "@buildrik/shared/seo/titles";
 import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
 import { appendDynamicPagesToPublish, findEmptyBindings, findStaleTemplateBindings, findUnboundLists } from "@/server/services/cms.service";
 import { getActiveVercelConnection, markInactive } from "@server/services/integrations.service";
@@ -106,6 +107,8 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
     prisma.site.findUnique({
       where: { id: siteId },
       select: {
+        name: true,
+        metaTitle: true,
         metaTitleTemplate: true,
         favicon: true,
         touchIcon: true,
@@ -175,11 +178,33 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
     checks.push({ label: "Pages ready", status: "pass", detail: `${pageCount} page${pageCount > 1 ? "s" : ""} ready to publish.` });
   }
 
-  // SEO configured
-  if (!site?.metaTitleTemplate) {
-    checks.push({ label: "SEO configured", status: "warning", detail: "No meta title template set. Search engines may not index your site properly." });
+  /* SEO configured (L3-036, owner 2026-10-10): every title the deploy will
+     emit, through the same resolver the export and the drawer use. It
+     used to pass on the mere presence of a title template — a field the
+     editor could not even set. Still a warning: SEO never blocks publish.
+     The label is what PublishTab's Fix target keys on. */
+  const emitted = livePages.map((p) => {
+    const settings = (p.settings ?? {}) as { title?: string; seo?: { metaTitle?: string; noIndex?: boolean } };
+    return {
+      id: p.id,
+      name: p.name,
+      noIndex: settings.seo?.noIndex === true,
+      title: resolveEmittedTitle({
+        pageName: p.name,
+        isHome: p.isHomePage,
+        seoTitle: settings.seo?.metaTitle,
+        settingsTitle: settings.title,
+        site: { metaTitle: site?.metaTitle, metaTitleTemplate: site?.metaTitleTemplate, siteName: site?.name },
+      }).title,
+    };
+  });
+  const titleMessages = [...new Set(titleFindings(emitted).map((f) => f.message))];
+  if (titleMessages.length > 0) {
+    const shown = titleMessages.slice(0, 3).join(" ");
+    const more = titleMessages.length > 3 ? ` and ${titleMessages.length - 3} more.` : "";
+    checks.push({ label: "SEO configured", status: "warning", detail: `${shown}${more}` });
   } else {
-    checks.push({ label: "SEO configured", status: "pass", detail: "Meta title template is configured." });
+    checks.push({ label: "SEO configured", status: "pass", detail: "Every page has a usable search title." });
   }
 
   // Domain connected

@@ -245,10 +245,18 @@ describe("SEOInjector.inject — site default title/description fallback", () =>
     expect(html).toContain('<meta name="twitter:description" content="Sourdough baked every morning in Leeds.">');
   });
 
-  it("a page with no title ships the site default title, ahead of the page name", () => {
-    const html = new SEOInjector().inject(makePage({ name: "About" }), SITE);
+  /* Owner L3-036 / plan Q3 (2026-10-10): the site default title is the HOME
+     page's fallback only. Every other page with no title of its own ships
+     its name (through the template when there is one). */
+  it("the home page with no title ships the site default title, ahead of its name", () => {
+    const html = new SEOInjector().inject(makePage({ name: "Home", isHome: true }), SITE);
     expect(html).toContain("<title>Acme Bakery — fresh bread daily</title>");
     expect(html).toContain('<meta property="og:title" content="Acme Bakery — fresh bread daily">');
+  });
+
+  it("any other page with no title ships its own name, not the site default", () => {
+    const html = new SEOInjector().inject(makePage({ name: "About" }), SITE);
+    expect(html).toContain("<title>About</title>");
   });
 
   it("the page's own title and description still win over the defaults", () => {
@@ -260,12 +268,17 @@ describe("SEOInjector.inject — site default title/description fallback", () =>
     expect(html).toContain('<meta name="description" content="Three generations of bakers.">');
   });
 
-  it("the site default title is not wrapped in the title template a second time", () => {
-    const html = new SEOInjector().inject(makePage({ name: "About" }), {
-      ...SITE,
+  it("the site default title is not wrapped in the title template; other pages use the template", () => {
+    const site = { ...SITE, metaTitleTemplate: "{page_title} | Acme" };
+    expect(new SEOInjector().inject(makePage({ name: "Home", isHome: true }), site)).toContain("<title>Acme Bakery — fresh bread daily</title>");
+    expect(new SEOInjector().inject(makePage({ name: "About" }), site)).toContain("<title>About | Acme</title>");
+  });
+
+  it("a page's own SEO title ships verbatim — the template does not wrap it (L3-036)", () => {
+    const html = new SEOInjector().inject(makePage({ name: "About", settings: { seo: { metaTitle: "Our story" } } }), {
       metaTitleTemplate: "{page_title} | Acme",
     });
-    expect(html).toContain("<title>Acme Bakery — fresh bread daily</title>");
+    expect(html).toContain("<title>Our story</title>");
   });
 
   it("without site defaults the page name (through the template) stands, as before", () => {
