@@ -509,6 +509,29 @@ describe("handleBlockDrop", () => {
     });
   });
 
+  /* L1-017 on the drag path (the Add panel is drag-only, owner 2026-11-19):
+     a dropped Image is selected and the panel stays — no switch to Assets,
+     no asset pick request. */
+  it("L1-017: a dropped Image is selected; no tab switch, no pick request", () => {
+    vi.useFakeTimers();
+    vi.mocked(getBlockById).mockReturnValue({ id: "image", label: "Image", elementType: "image" } as never);
+    vi.mocked(insertBlock).mockReturnValue("new-img");
+    vi.mocked(canNestElement).mockReturnValue(true);
+    const root = makeStubElement({ id: "r1", getType: () => "container" });
+    const img = makeStubElement({ id: "new-img", getType: () => "image" });
+    const composer = makeStubComposer({
+      activePage: { id: "p1", root: { id: "r1" } },
+      elements: new Map([["r1", root], ["new-img", img]]),
+    });
+    const emit = vi.fn();
+    Object.assign(composer, { emit });
+    handleBlockDrop(makeDragEvent({ block: JSON.stringify({ id: "image" }) }), makeDropContext(composer));
+    vi.runAllTimers();
+    expect(composer.selection.select).toHaveBeenCalledWith(img);
+    expect(emit).not.toHaveBeenCalledWith("ui:switch-tab", expect.anything());
+    expect(emit).not.toHaveBeenCalledWith("element:needs-asset", expect.anything());
+  });
+
   it("inserts under resolved parent when findValidDropTargetWithFallback succeeds", () => {
     vi.useFakeTimers();
     vi.mocked(getBlockById).mockReturnValue({

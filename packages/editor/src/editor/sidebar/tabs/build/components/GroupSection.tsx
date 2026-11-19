@@ -19,6 +19,7 @@ import { BK_TOOLTIP_CLASS, Button, Tooltip } from "@/editor/chrome-ui";
 import { BlockThumb } from "./BlockThumb";
 import { getElementIcon } from "@/editor/shared/elementIcons";
 import { BlockPreviewCard } from "./BlockPreviewCard";
+import { isPointerClick } from "./DragHint";
 
 interface GroupSectionProps {
   /** Where a held row would land ("Home › Hero › Content"), board 4418:100890. */
@@ -45,6 +46,9 @@ interface GroupSectionProps {
   /** ★ on element rows (G2-115): which names are favourites, and the toggle. */
   favs?: Set<string>;
   onToggleFav?: (name: string) => void;
+  /** Drag-only Add (owner 2026-11-19): a pointer click on an element, block
+   *  or saved-component item shows "Drag onto the canvas to add" here. */
+  onDragHint: (anchor: HTMLElement) => void;
 }
 
 /** Board 1069:4979 group header: dense row · ▾/▸ 11 · LABEL 11/600 caps tracking .5 · count 11/400 right.
@@ -130,12 +134,16 @@ export const Row: React.FC<{
   fav?: { on: boolean; onToggle: () => void; testId: string };
   draggable?: boolean;
   onDragStart?: (e: React.DragEvent) => void;
+  /** Inserts. Without `dragOnly`, any click; with it, the keyboard (Enter,
+   *  Space) and pointer-less clicks only. */
   onClick: () => void;
+  /** Drag-only Add (owner 2026-11-19): a pointer click hints instead. */
+  dragOnly?: (anchor: HTMLElement) => void;
   /** v3 FC-5: a saved component scoped to the open page only (board
    *  6971:77663's "This page" scope) drew identically to a site-wide one —
    *  nothing told the two apart in the Mine list. */
   meta?: string;
-}> = ({ label, iconType, noIcon, pinned, disabled, disabledReason, onHoverChange, testId, grip, fav, draggable, onDragStart, onClick, meta }) => {
+}> = ({ label, iconType, noIcon, pinned, disabled, disabledReason, onHoverChange, testId, grip, fav, draggable, onDragStart, onClick, dragOnly, meta }) => {
   const ElIcon = iconType ? getElementIcon(iconType) : null;
   const row = (
     <div
@@ -157,7 +165,14 @@ export const Row: React.FC<{
       onMouseLeave={onHoverChange ? () => onHoverChange(null) : undefined}
       onFocus={onHoverChange ? (e) => onHoverChange(e.currentTarget) : undefined}
       onBlur={onHoverChange ? () => onHoverChange(null) : undefined}
-      onClick={disabled ? undefined : onClick}
+      onClick={
+        disabled
+          ? undefined
+          : (e) => {
+              if (dragOnly && isPointerClick(e)) dragOnly(e.currentTarget);
+              else onClick();
+            }
+      }
       onDragStart={disabled ? undefined : onDragStart}
       onKeyDown={(e) => {
         if (disabled) return;
@@ -266,7 +281,8 @@ const ElementRows: React.FC<{
   onDragStart: DragStartFn;
   onElClick: ElClickFn;
   insertPath: string | null;
-}> = ({ group, elements, favs, onToggleFav, onDragStart, onElClick, insertPath }) => {
+  onDragHint: (anchor: HTMLElement) => void;
+}> = ({ group, elements, favs, onToggleFav, onDragStart, onElClick, insertPath, onDragHint }) => {
   const [tip, setTip] = React.useState<{ text: string; top: number } | null>(null);
   // Board 4418:100890: the row being dragged carries a note saying where it lands.
   const [dragging, setDragging] = React.useState<string | null>(null);
@@ -298,6 +314,10 @@ const ElementRows: React.FC<{
             onDragStart(e, el);
           }}
           onClick={() => onElClick(el)}
+          dragOnly={(row) => {
+            setTip(null);
+            onDragHint(row);
+          }}
         />
         {dragging === el.name && (
           <p
@@ -340,7 +360,8 @@ const BlockGrid: React.FC<{
   blocks: BlockDefinition[];
   onBlockInsert?: (block: BlockDefinition) => void;
   onBlockDragStart?: BlockDragStartFn;
-}> = ({ blocks, onBlockInsert, onBlockDragStart }) => {
+  onDragHint: (anchor: HTMLElement) => void;
+}> = ({ blocks, onBlockInsert, onBlockDragStart, onDragHint }) => {
   const [hovered, setHovered] = React.useState<{ block: BlockDefinition; el: HTMLElement } | null>(null);
   const timer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const clear = () => {
@@ -372,7 +393,7 @@ const BlockGrid: React.FC<{
               className="tw:group tw:flex tw:flex-col tw:gap-[6px] tw:min-w-0 tw:cursor-pointer tw:select-none tw:rounded-[var(--bk-radius-md)] tw:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]"
               data-testid={`insert-block-${b.id}`}
               aria-label={`Add ${b.label}`}
-              onClick={() => onBlockInsert?.(b)}
+              onClick={(e) => (isPointerClick(e) ? onDragHint(e.currentTarget) : onBlockInsert?.(b))}
               onMouseEnter={(e) => show(b, e.currentTarget)}
               onMouseLeave={hide}
               onDragStart={onBlockDragStart ? (e) => onBlockDragStart(e, b) : undefined}
@@ -418,7 +439,11 @@ const BlockGrid: React.FC<{
           anchor={hovered.el}
           onPointerEnter={clear}
           onPointerLeave={hide}
-          onInsert={() => {
+          onAdd={(e) => {
+            if (isPointerClick(e)) {
+              onDragHint(hovered.el);
+              return;
+            }
             setHovered(null);
             onBlockInsert?.(hovered.block);
           }}
@@ -429,7 +454,7 @@ const BlockGrid: React.FC<{
 };
 
 export const GroupSection: React.FC<GroupSectionProps> = ({
-  group, isOpen, onToggle, elements, blocks, mine, library, onLibraryInsert, onDragStart, onBlockDragStart, onElClick, onBlockInsert, onMineInsert, onManageComponents, favs, onToggleFav, insertPath,
+  group, isOpen, onToggle, elements, blocks, mine, library, onLibraryInsert, onDragStart, onBlockDragStart, onElClick, onBlockInsert, onMineInsert, onManageComponents, favs, onToggleFav, insertPath, onDragHint,
 }) => (
   <div data-testid={`insert-section-${group.id}`}>
     <HeaderRow group={group} isOpen={isOpen} onToggle={onToggle} />
@@ -442,6 +467,7 @@ export const GroupSection: React.FC<GroupSectionProps> = ({
         onDragStart={onDragStart}
         onElClick={onElClick}
         insertPath={insertPath ?? null}
+        onDragHint={onDragHint}
       />
     )}
     {/* Board 138:2: BLOCKS is a CARD GRID, not rows — `Card / media` (17:6):
@@ -469,6 +495,7 @@ export const GroupSection: React.FC<GroupSectionProps> = ({
               e.dataTransfer.effectAllowed = "copy";
             }}
             onClick={() => onMineInsert?.(c)}
+            dragOnly={onDragHint}
             meta={c.pageId ? "This page" : undefined}
           />
         ))}
@@ -528,7 +555,7 @@ export const GroupSection: React.FC<GroupSectionProps> = ({
         (560/700) more columns instead of two marooned cards. */}
     {isOpen && group.id === "blocks" && (
       <>
-        <BlockGrid blocks={blocks ?? []} onBlockInsert={onBlockInsert} onBlockDragStart={onBlockDragStart} />
+        <BlockGrid blocks={blocks ?? []} onBlockInsert={onBlockInsert} onBlockDragStart={onBlockDragStart} onDragHint={onDragHint} />
         {/* Board 4428:140817's footnote under the grid. */}
         <p data-testid="insert-blocks-note" className="tw:m-0 tw:px-[var(--bk-space-16)] tw:pb-[var(--bk-space-8)] tw:text-[11px] tw:leading-[16px] tw:text-[var(--bk-ink-muted)]">
           Blocks use your Brand colours and fonts.

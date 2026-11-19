@@ -46,6 +46,7 @@ const renderResults = (over: Partial<React.ComponentProps<typeof SearchResults>>
       onBlockInsert={noop}
       onSavedInsert={noop}
       onClearSearch={noop}
+      onDragHint={noop}
       {...over}
     />
   );
@@ -73,27 +74,45 @@ describe("SearchResults — cross-source rows (4418:100087)", () => {
     expect(screen.queryByText("Basic")).not.toBeInTheDocument();
   });
 
-  it("element row click → onElClick with the entry", () => {
+  /* Drag-only Add (owner 2026-11-19): Enter / Space insert, a pointer click
+     only hints. */
+  it("element row Enter → onElClick with the entry", () => {
     const onElClick = vi.fn();
     renderResults({ onElClick });
-    fireEvent.click(screen.getByTestId("insert-hit-el-basic-Button"));
+    fireEvent.keyDown(screen.getByTestId("insert-hit-el-basic-Button"), { key: "Enter" });
     expect(onElClick).toHaveBeenCalledWith(el);
   });
 
-  it("block row click and its + Add → onBlockInsert with the definition", () => {
+  it("block row Enter and Space → onBlockInsert with the definition", () => {
     const onBlockInsert = vi.fn();
     renderResults({ onBlockInsert });
-    fireEvent.click(screen.getByTestId("insert-hit-block-button-group"));
-    fireEvent.click(screen.getByTestId("insert-hit-add-block-button-group"));
+    fireEvent.keyDown(screen.getByTestId("insert-hit-block-button-group"), { key: "Enter" });
+    fireEvent.keyDown(screen.getByTestId("insert-hit-block-button-group"), { key: " " });
     expect(onBlockInsert).toHaveBeenCalledTimes(2);
     expect(onBlockInsert).toHaveBeenCalledWith(block);
   });
 
-  it("saved component row → onSavedInsert", () => {
+  it("saved component row Enter → onSavedInsert", () => {
     const onSavedInsert = vi.fn();
     renderResults({ onSavedInsert });
-    fireEvent.click(screen.getByTestId("insert-hit-saved-cmp-1"));
+    fireEvent.keyDown(screen.getByTestId("insert-hit-saved-cmp-1"), { key: "Enter" });
     expect(onSavedInsert).toHaveBeenCalledWith(saved);
+  });
+
+  it("a pointer click on any row (or its + Add) inserts nothing and asks for the hint", () => {
+    const onElClick = vi.fn();
+    const onBlockInsert = vi.fn();
+    const onSavedInsert = vi.fn();
+    const onDragHint = vi.fn();
+    renderResults({ onElClick, onBlockInsert, onSavedInsert, onDragHint });
+    fireEvent.click(screen.getByTestId("insert-hit-el-basic-Button"), { detail: 1 });
+    fireEvent.click(screen.getByTestId("insert-hit-add-block-button-group"), { detail: 1 });
+    fireEvent.click(screen.getByTestId("insert-hit-saved-cmp-1"), { detail: 1 });
+    expect(onElClick).not.toHaveBeenCalled();
+    expect(onBlockInsert).not.toHaveBeenCalled();
+    expect(onSavedInsert).not.toHaveBeenCalled();
+    expect(onDragHint).toHaveBeenCalledTimes(3);
+    expect(onDragHint).toHaveBeenLastCalledWith(screen.getByTestId("insert-hit-saved-cmp-1"));
   });
 
   it("every row is a drag source; a saved component drags as a component id", () => {

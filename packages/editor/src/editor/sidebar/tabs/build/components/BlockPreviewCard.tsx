@@ -1,7 +1,8 @@
 /**
  * BlockPreviewCard — board 4428:145110 (Add · Blocks · hover): hovering a
  * block card opens a 320-wide card beside the drawer — name, what it is, a
- * preview, "Add {name}" and "or drag it onto the canvas".
+ * preview, "Add {name}" and "or drag it onto the canvas". Add is drag-only
+ * (owner 2026-11-19): `onAdd` gets the click, and a pointer click only hints.
  *
  * Portaled (chrome-ui Portal) because the drawer scrolls and clips; placed at
  * the drawer's right edge + 8, level with the hovered card, kept on screen.
@@ -21,12 +22,12 @@ interface Props {
   block: BlockDefinition;
   /** The hovered card — the preview sits level with it. */
   anchor: HTMLElement;
-  onInsert: () => void;
+  onAdd: (e: React.MouseEvent) => void;
   onPointerEnter: () => void;
   onPointerLeave: () => void;
 }
 
-export const BlockPreviewCard: React.FC<Props> = ({ block, anchor, onInsert, onPointerEnter, onPointerLeave }) => {
+export const BlockPreviewCard: React.FC<Props> = ({ block, anchor, onAdd, onPointerEnter, onPointerLeave }) => {
   const drawer = anchor.closest(".bld-container") ?? anchor;
   const left = drawer.getBoundingClientRect().right + 8;
   const top = Math.max(8, Math.min(anchor.getBoundingClientRect().top + 36, window.innerHeight - CARD_H_EST - 8));
@@ -51,7 +52,7 @@ export const BlockPreviewCard: React.FC<Props> = ({ block, anchor, onInsert, onP
           <BlockThumb blockId={block.id} className="tw:h-[150px] tw:w-full tw:rounded-md tw:bg-[var(--bk-gray-50)] tw:border tw:border-[var(--bk-border)]" />
         )}
         <div className="tw:flex tw:items-center tw:gap-2.5">
-          <Button size="xs" data-testid="insert-block-preview-add" onClick={onInsert} className="tw:h-7 tw:px-3 tw:text-[13px] tw:font-medium tw:focus:ring-0">
+          <Button size="xs" data-testid="insert-block-preview-add" onClick={onAdd} className="tw:h-7 tw:px-3 tw:text-[13px] tw:font-medium tw:focus:ring-0">
             Add {block.label}
           </Button>
           <span className="tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-gray-500)]">or drag it onto the canvas</span>

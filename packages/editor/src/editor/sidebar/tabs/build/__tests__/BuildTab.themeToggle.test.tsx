@@ -41,7 +41,7 @@ const renderTab = (composer: BuildTabProps["composer"], onBlockClick = vi.fn()) 
 const search = (q: string) => fireEvent.change(screen.getByTestId("add-search-input"), { target: { value: q } });
 
 describe("Add panel — theme toggle (BRP1-M12)", () => {
-  it("Auto: listed under ELEMENTS, and search shows the board's tile, which inserts the block", () => {
+  it("Auto: listed under ELEMENTS, and search shows the board's tile; its button inserts from the keyboard only", () => {
     const onBlockClick = vi.fn();
     renderTab(makeComposer("auto").composer, onBlockClick);
     expect(screen.getByTestId("insert-el-Theme toggle")).toBeTruthy();
@@ -49,7 +49,12 @@ describe("Add panel — theme toggle (BRP1-M12)", () => {
     const tile = screen.getByTestId("insert-theme-toggle-tile");
     expect(tile.textContent).toContain("Light / Dark switch");
     expect(screen.getByText("Available with Dark mode Auto.")).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "Add to page" }));
+    /* Drag-only Add (owner 2026-11-19): a pointer click only hints; the
+       keyboard's click (detail 0) inserts. */
+    fireEvent.click(screen.getByRole("button", { name: "Add to page" }), { detail: 1 });
+    expect(onBlockClick).not.toHaveBeenCalled();
+    expect(screen.getByTestId("add-drag-hint")).toHaveTextContent("Drag onto the canvas to add");
+    fireEvent.click(screen.getByRole("button", { name: "Add to page" }), { detail: 0 });
     expect(onBlockClick).toHaveBeenCalledWith(expect.objectContaining({ id: "theme-toggle" }));
   });
 

@@ -84,13 +84,18 @@ describe("BuildTab — board 137:2 taxonomy", () => {
     expect(screen.getByTestId("insert-el-Heading")).toBeTruthy();
   });
 
-  it("clicking a BLOCKS row inserts through the same onBlockClick path elements use", () => {
+  /* Drag-only Add (owner 2026-11-19): a pointer click on a block card only
+     hints; Enter inserts through the same onBlockClick path elements use. */
+  it("a BLOCKS card: a pointer click only hints, Enter inserts through onBlockClick", () => {
     const onBlockClick = vi.fn();
     renderTab({ onBlockClick });
     openTab("Blocks");
     const first = document.querySelector('[data-testid^="insert-block-"]') as HTMLElement;
     expect(first).toBeTruthy();
-    fireEvent.click(first);
+    fireEvent.click(first, { detail: 1 });
+    expect(onBlockClick).not.toHaveBeenCalled();
+    expect(screen.getByTestId("add-drag-hint")).toHaveTextContent("Drag onto the canvas to add");
+    fireEvent.keyDown(first, { key: "Enter" });
     expect(onBlockClick).toHaveBeenCalledTimes(1);
     expect(onBlockClick.mock.calls[0][0]).toHaveProperty("id");
     expect(onBlockClick.mock.calls[0][0]).toHaveProperty("label");
@@ -151,6 +156,28 @@ describe("BuildTab — SAVED COMPONENTS (G2-111)", () => {
     };
   };
 
+  /* Drag-only Add (owner 2026-11-19): a pointer click on a saved component
+     only hints; Enter still instantiates it. */
+  it("a pointer click only hints; Enter instantiates", async () => {
+    const { composer } = composerWith([{ id: "c1", name: "Menu card" }]);
+    const instantiateComponent = vi.fn(async () => "inst-1");
+    Object.assign(composer, {
+      selection: { getSelectedIds: () => [] },
+      beginTransaction: vi.fn(),
+      endTransaction: vi.fn(),
+      elements: { getActivePage: () => ({ id: "page-home", root: { id: "root" } }) },
+    });
+    Object.assign(composer.components, { instantiateComponent });
+    renderTab({ composer });
+    openTab("Components");
+    const row = screen.getByTestId("insert-mine-c1");
+    fireEvent.click(row, { detail: 1 });
+    expect(instantiateComponent).not.toHaveBeenCalled();
+    expect(screen.getByTestId("add-drag-hint")).toHaveTextContent("Drag onto the canvas to add");
+    fireEvent.keyDown(row, { key: "Enter" });
+    await waitFor(() => expect(instantiateComponent).toHaveBeenCalledWith("c1", "root"));
+  });
+
   it("rows drag as a component id and draw a grip", () => {
     const { composer } = composerWith([{ id: "c1", name: "Menu card" }]);
     renderTab({ composer });
@@ -203,10 +230,10 @@ describe("BuildTab — ★ FAVOURITES and RECENT (G2-115)", () => {
   it("an inserted element shows up under RECENT", () => {
     const onBlockClick = vi.fn();
     renderTab({ onBlockClick });
-    fireEvent.click(screen.getByTestId("insert-el-Heading"));
+    fireEvent.keyDown(screen.getByTestId("insert-el-Heading"), { key: "Enter" });
     expect(onBlockClick).toHaveBeenCalledTimes(1);
     expect(screen.getByTestId("insert-group-recent")).toHaveAttribute("aria-expanded", "true");
-    fireEvent.click(screen.getByTestId("insert-recent-Heading"));
+    fireEvent.keyDown(screen.getByTestId("insert-recent-Heading"), { key: "Enter" });
     expect(onBlockClick).toHaveBeenCalledTimes(2);
   });
 });
@@ -239,14 +266,14 @@ describe("BuildTab — Collection list row (G3-079)", () => {
   it("inserts the collection-list block", () => {
     const onBlockClick = vi.fn();
     renderTab({ onBlockClick });
-    fireEvent.click(screen.getByTestId("insert-el-Collection list"));
+    fireEvent.keyDown(screen.getByTestId("insert-el-Collection list"), { key: "Enter" });
     expect(onBlockClick.mock.calls[0][0]).toMatchObject({ id: "collection-list", label: "Collection list" });
   });
 });
 
 /* Board 4428:145110 — hovering a block card opens its preview card. */
 describe("BuildTab — block hover preview (4428:145110)", () => {
-  it("after a beat, names the block, says what it is, and Add inserts it", () => {
+  it("after a beat, names the block, says what it is; Add hints on a pointer click and inserts from the keyboard", () => {
     vi.useFakeTimers();
     const onBlockClick = vi.fn();
     renderTab({ onBlockClick });
@@ -257,7 +284,10 @@ describe("BuildTab — block hover preview (4428:145110)", () => {
     const card = screen.getByTestId("insert-block-preview");
     expect(card.textContent).toContain("Full-width headline, subtitle and a button.");
     expect(card.textContent).toContain("or drag it onto the canvas");
-    fireEvent.click(screen.getByTestId("insert-block-preview-add"));
+    fireEvent.click(screen.getByTestId("insert-block-preview-add"), { detail: 1 });
+    expect(onBlockClick).not.toHaveBeenCalled();
+    expect(screen.getByTestId("add-drag-hint")).toHaveTextContent("Drag onto the canvas to add");
+    fireEvent.click(screen.getByTestId("insert-block-preview-add"), { detail: 0 });
     expect(onBlockClick.mock.calls[0][0]).toMatchObject({ id: "hero" });
     expect(screen.queryByTestId("insert-block-preview")).toBeNull();
     vi.useRealTimers();
@@ -579,5 +609,37 @@ describe("BuildTab — insert target strip (board 7:18981)", () => {
     renderTab({ composer: composerWith(null) });
     expect(screen.getByTestId("add-insert-target-name").textContent).toBe("Insert into Home");
     expect(screen.getByTestId("add-insert-target-path").textContent).toBe("Home · At end");
+  });
+});
+
+/* Drag-only Add (owner 2026-11-19): a mouse click on an Elements, Blocks or
+   Saved components item does not insert — it shows "Drag onto the canvas to
+   add" and nothing else. Dragging onto the canvas inserts; Enter and Space
+   still insert (the a11y contract). */
+describe("BuildTab — drag-only Add (owner 2026-11-19)", () => {
+  it("a pointer click on an element row inserts nothing and shows the hint", () => {
+    const onBlockClick = vi.fn();
+    renderTab({ onBlockClick });
+    fireEvent.click(screen.getByTestId("insert-el-Image"), { detail: 1 });
+    expect(onBlockClick).not.toHaveBeenCalled();
+    expect(screen.getByTestId("add-drag-hint")).toHaveTextContent("Drag onto the canvas to add");
+    expect(screen.queryByTestId("insert-group-recent")).toBeNull();
+  });
+
+  it("Enter and Space on an element row insert it", () => {
+    const onBlockClick = vi.fn();
+    renderTab({ onBlockClick });
+    fireEvent.keyDown(screen.getByTestId("insert-el-Image"), { key: "Enter" });
+    expect(onBlockClick).toHaveBeenLastCalledWith(expect.objectContaining({ id: "image", label: "Image" }));
+    fireEvent.keyDown(screen.getByTestId("insert-el-Heading"), { key: " " });
+    expect(onBlockClick).toHaveBeenCalledTimes(2);
+    expect(screen.queryByTestId("add-drag-hint")).toBeNull();
+  });
+
+  it("dragging an element row hands the canvas its block payload (the drop inserts)", () => {
+    renderTab();
+    const setData = vi.fn();
+    fireEvent.dragStart(screen.getByTestId("insert-el-Image"), { dataTransfer: { setData, effectAllowed: "" } });
+    expect(setData).toHaveBeenCalledWith("block", expect.stringContaining('"id":"image"'));
   });
 });

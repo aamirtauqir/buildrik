@@ -23,6 +23,7 @@ import { FirstUseTip } from "./components/FirstUseTip";
 import { GroupSection, Row } from "./components/GroupSection";
 import { useToast } from "@/editor/chrome-ui";
 import { SearchResults } from "./components/SearchResults";
+import { useDragHint } from "./components/DragHint";
 import { useInsertDrag } from "@/editor/canvas/insertDrag";
 import { setInsertReceiptSink, takePendingInsertGroup, takePendingPasteHtml, type InsertReceipt } from "./insertGroupRequest";
 import { addTabOf, buildInsertGroups, blockRows, elementCategoryGroups, type AddTabId, type InsertGroup, type InsertGroupId } from "./catalog/groups";
@@ -191,6 +192,8 @@ export const BuildTab: React.FC<BuildTabProps> = ({
   // taken only while focus is in this panel or its search field — anywhere
   // else it stays the browser's find.
   const panelRef = React.useRef<HTMLDivElement>(null);
+  /* Drag-only Add (owner 2026-11-19): a pointer click on an item hints. */
+  const dragHint = useDragHint(panelRef);
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       /* The field only answered while the drawer was open (the topbar had no
@@ -291,7 +294,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
         </div>
       )}
 
-      <div className="bld-content" ref={panelRef}>
+      <div className="bld-content tw:relative" ref={panelRef}>
         {isSearching ? (
           <div className="bld-scroll">
             <SearchResults
@@ -303,6 +306,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
               onBlockInsert={(b) => onBlockClick?.(b)}
               onSavedInsert={(c) => void insertMine(c)}
               onClearSearch={() => tab.setSearchQuery("")}
+              onDragHint={dragHint.show}
             />
           </div>
         ) : (
@@ -343,6 +347,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
                 onBlockInsert={(b) => onBlockClick?.(b)}
                 onMineInsert={(c) => void insertMine(c)}
                 onManageComponents={composer ? () => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "components" }) : undefined}
+                onDragHint={dragHint.show}
               />
             ))}
             {receipt && (
@@ -370,6 +375,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
           </div>
         )}
 
+        {dragHint.bubble}
         <div ref={panelBottomRef} className="bld-panel-bottom" />
         <FirstUseTip anchorRef={panelBottomRef} />
       </div>

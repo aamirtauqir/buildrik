@@ -4,7 +4,8 @@
  * ONE flat list across sources: 32h rows — label 13 ink, a grey source chip
  * right after it ([Element] / [Block] / [Component]), then "+ Add" (12 medium
  * accent) and a 28-wide ⠿ grip at the right edge. No results header, no
- * category sections. Every row inserts on click and drags onto the canvas.
+ * category sections. Every row drags onto the canvas; Enter / Space insert,
+ * and a pointer click only hints (drag-only Add, owner 2026-11-19).
  * Pure render — matching lives in utils/search.ts.
  * @license BSD-3-Clause
  */
@@ -16,6 +17,7 @@ import type { BlockDefinition } from "@/blocks/blockRegistry";
 import type { ComponentDefinition } from "@/shared/types/components";
 import { Button } from "@/editor/chrome-ui";
 import { themeToggleBlockConfig } from "@/blocks/Basic/ThemeToggle";
+import { isPointerClick } from "./DragHint";
 
 interface SearchResultsProps {
   query: string;
@@ -26,6 +28,7 @@ interface SearchResultsProps {
   onBlockInsert: (block: BlockDefinition) => void;
   onSavedInsert: (component: ComponentDefinition) => void;
   onClearSearch: () => void;
+  onDragHint: (anchor: HTMLElement) => void;
 }
 
 /** The board's chip names the kind of thing a row inserts — the same three
@@ -45,6 +48,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
   onBlockInsert,
   onSavedInsert,
   onClearSearch,
+  onDragHint,
 }) => {
   if (!hits.length) {
     // Board 138:106: two lines only — muted fact (curly quotes, trailing
@@ -84,6 +88,11 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
     else onBlockInsert(hit.block);
   };
 
+  const click = (e: React.MouseEvent<HTMLElement>, hit: InsertSearchHit) => {
+    if (isPointerClick(e)) onDragHint(e.currentTarget);
+    else activate(hit);
+  };
+
   const dragStart = (e: React.DragEvent, hit: InsertSearchHit) => {
     if (hit.group === "ELEMENTS") onDragStart(e, hit.el);
     else if (hit.group === "SAVED") {
@@ -112,7 +121,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
               <p className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]">
                 {hit.el.description}
               </p>
-              <Button type="button" size="xs" onClick={() => activate(hit)}>
+              <Button type="button" size="xs" onClick={(e) => click(e, hit)}>
                 Add to page
               </Button>
             </div>
@@ -129,7 +138,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
           aria-label={`Add ${hit.label} (${CHIP[hit.group]})`}
           className="tw:flex tw:items-center tw:h-[var(--bk-size-row)] tw:pl-[16px] tw:pr-[16px] tw:rounded-[4px] tw:cursor-pointer tw:select-none hover:tw:bg-[var(--bk-bg-subtle)]"
           data-testid={`insert-hit-${hit.key}`}
-          onClick={() => activate(hit)}
+          onClick={(e) => click(e, hit)}
           onDragStart={(e) => dragStart(e, hit)}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
