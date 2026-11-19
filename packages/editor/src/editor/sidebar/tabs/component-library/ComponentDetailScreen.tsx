@@ -15,6 +15,7 @@ import type { Composer } from "@/engine";
 import type { ComponentDefinition } from "@/shared/types/components";
 import { ELEMENT_TYPE_LABELS } from "@/shared/constants/elementTypeLabels";
 import { ExportPackageDialog } from "./ExportPackageDialog";
+import { MasterPreview } from "./MasterPreview";
 import { INSTANTIATE_TOASTS, instantiateComponentAtSelection } from "./instantiate";
 import { beginUpdateFromSelection } from "./sourcePick";
 import { captureDeleteRecord } from "./componentTrash";
@@ -277,14 +278,8 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
         </Button>
       ) : null}
 
-      {/* 215:47036 — 272×152 preview on bg-subtle. */}
-      <div className="tw:flex tw:h-[152px] tw:w-full tw:shrink-0 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded tw:bg-[var(--bk-bg-subtle)]" data-testid="component-preview">
-        {component.thumbnail ? (
-          <img src={component.thumbnail} alt={component.name} className="tw:max-h-full tw:max-w-full tw:object-contain" />
-        ) : (
-          <span className="tw:text-[12px] tw:text-[var(--bk-ink-muted)]">No preview yet</span>
-        )}
-      </div>
+      {/* 215:47036 — 272×152 preview; light / dark / checker well (L2-020). */}
+      <MasterPreview component={component} />
 
       {/* 215:47040 — the name, 16/24/600; it renames inline (G2-124). */}
       {renaming ? (

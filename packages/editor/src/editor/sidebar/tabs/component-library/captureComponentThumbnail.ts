@@ -5,9 +5,16 @@
  *
  * On create (and on "Update from selection…") the canvas node that became the
  * master is snapshotted with html2canvas — the same library the site
- * thumbnail uses (shell/captureThumbnail.ts) — into a small JPEG data URL and
+ * thumbnail uses (shell/captureThumbnail.ts) — into a small data URL and
  * stored on the component. Best-effort: a failed capture leaves the component
  * without a thumbnail and says nothing, as the site capture does.
+ *
+ * L2-020: captured on a TRANSPARENT background into WebP (alpha kept; a
+ * browser that cannot encode WebP hands back PNG, which keeps it too). It
+ * was a JPEG on white, so white text on a translucent fill baked into an
+ * empty white picture; now the preview well (MasterPreview) decides what the
+ * picture sits on. Thumbnails captured before this stay baked on white until
+ * "Update from selection…" recaptures them.
  *
  * @license BSD-3-Clause
  */
@@ -31,13 +38,13 @@ export async function captureComponentThumbnail(
     const node = document.querySelector<HTMLElement>(`[data-buildrick-id="${CSS.escape(elementId)}"]`);
     if (!node || !node.offsetWidth || !node.offsetHeight) return;
     const canvas = await html2canvas(node, {
-      backgroundColor: "white",
+      backgroundColor: null,
       useCORS: true,
       allowTaint: false,
       logging: false,
       scale: THUMB_WIDTH / node.offsetWidth,
     });
-    const thumbnail = canvas.toDataURL("image/jpeg", 0.8);
+    const thumbnail = canvas.toDataURL("image/webp", 0.85);
     await composer.components.updateComponentMetadata(componentId, { thumbnail });
   } catch {
     // Best-effort by design — the preview falls back to its empty state.
