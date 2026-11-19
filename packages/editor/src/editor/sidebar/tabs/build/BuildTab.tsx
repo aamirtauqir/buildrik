@@ -194,6 +194,8 @@ export const BuildTab: React.FC<BuildTabProps> = ({
   const panelRef = React.useRef<HTMLDivElement>(null);
   /* Drag-only Add (owner 2026-11-19): a pointer click on an item hints. */
   const dragHint = useDragHint(panelRef);
+  /* The CMS rows' "Collection list · blank" drags as the catalog row it is. */
+  const blankListEntry = tab.allElements.find((el) => el.blockId === "collection-list");
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       /* The field only answered while the drawer was open (the topbar had no
@@ -316,6 +318,8 @@ export const BuildTab: React.FC<BuildTabProps> = ({
               <CmsAddSection
                 composer={composer}
                 onBlankList={() => onBlockClick?.({ id: "collection-list", label: "Collection list", category: "basic" })}
+                onBlankListDragStart={blankListEntry ? (e) => tab.handleDragStart(e, blankListEntry) : undefined}
+                onDragHint={dragHint.show}
               />
             )}
             {/* Blocks insert through the SAME onBlockClick path elements use —

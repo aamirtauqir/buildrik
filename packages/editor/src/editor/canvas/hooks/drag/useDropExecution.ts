@@ -31,12 +31,16 @@ import {
   handleMultiElementDrop,
   handleElementDrop,
   handleComponentDrop,
+  handleLibraryComponentDrop,
+  handleCmsDrop,
   handleCatalogDrop,
   handleTemplateDrop,
   handleBlockDrop,
   type DropContext,
   type DropPayloads,
 } from "./dropOperations";
+import { CMS_INSERT_MIME } from "@/editor/sidebar/tabs/build/cmsInsert";
+import { LIBRARY_COMPONENT_MIME } from "@/editor/sidebar/tabs/component-library/instantiate";
 import type { SnapLine } from "../useCanvasSnapping";
 import type { DropError, DropSuccess } from "../useCanvasDragDrop";
 
@@ -184,6 +188,8 @@ export function useDropExecution({
         templateData: e.dataTransfer.getData("application/aquibra-template"),
         blockData: e.dataTransfer.getData("block"),
         catalogComponentId: e.dataTransfer.getData("application/x-buildrik-catalog-component"),
+        libraryComponentId: e.dataTransfer.getData(LIBRARY_COMPONENT_MIME),
+        cmsInsert: e.dataTransfer.getData(CMS_INSERT_MIME),
       };
 
       resetSession();
@@ -300,6 +306,10 @@ export function useDropExecution({
       } else if (handleElementDrop(e, ctx, dropTargetId, payloads)) {
         dropSucceeded = true;
       } else if (await handleComponentDrop(e, ctx, payloads)) {
+        dropSucceeded = true;
+      } else if (await handleLibraryComponentDrop(e, ctx, payloads)) {
+        dropSucceeded = true;
+      } else if (await handleCmsDrop(e, ctx, payloads)) {
         dropSucceeded = true;
       } else if (handleCatalogDrop(e, ctx, payloads)) {
         // S6 catalog drop. Payload is pre-snapshotted into `payloads` above

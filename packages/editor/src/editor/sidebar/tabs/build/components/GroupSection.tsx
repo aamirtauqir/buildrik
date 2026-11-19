@@ -20,6 +20,7 @@ import { BlockThumb } from "./BlockThumb";
 import { getElementIcon } from "@/editor/shared/elementIcons";
 import { BlockPreviewCard } from "./BlockPreviewCard";
 import { isPointerClick } from "./DragHint";
+import { LIBRARY_COMPONENT_MIME } from "@/editor/sidebar/tabs/component-library/instantiate";
 
 interface GroupSectionProps {
   /** Where a held row would land ("Home › Hero › Content"), board 4418:100890. */
@@ -520,7 +521,14 @@ export const GroupSection: React.FC<GroupSectionProps> = ({
                 key={c.componentId}
                 label={c.name}
                 testId={`insert-library-${c.componentId}`}
+                grip
+                draggable
+                onDragStart={(e) => {
+                  e.dataTransfer.setData(LIBRARY_COMPONENT_MIME, c.componentId);
+                  e.dataTransfer.effectAllowed = "copy";
+                }}
                 onClick={() => onLibraryInsert?.(c.componentId)}
+                dragOnly={onDragHint}
               />
             ))}
           </>

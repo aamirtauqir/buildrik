@@ -47,6 +47,10 @@ export async function instantiateComponentAtSelection(
   }
 }
 
+/** Add's FROM LIBRARY rows drag the shared master's id under this type; the
+ *  canvas drop adopts it through insertLibraryComponent (dropOperations). */
+export const LIBRARY_COMPONENT_MIME = "application/x-buildrik-library-component";
+
 export const LIBRARY_TOASTS = {
   gone: { description: "That component is no longer in the library.", tone: "warning" },
   /* A damaged library copy fails the same way every time — retrying won't help. */
@@ -66,13 +70,16 @@ export async function insertLibraryComponent(
   composer: Composer,
   componentId: string,
   fetchDefinition: (componentId: string) => Promise<ComponentDefinition | null>,
+  /* Where the adopted master goes: the selection (a row's Enter, "Insert on
+     this site"), or the canvas drop point (Add's drag, dropOperations). */
+  place: (adoptedId: string) => Promise<InstantiateResult> = (id) => instantiateComponentAtSelection(composer, id),
 ): Promise<InsertToast> {
   try {
     const existing = composer.components.getComponent(componentId);
     const definition = existing ?? (await fetchDefinition(componentId));
     if (!definition) return LIBRARY_TOASTS.gone;
     const adopted = existing ?? (await composer.components.adoptLibraryComponent(definition));
-    return INSTANTIATE_TOASTS[await instantiateComponentAtSelection(composer, adopted.id)];
+    return INSTANTIATE_TOASTS[await place(adopted.id)];
   } catch (err) {
     const damaged = err instanceof Error && err.message === "LIBRARY_MASTER_MALFORMED";
     return damaged ? LIBRARY_TOASTS.damaged : INSTANTIATE_TOASTS.error;

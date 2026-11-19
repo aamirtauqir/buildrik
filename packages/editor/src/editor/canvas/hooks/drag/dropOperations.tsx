@@ -25,6 +25,10 @@ import { canNestElement } from "@/shared/utils/nesting";
 import type { DropError, DropSuccess } from "../useCanvasDragDrop";
 import type { DropPosition } from "../useDragSession";
 import { getDefaultPageName } from "@/shared/utils/pageUtils";
+import { pageFieldPlan } from "@/editor/cms/createCollectionPage";
+import { CMS_INSERT_MIME, insertCmsField, insertCmsList, type CmsInsertPayload } from "@/editor/sidebar/tabs/build/cmsInsert";
+import { insertLibraryComponent, LIBRARY_COMPONENT_MIME } from "@/editor/sidebar/tabs/component-library/instantiate";
+import { fetchLibraryComponent } from "@/services/componentSync";
 
 // =============================================================================
 // TYPES
@@ -55,6 +59,10 @@ export interface DropPayloads {
   templateData: string;
   blockData: string;
   catalogComponentId?: string;
+  /** Add's FROM LIBRARY row: a shared master's id (LIBRARY_COMPONENT_MIME). */
+  libraryComponentId?: string;
+  /** Add's CMS rows: a CmsInsertPayload as JSON (CMS_INSERT_MIME). */
+  cmsInsert?: string;
 }
 
 // =============================================================================
@@ -285,10 +293,23 @@ export function handleElementDrop(
 export async function handleComponentDrop(e: React.DragEvent, ctx: DropContext, payloads?: DropPayloads): Promise<boolean> {
   const componentId = payloads?.componentId ?? e.dataTransfer.getData("application/x-aquibra-component");
   if (!componentId) return false;
+  if (!ctx.composer.components) return false;
+  try {
+    await instantiateAtDrop(ctx, componentId);
+  } catch {
+    ctx.onDropError?.({ type: "INSERT_FAILED", message: "Failed to instantiate component" });
+  }
+  return true;
+}
 
-  const { composer, freshTargetId, onDropError } = ctx;
-  if (!composer.components) return false;
-
+/**
+ * Instantiate a master where it was dropped — the target, else the page root
+ * — in one history step, then select and flash it. Resolves with the new id
+ * (null when the engine refused the placement); throws when the engine threw,
+ * after rolling back.
+ */
+async function instantiateAtDrop(ctx: DropContext, componentId: string): Promise<string | null> {
+  const { composer, freshTargetId } = ctx;
   composer.beginTransaction("instantiate-component-drop");
   let newElementId: string | null = null;
   try {
@@ -297,10 +318,9 @@ export async function handleComponentDrop(e: React.DragEvent, ctx: DropContext, 
       newElementId = await composer.components.instantiateComponent(componentId, targetId);
     }
     composer.endTransaction();
-  } catch {
+  } catch (err) {
     composer.rollbackTransaction();
-    onDropError?.({ type: "INSERT_FAILED", message: "Failed to instantiate component" });
-    return true;
+    throw err;
   }
 
   // Gap C Frame 4 — auto-select after drop. Inspector mounts immediately.
@@ -314,17 +334,88 @@ export async function handleComponentDrop(e: React.DragEvent, ctx: DropContext, 
     // query until after the engine flushes the new element into the
     // canvas innerHTML. The attribute triggers the bd-canvas-drop-fade-in
     // keyframe (Canvas.css) and is cleaned up after 200ms.
+    const id = newElementId;
     queueMicrotask(() => {
-      const node = document.querySelector(
-        `[data-buildrick-id="${newElementId}"]`,
-      );
+      const node = document.querySelector(`[data-buildrick-id="${id}"]`);
       if (node) {
         node.setAttribute("data-just-added", "true");
         setTimeout(() => node.removeAttribute("data-just-added"), 200);
       }
     });
   }
+  return newElementId;
+}
 
+// =============================================================================
+// LIBRARY COMPONENT DROP — Add's FROM LIBRARY rows (drag-only Add, 2026-11-19)
+// =============================================================================
+
+/**
+ * A shared library master dropped from Add: fetched and adopted onto this site
+ * by the same insertLibraryComponent the row's Enter uses, then instantiated
+ * where it was dropped instead of at the selection.
+ */
+export async function handleLibraryComponentDrop(e: React.DragEvent, ctx: DropContext, payloads?: DropPayloads): Promise<boolean> {
+  const libraryId = payloads?.libraryComponentId ?? e.dataTransfer.getData(LIBRARY_COMPONENT_MIME);
+  if (!libraryId) return false;
+  if (!ctx.composer.components) return false;
+  const outcome = await insertLibraryComponent(ctx.composer, libraryId, fetchLibraryComponent, async (adoptedId) => {
+    try {
+      return (await instantiateAtDrop(ctx, adoptedId)) ? "ok" : "error";
+    } catch {
+      return "error";
+    }
+  });
+  if (outcome.tone !== "success") ctx.onDropError?.({ type: "INSERT_FAILED", message: outcome.description });
+  return true;
+}
+
+// =============================================================================
+// CMS DROP — Add's CMS fields and "List of {Collection}" rows (2026-11-19)
+// =============================================================================
+
+/**
+ * A CMS row dropped from Add: the same insert its Enter runs (cmsInsert.ts),
+ * at the drop target — the nearest element there that can host it, else the
+ * page root. Selected after, like every drop.
+ */
+export async function handleCmsDrop(e: React.DragEvent, ctx: DropContext, payloads?: DropPayloads): Promise<boolean> {
+  const raw = payloads?.cmsInsert ?? e.dataTransfer.getData(CMS_INSERT_MIME);
+  if (!raw) return false;
+  const { composer, freshTargetId, onDropError, onDropSuccess } = ctx;
+  let payload: CmsInsertPayload;
+  try {
+    payload = JSON.parse(raw);
+  } catch {
+    onDropError?.({ type: "INVALID_DATA", message: "Invalid CMS data" });
+    return true;
+  }
+  const collection = composer.cms?.collections?.getCollection?.(payload.collectionId);
+  const plan = collection && payload.fieldSlug ? pageFieldPlan(collection).find((p) => p.field.slug === payload.fieldSlug) : undefined;
+  if (!collection || (payload.fieldSlug && !plan)) {
+    onDropError?.({ type: "INVALID_DATA", message: "That collection field no longer exists" });
+    return true;
+  }
+  const elementType: ElementType = plan ? plan.element : "collection-list";
+  const page = composer.elements.getActivePage();
+  const root = page ? composer.elements.getElement(page.root.id) : undefined;
+  if (!root) {
+    onDropError?.({ type: "NO_VALID_TARGET", message: "Page root element not found" });
+    return true;
+  }
+  const target = (freshTargetId && composer.elements.getElement(freshTargetId)) || null;
+  const resolved = findValidDropTargetWithFallback(target, root, elementType, {});
+  const parent = resolved.success && resolved.result ? resolved.result.parent : root;
+  const at = { parentId: parent.getId(), index: resolved.success && resolved.result ? resolved.result.index : undefined };
+  try {
+    const id = plan ? await insertCmsField(composer, collection, plan, at) : await insertCmsList(composer, collection, at);
+    composer.history?.flushPending?.();
+    const el = composer.elements.getElement(id);
+    if (el) composer.selection.select(el);
+    onDropSuccess?.({ elementLabel: plan ? plan.field.name : `List of ${collection.name}`, elementType });
+  } catch {
+    onDropError?.({ type: "INSERT_FAILED", message: "Failed to add element to canvas" });
+  }
   return true;
 }
 

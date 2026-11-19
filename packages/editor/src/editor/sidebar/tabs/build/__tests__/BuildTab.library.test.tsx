@@ -17,6 +17,8 @@ const sync = vi.hoisted(() => ({
 vi.mock("@/services/componentSync", () => sync);
 
 import { BuildTab, type BuildTabProps } from "../BuildTab";
+import { handleLibraryComponentDrop, type DropContext } from "@/editor/canvas/hooks/drag/dropOperations";
+import { LIBRARY_COMPONENT_MIME } from "@/editor/sidebar/tabs/component-library/instantiate";
 
 type Def = { id: string; name: string; pageId?: string | null };
 
@@ -92,7 +94,7 @@ describe("FROM LIBRARY", () => {
     const { composer, components } = makeComposer([]);
     renderTab(composer);
     fireEvent.click(screen.getByRole("tab", { name: "Components" }));
-    fireEvent.click(await screen.findByTestId("insert-library-price"));
+    fireEvent.keyDown(await screen.findByTestId("insert-library-price"), { key: "Enter" });
     await waitFor(() => expect(components.instantiateComponent).toHaveBeenCalledWith("price", "root"));
     expect(sync.fetchLibraryComponent).toHaveBeenCalledWith("price");
     expect(components.adoptLibraryComponent).toHaveBeenCalledWith({ id: "price", name: "Price row" });
@@ -103,7 +105,7 @@ describe("FROM LIBRARY", () => {
     const { composer, components } = makeComposer([{ id: "btn", name: "Button / primary" }]);
     renderTab(composer);
     fireEvent.click(screen.getByRole("tab", { name: "Components" }));
-    fireEvent.click(await screen.findByTestId("insert-library-btn"));
+    fireEvent.keyDown(await screen.findByTestId("insert-library-btn"), { key: "Enter" });
     await waitFor(() => expect(components.instantiateComponent).toHaveBeenCalledWith("btn", "root"));
     expect(sync.fetchLibraryComponent).not.toHaveBeenCalled();
     expect(components.adoptLibraryComponent).not.toHaveBeenCalled();
@@ -116,9 +118,56 @@ describe("FROM LIBRARY", () => {
     components.adoptLibraryComponent.mockRejectedValueOnce(new Error("LIBRARY_MASTER_MALFORMED"));
     renderTab(composer);
     fireEvent.click(screen.getByRole("tab", { name: "Components" }));
-    fireEvent.click(await screen.findByTestId("insert-library-price"));
+    fireEvent.keyDown(await screen.findByTestId("insert-library-price"), { key: "Enter" });
     expect(await screen.findByText("This library component is damaged and can't be added.")).toBeTruthy();
     expect(screen.queryByText("Couldn't add component. Try again.")).toBeNull();
     expect(components.instantiateComponent).not.toHaveBeenCalled();
+  });
+
+  /* Drag-only Add (owner 2026-11-19): FROM LIBRARY rows drag like the rest. */
+  it("a pointer click only hints; the row drags the shared id", async () => {
+    sync.fetchComponentLibrary.mockResolvedValue([{ componentId: "price", name: "Price row", siteCount: 2, onThisSite: false }]);
+    const { composer, components } = makeComposer([]);
+    renderTab(composer);
+    fireEvent.click(screen.getByRole("tab", { name: "Components" }));
+    const row = await screen.findByTestId("insert-library-price");
+    fireEvent.click(row, { detail: 1 });
+    expect(screen.getByTestId("add-drag-hint")).toHaveTextContent("Drag onto the canvas to add");
+    expect(sync.fetchLibraryComponent).not.toHaveBeenCalled();
+    expect(components.instantiateComponent).not.toHaveBeenCalled();
+    const setData = vi.fn();
+    fireEvent.dragStart(row, { dataTransfer: { setData, effectAllowed: "" } });
+    expect(setData).toHaveBeenCalledWith(LIBRARY_COMPONENT_MIME, "price");
+  });
+
+  it("a drop fetches and adopts the master through the row's own path, then instantiates it at the drop target", async () => {
+    sync.fetchLibraryComponent.mockResolvedValue({ id: "price", name: "Price row" });
+    const { composer, components } = makeComposer([]);
+    const select = vi.fn();
+    Object.assign(composer, {
+      rollbackTransaction: vi.fn(),
+      selection: { getSelectedIds: () => [], select },
+      elements: { getActivePage: () => ({ id: "page-home", root: { id: "root" } }), getElement: (id: string) => ({ id }) },
+    });
+    const onDropError = vi.fn();
+    const ctx = { composer, canvasRef: { current: null }, freshTargetId: "hero", freshDropPosition: null, onDropError } as unknown as DropContext;
+    const e = { dataTransfer: { getData: () => "" } } as unknown as React.DragEvent;
+    await expect(handleLibraryComponentDrop(e, ctx, { multiData: "", elementData: "", componentId: "", templateData: "", blockData: "", libraryComponentId: "price" })).resolves.toBe(true);
+    expect(sync.fetchLibraryComponent).toHaveBeenCalledWith("price");
+    expect(components.adoptLibraryComponent).toHaveBeenCalledWith({ id: "price", name: "Price row" });
+    expect(components.instantiateComponent).toHaveBeenCalledWith("price", "hero");
+    expect(select).toHaveBeenCalledWith({ id: "new-el" });
+    expect(onDropError).not.toHaveBeenCalled();
+  });
+
+  it("a drop of a master gone from the library says so", async () => {
+    sync.fetchLibraryComponent.mockResolvedValue(null);
+    const { composer, components } = makeComposer([]);
+    const onDropError = vi.fn();
+    const ctx = { composer, canvasRef: { current: null }, freshTargetId: null, freshDropPosition: null, onDropError } as unknown as DropContext;
+    const e = { dataTransfer: { getData: (t: string) => (t === LIBRARY_COMPONENT_MIME ? "gone" : "") } } as unknown as React.DragEvent;
+    await handleLibraryComponentDrop(e, ctx);
+    expect(components.instantiateComponent).not.toHaveBeenCalled();
+    expect(onDropError).toHaveBeenCalledWith({ type: "INSERT_FAILED", message: "That component is no longer in the library." });
   });
 });
