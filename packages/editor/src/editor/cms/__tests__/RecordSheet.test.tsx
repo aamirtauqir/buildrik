@@ -214,9 +214,12 @@ describe("RecordSheet", () => {
   /* 165:2414 — the per-field review: only fields where mine and the latest
      saved copy differ; Keep mine applies MY edited fields over theirs. */
   it("reviews field by field and keeps only my edited fields over the latest saved record (165:2414)", async () => {
-    const choice = conflictOnSave() as Choice & { mine?: Record<string, unknown>; theirs?: () => Promise<Record<string, unknown>> };
+    const choice = conflictOnSave() as Choice & {
+      mine?: Record<string, unknown>;
+      theirs?: () => Promise<{ data: Record<string, unknown>; updatedAt: string }>;
+    };
     choice.mine = { ...MARGHERITA.data, price: "$13" };
-    choice.theirs = async () => ({ ...MARGHERITA.data, description: "Tomato and basil" });
+    choice.theirs = async () => ({ data: { ...MARGHERITA.data, description: "Tomato and basil" }, updatedAt: "2026-11-19T10:00:00.000Z" });
     mount();
     await saveAnEdit();
     fireEvent.click(await screen.findByTestId("cms-sheet-conflict-review"));
@@ -224,16 +227,25 @@ describe("RecordSheet", () => {
     expect(screen.getByTestId("cms-conflict-field-description")).toHaveTextContent("Mine: TomatoTheirs · latest saved: Tomato and basil");
     expect(screen.queryByTestId("cms-conflict-field-name")).toBeNull();
     fireEvent.click(screen.getByTestId("cms-sheet-keep-mine"));
-    await waitFor(() => expect(choice.keepMine).toHaveBeenCalledWith({ ...MARGHERITA.data, description: "Tomato and basil", price: "$13" }));
+    /* L3-022: the overwrite names the revision the review showed. */
+    await waitFor(() =>
+      expect(choice.keepMine).toHaveBeenCalledWith(
+        { ...MARGHERITA.data, description: "Tomato and basil", price: "$13" },
+        "2026-11-19T10:00:00.000Z",
+      ),
+    );
     conflictMock.mockReset();
     conflictMock.mockImplementation(() => false);
   });
 
   it("Use theirs takes the server's copy and closes; Keep mine that lands closes saved", async () => {
-    let choice = conflictOnSave();
+    let choice = conflictOnSave() as Choice & { theirs?: () => Promise<{ data: Record<string, unknown>; updatedAt: string }> };
+    choice.theirs = async () => ({ data: MARGHERITA.data, updatedAt: "2026-11-19T10:00:00.000Z" });
     mount();
     await saveAnEdit();
     fireEvent.click(await screen.findByTestId("cms-sheet-conflict-review"));
+    /* L3-021: Use theirs waits until the server's copy is in hand. */
+    await waitFor(() => expect(screen.getByTestId("cms-sheet-use-theirs")).not.toBeDisabled());
     fireEvent.click(screen.getByTestId("cms-sheet-use-theirs"));
     await waitFor(() => expect(screen.queryByTestId("cms-sheet")).toBeNull());
     expect(choice.useTheirs).toHaveBeenCalledTimes(1);

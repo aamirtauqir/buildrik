@@ -121,9 +121,9 @@ export function useCmsSync(
 
     /* C0a (Task 5): a server conflict (someone else moved the row on since)
        can't be resolved silently — the user has to choose whose copy wins.
-       Keep-mine forces the next upsert with no precondition (the local stamp
-       was forgotten by the sync layer on the way in), use-theirs rehydrates
-       the server's copy. The toast is `duration: Infinity`, so each button
+       Keep-mine overwrites the server revision that refused the write (an
+       explicit overwrite, L3-022 — a later edit is a fresh conflict),
+       use-theirs takes the server's copy. The toast is `duration: Infinity`, so each button
        takes it down itself — it stayed up after either choice (C0.3 live,
        2026-10-02). */
     const offConflict = addToast

@@ -341,6 +341,21 @@ export async function listEntries(siteId: string, collectionId: string) {
   });
 }
 
+/**
+ * One record as the server holds it now — "theirs" in the record sheet's
+ * conflict diff (L3-021), and the revision (`updatedAt`) Keep mine overwrites.
+ * A deleted record is GONE, like a write to it.
+ */
+export async function getEntry(siteId: string, id: string) {
+  const row = await prisma.cmsEntry.findFirst({
+    where: { id, collection: { siteId } },
+    select: { id: true, collectionId: true, data: true, status: true, updatedAt: true, deletedAt: true },
+  });
+  if (!row) throw new CmsError("NOT_FOUND", "Entry not found");
+  if (row.deletedAt) throw new CmsError("GONE", "This record was deleted.");
+  return { id: row.id, collectionId: row.collectionId, data: row.data, status: row.status, updatedAt: row.updatedAt };
+}
+
 export async function upsertEntry(
   siteId: string,
   input: UpsertEntryInput,
@@ -374,7 +389,7 @@ export async function upsertEntry(
   const existing = input.id
     ? await prisma.cmsEntry.findUnique({
         where: { id: input.id },
-        select: { deletedAt: true, status: true, collection: { select: { siteId: true } } },
+        select: { deletedAt: true, status: true, updatedAt: true, collection: { select: { siteId: true } } },
       })
     : null;
   if (existing && existing.collection.siteId !== siteId) throw new CmsError("NOT_FOUND", "Entry not found");
@@ -399,16 +414,19 @@ export async function upsertEntry(
   }
   if (input.id) {
     if (existing) {
-      await assertFresh(
-        "cmsEntry",
-        { id: input.id },
-        input.expectedUpdatedAt,
-      );
-      const expected = input.expectedUpdatedAt ? new Date(input.expectedUpdatedAt) : null;
+      /* L3-022: an update names the version it was edited from — a normal
+         save's `expectedUpdatedAt`, or Keep mine's `overwrite` of the revision
+         the person reviewed. None at all is refused; `null` ("I thought this
+         row was new") meets a row that exists, so it is that row's CONFLICT.
+         The write itself is conditional, so an edit landing in between is a
+         fresh CONFLICT, never a blind overwrite. */
+      const version = input.overwrite?.reviewedUpdatedAt ?? input.expectedUpdatedAt;
+      if (version === undefined) {
+        throw new CmsError("BAD_REQUEST", "A record update must name the version it was edited from (expectedUpdatedAt).");
+      }
+      if (version === null) throw new CmsError("CONFLICT", existing.updatedAt.toISOString());
       const result = await prisma.cmsEntry.updateMany({
-        where: expected
-          ? { id: input.id, updatedAt: expected, deletedAt: null }
-          : { id: input.id, deletedAt: null },
+        where: { id: input.id, updatedAt: new Date(version), deletedAt: null },
         data,
       });
       if (result.count === 0) {

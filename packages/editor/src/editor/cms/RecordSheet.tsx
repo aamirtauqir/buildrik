@@ -311,7 +311,7 @@ export function RecordSheet({
   /* Keep mine re-sends this device's copy; it can conflict again (the claim
      then holds the new choice), land, or queue. Use theirs replaces this
      device's copy with the server's, so the sheet's edits are gone with it. */
-  const choose = async (choice: "keepMine" | "useTheirs", merged?: Record<string, unknown>) => {
+  const choose = async (choice: "keepMine" | "useTheirs", merged?: Record<string, unknown>, reviewed?: string) => {
     const c = conflict;
     if (!c) return;
     setResolving(true);
@@ -324,7 +324,7 @@ export function RecordSheet({
         leave(back ? back.go : onClose);
         return;
       }
-      const landed = await c.keepMine(merged);
+      const landed = await c.keepMine(merged, reviewed);
       if (isCmsConflictPending("entry", c.id)) return;
       settleConflict();
       if (landed) closeSaved();
@@ -625,7 +625,7 @@ export function RecordSheet({
                 base={openedWith.current}
                 resolving={resolving}
                 onCancel={() => setReviewing(false)}
-                onKeepMine={(merged) => void choose("keepMine", merged)}
+                onKeepMine={(merged, reviewed) => void choose("keepMine", merged, reviewed)}
                 onUseTheirs={() => void choose("useTheirs")}
               />
             </div>

@@ -118,12 +118,14 @@ const OUTBOX_KEY = "bk-cms-outbox-v1";
 
 type OutboxBody =
   | { key: string; op: "collectionUpsert"; collection: CMSCollection; base?: string | null }
-  | { key: string; op: "entryUpsert"; item: CMSContentItem; base?: string | null }
-  | { key: string; op: "collectionDelete" | "entryDelete"; id: string };
+  | { key: string; op: "entryUpsert"; item: CMSContentItem; base?: string | null; overwrite?: string }
+  | { key: string; op: "collectionDelete" | "entryDelete"; id: string }
+  | { key: string; op: "entryRestore"; item: CMSContentItem };
 type OutboxOp = OutboxBody & { seq: string };
 
-/* Collections before their entries; deletes after the writes they supersede. */
-const REPLAY_ORDER = ["collectionUpsert", "entryUpsert", "entryDelete", "collectionDelete"] as const;
+/* Collections before their entries; a restored record back before any later
+   save of it (L3-020); deletes after the writes they supersede. */
+const REPLAY_ORDER = ["collectionUpsert", "entryRestore", "entryUpsert", "entryDelete", "collectionDelete"] as const;
 
 function readOutbox(): Record<string, OutboxOp[]> {
   try {
@@ -224,15 +226,25 @@ export interface CmsConflict {
   id: string;
   /** Overwrite the server with this device's copy; true when it landed.
    *  Entries take `data` — a merged copy (165:2414: your changed fields over
-   *  the latest saved record) — which is written here first, then sent. */
-  keepMine(data?: Record<string, unknown>): Promise<boolean>;
+   *  the latest saved record) — which is written here first, then sent.
+   *  `reviewedUpdatedAt`: the server revision the person looked at — Keep
+   *  mine overwrites exactly that one, and another edit since is a fresh
+   *  conflict (L3-022). Absent, the revision that refused this write. */
+  keepMine(data?: Record<string, unknown>, reviewedUpdatedAt?: string): Promise<boolean>;
   /** Replace this device's copy with the server's. */
   useTheirs(): Promise<void>;
   /** Entries: the field values this device tried to save. */
   mine?: Record<string, unknown>;
-  /** Entries: the server's current field values (read, not applied), or null
-   *  when the server no longer has the row. */
-  theirs?: () => Promise<Record<string, unknown> | null>;
+  /** Entries: the server's current copy (read, not applied) with its
+   *  revision — what Keep mine overwrites (L3-021 / L3-022) — or null when
+   *  the server no longer has the row. Rejects when it could not be read. */
+  theirs?: () => Promise<CmsServerRecord | null>;
+}
+
+/** One record as the server holds it now, with the revision it is at. */
+export interface CmsServerRecord {
+  data: Record<string, unknown>;
+  updatedAt: string;
 }
 const conflictListeners = new Set<(c: CmsConflict) => void>();
 export function onCmsConflict(cb: (c: CmsConflict) => void): () => void {
@@ -382,14 +394,26 @@ function adoptBase(stampKey: string, serverUpdatedAt: Date | string): void {
   if (!tabBase.has(stampKey)) tabBase.set(stampKey, serverStampOf(stampKey) ?? iso(new Date(serverUpdatedAt)));
 }
 
+/** The server revision a CONFLICT names (its current updatedAt), if any. */
+function conflictStamp(e: unknown): string | null {
+  const at = (e instanceof Error ? e.message : "").replace(/^CMS_CONFLICT:/, "");
+  return Number.isNaN(Date.parse(at)) ? null : iso(new Date(at));
+}
+
 /* Keep mine overwrites exactly the copy that refused this one: a CONFLICT
    carries the server's current updatedAt, so a third write landing meanwhile
    is refused again rather than overwritten blind (EDT-013). A CONFLICT with
    no stamp in it sends no precondition, as before. */
 function rebaseOnConflict(stampKey: string, e: unknown): void {
-  const at = (e instanceof Error ? e.message : "").replace(/^CMS_CONFLICT:/, "");
-  tabBase.set(stampKey, Number.isNaN(Date.parse(at)) ? null : iso(new Date(at)));
+  tabBase.set(stampKey, conflictStamp(e));
 }
+
+/* L3-022: a record's Keep mine is an explicit overwrite of the revision the
+   person reviewed (`overwrite.reviewedUpdatedAt`), not a normal save. Held per
+   row until the server answers it — a write that only failed to reach the
+   server keeps it for the retry; any answer (landed, a fresh conflict, gone,
+   refused) ends it, so a second conflict needs a second choice. */
+const overwriteOf = new Map<string, string>();
 
 /* Wrap a mirror task so CONFLICT and GONE leave the queue instead of being
    retried forever. queue.run still drives the lifecycle — it tracks the
@@ -625,7 +649,11 @@ function isHeld(siteId: string, key: string): boolean {
 }
 
 function hasQueuedMirror(siteId: string, kind: "collection" | "entry", id: string): boolean {
-  return isHeld(siteId, `${kind}Upsert:${id}`) || isHeld(siteId, `${kind}Delete:${id}`);
+  return (
+    isHeld(siteId, `${kind}Upsert:${id}`) ||
+    isHeld(siteId, `${kind}Delete:${id}`) ||
+    (kind === "entry" && isHeld(siteId, `entryRestore:${id}`))
+  );
 }
 
 /** Not this site's, and not known to be any other's — hidden everywhere,
@@ -950,21 +978,24 @@ export async function syncEntryUpsert(item: CMSContentItem): Promise<boolean> {
   await queue.settled(`collectionUpsert:${item.collectionId}`);
   const key = `entryUpsert:${item.id}`;
   const stampKey = `entry:${item.id}`;
+  const overwrite = overwriteOf.get(stampKey);
   return mirror(
     siteId,
-    { key, op: "entryUpsert", item, base: preconditionOf(stampKey) },
+    { key, op: "entryUpsert", item, base: preconditionOf(stampKey), ...(overwrite ? { overwrite } : {}) },
     () => {
       /* Read at send time — see syncCollectionUpsert. */
       const base = preconditionOf(stampKey);
       outboxRebase(siteId, key, base);
+      const reviewed = overwriteOf.get(stampKey);
       return client().cms.entries.upsert.mutate({
         id: item.id,
         siteId,
         collectionId: item.collectionId,
         data: item.data,
         status: item.status === "published" ? "PUBLISHED" : "DRAFT",
-        expectedUpdatedAt: base,
+        ...(reviewed ? { overwrite: { reviewedUpdatedAt: reviewed } } : { expectedUpdatedAt: base }),
       }).then(async (row) => {
+        overwriteOf.delete(stampKey);
         /* No row back is still a mirror that landed; reading updatedAt off
            undefined made it a "failure", queued and replayed forever. */
         if (row?.updatedAt) confirmServerCopy(stampKey, row.updatedAt, item.updatedAt);
@@ -977,6 +1008,9 @@ export async function syncEntryUpsert(item: CMSContentItem): Promise<boolean> {
           await Storage.saveContentItem({ ...item, data: stored });
           await engine?.refreshFromStorage();
         }
+      }, (e: unknown) => {
+        if (classify(e)) overwriteOf.delete(stampKey);
+        throw e;
       });
     },
     // eslint-disable-next-line no-console
@@ -992,8 +1026,12 @@ export async function syncEntryUpsert(item: CMSContentItem): Promise<boolean> {
         raiseConflict({
           kind: "entry",
           id: item.id,
-          keepMine: async (data) => {
-            rebaseOnConflict(stampKey, e);
+          keepMine: async (data, reviewedUpdatedAt) => {
+            const reviewed = reviewedUpdatedAt ?? conflictStamp(e);
+            if (reviewed) overwriteOf.set(stampKey, reviewed);
+            /* No revision to name: a normal save from "new", which the server
+               answers with a CONFLICT that does name one. */
+            else tabBase.set(stampKey, null);
             if (!data) return syncEntryUpsert(item);
             const merged: CMSContentItem = { ...item, data, updatedAt: new Date().toISOString() };
             await Storage.saveContentItem(merged);
@@ -1003,8 +1041,13 @@ export async function syncEntryUpsert(item: CMSContentItem): Promise<boolean> {
           useTheirs: () => takeServerCopy(siteId, "entry", item.id),
           mine: item.data,
           theirs: async () => {
-            const rows = (await client().cms.entries.list.query({ siteId, collectionId: item.collectionId })) as Array<{ id: string; data: Record<string, unknown> }>;
-            return rows.find((r) => r.id === item.id)?.data ?? null;
+            try {
+              const row = (await client().cms.entries.get.query({ siteId, id: item.id })) as { data: unknown; updatedAt: Date | string };
+              return { data: (row.data as Record<string, unknown> | null) ?? {}, updatedAt: iso(row.updatedAt) };
+            } catch (err) {
+              if (classify(err) === "gone" || (err as { data?: { code?: string } } | null)?.data?.code === "NOT_FOUND") return null;
+              throw err;
+            }
           },
         }),
       /* Refused as published: a record the server already holds goes back
@@ -1043,35 +1086,80 @@ export async function syncEntryDelete(id: string): Promise<void> {
   );
 }
 
+/** How an Undo of a record delete ended (L3-020). */
+export type CmsRestoreOutcome = "restored" | "queued" | "refused";
+
 /**
  * Undo of a record delete, on the server (REA 2026-10-20 #11a): the record
  * comes back under its own id, so references and bindings to it hold.
  * Re-creating it would mint a new id, and upserting the old one is GONE (the
- * row is a tombstone). A delete still queued never reached the server — it
- * is simply dropped. Resolves false when the server could not be reached or
- * refused; the caller then leaves the record deleted and says so.
+ * row is a tombstone). A delete still queued is cancelled, and the server is
+ * asked either way: a delete whose answer was lost may have landed (L3-020).
+ *
+ * L3-020: offline, the restore is queued in the outbox like any other write
+ * ("queued": the caller brings the local copy back now) and replays before
+ * any later save of the record. A record the server never held is created
+ * under its own id. A refusal — the collection deleted, the page path taken
+ * since, a full collection — is "refused": the row leaves this device again
+ * (it may have come back locally when the restore was queued) and the reason
+ * is kept for `takeCmsInvalid`.
  */
-export async function syncEntryRestore(item: CMSContentItem): Promise<boolean> {
+export async function syncEntryRestore(item: CMSContentItem): Promise<CmsRestoreOutcome> {
   const siteId = getSiteIdFromUrl();
-  if (!siteId) return true;
+  if (!siteId) return "restored";
   const deleteKey = `entryDelete:${item.id}`;
-  if (queue.isPending(deleteKey)) {
-    queue.drop(deleteKey);
-    outboxRemove(siteId, deleteKey);
-    return true;
-  }
+  queue.drop(deleteKey);
   await queue.settled(deleteKey);
-  try {
-    const row = await client().cms.entries.restore.mutate({ siteId, id: item.id });
-    /* The un-tombstoning moved the row's updatedAt: without the new stamp the
-       next save of this record would CONFLICT against its own restore. */
-    if (row?.updatedAt) confirmServerCopy(`entry:${item.id}`, row.updatedAt, item.updatedAt);
-    return true;
-  } catch (e) {
+  outboxRemove(siteId, deleteKey);
+  const stampKey = `entry:${item.id}`;
+  let refused = false;
+  const refuse = () => {
+    refused = true;
+    forgetRow(stampKey);
+    if (engine) void engine.forgetLocal("entry", item.id);
+    else void Storage.deleteContentItem(item.id);
+  };
+  const landed = await mirror(
+    siteId,
+    { key: `entryRestore:${item.id}`, op: "entryRestore", item },
+    async () => {
+      let row: { updatedAt?: Date | string } | undefined;
+      try {
+        row = (await client().cms.entries.restore.mutate({ siteId, id: item.id })) as typeof row;
+      } catch (e) {
+        if ((e as { data?: { code?: string } } | null)?.data?.code !== "NOT_FOUND") throw e;
+        /* Never on the server (made and deleted while offline): create it
+           under its own id. */
+        row = (await client().cms.entries.upsert.mutate({
+          id: item.id,
+          siteId,
+          collectionId: item.collectionId,
+          data: item.data,
+          status: item.status === "published" ? "PUBLISHED" : "DRAFT",
+          expectedUpdatedAt: null,
+        })) as typeof row;
+      }
+      /* The un-tombstoning moved the row's updatedAt: without the new stamp the
+         next save of this record would CONFLICT against its own restore. */
+      if (row?.updatedAt) confirmServerCopy(stampKey, row.updatedAt, item.updatedAt);
+    },
     // eslint-disable-next-line no-console
-    console.warn("[cms-sync] entry restore failed", e);
-    return false;
-  }
+    (e) => console.warn("[cms-sync] entry restore failed (kept locally, queued)", e),
+    {
+      gone: (e) => {
+        refuse();
+        announceGone("entry", item.id, e);
+      },
+      conflict: () => {
+        refused = true;
+      },
+      invalid: (e) => {
+        announceInvalid("entry", item.id, e);
+        refuse();
+      },
+    },
+  );
+  return landed ? "restored" : refused ? "refused" : "queued";
 }
 
 /* One replay per site per page load at a time — React's dev double-mount runs
@@ -1100,6 +1188,8 @@ export function flushCmsOutbox(): Promise<void> {
       if (o.op !== "collectionUpsert" && o.op !== "entryUpsert") continue;
       const stampKey = o.op === "entryUpsert" ? `entry:${o.item.id}` : `collection:${o.collection.id}`;
       if (o.base !== undefined && !tabBase.has(stampKey)) tabBase.set(stampKey, o.base);
+      /* A Keep mine that never reached the server is still that choice. */
+      if (o.op === "entryUpsert" && o.overwrite && !overwriteOf.has(stampKey)) overwriteOf.set(stampKey, o.overwrite);
     }
     for (const phase of REPLAY_ORDER) {
       await Promise.all(
@@ -1107,6 +1197,7 @@ export function flushCmsOutbox(): Promise<void> {
           switch (o.op) {
             case "collectionUpsert": return syncCollectionUpsert(o.collection);
             case "entryUpsert": return syncEntryUpsert(o.item);
+            case "entryRestore": return syncEntryRestore(o.item);
             case "entryDelete": return syncEntryDelete(o.id);
             case "collectionDelete": return syncCollectionDelete(o.id);
           }

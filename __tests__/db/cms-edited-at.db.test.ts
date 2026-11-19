@@ -59,7 +59,7 @@ describe("Site.cmsEditedAt bumps on CMS mutations", () => {
 
     await new Promise((r) => setTimeout(r, 5));
     const e1 = await upsertEntry(site.id, { siteId: site.id, collectionId: "c1", data: { title: "A" } });
-    await upsertEntry(site.id, { id: e1.id, siteId: site.id, collectionId: "c1", data: { title: "A2" } });
+    await upsertEntry(site.id, { id: e1.id, siteId: site.id, collectionId: "c1", data: { title: "A2" }, expectedUpdatedAt: e1.updatedAt.toISOString() });
     const afterUpdate = (await cmsEditedAt(site.id))!.getTime();
     expect(afterUpdate).toBeGreaterThan(afterNew);
   });

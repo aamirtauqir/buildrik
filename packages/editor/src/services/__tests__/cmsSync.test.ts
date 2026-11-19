@@ -685,8 +685,9 @@ describe("C0a sync", () => {
 
   it("a first create sends no precondition", async () => {
     await syncEntryUpsert({ id: "new1", collectionId: "c1", data: {}, status: "draft", createdAt: "L0", updatedAt: "L0" } as never);
-    /* `null` is the wire shape — the server treats `undefined` and `null`
-       both as "skip precondition" (see cms.service.ts:assertFresh). */
+    /* `null` is the wire shape for "I believe this row is new": a create
+       needs no precondition, and meeting an existing row it is a CONFLICT
+       (L3-022, cms.service.ts upsertEntry). */
     expect(entUpsert.mock.calls.at(-1)?.[0].expectedUpdatedAt).toBeNull();
   });
 

@@ -305,8 +305,10 @@ export function useContentPanel(composer: Composer | null): UseContentPanelRetur
       /* Server first (REA 2026-10-20 #11a). Undo used to save the record as
          NEW — a fresh id, so every reference and binding to it broke. The
          server un-tombstones the same row; the local copy then comes back
-         under that id, marked so the event mirror does not POST it again. */
-      if (!(await syncEntryRestore(record))) throw new Error("CMS_RESTORE_FAILED");
+         under that id, marked so the event mirror does not POST it again.
+         L3-020: offline the restore is queued and the record comes back here
+         now; only a refusal leaves it deleted. */
+      if ((await syncEntryRestore(record)) === "refused") throw new Error("CMS_RESTORE_FAILED");
       markDirectSync("entry", record.id);
       try {
         await composer.cms.collections.createContentItem(record.collectionId, record.data, {

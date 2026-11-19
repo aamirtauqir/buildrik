@@ -10,6 +10,7 @@ import {
   upsertCollection,
   deleteCollection,
   listEntries,
+  getEntry,
   upsertEntry,
   deleteEntry,
   restoreEntry,
@@ -26,6 +27,7 @@ import {
   deleteCollectionInput,
   upsertEntryInput,
   listEntriesInput,
+  getEntryInput,
   deleteEntryInput,
   dynamicPagesInput,
   previewCsvEntriesInput,
@@ -92,6 +94,16 @@ export const cmsRouter = router({
       await requireRead(ctx, input.siteId);
       try {
         return await listEntries(input.siteId, input.collectionId);
+      } catch (e) {
+        translateCms(e);
+      }
+    }),
+    // The server's current copy of one record: the conflict diff's "theirs"
+    // and the revision Keep mine overwrites (L3-021).
+    get: protectedProcedure.input(getEntryInput).query(async ({ ctx, input }) => {
+      await requireRead(ctx, input.siteId);
+      try {
+        return await getEntry(input.siteId, input.id);
       } catch (e) {
         translateCms(e);
       }

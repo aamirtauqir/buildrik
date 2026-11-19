@@ -6,14 +6,17 @@
  * record was opened — over the latest saved record; every other field takes
  * the latest version. Use theirs takes the server's copy whole.
  *
- * If the latest copy cannot be read the dialog says so and still offers the
- * whole-record choice (Keep mine re-sends this device's copy unmerged).
+ * If the latest copy cannot be read the dialog says so and still offers Keep
+ * mine (this device's copy, unmerged). Use theirs waits until the server's
+ * copy is in hand — it cannot apply a copy nobody has read (L3-021). Keep
+ * mine overwrites exactly the revision shown here: another save since is a
+ * fresh conflict, never a blind overwrite (L3-022).
  *
  * @license BSD-3-Clause
  */
 import * as React from "react";
 import type { CMSField } from "@/shared/types/cms";
-import type { CmsConflict } from "@/services/cmsSync";
+import type { CmsConflict, CmsServerRecord } from "@/services/cmsSync";
 import { Button, Modal } from "@/editor/chrome-ui";
 
 export interface ConflictReviewDialogProps {
@@ -24,7 +27,8 @@ export interface ConflictReviewDialogProps {
   base: Record<string, unknown>;
   resolving: boolean;
   onCancel: () => void;
-  onKeepMine: (merged: Record<string, unknown> | undefined) => void;
+  /** `reviewedUpdatedAt`: the server revision shown, when it was read. */
+  onKeepMine: (merged: Record<string, unknown> | undefined, reviewedUpdatedAt: string | undefined) => void;
   onUseTheirs: () => void;
 }
 
@@ -36,7 +40,7 @@ const shown = (v: unknown): string => {
 };
 
 export function ConflictReviewDialog({ open, conflict, fields, base, resolving, onCancel, onKeepMine, onUseTheirs }: ConflictReviewDialogProps) {
-  const [theirs, setTheirs] = React.useState<Record<string, unknown> | null | "loading" | "failed">("loading");
+  const [theirs, setTheirs] = React.useState<CmsServerRecord | null | "loading" | "failed">("loading");
   React.useEffect(() => {
     if (!open) return;
     let live = true;
@@ -56,10 +60,10 @@ export function ConflictReviewDialog({ open, conflict, fields, base, resolving, 
 
   const mine = conflict.mine ?? {};
   const loaded = theirs !== "loading" && theirs !== "failed" && theirs !== null;
-  const diff = loaded ? fields.filter((f) => !same(mine[f.slug], theirs[f.slug])) : [];
+  const diff = loaded ? fields.filter((f) => !same(mine[f.slug], theirs.data[f.slug])) : [];
   const merged = () => {
     if (!loaded) return undefined;
-    const out: Record<string, unknown> = { ...theirs };
+    const out: Record<string, unknown> = { ...theirs.data };
     for (const f of fields) if (!same(mine[f.slug], base[f.slug])) out[f.slug] = mine[f.slug];
     return out;
   };
@@ -78,10 +82,15 @@ export function ConflictReviewDialog({ open, conflict, fields, base, resolving, 
           <Button variant="secondary" onClick={onCancel} data-testid="cms-conflict-cancel">
             Cancel
           </Button>
-          <Button variant="secondary" disabled={resolving} onClick={onUseTheirs} data-testid="cms-sheet-use-theirs">
+          <Button
+            variant="secondary"
+            disabled={resolving || theirs === "loading" || theirs === "failed"}
+            onClick={onUseTheirs}
+            data-testid="cms-sheet-use-theirs"
+          >
             Use theirs
           </Button>
-          <Button disabled={resolving || theirs === "loading"} onClick={() => onKeepMine(merged())} data-testid="cms-sheet-keep-mine">
+          <Button disabled={resolving || theirs === "loading"} onClick={() => onKeepMine(merged(), loaded ? theirs.updatedAt : undefined)} data-testid="cms-sheet-keep-mine">
             Keep mine
           </Button>
         </>
@@ -94,13 +103,13 @@ export function ConflictReviewDialog({ open, conflict, fields, base, resolving, 
             ? "Reading the latest saved record…"
             : theirs === null
               ? "The latest saved record could not be found. Keep mine saves your copy again; Use theirs takes what the server holds."
-              : "The latest saved record couldn’t be read. Keep mine saves your whole copy over it; Use theirs takes the server’s copy."}
+              : "The latest saved record couldn’t be read. Keep mine saves your whole copy over it; Use theirs needs the latest copy — close and review again to retry."}
       </p>
       {diff.map((f) => (
         <div key={f.id} className="tw:mt-4 tw:flex tw:flex-col tw:gap-2" data-testid={`cms-conflict-field-${f.slug}`}>
           <span className="tw:text-[12px] tw:font-semibold tw:leading-[18px] tw:text-[var(--bk-ink)]">{f.name}</span>
           <span className="tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">{`Mine: ${shown(mine[f.slug])}`}</span>
-          <span className="tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">{`Theirs · latest saved: ${shown(loaded ? theirs[f.slug] : undefined)}`}</span>
+          <span className="tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">{`Theirs · latest saved: ${shown(loaded ? theirs.data[f.slug] : undefined)}`}</span>
         </div>
       ))}
       {loaded && diff.length === 0 ? (

@@ -376,19 +376,37 @@ export const dynamicPagesInput = z.object({ siteId: z.string().min(1), collectio
 
 export const deleteCollectionInput = z.object({ siteId: z.string().min(1), id: z.string().min(1) });
 
-export const upsertEntryInput = z.object({
-  id: z.string().optional(),
-  siteId: z.string().min(1),
-  collectionId: z.string().min(1),
-  expectedUpdatedAt: z.string().datetime().nullable().optional(),
-  data: z.record(z.string(), z.unknown()).default({}),
-  status: z.enum(["DRAFT", "PUBLISHED"]).optional(),
-});
+/**
+ * A record write. An UPDATE of a row the server holds must name the version it
+ * was edited from (L3-022, owner 2026-10-10): `expectedUpdatedAt` for a normal
+ * save, or `overwrite.reviewedUpdatedAt` for "Keep mine" — an explicit
+ * overwrite of the revision the person reviewed in the conflict diff. Both are
+ * conditional writes: a version that has moved on since is a CONFLICT, never a
+ * blind write. `expectedUpdatedAt: null` says "I believe this row is new";
+ * meeting an existing row, it is a CONFLICT too. A create needs neither.
+ */
+export const upsertEntryInput = z
+  .object({
+    id: z.string().optional(),
+    siteId: z.string().min(1),
+    collectionId: z.string().min(1),
+    expectedUpdatedAt: z.string().datetime().nullable().optional(),
+    overwrite: z.object({ reviewedUpdatedAt: z.string().datetime() }).optional(),
+    data: z.record(z.string(), z.unknown()).default({}),
+    status: z.enum(["DRAFT", "PUBLISHED"]).optional(),
+  })
+  .refine((i) => !(i.overwrite && i.expectedUpdatedAt !== undefined), {
+    message: "Send either expectedUpdatedAt or overwrite, not both",
+    path: ["overwrite"],
+  });
 export type UpsertEntryInput = z.infer<typeof upsertEntryInput>;
 
 export const listEntriesInput = z.object({ siteId: z.string().min(1), collectionId: z.string().min(1) });
 
 export const deleteEntryInput = z.object({ siteId: z.string().min(1), id: z.string().min(1) });
+
+/** One record's current server copy (the conflict diff's "theirs", L3-021). */
+export const getEntryInput = z.object({ siteId: z.string().min(1), id: z.string().min(1) });
 
 // ── CSV import (fix-all round, 2026-09-25 — decision: "build CSV import now") ─
 // Upload → preview → map columns → create records, entirely server-side

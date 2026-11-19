@@ -266,7 +266,7 @@ describe("CMS outbox — conflicts are never silently overwritten", () => {
     expect(keysFor("site-A")).toEqual(["entryUpsert:e1"]);
   });
 
-  it("Keep mine sends without a precondition and clears the outbox", async () => {
+  it("Keep mine with no revision to name sends a save from 'new' and clears the outbox once it lands", async () => {
     const { recordServerStamp, syncEntryUpsert, onCmsConflict } = await pageLoad();
     recordServerStamp("entry:e1", "2026-10-01T00:00:00.000Z", "L0");
     let choice: { keepMine(): Promise<unknown> } | null = null;
@@ -275,6 +275,68 @@ describe("CMS outbox — conflicts are never silently overwritten", () => {
     await syncEntryUpsert(item("e1"));
     await choice!.keepMine();
     expect(entUpsert.mock.calls.at(-1)?.[0].expectedUpdatedAt).toBeNull();
+    expect(entUpsert.mock.calls.at(-1)?.[0]).not.toHaveProperty("overwrite");
+    expect(keysFor("site-A")).toEqual([]);
+  });
+
+  it("Keep mine is an explicit overwrite of the revision the CONFLICT named (L3-022)", async () => {
+    const { recordServerStamp, syncEntryUpsert, onCmsConflict } = await pageLoad();
+    recordServerStamp("entry:e1", "2026-10-01T00:00:00.000Z", "L0");
+    let choice: { keepMine(data?: Record<string, unknown>, reviewed?: string): Promise<unknown> } | null = null;
+    onCmsConflict((c) => (choice = c));
+    entUpsert.mockRejectedValueOnce(new Error("CMS_CONFLICT:2026-10-03T00:00:00.000Z"));
+    await syncEntryUpsert(item("e1"));
+    await choice!.keepMine();
+    const sent = entUpsert.mock.calls.at(-1)?.[0];
+    expect(sent).toMatchObject({ overwrite: { reviewedUpdatedAt: "2026-10-03T00:00:00.000Z" } });
+    expect(sent).not.toHaveProperty("expectedUpdatedAt");
+    /* A later ordinary save is a normal, preconditioned save again. */
+    await syncEntryUpsert(item("e1", { t: 2 }, "L2"));
+    expect(entUpsert.mock.calls.at(-1)?.[0]).not.toHaveProperty("overwrite");
+    expect(entUpsert.mock.calls.at(-1)?.[0].expectedUpdatedAt).toBe("2026-10-02T12:00:00.000Z");
+  });
+
+  it("Keep mine names the revision the person reviewed when given one", async () => {
+    const { recordServerStamp, syncEntryUpsert, onCmsConflict } = await pageLoad();
+    recordServerStamp("entry:e1", "2026-10-01T00:00:00.000Z", "L0");
+    let choice: { keepMine(data?: Record<string, unknown>, reviewed?: string): Promise<unknown> } | null = null;
+    onCmsConflict((c) => (choice = c));
+    entUpsert.mockRejectedValueOnce(new Error("CMS_CONFLICT:2026-10-03T00:00:00.000Z"));
+    await syncEntryUpsert(item("e1"));
+    await choice!.keepMine(undefined, "2026-10-04T00:00:00.000Z");
+    expect(entUpsert.mock.calls.at(-1)?.[0]).toMatchObject({ overwrite: { reviewedUpdatedAt: "2026-10-04T00:00:00.000Z" } });
+  });
+
+  /* 165:2414: the review dialog's merged copy (your changed fields over the
+     latest saved record) is what overwrites the revision it showed. */
+  it("Keep mine with the review's merged copy sends that copy as the overwrite", async () => {
+    const { recordServerStamp, syncEntryUpsert, onCmsConflict } = await pageLoad();
+    recordServerStamp("entry:e1", "2026-10-01T00:00:00.000Z", "L0");
+    let choice: { keepMine(data?: Record<string, unknown>, reviewed?: string): Promise<unknown> } | null = null;
+    onCmsConflict((c) => (choice = c));
+    entUpsert.mockRejectedValueOnce(new Error("CMS_CONFLICT:2026-10-03T00:00:00.000Z"));
+    await syncEntryUpsert(item("e1"));
+    await choice!.keepMine({ t: "merged" }, "2026-10-04T00:00:00.000Z");
+    expect(entUpsert.mock.calls.at(-1)?.[0]).toMatchObject({
+      data: { t: "merged" },
+      overwrite: { reviewedUpdatedAt: "2026-10-04T00:00:00.000Z" },
+    });
+  });
+
+  it("a Keep mine that never reached the server replays after a reload as the same overwrite", async () => {
+    const first = await pageLoad();
+    first.recordServerStamp("entry:e1", "2026-10-01T00:00:00.000Z", "L0");
+    let choice: { keepMine(): Promise<unknown> } | null = null;
+    first.onCmsConflict((c) => (choice = c));
+    entUpsert.mockRejectedValueOnce(new Error("CMS_CONFLICT:2026-10-03T00:00:00.000Z"));
+    await first.syncEntryUpsert(item("e1"));
+    entUpsert.mockRejectedValueOnce(offline());
+    await choice!.keepMine();
+    expect(keysFor("site-A")).toEqual(["entryUpsert:e1"]);
+
+    const second = await pageLoad();
+    await second.flushCmsOutbox();
+    expect(entUpsert.mock.calls.at(-1)?.[0]).toMatchObject({ overwrite: { reviewedUpdatedAt: "2026-10-03T00:00:00.000Z" } });
     expect(keysFor("site-A")).toEqual([]);
   });
 

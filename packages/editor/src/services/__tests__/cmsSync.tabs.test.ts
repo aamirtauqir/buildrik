@@ -39,10 +39,13 @@ const S0 = "2026-10-08T19:50:00.000Z";
 const S1 = "2026-10-08T19:51:26.000Z";
 const S2 = "2026-10-08T19:52:00.000Z";
 
-/** The server: one row, refusing any write whose precondition is not its current updatedAt. */
+/** The server: one row, refusing any write whose precondition is not its
+ *  current updatedAt — a normal save's `expectedUpdatedAt` or Keep mine's
+ *  `overwrite.reviewedUpdatedAt` alike (L3-022). */
 let serverAt = S0;
-function serverUpsert(input: { expectedUpdatedAt: string | null }, next: string) {
-  if (input.expectedUpdatedAt && input.expectedUpdatedAt !== serverAt) {
+function serverUpsert(input: { expectedUpdatedAt?: string | null; overwrite?: { reviewedUpdatedAt: string } }, next: string) {
+  const version = input.overwrite?.reviewedUpdatedAt ?? input.expectedUpdatedAt;
+  if (version !== serverAt) {
     return Promise.reject(new Error(`CMS_CONFLICT:${serverAt}`));
   }
   serverAt = next;
@@ -69,7 +72,10 @@ async function openTab() {
 const record = (title: string, updatedAt: string) =>
   ({ id: "e1", collectionId: "c1", data: { title }, status: "draft", createdAt: S0, updatedAt }) as never;
 
-const sentPrecondition = () => entUpsert.mock.calls.at(-1)?.[0].expectedUpdatedAt;
+const sentPrecondition = () => {
+  const sent = entUpsert.mock.calls.at(-1)?.[0];
+  return sent?.overwrite?.reviewedUpdatedAt ?? sent?.expectedUpdatedAt;
+};
 
 beforeEach(() => {
   window.history.replaceState({}, "", "/edit/site-A");
@@ -140,6 +146,32 @@ describe("two tabs, one browser (EDT-002)", () => {
     await tab2.syncEntryUpsert(record("tab 2", "L2"));
     await expect(choice!.keepMine()).resolves.toBe(true);
     expect(sentPrecondition()).toBe(S1);
+    /* An explicit overwrite, not a normal save (L3-022). */
+    expect(entUpsert.mock.calls.at(-1)?.[0]).toMatchObject({ overwrite: { reviewedUpdatedAt: S1 } });
+    expect(entUpsert.mock.calls.at(-1)?.[0]).not.toHaveProperty("expectedUpdatedAt");
     expect(serverAt).toBe(S2);
+  });
+
+  it("Keep mine against a revision another tab has since replaced is a fresh conflict, not an overwrite", async () => {
+    const tab1 = await openTab();
+    const tab2 = await openTab();
+    entUpsert.mockImplementationOnce((input) => serverUpsert(input, S1));
+    await tab1.syncEntryUpsert(record("tab 1", "L1"));
+
+    const choices: Array<{ keepMine(): Promise<boolean> }> = [];
+    tab2.onCmsConflict((c) => choices.push(c));
+    entUpsert.mockImplementationOnce((input) => serverUpsert(input, S2));
+    await tab2.syncEntryUpsert(record("tab 2", "L2"));
+    /* Tab 1 saves again while tab 2 is still looking at S1. */
+    entUpsert.mockImplementationOnce((input) => serverUpsert(input, S2));
+    await tab1.syncEntryUpsert(record("tab 1 again", "L3"));
+    expect(serverAt).toBe(S2);
+
+    entUpsert.mockImplementationOnce((input) => serverUpsert(input, "never"));
+    await expect(choices[0].keepMine()).resolves.toBe(false);
+    expect(sentPrecondition()).toBe(S1);
+    expect(serverAt).toBe(S2);
+    expect(choices).toHaveLength(2);
+    expect(tab2.isCmsConflictPending("entry", "e1")).toBe(true);
   });
 });

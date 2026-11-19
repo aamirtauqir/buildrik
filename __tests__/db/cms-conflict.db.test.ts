@@ -51,7 +51,7 @@ describe("CMS preconditions (expectedUpdatedAt)", () => {
     const site = await seedSite();
     await upsertCollection(site.id, { id: "c1", siteId: site.id, name: "Blog", slug: "blog", fields: [] });
     const first = await upsertEntry(site.id, { id: "e1", siteId: site.id, collectionId: "c1", data: { title: "A" } });
-    await upsertEntry(site.id, { id: "e1", siteId: site.id, collectionId: "c1", data: { title: "A2" } });
+    await upsertEntry(site.id, { id: "e1", siteId: site.id, collectionId: "c1", data: { title: "A2" }, expectedUpdatedAt: first.updatedAt.toISOString() });
     await expect(
       upsertEntry(site.id, { id: "e1", siteId: site.id, collectionId: "c1", data: { title: "A3" }, expectedUpdatedAt: first.updatedAt.toISOString() }),
     ).rejects.toMatchObject({ code: "CONFLICT" });
@@ -63,5 +63,61 @@ describe("CMS preconditions (expectedUpdatedAt)", () => {
     await upsertCollection(site.id, { id: "c1", siteId: site.id, name: "Blog v2", slug: "blog", fields: [], expectedUpdatedAt: null });
     const row = await prisma.cmsCollection.findUnique({ where: { id: "c1" } });
     expect(row?.name).toBe("Blog v2");
+  });
+});
+
+/* L3-022 (owner 2026-10-10): a record update names the version it was edited
+   from; "Keep mine" is an explicit overwrite of the reviewed revision. */
+describe("CMS record updates — precondition required (L3-022)", () => {
+  async function seedEntry() {
+    const site = await seedSite();
+    await upsertCollection(site.id, { id: "c1", siteId: site.id, name: "Blog", slug: "blog", fields: [] });
+    const first = await upsertEntry(site.id, { id: "e1", siteId: site.id, collectionId: "c1", data: { title: "A" } });
+    return { site, first };
+  }
+  const titleOf = async () => ((await prisma.cmsEntry.findUnique({ where: { id: "e1" } }))?.data as { title?: string })?.title;
+
+  it("an update with no precondition is refused and changes nothing", async () => {
+    const { site } = await seedEntry();
+    await expect(upsertEntry(site.id, { id: "e1", siteId: site.id, collectionId: "c1", data: { title: "blind" } })).rejects.toMatchObject({ code: "BAD_REQUEST" });
+    expect(await titleOf()).toBe("A");
+  });
+
+  it("null ('I thought it was new') meeting an existing row is a CONFLICT", async () => {
+    const { site, first } = await seedEntry();
+    await expect(
+      upsertEntry(site.id, { id: "e1", siteId: site.id, collectionId: "c1", data: { title: "blind" }, expectedUpdatedAt: null }),
+    ).rejects.toMatchObject({ code: "CONFLICT", message: first.updatedAt.toISOString() });
+    expect(await titleOf()).toBe("A");
+  });
+
+  it("the race: two saves from the same version — one lands, the other is a CONFLICT", async () => {
+    const { site, first } = await seedEntry();
+    const at = first.updatedAt.toISOString();
+    const results = await Promise.allSettled([
+      upsertEntry(site.id, { id: "e1", siteId: site.id, collectionId: "c1", data: { title: "tab 1" }, expectedUpdatedAt: at }),
+      upsertEntry(site.id, { id: "e1", siteId: site.id, collectionId: "c1", data: { title: "tab 2" }, expectedUpdatedAt: at }),
+    ]);
+    const landed = results.filter((r) => r.status === "fulfilled");
+    const refused = results.filter((r) => r.status === "rejected") as PromiseRejectedResult[];
+    expect(landed).toHaveLength(1);
+    expect(refused).toHaveLength(1);
+    expect(refused[0].reason).toMatchObject({ code: "CONFLICT" });
+  });
+
+  it("Keep mine overwrites the reviewed revision; another edit since is a fresh CONFLICT", async () => {
+    const { site, first } = await seedEntry();
+    const theirs = await upsertEntry(site.id, { id: "e1", siteId: site.id, collectionId: "c1", data: { title: "theirs" }, expectedUpdatedAt: first.updatedAt.toISOString() });
+    const reviewed = theirs.updatedAt.toISOString();
+    /* A third edit lands after the person looked at "theirs". */
+    await new Promise((r) => setTimeout(r, 5));
+    await upsertEntry(site.id, { id: "e1", siteId: site.id, collectionId: "c1", data: { title: "third" }, expectedUpdatedAt: reviewed });
+    await expect(
+      upsertEntry(site.id, { id: "e1", siteId: site.id, collectionId: "c1", data: { title: "mine" }, overwrite: { reviewedUpdatedAt: reviewed } }),
+    ).rejects.toMatchObject({ code: "CONFLICT" });
+    expect(await titleOf()).toBe("third");
+    const latest = (await prisma.cmsEntry.findUnique({ where: { id: "e1" } }))!.updatedAt.toISOString();
+    await upsertEntry(site.id, { id: "e1", siteId: site.id, collectionId: "c1", data: { title: "mine" }, overwrite: { reviewedUpdatedAt: latest } });
+    expect(await titleOf()).toBe("mine");
   });
 });
