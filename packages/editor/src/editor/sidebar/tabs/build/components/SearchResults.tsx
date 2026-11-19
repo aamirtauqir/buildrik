@@ -2,8 +2,10 @@
  * SearchResults — board 4418:100087 (Insert · searching).
  *
  * ONE flat list across sources: 32h rows — label 13 ink, a grey source chip
- * right after it ([Element] / [Block] / [Component]), then "+ Add" (12 medium
- * accent) and a 28-wide ⠿ grip at the right edge. No results header, no
+ * right after it ([Element] / [Block] / [Component]), then "Drag to add" (12
+ * medium accent; the board's "+ Add", reworded for drag-only Add, owner
+ * 2026-11-19) and a 28-wide ⠿ grip at the right edge. Accessible names keep
+ * "Add …": the keyboard still inserts. No results header, no
  * category sections. Every row drags onto the canvas; Enter / Space insert,
  * and a pointer click only hints (drag-only Add, owner 2026-11-19).
  * Pure render — matching lives in utils/search.ts.
@@ -121,8 +123,8 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
               <p className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]">
                 {hit.el.description}
               </p>
-              <Button type="button" size="xs" onClick={(e) => click(e, hit)}>
-                Add to page
+              <Button type="button" size="xs" aria-label={`Add ${hit.label} to page`} onClick={(e) => click(e, hit)}>
+                Drag to add to page
               </Button>
             </div>
             <p className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">
@@ -159,14 +161,14 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
           >
             {CHIP[hit.group]}
           </span>
-          {/* The whole row inserts; "+ Add" is its visible affordance, so the
+          {/* The row is the drag source; this is its visible affordance, so a
               click bubbles to the row rather than being a second control. */}
           <span
             aria-hidden="true"
             className="tw:ml-auto tw:pl-[8px] tw:shrink-0 tw:text-[12px] tw:leading-[18px] tw:font-medium tw:text-[var(--bk-accent)]"
             data-testid={`insert-hit-add-${hit.key}`}
           >
-            + Add
+            Drag to add
           </span>
           <span
             aria-hidden="true"

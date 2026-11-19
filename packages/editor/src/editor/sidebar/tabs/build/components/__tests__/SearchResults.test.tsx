@@ -52,10 +52,11 @@ const renderResults = (over: Partial<React.ComponentProps<typeof SearchResults>>
   );
 
 /* Board 4418:100087 (Insert · searching): each 32px row is the label, a grey
-   [Element] / [Block] / [Component] chip right after it, then "+ Add" and a ⠿
+   [Element] / [Block] / [Component] chip right after it, then "Drag to add"
+   (the board's "+ Add", reworded for drag-only Add, owner 2026-11-19) and a ⠿
    grip at the right edge. It replaced 138:53's uppercase group tag. */
 describe("SearchResults — cross-source rows (4418:100087)", () => {
-  it("one row per hit: label, a source chip, + Add and a grip", () => {
+  it("one row per hit: label, a source chip, Drag to add and a grip; the name still says Add", () => {
     renderResults();
     expect(screen.getByTestId("insert-search-results")).toBeInTheDocument();
     const chips = hits.map((h) => screen.getByTestId(`insert-hit-chip-${h.key}`).textContent);
@@ -63,7 +64,8 @@ describe("SearchResults — cross-source rows (4418:100087)", () => {
     expect(screen.queryByText("ELEMENTS")).toBeNull();
     expect(screen.queryByText("BLOCKS")).toBeNull();
     for (const h of hits) {
-      expect(screen.getByTestId(`insert-hit-add-${h.key}`).textContent).toBe("+ Add");
+      expect(screen.getByTestId(`insert-hit-add-${h.key}`).textContent).toBe("Drag to add");
+      expect(screen.getByTestId(`insert-hit-${h.key}`).getAttribute("aria-label")).toMatch(/^Add /);
       expect(screen.getByTestId(`insert-hit-grip-${h.key}`).textContent).toBe("⠿");
     }
   });

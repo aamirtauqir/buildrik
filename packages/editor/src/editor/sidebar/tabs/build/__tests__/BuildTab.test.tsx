@@ -283,7 +283,13 @@ describe("BuildTab — block hover preview (4428:145110)", () => {
     act(() => { vi.advanceTimersByTime(350); });
     const card = screen.getByTestId("insert-block-preview");
     expect(card.textContent).toContain("Full-width headline, subtitle and a button.");
-    expect(card.textContent).toContain("or drag it onto the canvas");
+    /* Drag-only copy (owner 2026-11-19): visible "Drag Hero to add", named
+       "Add Hero" for the keyboard that still inserts with it. */
+    const button = within(card).getByRole("button", { name: "Add Hero" });
+    expect(button).toHaveTextContent("Drag Hero to add");
+    expect(card.textContent).not.toContain("or drag it onto the canvas");
+    expect(screen.getByTestId("insert-block-pill-hero")).toHaveTextContent("Drag to add");
+    expect(screen.getByTestId("insert-block-hero")).toHaveAttribute("aria-label", "Add Hero");
     fireEvent.click(screen.getByTestId("insert-block-preview-add"), { detail: 1 });
     expect(onBlockClick).not.toHaveBeenCalled();
     expect(screen.getByTestId("add-drag-hint")).toHaveTextContent("Drag onto the canvas to add");

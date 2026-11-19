@@ -416,14 +416,15 @@ const BlockGrid: React.FC<{
                     className="tw:h-[65px] tw:w-full tw:rounded-[var(--bk-radius-md)] tw:bg-[var(--bk-bg-subtle)] tw:border tw:border-[var(--bk-border)] tw:group-hover:border-[var(--bk-accent)]"
                   />
                 )}
-                {/* Board 4428:145110: the hovered card's "Add" is a blue pill on
-                    the thumbnail's bottom-right corner. */}
+                {/* Board 4428:145110: the hovered card's pill on the thumbnail's
+                    bottom-right corner. It reads "Drag to add" (owner
+                    2026-11-19, drag-only Add); the card's name stays "Add …". */}
                 <span
                   aria-hidden="true"
                   data-testid={`insert-block-pill-${b.id}`}
                   className="tw:absolute tw:right-1.5 tw:bottom-1.5 tw:hidden tw:group-hover:inline-flex tw:h-5 tw:items-center tw:rounded-md tw:bg-[var(--bk-accent)] tw:px-2 tw:text-[12px] tw:leading-4 tw:font-medium tw:text-[var(--bk-accent-on)]"
                 >
-                  Add
+                  Drag to add
                 </span>
               </div>
               <div className="tw:flex tw:items-center tw:justify-between tw:gap-1 tw:min-w-0">

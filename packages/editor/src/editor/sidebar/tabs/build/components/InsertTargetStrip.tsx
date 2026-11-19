@@ -1,5 +1,6 @@
 /**
- * InsertTargetStrip — where a click in Add lands, said before the click
+ * InsertTargetStrip — where Enter in Add lands (a drag lands where it drops),
+ * said before the insert
  * (boards 7:18981 / 302:3965): "Insert into Hero" over "Home / Hero · At end".
  *
  * It follows the live selection: select another container and the target

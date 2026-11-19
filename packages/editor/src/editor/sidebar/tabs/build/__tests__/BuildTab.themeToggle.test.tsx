@@ -51,10 +51,13 @@ describe("Add panel — theme toggle (BRP1-M12)", () => {
     expect(screen.getByText("Available with Dark mode Auto.")).toBeTruthy();
     /* Drag-only Add (owner 2026-11-19): a pointer click only hints; the
        keyboard's click (detail 0) inserts. */
-    fireEvent.click(screen.getByRole("button", { name: "Add to page" }), { detail: 1 });
+    /* Visible text says how (drag); the accessible name says what (Add). */
+    const add = screen.getByRole("button", { name: "Add Theme toggle to page" });
+    expect(add).toHaveTextContent("Drag to add to page");
+    fireEvent.click(add, { detail: 1 });
     expect(onBlockClick).not.toHaveBeenCalled();
     expect(screen.getByTestId("add-drag-hint")).toHaveTextContent("Drag onto the canvas to add");
-    fireEvent.click(screen.getByRole("button", { name: "Add to page" }), { detail: 0 });
+    fireEvent.click(add, { detail: 0 });
     expect(onBlockClick).toHaveBeenCalledWith(expect.objectContaining({ id: "theme-toggle" }));
   });
 

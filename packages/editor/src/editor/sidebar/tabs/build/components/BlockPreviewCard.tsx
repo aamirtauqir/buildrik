@@ -1,8 +1,10 @@
 /**
  * BlockPreviewCard — board 4428:145110 (Add · Blocks · hover): hovering a
  * block card opens a 320-wide card beside the drawer — name, what it is, a
- * preview, "Add {name}" and "or drag it onto the canvas". Add is drag-only
- * (owner 2026-11-19): `onAdd` gets the click, and a pointer click only hints.
+ * preview and its add button. Add is drag-only (owner 2026-11-19): the
+ * button reads "Drag {name} to add" — named "Add {name}" for the keyboard,
+ * which still inserts with it — and a pointer click only hints (`onAdd`).
+ * The board's "or drag it onto the canvas" went with the old "Add {name}". 
  *
  * Portaled (chrome-ui Portal) because the drawer scrolls and clips; placed at
  * the drawer's right edge + 8, level with the hovered card, kept on screen.
@@ -52,10 +54,15 @@ export const BlockPreviewCard: React.FC<Props> = ({ block, anchor, onAdd, onPoin
           <BlockThumb blockId={block.id} className="tw:h-[150px] tw:w-full tw:rounded-md tw:bg-[var(--bk-gray-50)] tw:border tw:border-[var(--bk-border)]" />
         )}
         <div className="tw:flex tw:items-center tw:gap-2.5">
-          <Button size="xs" data-testid="insert-block-preview-add" onClick={onAdd} className="tw:h-7 tw:px-3 tw:text-[13px] tw:font-medium tw:focus:ring-0">
-            Add {block.label}
+          <Button
+            size="xs"
+            aria-label={`Add ${block.label}`}
+            data-testid="insert-block-preview-add"
+            onClick={onAdd}
+            className="tw:h-7 tw:px-3 tw:text-[13px] tw:font-medium tw:focus:ring-0"
+          >
+            Drag {block.label} to add
           </Button>
-          <span className="tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-gray-500)]">or drag it onto the canvas</span>
         </div>
       </div>
     </Portal>
