@@ -12,6 +12,12 @@
  *     on every record." The pre-CMS "old Conditions" binding shows as "Not
  *     active — from old Conditions" with Activate condition / Keep inactive.
  *
+ * FG-021 (owner 2026-10-10, kept 2026-11-19): the empty state offers "Hide
+ * when <Field> is empty" for each field the element shows from the record. It
+ * is a shortcut, not a second visibility mechanism: it WRITES this model's
+ * condition — one "<field> is set" rule — so canvas, preview and publish read
+ * it like any other, and the panel then shows that rule.
+ *
  * Every write is one history step with its receipt and an Undo bound to it.
  * Offered only where the element has a record to read (a Collection list, a
  * template page) or already carries a condition.
@@ -37,7 +43,8 @@ import { SelectRow, Section } from "@/editor/inspector/shared/controls";
 import { WIDE_BUTTON } from "@/editor/inspector/shared/controls/controlClasses";
 import { closeSubview, openSubview } from "@/editor/inspector/tabs/subviewStore";
 import { CommitRow, NoteRow } from "../behaviourRows";
-import type { CMSFieldType } from "@/shared/types/cms";
+import type { CMSCollection, CMSField, CMSFieldType } from "@/shared/types/cms";
+import { followsContextRecord } from "@/engine/cms/RepeaterRenderer";
 import { ruleLabel, useConditions, type ConditionsState } from "./useConditions";
 
 const LINK = "tw:h-8 tw:self-center tw:text-[13px] tw:font-normal";
@@ -53,6 +60,18 @@ function missingRules(state: Pick<ConditionsState, "condition" | "collection">):
   if (!state.condition || !state.collection) return [];
   const slugs = new Set(state.collection.fields.map((f) => f.slug));
   return state.condition.rules.map((rule, i) => ({ rule, i })).filter(({ rule }) => !slugs.has(rule.field.split(".")[0]));
+}
+
+/** FG-021: the collection fields this element shows from the record it reads
+ *  (its bindings that follow the list's or the page's record), in order. */
+function recordBoundFields(composer: Composer | null | undefined, elementId: string, collection: CMSCollection | null): CMSField[] {
+  if (!composer || !collection) return [];
+  const slugs = new Set(
+    (composer.cms?.bindings?.getBindings?.(elementId) ?? [])
+      .filter((b) => b.collectionId === collection.id && followsContextRecord(b))
+      .map((b) => b.fieldSlug),
+  );
+  return collection.fields.filter((f) => slugs.has(f.slug));
 }
 
 /** "1 · Hidden" — what the closed row says. */
@@ -275,10 +294,23 @@ export function ConditionsPanel({ composer, elementId }: { composer: Composer | 
   }
 
   if (!state.condition) {
+    const bound = recordBoundFields(composer, elementId, state.collection);
     return (
       <div className="tw:flex tw:flex-col tw:gap-2 tw:px-3 tw:py-2" data-testid="conditions-empty">
         {header}
         <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-soft)]">Show this element on every record.</p>
+        {bound.map((f) => (
+          <Button
+            key={f.slug}
+            color="light"
+            size="xs"
+            className={WIDE_BUTTON}
+            onClick={() => write({ match: "all", rules: [{ field: f.slug, op: "set" }] }, "Add visibility condition", "Visibility condition added")}
+            data-testid={`conditions-hide-when-empty-${f.slug}`}
+          >
+            Hide when {f.name} is empty
+          </Button>
+        ))}
         <Button color="light" size="xs" className={WIDE_BUTTON} disabled={!firstField} onClick={addRule} data-testid="conditions-add-rule">
           + Add rule
         </Button>

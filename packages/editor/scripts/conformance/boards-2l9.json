@@ -8828,9 +8828,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "founder:fg-021-hide-when-empty",
    "verified": "drift-fixed",
-   "verifiedNote": "L-B round 27, probe-compared on :5172 (inspector-panel ?type=heading&cms=template[&fields=1][&condition=…|&legacyCondition=1|&unbound=1], innerText read against the board's inspector text from the dump; scripts scratch lb/ptxt.mjs, d25.mjs, cond.mjs): Conditions subview, empty: '‹ Back to Content · Conditions · Show this element on every record. · + Add rule · Conditions control visibility. Device visibility stays in Behavior.' — exact. | Inspector Content Conditions (\"Show on every record · + Add rule\"); code edits conditions only in CMS drawer (ContentViews.tsx:651)",
+   "verifiedNote": "owner 2026-11-19 kept code-ahead feature FG-021 (from fix/p3b-components-forms 60a0b3139): the empty Conditions subview adds one 'Hide when <Field> is empty' button per field the element shows from the record it reads, between 'Show this element on every record.' and '+ Add rule'. It is a shortcut that writes this B-11 model's condition (Match all, '<field> is set'), not a second visibility mechanism; the branch's data-bk-hide-when-empty attribute was not ported. The board draws the empty state without it. Test: ConditionsPanel.test.tsx. Live not compared. | Before: L-B round 27, probe-compared on :5172 (inspector-panel ?type=heading&cms=template[&fields=1][&condition=…|&legacyCondition=1|&unbound=1], innerText read against the board's inspector text from the dump; scripts scratch lb/ptxt.mjs, d25.mjs, cond.mjs): Conditions subview, empty: '‹ Back to Content · Conditions · Show this element on every record. · + Add rule · Conditions control visibility. Device visibility stays in Behavior.' — exact. | Inspector Content Conditions (\"Show on every record · + Add rule\"); code edits conditions only in CMS drawer (ContentViews.tsx:651)",
    "tier": "P1"
   },
   {

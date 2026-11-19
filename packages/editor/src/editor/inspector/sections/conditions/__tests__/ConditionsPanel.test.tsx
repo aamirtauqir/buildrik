@@ -27,7 +27,7 @@ const BLOG = {
   ],
 };
 
-function makeComposer(opts: { condition?: CmsCondition | null; legacy?: boolean } = {}) {
+function makeComposer(opts: { condition?: CmsCondition | null; legacy?: boolean; bindings?: Array<{ collectionId: string; fieldSlug: string; itemId?: string }> } = {}) {
   let condition = opts.condition ?? null;
   let legacy = opts.legacy ? { type: "condition", condition: { operator: "exists", left: "opening_hours.sunday" } } : undefined;
   const page = { id: "p1", name: "Home", slug: "", isHome: true, root: { id: "root" } };
@@ -51,7 +51,7 @@ function makeComposer(opts: { condition?: CmsCondition | null; legacy?: boolean 
       history: { captureUndo: vi.fn(() => vi.fn()), flushPending: vi.fn(), record: vi.fn() },
       elements: { getElement: () => el, getActivePage: () => page, getAllPages: () => [page] },
       cms: {
-        bindings: { getCondition: () => condition, setCondition, getCollectionBinding: () => null },
+        bindings: { getCondition: () => condition, setCondition, getCollectionBinding: () => null, getBindings: () => opts.bindings ?? [] },
         collections: {
           getAllCollections: () => [BLOG],
           queryContent: vi.fn(async () => ({ items: [{ id: "r1", data: { title: "A clearer point of view", sunday: "" } }] })),
@@ -164,5 +164,30 @@ describe("Conditions", () => {
         { field: "note", op: "empty" },
       ],
     });
+  });
+
+  /* FG-021 (owner 2026-10-10, kept 2026-11-19): "Hide when <Field> is empty"
+     is a shortcut that writes this model's condition — never a second rule. */
+  it("FG-021: Hide when <Field> is empty writes one 'is set' condition on the bound field", () => {
+    const { composer, setCondition } = makeComposer({
+      bindings: [
+        { collectionId: "blog", fieldSlug: "sunday" },
+        { collectionId: "blog", fieldSlug: "title", itemId: "r9" },
+      ],
+    });
+    mount(composer);
+    /* A binding pinned to one record is not the record this element reads. */
+    expect(screen.queryByTestId("conditions-hide-when-empty-title")).toBeNull();
+    act(() => {
+      fireEvent.click(screen.getByRole("button", { name: "Hide when Sunday is empty" }));
+    });
+    expect(setCondition).toHaveBeenCalledWith("h1", { match: "all", rules: [{ field: "sunday", op: "set" }] }, "Add visibility condition");
+    expect(screen.getByText("Visibility condition added")).toBeTruthy();
+  });
+
+  it("FG-021: no shortcut when the element shows nothing from the record", () => {
+    const { composer } = makeComposer();
+    mount(composer);
+    expect(screen.queryByRole("button", { name: /^Hide when/ })).toBeNull();
   });
 });
