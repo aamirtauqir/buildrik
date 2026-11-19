@@ -33,6 +33,7 @@ import {
   TextInput as ChromeTextInput,
 } from "@/editor/chrome-ui";
 import type { SiteColumnField } from "@buildrik/shared/schemas/site-column-fields";
+import type { LoadFailure } from "./hooks/useServerLoad";
 /** Conformance anchor stem: a card/field is identified by its own title. */
 const slug = (s: string) =>
   s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -382,8 +383,13 @@ export interface LoadCardProps {
   /** The screen's name — "Analytics" reads "Loading Analytics…" / "Couldn’t load Analytics". */
   title: string;
   state: "loading" | "error";
-  /** The failure's sentence under the heading. */
+  /** The failure's sentence under the heading. It names the screen and never
+   *  guesses the cause (L3-035: "Check your connection" was printed for
+   *  server 500s too). */
   errorLine: string;
+  /** Why the read failed (`useServerLoad`). Auth and permission refusals get
+   *  their own sentence and no Try again — a retry hits the same wall. */
+  failure?: LoadFailure | null;
   /** `Try again` — re-runs the screen's load. */
   onRetry?: () => void;
 }
@@ -394,7 +400,16 @@ export interface LoadCardProps {
 /* The board's bars sit a step darker than the card they are on. */
 const PLACEHOLDER_BAR = "tw:rounded tw:bg-[var(--bk-gray-200)] tw:animate-pulse tw:motion-reduce:animate-none";
 
-export const LoadCard: React.FC<LoadCardProps> = ({ title, state, errorLine, onRetry }) => (
+/* L3-035: a sign-out or a permission refusal is not a hiccup — its own
+   sentence, and no Try again (a retry hits the same wall). */
+const LOAD_FAILURE_LINE: Record<Exclude<LoadFailure, "failed">, string> = {
+  "signed-out": "Your session has ended. Sign in again to load these settings.",
+  forbidden: "You don't have access to these settings. Ask the site owner.",
+};
+
+export const LoadCard: React.FC<LoadCardProps> = ({ title, state, errorLine, failure, onRetry }) => {
+  const wall = state === "error" && failure && failure !== "failed" ? LOAD_FAILURE_LINE[failure] : null;
+  return (
   /* 252:47733 / 252:47989: no card of its own — the heading on the pane, then
      three placeholder cards while loading; on failure the sentence and a
      filled Try again under it. */
@@ -423,17 +438,20 @@ export const LoadCard: React.FC<LoadCardProps> = ({ title, state, errorLine, onR
     ) : (
       <>
         <div className="tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="set-load-state">
-          {errorLine}
+          {wall ?? errorLine}
         </div>
-        <div className="tw:mt-2">
-          <Button type="button" size="xs" className={`${SET_BTN} tw:px-6`} onClick={onRetry} data-testid="set-load-retry">
-            Try again
-          </Button>
-        </div>
+        {wall ? null : (
+          <div className="tw:mt-2">
+            <Button type="button" size="xs" className={`${SET_BTN} tw:px-6`} onClick={onRetry} data-testid="set-load-retry">
+              Try again
+            </Button>
+          </div>
+        )}
       </>
     )}
   </section>
-);
+  );
+};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SaveErrorBanner — 3950:26309

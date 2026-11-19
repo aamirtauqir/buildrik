@@ -78,6 +78,7 @@ const failedJob = (steps: UsePublishJobResult["steps"]): UsePublishJobResult => 
   serverBlockers: null,
   lastPublishedAt: null,
   hasUnpublishedChanges: null,
+  isPublished: null,
   unpublished: vi.fn(),
   startedAt: null,
   pollLost: false,

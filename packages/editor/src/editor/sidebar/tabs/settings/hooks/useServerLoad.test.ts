@@ -81,3 +81,73 @@ describe("useServerLoad", () => {
     expect(registerRetryLoad).toHaveBeenLastCalledWith(null);
   });
 });
+
+/* L3-035 (owner, 2026-10-10): one silent auto-retry for a transient read, a
+   failure that names auth/permission problems for what they are, and the
+   loaded data kept on screen while a retry runs. */
+describe("useServerLoad · L3-035 failure handling", () => {
+  const trpcError = (code: string, httpStatus: number) =>
+    Object.assign(new Error(code), { data: { code, httpStatus } });
+
+  it("retries a transient failure once, silently, and lands ready", async () => {
+    vi.useFakeTimers();
+    try {
+      const read = vi
+        .fn()
+        .mockRejectedValueOnce(trpcError("INTERNAL_SERVER_ERROR", 500))
+        .mockResolvedValueOnce({ ok: true });
+      const apply = vi.fn();
+      const onLoadStateChange = vi.fn();
+      const { result } = renderHook(() => useServerLoad("s1", read, apply, { onLoadStateChange }));
+      await act(async () => { await Promise.resolve(); });
+      expect(result.current.state).toBe("loading");
+      expect(onLoadStateChange).not.toHaveBeenCalledWith("error");
+      await act(async () => { await vi.runAllTimersAsync(); });
+      expect(read).toHaveBeenCalledTimes(2);
+      expect(apply).toHaveBeenCalledWith({ ok: true });
+      expect(result.current.state).toBe("ready");
+      expect(onLoadStateChange).not.toHaveBeenCalledWith("error");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("a network failure that fails twice reports the generic failure, once retried", async () => {
+    vi.useFakeTimers();
+    try {
+      const read = vi.fn().mockRejectedValue(new TypeError("Failed to fetch"));
+      const { result } = renderHook(() => useServerLoad("s1", read, () => {}, {}));
+      await act(async () => { await vi.runAllTimersAsync(); });
+      expect(read).toHaveBeenCalledTimes(2);
+      expect(result.current.state).toBe("error");
+      expect(result.current.failure).toBe("failed");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("an auth or permission refusal is not retried and says which it is", async () => {
+    const signedOut = vi.fn().mockRejectedValue(trpcError("UNAUTHORIZED", 401));
+    const a = renderHook(() => useServerLoad("s1", signedOut, () => {}, {}));
+    await act(async () => { await Promise.resolve(); });
+    expect(signedOut).toHaveBeenCalledTimes(1);
+    expect(a.result.current.state).toBe("error");
+    expect(a.result.current.failure).toBe("signed-out");
+
+    const forbidden = vi.fn().mockRejectedValue(trpcError("FORBIDDEN", 403));
+    const b = renderHook(() => useServerLoad("s1", forbidden, () => {}, {}));
+    await act(async () => { await Promise.resolve(); });
+    expect(forbidden).toHaveBeenCalledTimes(1);
+    expect(b.result.current.failure).toBe("forbidden");
+  });
+
+  it("a retry after a successful load keeps the loaded screen instead of a loading card", async () => {
+    const resolvers: Array<(row: { n: number }) => void> = [];
+    const read = vi.fn(() => new Promise<{ n: number }>((r) => { resolvers.push(r); }));
+    const { result } = renderHook(() => useServerLoad("s1", read, () => {}, {}));
+    await act(async () => { resolvers[0]({ n: 1 }); });
+    expect(result.current.state).toBe("ready");
+    act(() => result.current.retry());
+    expect(result.current.state).toBe("ready");
+  });
+});

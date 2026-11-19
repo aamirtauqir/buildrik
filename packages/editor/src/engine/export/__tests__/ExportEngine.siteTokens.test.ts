@@ -158,10 +158,51 @@ describe("the three documents carry the token definitions", () => {
   });
 });
 
+/* L5-050 (owner, 2026-10-10): the canvas paints every site from its
+   EFFECTIVE tokens — the seed where nothing was saved — so the export (and
+   the preview and the published page built from it) must too. Reporting only
+   saved slots shipped a fresh site in black text with no Inter link while the
+   canvas showed slate Inter. */
 describe("siteFontsFromSettings", () => {
-  it("resolves a text-only v5 save against the emit list", () => {
+  it("a text-only v5 save keeps its colour and resolves the other slots from the seed", () => {
     const only = { id: "color-text", name: "Text", value: "#123456", category: "colors", cssVar: "--buildrick-design-color-text", type: "color" };
-    expect(siteFontsFromSettings({ designTokens: [only], designTokensSchemaVersion: 5 })).toEqual({ text: "#123456" });
+    expect(siteFontsFromSettings({ designTokens: [only], designTokensSchemaVersion: 5 })).toEqual({
+      heading: "Inter",
+      body: "Inter",
+      mono: "Geist Mono",
+      text: "#123456",
+    });
+  });
+
+  it("a fresh site with no saved token resolves the seed's fonts and text colour", () => {
+    expect(siteFontsFromSettings({})).toEqual({ heading: "Inter", body: "Inter", mono: "Geist Mono", text: "#334155" });
+    expect(siteFontsFromSettings(undefined)).toEqual({ heading: "Inter", body: "Inter", mono: "Geist Mono", text: "#334155" });
+  });
+
+  it("a customised Brand keeps its own choices", () => {
+    const tokens = [
+      v6Token({ id: "font-heading", name: "Heading", value: "Lora", category: "typography", type: "font-family" }),
+      v6Token({ id: "color-text", name: "Text", value: "#112233" }),
+    ];
+    const fonts = siteFontsFromSettings({ designTokens: tokens });
+    expect(fonts.heading).toBe("Lora");
+    expect(fonts.text).toBe("#112233");
+    expect(fonts.body).toBe("Inter");
+  });
+});
+
+describe("the preview of a fresh site matches the canvas (L5-050)", () => {
+  it("names the text colour and links Inter with no saved token", async () => {
+    const { Composer } = await import("@/engine/Composer");
+    const c = Object.create(Composer.prototype) as InstanceType<typeof Composer>;
+    Object.assign(c, {
+      elements: { toHTML: () => "<p>Hi</p>", getActivePage: () => ({ name: "Home" }) },
+      styles: { toCSS: () => "", generateResponsiveCSS: () => "" },
+      getProjectSettings: () => ({}),
+    });
+    const html = c.exportHTML().combined;
+    expect(html).toContain("color:var(--buildrick-design-color-text,#334155)");
+    expect(html).toMatch(/<link[^>]+fonts\.googleapis\.com[^>]+Inter/);
   });
 });
 

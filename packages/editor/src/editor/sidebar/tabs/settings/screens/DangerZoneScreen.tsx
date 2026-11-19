@@ -260,7 +260,8 @@ export const DangerZoneScreen: React.FC<ScreenProps> = ({
         <LoadCard
           title="Danger zone"
           state={load.state}
-          errorLine="Couldn't load this site. Check your connection, then try again."
+          errorLine="Couldn't load this site. Try again."
+          failure={load.failure}
           onRetry={load.retry}
         />
       </Screen>

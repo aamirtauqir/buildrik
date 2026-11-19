@@ -4,6 +4,7 @@
  */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent, createEvent } from "@testing-library/react";
+import { SitePublicationContext } from "@/editor/shell/hooks/useLifecycle";
 import { PageRow } from "../components/PageRow";
 import type { PageItem } from "../types";
 
@@ -131,8 +132,9 @@ describe("PageRow", () => {
     expect(screen.queryByTestId("page-dirty-dot")).toBeNull();
     rerender(<PageRow {...baseProps} page={home} isDirty />);
     expect(screen.getByTestId("page-dirty-dot")).toBeInTheDocument();
-    /* 4418:93381: "● Unpublished" — the dot carries its word. */
-    expect(screen.getByTestId("page-dirty-label-p1").textContent).toBe("Unpublished");
+    /* L3-009: the dot carries its word, and the word is what it means —
+       board 4418:93381's "Unpublished" named UNSAVED edits. */
+    expect(screen.getByTestId("page-dirty-label-p1").textContent).toBe("Unsaved changes");
   });
 
   it("announces unsaved changes in the row label", () => {
@@ -140,6 +142,47 @@ describe("PageRow", () => {
     expect(
       screen.getByRole("treeitem", { name: /unsaved changes/i }),
     ).toBeInTheDocument();
+  });
+});
+
+/* L3-009 (owner, 2026-10-10): the row's screen-reader status comes from the
+   same publication state as the visible chip — never "Live" on a site that
+   has never been published. */
+describe("PageRow · publication status (L3-009)", () => {
+  const withSite = (site: { isPublished: boolean | null; hasUnpublishedChanges: boolean | null }, isDirty = false) =>
+    render(
+      <SitePublicationContext.Provider value={site}>
+        <PageRow {...baseProps} page={home} isDirty={isDirty} />
+      </SitePublicationContext.Provider>,
+    );
+  const rowName = () => screen.getByRole("treeitem").getAttribute("aria-label") ?? "";
+
+  it("a never-published site reads 'Draft · not published yet', not 'Live'", () => {
+    withSite({ isPublished: false, hasUnpublishedChanges: null });
+    expect(rowName()).toContain("Draft · not published yet");
+    expect(rowName()).not.toMatch(/\bLive\b/);
+  });
+
+  it("a live site with changes since reads 'Unpublished changes'", () => {
+    withSite({ isPublished: true, hasUnpublishedChanges: true });
+    expect(rowName()).toContain("Unpublished changes");
+  });
+
+  it("a live site with nothing waiting reads 'Live'", () => {
+    withSite({ isPublished: true, hasUnpublishedChanges: false });
+    expect(rowName()).toContain("Live");
+  });
+
+  it("unsaved edits read 'Unsaved changes' — visible and spoken alike", () => {
+    withSite({ isPublished: true, hasUnpublishedChanges: true }, true);
+    expect(rowName()).toContain("Unsaved changes");
+    expect(rowName()).not.toContain("Unpublished changes");
+    expect(screen.getByTestId("page-dirty-label-p1").textContent).toBe("Unsaved changes");
+  });
+
+  it("before the publish state is known it names no status", () => {
+    withSite({ isPublished: null, hasUnpublishedChanges: null });
+    expect(rowName()).not.toMatch(/Live|Draft|Unpublished/);
   });
 });
 

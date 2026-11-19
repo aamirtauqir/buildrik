@@ -2664,6 +2664,7 @@ function publishTrayFrame(
     reset: () => {},
     lastPublishedAt: null,
     hasUnpublishedChanges: true,
+    isPublished: null,
     dismissBlock: () => {},
     unpublished: () => {},
     startedAt: null,

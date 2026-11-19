@@ -158,6 +158,35 @@ describe("LoadCard", () => {
   });
 });
 
+/* L3-035: an auth or permission refusal is not a retryable blip — it gets
+   its own sentence and no Try again that would hit the same wall. */
+describe("LoadCard · L3-035 failure kinds", () => {
+  const base = { title: "SEO", errorLine: "Couldn't load your SEO settings. Try again." };
+
+  it("signed-out: says the session ended, offers no Try again", () => {
+    render(<LoadCard {...base} state="error" failure="signed-out" onRetry={vi.fn()} />);
+    expect(screen.getByTestId("set-load-state").textContent).toBe(
+      "Your session has ended. Sign in again to load these settings.",
+    );
+    expect(screen.queryByTestId("set-load-retry")).toBeNull();
+  });
+
+  it("forbidden: says the role cannot read them, offers no Try again", () => {
+    render(<LoadCard {...base} state="error" failure="forbidden" onRetry={vi.fn()} />);
+    expect(screen.getByTestId("set-load-state").textContent).toBe(
+      "You don't have access to these settings. Ask the site owner.",
+    );
+    expect(screen.queryByTestId("set-load-retry")).toBeNull();
+  });
+
+  it("failed: the screen's own line and Try again, never the network blamed", () => {
+    render(<LoadCard {...base} state="error" failure="failed" onRetry={vi.fn()} />);
+    expect(screen.getByTestId("set-load-state").textContent).toBe(base.errorLine);
+    expect(screen.getByTestId("set-load-card").textContent).not.toMatch(/connection/i);
+    expect(screen.getByTestId("set-load-retry")).toBeTruthy();
+  });
+});
+
 describe("SaveErrorBanner", () => {
   it("is a danger alert carrying the screen's sentence", () => {
     render(<SaveErrorBanner message="Site settings were not saved. Your changes are still here. Review the values, then retry." />);

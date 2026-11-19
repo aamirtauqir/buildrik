@@ -23,10 +23,42 @@ import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { devError } from "@/shared/utils/devLogger";
 
 
+/** Why a read failed, as far as the reader can act on it (L3-035):
+ *  `signed-out` and `forbidden` are walls a retry hits again; `failed` is
+ *  everything else, and the only kind offered Try again. */
+export type LoadFailure = "failed" | "signed-out" | "forbidden";
+
 export interface ServerLoad {
   state: ScreenLoadState;
+  /** Set while `state` is `error`. */
+  failure: LoadFailure | null;
   /** Re-runs the read. The load card's Try again and the shell's retry both land here. */
   retry: () => void;
+}
+
+/** The one silent second attempt waits this long — long enough for a
+ *  restarting worker or a dropped batch, short enough to read as one load. */
+const AUTO_RETRY_MS = 800;
+
+const TRANSIENT_CODES = new Set(["INTERNAL_SERVER_ERROR", "TIMEOUT", "TOO_MANY_REQUESTS", "CLIENT_CLOSED_REQUEST"]);
+
+type ReadError = { data?: { code?: unknown; httpStatus?: unknown } | null };
+
+function failureOf(err: unknown): LoadFailure {
+  const data = (err as ReadError | null)?.data;
+  if (data?.code === "UNAUTHORIZED" || data?.httpStatus === 401) return "signed-out";
+  if (data?.code === "FORBIDDEN" || data?.httpStatus === 403) return "forbidden";
+  return "failed";
+}
+
+/** Worth one more try without asking: the request died in transport (no tRPC
+ *  shape at all — `fetch` threw) or the server answered with a 5xx / timeout
+ *  / rate limit. A 400 or 404 would fail the same way again. */
+function isTransient(err: unknown): boolean {
+  const data = (err as ReadError | null)?.data;
+  if (!data) return true;
+  if (typeof data.code === "string" && TRANSIENT_CODES.has(data.code)) return true;
+  return typeof data.httpStatus === "number" && (data.httpStatus >= 500 || data.httpStatus === 408);
 }
 
 export function useServerLoad<T>(
@@ -36,6 +68,7 @@ export function useServerLoad<T>(
   { onLoadStateChange, registerRetryLoad }: Pick<ScreenProps, "onLoadStateChange" | "registerRetryLoad">,
 ): ServerLoad {
   const [state, setState] = useState<ScreenLoadState>(projectId ? "loading" : "ready");
+  const [failure, setFailure] = useState<LoadFailure | null>(null);
   const [attempt, setAttempt] = useState(0);
 
   // Screens pass inline arrows for `read` / `apply` / `onLoadStateChange`.
@@ -48,6 +81,10 @@ export function useServerLoad<T>(
   applyRef.current = apply;
   const reportRef = useRef(onLoadStateChange);
   reportRef.current = onLoadStateChange;
+  /* Once a row has landed for this site, a re-read keeps the screen up
+     (L3-035: keep existing data while retrying) instead of swapping it for
+     the loading card. */
+  const loadedRef = useRef<string | null>(null);
 
   const report = useCallback((next: ScreenLoadState) => {
     setState(next);
@@ -60,20 +97,32 @@ export function useServerLoad<T>(
       return;
     }
     let stale = false;
-    report("loading");
-    readRef.current(getBuildrikClient(DASHBOARD_URL), projectId)
-      .then((data) => {
-        if (stale) return;
-        applyRef.current(data);
-        report("ready");
-      })
-      .catch((error: unknown) => {
-        if (stale) return;
-        devError("settings", `settings load failed for site ${projectId}`, error);
-        report("error");
-      });
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    if (loadedRef.current !== projectId) report("loading");
+    const run = (secondTry: boolean) => {
+      readRef.current(getBuildrikClient(DASHBOARD_URL), projectId)
+        .then((data) => {
+          if (stale) return;
+          applyRef.current(data);
+          loadedRef.current = projectId;
+          setFailure(null);
+          report("ready");
+        })
+        .catch((error: unknown) => {
+          if (stale) return;
+          if (!secondTry && isTransient(error)) {
+            timer = setTimeout(() => run(true), AUTO_RETRY_MS);
+            return;
+          }
+          devError("settings", `settings load failed for site ${projectId}`, error);
+          setFailure(failureOf(error));
+          report("error");
+        });
+    };
+    run(false);
     return () => {
       stale = true;
+      if (timer) clearTimeout(timer);
     };
   }, [projectId, attempt, report]);
 
@@ -85,5 +134,5 @@ export function useServerLoad<T>(
     return () => registerRetryLoad(null);
   }, [registerRetryLoad, retry]);
 
-  return { state, retry };
+  return { state, failure, retry };
 }

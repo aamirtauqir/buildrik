@@ -389,7 +389,8 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
         <LoadCard
           title="General"
           state={load.state}
-          errorLine="Couldn't load your site settings. Check your connection, then try again."
+          errorLine="Couldn't load your site settings. Try again."
+          failure={load.failure}
           onRetry={load.retry}
         />
       </Screen>

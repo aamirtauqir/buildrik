@@ -413,17 +413,18 @@ describe("DomainsScreen — empty (3397:33034), loading (3397:32985), load-error
   });
 
   it("shows the error line + Try again when the read fails, and Try again re-reads", async () => {
-    d.list.query.mockRejectedValueOnce(new Error("network"));
+    /* L3-035: the one silent retry of a transient read fails too. */
+    d.list.query.mockRejectedValueOnce(new Error("network")).mockRejectedValueOnce(new Error("network"));
     const onLoadStateChange = vi.fn();
     setup({ onLoadStateChange });
-    await waitFor(() => expect(screen.getByTestId("set-load-retry")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByTestId("set-load-retry")).toBeInTheDocument(), { timeout: 4000 });
     expect(screen.getByTestId("set-load-state")).toHaveTextContent(
-      "Couldn't load your domains. Check your connection, then try again.",
+      "Couldn't load your domains. Try again.",
     );
     expect(onLoadStateChange).toHaveBeenLastCalledWith("error");
     fireEvent.click(screen.getByTestId("set-load-retry"));
     await loaded();
-    expect(d.list.query).toHaveBeenCalledTimes(2);
+    expect(d.list.query).toHaveBeenCalledTimes(3);
   });
 
   it("without a projectId (the demo) requests nothing and says so", () => {

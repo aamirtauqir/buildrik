@@ -181,7 +181,8 @@ export const AccessScreen: React.FC<ScreenProps> = ({
         <LoadCard
           title="Access"
           state={load.state}
-          errorLine="Couldn't load your access settings. Check your connection, then try again."
+          errorLine="Couldn't load your access settings. Try again."
+          failure={load.failure}
           onRetry={load.retry}
         />
       </Screen>

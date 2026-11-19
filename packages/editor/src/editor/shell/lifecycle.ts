@@ -429,3 +429,37 @@ export function deriveLifecycleState(i: LifecycleInput): NextMove | null {
     i.isPublished ? "Changes since this site went live." : "Not live yet.",
   );
 }
+
+/* ── Where the site stands (L3-009, owner 2026-10-10) ─────────────────────
+   Three status words used to come from three places: the page row's chip
+   said "Unpublished" for UNSAVED edits, its aria-label said "Live" on a site
+   that had never been published (per-page visibility read as publish
+   status), and the save pill said "Unsaved changes". One state, one label
+   table, read by the chip and the screen-reader text alike. */
+export type PublicationState = "unsaved" | "unpublished" | "draft" | "live";
+
+export const PUBLICATION_LABEL: Record<PublicationState, string> = {
+  unsaved: "Unsaved changes",
+  unpublished: "Unpublished changes",
+  draft: "Draft · not published yet",
+  live: "Live",
+};
+
+export interface PublicationInput {
+  /** Edits that have not reached the server. */
+  unsaved: boolean;
+  /** Has the site ever gone live? `null` = not known yet. */
+  isPublished: boolean | null;
+  /** Changed since it last went live. `null` = unknown. */
+  hasUnpublishedChanges: boolean | null;
+}
+
+/** `null` when the facts are not in — a status word is withheld rather than
+ *  guessed (the "Live" on a never-published draft was a guess). */
+export function publicationState(i: PublicationInput): PublicationState | null {
+  if (i.unsaved) return "unsaved";
+  if (i.isPublished === null) return null;
+  if (!i.isPublished) return "draft";
+  if (i.hasUnpublishedChanges === null) return null;
+  return i.hasUnpublishedChanges ? "unpublished" : "live";
+}

@@ -59,29 +59,21 @@ export function siteFontsFromTokens(
 }
 
 /**
- * The font slots the SITE saved, and its text colour, resolved against the
- * same list the canvas and the token CSS use. A font slot is reported only when
- * the site carries its token: the seed's Inter must not become a rule on every
- * export, or "a missing token leaves the reset's family in place"
- * (`siteFontCSS`) could never be true.
+ * The font slots and text colour the site EFFECTIVELY has — its saved tokens
+ * laid over the seed, the same list the canvas paints from and the token CSS
+ * declares (`tokensForEmit`).
  *
- * The text colour is reported from the seed too. The canvas always paints body
- * text with the Text token (site-content.css), saved or not, so a site that
- * never saved one was slate on the canvas and browser black in Preview and on
- * the published page (REA #18).
+ * L5-050 (owner, 2026-10-10): this used to report only the slots a site had
+ * saved, so a site on the defaults previewed and published in black text in
+ * an unloaded Inter while the canvas — which reads the seed through
+ * `site-content.css` — showed slate Inter. Every site now gets its effective
+ * values: a fresh site the seed's, a customised Brand its own choices.
  */
 export function siteFontsFromSettings(
   settings: SiteTokenSettings | undefined,
   opts?: { migrate: boolean }
 ): ReturnType<typeof siteFontsFromTokens> {
-  const saved = new Set(tokenList(settings?.designTokens).map((r) => (r as { id?: unknown } | null)?.id));
-  const all = siteFontsFromTokens(tokensForEmit(settings, opts));
-  return {
-    heading: saved.has("font-heading") ? all.heading : undefined,
-    body: saved.has("font-body") ? all.body : undefined,
-    mono: saved.has("font-mono") ? all.mono : undefined,
-    text: all.text,
-  };
+  return siteFontsFromTokens(tokensForEmit(settings, opts));
 }
 
 /**
@@ -96,8 +88,8 @@ export function siteFontsFromSettings(
  * from a token and the export named none, so unstyled text was slate in the
  * editor and browser-default black on the published page.
  *
- * Only emitted for slots the site actually carries; a missing token leaves the
- * reset's family in place rather than naming an empty family.
+ * A slot with no value (a token list that resolves none) leaves the reset's
+ * family in place rather than naming an empty family.
  */
 export function siteFontCSS(fonts: {
   heading?: string;

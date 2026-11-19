@@ -351,6 +351,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
           title="Analytics"
           state={load.state}
           errorLine="The settings service did not respond. Your existing configuration has not changed."
+          failure={load.failure}
           onRetry={load.retry}
         />
       </Screen>

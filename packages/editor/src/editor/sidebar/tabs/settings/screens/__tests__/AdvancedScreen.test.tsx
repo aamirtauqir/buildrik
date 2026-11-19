@@ -129,15 +129,16 @@ describe("AdvancedScreen — the frame's three cards, read from the Site row", (
   });
 
   it("shows the CUSTOM CODE load card while the row is on its way, then the error line + Try again", async () => {
-    getMock.mockRejectedValueOnce(new Error("network"));
+    /* L3-035: the one silent retry of a transient read fails too. */
+    getMock.mockRejectedValueOnce(new Error("network")).mockRejectedValueOnce(new Error("network"));
     const onLoadStateChange = vi.fn();
     setup({ projectId: "s1", onLoadStateChange });
     expect(screen.getByTestId("set-load-title")).toHaveTextContent("Loading Custom code…");
     expect(onLoadStateChange).toHaveBeenLastCalledWith("loading");
 
-    await waitFor(() => expect(screen.getByTestId("set-load-retry")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByTestId("set-load-retry")).toBeInTheDocument(), { timeout: 4000 });
     expect(screen.getByTestId("set-load-state")).toHaveTextContent(
-      "Couldn't load your custom code. Check your connection, then try again.",
+      "Couldn't load your custom code. Try again.",
     );
     expect(onLoadStateChange).toHaveBeenLastCalledWith("error");
 

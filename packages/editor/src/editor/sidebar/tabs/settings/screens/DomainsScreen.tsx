@@ -341,7 +341,8 @@ export const DomainsScreen: React.FC<ScreenProps> = ({
         <LoadCard
           title="Domains"
           state={load.state}
-          errorLine="Couldn't load your domains. Check your connection, then try again."
+          errorLine="Couldn't load your domains. Try again."
+          failure={load.failure}
           onRetry={load.retry}
         />
       </Screen>

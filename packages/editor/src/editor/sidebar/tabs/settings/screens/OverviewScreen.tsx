@@ -77,7 +77,7 @@ const STATE_NOTICE =
   "tw:flex tw:flex-col tw:items-start tw:gap-2 tw:rounded-[var(--bk-radius-sm)] tw:px-4 tw:py-3 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]";
 
 const LOAD_TITLE = "Overview";
-const LOAD_ERROR = "Couldn't load the overview. Check your connection, then try again.";
+const LOAD_ERROR = "Couldn't load the overview. Try again.";
 
 export const OverviewScreen: React.FC<OverviewScreenProps> = ({ projectId, siteName, onOpenScreen }) => {
   const [data, setData] = React.useState<SettingsOverview | null>(null);

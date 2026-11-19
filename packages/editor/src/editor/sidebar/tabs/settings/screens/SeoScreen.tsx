@@ -264,7 +264,8 @@ export const SeoScreen: React.FC<ScreenProps> = ({
         <LoadCard
           title="SEO"
           state={load.state}
-          errorLine="Couldn't load your SEO settings. Check your connection, then try again."
+          errorLine="Couldn't load your SEO settings. Try again."
+          failure={load.failure}
           onRetry={load.retry}
         />
       </Screen>

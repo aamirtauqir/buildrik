@@ -414,7 +414,8 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
         <LoadCard
           title="Redirects"
           state={load.state}
-          errorLine="Couldn't load your redirects. Check your connection, then try again."
+          errorLine="Couldn't load your redirects. Try again."
+          failure={load.failure}
           onRetry={load.retry}
         />
       </Screen>

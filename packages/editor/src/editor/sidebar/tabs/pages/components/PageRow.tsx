@@ -17,6 +17,8 @@ import * as React from "react";
 import type { Composer } from "@/engine";
 import type { PageItem } from "../types";
 import { getStatusLabel } from "../utils/statusLabel";
+import { SitePublicationContext } from "@/editor/shell/hooks/useLifecycle";
+import { PUBLICATION_LABEL, publicationState } from "@/editor/shell/lifecycle";
 import { pageRoute } from "../utils/slug";
 
 /* Board 63:6393: the URL / state lines under a row's name, and the tag at
@@ -199,12 +201,19 @@ export const PageRow = React.memo<Props>(
     };
 
     const label = getStatusLabel(page.status ?? "live");
+    /* L3-009: the row's status word comes from the site's publication state
+       (plus this page's unsaved flag) — the same one the visible chip reads.
+       `page.status` is the page's VISIBILITY ("will it ship?"), not whether
+       anything has shipped, so it no longer speaks "Live" for a draft site;
+       only a non-live visibility ("Hidden from publish") is still named. */
+    const site = React.useContext(SitePublicationContext);
+    const publication = publicationState({ unsaved: isDirty, ...site });
 
     const ariaLabel = [
       page.name,
-      label ?? "",
-      page.isHome ? "Homepage," : "",
-      isDirty ? "unsaved changes," : "",
+      publication ? PUBLICATION_LABEL[publication] : "",
+      label && page.status && page.status !== "live" ? label : "",
+      page.isHome ? "Homepage" : "",
       "press Enter to select",
     ]
       .filter(Boolean)
@@ -396,13 +405,14 @@ export const PageRow = React.memo<Props>(
             </span>
           )}
 
-          {/* Board 4418:93381 — "● Unpublished" for unsaved edits, then the
-              page's status chip ("Draft", "Hidden from publish"); a live page
-              with nothing pending draws neither (C5 G2-071). */}
+          {/* Board 4418:93381 — the dirty dot and its word for unsaved edits
+              (the board's "Unpublished", renamed by L3-009 to what it means),
+              then the page's visibility chip ("Hidden from publish"); a live
+              page with nothing pending draws neither (C5 G2-071). */}
           {isDirty && (
             <span className="bd-pg-row-unpublished" aria-hidden="true">
               <span className="bd-pg-row-dirty" data-testid="page-dirty-dot" />
-              <span data-testid={`page-dirty-label-${page.id}`}>Unpublished</span>
+              <span data-testid={`page-dirty-label-${page.id}`}>{PUBLICATION_LABEL.unsaved}</span>
             </span>
           )}
 

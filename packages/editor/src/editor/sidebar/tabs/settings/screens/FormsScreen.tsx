@@ -336,7 +336,7 @@ export const FormsScreen: React.FC<ScreenProps> = ({ composer, projectId, onDirt
         <LoadCard
           title="Form submissions"
           state={formsState}
-          errorLine="Couldn't load your forms. Check your connection, then try again."
+          errorLine="Couldn't load your forms. Try again."
           onRetry={() => setAttempt((n) => n + 1)}
         />
       </Screen>

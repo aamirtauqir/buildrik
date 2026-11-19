@@ -148,9 +148,10 @@ describe("General · 2L9 B8-S02 238:10283 — Site and Icons cards from the Site
   });
 
   it("shows the load card while reading and Try again after a failure", async () => {
-    getMock.mockRejectedValueOnce(new Error("network"));
+    /* L3-035: the one silent retry of a transient read fails too. */
+    getMock.mockRejectedValueOnce(new Error("network")).mockRejectedValueOnce(new Error("network"));
     setup();
-    await waitFor(() => expect(screen.getByTestId("set-load-retry")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByTestId("set-load-retry")).toBeInTheDocument(), { timeout: 4000 });
     expect(screen.getByTestId("set-load-title")).toHaveTextContent("Couldn’t load General");
     getMock.mockResolvedValueOnce(serverRow());
     fireEvent.click(screen.getByTestId("set-load-retry"));

@@ -52,6 +52,8 @@ export interface UseLifecycleInput {
   errorCount: number;
   /** The canonical publish job — the live URL and the server's stamps. */
   publishedUrl: string | null;
+  /** `publishJob.isPublished` — `null` until the server has said. */
+  isPublished?: boolean | null;
   lastPublishedAt: string | null;
   serverHasUnpublishedChanges: boolean | null;
   /** `publishJob.blockedReason` — the server refused a publish. A refusal the
@@ -78,7 +80,23 @@ export interface Lifecycle {
    * plain confirm. Derived from the same input with the errors acknowledged.
    */
   gateAfterErrors: PublishGate;
+  /** The site's publication facts behind every status word (L3-009). */
+  sitePublication: SitePublication;
 }
+
+/** What `publicationState` needs from the site; the page's own unsaved flag
+ *  is added by whoever draws the page. */
+export interface SitePublication {
+  isPublished: boolean | null;
+  hasUnpublishedChanges: boolean | null;
+}
+
+/** The shell's one answer, for surfaces too deep to be handed it as a prop
+ *  (the Pages panel's rows). Default: nothing known — no status word. */
+export const SitePublicationContext = React.createContext<SitePublication>({
+  isPublished: null,
+  hasUnpublishedChanges: null,
+});
 
 const LIVE_ROUND: ReadonlySet<ReviewPillState> = new Set(["pending", "opened-not-acted"]);
 
@@ -101,6 +119,7 @@ export function useLifecycle({
   offline,
   errorCount,
   publishedUrl,
+  isPublished = null,
   lastPublishedAt,
   serverHasUnpublishedChanges,
   serverBlock,
@@ -259,5 +278,11 @@ export function useLifecycle({
     [input, nextMove?.gate],
   );
 
-  return { reviewStatus, openCommentCount, nextMove, gateAfterErrors };
+  const known = isPublished ?? (publishedUrl ? true : null);
+  const sitePublication = React.useMemo<SitePublication>(
+    () => ({ isPublished: known, hasUnpublishedChanges: known === false ? null : hasUnpublishedChanges }),
+    [known, hasUnpublishedChanges],
+  );
+
+  return { reviewStatus, openCommentCount, nextMove, gateAfterErrors, sitePublication };
 }

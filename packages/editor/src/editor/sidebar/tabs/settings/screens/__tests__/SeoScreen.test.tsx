@@ -135,9 +135,10 @@ describe("SEO · 8135:214533 — Defaults, Social profiles, the Pages strip, Ind
   });
 
   it("shows the load card and Try again when the read fails", async () => {
-    getMock.mockRejectedValueOnce(new Error("network"));
+    /* L3-035: the one silent retry of a transient read fails too. */
+    getMock.mockRejectedValueOnce(new Error("network")).mockRejectedValueOnce(new Error("network"));
     setup();
-    await waitFor(() => expect(screen.getByTestId("set-load-retry")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByTestId("set-load-retry")).toBeInTheDocument(), { timeout: 4000 });
     fireEvent.click(screen.getByTestId("set-load-retry"));
     await loaded();
   });

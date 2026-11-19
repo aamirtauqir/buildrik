@@ -342,17 +342,18 @@ describe("AnalyticsScreen — loading, load-error and save-error", () => {
   });
 
   it("shows the error line + Try again when the read fails, and Try again re-reads", async () => {
-    statusMock.mockRejectedValueOnce(new Error("network"));
+    /* L3-035: the one silent retry of a transient read fails too. */
+    statusMock.mockRejectedValueOnce(new Error("network")).mockRejectedValueOnce(new Error("network"));
     const onLoadStateChange = vi.fn();
     setup({ onLoadStateChange });
-    await waitFor(() => expect(screen.getByTestId("set-load-retry")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByTestId("set-load-retry")).toBeInTheDocument(), { timeout: 4000 });
     expect(screen.getByTestId("set-load-state")).toHaveTextContent(
       "The settings service did not respond. Your existing configuration has not changed.",
     );
     expect(onLoadStateChange).toHaveBeenLastCalledWith("error");
     fireEvent.click(screen.getByTestId("set-load-retry"));
     await loaded();
-    expect(statusMock).toHaveBeenCalledTimes(2);
+    expect(statusMock).toHaveBeenCalledTimes(3);
   });
 
   it("renders the shell's saveError above the cards", async () => {

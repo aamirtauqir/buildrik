@@ -92,7 +92,7 @@ describe("OverviewScreen — load states", () => {
     render(<OverviewScreen siteName="Bella Cucina" projectId="site-1" onOpenScreen={vi.fn()} />);
     first.reject(new Error("No procedure found on path siteDetail.settingsOverview"));
     const retry = await screen.findByTestId("set-load-retry");
-    expect(screen.getByText("Couldn't load the overview. Check your connection, then try again.")).toBeTruthy();
+    expect(screen.getByText("Couldn't load the overview. Try again.")).toBeTruthy();
     query.mockResolvedValueOnce(full);
     fireEvent.click(retry);
     expect(query).toHaveBeenCalledTimes(2);

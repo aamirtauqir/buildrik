@@ -265,17 +265,18 @@ describe("HeadersScreen — the server states", () => {
   });
 
   it("a failed read is the load-error card with Try again, which re-reads (3397:33383)", async () => {
-    getMock.mockRejectedValueOnce(new Error("boom"));
+    /* L3-035: the one silent retry of a transient read fails too. */
+    getMock.mockRejectedValueOnce(new Error("boom")).mockRejectedValueOnce(new Error("boom"));
     const onLoadStateChange = vi.fn();
     setup({ onLoadStateChange });
-    await waitFor(() => expect(screen.getByTestId("set-load-card")).toHaveAttribute("data-state", "error"));
+    await waitFor(() => expect(screen.getByTestId("set-load-card")).toHaveAttribute("data-state", "error"), { timeout: 4000 });
     expect(screen.getByTestId("set-load-state")).toHaveTextContent(
       "The settings service did not respond. Your existing configuration has not changed.",
     );
     expect(onLoadStateChange).toHaveBeenCalledWith("error");
     fireEvent.click(screen.getByTestId("set-load-retry"));
     await loaded();
-    expect(getMock).toHaveBeenCalledTimes(2);
+    expect(getMock).toHaveBeenCalledTimes(3);
     expect(onLoadStateChange).toHaveBeenLastCalledWith("ready");
     expect(xfo().value).toBe("SAMEORIGIN");
   });

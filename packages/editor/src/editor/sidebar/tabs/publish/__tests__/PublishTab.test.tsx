@@ -68,6 +68,7 @@ function makeJob(over: Partial<UsePublishJobResult> = {}): UsePublishJobResult {
     retryForms: vi.fn(), retryPostDeploy: vi.fn(), serverBlockers: null,
     lastPublishedAt: null,
     hasUnpublishedChanges: null,
+    isPublished: null,
     unpublished: vi.fn(),
     startedAt: null,
     pollLost: false,

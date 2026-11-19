@@ -156,23 +156,25 @@ describe("RedirectsScreen — gating + the load states (3397:33479 / 3397:33573)
   });
 
   it("a failed list read is the load-error card with the frame's line and a Try again that re-reads", async () => {
-    r.list.query.mockRejectedValueOnce(new Error("boom"));
+    /* L3-035: the one silent retry of a transient read fails too. */
+    r.list.query.mockRejectedValueOnce(new Error("boom")).mockRejectedValueOnce(new Error("boom"));
     const onLoadStateChange = vi.fn();
     setup({ onLoadStateChange });
-    await waitFor(() => expect(screen.getByTestId("set-load-card")).toHaveAttribute("data-state", "error"));
-    expect(screen.getByTestId("set-load-state")).toHaveTextContent("Couldn't load your redirects. Check your connection, then try again.");
+    await waitFor(() => expect(screen.getByTestId("set-load-card")).toHaveAttribute("data-state", "error"), { timeout: 4000 });
+    expect(screen.getByTestId("set-load-state")).toHaveTextContent("Couldn't load your redirects. Try again.");
     expect(onLoadStateChange).toHaveBeenLastCalledWith("error");
     expect(screen.queryByTestId("set-rd-table")).toBeNull();
 
     fireEvent.click(screen.getByTestId("set-load-retry"));
     await loaded();
-    expect(r.list.query).toHaveBeenCalledTimes(2);
+    expect(r.list.query).toHaveBeenCalledTimes(3);
   });
 
   it("one load state over BOTH reads — a failed suggestions read is the same load-error card", async () => {
-    r.suggestions.query.mockRejectedValueOnce(new Error("no suggester"));
+    /* L3-035: the one silent retry of a transient read fails too. */
+    r.suggestions.query.mockRejectedValueOnce(new Error("no suggester")).mockRejectedValueOnce(new Error("no suggester"));
     setup();
-    await waitFor(() => expect(screen.getByTestId("set-load-card")).toHaveAttribute("data-state", "error"));
+    await waitFor(() => expect(screen.getByTestId("set-load-card")).toHaveAttribute("data-state", "error"), { timeout: 4000 });
   });
 });
 

@@ -22,7 +22,7 @@ import { PublishConfirmModal } from "./modals/PublishConfirmModal";
 import { PublishErrorsConfirmModal } from "./modals/PublishErrorsConfirmModal";
 import { PublishGateModal, isPublishGateReason } from "./modals/PublishGateModal";
 import { gateFromBlockReason, type PublishGate } from "./lifecycle";
-import { useLifecycle } from "./hooks/useLifecycle";
+import { SitePublicationContext, useLifecycle } from "./hooks/useLifecycle";
 import { PreviewOverlay } from "./PreviewOverlay";
 import { CompareHost } from "./CompareHost";
 import { sanitizeHTMLForPreview } from "../export/ExportUtils";
@@ -480,7 +480,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     () => state.issues.filter((i) => i.type === "error").length,
     [state.issues],
   );
-  const { reviewStatus, openCommentCount, nextMove, gateAfterErrors } = useLifecycle({
+  const { reviewStatus, openCommentCount, nextMove, gateAfterErrors, sitePublication } = useLifecycle({
     composer,
     addToast,
     isDirty: state.isDirty,
@@ -489,6 +489,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     offline: isOffline || state.syncStatus === "offline",
     errorCount,
     publishedUrl: publishJob.publishedUrl,
+    isPublished: publishJob.isPublished,
     lastPublishedAt: publishJob.lastPublishedAt,
     serverHasUnpublishedChanges: publishJob.hasUnpublishedChanges,
     serverBlock: publishJob.blockedReason,
@@ -777,6 +778,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         onSignIn={() => window.open(`${DASHBOARD_URL}/auth?reason=session-expired`, "_blank", "noopener")}
         onDismiss={() => setLoadError(null)}
       />
+      <SitePublicationContext.Provider value={sitePublication}>
       <StudioPanels
         composer={composer}
         selectedElement={selectedElement}
@@ -835,6 +837,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         // visible either way (owner decision).
         reviewsEnabled={reviewStatus.reviewsEnabled}
       />
+      </SitePublicationContext.Provider>
 
       {/* Tour overlay removed — onboarding handled by orchestrator */}
 

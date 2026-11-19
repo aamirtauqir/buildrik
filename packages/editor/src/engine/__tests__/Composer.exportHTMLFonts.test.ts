@@ -51,7 +51,7 @@ describe("the preview document carries the site's fonts", () => {
       { id: "font-body", value: "Verdana" },
       { id: "font-heading", value: "Playfair Display" },
     ]).exportHTML();
-    expect(combined).toMatch(/body\{font-family:Verdana,sans-serif[;}]/);
+    expect(combined).toContain("body{font-family:Verdana,sans-serif;");
     expect(combined).toContain("h1,h2,h3,h4,h5,h6{font-family:Playfair Display,sans-serif}");
     expect(combined).toContain("family=Playfair+Display");
   });

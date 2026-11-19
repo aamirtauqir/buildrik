@@ -240,7 +240,8 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
         <LoadCard
           title="Languages"
           state={load.state}
-          errorLine="Couldn't load your locales. Check your connection, then try again."
+          errorLine="Couldn't load your locales. Try again."
+          failure={load.failure}
           onRetry={load.retry}
         />
       </Screen>

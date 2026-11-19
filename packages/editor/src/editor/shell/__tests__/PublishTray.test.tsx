@@ -82,6 +82,7 @@ function job(over: Partial<UsePublishJobResult> = {}): UsePublishJobResult {
     reset: vi.fn(),
     lastPublishedAt: null,
     hasUnpublishedChanges: null,
+    isPublished: null,
     dismissBlock: vi.fn(),
     unpublished: vi.fn(),
     startedAt: null,

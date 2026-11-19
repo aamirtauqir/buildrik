@@ -114,9 +114,10 @@ describe("Languages · 8135:214023", () => {
   });
 
   it("a failed read is the load-error card with Try again", async () => {
-    localesMock.mockRejectedValueOnce(new Error("network"));
+    /* L3-035: the one silent retry of a transient read fails too. */
+    localesMock.mockRejectedValueOnce(new Error("network")).mockRejectedValueOnce(new Error("network"));
     setup();
-    await waitFor(() => expect(screen.getByTestId("set-load-retry")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByTestId("set-load-retry")).toBeInTheDocument(), { timeout: 4000 });
     expect(screen.getByTestId("set-load-title")).toHaveTextContent("Couldn’t load Languages");
     fireEvent.click(screen.getByTestId("set-load-retry"));
     await loaded();

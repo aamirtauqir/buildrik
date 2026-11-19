@@ -159,6 +159,10 @@ export interface UsePublishJobResult {
   /** The server's answer at hydration (and again after a publish completes):
    *  had the site changed since it last went live? Null = unknown. */
   hasUnpublishedChanges: boolean | null;
+  /** Has the site ever gone live? `null` until the server's publish state
+   *  has been read (or a publish in this session answered it) — a label must
+   *  not call a site a draft, or live, on a guess (L3-009). */
+  isPublished: boolean | null;
   /** Dismiss an approval block without publishing (Cancel / after a toast). */
   dismissBlock: () => void;
   /** The server just took the site down (sites.unpublish succeeded). Drop the
@@ -497,6 +501,7 @@ export function usePublishJob(): UsePublishJobResult {
     publishedUrl: status?.publishedUrl ?? hydratedUrl,
     lastPublishedAt: hydrated?.lastPublishedAt ?? null,
     hasUnpublishedChanges: hydrated?.hasUnpublishedChanges ?? null,
+    isPublished: status?.publishedUrl ? true : hydrated ? Boolean(hydratedUrl) : null,
     error,
     steps: status?.steps ?? null,
     startedAt: status?.startedAt ?? null,

@@ -4,7 +4,14 @@
  * "these two rows render the same button" is visible.
  */
 import { describe, it, expect, vi } from "vitest";
-import { deriveLifecycleState, gateFromBlockReason, type LifecycleInput, type PublishGate } from "../lifecycle";
+import {
+  deriveLifecycleState,
+  gateFromBlockReason,
+  publicationState,
+  PUBLICATION_LABEL,
+  type LifecycleInput,
+  type PublishGate,
+} from "../lifecycle";
 
 /** A workspace that requires client approval, actor is an editor, online,
  *  nothing wrong with the site, never published. */
@@ -372,5 +379,29 @@ describe("gateFromBlockReason — the server's refusal on the same enum", () => 
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     expect(gateFromBlockReason("quota-exceeded")).toBe("none");
     warn.mockRestore();
+  });
+});
+
+/* L3-009 (owner, 2026-10-10): "Unsaved changes" / "Unpublished changes" /
+   "Draft · not published yet" come from ONE state, read the same way by the
+   eye and by a screen reader. */
+describe("publicationState — L3-009", () => {
+  it("unsaved edits outrank everything", () => {
+    expect(publicationState({ unsaved: true, isPublished: false, hasUnpublishedChanges: null })).toBe("unsaved");
+    expect(publicationState({ unsaved: true, isPublished: true, hasUnpublishedChanges: false })).toBe("unsaved");
+  });
+  it("a site that never went live is a draft, never 'Live'", () => {
+    expect(publicationState({ unsaved: false, isPublished: false, hasUnpublishedChanges: null })).toBe("draft");
+    expect(PUBLICATION_LABEL.draft).toBe("Draft · not published yet");
+  });
+  it("a live site with changes since is 'Unpublished changes'; without, 'Live'", () => {
+    expect(publicationState({ unsaved: false, isPublished: true, hasUnpublishedChanges: true })).toBe("unpublished");
+    expect(publicationState({ unsaved: false, isPublished: true, hasUnpublishedChanges: false })).toBe("live");
+    expect(PUBLICATION_LABEL.unpublished).toBe("Unpublished changes");
+    expect(PUBLICATION_LABEL.unsaved).toBe("Unsaved changes");
+  });
+  it("says nothing while the publish state is unknown", () => {
+    expect(publicationState({ unsaved: false, isPublished: null, hasUnpublishedChanges: null })).toBeNull();
+    expect(publicationState({ unsaved: false, isPublished: true, hasUnpublishedChanges: null })).toBeNull();
   });
 });
