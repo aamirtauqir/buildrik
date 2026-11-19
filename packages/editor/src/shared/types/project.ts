@@ -8,6 +8,7 @@
 
 import type { CmsBindingsInput } from "@buildrik/shared/schemas/sites";
 import type { DarkMode, DesignToken } from "@buildrik/shared/schemas/design-tokens";
+import type { StyleModel } from "@buildrik/shared/schemas/class-styles";
 import type { AssetData } from "./asset";
 import type { CanvasGuide } from "./canvas";
 import type { ElementData } from "./element";
@@ -70,6 +71,9 @@ export interface ProjectData {
   brandTokensV2?: boolean;
   /** Operator rollback hold: this site is never migrated while set. */
   tokensMigrationHold?: boolean;
+  /** The server's effective style model at load (class-first, BD-30). Read
+   *  into `composer.styleModel`; never sent back — the server owns it. */
+  styleModel?: StyleModel;
 }
 
 export interface ProjectMetadata {

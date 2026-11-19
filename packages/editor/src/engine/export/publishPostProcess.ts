@@ -63,6 +63,13 @@ export interface FormTarget {
   appOrigin: string;
 }
 
+/**
+ * On an element a Collection list repeated: the id of the element it is a copy
+ * of (keyCollectionCopies). Each copy has its own `data-buildrick-id`, but a
+ * form in a card is still the one form block the site saved.
+ */
+export const COPY_OF_ATTR = "data-buildrick-copy-of";
+
 const FORM_TAG = /<form\b[^>]*>/gi;
 const ATTR = (html: string, attr: string) =>
   new RegExp(`\\b${attr}="([^"]*)"`, "i").exec(html)?.[1] ?? null;
@@ -126,7 +133,7 @@ if(p.get("submitted")!=="1")return;
 var id=p.get("form");
 if(!id)return;
 var esc=(window.CSS&&CSS.escape)?CSS.escape(id):id.replace(/[^a-zA-Z0-9_-]/g,"");
-var f=document.querySelector('[data-buildrick-id="'+esc+'"]')||document.getElementById(id);
+var f=document.querySelector('[data-buildrick-id="'+esc+'"],[${COPY_OF_ATTR}="'+esc+'"]')||document.getElementById(id);
 if(!f)return;
 var m=f.getAttribute("data-success-message")||"Thanks — your message was sent.";
 var el=document.createElement("p");
@@ -170,7 +177,7 @@ export function wireForms(
       out = out.replace(open, `<form${POST_ATTRS}${rest}`);
       continue;
     }
-    const blockId = ATTR(open, "data-buildrick-id") ?? ATTR(open, "id");
+    const blockId = ATTR(open, COPY_OF_ATTR) ?? ATTR(open, "data-buildrick-id") ?? ATTR(open, "id");
     if (!blockId) continue;
 
     const settings = formSettings[blockId];

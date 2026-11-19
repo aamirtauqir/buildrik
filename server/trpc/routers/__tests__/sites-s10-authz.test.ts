@@ -241,6 +241,6 @@ describe("sites.saveProject — records who saved (A1)", () => {
     saveProjectFromEditorMock.mockResolvedValueOnce({ success: true, savedAt: new Date(0) });
     const caller = sitesRouter.createCaller(ctx() as never);
     await caller.saveProject({ siteId: "s_a", projectData: { version: "1", pages: [], styles: [], assets: [] } } as never);
-    expect(saveProjectFromEditorMock).toHaveBeenCalledWith("s_a", expect.anything(), undefined, "u_1");
+    expect(saveProjectFromEditorMock).toHaveBeenCalledWith("s_a", expect.anything(), undefined, "u_1", undefined);
   });
 });

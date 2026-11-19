@@ -18,11 +18,37 @@
  * the live site resolve every property the same way (ResolvedStyle).
  */
 import { isSafeElementId } from "@buildrik/shared/schemas/element-markup";
+import { CLASS_CHAIN_MAX, type StyleModel } from "@buildrik/shared/schemas/class-styles";
 import type { BreakpointId } from "@/shared/types/breakpoints";
 import { isSafeAttrValue } from "@/shared/utils/html/sanitization";
 import { stylesToCSS, stylesToString } from "../export/ExportHelpers";
 
 export type CascadeTarget = "media" | BreakpointId;
+
+/**
+ * How many times an element-local rule repeats its identity selector in the
+ * class style model (CLASS-FIRST-SPEC §4.2, the specificity ladder). A class
+ * rule is at most CLASS_CHAIN_MAX classes plus one pseudo-class — (0,4,0) —
+ * so a local identity repeated one more time than that, (0,5,0), beats every
+ * class rule, state rules included, by specificity alone. The spec's 4×
+ * relied on locals coming after classes in source order, but every surface
+ * writes the element base rules (elementBaseCSS) BEFORE the class rules, so
+ * `.a.b.c:hover` would have tied a local base value and won.
+ */
+const LOCAL_LADDER = CLASS_CHAIN_MAX + 2;
+
+/**
+ * An element-local rule's identity selector (`.buildrick-<id>` on publish,
+ * `[data-buildrick-id="<id>"]` on the canvas and in StyleEngine rules) as the
+ * cascade writes it: unchanged in the element model, so legacy output stays
+ * byte-identical; repeated LOCAL_LADDER times in the class model, so a value
+ * set on "this element only" wins over every tag and class rule at every
+ * breakpoint and in every state (owner Q3, BD-38). `pseudo` (`:hover`) goes
+ * after the repeated identity.
+ */
+export function localSelector(identity: string, styleModel: StyleModel, pseudo = ""): string {
+  return (styleModel === "class" ? identity.repeat(LOCAL_LADDER) : identity) + pseudo;
+}
 
 /** `--hide-<bp>: true` (the inspector's Visibility toggles), per breakpoint, as the viewport query that hides. */
 const HIDE_QUERIES: Record<BreakpointId, { key: string; query: string }> = {
@@ -66,6 +92,9 @@ export type BaseRuleCache = Map<string, { base: string | null; hides: string[] }
  * whole block carrying a dangerous pattern (expression(), -moz-binding) is
  * dropped, as the inline style attribute used to be.
  *
+ * `styleModel` "class" writes each selector through localSelector (the
+ * specificity ladder); "element" leaves it as `selectorFor` built it.
+ *
  * `cache` (the canvas passes one) keeps each element's built rules between
  * calls: the canvas rewrites its whole sheet on every edit, and rebuilding
  * 500 unchanged rules each time was the bulk of the cost. An element whose
@@ -77,11 +106,12 @@ export function elementBaseCSS(
   target: CascadeTarget,
   minify: boolean,
   cache?: BaseRuleCache,
+  styleModel: StyleModel = "element",
 ): string {
   const baseRules: string[] = [];
   const hideRules: string[] = [];
   const build = (id: string, styles: Record<string, string>, flat: string) => {
-    const sel = selectorFor(id);
+    const sel = localSelector(selectorFor(id), styleModel);
     const base = isSafeAttrValue("style", flat, "")
       ? minify
         ? `${sel}{${stylesToCSS(styles, true)}}`
@@ -96,7 +126,7 @@ export function elementBaseCSS(
       const flat = stylesToString(styles);
       let built;
       if (cache) {
-        const key = `${el.id}|${target}|${flat}`;
+        const key = `${el.id}|${target}|${styleModel}|${flat}`;
         built = cache.get(key);
         if (!built) cache.set(key, (built = build(el.id, styles, flat)));
       } else {

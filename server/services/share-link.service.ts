@@ -6,6 +6,7 @@ import { getPublishedCmsForBindings } from "@/server/services/cms.service";
 import { listSiteFontAssets } from "@/server/services/media.service";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import { isBrandTokensV2Enabled } from "@/server/services/brand-tokens";
+import { effectiveStyleModel } from "@/server/services/class-styles";
 
 // The link token IS the bearer credential for the draft it unlocks — a
 // VIEWER should not be able to read it off the list, only an EDITOR+ who
@@ -261,6 +262,7 @@ export async function getShareDraftRows(siteId: string) {
       bodyCode: true,
       socialLinks: true,
       touchIcon: true,
+      styleModel: true,
       sitePages: {
         where: { deletedAt: null },
         select: {
@@ -283,7 +285,7 @@ export async function getShareDraftRows(siteId: string) {
      them the scratch render cannot write their @font-face, and the preview
      named e.g. 'Inter Var' while loading nothing (2026-09-24). */
   const fontAssets = await listSiteFontAssets(siteId);
-  const { sitePages, name, workspaceId, publishedUrl, projectStyles, projectSettings, projectCmsBindings, dsSchemaVersion, ...columns } = site;
+  const { sitePages, name, workspaceId, publishedUrl, projectStyles, projectSettings, projectCmsBindings, dsSchemaVersion, styleModel, ...columns } = site;
   const pages = sitePages.filter((p) => {
     const visibility = (p.settings as { visibility?: unknown } | null)?.visibility;
     return visibility === undefined || visibility === "live";
@@ -303,7 +305,13 @@ export async function getShareDraftRows(siteId: string) {
     pages,
     /* L4-031: the server's brand-token switch, so the scratch render does not
        take the engine default (on) for a switched-off site. */
-    siteColumns: { name, ...columns, brandTokensV2: isBrandTokensV2Enabled(workspaceId) },
+    siteColumns: {
+      name,
+      ...columns,
+      brandTokensV2: isBrandTokensV2Enabled(workspaceId),
+      // The draft renders in the style model the editor and publish use.
+      styleModel: effectiveStyleModel(styleModel, workspaceId),
+    },
     siteFonts: fontAssets,
     cms,
   };

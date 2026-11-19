@@ -23,3 +23,15 @@ const ELEMENT_ID_IN_SELECTOR = /\[data-buildrick-id="((?:[^"\\]|\\.)*)"\]/g;
 export function elementIdsInSelector(selector: string): string[] {
   return [...selector.matchAll(ELEMENT_ID_IN_SELECTOR)].map((m) => m[1].replace(/\\(.)/g, "$1"));
 }
+
+/**
+ * `selector` with each element it names re-keyed to `to(id)` — or left as it
+ * is where `to` answers undefined. The export writes a Collection list's
+ * repeated elements as their shared class (`.buildrick-<id>`): each published
+ * copy carries its own `data-buildrick-id`, so the attribute form would style
+ * none of them. A class and an attribute selector weigh the same, so the
+ * cascade does not move.
+ */
+export function renameElementSelectors(selector: string, to: (id: string) => string | undefined): string {
+  return selector.replace(ELEMENT_ID_IN_SELECTOR, (whole, raw: string) => to(raw.replace(/\\(.)/g, "$1")) ?? whole);
+}

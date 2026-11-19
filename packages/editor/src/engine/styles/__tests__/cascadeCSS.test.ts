@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { elementBaseCSS, hideRulesFor, type BaseRuleCache, type StyleNode } from "../cascadeCSS";
+import { isSafeCssSelector } from "@buildrik/shared/schemas/element-markup";
+import { elementBaseCSS, hideRulesFor, localSelector, type BaseRuleCache, type StyleNode } from "../cascadeCSS";
 import { elementSelector } from "@/shared/utils/elementSelector";
 
 const tree = (color: string): StyleNode => ({
@@ -53,5 +54,24 @@ describe("hideRulesFor", () => {
       "@media (min-width:768px) and (max-width:1023px){.x{display:none!important}}",
       "@media (min-width:1024px){.x{display:none!important}}",
     ]);
+  });
+});
+
+describe("localSelector — the class-mode specificity ladder (CLASS-FIRST-SPEC §4.2)", () => {
+  const local = elementSelector("el-a");
+
+  it("is the identity unchanged in the element model (legacy output byte-identical)", () => {
+    expect(localSelector(local, "element")).toBe(local);
+    expect(localSelector(".buildrick-el-a", "element", ":hover")).toBe(".buildrick-el-a:hover");
+  });
+
+  it("repeats the identity in the class model, ahead of the state", () => {
+    expect(localSelector(".buildrick-el-a", "class")).toBe(".buildrick-el-a".repeat(5));
+    expect(localSelector(local, "class", ":hover")).toBe(local.repeat(5) + ":hover");
+  });
+
+  it("stays inside the shared selector grammar", () => {
+    expect(isSafeCssSelector(localSelector(local, "class", ":focus"))).toBe(true);
+    expect(isSafeCssSelector(localSelector(".buildrick-el-a", "class"))).toBe(true);
   });
 });

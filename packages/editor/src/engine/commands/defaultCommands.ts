@@ -8,7 +8,7 @@
 
 import { EVENTS } from "@/shared/constants";
 import { stepZoom } from "@/shared/constants/canvas";
-import type { CommandData, CommandOptions, ElementType } from "@/shared/types";
+import type { CommandData, CommandOptions, ElementData, ElementType } from "@/shared/types";
 /* Explicit: without it `Element` in this file resolves to the DOM one. */
 import type { Element } from "../elements/Element";
 import { insertionPlace } from "@/shared/utils/nesting";
@@ -47,6 +47,12 @@ function lockTargets(c: Composer, options?: CommandOptions): Element[] {
   if (!id) return c.selection.getAllSelected();
   const el = c.elements.getElement(id);
   return el ? [el] : [];
+}
+
+/** Every element id in a serialized tree. */
+function forEachId(data: ElementData, visit: (id: string) => void): void {
+  visit(data.id);
+  for (const child of data.children ?? []) forEachId(child, visit);
 }
 
 export function buildDefaultCommands(composer: Composer): CommandData[] {
@@ -118,7 +124,21 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
           return;
         }
         c.beginTransaction("delete");
+        const removed = new Set<string>();
+        const collect = (el: Element): void => {
+          removed.add(el.getId());
+          el.getChildren().forEach(collect);
+        };
+        selected.forEach(collect);
         for (const el of selected) c.elements.removeElement(el.getId());
+        /* Their breakpoint and :state rules go too (CLASS-FIRST-SPEC §2.2) —
+           in this transaction, so ⌘Z restores them with the elements. Only
+           here: cut keeps them (paste finds them by the source id), and so
+           does a component re-sync, which removes and rebuilds the same ids.
+           An element whose copy is on the clipboard keeps its rules for the
+           same reason. */
+        for (const item of c.clipboard ?? []) forEachId(item, (id) => removed.delete(id));
+        c.styles.removeRulesOf(removed);
         c.endTransaction();
       },
     },

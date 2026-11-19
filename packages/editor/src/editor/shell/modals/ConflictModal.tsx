@@ -76,6 +76,8 @@ export interface ConflictModalProps {
   onClose: () => void;
   /** The server refused this tab's brand as an older format: no Overwrite. */
   brandFormat?: boolean;
+  /** The server refused this tab because the site now uses classes (class-first): no Replace. */
+  styleModel?: boolean;
 }
 
 const TITLE_ID = "conflict-modal-title";
@@ -120,6 +122,7 @@ export function ConflictModal({
   onReplace,
   onClose,
   brandFormat = false,
+  styleModel = false,
 }: ConflictModalProps) {
   const [step, setStep] = React.useState<Step>("choose");
   const [showDiff, setShowDiff] = React.useState(false);
@@ -141,7 +144,7 @@ export function ConflictModal({
 
   const restore = variant === "restore";
   const safeRestore = restore && relation === "unchanged";
-  const canReplace = !brandFormat;
+  const canReplace = !brandFormat && !styleModel;
 
   const keep = () => {
     if (siteId) {
@@ -225,7 +228,11 @@ export function ConflictModal({
   } else {
     title = restore ? restoreTitle(relation, server) : "This site changed somewhere else";
     let text: string;
-    if (brandFormat) {
+    if (styleModel) {
+      text =
+        "This site now uses classes for styling, so this tab can't save over it. " +
+        "Reload to keep editing. Save your edits to History first if you want a copy of your recent changes.";
+    } else if (brandFormat) {
       text =
         "This site's brand was upgraded to a newer format, so this tab can't save over it. " +
         "Reload to keep editing. Save your edits to History first if you want a copy of your recent changes.";
@@ -248,7 +255,7 @@ export function ConflictModal({
     body = (
       <>
         <p data-testid="conflict-body" className={BODY}>{text}</p>
-        {!brandFormat && !safeRestore && (
+        {canReplace && !safeRestore && (
           <div className="tw:mt-2">
             <Button
               color="light"

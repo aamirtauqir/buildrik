@@ -368,6 +368,11 @@ model Site {
   // when a migrated site is put back on its pre-v6 tokens; the site is never
   // migrated again and Brand stays read-only until `--clear`.
   tokensMigrationHold Boolean @default(false)
+  // Class-first styling (BD-30): "element" (every site today — element-local
+  // styles, legacy cascade) or "class" (class-first cascade ladder). Server-
+  // owned, never taken from an editor payload; effective only while the
+  // CLASS_STYLES / CLASS_STYLES_WORKSPACES flags enable the site's workspace.
+  styleModel        String    @default("element")
   projectAssets     Json?
   projectSettings   Json?
   // Editor CMS bindings (element id → collection field / repeater), as

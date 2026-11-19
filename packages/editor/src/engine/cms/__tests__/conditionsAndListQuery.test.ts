@@ -128,7 +128,7 @@ describe("render", () => {
     expect(bindings.setCondition("sun", hidden("sunday"))).toBe(true);
     expect(bindings.getCondition("sun")).toEqual(hidden("sunday"));
     const html = await new CMSExportResolver(composer).resolve(LIST, { mode: "static" });
-    expect(html.match(/data-buildrick-id="card"/g)).toHaveLength(3);
+    expect(html.match(/data-buildrick-copy-of="card"/g)).toHaveLength(3);
     expect(html.match(/Open Sundays/g)).toHaveLength(2);
     expect(html).not.toContain("data-bk-condition");
   });
@@ -148,10 +148,10 @@ describe("render", () => {
     bindings.bindCollection("list", blogId, { repeat: "children" });
     expect(bindings.setListQuery("list", { filter: hidden("sunday"), sort: [{ field: "rank", dir: "asc" }], limit: 1 }, "Filter list")).toBe(true);
     let html = await new CMSExportResolver(composer).resolve(LIST, { mode: "static" });
-    expect([...html.matchAll(/<h3 data-buildrick-id="t">([^<]*)<\/h3>/g)].map((m) => m[1])).toEqual(["Charlie"]);
+    expect([...html.matchAll(/<h3 data-buildrick-id="t--[^"]+"[^>]*>([^<]*)<\/h3>/g)].map((m) => m[1])).toEqual(["Charlie"]);
     bindings.setListQuery("list", { filter: undefined, limit: undefined, skip: 1 });
     html = await new CMSExportResolver(composer).resolve(LIST, { mode: "static" });
-    expect([...html.matchAll(/<h3 data-buildrick-id="t">([^<]*)<\/h3>/g)].map((m) => m[1])).toEqual(["Charlie", "Alpha"]);
+    expect([...html.matchAll(/<h3 data-buildrick-id="t--[^"]+"[^>]*>([^<]*)<\/h3>/g)].map((m) => m[1])).toEqual(["Charlie", "Alpha"]);
   });
 
   it("template page: the condition is handed to the server per record (data-bk-if); a preview evaluates it", async () => {

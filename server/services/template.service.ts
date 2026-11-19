@@ -5,6 +5,7 @@ import { withUniqueIds } from "@buildrik/shared/content/elementIds";
 import type { ListTemplatesInput } from "@buildrik/shared/schemas/templates";
 import { assertSiteQuota } from "@/server/services/site-quota";
 import { generateUniqueSlug } from "@/server/services/sites.service";
+import { newSiteStyleModel } from "@/server/services/class-styles";
 
 const SORT_MAP: Record<string, Record<string, string>> = {
   popular: { usageCount: "desc" },
@@ -150,6 +151,7 @@ export async function useTemplate(
       creationMethod: "TEMPLATE",
       templateId: template.id,
       pages: templatePageCount,
+      styleModel: newSiteStyleModel(workspaceId),
       lastEditedAt: new Date(),
       lastEditedById: userId,
     },

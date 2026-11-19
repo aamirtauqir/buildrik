@@ -9,7 +9,7 @@ import { escapeStyleText, isSafeElementId } from "@buildrik/shared/schemas/eleme
 import { DarkModeSchema } from "@buildrik/shared/schemas/design-tokens";
 import type { PageData } from "@/shared/types";
 import { isPageLive, pageFileNames, paginatedFileName, resolveHomePageId } from "./pageFiles";
-import { elementIdsInSelector } from "@/shared/utils/elementSelector";
+import { elementIdsInSelector, renameElementSelectors } from "@/shared/utils/elementSelector";
 import type {
   ExportConfig,
   ExportResult,
@@ -20,7 +20,7 @@ import { DEFAULT_EXPORT_CONFIG } from "@/shared/types/export";
 import { collectUsedKeyframes } from "@/shared/constants/animationKeyframes";
 import { getDefaultAttributes, getDefaultTagName } from "@/shared/utils/html";
 import { CMSExportResolver } from "../cms/CMSExportResolver";
-import { elementBaseCSS, hideRulesFor } from "../styles/cascadeCSS";
+import { elementBaseCSS, hideRulesFor, localSelector } from "../styles/cascadeCSS";
 import type { CMSExportMode, CMSExportOptions } from "../cms/CMSExportResolver";
 import type { Composer } from "../Composer";
 import { generateAnalyticsScripts } from "./AnalyticsInjector";
@@ -415,7 +415,8 @@ export class ExportEngine {
       // appended these, and the order is the same for the same reason: base and
       // breakpoint rules share specificity, so the @media has to come later to
       // win at its viewport.
-      const responsive = this.composer.styles?.generateResponsiveCSS?.({ minify: cfg.minify }) ?? "";
+      const responsive =
+        this.composer.styles?.generateResponsiveCSS?.({ minify: cfg.minify, rename: this.repeatedElementRename(cfg.cssPrefix) }) ?? "";
       if (responsive) css += (cfg.minify ? "" : "\n") + responsive;
 
       // Emit @keyframes for any bd-anim-* animation referenced in the styles.
@@ -566,7 +567,8 @@ export class ExportEngine {
     const children = element.getChildren?.() || [];
 
     let css = "";
-    const className = `.${config.cssPrefix}${id}`;
+    // The class model weights it above every class rule (the ladder).
+    const className = localSelector(`.${config.cssPrefix}${id}`, this.composer.styleModel);
 
     // The id is written into the selector; one that is not a plain word never
     // is (the load sanitizer regenerates it — this is the writer's own check).
@@ -614,7 +616,29 @@ export class ExportEngine {
       (id) => `.${prefix}${id}`,
       "media",
       minify,
+      undefined,
+      this.composer.styleModel,
     );
+  }
+
+  /**
+   * The StyleEngine selector rename for every element a Collection list
+   * repeats (its item template and all it holds), or undefined when the site
+   * has none. Each published copy gets its own `data-buildrick-id`
+   * (keyCollectionCopies), so those elements' rules are written against the
+   * class every copy shares — `.${prefix}<id>`, the base rules' own selector.
+   */
+  private repeatedElementRename(prefix: string): ((selector: string) => string) | undefined {
+    const lists = this.composer.cms?.bindings?.getAllCollectionBindings?.().filter((b) => b.repeat === "children") ?? [];
+    const ids = new Set<string>();
+    const collect = (el: ReturnType<typeof this.composer.elements.getElement>): void => {
+      if (!el) return;
+      ids.add(el.getId());
+      el.getChildren().forEach(collect);
+    };
+    for (const list of lists) this.composer.elements.getElement(list.elementId)?.getChildren().forEach(collect);
+    if (ids.size === 0) return undefined;
+    return (selector) => renameElementSelectors(selector, (id) => (ids.has(id) ? `.${prefix}${id}` : undefined));
   }
 
   /**
@@ -642,7 +666,7 @@ export class ExportEngine {
       return named.length === 0 || named.some((id) => ids.has(id));
     };
     const responsiveCss =
-      this.composer.styles?.generateResponsiveCSS?.({ minify, keep }) ??
+      this.composer.styles?.generateResponsiveCSS?.({ minify, keep, rename: this.repeatedElementRename(this.config.cssPrefix) }) ??
       this.generateCSS({ ...this.config, minify });
     /* The site's own font rules. `generateCSS` emits these for the single file;
        this path emitted the LINKS that fetch the families and no rule that

@@ -18,6 +18,7 @@ import * as React from "react";
 import {
   getPendingConflictToken,
   isBrandFormatConflict,
+  isStyleModelConflict,
   isSaveConflictPending,
   SAVE_CONFLICT_CLEARED_EVENT,
   SAVE_CONFLICT_EVENT,
@@ -33,7 +34,7 @@ const reopen = () => {
   const token = getPendingConflictToken();
   if (token === null) return;
   window.dispatchEvent(
-    new CustomEvent(SAVE_CONFLICT_EVENT, { detail: { serverLastEditedAt: token, brandFormat: isBrandFormatConflict() } }),
+    new CustomEvent(SAVE_CONFLICT_EVENT, { detail: { serverLastEditedAt: token, brandFormat: isBrandFormatConflict(), styleModel: isStyleModelConflict() } }),
   );
 };
 

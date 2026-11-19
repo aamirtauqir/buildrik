@@ -2,6 +2,7 @@ import { createComposer, type Composer } from "@/engine";
 import { ExportEngine } from "@/engine/export";
 import { CMSExportResolver } from "@/engine/cms/CMSExportResolver";
 import type { ProjectData } from "@/shared/types/project";
+import type { StyleModel } from "@buildrik/shared/schemas/class-styles";
 import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { cmsFromRows, cmsSyncBlocker, fetchPublishSnapshot } from "@/services/cmsSync";
@@ -66,7 +67,7 @@ export async function exportPublishPages(composer: Composer): Promise<PublishPag
   const blocker = cmsSyncBlocker();
   if (blocker) throw new PublishBlockedError(blocker);
   const { cms, siteFonts } = await fetchPublishSnapshot(siteId, collectionIds);
-  return renderProjectPages(project, siteFonts, cmsFromRows(cms), composer.designSystem.brandTokensV2);
+  return renderProjectPages(project, siteFonts, cmsFromRows(cms), composer.designSystem.brandTokensV2, composer.styleModel);
 }
 
 /** A rendered page plus the page it came from — its NAME for a page menu and
@@ -106,12 +107,17 @@ export async function renderProjectPages(
    *  tokens in memory, so the render's CSS differed from canvas and publish.
    *  The editor passes its own; the /share rows carry the server's. */
   brandTokensV2: boolean = snapshot.brandTokensV2 === true,
+  /** The site's style model (class-first): the editor passes its own, the
+   *  /share rows carry the server's. Without it the scratch render would use
+   *  the legacy cascade for a class-model site. */
+  styleModel: StyleModel = snapshot.styleModel === "class" ? "class" : "element",
 ): Promise<RenderedPage[]> {
   const scratch = createComposer({
     container: document.createElement("div"),
     storage: { type: "none", autoSave: false },
   });
   scratch.designSystem.brandTokensV2 = brandTokensV2;
+  scratch.styleModel = styleModel;
   scratch.whenReady().catch(() => {});
   try {
     await Promise.all(siteFonts.map((f) => scratch.fonts.registerLibraryFont(f).catch(() => undefined)));
