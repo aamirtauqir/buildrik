@@ -159,9 +159,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
   }, [onClose]);
 
   // Usage count map over the WHOLE library: key → count (memoized to avoid
-  // N² on every render). The smart filters and the SMART row counts both
-  // read it, and the counts are library-wide even inside a folder scope
-  // (Clone 3698:20337 keeps them while Products is the scope).
+  // N² on every render). The smart filters and the cards' usage read it.
   //
   // Clone 3695:45529 (Phase 6): a file's usage is its FAMILY's — the
   // original's placements plus every saved version's. Applying v2 across
@@ -208,14 +206,6 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
     }
     return items;
   }, [state.libraryItems, smartFolder, usageMap]);
-
-  // SMART row counts — library-wide, never the scope's
-  const inUseCount = usageMap.size;
-  const unusedCount = state.allLibraryItems.length - inUseCount;
-  const recentCount = React.useMemo(() => {
-    const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
-    return state.allLibraryItems.filter((i) => new Date(i.createdAt).getTime() >= cutoff).length;
-  }, [state.allLibraryItems]);
 
   /* The checked set, in list order — what the bulk rail, the Move modal and
      a drag of a checked row are all about. */
@@ -770,13 +760,10 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
           folders={state.allFolders}
           currentFolderId={state.currentFolderId}
           setCurrentFolderId={state.setCurrentFolderId}
-          counts={state.counts}
           smartFolder={smartFolder}
           setSmartFolder={setSmartFolder}
-          recentCount={recentCount}
-          inUseCount={inUseCount}
-          unusedCount={unusedCount}
-          folderCounts={state.folderCounts}
+          activeTypes={state.activeTypes}
+          setType={state.setType}
           onNewFolder={() => setCreateFolderOpen(true)}
           deleteFolder={async (folderId: string) => {
             /* P0 — close the silent-refusal gap. The hook rejects non-empty
@@ -810,7 +797,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
             ‹ Back to Editor{activePageName ? ` · ${activePageName}` : ""}
           </Button>
           <h3 className="mgr-scope" data-testid="mgr-scope-title">
-            {assetScopeLabel(smartFolder, state.currentFolderId, state.allFolders)}
+            {assetScopeLabel(smartFolder, state.currentFolderId, state.allFolders, state.activeTypes)}
           </h3>
         </div>
         <div className="mgr-toolrow">

@@ -14,19 +14,9 @@
  * @license BSD-3-Clause
  */
 
-import {
-  Clock,
-  CheckCircle,
-  MinusCircle,
-  Folder,
-  FolderOpen,
-  Plus,
-  Trash2,
-  ChevronDown,
-  ChevronRight,
-} from "lucide-react";
+import { Trash2, ChevronDown, ChevronRight } from "lucide-react";
 import * as React from "react";
-import type { MediaFolder } from "@/editor/sidebar/tabs/media/data/mediaTypes";
+import type { MediaBucket, MediaFolder, MediaTypeFilter } from "@/editor/sidebar/tabs/media/data/mediaTypes";
 import { useMediaWriteAccess } from "@/editor/sidebar/tabs/media/hooks/useMediaWriteAccess";
 import { Button, Tooltip } from "@/editor/chrome-ui";
 /* `.mgr-*` lives in LibraryManager.css, which only LibraryManager imported — so
@@ -39,28 +29,23 @@ import "../LibraryManager.css";
 
 export type SmartFolder = null | "recent" | "in-use" | "unused";
 
-/* 1160:44 / Clone 3695:45155 — a tag chip: 8/3 on a full radius, a
-   --bk-border edge on bg-panel, 11 ink-soft. On a flowbite Button every one of
-   its own groups (h-10, px-5, text-sm, font-medium, rounded-lg, the primary
-   fill) has to be displaced per property or it stands; the `.mgr-tag` rule
-   this replaces set no height, so the chips would have drawn 40 tall.
-   The active chip (3721:43697) takes the toolbar's format-chip recipe —
-   accent edge on the accent tint; the board's own pressed state is drawn at
-   near-zero contrast and is not a colour anyone can read. */
-export interface TypeCounts {
-  all: number;
-  img: number;
-  vid: number;
-  ico: number;
-  fnt: number;
+/** 2L9 B6-A01 (199:37199) — the rail's Fonts row is the type filter narrowed
+ *  to font files with no smart folder and no folder as the scope. The rail's
+ *  selected row and the page title both read it. */
+export function isFontsScope(
+  smartFolder: SmartFolder,
+  currentFolderId: string | null,
+  activeTypes: ReadonlySet<MediaBucket>,
+): boolean {
+  return !smartFolder && !currentFolderId && activeTypes.size === 1 && activeTypes.has("fnt");
 }
 
 interface TreeNodeProps {
-  icon: React.ReactNode;
   label: string;
   /** Conformance anchor — board 1205:4829 measures these rows individually. */
   testId?: string;
-  count?: number;
+  /** Extra row class (the accent "+ New folder" row). */
+  className?: string;
   active: boolean;
   expandable?: boolean;
   expanded?: boolean;
@@ -89,14 +74,12 @@ export interface FolderTreeProps {
   folders: MediaFolder[];
   currentFolderId: string | null;
   setCurrentFolderId(id: string | null): void;
-  counts: TypeCounts;
   smartFolder: SmartFolder;
   setSmartFolder(sf: SmartFolder): void;
-  recentCount: number;
-  inUseCount: number;
-  unusedCount: number;
-  /** Clone 3698:20337 — each folder row prints its own asset count. */
-  folderCounts: ReadonlyMap<string, number>;
+  /** The library's type filter — the Fonts row scopes through it, and reads
+   *  it to know whether it is the selected row. */
+  activeTypes: ReadonlySet<MediaBucket>;
+  setType(t: MediaTypeFilter): void;
   /** Clone 3700:20347 — `row/＋ New folder` opens the orchestrator's modal. */
   onNewFolder(): void;
   deleteFolder(id: string): Promise<void>;
@@ -115,10 +98,9 @@ export interface FolderTreeProps {
 // ─── TreeNode (leaf, internal) ────────────────────────────────────────────
 
 function TreeNode({
-  icon,
   label,
   testId,
-  count,
+  className,
   active,
   expandable,
   expanded = true,
@@ -150,7 +132,7 @@ function TreeNode({
        actionable by Enter. Gate 24 owns native elements in chrome, so the row
        stays a div and gets the semantics instead of becoming a <button>. */
     <div
-      className={`mgr-node${active ? " active" : ""}${depthClass}${dropClass}`}
+      className={`mgr-node${active ? " active" : ""}${depthClass}${dropClass}${className ? ` ${className}` : ""}`}
       data-testid={testId}
       data-drop-target={isTarget || undefined}
       role="button"
@@ -185,9 +167,7 @@ function TreeNode({
       ) : (
         <span className="mgr-chev hidden" style={{ width: 12, height: 12 }} />
       )}
-      {icon}
       <span className="mgr-node-name">{label}</span>
-      {count !== undefined && <span className="mgr-node-count">{count}</span>}
       {onDelete && !deleteViewOnlyReason && (
         <Button
           className="mgr-node-del"
@@ -222,13 +202,10 @@ export function FolderTree({
   folders,
   currentFolderId,
   setCurrentFolderId,
-  counts,
   smartFolder,
   setSmartFolder,
-  recentCount,
-  inUseCount,
-  unusedCount,
-  folderCounts,
+  activeTypes,
+  setType,
   onNewFolder,
   deleteFolder,
   onMoveAssetToFolder,
@@ -238,6 +215,19 @@ export function FolderTree({
   /* Audit G3-064: viewers see New folder and each folder's trash disabled
      with the reason (board 6289:148485 pattern). */
   const write = useMediaWriteAccess();
+  const fontsActive = isFontsScope(smartFolder, currentFolderId, activeTypes);
+
+  /* Every scope row but Fonts. Leaving the Fonts scope through one of them
+     clears the type filter too, or "All assets" would go on showing fonts;
+     otherwise the type filter is left as it is. */
+  const pickScope = React.useCallback(
+    (sf: SmartFolder, folderId: string | null) => {
+      setSmartFolder(sf);
+      setCurrentFolderId(folderId);
+      if (fontsActive) setType("all");
+    },
+    [setSmartFolder, setCurrentFolderId, setType, fontsActive],
+  );
 
   const toggleCollapsed = React.useCallback((folderId: string) => {
     setCollapsedFolders((prev) => {
@@ -299,23 +289,15 @@ export function FolderTree({
         const isCollapsed = collapsedFolders.has(folder.id);
         return (
           <React.Fragment key={folder.id}>
-            {/* Clone 3698:20337 — a folder glyph and the folder's own count
-                ("Products 8"). The 10px swatch this replaces cycled five hexes
-                no board names. A folder the map does not know holds nothing,
-                so it reads 0 (3700:20353), not blank. */}
+            {/* 199:37199 — a folder row is its name alone, no glyph, no count. */}
             <TreeNode
-              icon={<Folder size={14} className="mgr-node-ico" />}
               label={folder.name}
               testId={`mgr-row-folder-${folder.id}`}
-              count={folderCounts.get(folder.id) ?? 0}
               active={currentFolderId === folder.id}
               expandable={hasChildren}
               expanded={!isCollapsed}
               depth={depth}
-              onClick={() => {
-                setSmartFolder(null);
-                setCurrentFolderId(folder.id);
-              }}
+              onClick={() => pickScope(null, folder.id)}
               onToggleExpand={hasChildren ? () => toggleCollapsed(folder.id) : undefined}
               onDelete={() => deleteFolder(folder.id)}
               deleteViewOnlyReason={write.reason("delete")}
@@ -328,85 +310,58 @@ export function FolderTree({
         );
       });
     },
-    [folders, folderCounts, currentFolderId, deleteFolder, setCurrentFolderId, setSmartFolder, collapsedFolders, toggleCollapsed, dropTargetId, handleAssetDragOver, handleAssetDragLeave, handleAssetDrop, onMoveAssetToFolder, assetDragActive, write]
+    [folders, currentFolderId, deleteFolder, pickScope, collapsedFolders, toggleCollapsed, dropTargetId, handleAssetDragOver, handleAssetDragLeave, handleAssetDrop, onMoveAssetToFolder, assetDragActive, write]
   );
 
   return (
-    /* Board 1160:16/27/43 — the rail is three NAMED groups (SMART, FOLDERS,
-       TAGS) separated by 10-high gaps, with Trash at the foot. It shipped as
-       one "Folders" head over four hairline-separated blocks, which named the
-       whole rail after one of its groups and gave the smart folders no name at
-       all. */
+    /* 2L9 B6-A01 (199:37199) — All assets and the three smart scopes, a gap,
+       "My folders" over "Only you see these" with the folders and "+ New
+       folder", then Fonts set apart at the foot. Every row is a centred label:
+       no glyph, no count. The "Smart" head it replaced (board 1160:16) is not
+       on the board. */
     <div className="mgr-left" data-testid="mgr-folders">
       <div className="mgr-tree">
-        <div className="mgr-tree-section" data-testid="mgr-section-smart">Smart</div>
+        <TreeNode
+          label="All assets"
+          testId="mgr-row-all-assets"
+          active={!currentFolderId && !smartFolder && !fontsActive}
+          onClick={() => pickScope(null, null)}
+          dropFolderId={null}
+          isDropTarget={dropTargetId === "__root__"}
+          {...dropProps}
+        />
         {/* Smart folders (Bugs #6, #7 fix: actually filter) */}
         <TreeNode
-          icon={<Clock size={14} style={{ color: /* @lint-hex-policy: "Recent" smart-folder sky-500 marker, off chrome palette */ "#0EA5E9" }} />}
           label="Recent"
           testId="mgr-row-recent"
-          count={recentCount}
           active={smartFolder === "recent"}
-          onClick={() => {
-            setSmartFolder("recent");
-            setCurrentFolderId(null);
-          }}
+          onClick={() => pickScope("recent", null)}
         />
         <TreeNode
-          icon={<CheckCircle size={14} style={{ color: "var(--bk-success)" }} />}
           label="Used on this site"
           testId="mgr-row-in-use"
-          count={inUseCount}
           active={smartFolder === "in-use"}
-          onClick={() => {
-            setSmartFolder("in-use");
-            setCurrentFolderId(null);
-          }}
+          onClick={() => pickScope("in-use", null)}
         />
         <TreeNode
-          icon={<MinusCircle size={14} style={{ color: "var(--bk-ink-disabled)" }} />}
           label="No known placements"
           testId="mgr-row-unused"
-          count={unusedCount}
           active={smartFolder === "unused"}
-          onClick={() => {
-            setSmartFolder("unused");
-            setCurrentFolderId(null);
-          }}
+          onClick={() => pickScope("unused", null)}
         />
 
         <div className="mgr-tree-gap" data-testid="mgr-tree-gap-1" />
         {/* FC-4 (fix-all 2026-09-25): media folders are per-user (no shared-folder
             model exists), so the section is labelled "My folders" — same reasoning
             as the Pages folder tooltip (`PageFolder.tsx` `FOLDERS_TIP`) — so nobody
-            reads a plain "Folders" head as a team-shared space. */}
-        <div
-          className="mgr-tree-section"
-          data-testid="mgr-section-folders"
-          title="My folders · Only you see these"
-        >
-          My folders
+            reads a plain "Folders" head as a team-shared space. 199:37199 prints
+            the "Only you see these" under it. */}
+        <div className="mgr-tree-head" data-testid="mgr-section-folders">
+          <div className="mgr-tree-head-title">My folders</div>
+          <div className="mgr-tree-head-sub">Only you see these</div>
         </div>
 
-        {/* All assets */}
-        <TreeNode
-          icon={<FolderOpen size={14} />}
-          label="All assets"
-          testId="mgr-row-all-assets"
-          count={counts.all}
-          active={!currentFolderId && !smartFolder}
-          onClick={() => {
-            setSmartFolder(null);
-            setCurrentFolderId(null);
-          }}
-          dropFolderId={null}
-          isDropTarget={dropTargetId === "__root__"}
-          {...dropProps}
-        />
-
         {/* User folders (nested tree) */}
-        {/* 4418:58292 draws the top-level folders flush with `🏠 All assets`
-            (displacing 1205:4849's 16 inset); a nested folder still steps in. */}
         {renderFolderTree(null, 0)}
 
         {/* Clone 3700:20347 — `row/＋ New folder` is a row IN the list, right
@@ -415,21 +370,22 @@ export function FolderTree({
             opened here with "Enter to create · Esc to cancel" under it), which
             had itself displaced a native prompt(). Same row shape as every
             other row in this rail — a TreeNode, so it is reachable by Tab and
-            fires on Enter — and never a scope: it has no `active` state. */}
+            fires on Enter — and never a scope: it has no `active` state.
+            199:37199 draws it as accent text with the "+" inline. */}
         {write.canWrite ? (
           <TreeNode
-            icon={<Plus size={14} className="mgr-node-ico" />}
-            label="New folder"
+            label="+ New folder"
             testId="mgr-new-folder-open"
+            className="mgr-node--new"
             active={false}
             onClick={onNewFolder}
           />
         ) : (
           <Tooltip content={write.reason("upload")} placement="right">
             <TreeNode
-              icon={<Plus size={14} className="mgr-node-ico" />}
-              label="New folder"
+              label="+ New folder"
               testId="mgr-new-folder-open"
+              className="mgr-node--new"
               active={false}
               onClick={onNewFolder}
               viewOnlyReason={write.reason("upload")}
@@ -437,12 +393,20 @@ export function FolderTree({
           </Tooltip>
         )}
 
-        {folders.length === 0 && (
-          <div style={{ padding: "12px 8px", fontSize: 11, color: "var(--bk-ink-disabled)" }}>
-            No folders yet
-          </div>
-        )}
-
+        {/* 199:37199 — Fonts, set apart at the foot, scopes the library to
+            font files in place through the type filter (the Fonts page,
+            200:32519, is not built). A type is not a folder: no drop target. */}
+        <div className="mgr-tree-gap mgr-tree-gap--foot" data-testid="mgr-tree-gap-2" />
+        <TreeNode
+          label="Fonts"
+          testId="mgr-row-fonts"
+          active={fontsActive}
+          onClick={() => {
+            setSmartFolder(null);
+            setCurrentFolderId(null);
+            setType("fnt");
+          }}
+        />
       </div>
     </div>
   );

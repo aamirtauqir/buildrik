@@ -131,6 +131,29 @@ describe("Clone 3695:45155 · Assets · No selection — J-A library chrome", ()
     expect(setFmtFilter).toHaveBeenCalledWith("jpg");
   });
 
+  it("199:37199 — the rail's Fonts row scopes through the type filter", async () => {
+    const setType = vi.fn();
+    const setCurrentFolderId = vi.fn();
+    await mountLibrary({ setType, setCurrentFolderId });
+    fireEvent.click(screen.getByTestId("mgr-row-fonts"));
+    expect(setType).toHaveBeenCalledWith("fnt");
+    expect(setCurrentFolderId).toHaveBeenCalledWith(null);
+  });
+
+  it("199:37199 — in the Fonts scope the title, count line and Type ▾ read Fonts, even with no fonts", async () => {
+    const setType = vi.fn();
+    await mountLibrary({ activeTypes: new Set(["fnt"]), libraryItems: [], allLibraryItems: TEN, setType });
+    expect(screen.getByTestId("mgr-scope-title")).toHaveTextContent(/^Fonts$/);
+    expect(screen.getByTestId("mgr-row-fonts")).toHaveClass("active");
+    expect(screen.getByTestId("mgr-row-all-assets")).not.toHaveClass("active");
+    expect(screen.getByTestId("mgr-filter")).toHaveTextContent(/^Fonts$/);
+    fireEvent.click(screen.getByTestId("mgr-filter"));
+    expect(screen.getByTestId("mgr-filter-fnt")).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByTestId("mgr-filter-all")).toHaveAttribute("aria-checked", "false");
+    fireEvent.click(screen.getByTestId("mgr-row-all-assets"));
+    expect(setType).toHaveBeenCalledWith("all");
+  });
+
   it("199:37199 — the sort select names the sort: 'Date added' by default", async () => {
     await mountLibrary();
     expect(screen.getByTestId("mgr-sort")).toHaveTextContent("Date added");
@@ -273,7 +296,7 @@ describe("Clone 3695:19968 / 20154 · bulk mode", () => {
 });
 
 describe("Clone 3698:20337 · Assets · Products · folder scope — P2-A", () => {
-  it("draws every folder in FOLDERS with its own count, a nested one under its parent", async () => {
+  it("draws every folder in My folders, a nested one under its parent, with no count (199:37199)", async () => {
     await mountLibrary({
       folders: [makeFolder({ id: "f1", name: "Products" })],
       allFolders: [
@@ -283,12 +306,13 @@ describe("Clone 3698:20337 · Assets · Products · folder scope — P2-A", () =
       folderCounts: new Map([["f1", 8]]),
     });
     const rail = within(screen.getByTestId("mgr-folders"));
-    expect(rail.getByTestId("mgr-row-folder-f1").querySelector(".mgr-node-count")).toHaveTextContent("8");
+    expect(rail.getByTestId("mgr-row-folder-f1")).toHaveTextContent(/^Products$/);
     // The nested folder used to be invisible here: the tree was handed the
     // root-only list, so a folder created inside a scope had no row at all.
     const nested = rail.getByTestId("mgr-row-folder-f2");
     expect(nested).toHaveClass("depth-1");
-    expect(nested.querySelector(".mgr-node-count")).toHaveTextContent("0");
+    expect(nested).toHaveTextContent(/^Campaign images$/);
+    expect(screen.getByTestId("mgr-folders").querySelector(".mgr-node-count")).toBeNull();
   });
 
   it("clicking a folder row scopes the grid to it and clears the smart folder", async () => {
@@ -298,24 +322,21 @@ describe("Clone 3698:20337 · Assets · Products · folder scope — P2-A", () =
     expect(setCurrentFolderId).toHaveBeenCalledWith("f1");
   });
 
-  /* 3698:20337 draws SMART with the library's own counts while Products is
-     the scope — Recent · In use · Unused are library-wide rows, never a
-     folder's. `libraryItems` is the scoped list; the counts read the full
-     one. */
-  it("SMART counts stay library-wide while a folder is the scope", async () => {
-    const inFolder = TEN.slice(0, 2);
+  /* 199:37199 — the rail's smart rows are bare labels; the counts
+     3698:20337 drew beside them are gone. */
+  it("the smart rows carry no count while a folder is the scope", async () => {
     await mountLibrary(
       {
         currentFolderId: "f1",
         allFolders: [makeFolder({ id: "f1", name: "Products" })],
-        libraryItems: inFolder,
+        libraryItems: TEN.slice(0, 2),
         allLibraryItems: TEN,
       },
       { [TEN[0].src]: 1, [TEN[5].src]: 2, [TEN[7].src]: 1 },
     );
-    const smart = within(screen.getByTestId("mgr-folders"));
-    expect(smart.getByTestId("mgr-row-in-use").querySelector(".mgr-node-count")).toHaveTextContent("3");
-    expect(smart.getByTestId("mgr-row-unused").querySelector(".mgr-node-count")).toHaveTextContent(String(TEN.length - 3));
+    const rail = within(screen.getByTestId("mgr-folders"));
+    expect(rail.getByTestId("mgr-row-in-use")).toHaveTextContent(/^Used on this site$/);
+    expect(rail.getByTestId("mgr-row-unused")).toHaveTextContent(/^No known placements$/);
   });
 });
 
@@ -394,9 +415,8 @@ describe("Clone 3700:20353 · Assets · Campaign images · empty folder created 
     expect(empty.getByRole("button", { name: "Upload files" })).toBeInTheDocument();
     expect(screen.queryByText("No images or files yet.")).toBeNull();
     expect(screen.queryByTestId("mgr-empty")).toBeNull();
-    // Its row lights in FOLDERS at 0 while the folder it was made beside keeps its count.
+    // Its row lights in My folders.
     expect(screen.getByTestId("mgr-row-folder-f-new")).toHaveClass("active");
-    expect(screen.getByTestId("mgr-row-folder-f-new").querySelector(".mgr-node-count")).toHaveTextContent("0");
   });
 
   it("'Upload files' is the library's own upload picker", async () => {
@@ -634,6 +654,7 @@ describe("Clone 4215:26635 / 4207:26629 / 4220:26643 · dragging assets over the
     expect(screen.getByTestId("mgr-row-folder-f1")).toHaveAttribute("data-drop-target", "true");
     expect(screen.getByTestId("mgr-row-folder-f2")).toHaveAttribute("data-drop-target", "true");
     expect(screen.getByTestId("mgr-new-folder-open")).not.toHaveAttribute("data-drop-target");
+    expect(screen.getByTestId("mgr-row-fonts")).not.toHaveAttribute("data-drop-target");
     expect(screen.getByTestId("mgr-details")).toHaveAttribute("data-dimmed", "true");
     expect(screen.getByTestId("mgr-status-drag-hint")).toHaveTextContent(
       "Drop 2 files on a folder to move them · release outside to cancel",

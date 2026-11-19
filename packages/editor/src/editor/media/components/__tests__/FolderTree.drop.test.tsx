@@ -24,13 +24,10 @@ function mount(onMoveAssetToFolder?: (k: string, f: string | null) => void, asse
       folders={folders}
       currentFolderId={null}
       setCurrentFolderId={vi.fn()}
-      counts={{ all: 3, img: 3, vid: 0, ico: 0, fnt: 0 }}
       smartFolder={null}
       setSmartFolder={vi.fn()}
-      recentCount={1}
-      inUseCount={2}
-      unusedCount={1}
-      folderCounts={new Map()}
+      activeTypes={new Set()}
+      setType={vi.fn()}
       onNewFolder={vi.fn()}
       deleteFolder={vi.fn()}
      
@@ -95,7 +92,7 @@ describe("FolderTree — drag an asset onto a folder", () => {
 
 // Clone 4215:26635 — while an asset is in flight EVERY folder row (All assets
 // and each user folder) is outlined as a target; the smart rows, New folder
-// and Tags are not places a file can land.
+// and Fonts are not places a file can land.
 describe("FolderTree — every folder is a target while an asset is dragged (Clone 4215:26635)", () => {
   it("outlines All assets and each folder, and nothing else", () => {
     mount(vi.fn(), true);
@@ -103,6 +100,7 @@ describe("FolderTree — every folder is a target while an asset is dragged (Clo
     expect(screen.getByTestId("mgr-row-folder-f1")).toHaveAttribute("data-drop-target", "true");
     expect(screen.getByTestId("mgr-row-recent")).not.toHaveAttribute("data-drop-target");
     expect(screen.getByTestId("mgr-new-folder-open")).not.toHaveAttribute("data-drop-target");
+    expect(screen.getByTestId("mgr-row-fonts")).not.toHaveAttribute("data-drop-target");
   });
 
   it("outlines nothing at rest, or without a move handler", () => {
