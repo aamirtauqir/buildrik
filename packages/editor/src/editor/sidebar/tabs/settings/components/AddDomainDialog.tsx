@@ -7,9 +7,10 @@
  * server's own hostname rule (`connectDomainSchema`, so the field refuses
  * exactly what `connect` would), the rest `domains.checkAvailability`,
  * debounced 300 ms · `Domain type` segmented `Primary · Redirect ·
- * Subdomain` · `DNS provider` + hint · `Nameservers` (read-only mono, per
- * provider) · `DNS records` (read-only mono: the SHAPE `connect` will create;
- * the real values are the server's, on the screen once it answers) · `Force
+ * Subdomain` · `DNS provider` + hint · `Nameservers` (an instruction, not
+ * values — L3-033) · `DNS records` (read-only mono: the records `connect`
+ * will require; with Vercel connected the A/CNAME values are Vercel's to
+ * assign, so they are not guessed here) · `Force
  * HTTPS` + toggle · the propagation note · Cancel · `Add domain`, enabled
  * only once the name is valid and available. A refused connect keeps the
  * dialog open with the reason under the form; success is the caller's to
@@ -82,15 +83,23 @@ const KINDS: { id: DomainKind; label: string }[] = [
   { id: "SUBDOMAIN", label: "Subdomain" },
 ];
 
-/* The records `connect` writes, in the shape the typed name needs — the
+/** The value cell for a record whose value only Vercel can name (L3-033). */
+const VERCEL_ASSIGNED_VALUE = "Shown after you add the domain";
+
+/* The records `connect` will require, in the shape the typed name needs — the
    shared `expectedDnsRecords`, so an apex draws A @ + CNAME www (the frame)
-   and a subdomain its one CNAME. Only the TXT token is minted per row, so it
-   is the one value still elided. The REAL rows replace this after connect.
-   A Vercel-connected workspace gets no TXT at all (owner decision Q6). */
+   and a subdomain its one CNAME. Without Vercel these ARE the values connect
+   writes (the static targets); only the TXT token is minted per row, so it is
+   elided. With Vercel connected, connect takes the A/CNAME values from
+   Vercel's domain config for this project — which can differ from the static
+   targets — so the dialog names the record and leaves the value to the
+   domain's own records once added, never a guess (L3-033). A
+   Vercel-connected workspace gets no TXT at all (owner decision Q6). */
 function expectedRecordsFor(name: string, vercelConnected: boolean) {
   const valid = connectDomainSchema.shape.domain.safeParse(name).success;
   const domain = valid ? name : "example.com";
-  return expectedDnsRecords({ domain, apex: apexOf(domain), ownershipToken: vercelConnected ? null : `${DNS_TARGETS.txtPrefix}…` });
+  const records = expectedDnsRecords({ domain, apex: apexOf(domain), ownershipToken: vercelConnected ? null : `${DNS_TARGETS.txtPrefix}…` });
+  return vercelConnected ? records.map((r) => ({ ...r, value: VERCEL_ASSIGNED_VALUE })) : records;
 }
 
 type Availability = "idle" | "checking" | "failed" | DomainAvailability;
@@ -293,14 +302,16 @@ export function AddDomainDialog({ open, siteName, vercelConnected = false, check
               <span id="set-dom-ns-label" className={LABEL}>
                 Nameservers
               </span>
-              <span className={NOTE}>Read-only · set at your registrar</span>
+              <span className={NOTE}>No change needed</span>
             </div>
+            {/* L3-033: this block used to print a provider's default pair
+                (Namecheap's dns1/dns2.registrar-servers.com) as if it were the
+                user's — no lookup behind it. Connecting changes records, not
+                nameservers, so the honest answer is an instruction. */}
             <div className={MONO_BLOCK} aria-labelledby="set-dom-ns-label" data-testid="set-dom-ns">
-              {chosen.nameservers.length === 0 ? (
-                <span>Set at your registrar.</span>
-              ) : (
-                chosen.nameservers.map((ns, i) => <span key={i}>{ns}</span>)
-              )}
+              <span className="tw:[font-family:var(--bk-font-ui)]">
+                Keep the nameservers your registrar already uses. Add the records below in its DNS settings.
+              </span>
             </div>
           </div>
 
@@ -309,7 +320,7 @@ export function AddDomainDialog({ open, siteName, vercelConnected = false, check
               <span id="set-dom-records-label" className={LABEL}>
                 DNS records
               </span>
-              <span className={NOTE}>Add these at {chosen.id === "other" ? "your registrar" : chosen.label}</span>
+              <span className={NOTE}>Required · add these at {chosen.id === "other" ? "your registrar" : chosen.label}</span>
             </div>
             <table className={RECORDS_TABLE} aria-labelledby="set-dom-records-label" data-testid="set-dom-records">
               <thead>
@@ -335,6 +346,11 @@ export function AddDomainDialog({ open, siteName, vercelConnected = false, check
                 ))}
               </tbody>
             </table>
+            <span className={NOTE} data-testid="set-dom-records-source">
+              {vercelConnected
+                ? "Vercel assigns the values for this project. They appear on the domain once it is added."
+                : "Your own verification code is added to the TXT record once the domain is added."}
+            </span>
           </div>
 
           <div className="tw:flex tw:items-center tw:justify-between tw:gap-4 tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-border)] tw:px-3 tw:py-2">

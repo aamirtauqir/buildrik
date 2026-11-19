@@ -2,8 +2,9 @@
  * RailCoach — the first-run coach mark over the left icon rail.
  *
  * Board 65:2 draws it ("Everything you build lives behind these six." ·
- * Got it); the S1.1 family owns its dismissal. It was never built —
- * CanvasEmptyCTA's header deferred it here for two arcs.
+ * Got it). WHEN it shows is the tip queue's call (L1-029 — idle only, one
+ * automatic tip per session, seen/dismissed stored per site); this component
+ * only draws it and reports "Got it". It never takes focus.
  *
  * Positioning: chrome-ui Portal + a hand-measured anchor on
  * `[data-testid="rail"]`. HintTooltip is the right shape but the wrong
@@ -17,14 +18,8 @@
 
 import * as React from "react";
 import { Button, Portal } from "@/editor/chrome-ui";
-import { STORAGE_KEYS } from "@/shared/constants/storageKeys";
-import { safeGet, safeSet } from "@/shared/utils/safeStorage";
 
 const GAP = 12;
-
-export function railCoachDismissed(): boolean {
-  return safeGet(STORAGE_KEYS.ONBOARDING_COACH_DISMISSED) === "1";
-}
 
 export interface RailCoachProps {
   onDismiss: () => void;
@@ -49,11 +44,6 @@ export const RailCoach: React.FC<RailCoachProps> = ({ onDismiss }) => {
     window.addEventListener("resize", place);
     return () => window.removeEventListener("resize", place);
   }, []);
-
-  const dismiss = React.useCallback(() => {
-    safeSet(STORAGE_KEYS.ONBOARDING_COACH_DISMISSED, "1");
-    onDismiss();
-  }, [onDismiss]);
 
   if (!pos) return null;
 
@@ -91,7 +81,7 @@ export const RailCoach: React.FC<RailCoachProps> = ({ onDismiss }) => {
           size="xs"
           variant="link"
           className="tw:h-auto tw:min-h-6 tw:self-start tw:p-0 tw:text-[11px] tw:leading-4 tw:font-normal tw:text-[var(--bk-accent-text)]"
-          onClick={dismiss}
+          onClick={onDismiss}
           data-testid="rail-coach-got-it"
         >
           Got it

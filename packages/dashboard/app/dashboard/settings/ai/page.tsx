@@ -2,6 +2,7 @@
 
 import { trpc } from "@lib/trpc/client";
 import { AICreditsTab } from "@/components/settings/ai-credits-tab";
+import { AutoAltTextToggle } from "@/components/settings/auto-alt-text-toggle";
 import { ErrorState } from "@/components/states";
 
 export default function AICreditsPage() {
@@ -11,12 +12,15 @@ export default function AICreditsPage() {
   if (!creditsQuery.data) return <ErrorState title="Couldn't load AI credits" onRetry={() => creditsQuery.refetch()} />;
 
   return (
-    <AICreditsTab
-      used={creditsQuery.data.used}
-      limit={creditsQuery.data.limit}
-      history={creditsQuery.data.history}
-      dailyPromptsUsed={creditsQuery.data.dailyPromptsUsed}
-      dailyPromptsLimit={creditsQuery.data.dailyPromptsLimit}
-    />
+    <div className="space-y-8">
+      <AICreditsTab
+        used={creditsQuery.data.used}
+        limit={creditsQuery.data.limit}
+        history={creditsQuery.data.history}
+        dailyPromptsUsed={creditsQuery.data.dailyPromptsUsed}
+        dailyPromptsLimit={creditsQuery.data.dailyPromptsLimit}
+      />
+      <AutoAltTextToggle />
+    </div>
   );
 }

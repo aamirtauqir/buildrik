@@ -57,8 +57,6 @@ export const STORAGE_KEYS = {
   BUILD_RECENT: "buildrick-build-recent",
   /** Open category IDs in Build tab accordion (sessionStorage) */
   BUILD_OPEN_CATS: "buildrick-build-open-cats",
-  /** How many of the Add panel's first-use tips have been shown (G2-113) */
-  BUILD_TIPS_SEEN: "buildrick-build-tips-seen",
   /** Whether the user has been informed that favorites are browser-local only */
   BUILD_FAVS_INFORMED: "buildrick-build-favs-informed",
   /** @deprecated — Sections mode removed 2026-04-23. Cleaned on next read of BUILD_OPEN_CATS. */
@@ -113,20 +111,10 @@ export const STORAGE_KEYS = {
   ONBOARDING_MODAL: "buildrick-onboarding-modal",
   /** Spotlight tour — v2 key forces reset for users with old tour state */
   ONBOARDING_TOUR: "buildrick-onboarding-tour-v2",
-  /** Get-started checklist step progress (JSON array of OnboardingStep) */
-  ONBOARDING_PROGRESS: "buildrick-onboarding-progress",
-  /** Whether the checklist widget has been dismissed */
-  ONBOARDING_DISMISSED: "buildrick-onboarding-dismissed",
-  /** Schema version — bump when DEFAULT_STEPS changes to clear stale data */
-  ONBOARDING_SCHEMA_VERSION: "buildrick-onboarding-schema-v",
-  /** Current onboarding phase — "modal" | "tour" | "checklist" | "done" */
-  ONBOARDING_PHASE: "buildrick-onboarding-phase",
   /** Current tour step index (0-based) — persisted so refresh resumes same step */
   ONBOARDING_TOUR_STEP: "buildrick-onboarding-tour-step",
   /** Whether user has named their project during onboarding */
   ONBOARDING_PROJECT_NAMED: "buildrick-onboarding-project-named",
-  /** First-run rail coach mark ("Got it") — board 65:2 / S1.1 family */
-  ONBOARDING_COACH_DISMISSED: "buildrick-onboarding-coach-dismissed",
 
   // ─── Integrations ─────────────────────────────────────────────
   /** Vercel deployment token (encrypted) */

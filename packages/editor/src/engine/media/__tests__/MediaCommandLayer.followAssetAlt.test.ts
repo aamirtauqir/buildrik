@@ -66,4 +66,13 @@ describe("MediaCommandLayer.followAssetAlt (L4-014)", () => {
     expect(h.layer.followAssetAlt("s", "old", "new")).toBe(0);
     expect(h.composer.beginTransaction).not.toHaveBeenCalled();
   });
+
+  it("L4-007: a decorative placement (alt=\"\") keeps its empty alt when the asset gains one", () => {
+    const h = harness([
+      { id: "deco", src: "s", alt: "" },
+      { id: "none", src: "s" },
+    ]);
+    expect(h.layer.followAssetAlt("s", undefined, "AI description")).toBe(1);
+    expect(h.state.map((e) => e.alt)).toEqual(["", "AI description"]);
+  });
 });

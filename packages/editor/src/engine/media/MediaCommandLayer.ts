@@ -258,8 +258,9 @@ export class MediaCommandLayer {
       const previousSrc = this.getElementSrc(element);
       this.setElementSrc(element, previousSrc, newSrc);
       // Only an element whose `src` took the new media has an alt to fix — a
-      // background-image element's alt (if any) describes something else.
-      if (asset && newSrc !== previousSrc && element.getAttribute("src") === newSrc) {
+      // background-image element's alt (if any) describes something else. A
+      // decorative image (`alt=""`, the standard marker) stays decorative.
+      if (asset && newSrc !== previousSrc && element.getAttribute("src") === newSrc && element.getAttribute("alt") !== "") {
         if (asset.alt) element.setAttribute("alt", asset.alt);
         else element.removeAttribute("alt");
       }
@@ -275,14 +276,15 @@ export class MediaCommandLayer {
    * L4-014: an asset's alt text changed (a library edit, or AI alt arriving
    * after placement). Placements still carrying the asset's previous alt — or
    * none — take the new one; an alt written on the element by hand is its
-   * own and stays. Locked elements are left alone. One undo step. Returns how
-   * many elements changed.
+   * own and stays, and so does a decorative `alt=""` (L4-007 — the standard
+   * marker the missing-alt check honours). Locked elements are left alone.
+   * One undo step. Returns how many elements changed.
    */
   followAssetAlt(src: string, previousAlt: string | undefined, nextAlt: string | undefined): number {
     const followers = this.composer.elements.findByMediaSrc(src).filter((el) => {
       if (lockOwner(el)) return false;
       const alt = el.getAttribute("alt");
-      return !alt || alt === previousAlt;
+      return alt === undefined || (alt !== "" && alt === previousAlt);
     });
     if (followers.length === 0) return 0;
     this.composer.beginTransaction("Update alt text");

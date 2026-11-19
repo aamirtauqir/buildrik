@@ -118,12 +118,17 @@ export const generateAltTextSchema = z.object({
   assetId: z.string(),
   /** Replace existing alt text ("Regenerate"). Omitted → existing text is kept. */
   force: z.boolean().optional(),
+  /** `auto` = the upload hook: runs only when the workspace turned on automatic
+   *  alt text, once per asset (L4-007). Omitted = on demand. */
+  trigger: z.enum(["auto", "manual"]).optional(),
 });
 
 export const generateAltTextResultSchema = z.object({
   altText: z.string(),
   /** True when the existing user-typed alt text was preserved instead of overwritten. */
   skipped: z.boolean(),
+  /** Why an automatic request generated nothing (L4-007). */
+  reason: z.enum(["AUTO_OFF", "ALREADY_GENERATED"]).optional(),
   model: z.string().optional(),
 });
 

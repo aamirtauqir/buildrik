@@ -5,7 +5,12 @@ import { z } from "zod";
  * SSOT for the flag keys — services and routers import from here, never redefine.
  * Absent row = disabled (default-off): a new feature ships dark.
  */
-export const FEATURE_KEYS = ["agency_layer", "client_mode"] as const;
+export const FEATURE_KEYS = [
+  "agency_layer",
+  "client_mode",
+  /** L4-007: generate alt text automatically on image upload (paid AI). Off by default. */
+  "auto_alt_text",
+] as const;
 
 export const featureKeySchema = z.enum(FEATURE_KEYS);
 export type FeatureKey = z.infer<typeof featureKeySchema>;

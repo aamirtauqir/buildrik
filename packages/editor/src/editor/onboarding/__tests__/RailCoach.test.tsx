@@ -1,7 +1,8 @@
 /**
- * The first-run rail coach — board 65:2's note, S1.1 family.
- * "Got it" persists per browser; the bubble anchors beside the rail and
- * renders nothing at all when the rail is not in the DOM.
+ * The first-run rail coach — board 65:2's note, S1.1 family. It only draws
+ * and reports "Got it"; when it shows, and remembering that it was closed, is
+ * the tip queue's job (L1-029 — tipQueue.test.tsx). The bubble anchors beside
+ * the rail and renders nothing at all when the rail is not in the DOM.
  *
  * @license BSD-3-Clause
  */
@@ -9,8 +10,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import * as React from "react";
-import { STORAGE_KEYS } from "@/shared/constants/storageKeys";
-import { RailCoach, railCoachDismissed } from "../RailCoach";
+import { RailCoach } from "../RailCoach";
 
 function mountRail() {
   const rail = document.createElement("nav");
@@ -52,17 +52,20 @@ describe("RailCoach", () => {
     expect(screen.queryByRole("note")).toBeNull();
   });
 
-  it("Got it persists the flag and calls onDismiss", () => {
+  it("Got it calls onDismiss and writes nothing to browser storage", () => {
     mountRail();
     let dismissed = false;
     render(<RailCoach onDismiss={() => (dismissed = true)} />);
     fireEvent.click(screen.getByRole("button", { name: "Got it" }));
     expect(dismissed).toBe(true);
-    expect(localStorage.getItem(STORAGE_KEYS.ONBOARDING_COACH_DISMISSED)).toBe("1");
-    expect(railCoachDismissed()).toBe(true);
+    expect(localStorage.length).toBe(0);
   });
 
-  it("railCoachDismissed reads false on a fresh browser", () => {
-    expect(railCoachDismissed()).toBe(false);
+  it("is a note that never takes focus", () => {
+    mountRail();
+    const before = document.activeElement;
+    render(<RailCoach onDismiss={() => {}} />);
+    expect(screen.getByRole("note")).toBeInTheDocument();
+    expect(document.activeElement).toBe(before);
   });
 });

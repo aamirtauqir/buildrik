@@ -1,9 +1,8 @@
 /**
- * OnboardingMount — wires the (previously unmounted) onboarding checklist into
- * the editor. The components + orchestrator existed but nothing rendered them,
- * so new users got no guided setup. This mounts the checklist + achievement
- * prompt, gated to first-time users by the orchestrator's localStorage phase,
- * and routes each step's CTA to the matching editor action.
+ * OnboardingMount — wires the onboarding checklist into the editor: mounts the
+ * checklist + achievement prompt for THIS site's Getting-started state (L1-015
+ * — server state per user × site, one view for pill and checklist), feeds it
+ * the real events, and routes each step's CTA to the matching editor action.
  *
  * @license BSD-3-Clause
  */
@@ -11,11 +10,12 @@
 import * as React from "react";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants";
-import { fetchCurrentRound } from "@/services/ReviewService";
+import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { getEditorViewMode } from "@/shared/utils/editorViewMode";
 import { OnboardingChecklist } from "./OnboardingChecklist";
 import { AchievementPrompt } from "./AchievementPrompt";
-import { RailCoach, railCoachDismissed } from "./RailCoach";
+import { RailCoach } from "./RailCoach";
+import { useAutoTip } from "./tipQueue";
 import { useOnboardingOrchestrator } from "./useOnboardingOrchestrator";
 
 /** Block ids that count as "a section" for the insert-section step — the
@@ -30,12 +30,15 @@ const SECTION_BLOCK_IDS: ReadonlySet<string> = new Set([
   "navbar",
 ]);
 
+const RAIL_COACH_TIP = ["rail-coach"] as const;
+
 export interface OnboardingMountProps {
   composer: Composer | null;
 }
 
 export const OnboardingMount: React.FC<OnboardingMountProps> = ({ composer }) => {
-  const o = useOnboardingOrchestrator();
+  const [siteId] = React.useState(getSiteIdFromUrl);
+  const o = useOnboardingOrchestrator(siteId);
 
   // Collapse to the pill when the user selects an element — the expanded
   // panel sits over the inspector exactly when they want to style something.
@@ -153,59 +156,43 @@ export const OnboardingMount: React.FC<OnboardingMountProps> = ({ composer }) =>
 
   /* Steps finished before this editor session opened stay finished — a
      returning designer must not be told to redo work the project already
-     shows. Seeded from what is observable, never assumed:
+     shows. Seeded SILENTLY (recorded, no achievement) from what the loaded
+     project shows:
        add-page       — more than one page in the loaded project
        insert-section — a section-type element in the live registry (never
                         `page.root`, the hollow-snapshot trap)
-       send-review    — a round exists on the server
-       connect-client — that round carries an invited email
-     Brand, preview and publish stay unseeded — a loaded snapshot holds no
-     honest signal for them. */
+     Review rounds, the client invite and a publish are derived by the
+     server from the site's own rows (L1-015), so nothing is fetched here.
+     Brand and preview leave no state to read — only their events count. */
   const seedRef = React.useRef(o.completeStep);
   seedRef.current = o.completeStep;
   React.useEffect(() => {
     if (!composer) return;
     const seed = () => {
-      if ((composer.elements.getAllPages?.() ?? []).length > 1) seedRef.current("add-page");
+      if ((composer.elements.getAllPages?.() ?? []).length > 1) seedRef.current("add-page", { silent: true });
       const hasSection = composer.elements
         .getAllElements()
         .some((el) => el.getType?.() === "section");
-      if (hasSection) seedRef.current("insert-section");
+      if (hasSection) seedRef.current("insert-section", { silent: true });
     };
     seed();
     composer.on(EVENTS.PROJECT_LOADED, seed);
-
-    /* One best-effort read; a fetch error seeds nothing (the live REVIEW_SENT
-       wire still completes both rows the moment a send happens). */
-    let cancelled = false;
-    fetchCurrentRound()
-      .then((round) => {
-        if (cancelled || !round) return;
-        seedRef.current("send-review");
-        if (round.invitedEmail) seedRef.current("connect-client");
-      })
-      .catch(() => {});
-
     return () => {
-      cancelled = true;
       composer.off(EVENTS.PROJECT_LOADED, seed);
     };
   }, [composer]);
 
-  /* The door back in. `replayAll` shipped with no caller anywhere in the
-     product, so "Skip" was permanent and global — dismiss once and no site
-     ever offered the checklist again. */
-  const replayRef = React.useRef({ replayAll: o.replayAll, restore: o.restore });
-  replayRef.current = { replayAll: o.replayAll, restore: o.restore };
+  /* The door back in (Site menu → Getting started). It REOPENS the checklist
+     with the site's progress as it is — it used to reset the list to 0/7,
+     which is half of how the pill and the checklist came to disagree. */
+  const reopenRef = React.useRef(o.reopen);
+  reopenRef.current = o.reopen;
   React.useEffect(() => {
     if (!composer) return;
-    const onReplay = () => {
-      replayRef.current.replayAll();
-      replayRef.current.restore();
-    };
-    composer.on(EVENTS.UI_ONBOARDING_REPLAY, onReplay);
+    const onReopen = () => reopenRef.current();
+    composer.on(EVENTS.UI_ONBOARDING_REPLAY, onReopen);
     return () => {
-      composer.off(EVENTS.UI_ONBOARDING_REPLAY, onReplay);
+      composer.off(EVENTS.UI_ONBOARDING_REPLAY, onReopen);
     };
   }, [composer]);
 
@@ -249,12 +236,12 @@ export const OnboardingMount: React.FC<OnboardingMountProps> = ({ composer }) =>
   );
 
   /* The rail coach (board 65:2 / S1.1): first run only — nothing done yet,
-     never dismissed, and never over the stripped view-mode chrome (the rail
-     it introduces is not there). Lives with the checklist because both are
-     the same first-run story; dismissing the coach is not dismissing the
-     checklist. State so "Got it" hides it without waiting for a re-render
-     of the flag read. */
-  const [coachDismissed, setCoachDismissed] = React.useState(railCoachDismissed);
+     and never over the stripped view-mode chrome (the rail it introduces is
+     not there). WHEN is the tip queue's call (L1-029): idle only, at most one
+     automatic tip per session, once per site. Closing it is not dismissing
+     the checklist and completes no step. */
+  const readOnlyView = getEditorViewMode().readOnlyView;
+  const coach = useAutoTip(RAIL_COACH_TIP, o.phase === "active" && o.completedCount === 0 && !readOnlyView);
 
   /* View mode is stripped chrome, and the setup checklist is owner chrome.
      Board 1343:7162 draws the read-only editor as topbar + canvas + a bare
@@ -265,13 +252,11 @@ export const OnboardingMount: React.FC<OnboardingMountProps> = ({ composer }) =>
      status band, telling someone who cannot edit the site to go set its brand.
      The coach two lines below already carried this condition; the checklist it
      belongs to never got it. */
-  if (o.phase === "done" || getEditorViewMode().readOnlyView) return null;
-
-  const showCoach = o.completedCount === 0 && !coachDismissed;
+  if (o.phase !== "active" || readOnlyView) return null;
 
   return (
     <>
-      {showCoach && <RailCoach onDismiss={() => setCoachDismissed(true)} />}
+      {coach.tipId && <RailCoach onDismiss={coach.close} />}
       <OnboardingChecklist
         steps={o.steps}
         completedCount={o.completedCount}
@@ -279,7 +264,7 @@ export const OnboardingMount: React.FC<OnboardingMountProps> = ({ composer }) =>
         activeStepId={o.activeStepId}
         onSetActiveStepId={o.setActiveStepId}
         onAction={handleAction}
-        onDismiss={o.skipAll}
+        onDismiss={o.dismiss}
         onMinimize={o.minimize}
         isMinimized={o.isMinimized}
         onRestore={o.restore}

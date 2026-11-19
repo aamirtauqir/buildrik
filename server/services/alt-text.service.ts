@@ -28,6 +28,13 @@
  * procedures (reserved before the call, refunded if the provider fails). The
  * free paths — kept user text, refused asset — never reserve.
  *
+ * L4-007 (owner, 2026-10-10): the upload hook's AUTOMATIC call is an opt-in —
+ * the workspace's `auto_alt_text` flag, off by default. With it off an
+ * automatic request is a free no-op; the on-demand Generate is unaffected.
+ * Automatic generation runs once per asset (an asset the model already
+ * described is never re-billed), and concurrent requests for one asset share
+ * one provider call.
+ *
  * @license BSD-3-Clause
  */
 import { prisma } from "@/lib/prisma";
@@ -37,6 +44,7 @@ import { getOpenAI } from "./openai.client";
 import { assertProviderConfigured } from "./ai.service";
 import { assertMediaWrite } from "./media.service";
 import { releaseQuota, reserveQuota } from "./quota.service";
+import { isFeatureEnabled } from "./feature-flag.service";
 
 const ALT_TEXT_PROMPT = [
   "Generate concise alt text for this image suitable for screen readers.",
@@ -128,9 +136,32 @@ export async function generateAltText(
 
 export interface ApplyAltTextResult {
   altText: string;
-  /** True when an existing user-typed alt text was preserved instead of overwritten. */
+  /** True when nothing was generated: user text kept, or an automatic request declined. */
   skipped: boolean;
+  /** Why an automatic request generated nothing (L4-007). */
+  reason?: "AUTO_OFF" | "ALREADY_GENERATED";
   model?: string;
+}
+
+export interface ApplyAltTextOptions {
+  /** Regenerate: replace existing alt text (the asset library's "Regenerate").
+   *  Without it an existing alt text is kept, as before. */
+  force?: boolean;
+  /** `auto` = the upload hook. Runs only when the workspace opted in, once per asset. */
+  trigger?: "auto" | "manual";
+}
+
+/** One provider call per asset at a time — a second request joins the first. */
+const inflight = new Map<string, Promise<ApplyAltTextResult>>();
+
+function hasGeneratedAlt(meta: unknown): boolean {
+  return typeof meta === "object" && meta !== null && "altText" in meta && Boolean((meta as { altText?: unknown }).altText);
+}
+
+async function autoAltTextEnabled(siteId: string | null): Promise<boolean> {
+  if (!siteId) return false;
+  const site = await prisma.site.findUnique({ where: { id: siteId }, select: { workspaceId: true } });
+  return site ? isFeatureEnabled(site.workspaceId, "auto_alt_text") : false;
 }
 
 function isPopulatedAltText(value: string | null | undefined): boolean {
@@ -145,13 +176,20 @@ function isPopulatedAltText(value: string | null | undefined): boolean {
 export async function applyAltTextToAsset(
   userId: string,
   assetId: string,
-  /** Regenerate: replace existing alt text (the asset library's "Regenerate").
-   *  Without it an existing alt text is kept, as before. */
-  opts: { force?: boolean } = {},
+  opts: ApplyAltTextOptions = {},
 ): Promise<ApplyAltTextResult> {
+  const running = inflight.get(assetId);
+  if (running) return running;
+  const run = generateForAsset(userId, assetId, opts).finally(() => inflight.delete(assetId));
+  inflight.set(assetId, run);
+  return run;
+}
+
+async function generateForAsset(userId: string, assetId: string, opts: ApplyAltTextOptions): Promise<ApplyAltTextResult> {
+  const auto = opts.trigger === "auto";
   const asset = await prisma.mediaAsset.findUnique({
     where: { id: assetId },
-    select: { userId: true, url: true, type: true, altText: true, siteId: true },
+    select: { userId: true, url: true, type: true, altText: true, siteId: true, generatedMetadata: true },
   });
   if (!asset || asset.userId !== userId) {
     throw new Error("ASSET_NOT_FOUND");
@@ -162,9 +200,14 @@ export async function applyAltTextToAsset(
   }
 
   // Pre-call skip-guard: user already typed something — return existing,
-  // unless this is an explicit Regenerate.
-  if (!opts.force && isPopulatedAltText(asset.altText)) {
+  // unless this is an explicit Regenerate (never from the automatic hook).
+  if ((auto || !opts.force) && isPopulatedAltText(asset.altText)) {
     return { altText: asset.altText as string, skipped: true };
+  }
+
+  if (auto) {
+    if (!(await autoAltTextEnabled(asset.siteId))) return { altText: "", skipped: true, reason: "AUTO_OFF" };
+    if (hasGeneratedAlt(asset.generatedMetadata)) return { altText: "", skipped: true, reason: "ALREADY_GENERATED" };
   }
 
   try {
@@ -205,7 +248,7 @@ export async function applyAltTextToAsset(
   /* Without force: anything typed now wins. With force: the text being
      replaced is the one the user asked to regenerate — but if it CHANGED while
      we waited, they typed something new, and that still wins. */
-  const typedMeanwhile = opts.force
+  const typedMeanwhile = opts.force && !auto
     ? (fresh.altText ?? "") !== (asset.altText ?? "") && isPopulatedAltText(fresh.altText)
     : isPopulatedAltText(fresh.altText);
   if (typedMeanwhile) {

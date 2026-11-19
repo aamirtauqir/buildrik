@@ -260,13 +260,13 @@ export const domainNameSchema = z
 export const domainKindSchema = z.enum(["PRIMARY", "REDIRECT", "SUBDOMAIN"]);
 
 /**
- * The DNS providers the Add-a-domain dialog offers, with the nameservers the
- * "Nameservers · Read-only · set at your registrar" block draws. Shared because
- * the editor renders the select and the block from it and the server stores
- * the chosen `id` in `Domain.dnsProvider`. Namecheap's pair is fixed
- * (BasicDNS). Cloudflare assigns two per zone from `<name>.ns.cloudflare.com`
- * and GoDaddy a numbered pair from `nsNN.domaincontrol.com` — the entries name
- * the pattern, not a pair the user will necessarily hold. "Other" lists none.
+ * The DNS providers the Add-a-domain dialog offers. Shared because the editor
+ * renders the select from it and the server stores the chosen `id` in
+ * `Domain.dnsProvider`. It carries no nameservers (L3-033): Namecheap's
+ * BasicDNS pair was drawn as a fact for every Namecheap domain, but a domain on
+ * custom DNS, PremiumDNS or another host holds different ones, and Cloudflare
+ * and GoDaddy assign per zone. Connecting a site never changes nameservers —
+ * only the records below — so the dialog says to keep the registrar's own.
  */
 /**
  * The targets `domains.connect` points a domain at when the workspace has no
@@ -283,11 +283,11 @@ export const DNS_TARGETS = {
 } as const;
 
 export const DNS_PROVIDERS = [
-  { id: "namecheap", label: "Namecheap", nameservers: ["dns1.registrar-servers.com", "dns2.registrar-servers.com"] },
-  { id: "cloudflare", label: "Cloudflare", nameservers: ["<first>.ns.cloudflare.com", "<second>.ns.cloudflare.com"] },
-  { id: "godaddy", label: "GoDaddy", nameservers: ["ns01.domaincontrol.com", "ns02.domaincontrol.com"] },
-  { id: "other", label: "Other", nameservers: [] },
-] as const satisfies ReadonlyArray<{ id: string; label: string; nameservers: ReadonlyArray<string> }>;
+  { id: "namecheap", label: "Namecheap" },
+  { id: "cloudflare", label: "Cloudflare" },
+  { id: "godaddy", label: "GoDaddy" },
+  { id: "other", label: "Other" },
+] as const satisfies ReadonlyArray<{ id: string; label: string }>;
 
 export const connectDomainSchema = z.object({
   siteId: z.string(),
