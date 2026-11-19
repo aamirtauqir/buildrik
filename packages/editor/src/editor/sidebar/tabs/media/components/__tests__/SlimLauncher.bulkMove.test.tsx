@@ -70,3 +70,35 @@ describe("SlimLauncher — bulk Move to… picks a folder in place", () => {
     expect(screen.queryByText("Hero shots")).toBeNull();
   });
 });
+
+/* L4-012 (owner 2026-10-10): the select-mode bar fits the drawer's supported
+   width (--bk-size-drawer, 280) on ONE line — "0 selected" and "Move to…"
+   wrapped onto two — and a disabled action is dimmed text on the dark bar,
+   not flowbite's pale disabled pill. jsdom has no layout, so this pins the
+   classes that make it so; the live walk measures the result. */
+describe("SlimLauncher — select-mode bar fits one line (L4-012)", () => {
+  const bar = () => screen.getByTestId("media-bulk-bar");
+
+  it("never wraps: the bar is nowrap and every item keeps its words together", () => {
+    render(<SlimLauncher {...(props({ onBulkMove: vi.fn() }) as unknown as React.ComponentProps<typeof SlimLauncher>)} />);
+    expect(bar().className).toMatch(/tw:flex-nowrap/);
+    expect(bar().className).not.toMatch(/tw:gap-6/);
+    for (const child of Array.from(bar().querySelectorAll(":scope > *"))) {
+      expect(child.className).toMatch(/tw:whitespace-nowrap/);
+    }
+    // The count is the one part allowed to give way.
+    expect(screen.getByTestId("media-bulk-count").className).toMatch(/tw:truncate/);
+  });
+
+  it("a disabled action is dimmed text, not a pale pill", () => {
+    render(
+      <SlimLauncher
+        {...(props({ onBulkMove: vi.fn(), selectedKeys: new Set() }) as unknown as React.ComponentProps<typeof SlimLauncher>)}
+      />,
+    );
+    const del = screen.getByTestId("media-bulk-delete");
+    expect(del).toBeDisabled();
+    expect(del.className).toMatch(/tw:disabled:bg-transparent/);
+    expect(screen.getByTestId("media-bulk-count")).toHaveTextContent("0 selected");
+  });
+});

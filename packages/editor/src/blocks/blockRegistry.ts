@@ -339,6 +339,34 @@ function pageHasH1(element: EngineElement): boolean {
   return hasH1(root.toJSON());
 }
 
+/**
+ * L2-024 (owner 2026-10-10): a form's CHILDREN take their control's defaults
+ * too — the input, textarea, select, label and submit button inside a Form
+ * block arrived with none (borderless inputs, a plain-text Submit), because
+ * only the inserted root is seeded above. The walk is limited to a form and
+ * keyed by TAG on a closed list — never `getElementTypeFromTag`'s
+ * "container" fallback that `applyTypeDefaults` warns about — and fills gaps
+ * only, exactly like the root. Exported for the Inspector's "+ Add field",
+ * which builds its field the same way.
+ */
+export function formControlDefaultsKey(tagName: string, inputType?: string): string | null {
+  const tag = tagName.toLowerCase();
+  if (tag === "textarea" || tag === "select" || tag === "label" || tag === "button") return tag;
+  if (tag !== "input") return null;
+  const type = (inputType ?? "text").toLowerCase();
+  if (type === "submit" || type === "button" || type === "reset") return "button";
+  if (type === "checkbox" || type === "radio" || type === "hidden" || type === "file" || type === "range" || type === "color") return null;
+  return "input";
+}
+
+export function applyFormChildDefaults(root: EngineElement): void {
+  for (const el of root.getDescendants?.() ?? []) {
+    const tag = el.getData?.()?.tagName ?? "";
+    const key = formControlDefaultsKey(tag, el.getAttribute?.("type"));
+    if (key) applyTypeDefaults(el, key);
+  }
+}
+
 function insertOne(
   composer: Composer,
   block: BlockDefinition,
@@ -373,7 +401,10 @@ function insertOne(
 
        Anything the block's own HTML specified wins — this only fills gaps. */
     if (Array.isArray(inserted)) {
-      for (const el of inserted) applyTypeDefaults(el, block.elementType);
+      for (const el of inserted) {
+        applyTypeDefaults(el, block.elementType);
+        if (block.elementType === "form") applyFormChildDefaults(el);
+      }
       /* BD-39 (6): a Heading dropped on a page with no H1 becomes the page's
          H1. Re-tagged AFTER the defaults, as the inspector's Level row does:
          it keeps the block's token-bound size (font-size-4xl, Brand's

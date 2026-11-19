@@ -736,7 +736,8 @@ describe("StudioHeader", () => {
       expect(labels).toEqual([
         "Site settings",
         "Export site…",
-        "Issues",
+        /* L4-038: the row carries the open-findings count once a scan ran. */
+        "Issues0",
         "Enter view mode",
         "Keyboard shortcutsCtrl /",
         "Start collaborationPlanned",

@@ -114,6 +114,9 @@ export interface StudioHeaderProps {
   studioSyncStatus?: SyncStatus;
   /** Issues list */
   issues?: Issue[];
+  /** The issue feed has checked the site (L4-038). False = the Site menu's
+   *  Issues badge reads "Not checked", never 0. */
+  issuesChecked?: boolean;
 
   // Callbacks for state changes
   onSetPreviewLoading: (loading: boolean) => void;
@@ -284,6 +287,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   selectedElement,
   studioSyncStatus = "connected",
   issues = [],
+  issuesChecked = true,
   onSetPreviewLoading,
   onSetExportLoading,
   onShowExporter,
@@ -1091,9 +1095,12 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             onExportCode={handleExport}
             onDuplicateSite={siteIdForMenu ? duplicateThisSite : undefined}
             /* C3: the Issues chip left the bar; this row and ⌘K's "Show
-               issues" are the panel's doors, and the count rides in the title. */
+               issues" are the panel's doors. The count rides on the row as a
+               badge (L4-038) — the panel's own list — and in the title. */
             onOpenIssues={onOpenIssues}
             issuesTitle={formatIssueSummary(errorCount, warnCount)}
+            issueCount={issuesChecked ? issues.length : null}
+            issueErrors={errorCount}
             onOpenActivity={onOpenActivity}
             onOpenCommandPalette={composer ? () => composer.emit(EVENTS.UI_TOGGLE_COMMAND_PALETTE, {}) : undefined}
             onOpenShortcuts={onOpenShortcuts}

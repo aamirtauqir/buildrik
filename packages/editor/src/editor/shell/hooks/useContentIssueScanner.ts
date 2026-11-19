@@ -39,6 +39,9 @@ export interface UseContentIssueScannerReturn {
   scanState: ContentScanState;
   /** Manual scan — mount, and the panel's "Try again". Shows "Scanning…". */
   rescan: () => void;
+  /** A scan has completed at least once. Before that, an empty `issues`
+   *  means "not checked", not "no issues" (L4-038). */
+  checked: boolean;
 }
 
 const DEBOUNCE_MS = 400;
@@ -46,6 +49,7 @@ const DEBOUNCE_MS = 400;
 export function useContentIssueScanner(composer: Composer | null): UseContentIssueScannerReturn {
   const [issues, setIssues] = React.useState<Issue[]>([]);
   const [scanState, setScanState] = React.useState<ContentScanState>("idle");
+  const [checked, setChecked] = React.useState(false);
   const debounceRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const [paginationIssues, setPaginationIssues] = React.useState<Issue[]>([]);
 
@@ -73,6 +77,7 @@ export function useContentIssueScanner(composer: Composer | null): UseContentIss
         })),
       );
       setScanState("idle");
+      setChecked(true);
     } catch (e) {
       console.error("[content-issues] scan failed", e);
       setScanState("error");
@@ -151,7 +156,7 @@ export function useContentIssueScanner(composer: Composer | null): UseContentIss
   }, [composer]);
 
   const all = React.useMemo(() => (paginationIssues.length ? [...issues, ...paginationIssues] : issues), [issues, paginationIssues]);
-  return { issues: all, scanState, rescan };
+  return { issues: all, scanState, rescan, checked };
 }
 
 export default useContentIssueScanner;

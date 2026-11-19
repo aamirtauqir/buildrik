@@ -1,8 +1,8 @@
 import type { StarterDS } from "./types";
 
-export const appleMinimal: StarterDS = {
-  id: "apple-minimal",
-  name: "Apple Minimal",
+export const minimal: StarterDS = {
+  id: "minimal",
+  name: "Minimal",
   description: "Almost monochrome, restrained. Premium product feel.",
   tokens: [
     { id: "color-primary",    name: "Primary", category: "colors", cssVar: "--buildrick-design-color-primary",    type: "color", kind: "color", layer: "semantic", modes: { light: { value: "#1D1D1F" }, dark: { value: "#F5F5F7" } }, group: "brand" },

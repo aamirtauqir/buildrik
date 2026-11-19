@@ -1,8 +1,8 @@
 import type { StarterDS } from "./types";
 
-export const stripeBlue: StarterDS = {
-  id: "stripe-blue",
-  name: "Stripe Blue",
+export const ocean: StarterDS = {
+  id: "ocean",
+  name: "Ocean",
   description: "Clean blue brand. Bright, financial-friendly, high-contrast.",
   tokens: [
     { id: "color-primary",    name: "Primary", category: "colors", cssVar: "--buildrick-design-color-primary",    type: "color", kind: "color", layer: "semantic", modes: { light: { value: "#635BFF" }, dark: { value: "#897EFF" } }, group: "brand" },

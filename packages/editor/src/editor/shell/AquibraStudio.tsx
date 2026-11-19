@@ -739,6 +739,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           selectedElement={selectedElement}
           studioSyncStatus={state.syncStatus}
           issues={state.issues}
+          issuesChecked={issuesFeed.checked}
           onSetPreviewLoading={modals.setPreviewLoading}
           onSetExportLoading={modals.setExportLoading}
           onShowExporter={modals.openExporter}

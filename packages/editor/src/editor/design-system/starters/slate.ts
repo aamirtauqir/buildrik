@@ -1,9 +1,9 @@
 import type { StarterDS } from "./types";
 
-export const linearDark: StarterDS = {
-  id: "linear-dark",
-  name: "Linear Dark",
-  description: "Dark-first surface with electric accent. Tool-builder default.",
+export const slate: StarterDS = {
+  id: "slate",
+  name: "Slate",
+  description: "Cool slate neutrals with an electric accent. Tool-builder default.",
   tokens: [
     { id: "color-primary",    name: "Primary", category: "colors", cssVar: "--buildrick-design-color-primary",    type: "color", kind: "color", layer: "semantic", modes: { light: { value: "#5E6AD2" }, dark: { value: "#7B85E7" } }, group: "brand" },
     { id: "color-secondary",  name: "Secondary", category: "colors", cssVar: "--buildrick-design-color-secondary",  type: "color", kind: "color", layer: "semantic", modes: { light: { value: "#3F4253" }, dark: { value: "#5C6076" } }, group: "brand" },

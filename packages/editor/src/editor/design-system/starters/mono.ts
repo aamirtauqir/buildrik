@@ -1,8 +1,8 @@
 import type { StarterDS } from "./types";
 
-export const vercelMono: StarterDS = {
-  id: "vercel-mono",
-  name: "Vercel Mono",
+export const mono: StarterDS = {
+  id: "mono",
+  name: "Mono",
   description: "Pure monochrome, technical, sharp.",
   tokens: [
     { id: "color-primary",    name: "Primary", category: "colors", cssVar: "--buildrick-design-color-primary",    type: "color", kind: "color", layer: "semantic", modes: { light: { value: "#171717" }, dark: { value: "#FAFAFA" } }, group: "brand" },

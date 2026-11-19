@@ -86,6 +86,27 @@ export function snapshotFromTokens(
 }
 
 /**
+ * L4-024: the snapshot a template APPLY resolves against — each token as its
+ * own `var(--…)`, so what a template inserts stays connected to the Brand
+ * (an edit there restyles it, and the token reads as used). A token without
+ * a CSS variable falls back to its value.
+ */
+export function snapshotVars(tokens: ReadonlyArray<DesignToken>): TokenSnapshot {
+  const out = snapshotFromTokens(tokens);
+  for (const token of tokens) {
+    const placement = bucketAndKey(token);
+    if (!placement || !token.cssVar) continue;
+    const bucket = out[placement.bucket];
+    /* The same tie rule as snapshotFromTokens: the semantic token wins. */
+    if (bucket[placement.key] !== undefined && token.layer !== "semantic" && tokens.some(
+      (t) => t !== token && t.layer === "semantic" && bucketAndKey(t)?.bucket === placement.bucket && bucketAndKey(t)?.key === placement.key,
+    )) continue;
+    bucket[placement.key] = `var(${token.cssVar})`;
+  }
+  return out;
+}
+
+/**
  * Build a snapshot from :root computed style. For each token, reads
  * `getPropertyValue(cssVar).trim()` and falls back to the token's light
  * literal when the computed value is empty (e.g., test environment without

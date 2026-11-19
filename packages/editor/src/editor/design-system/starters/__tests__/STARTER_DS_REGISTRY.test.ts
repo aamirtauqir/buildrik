@@ -67,3 +67,22 @@ describe("getStarterById", () => {
     expect(getStarterById("ghost")).toBeUndefined();
   });
 });
+
+describe("STARTER_DS_REGISTRY · neutral names (L4-028)", () => {
+  // Owner 2026-10-10: starters are named for their palette, never after a
+  // real company. The palettes themselves are customer-site data and stay.
+  const BRANDS = /stripe|linear|notion|apple|vercel/i;
+
+  it("no starter id, name or description names a real company", () => {
+    for (const s of STARTER_DS_REGISTRY) {
+      expect(s.id).not.toMatch(BRANDS);
+      expect(s.name).not.toMatch(BRANDS);
+      expect(s.description).not.toMatch(BRANDS);
+    }
+  });
+
+  it("ships the owner's neutral names", () => {
+    const names = STARTER_DS_REGISTRY.map((s) => s.name);
+    for (const n of ["Ocean", "Slate", "Paper", "Mono"]) expect(names).toContain(n);
+  });
+});

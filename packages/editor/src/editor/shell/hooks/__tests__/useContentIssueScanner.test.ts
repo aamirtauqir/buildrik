@@ -147,3 +147,20 @@ describe("useContentIssueScanner (real Composer)", () => {
     expect(result.current.issues.map((i) => i.id)).not.toContain("content:alt:img-hidden");
   });
 });
+
+/* L4-038: the Site menu's Issues badge must not read 0 before anything was
+   checked — "not checked" and "no issues" are different facts. */
+describe("useContentIssueScanner — checked (L4-038)", () => {
+  it("is false until a scan has completed, then true", async () => {
+    const composer = new Composer({} as never);
+    await composer.whenReady();
+    const { result } = renderHook(() => useContentIssueScanner(composer));
+    expect(result.current.checked).toBe(false);
+    await waitFor(() => expect(result.current.checked).toBe(true));
+  });
+
+  it("is false with no composer", () => {
+    const { result } = renderHook(() => useContentIssueScanner(null));
+    expect(result.current.checked).toBe(false);
+  });
+});

@@ -163,3 +163,37 @@ describe("SiteMenu — board 4418:126034", () => {
     vi.unstubAllGlobals();
   });
 });
+
+/* L4-038 (owner 2026-10-10): the count rides on the Issues row as a badge,
+   from the same unresolved findings the Issues panel lists, and in the row's
+   accessible name. "Not checked" is never drawn as zero. */
+describe("SiteMenu — Issues count badge (L4-038)", () => {
+  const issuesRow = () => screen.getByTestId("site-menu-issues");
+
+  it("shows the open count, and names it for screen readers", () => {
+    render(<ToastProvider><SiteMenu {...all} issueCount={18} issueErrors={2} /></ToastProvider>);
+    openMenu();
+    expect(within(issuesRow()).getByTestId("site-menu-issues-count").textContent).toBe("18");
+    expect(issuesRow()).toHaveAccessibleName("Issues, 18 open (2 errors)");
+  });
+
+  it("one issue reads singular", () => {
+    render(<ToastProvider><SiteMenu {...all} issueCount={1} issueErrors={0} /></ToastProvider>);
+    openMenu();
+    expect(issuesRow()).toHaveAccessibleName("Issues, 1 open");
+  });
+
+  it("zero is a checked result: 0, 'no open issues'", () => {
+    render(<ToastProvider><SiteMenu {...all} issueCount={0} issueErrors={0} /></ToastProvider>);
+    openMenu();
+    expect(within(issuesRow()).getByTestId("site-menu-issues-count").textContent).toBe("0");
+    expect(issuesRow()).toHaveAccessibleName("Issues, no open issues");
+  });
+
+  it("not checked is not zero", () => {
+    render(<ToastProvider><SiteMenu {...all} issueCount={null} /></ToastProvider>);
+    openMenu();
+    expect(within(issuesRow()).getByTestId("site-menu-issues-count").textContent).toBe("Not checked");
+    expect(issuesRow()).toHaveAccessibleName("Issues, not checked yet");
+  });
+});

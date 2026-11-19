@@ -39,6 +39,11 @@ export interface SiteMenuProps {
   onOpenIssues?: () => void;
   /** The row's tooltip — the issue count sentence (`formatIssueSummary`). */
   issuesTitle?: string;
+  /** L4-038: open findings — the Issues panel's own list, whole site. `null`
+   *  = not checked yet (never drawn as 0); absent = no badge. */
+  issueCount?: number | null;
+  /** How many of `issueCount` are errors (the badge's tone and its name). */
+  issueErrors?: number;
   /** History · Activity, in the editor (B6, G1-019). */
   onOpenActivity?: () => void;
   onOpenCommandPalette?: () => void;
@@ -93,6 +98,8 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
   onDuplicateSite,
   onOpenIssues,
   issuesTitle,
+  issueCount,
+  issueErrors = 0,
   onOpenActivity,
   onOpenCommandPalette,
   readOnlyView = false,
@@ -174,8 +181,16 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
                   </MenuItem>
                 ) : null}
                 {onOpenIssues ? (
-                  <MenuItem onClick={run(onOpenIssues)} title={issuesTitle} data-testid="site-menu-issues">
-                    Issues
+                  <MenuItem
+                    onClick={run(onOpenIssues)}
+                    title={issuesTitle}
+                    aria-label={issuesAccessibleName(issueCount, issueErrors)}
+                    data-testid="site-menu-issues"
+                  >
+                    <span className="tw:flex tw:w-full tw:items-center tw:gap-2">
+                      Issues
+                      <IssueCountBadge count={issueCount} errors={issueErrors} />
+                    </span>
                   </MenuItem>
                 ) : null}
                 {onOpenActivity ? (
@@ -278,3 +293,34 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
 };
 
 export default SiteMenu;
+
+/** "Issues, 18 open (2 errors)" · "Issues, no open issues" · "Issues, not checked yet". */
+function issuesAccessibleName(count: number | null | undefined, errors: number): string | undefined {
+  if (count === undefined) return undefined;
+  if (count === null) return "Issues, not checked yet";
+  if (count === 0) return "Issues, no open issues";
+  const errorPart = errors > 0 ? ` (${errors} ${errors === 1 ? "error" : "errors"})` : "";
+  return `Issues, ${count} open${errorPart}`;
+}
+
+/** L4-038: the count, trailing the row like a kbd hint. Errors read in the
+ *  error tint, warnings only in the warning tint; 0 and "Not checked" stay
+ *  neutral — and they are different words. */
+function IssueCountBadge({ count, errors }: { count: number | null | undefined; errors: number }) {
+  if (count === undefined) return null;
+  const tone =
+    count === null || count === 0
+      ? "tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-muted)]"
+      : errors > 0
+        ? "tw:bg-[var(--bk-error-tint)] tw:text-[var(--bk-error-text)]"
+        : "tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning-text)]";
+  return (
+    <span
+      aria-hidden="true"
+      data-testid="site-menu-issues-count"
+      className={`tw:ml-auto tw:rounded-full tw:px-1.5 tw:text-[11px] tw:font-medium tw:leading-4 tw:tabular-nums ${tone}`}
+    >
+      {count === null ? "Not checked" : count}
+    </span>
+  );
+}

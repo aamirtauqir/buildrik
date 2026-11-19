@@ -9,19 +9,19 @@
  */
 import type { StarterDS } from "./types";
 import { cobaltDefault } from "./cobalt-default";
-import { stripeBlue } from "./stripe-blue";
-import { notionWarm } from "./notion-warm";
-import { appleMinimal } from "./apple-minimal";
-import { linearDark } from "./linear-dark";
-import { vercelMono } from "./vercel-mono";
+import { ocean } from "./ocean";
+import { paper } from "./paper";
+import { minimal } from "./minimal";
+import { slate } from "./slate";
+import { mono } from "./mono";
 
 export const STARTER_DS_REGISTRY: readonly StarterDS[] = [
   cobaltDefault,
-  stripeBlue,
-  notionWarm,
-  appleMinimal,
-  linearDark,
-  vercelMono,
+  ocean,
+  paper,
+  minimal,
+  slate,
+  mono,
 ];
 
 export function getStarterById(id: string): StarterDS | undefined {

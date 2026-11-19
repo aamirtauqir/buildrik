@@ -1,8 +1,8 @@
 import type { StarterDS } from "./types";
 
-export const notionWarm: StarterDS = {
-  id: "notion-warm",
-  name: "Notion Warm",
+export const paper: StarterDS = {
+  id: "paper",
+  name: "Paper",
   description: "Warm neutrals + tan accent. Friendly editorial feel.",
   tokens: [
     { id: "color-primary",    name: "Primary", category: "colors", cssVar: "--buildrick-design-color-primary",    type: "color", kind: "color", layer: "semantic", modes: { light: { value: "#37352F" }, dark: { value: "#E2E0DD" } }, group: "brand" },

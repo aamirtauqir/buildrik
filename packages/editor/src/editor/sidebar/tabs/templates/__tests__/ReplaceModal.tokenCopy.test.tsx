@@ -33,9 +33,14 @@ describe("ReplaceModal — what happens to brand tokens", () => {
     expect(screen.getByRole("button", { name: "Replace Home" })).toBeTruthy();
   });
 
-  it("a built-in template (raw colours) brings its own colours", () => {
+  it("a template with raw colours (an older saved one) brings its own colours", () => {
     modal('<section style="color:#111827">Hi</section>');
     expect(screen.getByText(/Bistro has its own colors and fonts — your Brand is not changed\./)).toBeTruthy();
+  });
+
+  it("a template authored on the Brand tokens' var()s (L4-024) picks up this site's brand", () => {
+    modal('<section style="color:var(--buildrick-design-color-text)">Hi</section>');
+    expect(screen.getByText(/Bistro uses this site’s Brand colors and fonts — your Brand is not changed\./)).toBeTruthy();
   });
 
   it("a saved template (token placeholders) picks up this site's brand", () => {

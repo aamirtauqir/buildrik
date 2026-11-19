@@ -111,8 +111,10 @@ export const ReplaceModal: React.FC<ReplaceModalProps> = ({
         ? `${currentPageName || "This page"}’s ${currentPageCount} element${currentPageCount === 1 ? " is" : "s are"} removed and replaced. `
         : `Everything on ${currentPageName || "this page"} is replaced. `}
       {/* L2-026: a template saved from a page carries {{token…}} placeholders
-          that apply resolves to this site's brand; a built-in one does not. */}
-      {template.html?.includes("{{token.")
+          that apply resolves to this site's brand. L4-024: the built-in ones
+          are authored on the Brand tokens' var()s; only a template with raw
+          colours (an older saved one) brings its own. */}
+      {template.html?.includes("{{token.") || template.html?.includes("var(--buildrick-design-")
         ? `${template.name} uses this site’s Brand colors and fonts — your Brand is not changed.`
         : `${template.name} has its own colors and fonts — your Brand is not changed.`}
     </div>

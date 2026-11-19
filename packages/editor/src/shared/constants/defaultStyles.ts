@@ -134,11 +134,14 @@ export const DEFAULT_ELEMENT_STYLES: Record<string, Record<string, string>> = {
     color: "inherit",
   },
 
+  /* L2-024: Brand tokens — the label's size and weight are the Brand panel's
+     own label tokens, its colour the site's text token (it was a literal
+     #333333 that no Brand edit could reach). */
   label: {
     "font-family": THEME.fontFamily,
-    "font-size": "var(--buildrick-design-font-size-sm)",
-    "font-weight": "500",
-    color: THEME.textSecondary,
+    "font-size": "var(--buildrick-design-label-font-size)",
+    "font-weight": "var(--buildrick-design-label-weight)",
+    color: "var(--buildrick-design-color-text)",
     "margin-bottom": "var(--buildrick-design-space-1)",
   },
 
@@ -339,8 +342,10 @@ export const DEFAULT_ELEMENT_STYLES: Record<string, Record<string, string>> = {
     "font-size": "var(--buildrick-design-label-font-size)",
     "padding-left": "var(--buildrick-design-input-padding-x)",
     "padding-right": "var(--buildrick-design-input-padding-x)",
-    "padding-top": "10px",
-    "padding-bottom": "10px",
+    /* L2-024: a textarea in a form is seeded from these, so its block
+       padding is a spacing token like the rest (was a raw 10px). */
+    "padding-top": "var(--buildrick-design-space-2)",
+    "padding-bottom": "var(--buildrick-design-space-2)",
     border: "1px solid var(--buildrick-design-input-border)",
     "border-radius": "var(--buildrick-design-input-radius)",
     "background-color": "var(--buildrick-design-color-surface-raised)",

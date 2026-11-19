@@ -148,6 +148,12 @@ function DrawerMenuHeading({ children }: { children: React.ReactNode }) {
   );
 }
 
+/* L4-012: a select-mode bar action — white link text that keeps its words
+   together, dimmed (not flowbite's pale disabled pill) when disabled. */
+const BULK_ACTION =
+  "tw:min-h-6 tw:shrink-0 tw:whitespace-nowrap tw:text-[length:var(--bk-text-12)] tw:text-white " +
+  "tw:disabled:bg-transparent tw:disabled:text-[var(--bk-gray-400)]";
+
 export function SlimLauncher(props: SlimLauncherProps) {
   const [bulkMoveOpen, setBulkMoveOpen] = React.useState(false);
   const {
@@ -702,10 +708,15 @@ export function SlimLauncher(props: SlimLauncherProps) {
            and adding while choosing among what is already there is a different
            job. */
         <div
-          className="tw:flex tw:h-11 tw:items-center tw:gap-6 tw:bg-[var(--bk-gray-900)] tw:px-4 tw:text-[12px] tw:leading-[18px] tw:text-white"
+          className="tw:flex tw:h-11 tw:flex-nowrap tw:items-center tw:gap-4 tw:bg-[var(--bk-gray-900)] tw:px-4 tw:text-[12px] tw:leading-[18px] tw:text-white"
           data-testid="media-bulk-bar"
         >
-          <span data-testid="media-bulk-count">{props.selectedKeys?.size ?? 0} selected</span>
+          {/* L4-012: one line at the drawer's 280 — 24px gaps put "0 selected"
+              and "Move to…" on two lines. The count is the one part that may
+              truncate; the actions keep their words. */}
+          <span data-testid="media-bulk-count" className="tw:min-w-0 tw:truncate tw:whitespace-nowrap">
+            {props.selectedKeys?.size ?? 0} selected
+          </span>
           {/* Board 145:349 draws "Move to…" — the ellipsis promises a second
               step. That step used to be "open the whole library and find the
               picker there". Now it is the picker: the same folder list the
@@ -721,7 +732,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
                   type="button"
                   color="light"
                   size="xs"
-                  variant="link" className="tw:min-h-6 tw:text-[length:var(--bk-text-12)] tw:text-white"
+                  variant="link" className={BULK_ACTION}
                   onClick={() => setBulkMoveOpen((v) => !v)}
                   disabled={!props.selectedKeys?.size}
                   aria-haspopup="menu"
@@ -748,7 +759,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
               type="button"
               color="light"
               size="xs"
-              variant="link" className="tw:min-h-6 tw:text-[length:var(--bk-text-12)] tw:text-white"
+              variant="link" className={BULK_ACTION}
               onClick={props.onBulkMove}
               disabled={!props.selectedKeys?.size}
             >
@@ -760,7 +771,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
               type="button"
               color="light"
               size="xs"
-              variant="link" className="tw:min-h-6 tw:text-[length:var(--bk-text-12)] tw:text-white"
+              variant="link" className={BULK_ACTION}
               data-testid="media-bulk-delete"
               onClick={props.onBulkDelete}
               disabled={!props.selectedKeys?.size}
@@ -773,7 +784,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
                 type="button"
                 color="light"
                 size="xs"
-                variant="link" className="tw:min-h-6 tw:text-[length:var(--bk-text-12)] tw:text-white tw:opacity-55"
+                variant="link" className={`${BULK_ACTION} tw:opacity-55`}
                 data-testid="media-bulk-delete"
                 aria-disabled="true"
               >
@@ -785,7 +796,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
             type="button"
             color="light"
             size="xs"
-            variant="link" className="tw:min-h-6 tw:text-[length:var(--bk-text-12)] tw:text-white tw:ml-auto"
+            variant="link" className={`${BULK_ACTION} tw:ml-auto`}
             data-testid="media-bulk-done"
             onClick={props.onExitSelection}
           >

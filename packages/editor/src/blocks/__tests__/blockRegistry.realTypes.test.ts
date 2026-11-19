@@ -144,8 +144,10 @@ async function publishedFiles(composer: ReturnType<typeof createTestComposer>): 
        That block is pinned by `ExportEngine.tokenClosure.test.ts`. */
     .replace(/\n\n\n:root\{--buildrick-design-[^}]*\}\n/, "")
     /* Site-wide too: since REA #18 every export paints body text with the
-       site's Text token, saved or seed. Pinned by ExportEngine.siteFonts.test.ts. */
-    .replace(/\nbody\{color:var\(--buildrick-design-color-text,[^)]*\)\}\n/, "");
+       site's Text token, and since L5-050 it names the site's effective
+       fonts (body, headings, code), saved or seed. Pinned by
+       ExportEngine.siteFonts.test.ts. */
+    .replace(/\nbody\{[^}]*color:var\(--buildrick-design-color-text,[^)]*\)\}\n(?:h1,h2,h3,h4,h5,h6\{[^}]*\}\n)?(?:code,pre,kbd,samp\{[^}]*\}\n)?/, "");
 }
 
 describe("Q2 — inserted blocks keep their real element type", () => {

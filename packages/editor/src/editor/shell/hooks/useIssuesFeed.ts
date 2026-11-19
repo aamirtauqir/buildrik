@@ -51,6 +51,9 @@ export interface UseIssuesFeedReturn {
   /** Re-runs the content scan AND re-fetches the pre-publish checks — the
    *  panel's one "Try again" affordance covers both fallible sources. */
   rescan: () => void;
+  /** The findings have been checked at least once and the last scan did not
+   *  fail. False means the count is unknown — never show it as 0 (L4-038). */
+  checked: boolean;
 }
 
 const SERVER_CONTENT_LABELS = new Set(Object.values(CONTENT_CHECK_LABELS));
@@ -252,7 +255,7 @@ export function useIssuesFeed(
     refetchChecks();
   }, [content, refetchChecks]);
 
-  return { scanState: content.scanState, rescan };
+  return { scanState: content.scanState, rescan, checked: content.checked && content.scanState !== "error" };
 }
 
 export default useIssuesFeed;

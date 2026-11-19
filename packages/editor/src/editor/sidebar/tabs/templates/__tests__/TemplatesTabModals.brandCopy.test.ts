@@ -30,11 +30,12 @@ describe("the template confirm says what applying one actually does", () => {
     expect(modals).toContain("has its own colors and fonts — your Brand is not changed.");
   });
 
-  it("…and that is still true of the built-in templates", () => {
-    // The claim and the data have to be checked together: if this stops being
-    // true, the copy above is the thing to change.
-    expect(data).not.toContain("var(--buildrick-design-");
-    expect(data).toMatch(/#[0-9a-fA-F]{3,6}/);
+  /* L4-024 moved the built-in templates onto the Brand tokens, so the copy a
+     built-in template gets is the brand sentence (the raw-colour sentence is
+     left for an older saved template that still carries literals). */
+  it("…and the built-in templates are on the Brand tokens, so they get the brand sentence", () => {
+    expect(data).toContain("var(--buildrick-design-");
+    expect(modals).toContain('template.html?.includes("var(--buildrick-design-")');
   });
 });
 

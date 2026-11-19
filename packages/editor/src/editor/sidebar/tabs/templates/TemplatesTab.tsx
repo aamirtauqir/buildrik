@@ -29,7 +29,7 @@ import { useTemplateSelection } from "./hooks/useTemplateSelection";
 import { TemplateCard } from "./components/TemplateCard";
 import { useTemplateUsageMap } from "./hooks/useTemplateUsageMap";
 import { resolveTokens } from "./utils/resolveTemplateTokens";
-import { snapshotFromComputedStyle } from "./utils/tokenSnapshot";
+import { snapshotVars } from "./utils/tokenSnapshot";
 import { DEFAULT_TOKENS } from "@/editor/design-system/constants";
 import { ApplyProgressOverlay, type ApplyStep } from "./ApplyProgressOverlay";
 import { RecentlyDeletedTemplates } from "./components/RecentlyDeletedTemplates";
@@ -329,12 +329,13 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
       // 1 — tokens
       setApplyStepIndex(0);
       await paint();
-      // P3 phase 2: resolve `{{token.kind.name}}` placeholders against the
-      // current Design System (read from :root computed style) before
-      // sanitize+import. Templates without placeholders pass through
-      // unchanged — regex misses leave content verbatim.
-      const snapshot = snapshotFromComputedStyle(document.documentElement, DEFAULT_TOKENS);
-      const resolvedHtml = resolveTokens(t.html, snapshot);
+      // P3 phase 2: resolve `{{token.kind.name}}` placeholders (a saved
+      // template's) before sanitize+import. Templates without placeholders
+      // pass through unchanged — regex misses leave content verbatim.
+      /* L4-024: placeholders resolve to the tokens' own var()s, so what the
+         template inserts stays connected to the Brand — a copy of today's
+         value read every token as "unused" and no Brand edit reached it. */
+      const resolvedHtml = resolveTokens(t.html, snapshotVars(DEFAULT_TOKENS));
       if (applyCancelledRef.current) { setShowProgress(false); return; }
 
       // 2 — import. Past this point the page has changed, so Cancel stops
