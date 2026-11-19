@@ -22,7 +22,7 @@
 import type { CMSContentItem, CMSFieldType } from "@/shared/types/cms";
 import { filterCmsBindings, isSafeCmsBoundValue, type CmsBindableProperty } from "@buildrik/shared/schemas/sites";
 import { escapeHtmlText } from "@buildrik/shared/schemas/element-markup";
-import { cmsTextOf } from "@buildrik/shared/schemas/cms";
+import { cmsFieldText } from "@buildrik/shared/schemas/cms";
 import { sanitizeRichtext } from "@/shared/utils/html/sanitization";
 import { EVENTS } from "@/shared/constants/events";
 import { BINDABLE_TYPES } from "@/shared/constants/elementCapabilities";
@@ -347,7 +347,7 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
         const first = opts.preview
           ? await this.getPreviewRecord(collectionId)
           : (await this.cmsManager.queryContent({ collectionId, status: "published", filter: {} })).items[0];
-        return cmsTextOf(first?.data[fieldSlug]) || fallback || "";
+        return cmsFieldText(this.fieldOf(collectionId, fieldSlug), first?.data[fieldSlug]) || fallback || "";
       }
 
       // Get the content item. Only published records may resolve: static
@@ -366,8 +366,8 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
         return fallback || "";
       }
 
-      // Get the field value
-      return cmsTextOf(item.data[fieldSlug]) || fallback || "";
+      // Get the field value — as its presentation config reads it (FG-043)
+      return cmsFieldText(this.fieldOf(collectionId, fieldSlug), item.data[fieldSlug]) || fallback || "";
     } catch {
       return binding.fallback || "";
     }
@@ -382,7 +382,12 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
   ): Promise<string> {
     const { fieldSlug, fallback } = binding;
 
-    return cmsTextOf(contextItem.data[fieldSlug]) || fallback || "";
+    return cmsFieldText(this.fieldOf(binding.collectionId, fieldSlug), contextItem.data[fieldSlug]) || fallback || "";
+  }
+
+  /** The bound field's definition — its presentation config shapes the text. */
+  private fieldOf(collectionId: string, fieldSlug: string) {
+    return this.cmsManager.getCollection(collectionId)?.fields.find((f) => f.slug === fieldSlug);
   }
 
   /**

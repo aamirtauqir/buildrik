@@ -12,6 +12,12 @@
  * field's options, the default value, the type's min/max rules, the usage
  * list behind "Show N usages", Open affected record and Delete field.
  *
+ * FG-043 (owner 2026-10-10, kept 2026-11-19): a Date field's fold adds Format
+ * (short / long / ISO — its presentation config, how it reads on a page) and
+ * Earliest / Latest (inclusive days, its validation). They wait for Save field
+ * like the rest; an earliest after the latest is refused by the shared
+ * `cmsFieldValidationSchema`, which the server applies too.
+ *
  * @license BSD-3-Clause
  */
 import * as React from "react";
@@ -24,7 +30,7 @@ import type { FieldUse } from "./fieldUsage";
 import { DeleteFieldDialog } from "./DeleteFieldDialog";
 import { RequiredImpactDialog } from "./RequiredImpactDialog";
 import { TypeChangeDialog, type TypeChangeMode } from "./TypeChangeDialog";
-import { isEmptyCmsValue } from "@buildrik/shared/schemas/cms";
+import { CMS_DATE_FORMATS, cmsFieldValidationSchema, formatCmsDate, isEmptyCmsValue, type CmsDateFormat } from "@buildrik/shared/schemas/cms";
 import { OptionsEditor } from "./OptionsEditor";
 
 /* 165:2917 — a 320 column on 16 gutters. */
@@ -60,6 +66,17 @@ export interface FieldInspectorProps {
 
 const text = (v: unknown) => (v === undefined || v === null ? "" : String(v));
 
+/** FG-043: Format's choices, each with how a sample day reads. */
+const SAMPLE_DAY = "2026-10-03";
+const DATE_FORMAT_LABEL: Record<CmsDateFormat, string> = {
+  short: `Short · ${formatCmsDate(SAMPLE_DAY, "short")}`,
+  long: `Long · ${formatCmsDate(SAMPLE_DAY, "long")}`,
+  iso: `ISO · ${formatCmsDate(SAMPLE_DAY, "iso")}`,
+};
+/** No format: the value reads as stored. */
+const AS_ENTERED: CmsDateFormat | "" = "";
+const isDateType = (type: CMSFieldType) => type === "date" || type === "datetime";
+
 export function FieldInspector({ composer, collection, collections, field, records, uses, onClose, onDeleteField, onOpenUse, onSetDefault, onChangeType }: FieldInspectorProps) {
   const [askingRequired, setAskingRequired] = React.useState(false);
   const [retyping, setRetyping] = React.useState<CMSFieldType | null>(null);
@@ -80,6 +97,9 @@ export function FieldInspector({ composer, collection, collections, field, recor
       helpText: field.helpText ?? "",
       defaultValue: text(field.defaultValue),
       rules: Object.fromEntries((FIELD_RULES[field.type] ?? []).map((r) => [r.key, text(field.validation?.[r.key])])) as Partial<Record<FieldRuleKey, string>>,
+      dateFormat: field.presentation?.dateFormat ?? AS_ENTERED,
+      minDate: field.validation?.minDate ?? "",
+      maxDate: field.validation?.maxDate ?? "",
     }),
     [field],
   );
@@ -99,8 +119,12 @@ export function FieldInspector({ composer, collection, collections, field, recor
   const rules = Object.fromEntries(
     Object.entries(draft.rules).map(([k, v]) => [k, v && v.trim() !== "" && Number.isFinite(Number(v)) ? Number(v) : undefined]),
   ) as Partial<Record<FieldRuleKey, number>>;
+  const isDate = isDateType(field.type);
+  const dateBounds = { minDate: draft.minDate || undefined, maxDate: draft.maxDate || undefined };
+  const boundsCheck = isDate ? cmsFieldValidationSchema.safeParse(dateBounds) : null;
+  const boundsError = boundsCheck && !boundsCheck.success ? (boundsCheck.error.issues[0]?.message ?? "Check Earliest and Latest.") : null;
   const dirty = JSON.stringify(draft) !== JSON.stringify(initial);
-  const canSave = dirty && nextName !== "" && !keyError;
+  const canSave = dirty && nextName !== "" && !keyError && !boundsError;
   const affected = records.find((r) => !isEmptyCmsValue(r.data[field.slug]));
   /* The addable types, plus whatever this field already is. */
   const types = (FIELD_TYPES as readonly string[]).includes(field.type) ? FIELD_TYPES : [...FIELD_TYPES, field.type];
@@ -122,7 +146,8 @@ export function FieldInspector({ composer, collection, collections, field, recor
     placeholder: draft.placeholder.trim() || undefined,
     helpText: draft.helpText.trim() || undefined,
     defaultValue: parseDefault(field.type, draft.defaultValue),
-    validation: { ...field.validation, ...rules, required },
+    validation: { ...field.validation, ...rules, ...(isDate ? dateBounds : {}), required },
+    ...(isDate ? { presentation: { ...field.presentation, dateFormat: draft.dateFormat || undefined } } : {}),
   });
   const save = () => {
     if (!canSave) return;
@@ -279,11 +304,31 @@ export function FieldInspector({ composer, collection, collections, field, recor
             Save field so the board's column reads as drawn. */}
         {TYPED_VALUE_TYPES.has(field.type) || (FIELD_RULES[field.type] ?? []).length > 0 ? (
           <Button size="xs" variant="link" className="tw:h-auto tw:min-h-0 tw:self-start tw:p-0 tw:text-[12px] tw:font-medium" aria-expanded={showMore} onClick={() => setShowMore((v) => !v)} data-testid="cms-fi-more">
-            {showMore ? "Hide default and rules" : "Default and rules ›"}
+            {isDate
+              ? showMore ? "Hide format, default and rules" : "Format, default and rules ›"
+              : showMore ? "Hide default and rules" : "Default and rules ›"}
           </Button>
         ) : null}
         {showMore ? (
           <>
+            {isDate ? (
+              <div className={STACK}>
+                <label className={LABEL} htmlFor="cms-fi-date-format">Format</label>
+                <Select
+                  id="cms-fi-date-format"
+                  sizing="sm"
+                  className={CONTROL}
+                  value={draft.dateFormat}
+                  onChange={(e) => set("dateFormat", CMS_DATE_FORMATS.find((f) => f === e.target.value) ?? "")}
+                  data-testid="cms-fi-date-format"
+                >
+                  <option value="">As entered</option>
+                  {CMS_DATE_FORMATS.map((f) => (
+                    <option key={f} value={f}>{DATE_FORMAT_LABEL[f]}</option>
+                  ))}
+                </Select>
+              </div>
+            ) : null}
             {TYPED_VALUE_TYPES.has(field.type) ? (
               <div className={STACK}>
                 <label className={LABEL} htmlFor="cms-fi-default">Default value</label>
@@ -305,6 +350,27 @@ export function FieldInspector({ composer, collection, collections, field, recor
                 />
               </div>
             ))}
+            {isDate ? (
+              <>
+                {(
+                  [
+                    ["minDate", "Earliest", "cms-fi-date-min"],
+                    ["maxDate", "Latest", "cms-fi-date-max"],
+                  ] as const
+                ).map(([key, label, id]) => (
+                  <div key={key} className={STACK}>
+                    <label className={LABEL} htmlFor={id}>{label}</label>
+                    <TextInput id={id} sizing="sm" type="date" className={CONTROL} value={draft[key]} onChange={(e) => set(key, e.target.value)} data-testid={id} />
+                  </div>
+                ))}
+                {boundsError ? (
+                  <p className="tw:m-0 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-error-text)]" role="alert" data-testid="cms-fi-date-error">
+                    {boundsError}
+                  </p>
+                ) : null}
+                <p className={NOTE}>Both days are inclusive. Leave empty for no limit.</p>
+              </>
+            ) : null}
           </>
         ) : null}
         <div className="tw:flex tw:items-center tw:justify-between tw:gap-2">

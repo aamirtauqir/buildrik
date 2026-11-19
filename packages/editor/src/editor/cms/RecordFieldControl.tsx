@@ -173,6 +173,10 @@ export function RecordFieldControl({
         sizing="sm"
         className={CONTROL}
         placeholder={placeholder}
+        /* FG-043: the picker offers only days inside the field's inclusive
+           bounds (publish enforces them too, cmsValueError). */
+        min={f.type === "date" ? f.validation?.minDate : undefined}
+        max={f.type === "date" ? f.validation?.maxDate : undefined}
         value={v === undefined || v === null ? "" : String(v)}
         onChange={(e) => onChange(f.type === "number" ? (e.target.value === "" ? undefined : Number(e.target.value)) : e.target.value)}
       />

@@ -61,7 +61,13 @@ export const CMS_MAX_ENTRIES_PER_COLLECTION = 10_000;
 export const CMS_MAX_COLLECTIONS_PER_SITE = 100;
 export const CMS_MAX_OPTIONS = 100;
 
-const cmsFieldValidation = z
+/** A calendar day as stored and bounded: YYYY-MM-DD (FG-043). */
+const DATE_ONLY_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+/** A field's validation rules. FG-043: a Date field's earliest day may not
+ *  fall after its latest — the field inspector and the server read this one
+ *  refusal. */
+export const cmsFieldValidationSchema = z
   .object({
     required: z.boolean().optional(),
     min: z.number().optional(),
@@ -70,6 +76,25 @@ const cmsFieldValidation = z
     maxLength: z.number().int().min(0).optional(),
     pattern: z.string().max(200).optional(),
     patternMessage: z.string().max(200).optional(),
+    /** FG-043: a Date field's inclusive earliest / latest day. */
+    minDate: z.string().regex(DATE_ONLY_RE, "Use YYYY-MM-DD").optional(),
+    maxDate: z.string().regex(DATE_ONLY_RE, "Use YYYY-MM-DD").optional(),
+  })
+  .passthrough()
+  .superRefine((v, ctx) => {
+    if (v.minDate && v.maxDate && v.minDate > v.maxDate)
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["maxDate"], message: "Earliest must be on or before Latest." });
+  });
+
+/** FG-043: how a Date field's value reads on a page. */
+export const CMS_DATE_FORMATS = ["short", "long", "iso"] as const;
+export type CmsDateFormat = (typeof CMS_DATE_FORMATS)[number];
+
+/** A field's PRESENTATION config — how its value is shown, never what it may
+ *  hold (that is `validation`). */
+const cmsFieldPresentation = z
+  .object({
+    dateFormat: z.enum(CMS_DATE_FORMATS).optional(),
   })
   .passthrough();
 
@@ -81,7 +106,8 @@ export const cmsFieldSchema = z
     slug: z.string().min(1).max(64).regex(STORED_FIELD_KEY_RE, "Field keys can't contain spaces, braces or dots"),
     type: z.enum(CMS_FIELD_TYPES),
     order: z.number(),
-    validation: cmsFieldValidation.optional(),
+    validation: cmsFieldValidationSchema.optional(),
+    presentation: cmsFieldPresentation.optional(),
     options: z.array(z.string().max(100)).max(CMS_MAX_OPTIONS).optional(),
     referenceCollection: z.string().max(200).optional(),
   })
@@ -114,7 +140,10 @@ export interface CmsFieldRule {
     maxLength?: number;
     pattern?: string;
     patternMessage?: string;
+    minDate?: string;
+    maxDate?: string;
   };
+  presentation?: { dateFormat?: CmsDateFormat };
   options?: string[];
 }
 
@@ -165,8 +194,16 @@ export function cmsValueError(field: CmsFieldRule, value: unknown): string | nul
         ? `${field.name} must be one of: ${field.options.join(", ")}`
         : null;
     case "date":
-    case "datetime":
-      return typeof value === "string" && !Number.isNaN(Date.parse(value)) ? null : `${field.name} must be a date`;
+    case "datetime": {
+      if (typeof value !== "string" || Number.isNaN(Date.parse(value))) return `${field.name} must be a date`;
+      /* FG-043: inclusive bounds, compared as calendar days (YYYY-MM-DD sorts
+         as text) — never through a Date, which would move the day with the
+         reader's timezone. */
+      const day = cmsDateOnly(value);
+      if (day && v?.minDate && day < v.minDate) return `${field.name} must be on or after ${v.minDate}`;
+      if (day && v?.maxDate && day > v.maxDate) return `${field.name} must be on or before ${v.maxDate}`;
+      return null;
+    }
     case "reference":
       return typeof value === "string" ? null : `${field.name} must name a record`;
   }
@@ -203,6 +240,44 @@ export function cmsTextOf(value: unknown): string {
   if (value === undefined || value === null) return "";
   if (Array.isArray(value)) return value.map((v) => cmsTextOf(v)).filter(Boolean).join(", ");
   return String(value);
+}
+
+/**
+ * FG-043: the calendar day a stored date names — "2026-10-03" as written, or
+ * the day part of an ISO date-time as written ("2026-10-03T23:30-05:00" is
+ * the 3rd, the day its author typed). Null when it is not a date.
+ */
+export function cmsDateOnly(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const day = value.trim().slice(0, 10);
+  if (!DATE_ONLY_RE.test(day)) return null;
+  const [y, m, d] = day.split("-").map(Number);
+  const probe = new Date(Date.UTC(y, m - 1, d));
+  return probe.getUTCFullYear() === y && probe.getUTCMonth() === m - 1 && probe.getUTCDate() === d ? day : null;
+}
+
+const DATE_FORMAT_OPTIONS: Record<Exclude<CmsDateFormat, "iso">, Intl.DateTimeFormatOptions> = {
+  short: { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" },
+  long: { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" },
+};
+
+/** "Oct 3, 2026" · "October 3, 2026" · "2026-10-03". The day is formatted in
+ *  UTC from its own parts, so canvas, Preview, export and the server's record
+ *  pages print the same day. One locale (en-US) for the same reason. */
+export function formatCmsDate(value: unknown, format: CmsDateFormat): string {
+  const day = cmsDateOnly(value);
+  if (!day) return cmsTextOf(value);
+  if (format === "iso") return day;
+  const [y, m, d] = day.split("-").map(Number);
+  return new Intl.DateTimeFormat("en-US", DATE_FORMAT_OPTIONS[format]).format(new Date(Date.UTC(y, m - 1, d)));
+}
+
+/** A field's value as text on a page, honouring its presentation config —
+ *  a Date with a format reads formatted (FG-043); everything else, and a
+ *  Date without one, reads as `cmsTextOf`. */
+export function cmsFieldText(field: Pick<CmsFieldRule, "type" | "presentation"> | undefined, value: unknown): string {
+  const format = field && (field.type === "date" || field.type === "datetime") ? field.presentation?.dateFormat : undefined;
+  return format ? formatCmsDate(value, format) : cmsTextOf(value);
 }
 
 /**

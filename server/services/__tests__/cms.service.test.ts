@@ -394,6 +394,21 @@ describe("resolveDynamicPages", () => {
 });
 
 describe("generateDynamicPages", () => {
+  /* FG-043: a Date field's presentation config formats its record pages as
+     the canvas does — the same day, never shifted by a timezone. */
+  it("formats a Date field by its presentation config, the day as written", async () => {
+    mocks.colFindFirst.mockResolvedValueOnce({
+      pageSlugPattern: "/events/{slug}",
+      fields: [
+        { id: "f1", name: "Slug", slug: "slug", type: "slug", order: 0 },
+        { id: "f2", name: "Opens", slug: "opens", type: "date", order: 1, presentation: { dateFormat: "long" } },
+      ],
+    });
+    mocks.entFindMany.mockResolvedValueOnce([{ id: "e1", data: { slug: "gala", opens: "2026-01-01" } }]);
+    const out = await generateDynamicPages("s1", "c1", "<html><head></head><body><p>{{bk:opens}}</p></body></html>");
+    expect(out[0].content).toContain("<p>January 1, 2026</p>");
+  });
+
   it("renders one HTML file per published entry, substituting + escaping + injecting SEO at the slug", async () => {
     mocks.colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/blog/{title}", pageSeoTitle: "{title}", pageSeoDescription: "desc {title}" });
     mocks.entFindMany.mockResolvedValueOnce([{ id: "e1", data: { title: "Hello & World" } }]);

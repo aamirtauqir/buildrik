@@ -37,3 +37,22 @@ describe("multi-select through a binding", () => {
     expect(value).toBe("Vegan, Spicy");
   });
 });
+
+/* FG-043: a Date field's presentation config formats it on the canvas — the
+   same text the export and the server's record pages print. */
+describe("date through a binding", () => {
+  it("reads in the field's format, the day as written", async () => {
+    const { cms, bindings } = setup();
+    const c = await cms.createCollection("Events", "events");
+    await cms.addField(c.id, { name: "Opens", slug: "opens", type: "date", order: 0, presentation: { dateFormat: "short" } });
+    const item = await cms.createContentItem(c.id, { opens: "2026-10-03" }, { status: "published" });
+    const value = await bindings.resolveBinding({
+      binding: { sourceId: `cms:${c.id}`, path: "opens", type: "variable" },
+      collectionId: c.id,
+      itemId: item!.id,
+      fieldSlug: "opens",
+      property: "content",
+    });
+    expect(value).toBe("Oct 3, 2026");
+  });
+});

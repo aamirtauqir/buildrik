@@ -262,3 +262,64 @@ describe("FieldInspector", () => {
     expect(screen.queryByTestId("cms-fi-more")).toBeNull();
   });
 });
+
+/* FG-043 (owner 2026-10-10, kept 2026-11-19): a Date field's fold configures
+   its display format (presentation) and optional inclusive earliest / latest
+   days (validation). Both wait for Save field like the rest of the draft. */
+describe("FieldInspector — Date field (FG-043)", () => {
+  function showDate(validation?: Record<string, unknown>) {
+    const field = { id: "d", name: "Opens", slug: "opens", type: "date", order: 0, ...(validation ? { validation } : {}) };
+    const col = { ...MENU, pageSlugPattern: undefined, fields: [field] } as unknown as CMSCollection;
+    const e = engine();
+    const updateField = (e.composer.cms.collections as unknown as { updateField: ReturnType<typeof vi.fn> }).updateField;
+    render(
+      <FieldInspector
+        composer={e.composer as never}
+        collection={col}
+        collections={[col]}
+        field={col.fields[0]}
+        records={[]}
+        uses={[]}
+        onClose={() => {}}
+        onDeleteField={vi.fn()}
+        onOpenUse={vi.fn()}
+        onSetDefault={vi.fn(() => Promise.resolve(0))}
+        onChangeType={vi.fn(() => Promise.resolve())}
+      />,
+    );
+    fireEvent.click(screen.getByTestId("cms-fi-more"));
+    return updateField;
+  }
+
+  it("Format offers Short, Long and ISO with a sample, saved into the presentation config", () => {
+    const updateField = showDate();
+    expect(screen.getByTestId("cms-fi-more")).toHaveTextContent("Hide format, default and rules");
+    const format = screen.getByTestId("cms-fi-date-format") as HTMLSelectElement;
+    expect([...format.options].map((o) => o.textContent)).toEqual([
+      "As entered", "Short · Oct 3, 2026", "Long · October 3, 2026", "ISO · 2026-10-03",
+    ]);
+    fireEvent.change(format, { target: { value: "long" } });
+    expect(updateField).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByTestId("cms-fi-save"));
+    expect(updateField).toHaveBeenCalledWith("col-1", "d", expect.objectContaining({ presentation: { dateFormat: "long" } }));
+  });
+
+  it("Earliest and Latest are optional inclusive days, saved into validation", () => {
+    const updateField = showDate({ required: true, maxDate: "2026-12-31" });
+    expect(screen.getByText("Both days are inclusive. Leave empty for no limit.")).toBeTruthy();
+    fireEvent.change(screen.getByTestId("cms-fi-date-min"), { target: { value: "2026-01-01" } });
+    fireEvent.click(screen.getByTestId("cms-fi-save"));
+    expect(updateField).toHaveBeenLastCalledWith("col-1", "d", expect.objectContaining({
+      validation: { required: true, minDate: "2026-01-01", maxDate: "2026-12-31" },
+    }));
+  });
+
+  it("refuses an earliest day after the latest — the shared schema's message, and no save", () => {
+    const updateField = showDate({ maxDate: "2026-01-01" });
+    fireEvent.change(screen.getByTestId("cms-fi-date-min"), { target: { value: "2026-06-01" } });
+    expect(screen.getByTestId("cms-fi-date-error")).toHaveTextContent("Earliest must be on or before Latest.");
+    expect(screen.getByTestId("cms-fi-save")).toBeDisabled();
+    fireEvent.click(screen.getByTestId("cms-fi-save"));
+    expect(updateField).not.toHaveBeenCalled();
+  });
+});

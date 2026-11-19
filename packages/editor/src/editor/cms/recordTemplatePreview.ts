@@ -20,7 +20,7 @@ import type { Composer } from "@/engine";
 import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 import { exportPublishPages } from "@/editor/shell/exportPublishPages";
 import { sanitizeHTML, sanitizeRichtext } from "@/shared/utils/html/sanitization";
-import { cmsTextOf, fillCmsRecordTokens } from "@buildrik/shared/schemas/cms";
+import { cmsFieldText, cmsTextOf, fillCmsRecordTokens } from "@buildrik/shared/schemas/cms";
 import { escapeHtmlText } from "@buildrik/shared/schemas/element-markup";
 
 export type RecordTemplatePreview =
@@ -58,7 +58,9 @@ export async function renderRecordTemplatePreview(
      rich text as its allow-listed markup, anything else escaped text. */
   const rich = new Set(collection.fields.filter((f) => f.type === "richtext").map((f) => f.slug));
   const body = fillCmsRecordTokens(page.html.slice(bodyStart, end), new Set(collection.fields.map((f) => f.slug)), (key) =>
-    rich.has(key) ? sanitizeRichtext(cmsTextOf(record.data[key])) : escapeHtmlText(cmsTextOf(record.data[key])),
+    rich.has(key)
+      ? sanitizeRichtext(cmsTextOf(record.data[key]))
+      : escapeHtmlText(cmsFieldText(collection.fields.find((f) => f.slug === key), record.data[key])),
   );
   return { ok: true, html: page.html.slice(0, bodyStart) + sanitizeHTML(body) + page.html.slice(end) };
 }

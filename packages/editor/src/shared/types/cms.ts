@@ -17,6 +17,15 @@ export interface CMSFieldValidation {
   maxLength?: number;
   pattern?: string;
   patternMessage?: string;
+  /** FG-043: a Date field's inclusive earliest / latest day (YYYY-MM-DD). */
+  minDate?: string;
+  maxDate?: string;
+}
+
+/** FG-043: how a field's value reads on a page — never what it may hold. */
+export interface CMSFieldPresentation {
+  /** A Date field's format: "Oct 3, 2026" · "October 3, 2026" · "2026-10-03". */
+  dateFormat?: "short" | "long" | "iso";
 }
 
 /** CMS field definition */
@@ -28,6 +37,7 @@ export interface CMSField {
   description?: string;
   defaultValue?: unknown;
   validation?: CMSFieldValidation;
+  presentation?: CMSFieldPresentation;
   options?: string[]; // For select/multiselect
   referenceCollection?: string; // For reference type
   placeholder?: string;

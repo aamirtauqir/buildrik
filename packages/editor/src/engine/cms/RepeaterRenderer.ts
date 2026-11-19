@@ -6,9 +6,9 @@
 
 import { isDangerousUrl, URL_ATTRIBUTES } from "@buildrik/shared/schemas/element-markup";
 import { CMS_COLLECTION_LIMIT_MAX, isSafeCmsBoundValue } from "@buildrik/shared/schemas/sites";
-import { cmsRecordLabel, cmsRecordPath, cmsTextOf } from "@buildrik/shared/schemas/cms";
+import { cmsFieldText, cmsRecordLabel, cmsRecordPath, cmsTextOf } from "@buildrik/shared/schemas/cms";
 import { sanitizeRichtext } from "@/shared/utils/html/sanitization";
-import type { CMSContentItem } from "@/shared/types/cms";
+import type { CMSContentItem, CMSField } from "@/shared/types/cms";
 import type { Composer } from "../Composer";
 import { COPY_OF_ATTR } from "../export/publishPostProcess";
 import type { CMSCollectionBinding, CMSElementBinding } from "./CMSBindingManager";
@@ -125,7 +125,7 @@ export interface CollectionListExpandOptions {
 
 /** A reference field's target records by id (and the target collection, for
  *  the record's display name). */
-type ReferenceTables = Map<string, { collection: { displayField?: string; fields: Array<{ slug: string }> }; byId: Map<string, CMSContentItem> }>;
+type ReferenceTables = Map<string, { collection: { displayField?: string; fields: CMSField[] }; byId: Map<string, CMSContentItem> }>;
 
 interface RepeaterContext {
   item: CMSContentItem;
@@ -383,7 +383,8 @@ export class RepeaterRenderer {
   ): HTMLElement[] {
     const emptied: HTMLElement[] = [];
     const bindings = this.composer.cms.bindings;
-    const rich = richtextKeys(this.composer.cms.collections?.getCollection?.(collectionId)?.fields);
+    const fields = this.composer.cms.collections?.getCollection?.(collectionId)?.fields;
+    const rich = richtextKeys(fields);
     const isList = (el: Element) => bindings.getCollectionBinding?.(el.getAttribute("data-buildrick-id") ?? "")?.repeat === "children";
     const candidates = [node, ...Array.from(node.querySelectorAll<HTMLElement>("[data-buildrick-id]"))];
     for (const el of candidates) {
@@ -395,7 +396,7 @@ export class RepeaterRenderer {
       }
       if (nested) continue;
       for (const b of own) {
-        const value = cmsTextOf(item.data[b.fieldSlug]) || b.fallback || "";
+        const value = cmsFieldText(fields?.find((f) => f.slug === b.fieldSlug), item.data[b.fieldSlug]) || b.fallback || "";
         if (canvas && !value) continue;
         writeBoundValue(el, b.property, value, rich.has(b.fieldSlug));
         if (!value && b.property === "content") emptied.push(el);
@@ -542,6 +543,8 @@ export class RepeaterRenderer {
     refs: ReferenceTables = new Map()
   ): void {
     const { item, index } = context;
+    /* FG-043: a field's presentation config (a Date's format) shapes its text. */
+    const ownFields = this.composer.cms.collections?.getCollection?.(binding.collectionId)?.fields;
     /* `{{item.<field>}}` reads the value; through a Reference field it reads
        the record it points at — `{{item.author}}` its name,
        `{{item.author.name}}` one of its fields. A deleted or unpublished
@@ -555,9 +558,12 @@ export class RepeaterRenderer {
       if (refs.has(field)) {
         const target = refRecord(field);
         if (!target) return "";
-        return sub ? cmsTextOf(target.data[sub]) : cmsRecordLabel(refs.get(field)!.collection, target.data);
+        const targetCollection = refs.get(field)!.collection;
+        return sub
+          ? cmsFieldText(targetCollection.fields.find((f) => f.slug === sub), target.data[sub])
+          : cmsRecordLabel(targetCollection, target.data);
       }
-      return sub ? "" : cmsTextOf(item.data[field]);
+      return sub ? "" : cmsFieldText(ownFields?.find((f) => f.slug === field), item.data[field]);
     };
     /* BD-12: `{{item.url}}` is the record's own page — the collection's URL
        pattern through the server's slug rule, root-absolute (the record page

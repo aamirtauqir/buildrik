@@ -18,6 +18,7 @@ import {
   cmsFieldsSchema,
   cmsPatternError,
   cmsRecordClash,
+  cmsFieldText,
   cmsRecordErrors,
   cmsTextOf,
   fillCmsRecordTokens,
@@ -914,6 +915,9 @@ function substituteOutsideScriptStyle(
   richtext: ReadonlySet<string> = new Set(),
   /** The collection's field keys — a bare `{word}` is a token only for these (BD-13). */
   fieldKeys: ReadonlySet<string> = new Set(Object.keys(data)),
+  /** The collection's fields — a field's presentation config (a Date's
+   *  format, FG-043) shapes its text as it does on the canvas. */
+  fields: readonly CmsFieldRule[] = [],
 ): string {
   const spanRe = /<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi;
   let result = "";
@@ -921,7 +925,9 @@ function substituteOutsideScriptStyle(
   let m: RegExpExecArray | null;
   const sub = (segment: string) =>
     fillCmsRecordTokens(segment, fieldKeys, (key) =>
-      richtext.has(key) ? sanitizeRichtext(cmsTextOf(data[key])) : escapeHtmlText(cmsTextOf(data[key])),
+      richtext.has(key)
+        ? sanitizeRichtext(cmsTextOf(data[key]))
+        : escapeHtmlText(cmsFieldText(fields.find((f) => f.slug === key), data[key])),
     );
   while ((m = spanRe.exec(html))) {
     result += sub(html.slice(last, m.index));
@@ -1011,7 +1017,7 @@ export async function generateDynamicPages(
     const ogImage = socialImage && isSafeCmsBoundValue("src", socialImage) ? socialImage : "";
     /* A record's own keys count as fields too (a collection stored without
        its field list still fills its tokens); any other {word} stays. */
-    let html = substituteOutsideScriptStyle(ogImage ? stripTemplateSocialImage(cleanedTemplate) : cleanedTemplate, data, richtext, new Set([...fieldKeys, ...Object.keys(data)]));
+    let html = substituteOutsideScriptStyle(ogImage ? stripTemplateSocialImage(cleanedTemplate) : cleanedTemplate, data, richtext, new Set([...fieldKeys, ...Object.keys(data)]), rules);
     /* B-26 / B-27: this record's conditions and list queries. */
     html = applyRecordToPage(html, data, e.id);
     const seoTags =
