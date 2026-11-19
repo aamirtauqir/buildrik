@@ -639,6 +639,20 @@ def cmd_merge(job):
         git(job, "push", "origin", f"{gated}:refs/heads/{job['branch']}")
         if gh_json("pr", "view", str(job["pr"]), "--json", "isDraft")["isDraft"]:
             gh("pr", "ready", str(job["pr"]))
+        if not CONFIG.get("auto_merge", True):
+            # The founder reviews every change, so the factory stops one step short of
+            # merging: the branch is synced, gated and pushed, and the PR goes to a human
+            # with the approver's reasoning. Merging it by hand moves the job to merged.
+            decision = job_dir(job["id"]) / "decision.md"
+            approver = decision.read_text().split("\n", 1)[1].strip()
+            decision.write_text(
+                "ESCALATE\n\n## Approved, waiting for you to merge\n"
+                f"The approver said APPROVE and the gate passed on {gated[:12]} after syncing with "
+                f"{BASE}. auto_merge is off in factory/config.json, so merge PR #{job['pr']} "
+                "yourself after review.\n\n" + approver + "\n")
+            save(advance(sync(job), "needs-human"))
+            print(f"{job['id']}: approved, PR #{job['pr']} waits for a human to merge")
+            return
         gh("pr", "merge", str(job["pr"]), f"--{CONFIG['merge_method']}", "--match-head-commit", gated)
     except Refused as e:
         return fail(f"The merge failed:\n\n```\n{e}\n```")

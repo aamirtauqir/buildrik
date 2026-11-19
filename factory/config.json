@@ -1,8 +1,9 @@
 {
-  "concurrency": 3,
+  "concurrency": 1,
   "max_rounds": 3,
   "base_branch": "main",
   "merge_method": "merge",
+  "auto_merge": false,
   "labels": {
     "queue": "factory",
     "needs_info": "factory:needs-info",

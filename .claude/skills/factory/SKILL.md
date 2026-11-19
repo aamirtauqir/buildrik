@@ -146,7 +146,10 @@ finished:
 
 - `APPROVE`: `factory/bin/job merge <id>`. It syncs the branch with the base,
   runs the gate again, pushes, and merges the PR, ending in `merged`. If any
-  of that fails it moves the job to `needs-human` and says why.
+  of that fails it moves the job to `needs-human` and says why. With
+  `auto_merge: false` in `config.json` (this repo) it stops before the merge
+  and moves the job to `needs-human` with the approval on the PR; the founder
+  merges it by hand.
 - `ESCALATE`: `factory/bin/job advance <id> needs-human`. It marks the PR ready,
   posts the decision on it and labels the issue `factory:needs-human`.
 
