@@ -89,6 +89,12 @@ const EFFECTS_ORDER: readonly SectionId[] = [
   "effects-advanced",
 ];
 
+/* FG-022 (owner 2026-10-10, kept on the 2L9 design 2026-11-19): Opacity and
+   Shadow stay on the tab; these three sit under one collapsed "More effects"
+   disclosure. */
+export const MORE_EFFECTS_ID = "more-effects";
+export const MORE_EFFECTS_SECTIONS: readonly SectionId[] = ["filters", "transform-motion", "effects-advanced"];
+
 export const SECTION_ORDER: Readonly<Record<TabId, readonly SectionId[]>> = {
   content: CONTENT_ORDER,
   style: STYLE_ORDER,

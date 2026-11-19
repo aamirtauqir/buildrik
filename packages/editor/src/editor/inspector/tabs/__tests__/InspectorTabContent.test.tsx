@@ -152,7 +152,8 @@ describe("InspectorTabContent — one order per tab, presence by capability", ()
 
   it("Behavior carries Interactions (Q1) and Visibility; Effects carries neither", () => {
     const { unmount } = renderTab({ tabId: "effects", elementType: "container" });
-    expect(sectionNames()).toEqual(["Opacity", "Shadow", "Filters", "Transform and transition", "Advanced effects"]);
+    /* FG-022: the three secondary sections sit behind "More effects". */
+    expect(sectionNames()).toEqual(["Opacity", "Shadow", "More effects"]);
     unmount();
     renderTab({ tabId: "behaviour", elementType: "container" });
     expect(sectionNames()).toEqual(["Link", "Visibility", "Interactions"]);
@@ -194,7 +195,7 @@ describe("InspectorTabContent — display modes (DD-11)", () => {
   });
 
   it("Effects › Advanced effects and Transform and transition arrive closed with 'n set' / 'None' (2L9 161:12525)", () => {
-    renderTab({ tabId: "effects", elementType: "heading" });
+    renderTab({ tabId: "effects", elementType: "heading", choices: { "heading:more-effects": "open" } });
     expect(screen.getByTestId("inspector-summary-effects-advanced")).toHaveTextContent("None");
     expect(screen.getByTestId("inspector-summary-transform-motion")).toHaveTextContent("None");
   });
@@ -209,5 +210,53 @@ describe("InspectorTabContent — display modes (DD-11)", () => {
     renderTab({ tabId: "style", elementType: "heading", onSetChoices });
     fireEvent.click(screen.getByRole("button", { name: "Size section, expanded" }), { altKey: true });
     expect(onSetChoices).toHaveBeenCalledWith("heading", ["typography", "size", "spacing", "fill", "border"], "closed");
+  });
+});
+
+/* FG-022 (owner 2026-10-10, kept on the 2L9 design 2026-11-19): Opacity and
+   Shadow arrive expanded; Filters, Transform and transition and Advanced
+   effects sit under a collapsed "More effects", and a collapsed More effects
+   says when one of them holds an active effect. */
+describe("InspectorTabContent — Effects › More effects (FG-022)", () => {
+  it("Opacity and Shadow arrive expanded with nothing set", () => {
+    renderTab({ tabId: "effects", elementType: "container" });
+    expect(screen.getByRole("button", { name: "Opacity section, expanded" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Shadow section, expanded" })).toBeInTheDocument();
+  });
+
+  it("More effects arrives collapsed, its three sections unmounted", () => {
+    renderTab({ tabId: "effects", elementType: "container" });
+    expect(screen.getByRole("button", { name: "More effects section, collapsed" })).toBeInTheDocument();
+    expect(screen.queryByTestId("inspector-section-filters")).toBeNull();
+    expect(screen.queryByTestId("inspector-summary-more-effects")).toBeNull();
+  });
+
+  it("opening it records the choice and shows the three sections", () => {
+    const onSetChoices = vi.fn();
+    const { unmount } = renderTab({ tabId: "effects", elementType: "container", onSetChoices });
+    fireEvent.click(screen.getByRole("button", { name: "More effects section, collapsed" }));
+    expect(onSetChoices).toHaveBeenCalledWith("container", ["more-effects"], "open");
+    unmount();
+    renderTab({ tabId: "effects", elementType: "container", choices: { "container:more-effects": "open" } });
+    expect(sectionNames()).toEqual(["Opacity", "Shadow", "More effects", "Filters", "Transform and transition", "Advanced effects"]);
+  });
+
+  it("closing it also closes the sections opened inside it", () => {
+    const onSetChoices = vi.fn();
+    renderTab({ tabId: "effects", elementType: "container", onSetChoices, choices: { "container:more-effects": "open", "container:filters": "open" } });
+    fireEvent.click(screen.getByRole("button", { name: "More effects section, expanded" }));
+    expect(onSetChoices).toHaveBeenCalledWith("container", ["more-effects", "filters"], "closed");
+  });
+
+  it("a collapsed More effects names the active effects it holds", () => {
+    renderTab({ tabId: "effects", elementType: "container", authored: { filter: "blur(4px)", transform: "rotate(5deg)" } });
+    expect(screen.getByRole("button", { name: "More effects section, collapsed" })).toBeInTheDocument();
+    expect(screen.getByTestId("inspector-summary-more-effects")).toHaveTextContent("Active: Filters, Transform and transition");
+    expect(screen.getByTestId("inspector-more-effects-active")).toBeInTheDocument();
+  });
+
+  it("opening a section inside it (a property jump) opens More effects too", () => {
+    renderTab({ tabId: "effects", elementType: "container", choices: { "container:filters": "open" } });
+    expect(screen.getByRole("button", { name: "Filters section, expanded" })).toBeInTheDocument();
   });
 });

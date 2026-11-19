@@ -23,7 +23,8 @@ export type Breakpoint = "wide" | "desktop" | "tablet" | "mobile";
 
 export interface BreakpointSwitcherProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange" | "children"> {
-  value: Breakpoint;
+  /** null = none of the cells (the preview's Fit or a typed width, FG-030). */
+  value: Breakpoint | null;
   onChange: (next: Breakpoint) => void;
   /** When true, renders full breakpoint names instead of icons. */
   labelled?: boolean;

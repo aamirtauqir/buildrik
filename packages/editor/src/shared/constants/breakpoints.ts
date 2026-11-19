@@ -80,6 +80,17 @@ export function isValidBreakpoint(id: string): id is BreakpointId {
   return id in BREAKPOINTS;
 }
 
+/** A typed page width: the canvas bar's Page width and the Preview's width
+ *  field (FG-030) take the same range — narrowest phone to a wide desktop. */
+export const CUSTOM_WIDTH_RANGE = { min: 240, max: 2560 } as const;
+
+/** A typed width in CSS px, or null when it is not a whole number in range. */
+export function parseCustomWidth(draft: string): number | null {
+  if (!/^\d+$/.test(draft)) return null;
+  const n = Number(draft);
+  return n >= CUSTOM_WIDTH_RANGE.min && n <= CUSTOM_WIDTH_RANGE.max ? n : null;
+}
+
 /**
  * Get breakpoint for a given viewport width
  */

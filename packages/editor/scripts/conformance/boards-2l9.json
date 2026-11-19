@@ -121,9 +121,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "founder:fg-030-preview-fit-width",
    "verified": "drift-fixed",
-   "verifiedNote": "Round 28 (A-22, owner cleared AquibraStudio): AquibraStudio passes initialDevice={state.device}, and PreviewOverlay (mounted closed) restarts at that device on every opening — test PreviewOverlay 'each opening starts at the editor's device'. The overlay's visuals were compared against shots/8-3262.png on 2026-10-30 ('Back to editor', '{Page} · Draft preview', the fidelity line); kept off-board: page menu and Share preview. Not re-shot live (needs the Next app).",
+   "verifiedNote": "owner 2026-11-19 kept code-ahead feature: FG-030 (149e39ccc, 9d76f3e8f, fff12907f) on the 2L9 bar — Fit and a typed CSS-px width (CUSTOM_WIDTH_RANGE 240–2560, the canvas Page width range) sit beside the device presets; the board's \"Back to editor · {page} · Draft preview\" and device · width cells stay. Fit and a typed width are remembered per site; a preset is not, so an opening still starts at the editor's device (A-22). Tests: PreviewOverlay \"Fit and custom width (FG-030)\". | Round 28 (A-22, owner cleared AquibraStudio): AquibraStudio passes initialDevice={state.device}, and PreviewOverlay (mounted closed) restarts at that device on every opening — test PreviewOverlay 'each opening starts at the editor's device'. The overlay's visuals were compared against shots/8-3262.png on 2026-10-30 ('Back to editor', '{Page} · Draft preview', the fidelity line); kept off-board: page menu and Share preview. Not re-shot live (needs the Next app).",
    "tier": "P1"
   },
   {
@@ -4852,9 +4852,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "founder:fg-022-more-effects",
    "verified": "drift-fixed",
-   "verifiedNote": "Lane L-B P1 round 2, probe ?type=text with opacity 1, a 1-layer shadow, filter 'blur(4px) saturate(1.2) blur(1px)', transform + transition, Effects tab, side by side: Opacity one field; Shadow '1 layer' with X offset · Y offset · Blur · Spread · Color ('#111827 / 12%') · Inset; Filters 'Custom' with 'Authored value', 'Two blur functions are preserved in their original order.', 'Edit custom value'; 'Transform and transition · 2 set' shut; 'Advanced effects · None'. Before this the sliders showed 'Blur 4px' and any edit dropped saturate() and the second blur (data loss). Exceptions: Opacity's field keeps its % unit cell; an 'Add layer' button stays under the layers (code:layers-reachable — a second shadow layer has no other writer).",
+   "verifiedNote": "owner 2026-11-19 kept code-ahead feature: FG-022 (8a39f48e6) — Opacity and Shadow arrive expanded; Filters, Transform and transition and Advanced effects sit under a collapsed \"More effects\" (accent dot + \"Active: …\" while one holds a value). Each section keeps its 2L9 visuals inside it. Tests: InspectorTabContent \"Effects › More effects (FG-022)\". | Lane L-B P1 round 2, probe ?type=text with opacity 1, a 1-layer shadow, filter 'blur(4px) saturate(1.2) blur(1px)', transform + transition, Effects tab, side by side: Opacity one field; Shadow '1 layer' with X offset · Y offset · Blur · Spread · Color ('#111827 / 12%') · Inset; Filters 'Custom' with 'Authored value', 'Two blur functions are preserved in their original order.', 'Edit custom value'; 'Transform and transition · 2 set' shut; 'Advanced effects · None'. Before this the sliders showed 'Blur 4px' and any edit dropped saturate() and the second blur (data loss). Exceptions: Opacity's field keeps its % unit cell; an 'Add layer' button stays under the layers (code:layers-reachable — a second shadow layer has no other writer).",
    "tier": "P1"
   },
   {
@@ -5490,9 +5490,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "founder:fg-022-more-effects",
    "verified": "drift-fixed",
-   "verifiedNote": "L-B round 26, probe ?type=container&styles={box-shadow '0 4px 16px #0002, inset 0 0 0 1px #fff8', transform scale(1.02) translateY(-4px), transition longhands} → Effects, side by side with shots/247-25026.png: Shadow '2 layers' · 'Authored shadow' (the value as written, in order) · 'Editing one layer keeps order and inset placement.' (layer rows behind 'Edit layers'); Transform as fields — Scale 102 %, Rotate deg, Move X / Y with unit, Skew deg; Transition — Property (as written, 'transform, opacity'), Duration ms, Delay ms, Easing (ease-out…). Match; the transform / transition sit in one 'Transform and transition' section (board: two headings).",
+   "verifiedNote": "owner 2026-11-19 kept code-ahead feature: FG-022 (8a39f48e6) — Transform and transition sits under the collapsed \"More effects\"; its 2L9 fields are unchanged once open. | L-B round 26, probe ?type=container&styles={box-shadow '0 4px 16px #0002, inset 0 0 0 1px #fff8', transform scale(1.02) translateY(-4px), transition longhands} → Effects, side by side with shots/247-25026.png: Shadow '2 layers' · 'Authored shadow' (the value as written, in order) · 'Editing one layer keeps order and inset placement.' (layer rows behind 'Edit layers'); Transform as fields — Scale 102 %, Rotate deg, Move X / Y with unit, Skew deg; Transition — Property (as written, 'transform, opacity'), Duration ms, Delay ms, Easing (ease-out…). Match; the transform / transition sit in one 'Transform and transition' section (board: two headings).",
    "tier": "P1"
   },
   {
@@ -5501,9 +5501,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "founder:fg-022-more-effects",
    "verified": "drift-fixed",
-   "verifiedNote": "L-B round 26, probe → Effects, side by side with shots/247-25554.png: Advanced effects — Cursor (Pointer), Blend mode (Multiply), Will change as written ('transform, opacity'); 'Text shadow' · Custom CSS (exact expression) · 'Exact authored expression is preserved.'; Filters keep the custom sequence (I11). Opacity is its own section above (SSOT: one Opacity writer) where the board draws it inside Advanced effects; the filter note reads I11's copy ('Two blur functions are preserved…') — the two boards differ.",
+   "verifiedNote": "owner 2026-11-19 kept code-ahead feature: FG-022 (8a39f48e6) — Advanced effects sits under the collapsed \"More effects\"; its 2L9 fields are unchanged once open. | L-B round 26, probe → Effects, side by side with shots/247-25554.png: Advanced effects — Cursor (Pointer), Blend mode (Multiply), Will change as written ('transform, opacity'); 'Text shadow' · Custom CSS (exact expression) · 'Exact authored expression is preserved.'; Filters keep the custom sequence (I11). Opacity is its own section above (SSOT: one Opacity writer) where the board draws it inside Advanced effects; the filter note reads I11's copy ('Two blur functions are preserved…') — the two boards differ.",
    "tier": "P1"
   },
   {

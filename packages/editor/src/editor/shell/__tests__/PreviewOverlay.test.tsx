@@ -234,3 +234,80 @@ describe("PreviewOverlay — pages", () => {
     expect(onShowPage).not.toHaveBeenCalled();
   });
 });
+
+/* FG-030 (owner 2026-10-10, kept on the 2L9 design 2026-11-19): beside the
+   device presets, Preview takes Fit or a typed width in CSS px (the canvas
+   Page width's range). It only sizes the preview frame. Fit and a typed width
+   are remembered per site; a preset is not, so the next opening starts at the
+   editor's device again (J-F1.11 8:3262). */
+describe("PreviewOverlay — Fit and custom width (FG-030)", () => {
+  afterEach(() => window.localStorage.clear());
+  const frame = () => screen.getByTitle("Site preview") as HTMLIFrameElement;
+  const input = () => screen.getByRole("textbox", { name: "Preview width in px" });
+  const typeWidth = (value: string) => {
+    fireEvent.change(input(), { target: { value } });
+    fireEvent.keyDown(input(), { key: "Enter" });
+  };
+
+  it("keeps the board's bar: Back to editor · page · Draft preview, the devices with widths", () => {
+    render(<PreviewOverlay html="<p>x</p>" onDone={vi.fn()} siteId="s1" pageName="Home" />);
+    expect(screen.getByTestId("preview-back")).toHaveTextContent("Back to editor");
+    expect(screen.getByTestId("preview-title")).toHaveTextContent("Home · Draft preview");
+    expect(screen.getByTestId("bp-cell-desktop")).toHaveTextContent("Desktop1280px");
+  });
+
+  it("Fit fills the stage; a preset renders at its own width", () => {
+    render(<PreviewOverlay html="<p>x</p>" onDone={vi.fn()} siteId="s1" />);
+    expect(frame().getAttribute("width")).toBe("1280");
+    fireEvent.click(screen.getByTestId("preview-width-fit"));
+    expect(screen.getByTestId("preview-width-fit")).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByTestId("bp-cell-desktop")).toHaveAttribute("aria-pressed", "false");
+    expect(frame().getAttribute("width")).toBe("100%");
+  });
+
+  it("a typed width renders the page at that many CSS px, without a bezel", () => {
+    render(<PreviewOverlay html="<p>x</p>" onDone={vi.fn()} siteId="s1" initialDevice="mobile" />);
+    typeWidth("900");
+    expect(frame().getAttribute("width")).toBe("900");
+    for (const id of ["desktop", "tablet", "mobile"]) {
+      expect(screen.getByTestId(`bp-cell-${id}`)).toHaveAttribute("aria-pressed", "false");
+    }
+  });
+
+  it("refuses a width outside the canvas Page width range and keeps the current one", () => {
+    render(<PreviewOverlay html="<p>x</p>" onDone={vi.fn()} siteId="s1" />);
+    typeWidth("50");
+    expect(frame().getAttribute("width")).toBe("1280");
+    expect(input()).toHaveAttribute("aria-invalid", "true");
+    typeWidth("2561");
+    expect(frame().getAttribute("width")).toBe("1280");
+    typeWidth("2560");
+    expect(frame().getAttribute("width")).toBe("2560");
+  });
+
+  it("a refused entry does not survive closing and reopening", () => {
+    const { rerender } = render(<PreviewOverlay html="<p>x</p>" onDone={vi.fn()} siteId="s1" />);
+    typeWidth("50");
+    rerender(<PreviewOverlay html={null} onDone={vi.fn()} siteId="s1" />);
+    rerender(<PreviewOverlay html="<p>x</p>" onDone={vi.fn()} siteId="s1" />);
+    expect(input()).toHaveValue("1280");
+  });
+
+  it("remembers Fit and a typed width per site; a preset is not remembered", () => {
+    const { unmount } = render(<PreviewOverlay html="<p>x</p>" onDone={vi.fn()} siteId="s1" />);
+    fireEvent.change(input(), { target: { value: "1100" } });
+    fireEvent.blur(input());
+    unmount();
+    render(<PreviewOverlay html="<p>x</p>" onDone={vi.fn()} siteId="s1" initialDevice="tablet" />);
+    expect(frame().getAttribute("width")).toBe("1100");
+    cleanup();
+    render(<PreviewOverlay html="<p>x</p>" onDone={vi.fn()} siteId="s2" />);
+    expect(frame().getAttribute("width")).toBe("1280");
+    cleanup();
+    render(<PreviewOverlay html="<p>x</p>" onDone={vi.fn()} siteId="s1" />);
+    fireEvent.click(screen.getByRole("button", { name: /^Mobile/ }));
+    cleanup();
+    render(<PreviewOverlay html="<p>x</p>" onDone={vi.fn()} siteId="s1" initialDevice="tablet" />);
+    expect(screen.getByTestId("bp-cell-tablet")).toHaveAttribute("aria-pressed", "true");
+  });
+});

@@ -11,6 +11,8 @@ import {
   getBreakpointForWidth,
   DEVICE_PREVIEW_SIZES,
   BREAKPOINTS,
+  CUSTOM_WIDTH_RANGE,
+  parseCustomWidth,
 } from "../breakpoints";
 import { DEVICE_PRESETS } from "../canvas";
 import { PREVIEW_DEVICES } from "@/shared/types/export";
@@ -69,5 +71,14 @@ describe("DEVICE_PREVIEW_SIZES — the one device table (G2-013)", () => {
 
   it("the legacy presets agree with it", () => {
     expect(DEVICE_PRESETS.map((d) => d.width)).toEqual([1280, 768, 375]);
+  });
+});
+
+/* FG-030: the canvas Page width and the Preview width field share one range. */
+describe("parseCustomWidth", () => {
+  it("takes whole numbers inside CUSTOM_WIDTH_RANGE only", () => {
+    expect(parseCustomWidth(String(CUSTOM_WIDTH_RANGE.min))).toBe(240);
+    expect(parseCustomWidth(String(CUSTOM_WIDTH_RANGE.max))).toBe(2560);
+    for (const bad of ["239", "2561", "", "12.5", "-300", "900px", "abc"]) expect(parseCustomWidth(bad)).toBeNull();
   });
 });

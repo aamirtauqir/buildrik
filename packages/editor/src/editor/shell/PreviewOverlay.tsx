@@ -39,8 +39,8 @@
  */
 import * as React from "react";
 import type { DeviceType } from "@/shared/types";
-import { DEVICE_PREVIEW_SIZES } from "@/shared/constants/breakpoints";
-import { Button, BreakpointSwitcher, Select, type Breakpoint } from "@/editor/chrome-ui";
+import { CUSTOM_WIDTH_RANGE, DEVICE_PREVIEW_SIZES, parseCustomWidth } from "@/shared/constants/breakpoints";
+import { Button, BreakpointSwitcher, Select, TextInput, type Breakpoint } from "@/editor/chrome-ui";
 import { isModalOpen } from "@/editor/chrome-ui";
 import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 import { buildInteractionRuntimeScript, INTERACTION_ATTR } from "@/engine/export/interactionRuntime";
@@ -143,7 +143,49 @@ const DEVICE_BAR_CLASS =
   "tw:bg-[var(--bk-bg-card)] tw:border-b tw:border-[var(--bk-border)]";
 
 const DEVICE_BAR_INNER_CLASS =
-  "tw:absolute tw:left-1/2 tw:-translate-x-1/2 tw:flex tw:items-center";
+  "tw:absolute tw:left-1/2 tw:-translate-x-1/2 tw:flex tw:items-center tw:gap-2";
+
+/* FG-030 (owner 2026-10-10, kept on the 2L9 design 2026-11-19): besides the
+   device presets, the preview takes Fit (the stage width) or a number of CSS
+   px. It sizes this frame only — the overlay holds no composer, so it cannot
+   write a style override. Fit and a typed width are remembered per site in
+   this browser, like the canvas zoom; a preset is not, so the next opening
+   starts at the editor's device again (J-F1.11 8:3262). */
+type PreviewWidth = Breakpoint | "fit" | number;
+const PREVIEW_WIDTH_KEY = "bk-preview-width:";
+
+function readPreviewWidth(siteId: string | null | undefined): "fit" | number | null {
+  try {
+    const raw = window.localStorage.getItem(PREVIEW_WIDTH_KEY + (siteId ?? "local"));
+    if (raw === "fit") return raw;
+    return raw ? parseCustomWidth(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function writePreviewWidth(siteId: string | null | undefined, width: "fit" | number | null): void {
+  try {
+    const key = PREVIEW_WIDTH_KEY + (siteId ?? "local");
+    if (width === null) window.localStorage.removeItem(key);
+    else window.localStorage.setItem(key, String(width));
+  } catch {
+    /* Storage blocked: the choice lasts while the overlay is open. */
+  }
+}
+
+/** The width the frame is drawn at, for the number field (empty at Fit). */
+function widthDigits(width: PreviewWidth): string {
+  if (typeof width === "number") return String(width);
+  return width === "fit" ? "" : String(DEVICE_PREVIEW_SIZES[width].width);
+}
+
+const FIT_CLASS =
+  "tw:h-7 tw:px-3 tw:text-[11px] tw:font-medium tw:text-[var(--bk-ink-muted)] tw:bg-[var(--bk-gray-50)] " +
+  "tw:border tw:border-[var(--bk-gray-200)] tw:rounded-lg tw:hover:text-[var(--bk-ink)] " +
+  "tw:aria-[pressed=true]:bg-[var(--bk-accent)] tw:aria-[pressed=true]:text-white tw:aria-[pressed=true]:font-semibold";
+
+const WIDTH_INPUT_CLASS = "tw:w-[72px] tw:tabular-nums";
 
 /* The widths each device renders at, printed beside its name — the one
    device table the canvas and export read too (L1-013: Desktop was 1320
@@ -188,15 +230,33 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
   onShowPage,
   initialDevice = "desktop",
 }) => {
-  const [device, setDevice] = React.useState<Breakpoint>(initialDevice);
-  /* J-F1.11 8:3262: every opening starts at the editor's device; switching
-     inside the preview (or moving to another page) keeps the choice. */
+  const [width, setWidthState] = React.useState<PreviewWidth>(() => readPreviewWidth(siteId) ?? initialDevice);
+  /* J-F1.11 8:3262: every opening starts at the editor's device — or at the
+     site's remembered Fit / typed width (FG-030); switching inside the preview
+     (or moving to another page) keeps the choice. */
   const opened = html != null;
-  const deviceRef = React.useRef(initialDevice);
-  deviceRef.current = initialDevice;
+  const startRef = React.useRef({ siteId, initialDevice });
+  startRef.current = { siteId, initialDevice };
   React.useEffect(() => {
-    if (opened) setDevice(deviceRef.current);
+    if (opened) setWidthState(readPreviewWidth(startRef.current.siteId) ?? startRef.current.initialDevice);
   }, [opened]);
+  const setWidth = React.useCallback(
+    (next: PreviewWidth) => {
+      setWidthState(next);
+      writePreviewWidth(siteId, next === "fit" || typeof next === "number" ? next : null);
+    },
+    [siteId],
+  );
+  /* The field shows the width in force — again on every opening, so a refused
+     entry from the last visit does not greet the next one. */
+  const [draft, setDraft] = React.useState(() => widthDigits(width));
+  React.useEffect(() => setDraft(widthDigits(width)), [width, opened]);
+  const draftWidth = parseCustomWidth(draft);
+  const draftValid = draft === "" || draftWidth !== null;
+  const commitDraft = () => {
+    if (draftWidth === null || draft === widthDigits(width)) return;
+    setWidth(draftWidth);
+  };
   const [shareOpen, setShareOpen] = React.useState(false);
   /* S-8: the copy said nothing either way; the button now answers. */
   const [errorCopied, setErrorCopied] = React.useState<boolean | null>(null);
@@ -263,8 +323,11 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
   if (!open) return null;
 
   /* `wide` and `desktop` have no bezel — DeviceFramePreview passes children
-     straight through for them, which is also what `active` says here. */
+     straight through for them, which is also what `active` says here. Fit and
+     a typed width are a page with edges. */
+  const device: Breakpoint | null = width === "fit" || typeof width === "number" ? null : width;
   const framed = device === "tablet" || device === "mobile";
+  const pageWidth = width === "fit" ? "100%" : typeof width === "number" ? String(width) : String(DEVICE_PREVIEW_SIZES[width].width);
 
   return (
     <div
@@ -285,7 +348,40 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
           </span>
         </div>
         <div className={DEVICE_BAR_INNER_CLASS}>
-          <BreakpointSwitcher labelled sublabels={DEVICE_WIDTHS} value={device} onChange={setDevice} />
+          <Button
+            color="light"
+            size="xs"
+            className={FIT_CLASS}
+            aria-pressed={width === "fit"}
+            title="Fit the preview to the window"
+            data-testid="preview-width-fit"
+            onClick={() => setWidth("fit")}
+          >
+            Fit
+          </Button>
+          <BreakpointSwitcher labelled sublabels={DEVICE_WIDTHS} value={device} onChange={setWidth} />
+          <div className="tw:flex tw:items-center tw:gap-1">
+            <TextInput
+              sizing="sm"
+              inputMode="numeric"
+              aria-label="Preview width in px"
+              aria-invalid={!draftValid}
+              title={`Custom width, ${CUSTOM_WIDTH_RANGE.min}\u2013${CUSTOM_WIDTH_RANGE.max} px`}
+              placeholder="Width"
+              color={draftValid ? undefined : "failure"}
+              className={WIDTH_INPUT_CLASS}
+              value={draft}
+              data-testid="preview-width-input"
+              onChange={(e) => setDraft(e.target.value.replace(/[^0-9]/g, ""))}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") commitDraft();
+              }}
+              onBlur={commitDraft}
+            />
+            <span aria-hidden="true" className="tw:text-[11px] tw:text-[var(--bk-ink-muted)]">
+              px
+            </span>
+          </div>
         </div>
         <div className="tw:flex tw:items-center tw:gap-2">
           {pages.length > 1 && onShowPage && (
@@ -358,7 +454,7 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
             )}
           </div>
         ) : (
-        <DeviceFramePreview device={device as DeviceType} active={framed}>
+        <DeviceFramePreview device={(device ?? "desktop") as DeviceType} active={framed}>
           <iframe
             ref={frameRef}
             title="Site preview"
@@ -367,8 +463,9 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
             sandbox="allow-scripts"
             srcDoc={srcDoc}
             className={framed ? SCREEN_FRAME_CLASS : PAGE_FRAME_CLASS}
-            /* The HTML width attribute, not a style: the width is data (L1-013). */
-            width={framed ? undefined : String(DEVICE_PREVIEW_SIZES[device].width)}
+            /* The HTML width attribute, not a style: the width is data (a
+               preset, the stage, or the typed px — L1-013, FG-030). */
+            width={framed ? undefined : pageWidth}
           />
         </DeviceFramePreview>
         )}

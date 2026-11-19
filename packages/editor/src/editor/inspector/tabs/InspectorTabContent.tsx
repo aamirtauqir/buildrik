@@ -20,7 +20,7 @@ import * as React from "react";
 import type { Composer } from "@/engine";
 import type { IconConfig, MediaAsset, MediaAssetType } from "@/shared/types/media";
 import type { CssContext, PropertyState } from "../config/cssContext";
-import { SECTION_ORDER } from "../config/sectionOrder";
+import { MORE_EFFECTS_ID, MORE_EFFECTS_SECTIONS, SECTION_ORDER } from "../config/sectionOrder";
 import type { UseAdvancedSettingsReturn } from "../hooks/useAdvancedSettings";
 import { resolveDisplayMode, type SectionChoice } from "../hooks/useInspectorSections";
 import {
@@ -31,7 +31,7 @@ import {
   type TabId,
 } from "../sections/registry";
 import { sectionHasValue } from "../sections/registry";
-import { SectionFrameContext, type SectionFrame } from "../shared/controls/Section";
+import { Section, SectionFrameContext, type SectionFrame } from "../shared/controls/Section";
 import { InspectorFieldContext } from "../shared/controls/InspectorFieldContext";
 import { sectionOverrideMarks } from "../shared/controls/OverrideDot";
 import { capabilitiesFor } from "@/shared/constants/elementCapabilities";
@@ -219,6 +219,71 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
   /* ⌥-click (DD-22): everything shut when anything is open, else all open. */
   const toggleAll = () => onSetChoices(type, ids, modes.some((m) => m === "open") ? "closed" : "open");
 
+  const rendered = ids.map((id, i) => {
+    const entry = SECTION_REGISTRY[id];
+    const displayMode = modes[i];
+    const setOpen = (open: boolean) => onSetChoices(type, [id], open ? "open" : "closed");
+    const advancedKey = entry.advancedKey ?? id;
+    const ctx: SectionContext = {
+      ...baseCtx,
+      isOpen: displayMode === "open",
+      onToggle: () => setOpen(displayMode !== "open"),
+      displayMode,
+      advancedExpanded: entry.advancedKey ? advancedState.isExpanded(advancedKey) : false,
+      onAdvancedToggle: entry.advancedKey ? () => advancedState.toggle(advancedKey) : () => undefined,
+    };
+    const frame: SectionFrame = {
+      ...sectionOverrideMarks(field, entry.styleKeys as readonly string[]),
+      sectionId: id,
+      title: entry.frameTitle ? entry.frameTitle(baseCtx) : entry.title,
+      displayMode,
+      summary: displayMode === "summary" && entry.summary ? entry.summary(baseCtx) : null,
+      onToggle: ctx.onToggle,
+      onToggleAll: toggleAll,
+      onAdd: () => {
+        setOpen(true);
+        entry.onAdd?.(ctx);
+      },
+    };
+    return (
+      <SectionFrameContext.Provider key={id} value={frame}>
+        {entry.render(ctx)}
+        {applied && id === resultAfter ? <ApplyStyleResultNote result={applied} /> : null}
+      </SectionFrameContext.Provider>
+    );
+  });
+
+  /* FG-022 (owner 2026-10-10, kept on the 2L9 design 2026-11-19): Filters,
+     Transform & motion and Advanced sit under "More effects", collapsed until
+     the user opens it — or opens one of them (⌘K "Jump to property" records
+     the section's own open choice). Collapsed, it names the ones that hold an
+     active effect so a set filter is never hidden. */
+  const nested = ids.filter((id) => MORE_EFFECTS_SECTIONS.includes(id));
+  const nestedOpen =
+    choices[`${type}:${MORE_EFFECTS_ID}`] === "open" || nested.some((id) => choices[`${type}:${id}`] === "open");
+  const active = nested.filter((id) => sectionHasValue(id, baseCtx)).map((id) => SECTION_REGISTRY[id].title);
+  const moreFrame: SectionFrame = {
+    sectionId: MORE_EFFECTS_ID,
+    title: "More effects",
+    displayMode: nestedOpen ? "open" : "summary",
+    summary: !nestedOpen && active.length ? `Active: ${active.join(", ")}` : null,
+    headerDot:
+      !nestedOpen && active.length ? (
+        <span
+          aria-hidden="true"
+          data-testid="inspector-more-effects-active"
+          className="tw:size-1.5 tw:shrink-0 tw:rounded-full tw:bg-[var(--bk-accent)]"
+        />
+      ) : undefined,
+    /* Closing it closes the sections opened inside it, or their open choice
+       would hold it open. */
+    onToggle: () =>
+      nestedOpen
+        ? onSetChoices(type, [MORE_EFFECTS_ID, ...nested.filter((id) => choices[`${type}:${id}`] === "open")], "closed")
+        : onSetChoices(type, [MORE_EFFECTS_ID], "open"),
+    onToggleAll: toggleAll,
+  };
+
   return (
     <>
       {/* 2L9 B04 247:29578: "Align and distribute" heads a multi-selection's Style tab. */}
@@ -228,39 +293,12 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
       {tabId === "content" && !isMultiSelect ? (
         <ListItemNote composer={composer} elementId={selectedElement.id} hasLinkSection={visibleSectionIds("behaviour", [type], baseCtx).includes("link")} />
       ) : null}
-      {ids.map((id, i) => {
-        const entry = SECTION_REGISTRY[id];
-        const displayMode = modes[i];
-        const setOpen = (open: boolean) => onSetChoices(type, [id], open ? "open" : "closed");
-        const advancedKey = entry.advancedKey ?? id;
-        const ctx: SectionContext = {
-          ...baseCtx,
-          isOpen: displayMode === "open",
-          onToggle: () => setOpen(displayMode !== "open"),
-          displayMode,
-          advancedExpanded: entry.advancedKey ? advancedState.isExpanded(advancedKey) : false,
-          onAdvancedToggle: entry.advancedKey ? () => advancedState.toggle(advancedKey) : () => undefined,
-        };
-        const frame: SectionFrame = {
-          ...sectionOverrideMarks(field, entry.styleKeys as readonly string[]),
-          sectionId: id,
-          title: entry.frameTitle ? entry.frameTitle(baseCtx) : entry.title,
-          displayMode,
-          summary: displayMode === "summary" && entry.summary ? entry.summary(baseCtx) : null,
-          onToggle: ctx.onToggle,
-          onToggleAll: toggleAll,
-          onAdd: () => {
-            setOpen(true);
-            entry.onAdd?.(ctx);
-          },
-        };
-        return (
-          <SectionFrameContext.Provider key={id} value={frame}>
-            {entry.render(ctx)}
-            {applied && id === resultAfter ? <ApplyStyleResultNote result={applied} /> : null}
-          </SectionFrameContext.Provider>
-        );
-      })}
+      {ids.map((id, i) => (nested.includes(id) ? null : rendered[i]))}
+      {nested.length ? (
+        <SectionFrameContext.Provider value={moreFrame}>
+          <Section title="More effects">{ids.map((id, i) => (nested.includes(id) ? rendered[i] : null))}</Section>
+        </SectionFrameContext.Provider>
+      ) : null}
     </>
   );
 };

@@ -14,8 +14,7 @@
  */
 import * as React from "react";
 import { Button, Menu, MenuItem, TextInput, type Breakpoint } from "@/editor/chrome-ui";
-
-const WIDTH_RANGE = { min: 240, max: 2560 } as const;
+import { CUSTOM_WIDTH_RANGE, parseCustomWidth } from "@/shared/constants/breakpoints";
 
 const PRESETS: ReadonlyArray<{ width: number; label?: string; device?: Breakpoint }> = [
   { width: 1920, label: "Wide" },
@@ -39,8 +38,8 @@ export interface PageWidthPanelProps {
 
 export function PageWidthPanel({ width, device, custom, onDeviceChange, onCustomWidth, onDone }: PageWidthPanelProps) {
   const [draft, setDraft] = React.useState(String(width));
-  const n = /^\d+$/.test(draft) ? Number(draft) : NaN;
-  const valid = n >= WIDTH_RANGE.min && n <= WIDTH_RANGE.max;
+  const parsed = parseCustomWidth(draft);
+  const valid = parsed !== null;
 
   const pick = (p: (typeof PRESETS)[number]) => {
     if (p.device) onDeviceChange(p.device);
@@ -75,8 +74,8 @@ export function PageWidthPanel({ width, device, custom, onDeviceChange, onCustom
           onChange={(e) => setDraft(e.target.value.replace(/[^0-9]/g, ""))}
           onKeyDown={(e) => {
             e.stopPropagation();
-            if (e.key === "Enter" && valid) {
-              onCustomWidth(n);
+            if (e.key === "Enter" && parsed !== null) {
+              onCustomWidth(parsed);
               onDone();
             }
           }}
@@ -84,7 +83,7 @@ export function PageWidthPanel({ width, device, custom, onDeviceChange, onCustom
       </label>
       {!valid && draft !== "" && (
         <span role="alert" className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-error-text)]" data-testid="page-width-error">
-          {`Enter a number from ${WIDTH_RANGE.min} to ${WIDTH_RANGE.max}. The page stays at ${width} px.`}
+          {`Enter a number from ${CUSTOM_WIDTH_RANGE.min} to ${CUSTOM_WIDTH_RANGE.max}. The page stays at ${width} px.`}
         </span>
       )}
       <Menu label="Page width presets" className="tw:-mx-1">
@@ -102,7 +101,7 @@ export function PageWidthPanel({ width, device, custom, onDeviceChange, onCustom
         ))}
       </Menu>
       <span className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
-        {`Custom width: ${WIDTH_RANGE.min}–${WIDTH_RANGE.max} px.`}
+        {`Custom width: ${CUSTOM_WIDTH_RANGE.min}–${CUSTOM_WIDTH_RANGE.max} px.`}
       </span>
     </div>
   );
