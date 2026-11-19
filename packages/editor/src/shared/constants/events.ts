@@ -49,8 +49,6 @@ export const EVENTS = {
   ELEMENT_CHANGE_IMAGE: "element:change-image",
   /** New media element inserted (from ElementManager.insertMedia) */
   ELEMENT_INSERTED: "element:inserted",
-  /** Empty media element needs an asset (Build tab → Media tab contract) */
-  ELEMENT_NEEDS_ASSET: "element:needs-asset",
   /** Edit alt text of an image element */
   ELEMENT_EDIT_ALT: "element:edit-alt",
   /** Preview layer changed for element (T8 — AI tab live-preview channel) */
@@ -355,6 +353,9 @@ export const EVENTS = {
    *  context menu's "Replace with block…" opens Add AND lands on BLOCKS —
    *  switching the tab alone leaves the user at ELEMENTS. */
   UI_INSERT_OPEN_GROUP: "ui:insert-open-group",
+  /** Insert a block through Add's insert path (`{ block: BlockData }`) —
+   *  placement, one undo step, the "added" toast. ⌘K's catalog rows (L1-033). */
+  UI_INSERT_BLOCK: "ui:insert-block",
   /** An Add-drawer drag started (`{ label }`) or ended (`{ label: null }`) —
    *  board 4418:100890's drag state (canvas cue, drawer note, readout). */
   UI_INSERT_DRAG: "ui:insert-drag",

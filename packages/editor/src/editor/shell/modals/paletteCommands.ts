@@ -14,6 +14,8 @@ import { ELEMENT_TYPE_LABELS } from "@/shared/constants/elementTypeLabels";
 import { PAGE_TEMPLATES, getMyTemplates } from "@/editor/sidebar/tabs/templates/templatesData";
 import { isTabAllowedForViewer, type GroupedTabId } from "@/editor/rail/tabsConfig";
 import { recordHistoryCleared } from "@/shared/utils/historySessionMarkers";
+import { offeredCatalog } from "@/editor/sidebar/tabs/build/catalog/catalog";
+import { DarkModeSchema } from "@buildrik/shared/schemas/design-tokens";
 
 // =============================================================================
 // TYPES
@@ -33,6 +35,9 @@ export interface PaletteCommand {
   disabledReason?: string;
   /** A door into a nested list (263:250988 "Go to page ›"): → or click opens it. */
   opens?: "pages";
+  /** Answers a query but stays out of the opening list (board 4418:141220
+   *  draws a curated set). */
+  searchOnly?: boolean;
 }
 
 
@@ -233,9 +238,11 @@ export function buildCommands(
     /* The footer flyout's third row (⇧2). Canvas has always listened for
        ZOOM_SELECTION; nothing emitted it (DQ-003). */
     { id: "view-zoom-selection", label: "Zoom to selection", group: "More", shortcut: "Shift+2", handler: run(() => composer.emit(EVENTS.ZOOM_SELECTION, {})) },
-    /* The registry's chordless "Reset zoom" printed nothing although ⇧0 works
-       (the flyout binds it). The row prints the flyout's chord, like fit's. */
-    { id: "view-zoom-100", label: "Reset zoom", group: "More", shortcut: "Shift+0", handler: run(() => composer.setZoom(100)) },
+    /* The registry's chordless copy printed nothing although ⇧0 works (the
+       flyout binds it). The row prints the flyout's chord, like fit's, and
+       carries the keyboard sheet's name (L1-033: "Reset zoom" here, "Zoom to
+       100%" there). */
+    { id: "view-zoom-100", label: "Zoom to 100%", group: "More", shortcut: "Shift+0", keywords: ["reset"], handler: run(() => composer.setZoom(100)) },
     {
       id: "history-clear",
       label: "Clear history",
@@ -274,6 +281,35 @@ export function buildCommands(
         if (siteId) void composer.collab.manager.startSession(siteId, "Editor").catch(() => {});
       }),
     });
+  }
+
+  /* L1-033 (owner 2026-10-10): an Add row for every element the Add panel
+     offers, generated from its catalog — searchable only, so the opening list
+     stays the board's curated ADD rows, and only where an insert can happen
+     (a page is open; a viewer cannot insert). A catalog row whose label the
+     list already carries ("Add text", "Add heading"…) is not printed twice. */
+  if (!viewerChrome && composer.elements?.getActivePage?.()) {
+    const darkMode = DarkModeSchema.catch("off").parse(composer.getProjectSettings?.()?.darkMode);
+    const taken = new Set([...commands.map((c) => c.label.toLowerCase()), ...registry.map((c) => (c.label ?? c.id).toLowerCase())]);
+    for (const el of offeredCatalog(darkMode)) {
+      const name = el.name
+        .split(" ")
+        .map((w) => (/^[A-Z0-9]+$/.test(w) && w.length > 1 ? w : w.toLowerCase()))
+        .join(" ");
+      const label = `Add ${name}`;
+      if (taken.has(label.toLowerCase())) continue;
+      taken.add(label.toLowerCase());
+      commands.push({
+        id: `add-el-${el.blockId}`,
+        label,
+        group: "Add",
+        searchOnly: true,
+        keywords: [...el.tags, el.catName, "insert"],
+        handler: run(() =>
+          composer.emit(EVENTS.UI_INSERT_BLOCK, { block: { id: el.blockId, label: el.name, category: el.catId } }),
+        ),
+      });
+    }
   }
 
   /* TEMPLATES — the catalogue's own search went with 4418:54134 (it draws

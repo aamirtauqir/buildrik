@@ -17,7 +17,6 @@ import type { ComponentDefinition } from "@/shared/types/components";
 export type InsertSearchHit =
   | { key: string; label: string; group: "ELEMENTS"; el: FlatElEntry }
   | { key: string; label: string; group: "BLOCKS"; block: BlockDefinition }
-  | { key: string; label: string; group: "COMPONENTS"; block: BlockDefinition }
   | { key: string; label: string; group: "SAVED"; component: ComponentDefinition };
 
 /* Tag → the word a user types for it. Blocks carry no tags, so a block is
@@ -56,7 +55,6 @@ export function searchInsert(
   query: string,
   elements: FlatElEntry[],
   blocks: BlockDefinition[],
-  components: BlockDefinition[] = [],
   saved: ComponentDefinition[] = []
 ): InsertSearchHit[] {
   const typed = query.toLowerCase().trim();
@@ -89,18 +87,9 @@ export function searchInsert(
       block: b,
     }));
 
-  const componentHits: InsertSearchHit[] = components
-    .filter((b) => has(blockTerms(b)))
-    .map((b) => ({
-      key: `component-${b.id}`,
-      label: b.label,
-      group: "COMPONENTS" as const,
-      block: b,
-    }));
-
   const savedHits: InsertSearchHit[] = saved
     .filter((c) => has([c.name, c.description ?? "", ...(c.tags ?? [])].join(" ").toLowerCase()))
     .map((c) => ({ key: `saved-${c.id}`, label: c.name, group: "SAVED" as const, component: c }));
 
-  return [...elHits, ...blockHits, ...componentHits, ...savedHits];
+  return [...elHits, ...blockHits, ...savedHits];
 }

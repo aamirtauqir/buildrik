@@ -5,6 +5,7 @@
  */
 
 import type { AnalyticsConfig, StripeConfig } from "./index";
+import { DEVICE_PREVIEW_SIZES } from "../constants/breakpoints";
 
 // ============================================================================
 // EXPORT OPTIONS
@@ -140,10 +141,13 @@ export interface DeviceDimensions {
 /**
  * Preview device configurations
  */
+/* Widths come from the one device table (L1-013): export used to call 1440
+   "Desktop" while the canvas drew 1024 and Preview 1320. */
+const { desktop, tablet, mobile } = DEVICE_PREVIEW_SIZES;
 export const PREVIEW_DEVICES: Record<PreviewDevice, DeviceDimensions> = {
-  desktop: { width: 1440, height: 900, label: "Desktop (1440px)" },
-  tablet: { width: 768, height: 1024, label: "Tablet (768px)" },
-  mobile: { width: 375, height: 667, label: "Mobile (375px)" },
+  desktop: { width: desktop.width, height: 900, label: `Desktop (${desktop.width}px)` },
+  tablet: { width: tablet.width, height: 1024, label: `Tablet (${tablet.width}px)` },
+  mobile: { width: mobile.width, height: 667, label: `Mobile (${mobile.width}px)` },
 };
 
 // ============================================================================

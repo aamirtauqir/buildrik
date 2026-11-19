@@ -25,7 +25,7 @@ import { useToast } from "@/editor/chrome-ui";
 import { SearchResults } from "./components/SearchResults";
 import { useInsertDrag } from "@/editor/canvas/insertDrag";
 import { setInsertReceiptSink, takePendingInsertGroup, takePendingPasteHtml, type InsertReceipt } from "./insertGroupRequest";
-import { addTabOf, buildInsertGroups, blockRows, componentRows, elementCategoryGroups, type AddTabId, type InsertGroup, type InsertGroupId } from "./catalog/groups";
+import { addTabOf, buildInsertGroups, blockRows, elementCategoryGroups, type AddTabId, type InsertGroup, type InsertGroupId } from "./catalog/groups";
 import type { FlatElEntry } from "./catalog/types";
 import { InsertTargetStrip } from "./components/InsertTargetStrip";
 import { CmsAddSection } from "./components/CmsAddSection";
@@ -44,7 +44,7 @@ const ADD_TABS: ReadonlyArray<{ id: AddTabId; label: string }> = [
 ];
 
 const DEFAULT_OPEN_GROUPS: InsertGroupId[] = [
-  "favourites", "recent", ...CATALOG.map((c) => `cat-${c.id}` as const), "blocks", "components", "mine",
+  "favourites", "recent", ...CATALOG.map((c) => `cat-${c.id}` as const), "blocks", "mine",
 ];
 
 export interface BuildTabProps {
@@ -133,7 +133,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
   const tabGroups = React.useMemo((): Array<InsertGroup & { elements?: FlatElEntry[] }> => {
     if (addTab === "elements") return [...groups.filter((g) => g.id === "favourites" || g.id === "recent"), ...categories];
     if (addTab === "blocks") return groups.filter((g) => g.id === "blocks");
-    return groups.filter((g) => g.id === "components" || g.id === "mine");
+    return groups.filter((g) => g.id === "mine");
   }, [addTab, groups, categories]);
 
   // MINE row click — the same instantiate contract the Components surface
@@ -333,7 +333,6 @@ export const BuildTab: React.FC<BuildTabProps> = ({
                 favs={tab.favs}
                 onToggleFav={tab.toggleFav}
                 blocks={g.id === "blocks" ? blockRows : undefined}
-                components={g.id === "components" ? componentRows : undefined}
                 mine={g.id === "mine" ? mine : undefined}
                 library={g.id === "mine" ? library : undefined}
                 onLibraryInsert={(id) => void insertFromLibrary(id)}

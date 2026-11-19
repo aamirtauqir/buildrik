@@ -8,10 +8,10 @@
  * both are the same shape: the canvas silently became its container, so the
  * customer's page was laid out at a width that ships on no screen.
  *
- *   1. `DEVICE_SIZES.desktop` is `"100%"` — the only elastic entry — so desktop
+ *   1. `DEVICE_SIZES.desktop` was `"100%"` — the only elastic entry — so desktop
  *      rendered at 712, under `BREAKPOINTS.desktop.minWidth` (1024), while
  *      StyleEngine withheld the tablet/mobile overrides because the device was
- *      still "desktop".
+ *      still "desktop". Since L1-013 Desktop is a fixed 1280.
  *   2. The canvas is a flex item, so `min-width: auto` resolves to 0 and the
  *      default `flex-shrink: 1` pulled the FIXED devices down too: tablet
  *      declared 768 and rendered 712 (under its own breakpoint), wide declared
@@ -39,22 +39,16 @@ describe("getCanvasStyles — a device frame keeps its width", () => {
     }
   });
 
-  it("floors desktop at the breakpoint the rest of the product uses", () => {
-    expect(styles("desktop").minWidth).toBe(`${BREAKPOINTS.desktop.minWidth}px`);
-  });
-
-  it("reads the floor from BREAKPOINTS, not a literal", () => {
-    // A hardcoded 1024 here would drift the day the breakpoint moves, and the
-    // symptom would be a page laid out below its own breakpoint again.
-    expect(styles("desktop").minWidth).not.toBe("1024px_literal");
-    expect(String(styles("desktop").minWidth)).toContain(String(BREAKPOINTS.desktop.minWidth));
-  });
-
-  it("does not floor the fixed-width devices — their own width is the frame", () => {
-    for (const device of ["wide", "tablet", "mobile"] as DeviceType[]) {
-      expect(styles(device).minWidth, `${device} should not carry a desktop floor`).toBeUndefined();
+  /* L1-013 (owner 2026-10-10): Desktop is a fixed 1280 preset now, shared
+     with Preview and export — no longer an elastic "100%" frame floored at
+     the breakpoint. Every device is a fixed width the column cannot squeeze. */
+  it("renders every device at its own fixed width, desktop included", () => {
+    for (const device of ["desktop", "wide", "tablet", "mobile"] as DeviceType[]) {
       expect(styles(device).width).toBe(DEVICE_SIZES[device].width);
+      expect(styles(device).maxWidth, `${device} may be capped by the column`).toBe(DEVICE_SIZES[device].width);
+      expect(styles(device).minWidth, `${device} needs no floor`).toBeUndefined();
     }
+    expect(styles("desktop").width).toBe("1280px");
   });
 
   it("every fixed device renders at or above its own breakpoint", () => {
@@ -62,7 +56,7 @@ describe("getCanvasStyles — a device frame keeps its width", () => {
     // live at 712. Guards the pairing itself, not just the number.
     const px = (v: unknown) => parseInt(String(v), 10);
     expect(px(styles("tablet").width)).toBeGreaterThanOrEqual(BREAKPOINTS.tablet.minWidth);
-    expect(px(styles("desktop").minWidth)).toBeGreaterThanOrEqual(BREAKPOINTS.desktop.minWidth);
+    expect(px(styles("desktop").width)).toBeGreaterThanOrEqual(BREAKPOINTS.desktop.minWidth);
   });
 
   it("keeps the scroll off the padded wrapper", () => {

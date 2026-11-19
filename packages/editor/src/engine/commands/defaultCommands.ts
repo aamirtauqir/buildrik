@@ -609,7 +609,9 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     },
     {
       id: "zoom-reset",
-      label: "Reset zoom",
+      /* L1-033: the keyboard sheet's name for ⇧0. */
+      label: "Zoom to 100%",
+      keywords: ["reset"],
       group: "View",
       run: (c) => c.setZoom(100),
     },

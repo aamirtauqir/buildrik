@@ -15,10 +15,8 @@ export const imageBlockConfig: ImageBlockConfig = {
   category: "Media",
   elementType: "image",
   icon: "/src/assets/icons/blocks/media/image.svg",
-  // Intentionally NO src — empty src triggers the element:needs-asset
-  // event at useBlockInsertion.ts:122, which the Media tab listens to
-  // (useMediaState.ts:132) and uses to auto-open the asset picker.
-  // Default src (e.g. via.placeholder.com) suppresses that event and
-  // leaves users with a placeholder URL that ships to production.
+  // Intentionally NO src — a default (e.g. via.placeholder.com) shipped to
+  // production. The inserted Image is selected and the Inspector's
+  // "Choose image" picks its asset (L1-017).
   content: '<img alt="Image"/>',
 };

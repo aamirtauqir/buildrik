@@ -12,7 +12,6 @@
  */
 
 import type * as React from "react";
-import { BREAKPOINTS } from "@/shared/constants/breakpoints";
 import { Z_LAYERS } from "@/shared/constants/canvas";
 import type { DeviceType } from "@/shared/types";
 
@@ -50,15 +49,11 @@ export function getCanvasStyles(
   return {
     width: safe.width,
     height: safe.height,
-    /* Desktop is the only device DEVICE_SIZES sizes elastically ("100%") —
-       every other one carries a real device width. So desktop alone rendered
-       at whatever the canvas column happened to be: 712px with the drawer
-       open at 1440, which is below `BREAKPOINTS.desktop.minWidth`. The page
-       reflowed as a narrow desktop while StyleEngine withheld the tablet and
-       mobile overrides (device is still "desktop"), so the customer's site was
-       drawn in a layout that ships on no screen. Floor it at the breakpoint
-       the rest of the product already agrees on and let the wrapper scroll. */
-    minWidth: device === "desktop" ? `${BREAKPOINTS.desktop.minWidth}px` : undefined,
+    /* Every device, Desktop included, is a fixed width (L1-013: Desktop is
+       the shared 1280 preset). An elastic desktop used to render at whatever
+       the column was — 712px with a drawer open, below the desktop
+       breakpoint — so the site was drawn in a layout that ships on no screen.
+       Zoom-to-fit, not the frame, adapts to the column (L1-012). */
     /* The canvas is a flex item, so `min-width: auto` resolves to 0 and the
        default `flex-shrink: 1` pulled EVERY device down to the column width.
        Measured live at 1440 with a drawer open (712px of viewport): tablet
@@ -69,7 +64,7 @@ export function getCanvasStyles(
        floor it. A device frame that silently becomes the column is not a device
        frame; let it keep its width and let .bd-canvas-scroll scroll. */
     flexShrink: 0,
-    maxWidth: device === "desktop" ? "100%" : safe.width,
+    maxWidth: safe.width,
     maxHeight: device === "desktop" ? "100%" : safe.height,
     background: "var(--bk-bg-card)",
     borderRadius: 12,

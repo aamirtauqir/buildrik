@@ -28,12 +28,11 @@ interface SearchResultsProps {
   onClearSearch: () => void;
 }
 
-/** The board's chip names the kind of thing a row inserts. Built-in and saved
- *  components are both "Component". */
+/** The board's chip names the kind of thing a row inserts — the same three
+ *  names as the Add groups (L1-022). */
 const CHIP: Record<InsertSearchHit["group"], string> = {
   ELEMENTS: "Element",
   BLOCKS: "Block",
-  COMPONENTS: "Component",
   SAVED: "Component",
 };
 

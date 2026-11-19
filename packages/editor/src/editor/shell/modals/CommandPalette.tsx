@@ -25,6 +25,7 @@ import { formatChord } from "@/editor/canvas/controls/keyboardSheetRows";
 import { Button, Portal, TextInput, useFocusTrap } from "@/editor/chrome-ui";
 import { getRecentCommandIds, recordCommandRun } from "./commandRecents";
 import { buildCommands, type PaletteCommand } from "./paletteCommands";
+import { scoreCommand } from "./commandMatch";
 import { useViewerChrome } from "../hooks/useEditorRole";
 
 export interface CommandPaletteProps {
@@ -204,10 +205,15 @@ const CommandPaletteCard: React.FC<CommandPaletteProps> = ({
   const visibleCommands = React.useMemo(() => {
     const q = query.toLowerCase().trim();
     if (nested === "pages") return pageCommands.filter((c) => !q || c.label.toLowerCase().includes(q));
-    if (!q) return [...recentCommands, ...commands.filter((c) => OPENING_BANDS.has(c.group))];
-    return [...commands, ...recordCommands].filter((cmd) =>
-      [cmd.label, cmd.group, ...(cmd.keywords ?? [])].join(" ").toLowerCase().includes(q),
-    );
+    if (!q) return [...recentCommands, ...commands.filter((c) => OPENING_BANDS.has(c.group) && !c.searchOnly)];
+    /* Word-start matches only, label hits ahead of keyword hits (L1-033).
+       The sort is stable, and bands keep BAND_ORDER, so this orders rows
+       within a band. */
+    return [...commands, ...recordCommands]
+      .map((cmd) => ({ cmd, score: scoreCommand(cmd, q) }))
+      .filter((r) => r.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .map((r) => r.cmd);
   }, [commands, recordCommands, recentCommands, query, nested, pageCommands]);
 
   // A query that matches nothing is never a dead end: stock photos. (No

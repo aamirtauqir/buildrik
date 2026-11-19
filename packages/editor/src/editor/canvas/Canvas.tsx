@@ -11,11 +11,10 @@ import { EVENTS } from "@/shared/constants/events";
 import { requestInsertGroup } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 import { useVisibleFrameSpan } from "./hooks/useVisibleFrameSpan";
 import { useCanvasNavigationGuard } from "./hooks/useCanvasNavigationGuard";
-
-/** Grey left each side of the page card when the canvas fits on load. */
-const FIT_GUTTER = 60;
+import { useCanvasZoomFit } from "./hooks/useCanvasZoomFit";
+import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { DeleteSelectionConfirm } from "./DeleteSelectionConfirm";
-import { getBreakpointForWidth } from "@/shared/constants/breakpoints";
+import { DEVICE_PREVIEW_SIZES, getBreakpointForWidth } from "@/shared/constants/breakpoints";
 import type { DeviceType } from "@/shared/types";
 import { useToast } from "@/editor/chrome-ui";
 import { getElementId } from "@/shared/utils/dragDrop";
@@ -308,29 +307,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     // Live global custom CSS (Settings → Advanced) injected into the canvas.
     const globalCustomCss = useGlobalCustomCss(composer);
 
-    // Zoom to fit: scale so the whole page fits the canvas viewport. The zoom
-    // transform sits on the canvas content's parent, so canvasRef.offsetWidth is
-    // the unscaled device width — measure against the wrapper's client box.
-    const handleFitToScreen = React.useCallback(() => {
-      const content = canvasRef.current;
-      const viewport = scrollRef.current;
-      if (!content || !viewport || !composer) return;
-      const cw = content.offsetWidth;
-      const ch = content.offsetHeight;
-      if (!cw || !ch) return;
-      const vw = viewport.clientWidth - 64; // breathing room
-      const vh = viewport.clientHeight - 64;
-      if (vw <= 0 || vh <= 0) return;
-      const scale = Math.min(vw / cw, vh / ch);
-      const clamped = Math.max(0.1, Math.min(5, scale));
-      /* PERCENT, not a fraction. `setZoom` clamps to THRESHOLDS.ZOOM_MIN/MAX,
-         which are 10 and 500, and every readout renders `{Math.round(zoom)}%`.
-         This sent `clamped * 100 / 100` — 0.85 for an 85% fit — which clamped
-         straight to 10, so Fit to screen snapped the canvas to 10% instead of
-         fitting it. */
-      composer.setZoom(Math.round(clamped * 100));
-    }, [composer]);
-
     /* Board 817:4723's second flyout row. Fit answers "show me the page";
        this answers "show me the thing I am working on", which on a long page
        is the question people actually have. Measured off the selected
@@ -391,15 +367,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       if (cw * current <= room) return;
       composer.setZoom(Math.floor((room / cw) * 100));
     }, [composer]);
-
-    React.useEffect(() => {
-      if (!composer) return;
-      const handler = (data?: { widthOnly?: boolean }) => (data?.widthOnly ? handleFitWidth() : handleFitToScreen());
-      composer.on(EVENTS.ZOOM_FIT, handler);
-      return () => {
-        composer.off(EVENTS.ZOOM_FIT, handler);
-      };
-    }, [composer, handleFitToScreen, handleFitWidth]);
 
     React.useEffect(() => {
       if (!composer) return;
@@ -568,40 +535,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       return !!rootEl && rootEl.getChildren().length === 0;
     }, [composer, content]);
     const isCanvasEmpty = pageIsEmpty && !projectLoading && !projectUnavailable;
-    /* Boards 5936:44788 / 4428:44164 draw the page as a card inside the
-       canvas — the 1024 desktop frame scaled to leave grey around it — not
-       edge to edge under the drawer and inspector. Once the project has
-       loaded, if the desktop frame is wider than its viewport, zoom to fit
-       its WIDTH with a 60 px gutter each side. Only on load: after that the
-       zoom is the user's. */
-    const didInitialFitRef = React.useRef(false);
-    React.useEffect(() => {
-      if (didInitialFitRef.current || projectLoading || !composer || device !== "desktop") return;
-      const frame = frameRef.current;
-      const viewport = scrollRef.current;
-      if (!frame || !viewport) return;
-      didInitialFitRef.current = true;
-      const fw = frame.offsetWidth;
-      const vw = viewport.clientWidth;
-      if (!fw || fw <= vw) return;
-      composer.setZoom(Math.max(10, Math.floor(((vw - FIT_GUTTER * 2) / fw) * 100)));
-    }, [projectLoading, composer, device]);
-    /* Boards 4418:126653 / 4428:140088 draw Tablet and Mobile at their real
-       width — 768 / 375 at 100% — not at the desktop fit (61%), where the
-       mobile page shrank to 229px. Switching breakpoint re-fits: 100% when
-       the frame fits, else its width with the gutter. */
-    const lastDeviceRef = React.useRef(device);
-    React.useEffect(() => {
-      if (lastDeviceRef.current === device || !composer) return;
-      lastDeviceRef.current = device;
-      const frame = frameRef.current;
-      const viewport = scrollRef.current;
-      const fw = frame?.offsetWidth;
-      const vw = viewport?.clientWidth;
-      if (!fw || !vw) return;
-      composer.setZoom(Math.max(10, Math.min(100, Math.floor(((vw - FIT_GUTTER * 2) / fw) * 100))));
-    }, [composer, device]);
-
     const showLoadingCanvas = pageIsEmpty && projectLoading;
 
     // Toolbar action callbacks (delegated to useCanvasToolbarActions)
@@ -723,6 +656,28 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       ro.observe(el);
       return () => ro.disconnect();
     }, [device, activeCustomWidth, deviceFrameActive]);
+
+    /* L1-012: boards 5936:44788 / 4428:44164 draw the page as a card inside
+       the canvas. Fit (the frame's width into the column, never above 100%)
+       unless the user picked a percent; the choice is remembered per site. */
+    const siteId = React.useMemo(() => getSiteIdFromUrl(), []);
+    const setCanvasZoom = React.useCallback((z: number) => (onZoomChange ? onZoomChange(z) : composer?.setZoom(z)), [onZoomChange, composer]);
+    const handleFitToScreen = useCanvasZoomFit({
+      setZoom: setCanvasZoom,
+      zoom,
+      frameWidth: activeCustomWidth ?? DEVICE_PREVIEW_SIZES[device].width,
+      scrollRef,
+      ready: !projectLoading,
+      siteId,
+    });
+    React.useEffect(() => {
+      if (!composer) return;
+      const handler = (data?: { widthOnly?: boolean }) => (data?.widthOnly ? handleFitWidth() : handleFitToScreen());
+      composer.on(EVENTS.ZOOM_FIT, handler);
+      return () => {
+        composer.off(EVENTS.ZOOM_FIT, handler);
+      };
+    }, [composer, handleFitToScreen, handleFitWidth]);
     const emptyCtaSpan = useVisibleFrameSpan(scrollRef, frameRef, isCanvasEmpty && !readOnly && !startedBlank);
 
     /* readOnly withholds every handler that can change the document — inline

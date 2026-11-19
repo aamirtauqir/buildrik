@@ -19,14 +19,14 @@ import { useToast } from "@/components/dashboard/toast-provider";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Plus, Search, CheckSquare, Folder } from "lucide-react";
-import { getEditorHref, useUnifiedEditorFlag } from "@/components/editor-route/unified-flag";
+import { useOpenEditor } from "@/components/editor-route/unified-flag";
 import { useDebouncedValue } from "@lib/hooks/use-debounced-value";
 import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 
 export default function ProjectsPage() {
   const { addToast } = useToast();
   const router = useRouter();
-  const unified = useUnifiedEditorFlag();
+  const openEditor = useOpenEditor();
   // sites.transfer accepts only a site-role OWNER who created the site, so
   // Transfer is offered on exactly those rows (gap walk 93 #9).
   const { data: session } = useSession();
@@ -179,9 +179,7 @@ export default function ProjectsPage() {
     onSuccess: (site) => {
       setCreateOpen(false);
       addToast("success", "Site created");
-      const href = getEditorHref(site.id, unified);
-      if (unified) router.push(href);
-      else window.location.href = href;
+      openEditor(site.id);
     },
     onError: (err) => addToast("error", "Failed to create site", err.message),
   });
@@ -353,12 +351,9 @@ export default function ProjectsPage() {
     (action: string, siteId: string) => {
       const site = sitesQuery.data?.data.find((s) => s.id === siteId);
       switch (action) {
-        case "edit": {
-          const href = getEditorHref(siteId, unified);
-          if (unified) router.push(href);
-          else window.location.href = href;
+        case "edit":
+          openEditor(siteId);
           break;
-        }
         case "manage":
           router.push(`/dashboard/sites/${siteId}`);
           break;
@@ -400,7 +395,7 @@ export default function ProjectsPage() {
           break;
       }
     },
-    [sitesQuery.data, duplicateMutation, archiveMutation, unarchiveMutation, addToast, unified, router]
+    [sitesQuery.data, duplicateMutation, archiveMutation, unarchiveMutation, addToast, openEditor, router]
   );
 
   // Bulk action handler

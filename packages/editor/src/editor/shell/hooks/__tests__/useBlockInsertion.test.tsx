@@ -1,6 +1,6 @@
 /**
  * useBlockInsertion — sidebar block insertion: spam guard, smart-parent
- * walk-up resolution, nesting-error toast, needs-asset two-step emit.
+ * walk-up resolution, nesting-error toast; a media insert stays in Add.
  *
  * blockRegistry / nesting / toast / drop-animation boundaries are mocked so
  * the placement decision logic is isolated.
@@ -89,6 +89,8 @@ describe("useBlockInsertion", () => {
     beginTransaction: ReturnType<typeof vi.fn>;
     endTransaction: ReturnType<typeof vi.fn>;
     emit: ReturnType<typeof vi.fn>;
+    on: ReturnType<typeof vi.fn>;
+    off: ReturnType<typeof vi.fn>;
     elements: {
       getActivePage: ReturnType<typeof vi.fn>;
       getElement: ReturnType<typeof vi.fn>;
@@ -98,8 +100,11 @@ describe("useBlockInsertion", () => {
     history: { captureUndo: ReturnType<typeof vi.fn> };
   };
 
+  const listeners = new Map<string, (p: unknown) => void>();
+
   beforeEach(() => {
     vi.useFakeTimers();
+    listeners.clear();
     elements = new Map();
     elements.set("root-1", makeElement("root-1", "root", { getChildCount: () => 3 }));
     selectedIds = [];
@@ -109,6 +114,10 @@ describe("useBlockInsertion", () => {
       history: { captureUndo: vi.fn(() => vi.fn()) },
       endTransaction: vi.fn(),
       emit: vi.fn(),
+      on: vi.fn((event: string, fn: (p: unknown) => void) => {
+        listeners.set(event, fn);
+      }),
+      off: vi.fn(),
       elements: {
         getActivePage: vi.fn(() => ({ name: "Home", root: { id: "root-1" } })),
         getElement: vi.fn((id: string) => elements.get(id) ?? null),
@@ -142,6 +151,14 @@ describe("useBlockInsertion", () => {
       useBlockInsertion(withComposer ? (composer as unknown as Composer) : null)
     );
   }
+
+  /* L1-033: ⌘K's catalog rows insert through this same path. */
+  it("inserts a block asked for on UI_INSERT_BLOCK, exactly as a click would", () => {
+    mountHook();
+    act(() => listeners.get("ui:insert-block")?.({ block: heroBlock }));
+    expect(mocks.insertBlock).toHaveBeenCalledWith(composer, expect.objectContaining({ id: "hero" }), "root-1", 3);
+    expect(composer.beginTransaction).toHaveBeenCalledWith("Added Hero");
+  });
 
   it("warns and bails when the composer is not ready", () => {
     const { result } = mountHook(false);
@@ -362,34 +379,12 @@ describe("useBlockInsertion", () => {
     expect(msg).not.toContain("grid");
   });
 
-  it("emits the two-step needs-asset flow for media blocks without a src", () => {
-    elements.set("new-img", makeElement("new-img", "image", { getAttribute: () => null }));
-    mocks.insertBlock.mockReturnValue("new-img");
-
-    const { result } = mountHook();
-    act(() =>
-      result.current.handleBlockClick({ id: "image", label: "Image" } as unknown as BlockData)
-    );
-
-    // Step 1 — synchronous tab switch so the Media tab mounts its listener
-    expect(composer.emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "assets" });
-    expect(composer.emit).not.toHaveBeenCalledWith("element:needs-asset", expect.anything());
-
-    // Step 2 — needs-asset fires after the 100ms mount grace period
-    act(() => {
-      vi.advanceTimersByTime(100);
-    });
-    expect(composer.emit).toHaveBeenCalledWith("element:needs-asset", {
-      elementId: "new-img",
-      type: "image",
-    });
-  });
-
-  it("does NOT emit needs-asset for media blocks that already carry a src", () => {
-    elements.set(
-      "new-img",
-      makeElement("new-img", "image", { getAttribute: () => "https://x/img.png" })
-    );
+  /* L1-017 (owner 2026-10-10): inserting an Image stays in Add and selects
+     it; the Inspector's "Choose image" is where the asset is picked. The
+     panel used to jump to Assets ("No images or files yet") on every insert. */
+  it("an empty Image stays in Add: selected, no tab switch, no pick request", () => {
+    const img = makeElement("new-img", "image", { getAttribute: () => null });
+    elements.set("new-img", img);
     mocks.insertBlock.mockReturnValue("new-img");
 
     const { result } = mountHook();
@@ -397,8 +392,11 @@ describe("useBlockInsertion", () => {
       result.current.handleBlockClick({ id: "image", label: "Image" } as unknown as BlockData)
     );
     act(() => {
-      vi.advanceTimersByTime(200);
+      vi.advanceTimersByTime(500);
     });
+
+    expect(composer.selection.select).toHaveBeenCalledWith(img);
+    expect(composer.emit).not.toHaveBeenCalledWith("ui:switch-tab", expect.anything());
     expect(composer.emit).not.toHaveBeenCalledWith("element:needs-asset", expect.anything());
   });
 

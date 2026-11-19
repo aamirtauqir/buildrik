@@ -5,9 +5,9 @@ import Link from "next/link";
 import { Pencil, ExternalLink, Send, Share2, MoreHorizontal, LayoutTemplate } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { siteAddress } from "@lib/utils";
-import { EditorLink } from "@/components/editor-route/EditorLink";
+import { getEditorHref, useUnifiedEditorFlag } from "@/components/editor-route/unified-flag";
 import { siteStatusTone } from "@/components/sites/site-status";
-import { Button, Pill, MetricValue, Modal } from "@/components/dashboard/primitives";
+import { Button, ButtonLink, Pill, MetricValue, Modal } from "@/components/dashboard/primitives";
 import { SendReviewModal } from "@/components/reviews/send-review-modal";
 import { ShareDraftModal } from "@/components/site-detail/share-draft-modal";
 import { UseTemplateModal } from "@/components/templates/use-template-modal";
@@ -61,6 +61,7 @@ export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
   }, []);
 
   const address = siteAddress(site);
+  const unified = useUnifiedEditorFlag();
 
   return (
     <div>
@@ -131,11 +132,17 @@ export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
             </Button>
           )}
           {site.status === "DRAFT" && onPublish && (
-            <Button onClick={onPublish}>Publish</Button>
+            <Button variant="ghost" onClick={onPublish}>Publish</Button>
           )}
           {site.status === "PUBLISHED" && onUnpublish && (
             <Button variant="ghost" onClick={() => setConfirmUnpublish(true)}>Unpublish</Button>
           )}
+          {/* L1-025 (owner 2026-10-10): editing is what a site page is for, so
+              it is the header's one primary action. It was only reachable as
+              More → "Edit in Editor"; Publish steps down to secondary. */}
+          <ButtonLink href={getEditorHref(site.id, unified)}>
+            <Pencil className="h-4 w-4" />Edit site
+          </ButtonLink>
           <div ref={menuRef} className="relative">
             <button
               onClick={() => setMenuOpen((o) => !o)}
@@ -148,16 +155,6 @@ export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
             </button>
             {menuOpen && (
               <div role="menu" className="absolute right-0 top-full z-20 mt-1 w-52 rounded-lg border bg-white py-1 shadow-lg" style={{ borderColor: "var(--color-border-default)" }}>
-                <EditorLink
-                  siteId={site.id}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => setMenuOpen(false)}
-                  className="flex w-full items-center gap-2.5 px-3 py-2 text-body transition-colors hover:bg-[var(--color-bg-subtle)]"
-                  style={{ color: "var(--color-text-primary)" }}
-                >
-                  <Pencil className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} />Edit in Editor
-                </EditorLink>
                 <button
                   onClick={() => { setShareOpen(true); setMenuOpen(false); }}
                   className="flex w-full items-center gap-2.5 px-3 py-2 text-body transition-colors hover:bg-[var(--color-bg-subtle)]"

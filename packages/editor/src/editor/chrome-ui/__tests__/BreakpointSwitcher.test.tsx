@@ -15,7 +15,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, within, fireEvent } from "@testing-library/react";
 import { BreakpointSwitcher } from "../BreakpointSwitcher";
-import { BREAKPOINTS, DEVICE_PREVIEW_SIZES } from "@/shared/constants/breakpoints";
+import { DEVICE_PREVIEW_SIZES } from "@/shared/constants/breakpoints";
 
 describe("BreakpointSwitcher", () => {
   it("is a labelled group of three type=button cells, four with includeWide", () => {
@@ -89,8 +89,8 @@ describe("BreakpointSwitcher (unlabelled)", () => {
     ["Tablet", `Tablet \u00b7 ${DEVICE_PREVIEW_SIZES.tablet.width}px`],
     ["Mobile", `Mobile \u00b7 ${DEVICE_PREVIEW_SIZES.mobile.width}px`],
     ["Wide", `Wide \u00b7 ${DEVICE_PREVIEW_SIZES.wide.width}px`],
-    /* Desktop fills the canvas column, floored at the desktop breakpoint. */
-    ["Desktop", `Desktop \u00b7 \u2265${BREAKPOINTS.desktop.minWidth}px`],
+    /* Desktop is one fixed preset (L1-013). */
+    ["Desktop", `Desktop \u00b7 ${DEVICE_PREVIEW_SIZES.desktop.width}px`],
   ])("tooltip on %s reads its width from the breakpoint config", (name, text) => {
     render(<BreakpointSwitcher value="desktop" onChange={() => {}} includeWide />);
     const btn = screen.getByRole("button", { name });

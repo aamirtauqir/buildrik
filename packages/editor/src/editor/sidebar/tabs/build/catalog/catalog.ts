@@ -1,11 +1,17 @@
 /**
  * Build Tab — element catalog, spec-aligned to §10.1
+ *
+ * ELEMENTS are primitives (L1-022, owner 2026-10-10). Navbar, Footer, CTA,
+ * Testimonials and Pricing are sections — they are BLOCKS (catalog/groups.ts)
+ * and appear only there, under one name each.
  * Every entry has a blockId that exists in blockRegistry.
  * No disabled entries in production.
  * @license BSD-3-Clause
  */
 
 import type { CatEntry, FlatElEntry } from "./types";
+import { isThemeToggleOffered, themeToggleBlockConfig } from "@/blocks/Basic/ThemeToggle";
+import type { DarkMode } from "@buildrik/shared/schemas/design-tokens";
 
 export const CATALOG: CatEntry[] = [
   {
@@ -300,31 +306,6 @@ export const CATALOG: CatEntry[] = [
     ],
   },
   {
-    id: "navigation",
-    name: "Navigation",
-    sub: "Navbar, Footer, CTA",
-    elements: [
-      {
-        name: "Navbar",
-        blockId: "navbar",
-        description: "Top navigation bar with logo and links",
-        tags: ["navigation", "menu", "header", "nav", "top bar"],
-      },
-      {
-        name: "Footer",
-        blockId: "footer",
-        description: "Site footer with links and copyright",
-        tags: ["bottom", "site footer", "copyright", "contact links"],
-      },
-      {
-        name: "CTA",
-        blockId: "cta",
-        description: "Call-to-action banner with headline and button",
-        tags: ["call to action", "banner", "signup", "convert", "get started"],
-      },
-    ],
-  },
-  {
     id: "interactive",
     name: "Interactive",
     sub: "Accordion, Tabs, Modal, Carousel",
@@ -355,18 +336,6 @@ export const CATALOG: CatEntry[] = [
         tags: ["dialog", "popup", "overlay", "lightbox"],
       },
       {
-        name: "Testimonials",
-        blockId: "testimonials",
-        description: "Customer testimonial cards or quote display",
-        tags: ["testimonial", "review", "quote", "social proof", "customer"],
-      },
-      {
-        name: "Pricing",
-        blockId: "pricing",
-        description: "Pricing plans comparison table",
-        tags: ["pricing", "plans", "tiers", "cost", "comparison"],
-      },
-      {
         name: "Social Icons",
         blockId: "social-icons",
         description: "Row of social media platform icons",
@@ -386,6 +355,12 @@ export const CATALOG: CatEntry[] = [
 export const flatCatalog: FlatElEntry[] = CATALOG.flatMap((cat) =>
   cat.elements.map((el) => ({ ...el, catId: cat.id, catName: cat.name }))
 );
+
+/** The rows this site offers: the theme toggle only while Dark mode is Auto
+ *  (BRP1-M12). Add and the ⌘K palette's Add rows both read it. */
+export function offeredCatalog(darkMode: DarkMode): FlatElEntry[] {
+  return isThemeToggleOffered(darkMode) ? flatCatalog : flatCatalog.filter((el) => el.blockId !== themeToggleBlockConfig.id);
+}
 
 /**
  * Pre-grouped catalog by category id — module-level so CatAccordion can read

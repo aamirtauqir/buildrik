@@ -330,12 +330,15 @@ describe("CommandPalette — search", () => {
     renderPalette(makeComposer({ registry: BOARD_REGISTRY, selected: ["a"], type: "heading" }));
     type("group");
     expect(screen.getByTestId("cmdk-row-cmd-group")).toHaveAttribute("aria-disabled", "true");
+    /* Word-start matching (L1-033): "group" no longer answers "Ungroup". */
+    type("ungroup");
     expect(screen.getByTestId("cmdk-label-cmd-ungroup")).toHaveTextContent("Select a group");
   });
 
-  /* L1-033: ⌘0 worked and the palette's Reset zoom printed no chord. One row,
-     not the registry's chordless copy beside it. */
-  it("Reset zoom prints ⇧0 (SC-12 / BD-39) and appears once", () => {
+  /* L1-033: ⇧0 worked and the palette's Reset zoom printed no chord. One row,
+     not the registry's chordless copy beside it — named "Zoom to 100%" like
+     the keyboard sheet, still found by "reset". */
+  it("Zoom to 100% prints ⇧0 (SC-12 / BD-39) and appears once", () => {
     const { composer } = renderPalette(
       makeComposer({ registry: [...BOARD_REGISTRY, { id: "zoom-reset", label: "Reset zoom" }] }),
     );

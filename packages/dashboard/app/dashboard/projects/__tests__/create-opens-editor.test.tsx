@@ -37,16 +37,17 @@ vi.mock("@lib/trpc/client", async () => {
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push, replace: vi.fn() }), useSearchParams: () => new URLSearchParams() }));
 vi.mock("next-auth/react", () => ({ useSession: () => ({ data: null, status: "unauthenticated" }) }));
 vi.mock("@/components/dashboard/toast-provider", () => ({ useToast: () => ({ addToast: vi.fn() }) }));
-vi.mock("@/components/editor-route/unified-flag", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@/components/editor-route/unified-flag")>()),
-  useUnifiedEditorFlag: () => true,
-}));
 
 import ProjectsPage from "../page";
+import { UnifiedEditorFlagContext } from "@/components/editor-route/unified-flag";
 
 describe("Projects — Start from Scratch", () => {
   it("opens the editor on the new site", () => {
-    render(<ProjectsPage />);
+    render(
+      <UnifiedEditorFlagContext.Provider value={true}>
+        <ProjectsPage />
+      </UnifiedEditorFlagContext.Provider>,
+    );
     expect(created.opts).toBeDefined();
     act(() => created.opts?.onSuccess({ id: "site-1" }));
     expect(push).toHaveBeenCalledWith("/edit/site-1");

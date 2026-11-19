@@ -40,24 +40,29 @@ vi.mock("@lib/trpc/client", async () => {
   };
 });
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push }) }));
-vi.mock("@/components/editor-route/unified-flag", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@/components/editor-route/unified-flag")>()),
-  useUnifiedEditorFlag: () => true,
-}));
 vi.mock("@/components/dashboard/toast-provider", () => ({ useToast: () => ({ addToast: vi.fn() }) }));
 
 import { QuickActions } from "../quick-actions";
+import { UnifiedEditorFlagContext } from "@/components/editor-route/unified-flag";
 
 describe("QuickActions — Invite teammate is admin-only", () => {
   it.each(["OWNER", "ADMIN"])("links %s to the team page", (r) => {
     role.current = r;
-    render(<QuickActions />);
+    render(
+      <UnifiedEditorFlagContext.Provider value={true}>
+        <QuickActions />
+      </UnifiedEditorFlagContext.Provider>,
+    );
     expect(screen.getByRole("link", { name: /Invite teammate/ })).toHaveAttribute("href", "/dashboard/settings/team");
   });
 
   it.each(["EDITOR", "DESIGNER", "VIEWER"])("withholds it from %s with the reason", (r) => {
     role.current = r;
-    render(<QuickActions />);
+    render(
+      <UnifiedEditorFlagContext.Provider value={true}>
+        <QuickActions />
+      </UnifiedEditorFlagContext.Provider>,
+    );
     expect(screen.queryByRole("link", { name: /Invite teammate/ })).toBeNull();
     const button = screen.getByRole("button", { name: /Invite teammate/ });
     expect(button).toBeDisabled();
@@ -71,7 +76,11 @@ describe("QuickActions — Invite teammate is admin-only", () => {
 describe("QuickActions — an unknown role keeps the door", () => {
   it("links Invite teammate while the role is still loading", () => {
     role.current = undefined;
-    render(<QuickActions />);
+    render(
+      <UnifiedEditorFlagContext.Provider value={true}>
+        <QuickActions />
+      </UnifiedEditorFlagContext.Provider>,
+    );
     expect(screen.getByRole("link", { name: /Invite teammate/ })).toHaveAttribute("href", "/dashboard/settings/team");
   });
 });
@@ -81,7 +90,11 @@ describe("QuickActions — an unknown role keeps the door", () => {
 describe("QuickActions — Create a site opens the editor", () => {
   it("routes a blank create to /edit/:id", () => {
     role.current = "OWNER";
-    render(<QuickActions />);
+    render(
+      <UnifiedEditorFlagContext.Provider value={true}>
+        <QuickActions />
+      </UnifiedEditorFlagContext.Provider>,
+    );
     act(() => created.opts?.onSuccess({ id: "site-9" }));
     expect(push).toHaveBeenCalledWith("/edit/site-9");
   });

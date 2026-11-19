@@ -28,8 +28,6 @@ interface GroupSectionProps {
   onToggle: () => void;
   elements?: FlatElEntry[];
   blocks?: BlockDefinition[];
-  /** COMPONENTS (board 1069:4790): the registry's component blocks as rows. */
-  components?: BlockDefinition[];
   /** MINE (board 1069:4970): the user's own components as plain rows. */
   mine?: ComponentDefinition[];
   /** FROM LIBRARY (board 4418:99857): the workspace's shared masters, listed
@@ -431,7 +429,7 @@ const BlockGrid: React.FC<{
 };
 
 export const GroupSection: React.FC<GroupSectionProps> = ({
-  group, isOpen, onToggle, elements, blocks, components, mine, library, onLibraryInsert, onDragStart, onBlockDragStart, onElClick, onBlockInsert, onMineInsert, onManageComponents, favs, onToggleFav, insertPath,
+  group, isOpen, onToggle, elements, blocks, mine, library, onLibraryInsert, onDragStart, onBlockDragStart, onElClick, onBlockInsert, onMineInsert, onManageComponents, favs, onToggleFav, insertPath,
 }) => (
   <div data-testid={`insert-section-${group.id}`}>
     <HeaderRow group={group} isOpen={isOpen} onToggle={onToggle} />
@@ -455,17 +453,6 @@ export const GroupSection: React.FC<GroupSectionProps> = ({
         EXACTLY". That arithmetic is right about the PANEL and wrong about its
         content box, and being one pixel out cost the grid entirely — see the
         note on the grid container below. */}
-    {/* Board 1069:4790 (components-expanded): registry component blocks as
-        plain rows — same Row treatment, same onBlockClick insert path
-        (BlockDefinition extends BlockData). */}
-    {isOpen && group.id === "components" && components?.map((c) => (
-      <Row
-        key={c.id}
-        label={c.label}
-        testId={`insert-component-${c.id}`}
-        onClick={() => onBlockInsert?.(c)}
-      />
-    ))}
     {isOpen && group.id === "mine" && mine && (
       <>
         {/* Board 4418:99857: dense rows with a ⠿ grip; each drags onto the

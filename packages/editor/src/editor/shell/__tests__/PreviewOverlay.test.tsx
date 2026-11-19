@@ -99,7 +99,7 @@ describe("PreviewOverlay", () => {
     expect(screen.queryByRole("button", { name: "Done" })).toBeNull();
     expect(screen.getByTestId("preview-title")).toHaveTextContent("Home · Draft preview");
     expect(screen.getByTestId("preview-fidelity")).toHaveTextContent("Fonts and colors may differ slightly until published");
-    expect(screen.getByTestId("bp-cell-desktop")).toHaveTextContent("Desktop1320px");
+    expect(screen.getByTestId("bp-cell-desktop")).toHaveTextContent("Desktop1280px");
     expect(screen.getByTestId("bp-cell-tablet")).toHaveTextContent("Tablet768px");
     expect(screen.getByTestId("bp-cell-mobile")).toHaveTextContent("Mobile375px");
     fireEvent.click(screen.getByRole("button", { name: "Back to editor" }));

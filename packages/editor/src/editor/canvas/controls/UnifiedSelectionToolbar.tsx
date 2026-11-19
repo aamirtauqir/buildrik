@@ -51,13 +51,14 @@ const INSIDE_MIN_H = 2 * PILL_H + 2 * INSET;
 const INSIDE_MIN_W = 2 * 88;
 
 const PILL = "tw:relative tw:flex tw:items-center tw:gap-1 tw:p-1 tw:rounded-lg tw:bg-[var(--bk-ink)]";
-/* Board 5940:148012: 11/16 medium gray-500, 4px under the pill. The board
-   runs it rightward from the pill's left edge, past the element; here the
-   page frame clips anything past its edge, so it ends at the pill's right
-   edge instead and runs leftward over the element. */
-const CAPTION =
-  "tw:absolute tw:right-0 tw:top-9 tw:m-0 tw:whitespace-pre tw:text-[11px] tw:leading-4 tw:font-medium " +
-  "tw:text-[var(--bk-gray-500)] tw:[font-family:var(--bk-font-ui)] tw:pointer-events-none";
+/* L2-035 (owner 2026-10-10): board 5940:148012's caption row (11/16 medium,
+   4px under the pill) was always on and lay over the next element's text.
+   The hint now names the hovered or focused button only, INSIDE the pill —
+   the pill grows toward its left edge and no second layer sits on the page. */
+const HINT =
+  "tw:pl-1.5 tw:pr-0.5 tw:whitespace-nowrap tw:text-[11px] tw:leading-4 tw:font-medium tw:text-white " +
+  "tw:[font-family:var(--bk-font-ui)] tw:pointer-events-none";
+const HINTS = { duplicate: "Duplicate ⌘D", delete: "Delete ⌫", more: "More actions" } as const;
 /* On-ink IconButton: white glyph, a white-10% hover instead of the light
    chrome's grey. */
 const ON_INK = "tw:text-white tw:hover:bg-white/10 tw:hover:text-white";
@@ -78,6 +79,22 @@ export const UnifiedSelectionToolbar: React.FC<UnifiedSelectionToolbarProps> = (
      re-derived from THIS anchor, never carried over from the last one. */
   const [shiftX, setShiftX] = React.useState(0);
   const moreRef = React.useRef<HTMLButtonElement>(null);
+  const [hint, setHint] = React.useState<keyof typeof HINTS | null>(null);
+  /* Hover, or KEYBOARD focus: a mouse click also focuses the button, and a
+     hint that stayed up after every click would be the old caption again. */
+  const hintProps = (key: keyof typeof HINTS) => ({
+    onMouseEnter: () => setHint(key),
+    onMouseLeave: () => setHint(null),
+    onFocus: (e: React.FocusEvent<HTMLButtonElement>) => {
+      if (e.currentTarget.matches(":focus-visible")) setHint(key);
+    },
+    /* A key pressed while the button already holds focus (it was focused by
+       a click or by script) turns its focus keyboard focus. */
+    onKeyUp: (e: React.KeyboardEvent<HTMLButtonElement>) => {
+      if (e.currentTarget.matches(":focus-visible")) setHint(key);
+    },
+    onBlur: () => setHint(null),
+  });
   const toolbarRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
@@ -179,10 +196,15 @@ export const UnifiedSelectionToolbar: React.FC<UnifiedSelectionToolbarProps> = (
         pointerEvents: "auto",
       }}
     >
-      <IconButton size="sm" className={ON_INK} label="Duplicate (⌘D)" data-testid="selection-toolbar-duplicate" onClick={onDuplicate}>
+      {hint ? (
+        <span aria-hidden="true" data-testid="selection-toolbar-hint" className={HINT}>
+          {HINTS[hint]}
+        </span>
+      ) : null}
+      <IconButton size="sm" className={ON_INK} label="Duplicate (⌘D)" data-testid="selection-toolbar-duplicate" onClick={onDuplicate} {...hintProps("duplicate")}>
         <Copy size={14} aria-hidden="true" />
       </IconButton>
-      <IconButton size="sm" className={ON_INK} label="Delete (⌫)" data-testid="selection-toolbar-delete" onClick={onDelete}>
+      <IconButton size="sm" className={ON_INK} label="Delete (⌫)" data-testid="selection-toolbar-delete" onClick={onDelete} {...hintProps("delete")}>
         <Trash2 size={14} aria-hidden="true" />
       </IconButton>
       <IconButton
@@ -192,6 +214,7 @@ export const UnifiedSelectionToolbar: React.FC<UnifiedSelectionToolbarProps> = (
         label="More"
         aria-haspopup="menu"
         data-testid="selection-toolbar-more"
+        {...hintProps("more")}
         onClick={() => {
           const b = moreRef.current?.getBoundingClientRect();
           onOpenMenu(elementId, b ? { x: b.left, y: b.bottom + 4 } : { x: 0, y: 0 });
@@ -199,15 +222,6 @@ export const UnifiedSelectionToolbar: React.FC<UnifiedSelectionToolbarProps> = (
       >
         <MoreHorizontal size={14} aria-hidden="true" />
       </IconButton>
-      {/* The board's caption under the pill: what each glyph does and its key.
-          Absolute, so the pill (not the caption) sets the anchor. */}
-      {/* Outside a small element the caption would lie over the element's own
-          content, which is exactly what moving the pill out avoids. */}
-      {anchor.outside ? null : (
-        <p aria-hidden="true" data-testid="selection-toolbar-caption" className={CAPTION}>
-          {"⧉ Duplicate ⌘D  ·  🗑 Delete ⌫  ·  ⋯ More"}
-        </p>
-      )}
     </div>
   );
 };

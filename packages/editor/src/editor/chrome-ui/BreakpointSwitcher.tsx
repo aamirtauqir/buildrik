@@ -16,7 +16,7 @@
  */
 import React from "react";
 import { Monitor, Smartphone, Tablet, Tv, type LucideIcon } from "lucide-react";
-import { BREAKPOINTS, DEVICE_PREVIEW_SIZES } from "@/shared/constants/breakpoints";
+import { DEVICE_PREVIEW_SIZES } from "@/shared/constants/breakpoints";
 import { HintTooltip } from "./HintTooltip";
 
 export type Breakpoint = "wide" | "desktop" | "tablet" | "mobile";
@@ -57,12 +57,10 @@ const CORE_BREAKPOINTS: ReadonlyArray<BreakpointEntry> = [
 const WIDE_BREAKPOINT: BreakpointEntry = { id: "wide", Icon: Tv, label: "Wide" };
 
 /* The width each cell previews, from DEVICE_PREVIEW_SIZES — the one table the
-   canvas frame reads, so the tooltip cannot disagree with the frame. Desktop
-   has no fixed width (it fills the column, floored at the desktop
-   breakpoint), so it says exactly that floor. */
+   canvas frame reads, so the tooltip cannot disagree with the frame (Desktop
+   is one fixed 1280 preset since L1-013). */
 function widthHint(id: Breakpoint): string {
-  const { width } = DEVICE_PREVIEW_SIZES[id];
-  return typeof width === "number" ? `${width}px` : `\u2265${BREAKPOINTS.desktop.minWidth}px`;
+  return `${DEVICE_PREVIEW_SIZES[id].width}px`;
 }
 
 /* The well is gray-50, which is the ground board 807:8321 sits its chips on

@@ -10,6 +10,7 @@
 import * as React from "react";
 import { getBlockDefinitions, insertBlock } from "@/blocks/blockRegistry";
 import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants/events";
 import type { BlockData } from "@/shared/types";
 import { useToast } from "@/editor/chrome-ui";
 import { animateDropSuccess } from "@/shared/utils/dragDrop/animations";
@@ -101,31 +102,10 @@ export function useBlockInsertion(composer: Composer | null): UseBlockInsertionR
             if (domEl) void animateDropSuccess(domEl);
           }, 0);
 
-          // Media elements without a src need an asset — open Media tab picker.
-          // Two-step emit because useMediaState (the element:needs-asset
-          // listener) only mounts when the Media tab is visible. If the user
-          // adds Image from the Add tab, the listener doesn't exist yet:
-          //   1. emit ui:switch-tab synchronously — sidebar swaps to Media,
-          //      React commits, MediaTab.tsx mounts, useMediaState's useEffect
-          //      runs and registers element:needs-asset handler
-          //   2. emit element:needs-asset after a paint frame so the handler
-          //      from step 1 is live before the event arrives
-          //
-          // Timing: useEffect fires after React paint (~16ms). 100ms timeout
-          // is conservative — gives a couple frames for slow renders + makes
-          // the order deterministic even if a parent re-render slows mount.
-          // Cleaner long-term fix: move the handler to a shell-level hook
-          // so the listener is always alive regardless of which tab is open.
-          const mediaTypes = new Set(["image", "video", "audio", "icon", "svg", "lottie"]);
-          if (mediaTypes.has(def.elementType) && el && !el.getAttribute("src")) {
-            composer.emit("ui:switch-tab", { tab: "assets" });
-            setTimeout(() => {
-              composer.emit("element:needs-asset", {
-                elementId: insertedId,
-                type: def.elementType,
-              });
-            }, 100);
-          }
+          /* L1-017 (owner 2026-10-10): an Image (or other media) without a
+             src stays put — inserted, selected, Add still open. The
+             Inspector's "Choose image" picks the asset. It used to switch
+             the panel to Assets and open a pick mode on every insert. */
 
           /* A-11 / boards 7:19448, 302:4542, 10:3787: the receipt names where
              the block landed ("Text added to Hero"; the page at its root) and
@@ -173,6 +153,19 @@ export function useBlockInsertion(composer: Composer | null): UseBlockInsertionR
     },
     [composer, addToast, isInsertingBlock]
   );
+
+  /* ⌘K's catalog rows (L1-033) insert through this same path — placement,
+     one undo step, the "added" toast — rather than a second insert. */
+  const handleBlockClickRef = React.useRef(handleBlockClick);
+  handleBlockClickRef.current = handleBlockClick;
+  React.useEffect(() => {
+    if (!composer) return;
+    const onInsert = (event: { block: BlockData }) => handleBlockClickRef.current(event.block);
+    composer.on(EVENTS.UI_INSERT_BLOCK, onInsert);
+    return () => {
+      composer.off(EVENTS.UI_INSERT_BLOCK, onInsert);
+    };
+  }, [composer]);
 
   return { handleBlockClick, isInsertingBlock };
 }

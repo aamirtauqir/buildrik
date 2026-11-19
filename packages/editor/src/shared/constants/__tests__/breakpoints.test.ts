@@ -13,6 +13,7 @@ import {
   BREAKPOINTS,
 } from "../breakpoints";
 import { DEVICE_PRESETS } from "../canvas";
+import { PREVIEW_DEVICES } from "@/shared/types/export";
 
 describe("getBreakpointQuery", () => {
   it("returns null for desktop (base styles) and media queries otherwise", () => {
@@ -52,11 +53,21 @@ describe("DEVICE_PREVIEW_SIZES — the one device table (G2-013)", () => {
   it("holds fixed device dimensions", () => {
     expect(DEVICE_PREVIEW_SIZES.mobile).toMatchObject({ width: 375, height: 812 });
     expect(DEVICE_PREVIEW_SIZES.tablet).toMatchObject({ width: 768, height: 1024 });
-    expect(DEVICE_PREVIEW_SIZES.desktop).toMatchObject({ width: "100%", height: "100%" });
+    /* L1-013 (owner 2026-10-10): one 1280 Desktop preset for canvas, Preview
+       and export. It is a preview width, not a breakpoint — the desktop media
+       query stays at BREAKPOINTS.desktop.minWidth (1024). */
+    expect(DEVICE_PREVIEW_SIZES.desktop).toMatchObject({ width: 1280, height: "100%" });
+    expect(BREAKPOINTS.desktop.minWidth).toBe(1024);
     expect(DEVICE_PREVIEW_SIZES.wide).toMatchObject({ width: 1920 });
   });
 
+  it("the export preview reads the same Desktop width", () => {
+    expect(PREVIEW_DEVICES.desktop).toMatchObject({ width: 1280, label: "Desktop (1280px)" });
+    expect(PREVIEW_DEVICES.tablet.width).toBe(DEVICE_PREVIEW_SIZES.tablet.width);
+    expect(PREVIEW_DEVICES.mobile.width).toBe(DEVICE_PREVIEW_SIZES.mobile.width);
+  });
+
   it("the legacy presets agree with it", () => {
-    expect(DEVICE_PRESETS.map((d) => d.width)).toEqual([BREAKPOINTS.desktop.minWidth, 768, 375]);
+    expect(DEVICE_PRESETS.map((d) => d.width)).toEqual([1280, 768, 375]);
   });
 });
