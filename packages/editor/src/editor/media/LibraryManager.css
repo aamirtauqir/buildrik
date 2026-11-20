@@ -159,50 +159,61 @@
   gap: 6px;
 }
 
-/* 1160:26 / 1160:42 — the rail's groups are separated by a 10-high GAP, not
-   by a rule. Four hairlines in a 240 column read as four sections of equal
-   weight; the board gives the rail three named groups and empty space. */
+/* 199:37199 — the rail's groups are separated by empty space, not by a rule:
+   28 from the smart rows to "My folders" (16 plus the rail's two 6 gaps), a
+   wider 30 before Fonts at the foot. */
 .mgr-tree-gap {
-  height: 10px;
+  height: var(--bk-space-16);
   flex-shrink: 0;
 }
 
-/* 4418:58292 — SMART / FOLDERS: 11/500 caps, 0.88 tracking, gray-500. The
-   rail is white now, where gray-500 reads 4.8:1 (it failed AA on the old
-   bg-subtle rail, which is why this used ink-soft). */
-.mgr-tree-section {
-  margin: 0;
-  font-size: var(--bk-text-11);
-  font-weight: 500;
-  color: var(--bk-gray-500);
-  text-transform: uppercase;
-  letter-spacing: 0.88px;
+.mgr-tree-gap--foot { height: 18px; }
+
+/* 199:37199 — "My folders" 13/600 ink in sentence case over "Only you see
+   these" 12 muted, left-aligned with the rail. */
+.mgr-tree-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bk-space-4);
+}
+
+.mgr-tree-head-title {
+  font: 600 var(--bk-text-13)/20px var(--bk-font-ui);
+  color: var(--bk-ink);
+}
+
+.mgr-tree-head-sub {
+  font: 400 var(--bk-text-12)/16px var(--bk-font-ui);
+  color: var(--bk-ink-muted);
 }
 
 .mgr-node {
+  position: relative;
   display: flex;
   align-items: center;
-  /* 4418:58292 — 12 between glyph and name, every row, every depth. */
   gap: var(--bk-space-12);
   padding: 0 var(--bk-space-12);
-  /* 4418:58292 row/* — a 36 nav row (--bk-size-row-nav), 14 ink, radius 8.
-     The v3 board displaced the Clone's 32/12 density rows (3698:20337);
-     padding alone would leave the row at the text's own height. */
-  min-height: var(--bk-size-row-nav);
+  /* 199:37199 — a 32 row, the label centred, 13 ink, radius 8 (the 36
+     --bk-size-row-nav of 4418:58292 pitched the rows 4 too far apart). */
+  min-height: var(--bk-size-row);
   border-radius: var(--bk-radius-lg);
-  font-size: var(--bk-text-14);
+  font-size: var(--bk-text-13);
   color: var(--bk-ink);
   cursor: pointer;
 }
+
+/* 199:37199 — "+ New folder" is accent text, never a selected scope. */
+.mgr-node.mgr-node--new { color: var(--bk-accent); }
 
 /* Every row in this rail is a TreeNode div now — Clone 3700:20347 made the
    "+ New folder" row one too (it opens a modal). The two-class reset that
    stripped flowbite's Button fill off that row went with the Button. */
 .mgr-node:hover { background: var(--bk-bg-subtle); }
 
+/* 199:37199 — the selected scope is the tint pill with its label in ink. */
 .mgr-node.active {
   background: var(--bk-accent-tint);
-  color: var(--bk-accent-text);
+  color: var(--bk-ink);
   font-weight: 600;
 }
 
@@ -215,27 +226,13 @@
 /* 4418:58292 — a row with nothing to expand has no chevron slot. */
 .mgr-node .mgr-chev.hidden { display: none; }
 
-.mgr-node .mgr-node-ico {
-  width: 14px; height: 14px;
-  flex-shrink: 0;
-}
-
-.mgr-node.active .mgr-node-ico { color: var(--bk-accent); }
-
 .mgr-node .mgr-node-name {
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-align: center;
 }
-
-.mgr-node .mgr-node-count {
-  font-size: var(--bk-text-13);
-  color: var(--bk-gray-500);
-  font-variant-numeric: tabular-nums;
-}
-
-.mgr-node.active .mgr-node-count { color: var(--bk-gray-500); }
 
 /* Board 1205:4849 / 1205:4853 — a nested folder is inset 16, not 20. */
 .mgr-node.depth-1 { padding-left: var(--bk-space-16); }
@@ -378,6 +375,13 @@
 
 .mgr-node:hover .mgr-node-del {
   display: inline-flex;
+}
+
+/* Over the row's right edge, so revealing it never moves the centred label.
+   Two classes deep: the Button's own `tw:relative` ties a single class. */
+.mgr-node .mgr-node-del {
+  position: absolute;
+  right: var(--bk-space-8);
 }
 /* A viewer's trash (audit G3-064) is always on show, muted, so the reason on
    its tooltip is reachable by keyboard without a hover first. */

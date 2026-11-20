@@ -57,7 +57,7 @@ import type {
   MediaSortBy,
   MediaStateResult,
 } from "@/editor/sidebar/tabs/media/data/mediaTypes";
-import type { SmartFolder } from "./FolderTree";
+import { isFontsScope, type SmartFolder } from "./FolderTree";
 import { formatBytes } from "@shared/utils/helpers/number";
 import { MEDIA_ACCEPTED_FORMATS_LABEL, MEDIA_SIZE_LIMITS_LABEL } from "@shared/constants/media";
 import { Button, IconButton, Menu, MenuItem, MenuLabel, MenuSeparator, Popover, Tooltip } from "@/editor/chrome-ui";
@@ -251,16 +251,18 @@ export interface AssetGridProps {
 // ─── Component ────────────────────────────────────────────────────────────
 
 /** The scope the manager is showing — the page title (2L9 B6-A01) and the
- *  count line both name it. Smart scopes use the 2L9 rail's words. */
+ *  count line both name it. Smart scopes and Fonts use the 2L9 rail's words. */
 export function assetScopeLabel(
   smartFolder: SmartFolder,
   currentFolderId: string | null,
   folders: ReadonlyArray<{ id: string; name: string }>,
+  activeTypes: ReadonlySet<MediaBucket>,
 ): string {
   if (smartFolder === "recent") return "Recent";
   if (smartFolder === "in-use") return "Used on this site";
   if (smartFolder === "unused") return "No known placements";
   if (currentFolderId) return folders.find((f) => f.id === currentFolderId)?.name ?? "All assets";
+  if (isFontsScope(smartFolder, currentFolderId, activeTypes)) return "Fonts";
   return "All assets";
 }
 
@@ -330,8 +332,8 @@ export function AssetGrid({
      in <scope>", which said the same count a third time. In a search the line
      reads `1 result for "menu"` (3695:44339). */
   const scopeLabel = React.useMemo(
-    () => assetScopeLabel(smartFolder, state.currentFolderId, state.allFolders),
-    [smartFolder, state.currentFolderId, state.allFolders],
+    () => assetScopeLabel(smartFolder, state.currentFolderId, state.allFolders, state.activeTypes),
+    [smartFolder, state.currentFolderId, state.allFolders, state.activeTypes],
   );
   const searchQuery = state.librarySearch.trim();
   const n = visibleItems.length;
@@ -347,9 +349,14 @@ export function AssetGrid({
   const [filterOpen, setFilterOpen] = React.useState(false);
   const [colsOpen, setColsOpen] = React.useState(false);
   const [tagsOpen, setTagsOpen] = React.useState(false);
+  /* Fonts stays listed while it is the filter (the rail's Fonts row sets
+     it), so the menu can show it selected in a library with no fonts. */
   const formatRows = React.useMemo(
-    () => FORMAT_ROWS.filter((r) => r.id !== "fnt" || state.libraryItems.some((i) => i.type === "fnt")),
-    [state.libraryItems],
+    () =>
+      FORMAT_ROWS.filter(
+        (r) => r.id !== "fnt" || state.activeTypes.has("fnt") || state.libraryItems.some((i) => i.type === "fnt"),
+      ),
+    [state.libraryItems, state.activeTypes],
   );
   const filterLabel = state.fmtFilter
     ? state.fmtFilter.toUpperCase()

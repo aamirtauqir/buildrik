@@ -117,9 +117,8 @@ describe("FolderTree — view only", () => {
       <FolderTree
         folders={[{ id: "f1", name: "Brand", parentId: null } as MediaFolder]}
         currentFolderId={null} setCurrentFolderId={vi.fn()}
-        counts={{ all: 0, img: 0, vid: 0, ico: 0, fnt: 0 }}
-        smartFolder={null} setSmartFolder={vi.fn()} recentCount={0} inUseCount={0} unusedCount={0}
-        folderCounts={new Map()}
+        smartFolder={null} setSmartFolder={vi.fn()}
+        activeTypes={new Set()} setType={vi.fn()}
         onNewFolder={onNewFolder} deleteFolder={deleteFolder}
       />,
     );
