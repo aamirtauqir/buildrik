@@ -210,9 +210,10 @@
    stripped flowbite's Button fill off that row went with the Button. */
 .mgr-node:hover { background: var(--bk-bg-subtle); }
 
+/* 199:37199 — the selected scope is the tint pill with its label in ink. */
 .mgr-node.active {
   background: var(--bk-accent-tint);
-  color: var(--bk-accent-text);
+  color: var(--bk-ink);
   font-weight: 600;
 }
 
